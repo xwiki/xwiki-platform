@@ -50,12 +50,13 @@ public class DocumentUserReferenceTest
             new DocumentUserReference(new DocumentReference("wiki1", "space1", "page1"), false);
         assertEquals(reference1, reference1);
         assertNotEquals(reference2, reference1);
-        assertNotEquals(reference3, reference1);
+        // We consider that the isGlobal flag should not be taken into account for checking equality.
+        assertEquals(reference3, reference1);
         assertNotEquals(reference1, null);
         assertNotEquals(reference1, "whatever");
         assertEquals(reference1.hashCode(), reference1.hashCode());
         assertNotEquals(reference2.hashCode(), reference1.hashCode());
-        assertNotEquals(reference3.hashCode(), reference1.hashCode());
+        assertEquals(reference3.hashCode(), reference1.hashCode());
     }
 
     @Test
@@ -71,7 +72,7 @@ public class DocumentUserReferenceTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         DocumentUserReference userReference = new DocumentUserReference(documentReference, true);
-        assertEquals("reference = [wiki:space.page], isGlobal = [true]", userReference.toString());
+        assertEquals("reference = [wiki:space.page]", userReference.toString());
     }
 
     @Test

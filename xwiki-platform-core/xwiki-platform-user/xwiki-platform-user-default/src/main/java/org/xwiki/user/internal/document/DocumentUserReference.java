@@ -20,7 +20,6 @@
 package org.xwiki.user.internal.document;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.text.XWikiToStringBuilder;
@@ -67,10 +66,7 @@ public class DocumentUserReference implements UserReference
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder()
-            .append(getReference())
-            .append(isGlobal())
-            .hashCode();
+        return getReference().hashCode();
     }
 
     @Override
@@ -88,7 +84,6 @@ public class DocumentUserReference implements UserReference
         DocumentUserReference rhs = (DocumentUserReference) object;
         return new EqualsBuilder()
             .append(getReference(), rhs.getReference())
-            .append(isGlobal(), rhs.isGlobal())
             .isEquals();
     }
 
@@ -96,8 +91,6 @@ public class DocumentUserReference implements UserReference
     public String toString()
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
-        return builder.append("reference", getReference())
-                .append("isGlobal", isGlobal())
-                .toString();
+        return builder.append("reference", getReference()).toString();
     }
 }

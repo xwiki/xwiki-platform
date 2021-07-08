@@ -39,6 +39,7 @@ public interface MergeManager
 {
     /**
      * Perform a 3-way merge between the given strings by first splitting them into lines.
+     * <p>
      * The comparison is performed line by line.
      *
      * @param previousStr the previous string.
@@ -65,6 +66,7 @@ public interface MergeManager
 
     /**
      * Perform a 3-way merge between the given strings by first splitting them into arrays of characters.
+     * <p>
      * The comparison is performed character by character.
      *
      * @param previousStr the previous string.
@@ -78,6 +80,7 @@ public interface MergeManager
 
     /**
      * Perform a 3-way merge between the list of elements.
+     * <p>
      * The current list is modified during the operation.
      *
      * @param commonAncestor the previous list.
@@ -92,8 +95,10 @@ public interface MergeManager
 
     /**
      * Perform a 3-way merge between documents.
-     * Note that if {@link MergeConfiguration#isProvidedVersionsModifiables()} is {@code true} then the current document
-     * is cloned before the merge operation, else the given current document is directly modified for performance.
+     * <p>
+     * Note that if {@link MergeConfiguration#isProvidedVersionsModifiables()} is {@code false} then the current
+     * document is cloned before the merge operation, else the given current document is directly modified for
+     * performance.
      *
      * @param previousDoc the previous document.
      * @param nextDoc the next document.

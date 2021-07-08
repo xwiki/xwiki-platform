@@ -83,7 +83,7 @@
     </div>
 
     <LivedataBottombar>
-      <div v-if="this.entries.length === 0" class="noentries-table">
+      <div v-if="entriesFetched && entries.length === 0" class="noentries-table">
         {{ $t('livedata.bottombar.noEntries') }}
       </div>
     </LivedataBottombar>
@@ -121,12 +121,22 @@ export default {
   },
 
   inject: ["logic"],
+  
+  data: () => ({
+    entriesFetched: false
+  }),
 
   computed: {
     data () { return this.logic.data; },
     entries () { return this.logic.data.data.entries; },
     canAddEntry () { return this.logic.canAddEntry(); },
   },
+  
+  mounted() {
+    this.logic.onEvent('afterEntryFetch', () => {
+      this.entriesFetched = true;
+    });
+  }
 
 };
 </script>

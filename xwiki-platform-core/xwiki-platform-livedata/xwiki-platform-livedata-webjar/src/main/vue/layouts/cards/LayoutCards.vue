@@ -69,7 +69,7 @@
 
     </div>
     <LivedataBottombar>
-      <div v-if="this.entries.length === 0" class="noentries-card">
+      <div v-if="entriesFetched && entries.length === 0" class="noentries-card">
         {{ $t('livedata.bottombar.noEntries') }}
       </div>
     </LivedataBottombar>
@@ -107,6 +107,10 @@ export default {
   },
 
   inject: ["logic"],
+  
+  data: () => ({
+    entriesFetched: false
+  }),
 
   computed: {
     data () { return this.logic.data; },
@@ -114,6 +118,12 @@ export default {
     isSelectionEnabled () { return this.logic.isSelectionEnabled(); },
     canAddEntry () { return this.logic.canAddEntry(); },
   },
+  
+  mounted() {
+    this.logic.onEvent('afterEntryFetch', () => {
+      this.entriesFetched = true;
+    });
+  }
 
 };
 </script>

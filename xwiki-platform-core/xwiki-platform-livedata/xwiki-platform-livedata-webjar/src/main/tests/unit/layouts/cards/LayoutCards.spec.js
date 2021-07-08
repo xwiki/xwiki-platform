@@ -21,6 +21,7 @@ import {shallowMount} from '@vue/test-utils';
 import LayoutCards from '../../../../layouts/cards/LayoutCards';
 import _ from 'lodash';
 import LayoutCardsCard from "../../../../layouts/cards/LayoutCardsCard";
+import Vue from "vue";
 
 /**
  * Vue Component initializer for LayoutCards component. Since this component creates a deep hierarchy of sub-components,
@@ -46,16 +47,23 @@ import LayoutCardsCard from "../../../../layouts/cards/LayoutCardsCard";
  * }
  * ```
  * The default option object is merged with the `option` parameter.
- * 
+ *
  * @param options an optional option object use to customize the initialized component
+ * @param afterEntryFetchWrapper wrapper for the afterEntryFetch event. The callback is stored in the callback field of
+ *   the object passed in parameter
  * @returns {*} a shallow wrapper for the LayoutCards component
  */
-function initWrapper(options) {
+function initWrapper({options, afterEntryFetchWrapper} = {}) {
   return shallowMount(LayoutCards, _.merge({
     provide: {
       logic: {
         canAddEntry: () => false,
         getEntryId: (e) => e.id,
+        onEvent: (eventName, callback) => {
+          if (afterEntryFetchWrapper) {
+            afterEntryFetchWrapper.callback = callback
+          }
+        },
         data: {
           data: {
             entries: []
@@ -70,25 +78,39 @@ function initWrapper(options) {
 }
 
 describe('LayoutCards.vue', () => {
-  it('Renders when no entries', () => {
-    const wrapper = initWrapper();
+  it('Renders when no entries', async () => {
+    const afterEntryFetchWrapper = {};
+    const wrapper = initWrapper({afterEntryFetchWrapper});
+    // Before afterEntryFetch is fired, the message is not displayed, and is only displayed once data are fetched but
+    // the number of entries is still 0.
+    expect(wrapper.findAll('.noentries-card').length).toBe(0)
+    // Manual trigger of the afterEntryFetch event.
+    afterEntryFetchWrapper.callback();
+    await Vue.nextTick();
     expect(wrapper.find('.noentries-card').text()).toBe('livedata.bottombar.noEntries');
   })
 
-  it('Renders with some entries', () => {
+  it('Renders with some entries', async () => {
+    const afterEntryFetchWrapper = {};
     const wrapper = initWrapper({
-      provide: {
-        logic: {
-          data: {
+      options: {
+        provide: {
+          logic: {
             data: {
-              entries: [
-                {id: 1}
-              ]
+              data: {
+                entries: [
+                  {id: 1}
+                ]
+              }
             }
           }
         }
-      }
+      },
+      afterEntryFetchWrapper
     });
+    // Manual trigger of the afterEntryFetch event.
+    afterEntryFetchWrapper.callback();
+    await Vue.nextTick();
     let cards = wrapper.findAllComponents(LayoutCardsCard);
     expect(cards.length).toBe(1);
     expect(cards.at(0).props()).toStrictEqual({entry: {id: 1}});

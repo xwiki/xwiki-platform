@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.user.CurrentUserReference;
@@ -52,7 +53,9 @@ public class DocumentDocumentReferenceUserReferenceResolver extends AbstractUser
         } else {
             reference = resolveName(rawReference.getName());
             if (reference == null) {
-                reference = new DocumentUserReference(rawReference, this.entityReferenceProvider);
+                boolean isGlobal = this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)
+                    .equals(rawReference.getWikiReference());
+                reference = new DocumentUserReference(rawReference, isGlobal);
             }
         }
         return reference;

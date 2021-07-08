@@ -113,7 +113,7 @@ public class NormalUserConfigurationSourceAuthorizationTest
 
         // The user for which we're retrieving its configuration.
         this.userDocumentReference = new DocumentReference("wiki", "space", "user");
-        this.userReference = new DocumentUserReference(this.userDocumentReference, this.entityReferenceProvider);
+        this.userReference = new DocumentUserReference(this.userDocumentReference, true);
 
         // Current document and last author.
         this.lastAuthorDocumentReference = new DocumentReference("wiki", "space", "lastauthor");
@@ -122,7 +122,7 @@ public class NormalUserConfigurationSourceAuthorizationTest
         DocumentReference currentDocumentReference = new DocumentReference("wiki", "space", "currentdoc");
         when(this.currentDocument.getDocumentReference()).thenReturn(currentDocumentReference);
         DocumentUserReference lastAuthorReference =
-            new DocumentUserReference(this.lastAuthorDocumentReference, this.entityReferenceProvider);
+            new DocumentUserReference(this.lastAuthorDocumentReference, true);
         when(this.documentResolver.resolve(this.lastAuthorDocumentReference)).thenReturn(lastAuthorReference);
         when(this.bridgeSerializer.serialize(lastAuthorReference)).thenReturn(this.lastAuthorDocumentReference);
 

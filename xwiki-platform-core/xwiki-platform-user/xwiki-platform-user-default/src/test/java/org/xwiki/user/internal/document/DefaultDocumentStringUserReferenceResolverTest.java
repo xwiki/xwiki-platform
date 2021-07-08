@@ -19,11 +19,13 @@
  */
 package org.xwiki.user.internal.document;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -34,6 +36,7 @@ import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,6 +57,15 @@ public class DefaultDocumentStringUserReferenceResolverTest
     @MockComponent
     private DocumentReferenceResolver<String> defaultDocumentReferenceResolver;
 
+    @MockComponent
+    private EntityReferenceProvider entityReferenceProvider;
+
+    @BeforeEach
+    void setup()
+    {
+        when(this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(new WikiReference("wiki"));
+    }
+
     @Test
     void resolveWithoutParameter()
     {
@@ -64,6 +76,7 @@ public class DefaultDocumentStringUserReferenceResolverTest
         assertNotNull(reference);
         assertTrue(reference instanceof DocumentUserReference);
         assertEquals("wiki:XWiki.page", ((DocumentUserReference) reference).getReference().toString());
+        assertTrue(reference.isGlobal());
     }
 
     @Test
@@ -77,6 +90,7 @@ public class DefaultDocumentStringUserReferenceResolverTest
         assertNotNull(reference);
         assertTrue(reference instanceof DocumentUserReference);
         assertEquals("somewiki:XWiki.page", ((DocumentUserReference) reference).getReference().toString());
+        assertFalse(reference.isGlobal());
     }
 
     @Test

@@ -22,14 +22,13 @@ package org.xwiki.cluster.test;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.xwiki.cluster.test.framework.AbstractClusterHttpIT;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.panels.internal.PanelClassDocumentInitializer;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
-import org.xwiki.cluster.test.framework.AbstractClusterHttpIT;
 import org.xwiki.test.ui.AbstractTest;
 
-import static org.junit.Assert.assertEquals;
 import static org.xwiki.test.ui.TestUtils.RestTestUtils.object;
 import static org.xwiki.test.ui.TestUtils.RestTestUtils.property;
 

@@ -75,7 +75,7 @@ public class DocumentUserManagerTest
         when(document.getXObject(new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki",
             EntityType.SPACE)))).thenReturn(mock(BaseObject.class));
 
-        assertTrue(this.userManager.exists(new DocumentUserReference(reference, null)));
+        assertTrue(this.userManager.exists(new DocumentUserReference(reference, true)));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class DocumentUserManagerTest
         when(document.getXObject(new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki",
             EntityType.SPACE)))).thenReturn(null);
 
-        assertFalse(this.userManager.exists(new DocumentUserReference(reference, null)));
+        assertFalse(this.userManager.exists(new DocumentUserReference(reference, true)));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class DocumentUserManagerTest
         when(document.isNew()).thenReturn(true);
         when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
 
-        assertFalse(this.userManager.exists(new DocumentUserReference(reference, null)));
+        assertFalse(this.userManager.exists(new DocumentUserReference(reference, true)));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class DocumentUserManagerTest
         when(this.contextProvider.get()).thenReturn(xcontext);
         when(xwiki.getDocument(reference, xcontext)).thenThrow(new XWikiException(0, 0, "error"));
 
-        assertFalse(this.userManager.exists(new DocumentUserReference(reference, null)));
+        assertFalse(this.userManager.exists(new DocumentUserReference(reference, true)));
 
         assertEquals("Failed to check if document [wiki:space.user] holds an XWiki user or not. Considering it's not "
             + "the case. Root error: [XWikiException: Error number 0 in 0: error]", logCapture.getMessage(0));

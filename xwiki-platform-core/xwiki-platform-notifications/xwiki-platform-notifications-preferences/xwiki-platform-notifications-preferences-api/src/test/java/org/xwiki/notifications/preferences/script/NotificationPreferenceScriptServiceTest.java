@@ -155,7 +155,7 @@ class NotificationPreferenceScriptServiceTest
     {
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(user);
-        DocumentUserReference documentUserReference = new DocumentUserReference(user, null);
+        DocumentUserReference documentUserReference = new DocumentUserReference(user, true);
 
         when(notificationPreferenceManager.getAllPreferences(user)).thenReturn(Collections.emptyList());
         assertFalse(this.scriptService

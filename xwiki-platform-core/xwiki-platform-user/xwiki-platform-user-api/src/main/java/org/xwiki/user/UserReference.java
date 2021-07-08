@@ -19,6 +19,8 @@
  */
 package org.xwiki.user;
 
+import java.io.Serializable;
+
 import org.xwiki.stability.Unstable;
 
 /**
@@ -31,7 +33,7 @@ import org.xwiki.stability.Unstable;
  * @since 12.2
  */
 @Unstable
-public interface UserReference
+public interface UserReference extends Serializable
 {
     /**
      * @return true if this reference points to a global user

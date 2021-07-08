@@ -22,6 +22,7 @@ package org.xwiki.user.internal.document;
 import javax.inject.Inject;
 
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -52,8 +53,10 @@ public abstract class AbstractDocumentStringUserReferenceResolver extends Abstra
             } else {
                 baseEntityReference = USER_SPACE_REFERENCE;
             }
-            reference = new DocumentUserReference(getDocumentReferenceResolver().resolve(userName, baseEntityReference),
-                this.entityReferenceProvider);
+            DocumentReference documentReference = getDocumentReferenceResolver().resolve(userName, baseEntityReference);
+            boolean isGlobal = this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)
+                .equals(documentReference.getWikiReference());
+            reference = new DocumentUserReference(documentReference, isGlobal);
         }
         return reference;
     }

@@ -82,7 +82,7 @@ public class SecureUserDocumentUserPropertiesResolverTest
     void resolveWhenNotAuthorized()
     {
         DocumentReference userDocumentReference = new DocumentReference("wiki", "space", "user");
-        UserReference userReference = new DocumentUserReference(userDocumentReference, this.entityReferenceProvider);
+        UserReference userReference = new DocumentUserReference(userDocumentReference, true);
         when(this.authorization.hasAccess("first_name", userReference, ConfigurationRight.READ)).thenReturn(false);
         when(this.authorization.hasAccess("active", userReference, ConfigurationRight.READ)).thenReturn(false);
 
@@ -96,7 +96,7 @@ public class SecureUserDocumentUserPropertiesResolverTest
     void resolveWhenAuthorized()
     {
         DocumentReference userDocumentReference = new DocumentReference("wiki", "space", "user");
-        UserReference userReference = new DocumentUserReference(userDocumentReference, this.entityReferenceProvider);
+        UserReference userReference = new DocumentUserReference(userDocumentReference, true);
         when(this.authorization.hasAccess("first_name", userReference, ConfigurationRight.READ)).thenReturn(true);
         when(this.configurationSource.getProperty("first_name")).thenReturn("John");
 

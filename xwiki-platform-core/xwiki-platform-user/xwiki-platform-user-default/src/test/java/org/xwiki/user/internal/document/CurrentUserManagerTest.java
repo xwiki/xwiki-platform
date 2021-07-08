@@ -84,7 +84,7 @@ public class CurrentUserManagerTest
         when(xcontext.getUserReference()).thenReturn(documentReference);
         when(this.contextProvider.get()).thenReturn(xcontext);
 
-        DocumentUserReference documentUserReference = new DocumentUserReference(documentReference, null);
+        DocumentUserReference documentUserReference = new DocumentUserReference(documentReference, true);
         when(this.userReferenceResolver.resolve(documentReference)).thenReturn(documentUserReference);
 
         this.manager.exists(CurrentUserReference.INSTANCE);

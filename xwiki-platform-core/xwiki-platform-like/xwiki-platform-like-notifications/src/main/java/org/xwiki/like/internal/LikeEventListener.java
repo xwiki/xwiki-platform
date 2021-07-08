@@ -36,6 +36,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 /**
  * Listener to transform generic {@link LikeEvent} into {@link LikeRecordableEvent} that generate a notification.
@@ -64,6 +65,9 @@ public class LikeEventListener extends AbstractEventListener
     @Inject
     private Logger logger;
 
+    @Inject
+    private RemoteObservationManagerContext remoteObservationManagerContext;
+
     /**
      * Default constructor.
      */
@@ -75,7 +79,7 @@ public class LikeEventListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (data != null) {
+        if (data != null && !this.remoteObservationManagerContext.isRemoteState()) {
             EntityReference likedEntity = (EntityReference) data;
 
             try {

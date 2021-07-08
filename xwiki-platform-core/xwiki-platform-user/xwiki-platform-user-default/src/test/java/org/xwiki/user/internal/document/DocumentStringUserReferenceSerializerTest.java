@@ -59,7 +59,7 @@ public class DocumentStringUserReferenceSerializerTest
     void serialize()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "user");
-        DocumentUserReference documentUserReference = new DocumentUserReference(documentReference, null);
+        DocumentUserReference documentUserReference = new DocumentUserReference(documentReference, true);
 
         this.serializer.serialize(documentUserReference);
 

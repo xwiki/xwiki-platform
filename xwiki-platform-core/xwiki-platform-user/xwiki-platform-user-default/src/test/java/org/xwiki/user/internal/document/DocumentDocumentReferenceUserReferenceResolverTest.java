@@ -19,10 +19,15 @@
  */
 package org.xwiki.user.internal.document;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
@@ -32,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DocumentDocumentReferenceUserReferenceResolver}.
@@ -44,6 +50,15 @@ public class DocumentDocumentReferenceUserReferenceResolverTest
     @InjectMockComponents
     private DocumentDocumentReferenceUserReferenceResolver resolver;
 
+    @MockComponent
+    private EntityReferenceProvider entityReferenceProvider;
+
+    @BeforeEach
+    void setup()
+    {
+        when(this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(new WikiReference("wiki"));
+    }
+
     @Test
     void resolve()
     {
@@ -51,6 +66,7 @@ public class DocumentDocumentReferenceUserReferenceResolverTest
         assertNotNull(reference);
         assertTrue(reference instanceof DocumentUserReference);
         assertEquals("wiki:space.page", ((DocumentUserReference) reference).getReference().toString());
+        assertTrue(reference.isGlobal());
     }
 
     @Test

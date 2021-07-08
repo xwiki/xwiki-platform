@@ -146,7 +146,6 @@ public class NotificationPreferenceScriptServiceTest
     {
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(user);
-
         when(notificationPreferenceManager.getAllPreferences(user)).thenReturn(Collections.emptyList());
         assertFalse(mocker.getComponentUnderTest().isEventTypeEnabled("update", NotificationFormat.ALERT));
 

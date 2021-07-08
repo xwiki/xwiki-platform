@@ -39,14 +39,14 @@ public class UserResourceReferenceTest
     void equalsAndHashcode()
     {
         DocumentReference documentReference1 = new DocumentReference("wiki", "space", "page");
-        UserReference userReference1 = new DocumentUserReference(documentReference1, null);
+        UserReference userReference1 = new DocumentUserReference(documentReference1, true);
         UserResourceReference userResourceReference1 = new UserResourceReference(userReference1);
 
         assertEquals(userResourceReference1, userResourceReference1);
         assertEquals(userReference1.hashCode(), userReference1.hashCode());
 
         DocumentReference documentReference2 = new DocumentReference("wiki2", "space", "page");
-        UserReference userReference2 = new DocumentUserReference(documentReference2, null);
+        UserReference userReference2 = new DocumentUserReference(documentReference2, true);
         UserResourceReference userResourceReference2 = new UserResourceReference(userReference2);
 
         assertNotEquals(userResourceReference2, userResourceReference1);

@@ -22,11 +22,8 @@ package com.xpn.xwiki.web;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.bridge.event.DocumentVersionRangeDeletedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.refactoring.batch.BatchOperationExecutor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -59,7 +56,7 @@ public class DeleteVersionsAction extends XWikiAction
 
         XWikiDocument doc = context.getDoc();
         String language = form.getLanguage();
-        XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
+        XWikiDocument tdoc = doc.getTranslatedDocument(language, context);        
         XWikiDocumentArchive archive = tdoc.getDocumentArchive(context);
 
         // Get the versions
@@ -68,45 +65,9 @@ public class DeleteVersionsAction extends XWikiAction
         Version v2 = versions[1];
 
         if (v1 != null && v2 != null) {
-            // Find the lower and upper bounds
-            Version upperBound = v1;
-            Version lowerBound = v2;
-            if (upperBound.compareVersions(lowerBound) < 0) {
-                Version tmp = upperBound;
-                upperBound = lowerBound;
-                lowerBound = tmp;
-            }
-
-            // Remove the versions
-            archive.removeVersions(upperBound, lowerBound, context);
-            context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
-            tdoc.setDocumentArchive(archive);
-
-            // Is this the last remaining version? If so, then recycle the document.
-            if (archive.getLatestVersion() == null) {
-                // Wrap the work as a batch operation.
-                BatchOperationExecutor batchOperationExecutor = Utils.getComponent(BatchOperationExecutor.class);
-                batchOperationExecutor.execute(() -> {
-                    if (StringUtils.isEmpty(language) || language.equals(doc.getDefaultLanguage())) {
-                        context.getWiki().deleteAllDocuments(doc, context);
-                    } else {
-                        // Only delete the translation
-                        context.getWiki().deleteDocument(tdoc, context);
-                    }
-                });
-            } else {
-                // There are still some versions left.
-                // If we delete the most recent (current) version, then rollback to latest undeleted version.
-                Version previousVersion = archive.getLatestVersion();
-                if (!tdoc.getRCSVersion().equals(previousVersion)) {
-                    context.getWiki().rollback(tdoc, previousVersion.toString(), false, context);
-                }
-
-                // Notify about versions delete
-                this.observation.notify(new DocumentVersionRangeDeletedEvent(tdoc.getDocumentReferenceWithLocale(),
-                    lowerBound.toString(), upperBound.toString()), tdoc, context);
-            }
+            context.getWiki().deleteDocumentVersions(tdoc, v1.toString(), v2.toString(), context);
         }
+
         sendRedirect(context);
         return false;
     }

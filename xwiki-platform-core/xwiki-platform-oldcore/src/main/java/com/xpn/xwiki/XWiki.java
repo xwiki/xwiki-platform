@@ -88,6 +88,7 @@ import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -96,6 +97,7 @@ import org.xwiki.bridge.event.DocumentRolledBackEvent;
 import org.xwiki.bridge.event.DocumentRollingBackEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
+import org.xwiki.bridge.event.DocumentVersionRangeDeletedEvent;
 import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
@@ -145,8 +147,8 @@ import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.refactoring.batch.BatchOperationExecutor;
 import org.xwiki.refactoring.ReferenceRenamer;
+import org.xwiki.refactoring.batch.BatchOperationExecutor;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
@@ -4647,6 +4649,66 @@ public class XWiki implements EventListener
             }
         } finally {
             context.setWikiId(currentWiki);
+        }
+    }
+
+    /**
+     * Delete a range of versions from a document history.
+     * 
+     * @param document the document from which to delete versions
+     * @param version1 one end of the versions range to remove
+     * @param version2 the other end of the versions range to remove
+     * @param context the XWiki context
+     * @throws XWikiException
+     * @since 13.6RC1
+     */
+    @Unstable
+    public void deleteDocumentVersions(XWikiDocument document, String version1, String version2, XWikiContext context)
+        throws XWikiException
+    {
+        Version v1 = new Version(version1);
+        Version v2 = new Version(version2);
+
+        // Find the lower and upper bounds
+        Version upperBound = v1;
+        Version lowerBound = v2;
+        if (upperBound.compareVersions(lowerBound) < 0) {
+            Version tmp = upperBound;
+            upperBound = lowerBound;
+            lowerBound = tmp;
+        }
+
+        XWikiDocumentArchive archive = document.getDocumentArchive(context);
+
+        // Remove the versions
+        archive.removeVersions(upperBound, lowerBound, context);
+        context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
+        document.setDocumentArchive(archive);
+
+        // Is this the last remaining version? If so, then recycle the document.
+        if (archive.getLatestVersion() == null) {
+            // Wrap the work as a batch operation.
+            BatchOperationExecutor batchOperationExecutor = Utils.getComponent(BatchOperationExecutor.class);
+            batchOperationExecutor.execute(() -> {
+                if (document.getLocale().equals(Locale.ROOT)) {
+                    context.getWiki().deleteAllDocuments(document, context);
+                } else {
+                    // Only delete the translation
+                    context.getWiki().deleteDocument(document, context);
+                }
+            });
+        } else {
+            // There are still some versions left.
+            // If we delete the most recent (current) version, then rollback to latest undeleted version.
+            Version previousVersion = archive.getLatestVersion();
+            if (!document.getRCSVersion().equals(previousVersion)) {
+                context.getWiki().rollback(document, previousVersion.toString(), false, context);
+            }
+
+            // Notify about versions delete
+            getObservationManager()
+                .notify(new DocumentVersionRangeDeletedEvent(document.getDocumentReferenceWithLocale(),
+                    lowerBound.toString(), upperBound.toString()), document, context);
         }
     }
 

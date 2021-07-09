@@ -30,9 +30,6 @@ jest.mock("moment", function () {
   }
 });
 
-jest.mock("jquery", function () {
-});
-
 import DisplayerDate from "../../../displayers/DisplayerDate.vue";
 import {initWrapper} from "./displayerTestsHelper";
 
@@ -46,7 +43,7 @@ describe('DisplayerDate.vue', () => {
   it('Switch to edit when double click', async () => {
     const wrapper = initWrapper(DisplayerDate, {});
 
-    const viewerDiv = wrapper.find('div[tabindex="0"]');
+    const viewerDiv = wrapper.find('.view div[tabindex="0"]');
 
     await viewerDiv.trigger('dblclick')
 

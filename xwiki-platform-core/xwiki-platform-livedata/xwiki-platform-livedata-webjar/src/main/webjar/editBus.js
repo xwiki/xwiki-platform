@@ -79,8 +79,8 @@ define('edit-bus', ['vue'], (Vue) => {
       this.editBus.$on('save-editing-entry', ({entryId, propertyId, content}) => {
         const entryState = this.editStates[entryId];
         const propertyState = entryState[propertyId];
-        // The entry is not edited anymore but its content will need to be saved once the rest of the properties of the
-        // entry are not in edit mode.
+        // The entry is not edited anymore but its content will need to be saved once the rest of the properties of the 
+        // entry are not in edit mode. 
         propertyState.editing = false;
         propertyState.tosave = true;
         propertyState.content = content;
@@ -109,7 +109,7 @@ define('edit-bus', ['vue'], (Vue) => {
         if (canBeSaved) break;
       }
 
-      // If a cell to save is found, we get its content and save it.
+      // If a cell to save is found, we get its content and save it. 
       if (canBeSaved && keyEntry) {
         const vals = values[keyEntry].content;
 
@@ -135,6 +135,10 @@ define('edit-bus', ['vue'], (Vue) => {
       }
       return true;
     }
+
+    onAnyEvent(callback) {
+      this.editBus.$on(['save-editing-entry', 'start-editing-entry', 'cancel-editing-entry'], () => callback())
+    }
   }
 
   /**
@@ -148,7 +152,8 @@ define('edit-bus', ['vue'], (Vue) => {
   }
 
   /**
-   * Notifies the start of a cell modification. After this event, the cell is considered as edited unless it is canceled.
+   * Notifies the start of a cell modification. After this event, the cell is considered as edited unless it is
+   * canceled.
    * @param entry the entry of the edited row
    * @param propertyId the property id of the edited cell.
    */
@@ -198,6 +203,10 @@ define('edit-bus', ['vue'], (Vue) => {
   function isEditable() {
     return _editBusService.isEditable();
   }
+  
+  function onAnyEvent(callback) {
+    _editBusService.onAnyEvent(callback);
+  }
 
-  return {init, start, cancel, save, isEditable};
+  return {init, start, cancel, save, isEditable, onAnyEvent};
 })

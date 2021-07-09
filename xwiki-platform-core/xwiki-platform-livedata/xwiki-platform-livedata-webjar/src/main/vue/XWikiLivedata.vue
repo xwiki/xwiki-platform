@@ -38,10 +38,10 @@
 
     <!-- Persistent configuration module (if supported by the config) -->
     <LivedataPersistentConfiguration v-if="data.id"/>
-
+    
     <!-- Displays a loader until the component is fully mounted. -->
     <div v-if="!layoutLoaded" class="loading"></div>
-
+    
   </div>
 </template>
 
@@ -52,7 +52,8 @@ __webpack_public_path__ = window.liveDataBaseURL;
 
 import Vue from "vue";
 import VueTippy from "vue-tippy";
-import 'tippy.js/themes/light-border.css'
+import Vue2TouchEvents from 'vue2-touch-events';
+import 'tippy.js/themes/light-border.css';
 import LivedataAdvancedPanels from "./panels/LivedataAdvancedPanels.vue";
 import LivedataLayout from "./layouts/LivedataLayout.vue";
 import LivedataPersistentConfiguration from "./LivedataPersistentConfiguration.vue";
@@ -65,6 +66,12 @@ import LivedataFootnotes from "./footnotes/LivedataFootnotes";
 Vue.use(VueTippy, {
   theme: 'light',
 });
+
+Vue.use(Vue2TouchEvents, {
+  disableClick: true
+})
+
+
 
 export default {
 
@@ -97,15 +104,15 @@ export default {
       logic: this.logic
     };
   },
-
+  
   data() {
     return {
       layoutLoaded: false
     }
   },
-
+  
   mounted() {
-    // Waits for the layout to be (lazily) loaded before hiding the loader.
+    // Waits for the layout to be (lazily) loaded before hiding the loader.  
     this.logic.onEvent("layoutLoaded", () => {
       this.layoutLoaded = true;
     });

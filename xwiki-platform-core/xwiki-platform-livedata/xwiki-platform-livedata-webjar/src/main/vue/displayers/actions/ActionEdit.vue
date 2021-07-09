@@ -17,12 +17,11 @@
 
 <template>
   <BaseAction
-    id="edit"
     v-if="displayer.isEditable"
-    :icon="{ name: 'edit' }"
+    title-translation-key="livedata.displayer.actions.edit"
+    :icon-descriptor="{ name: 'edit' }"
     :handler="handler"
-  >
-  </BaseAction>
+    :close-popover="closePopover"/>
 </template>
 
 <script>
@@ -39,12 +38,19 @@ export default {
   props: {
     displayer: {
       type: Object,
+      required: true
     },
+    closePopover: {
+      required: true
+    }
   },
 
   methods: {
-    handler () {
-      if (this.disabled) return;
+    handler(event) {
+      event.stop();
+      if (this.disabled) {
+        return;
+      }
       this.displayer.setEdit();
     },
   },

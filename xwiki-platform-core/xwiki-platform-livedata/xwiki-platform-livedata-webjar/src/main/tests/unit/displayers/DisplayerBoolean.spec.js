@@ -52,7 +52,7 @@ describe('DisplayerBoolean.vue', () => {
       mocks: {$t: defaultTranslationsMock}
     });
 
-    const viewerDiv = wrapper.find('div[tabindex="0"]');
+    const viewerDiv = wrapper.find('.view');
     await viewerDiv.trigger('dblclick')
 
     const checkbox = wrapper.find('input');
@@ -64,7 +64,7 @@ describe('DisplayerBoolean.vue', () => {
   it('Renders a false entry in edit mode', async () => {
     const wrapper = initWrapper(DisplayerBoolean, {props: {entry: {color: false}}});
 
-    const viewerDiv = wrapper.find('div[tabindex="0"]');
+    const viewerDiv = wrapper.find('.view');
     await viewerDiv.trigger('dblclick')
 
     const checkbox = wrapper.find('input');
@@ -83,14 +83,14 @@ describe('DisplayerBoolean.vue', () => {
       }
     });
 
-    const viewerDiv = wrapper.find('div[tabindex="0"]');
+    const viewerDiv = wrapper.find('.view');
     await viewerDiv.trigger('dblclick')
 
     const checkbox = wrapper.find('input');
 
     await checkbox.setChecked(false);
 
-    await wrapper.find('div[tabindex="0"]').trigger('keypress.enter');
+    await wrapper.find('.edit div[tabindex="0"]').trigger('keypress.enter');
 
     expect(values).toMatchObject([{
       color: {

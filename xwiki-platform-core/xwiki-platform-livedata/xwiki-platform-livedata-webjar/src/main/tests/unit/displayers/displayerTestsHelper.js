@@ -19,6 +19,7 @@
  */
 
 import {mount} from '@vue/test-utils'
+import $ from "jquery";
 
 /**
  * Generic Vue component initializer for the displayers tests. Calls `mount()` from `@vue/test-utils` with preconfigured
@@ -63,6 +64,34 @@ import {mount} from '@vue/test-utils'
  */
 export function initWrapper(displayer, {props, logic, editBus, mocks})
 {
+  global.XWiki = {}
+
+  if (!global.$) {
+    global.$ = global.jQuery = $;
+  }
+
+  global.$.fn.daterangepicker = jest.fn(() => {
+    return {show: jest.fn()}
+  });
+
+  global.$.fn.data = jest.fn(() => {
+    return {show: jest.fn()}
+  });
+
+  global.$.getJSON = jest.fn(() => {
+    // Default promise for the Icons component.
+    let promise = {
+      done: (fn) => {
+        fn({icons: [{cssClass: 'fa-minus'}]})
+        return promise;
+      },
+      fail: () => promise
+
+
+    };
+    return promise;
+  })
+
   // Creates a div in the document body. It will be used as the attach point when mounting the Vue component.
   // This is useful for some assertions, for instance when testing which element is on focus.
   const elem = document.createElement('div')

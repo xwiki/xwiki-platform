@@ -77,7 +77,7 @@ describe('DisplayerXObjectProperty.vue', () => {
       return $(wrapper.element).find('#editField')
     })
 
-    const viewerDiv = wrapper.find('div[tabindex="0"]');
+    const viewerDiv = wrapper.find('.view');
     // Send the edit event and wait for the asynchronous operation to finish before testing.
     await viewerDiv.trigger('dblclick')
     await Vue.nextTick()

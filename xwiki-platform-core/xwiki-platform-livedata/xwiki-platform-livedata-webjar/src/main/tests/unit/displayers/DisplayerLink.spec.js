@@ -93,7 +93,7 @@ describe('DisplayerLink.vue', () => {
 
   it('Renders an entry in edit mode', async () => {
     const wrapper = initWrapper(DisplayerLink, {});
-    const viewerDiv = wrapper.find('div[tabindex="0"]');
+    const viewerDiv = wrapper.find('.view');
     await viewerDiv.trigger('dblclick');
     expect(wrapper.find('input').element.value).toBe("red")
     expect(wrapper.find('input').element).toHaveFocus()
@@ -117,13 +117,13 @@ describe('DisplayerLink.vue', () => {
         }
       }
     });
-    const viewerDiv = wrapper.find('div[tabindex="0"]');
+    const viewerDiv = wrapper.find('.view');
     await viewerDiv.trigger('dblclick');
 
     let inputField = wrapper.find('input');
 
     await inputField.setValue('blue');
-    await wrapper.find('div[tabindex="0"]').trigger('keypress.enter');
+    await wrapper.find('.edit div[tabindex="0"]').trigger('keypress.enter');
 
     expect(values).toMatchObject([{
       color: {

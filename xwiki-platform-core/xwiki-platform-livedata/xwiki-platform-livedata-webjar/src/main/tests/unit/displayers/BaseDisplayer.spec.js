@@ -30,7 +30,7 @@ describe('BaseDisplayer.vue', () => {
   it('Send event on double click', async () => {
     const wrapper = initWrapper(BaseDisplayer, {});
 
-    const viewerDiv = wrapper.find('div[tabindex="0"]');
+    const viewerDiv = wrapper.find('div.view');
     await viewerDiv.trigger('dblclick');
 
     expect(wrapper.emitted()).toEqual({"update:isView": [[false]]})
@@ -56,7 +56,7 @@ describe('BaseDisplayer.vue', () => {
 
     wrapper.find('input').setValue('test-value');
 
-    await wrapper.find('div[tabindex="0"]').trigger('keypress.enter');
+    await wrapper.find('.edit [tabindex="0"]').trigger('keypress.enter');
 
     let events = wrapper.emitted();
     // Checks that the value is sent on the save event.
@@ -80,7 +80,7 @@ describe('BaseDisplayer.vue', () => {
       }
     });
 
-    expect(wrapper.find('[tabindex="0"]').html()).toBe('<div tabindex="0"><span></span> <span>livedata.displayer.emptyValue</span></div>');
+    expect(wrapper.find('div.view > div').html()).toBe('<div tabindex="0"><span></span> <span>livedata.displayer.emptyValue</span></div>');
   })
 
   it('Renders a viewable entry with an empty content', () => {
@@ -92,7 +92,7 @@ describe('BaseDisplayer.vue', () => {
       }
     });
 
-    expect(wrapper.find('[tabindex="0"]').html()).toBe('<div tabindex="0"><span></span>\n' +
+    expect(wrapper.find('div .view > div').html()).toBe('<div tabindex="0"><span></span>\n' +
       '  <!---->\n' +
       '</div>');
   })
@@ -110,7 +110,7 @@ describe('BaseDisplayer.vue', () => {
     // Even when the action is not allowed and the property value is undefined, 'N/A' is not displayed
     // if the props isEmpty is set to false.
     // This is useful when a displayed has his own way to present empty values, such as the link displayer.
-    expect(wrapper.find('[tabindex="0"]').html()).toBe('<div tabindex="0"><span></span>\n' +
+    expect(wrapper.find('div.view > div').html()).toBe('<div tabindex="0"><span></span>\n' +
       '  <!---->\n' +
       '</div>');
   })

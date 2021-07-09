@@ -1,0 +1,105 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+import XWikiIcon from "../../../utilities/XWikiIcon";
+import {mount} from '@vue/test-utils'
+import _ from "lodash";
+import $ from 'jquery';
+import Vue from "vue";
+
+global.$ = global.jQuery = $;
+
+function initWrapper(params = {}) {
+  return mount(XWikiIcon, _.merge({
+    propsData: {
+      iconDescriptor: {}
+    }
+  }, params));
+}
+
+describe('XWikiIcon.vue', () => {
+  it('Displays an icon using a font', () => {
+    const wrapper = initWrapper({
+      propsData: {
+        additionalClasses: ["newClass"],
+        iconDescriptor: {
+          cssClass: "fa fa-plus"
+        }
+      }
+    });
+
+    expect(wrapper.html()).toBe('<span class="fa fa-plus newClass"></span>');
+  })
+
+  it('Displays an icon using an image', () => {
+    const wrapper = initWrapper({
+      propsData: {
+        additionalClasses: ["newClass"],
+        iconDescriptor: {
+
+          url: "http://localhost:8080/myicon.jpg"
+        }
+      }
+    });
+
+    expect(wrapper.html()).toBe('<img src="http://localhost:8080/myicon.jpg" class="newClass">');
+
+  })
+
+  it('Displays an icon retrieved from the REST API', async () => {
+    // Mock the ajax query to get the metadata of the request icon.
+    $.getJSON = jest.fn().mockImplementation(() => {
+      let promise = {
+        done(fn) {
+          fn({
+            icons: [{
+              cssClass: "fa fa-plus"
+            }]
+          })
+          return promise;
+        },
+        fail() {
+          return promise;
+        }
+      };
+      return promise;
+    });
+
+    // Defines the name of the current wiki in the XWiki global object. Needed to resolve the REST URI to call to 
+    // retrieve the metadata of the icon.
+    global.XWiki = {
+      currentWiki: 'xwiki'
+    }
+    
+    const wrapper = initWrapper({
+      propsData: {
+        additionalClasses: ["newClass"],
+        iconDescriptor: {
+          name: 'add'
+        }
+      }
+    });
+
+    // Wait for the next rendering after the ajax query is resolved.
+    await Vue.nextTick()
+
+    expect(wrapper.html()).toBe('<span class="fa fa-plus newClass"></span>');
+  })
+})

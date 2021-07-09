@@ -27,24 +27,29 @@
   instead of reimplementing the whole displayer logic each time.
 -->
 <template>
+  <!-- 
+  Deactivate the popover on non editable entries by setting the trigger configuration to manual.
+  Since we don't do anything manually, that make the popover disabled.
+  -->
   <TippyComponent
     class="displayer-actions-popover"
     interactive
-    trigger="manual"
+    :trigger="isEditable && !duringEditing ? 'mouseenter focus' : 'manual'"
     theme="light-border"
-    placement="bottom-start"
+    placement="bottom"
     arrow
-    :visible="isPopoverVisible"
-  >
+    ref="tippy">
     <template #trigger>
 
       <div
-        :class="{ view: isView, edit: !isView }"
+        :class="{ view: isView, edit: !isView, editable: isEditable }"
         ref="displayerRoot"
-        @click="showPopover = !showPopover"
-        @dblclick="setEdit"
+        @mouseover="showPopover = true"
+        @mouseout="showPopover = false"
         @keypress.self.enter="setEdit"
+        v-touch:tap="touchHandler"
       >
+        <!--        @click="setFocus"-->
         <!--
           The base displayer contains three slots: `viewer`, `editor`, and `loading`.
           It displays `viewer` or `loading` according to its current state: `this.isView` when `this.isLoading` is
@@ -52,7 +57,7 @@
         -->
 
         <!-- The slot containing the displayer Viewer widget -->
-        <div tabindex="0" v-if="isView && !isLoading">
+        <div  v-if="isView && !isLoading">
           <slot name="viewer">
             <!--
               Default Viewer widget
@@ -64,15 +69,14 @@
             <span>{{ value }}</span>
           </slot>
         <span v-if="!isViewable" v-html="$t('livedata.displayer.emptyValue')"></span>
-    </div>
+    </div><!-- tabindex="0" -->
 
         <!-- The slot containing the displayer Editor widget -->
         <div @keypress.enter="applyEdit"
              @keydown.esc="cancelEdit"
              v-if="!isView && !isLoading"
-             tabindex="0"
              ref="editBlock"
-        >
+        > <!-- tabindex="0" -->
           <slot name="editor">
             <!--
               Default Editor widget
@@ -100,13 +104,8 @@
     <!-- Popover content -->
     <template>
       <div class="displayer-action-list">
-        <ActionEdit
-          :displayer="{
-            isEditable,
-            setEdit: () => void setEdit()
-          }"
-        />
-        <slot name="popover-actions"></slot>
+        <ActionEdit :displayer="{ isEditable, setEdit: () => { setEdit() } }" :close-popover="closePopover"/>
+        <ActionFollowLink :displayer="{ href }" v-if="href" :close-popover="closePopover"/>
       </div>
     </template>
 
@@ -115,10 +114,12 @@
 
 
 <script>
-import { TippyComponent } from "vue-tippy";
+import {TippyComponent} from "vue-tippy";
 import displayerMixin from "./displayerMixin.js";
 import XWikiLoader from "../utilities/XWikiLoader.vue";
 import ActionEdit from "./actions/ActionEdit.vue";
+import ActionFollowLink from "./actions/ActionFollowLink";
+// import ActionSelectAll from "./actions/ActionSelectAll";
 
 export default {
 
@@ -128,6 +129,8 @@ export default {
   mixins: [displayerMixin],
 
   components: {
+    ActionFollowLink,
+    // ActionSelectAll,
     XWikiLoader,
     TippyComponent,
     ActionEdit,
@@ -135,7 +138,8 @@ export default {
 
   data () {
     return {
-      showPopover: false,
+      duringEditing: false,
+      href: undefined
     };
   },
 
@@ -159,17 +163,6 @@ export default {
   },
 
   computed: {
-    // Checks if the property value is allowed to be edited and if the livedata is in a state where the displayer can
-    // be edited.
-    isEditable() {
-      const editable = this.logic.isEditable({
-        entry: this.entry,
-        propertyId: this.propertyId,
-      });
-      // Checks that no other property is currently being edited.
-      const noOtherEditing = this.logic.getEditBus().isEditable()
-      return editable && noOtherEditing;
-    },
     isViewable() {
       var empty = this.isEmpty;
       if (empty === undefined) {
@@ -181,16 +174,15 @@ export default {
       }
       return isViewable;
     },
-    hasActions () {
-      return this.isEditable || this.$slots["popover-actions"];
-    },
+    // hasActions () {
+    //   return this.isEditable || this.$slots["popover-actions"];
+    // },
 
-    isPopoverVisible () {
-      if (!this.isView) return false;
-      if (!this.hasActions) return false;
-      return this.showPopover;
-    }
-
+    // isPopoverVisible () {
+    //   if (!this.isView) return false;
+    //   if (!this.hasActions) return false;
+    //   return this.showPopover;
+    // }
   },
 
   // The following methods are only used by the BaseDisplayer component
@@ -208,7 +200,7 @@ export default {
     // The validation of the edited property is done once the whole entry is done editing.
     applyEdit() {
       // When the #edit slot is not the default, the editValue field is overloaded and is always undefined.
-      // When receiving a saveEdit event, the passed value can then be ignored since the overloaded slot has it own
+      // When receiving a saveEdit event, the passed value can then be ignored since the overloaded slot has it own 
       // field.
       this.$emit('saveEdit', this.editedValue);
       // Go back to view mode
@@ -225,34 +217,61 @@ export default {
       // Switches to view mode.
       this.$emit('update:isView', true);
     },
-
-    outsideClickHandler (e) {
-      if (this.isView) { return; }
-      const editBlock = this.$refs['editBlock'];
-      if (editBlock.contains(e.target)) { return; }
-      // Wait a little before switching back to view mode, otherwise the change case cause a column width change
-      // and make the user click on the wrong column, for instance when trying to edit the next column by double
-      // clicking on it.
-      setTimeout(() => this.applyEdit(), 200);
+    closePopover() {
+      this.$refs.tippy.tip.hide();
     },
-  },
+    touchHandler(e) {
+      // TODO: receive click outside events 
+      if(this.isView && !this.duringEditing) {
+        e.preventDefault();
+        const targetsLink = e.target.tagName.toLowerCase() === 'a';
+        if (targetsLink) {
+          this.href = e.target.getAttribute('href');
+        } else {
+          this.href = undefined;
+        }
 
-  watch: {
-    isView (isView) {
-      // Monitors clicks outside of the current cell.
-      // We switch back to view mode whenever a click is done outside of the current cell.
-      // The handler is bound dynamically when the display pass to edit mode for two reasons:
-      // - we don't have a event listener bound on document for every displayer of the livedata at the same time
-      // - We don't immediately leave edit mode by losing focus when we click on the edit action button
-      console.log("isview?", isView);
-      if (isView) {
-        document.removeEventListener("click", this.outsideClickHandler);
-      } else {
-        document.addEventListener("click", this.outsideClickHandler);
+        if (this.isEditable || targetsLink) {
+          this.$refs.tippy.tip.show();
+        }
       }
     }
+    // setFocus() {
+    //   this.$refs.displayerRoot.focus();
+    // }
   },
+  mounted() {
+    // Monitors clicks outside of the current cell. We switch back to view mode whenever a click is done outside of 
+    // the current cell.
+    const listener = (evt) => {
+      if (!this.isView) {
+        const editBlock = this.$refs['editBlock'];
 
+        if (editBlock.contains(evt.target)) {
+          return;
+        }
+
+        // Wait a little before switching back to view mode, otherwise the change case cause a column width change 
+        // and make the user click on the wrong column, for instance when trying to edit the next column by double 
+        // clicking on it.
+        setTimeout(() => this.applyEdit(), 200);
+      } else {
+        const displayerElement = this.$refs['displayerRoot'];
+
+        if (displayerElement.contains(evt.target)) {
+          return;
+        }
+        this.closePopover();
+      }
+    };
+    document.addEventListener("click", listener)
+    document.addEventListener("touchstart", listener)
+
+    // We need to listen on the edit bus event because isEditable is not reactive. 
+    this.logic.getEditBus().onAnyEvent(() => {
+      this.duringEditing = !this.logic.getEditBus().isEditable();
+    })
+  }
 };
 
 </script>
@@ -296,14 +315,19 @@ export default {
   height: auto;
 }
 
+/*.livedata-displayer .view.editable,*/
+/*.livedata-displayer .view.editable * {*/
+/*  cursor: col-resize;*/
+/*}*/
+
 </style>
 
 <!--
   We make a separate style tag for styling the tippy actions popover
   to differentiate as it is styling an external component of the livedata,
-  and also because the popover is append inside the body tag of the page
+  and also because the popover is appended inside the body tag of the page
   so if one day we refactor this SPA to make the style tags using the `scoped` attribute
-  the displayer-actions-popover styles should not be scoped with the rest of the component
+  the displayer-actions-popover styles should not be scoped with the rest of the component.
 -->
 <style lang="less">
 

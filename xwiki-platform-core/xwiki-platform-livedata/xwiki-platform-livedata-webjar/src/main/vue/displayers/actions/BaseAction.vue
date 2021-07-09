@@ -16,13 +16,14 @@
 -->
 
 <template>
-  <div
-    class="livedata-base-action btn"
-    @click="handler"
-  >
-    <XWikiIcon :icon-descriptor="icon" />
-    {{ $t("livedata.displayer.actions." + id) }}
-  </div>
+  <span class="livedata-base-action btn"
+        @click="trigger"
+        @keypress.self.enter="trigger"
+        :title="$t(titleTranslationKey)"
+        tabindex="0">
+    <XWikiIcon :icon-descriptor="iconDescriptor"/>
+    <template v-if="labelTranslationKey"> {{ $t(labelTranslationKey) }}</template>
+  </span>
 </template>
 
 <script>
@@ -37,19 +38,33 @@ export default {
   },
 
   props: {
-    id: {
-      required: true,
+    titleTranslationKey: {
       type: String,
+      required: true
     },
-    icon: {
+    closePopover: {
+      required: true
+    },
+    labelTranslationKey: {
+      type: String,
+      default: undefined
+    },
+    iconDescriptor: {
       type: Object,
       default: () => {},
     },
     handler: {
       type: Function,
       default: () => () => {},
-    },
+    }
   },
+
+  methods: {
+    trigger(event) {
+      this.handler(event);
+      this.closePopover()
+    }
+  }
 
 }
 </script>
@@ -57,6 +72,7 @@ export default {
 <style>
 .livedata-base-action {
   cursor: pointer;
+  padding: 0.2em;
 }
 
 </style>

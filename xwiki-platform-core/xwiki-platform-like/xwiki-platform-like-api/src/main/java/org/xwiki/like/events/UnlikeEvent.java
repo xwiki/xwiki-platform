@@ -19,6 +19,8 @@
  */
 package org.xwiki.like.events;
 
+import java.io.Serializable;
+
 import org.xwiki.observation.event.Event;
 import org.xwiki.stability.Unstable;
 
@@ -29,11 +31,13 @@ import org.xwiki.stability.Unstable;
  *   - source: a {@link org.xwiki.user.UserReference} of the user who performs the unlike
  *   - data: an {@link org.xwiki.model.reference.EntityReference} being the target of the original like.
  *
+ * Note that we need those events to be serializable so that they can be sent on cluster.
+ *
  * @version $Id$
  * @since 12.7RC1
  */
 @Unstable
-public class UnlikeEvent implements Event
+public class UnlikeEvent implements Event, Serializable
 {
     @Override
     public boolean matches(Object otherEvent)

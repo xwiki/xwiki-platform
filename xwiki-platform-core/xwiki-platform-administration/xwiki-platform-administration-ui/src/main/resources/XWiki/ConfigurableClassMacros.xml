@@ -85,7 +85,7 @@
     'BaseObject as obj',
     'StringProperty as category',
     'IntegerProperty as sectionOrder',
-    'IntegerProperty as global'
+    'StringProperty as global'
   ])
   #set ($whereClause = [
     "obj.name = doc.fullName and obj.className = :className",

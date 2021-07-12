@@ -45,7 +45,7 @@ import org.xwiki.websocket.WebSocketContext;
  */
 @Component
 @Named("org.xwiki.websocket.internal.StaticEchoEndpoint")
-@ServerEndpoint("/websocket/echo")
+@ServerEndpoint("/echo")
 @Singleton
 public class StaticEchoEndpoint implements EndpointComponent
 {

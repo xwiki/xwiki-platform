@@ -68,9 +68,13 @@
         <!-- Table Body -->
         <tbody>
           <!-- The rows (= the entries) -->
+          <!-- 
+          We include the entry index in the key in case of inconsistent data, in this case duplicated entry IDs.
+          That way even if two entries have the same id, the keys will not be equals. 
+          -->
           <LayoutTableRow
-            v-for="entry in entries"
-            :key="logic.getEntryId(entry)"
+            v-for="(entry, idx) in entries"
+            :key="`table-${logic.getEntryId(entry)}-${idx}`"
             :entry="entry"
           />
 

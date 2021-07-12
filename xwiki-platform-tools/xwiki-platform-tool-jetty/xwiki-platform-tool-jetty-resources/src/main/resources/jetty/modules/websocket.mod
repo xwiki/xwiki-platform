@@ -21,18 +21,13 @@
 DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
-Enables Annotation scanning for deployed webapplications.
+Enable websockets for deployed web applications
 
 [depend]
-plus
+# websocket client needs jetty-client
+client
+# javax.websocket needs annotations
+annotations
 
 [lib]
-lib/jetty-annotations-${jetty.version}.jar
-lib/annotations/*.jar
-
-[xml]
-# Enable annotation scanning webapp configurations
-etc/jetty-annotations.xml
-
-[jpms]
-add-modules:org.objectweb.asm
+lib/websocket/*.jar

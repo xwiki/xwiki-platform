@@ -41,8 +41,15 @@
       <outputDirectory>/jetty/lib</outputDirectory>
       <excludes>
         <exclude>org.eclipse.jetty:jetty-start:jar:shaded</exclude>
+        <!-- lib/ext -->
         <exclude>org.xwiki.platform:xwiki-platform-tool-jetty-listener</exclude>
         <exclude>commons-io:commons-io</exclude>
+        <!-- lib/annotations -->
+        <exclude>org.ow2.asm:*</exclude>
+        <exclude>javax.annotation:*</exclude>
+        <!-- lib/websocket -->
+        <exclude>org.eclipse.jetty.websocket:*</exclude>
+        <exclude>javax.websocket:*</exclude>
       </excludes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
       <useProjectArtifact>false</useProjectArtifact>
@@ -52,6 +59,24 @@
       <includes>
         <include>org.xwiki.platform:xwiki-platform-tool-jetty-listener</include>
         <include>commons-io:commons-io</include>
+      </includes>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>/jetty/lib/annotations</outputDirectory>
+      <includes>
+        <include>org.ow2.asm:*</include>
+        <include>javax.annotation:*</include>
+      </includes>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>/jetty/lib/websocket</outputDirectory>
+      <includes>
+        <include>org.eclipse.jetty.websocket:*</include>
+        <include>javax.websocket:*</include>
       </includes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
       <useProjectArtifact>false</useProjectArtifact>

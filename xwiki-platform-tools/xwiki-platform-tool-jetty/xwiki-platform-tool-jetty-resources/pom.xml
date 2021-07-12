@@ -108,6 +108,12 @@
       <version>${jetty.version}</version>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>javax-websocket-server-impl</artifactId>
+      <version>${jetty.version}</version>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

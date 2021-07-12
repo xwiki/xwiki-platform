@@ -21,18 +21,7 @@
 DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
-Enables Annotation scanning for deployed webapplications.
-
-[depend]
-plus
+Adds the Jetty HTTP client to the server classpath.
 
 [lib]
-lib/jetty-annotations-${jetty.version}.jar
-lib/annotations/*.jar
-
-[xml]
-# Enable annotation scanning webapp configurations
-etc/jetty-annotations.xml
-
-[jpms]
-add-modules:org.objectweb.asm
+lib/jetty-client-${jetty.version}.jar

@@ -41,12 +41,16 @@
        Standalone packaging since we create a custom distribution of Jetty and we don't include the Jetty "mail"
        module. However we have the problem in our functional Docker-based tests where we use the official Jetty
        image. -->
-  <!-- Note: If you're deploying on Jetty 10+ you must remove the 2 calls to prependSystemClass and
-       prependServerClass, as otherwise XWiki will fail to deploy. -->
-  <Call name="prependSystemClass">
-    <Arg>-javax.mail.</Arg>
+  <!-- Note: If you're deploying on Jetty 10+ you must remove the 2 calls to getSystemClasspathPattern and
+       getServerClasspathPattern, as otherwise XWiki will fail to deploy. -->
+  <Call name="getSystemClasspathPattern">
+    <Call name="add">
+      <Arg>-javax.mail.</Arg>
+    </Call>
   </Call>
-  <Call name="prependServerClass">
-    <Arg>javax.mail.</Arg>
+  <Call name="getServerClasspathPattern">
+    <Call name="add">
+      <Arg>javax.mail.</Arg>
+    </Call>
   </Call>
 </Configure>

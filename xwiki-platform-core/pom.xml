@@ -270,6 +270,7 @@
     <module>xwiki-platform-vfs</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webjars</module>
+    <module>xwiki-platform-websocket</module>
     <module>xwiki-platform-wiki</module>
     <module>xwiki-platform-wysiwyg</module>
     <module>xwiki-platform-xar</module>

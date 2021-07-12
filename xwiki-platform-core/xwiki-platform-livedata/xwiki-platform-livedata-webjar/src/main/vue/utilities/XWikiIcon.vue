@@ -109,8 +109,8 @@ export default {
         // If the icon was not already fetched, fetch it!
         if (!iconCache[iconName]) {
           // We set the iconCache value to the promise object, so that every other request
-          // of the same icon whether they occur during the firts request or after,
-          // will use the same promise and will not create another request
+          // of the same icon whether they occur during the first request or after,
+          // will use the same promise and will not create another request.
           iconCache[iconName] = this.fetchRemoteIconDescriptor(iconName);
         }
         // Set the icon to the resolved value of the promise.

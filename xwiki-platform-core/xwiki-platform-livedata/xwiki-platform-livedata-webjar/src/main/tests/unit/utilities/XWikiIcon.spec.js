@@ -45,7 +45,7 @@ describe('XWikiIcon.vue', () => {
       }
     });
 
-    expect(wrapper.html()).toBe('<span class="fa fa-plus newClass"></span>');
+    expect(wrapper.attributes('class')).toBe('fa fa-plus newClass');
   })
 
   it('Displays an icon using an image', () => {
@@ -59,8 +59,8 @@ describe('XWikiIcon.vue', () => {
       }
     });
 
-    expect(wrapper.html()).toBe('<img src="http://localhost:8080/myicon.jpg" class="newClass">');
-
+    expect(wrapper.attributes('src')).toBe('http://localhost:8080/myicon.jpg');
+    expect(wrapper.attributes('class')).toBe('newClass');
   })
 
   it('Displays an icon retrieved from the REST API', async () => {
@@ -100,6 +100,6 @@ describe('XWikiIcon.vue', () => {
     // Wait for the next rendering after the ajax query is resolved.
     await Vue.nextTick()
 
-    expect(wrapper.html()).toBe('<span class="fa fa-plus newClass"></span>');
+    expect(wrapper.attributes('class')).toBe('fa fa-plus newClass');
   })
 })

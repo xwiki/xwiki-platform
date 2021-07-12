@@ -41,12 +41,20 @@ function initWrapper({isEditable = true, setEdit = undefined}) {
 describe('ActionEdit.vue', () => {
   it('Renders and edit on click', async () => {
     const setEdit = jest.fn();
-    const wrapper = initWrapper({setEdit});
+    const stop = jest.fn();
 
+    const wrapper = initWrapper({setEdit});
     expect(wrapper.attributes('title')).toBe('livedata.displayer.actions.edit');
     expect(wrapper.attributes('class')).toBe('livedata-base-action btn');
     expect(wrapper.text()).toBe('');
+
     expect(wrapper.find('span span').attributes('class')).toBe('icon-placeholder')
+    // The stop attribute is not available in the event by default, adding it to make the handler pass as well
+    // as being able to assert its call.
+    await wrapper.trigger('click', {stop});
+
+    expect(setEdit.mock.calls.length).toBe(1)
+    expect(stop.mock.calls.length).toBe(1)
   })
 
   it('Renders when not editable', async () => {

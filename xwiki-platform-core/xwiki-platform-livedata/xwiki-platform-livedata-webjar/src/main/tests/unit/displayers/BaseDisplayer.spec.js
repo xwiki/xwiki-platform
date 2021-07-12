@@ -24,12 +24,14 @@ describe('BaseDisplayer.vue', () => {
   it('Renders an entry in view mode', () => {
     const wrapper = initWrapper(BaseDisplayer, {});
 
-    expect(wrapper.text()).toMatch('red')
+    expect(wrapper.text()).toMatch('red') 
   })
 
-  it('Switch to edit mode',  () => {
+  it('Switch to edit mode', () => {
     const wrapper = initWrapper(BaseDisplayer, {});
 
+    // Manuelly triggers setEdit until we find a way to simulate the hovering of the displayer and get access the 
+    // popover content.
     wrapper.vm.setEdit();
 
     expect(wrapper.emitted()).toEqual({"update:isView": [[false]]})

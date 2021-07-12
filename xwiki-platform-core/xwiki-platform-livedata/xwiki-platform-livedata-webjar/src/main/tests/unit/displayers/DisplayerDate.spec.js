@@ -40,7 +40,7 @@ describe('DisplayerDate.vue', () => {
     expect(wrapper.text()).toMatch('formatted date')
   })
 
-  it('Switch to edit when double click', async () => {
+  it('Switch to edit mode', async () => {
     const wrapper = initWrapper(DisplayerDate, {});
 
     await wrapper.setData({isView: false});

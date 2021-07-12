@@ -209,8 +209,6 @@ define('xwiki-livedata', [
         "displayer.xObjectProperty.failedToRetrieveField.errorMessage",
         "displayer.actions.edit",
         "displayer.actions.followLink",
-        "displayer.actions.selectAll",
-        "displayer.actions.selectAll.success",
         "filter.list.emptyLabel",
         "footnotes.computedTitle",
         "footnotes.propertyNotViewable",

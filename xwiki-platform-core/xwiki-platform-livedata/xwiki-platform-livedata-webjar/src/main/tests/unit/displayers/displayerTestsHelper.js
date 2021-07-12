@@ -68,18 +68,22 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
 {
   global.XWiki = {}
 
+  // Defines jQUery globally if it is not already done.
   if (!global.$) {
     global.$ = global.jQuery = $;
   }
 
+  // Mocks daterangepicker
   global.$.fn.daterangepicker = jest.fn(() => {
     return {show: jest.fn()}
   });
 
+  // Mock $.data
   global.$.fn.data = jest.fn(() => {
     return {show: jest.fn()}
   });
 
+  // Mock $.getJson
   global.$.getJSON = jest.fn(() => {
     // Default promise for the Icons component.
     let promise = {
@@ -88,8 +92,6 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
         return promise;
       },
       fail: () => promise
-
-
     };
     return promise;
   })

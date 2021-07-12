@@ -213,6 +213,10 @@ export default {
       this.$refs.tippy.tip.hide();
     },
     touchHandler(e) {
+      // Active only when intercepting touch event is allowed, the displayer is in view mode, and no other
+      // displayers are currently in edit mode.
+      // If the touched element is a link and/or is editable, we display the popover.
+      // If the touch element is a link, we get its target and display a following link action to its target.
       if(this.interceptTouch && this.isView && !this.duringEditing) {
         e.preventDefault();
         const targetsLink = e.target.tagName.toLowerCase() === 'a';
@@ -254,6 +258,7 @@ export default {
     };
     document.addEventListener("click", listener)
     if (this.interceptTouch) {
+      // When activated, we also listen to touch events outside of the current displayer.
       document.addEventListener("touchstart", listener)
     }
 

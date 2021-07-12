@@ -48,9 +48,6 @@ export default {
   methods: {
     handler(event) {
       event.stop();
-      if (this.disabled) {
-        return;
-      }
       this.displayer.setEdit();
     },
   },

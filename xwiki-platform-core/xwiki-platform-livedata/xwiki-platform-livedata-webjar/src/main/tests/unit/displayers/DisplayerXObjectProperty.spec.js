@@ -77,7 +77,8 @@ describe('DisplayerXObjectProperty.vue', () => {
       return $(wrapper.element).find('#editField')
     })
 
-    // Switch to edit mode and manually call updateEdit, instead of using the actions.
+    // Switch to edit mode and manually call updateEdit, instead of using the actions because accessing the actions
+    // of the popover is not currently possible.
     await wrapper.setData({isView: false})
     wrapper.vm.updateEdit()
     await Vue.nextTick()

@@ -23,6 +23,7 @@ import _ from "lodash"
 import ActionFollowLink from "../../../displayers/actions/ActionFollowLink";
 
 function initWrapper() {
+  // Define a name for the current wiki.
   global.XWiki = _.merge(global.XWiki, {
     currentWiki: 'xwiki'
   })

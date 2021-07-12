@@ -44,8 +44,7 @@ describe('DisplayerNumber.vue', () => {
       }
     })
 
-    const viewerDiv = wrapper.find('.view');
-    await viewerDiv.trigger('dblclick');
+    await wrapper.setData({isView: false})
 
     expect(wrapper.find('input').element.value).toBe('42')
     expect(wrapper.find('input').element).toHaveFocus()

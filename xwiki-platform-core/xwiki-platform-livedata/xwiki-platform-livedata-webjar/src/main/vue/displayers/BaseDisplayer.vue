@@ -49,7 +49,6 @@
         @keypress.self.enter="setEdit"
         v-touch:tap="touchHandler"
       >
-        <!--        @click="setFocus"-->
         <!--
           The base displayer contains three slots: `viewer`, `editor`, and `loading`.
           It displays `viewer` or `loading` according to its current state: `this.isView` when `this.isLoading` is
@@ -57,7 +56,7 @@
         -->
 
         <!-- The slot containing the displayer Viewer widget -->
-        <div  v-if="isView && !isLoading">
+        <div v-if="isView && !isLoading">
           <slot name="viewer">
             <!--
               Default Viewer widget
@@ -69,14 +68,14 @@
             <span>{{ value }}</span>
           </slot>
         <span v-if="!isViewable" v-html="$t('livedata.displayer.emptyValue')"></span>
-    </div><!-- tabindex="0" -->
+    </div>
 
         <!-- The slot containing the displayer Editor widget -->
         <div @keypress.enter="applyEdit"
              @keydown.esc="cancelEdit"
              v-if="!isView && !isLoading"
              ref="editBlock"
-        > <!-- tabindex="0" -->
+        >
           <slot name="editor">
             <!--
               Default Editor widget
@@ -119,7 +118,6 @@ import displayerMixin from "./displayerMixin.js";
 import XWikiLoader from "../utilities/XWikiLoader.vue";
 import ActionEdit from "./actions/ActionEdit.vue";
 import ActionFollowLink from "./actions/ActionFollowLink";
-// import ActionSelectAll from "./actions/ActionSelectAll";
 
 export default {
 
@@ -130,7 +128,6 @@ export default {
 
   components: {
     ActionFollowLink,
-    // ActionSelectAll,
     XWikiLoader,
     TippyComponent,
     ActionEdit,
@@ -159,6 +156,10 @@ export default {
     isEmpty: {
       type: Boolean,
       default: undefined
+    },
+    interceptTouch: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -173,16 +174,7 @@ export default {
         this.logic.footnotes.put('*', 'livedata.footnotes.propertyNotViewable');
       }
       return isViewable;
-    },
-    // hasActions () {
-    //   return this.isEditable || this.$slots["popover-actions"];
-    // },
-
-    // isPopoverVisible () {
-    //   if (!this.isView) return false;
-    //   if (!this.hasActions) return false;
-    //   return this.showPopover;
-    // }
+    }
   },
 
   // The following methods are only used by the BaseDisplayer component
@@ -221,8 +213,7 @@ export default {
       this.$refs.tippy.tip.hide();
     },
     touchHandler(e) {
-      // TODO: receive click outside events 
-      if(this.isView && !this.duringEditing) {
+      if(this.interceptTouch && this.isView && !this.duringEditing) {
         e.preventDefault();
         const targetsLink = e.target.tagName.toLowerCase() === 'a';
         if (targetsLink) {
@@ -236,9 +227,6 @@ export default {
         }
       }
     }
-    // setFocus() {
-    //   this.$refs.displayerRoot.focus();
-    // }
   },
   mounted() {
     // Monitors clicks outside of the current cell. We switch back to view mode whenever a click is done outside of 
@@ -265,7 +253,9 @@ export default {
       }
     };
     document.addEventListener("click", listener)
-    document.addEventListener("touchstart", listener)
+    if (this.interceptTouch) {
+      document.addEventListener("touchstart", listener)
+    }
 
     // We need to listen on the edit bus event because isEditable is not reactive. 
     this.logic.getEditBus().onAnyEvent(() => {
@@ -314,12 +304,6 @@ export default {
   width: auto;
   height: auto;
 }
-
-/*.livedata-displayer .view.editable,*/
-/*.livedata-displayer .view.editable * {*/
-/*  cursor: col-resize;*/
-/*}*/
-
 </style>
 
 <!--

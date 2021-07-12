@@ -31,7 +31,8 @@ function initWrapper() {
     propsData: {
       displayer: {
         href: 'https://link/'
-      }
+      },
+      closePopover: () => {}
     },
     mocks: {
       $t: (key) => key
@@ -42,14 +43,12 @@ function initWrapper() {
 
 describe('ActionFollowLink.vue', () => {
   it('Renders and click', async () => {
-
     const wrapper = initWrapper();
 
-    expect(wrapper.html()).toBe(
-      '<span title="livedata.displayer.actions.followLink" class="livedata-base-action btn">' +
-      '<span class="icon-placeholder"></span> ' +
-      'livedata.displayer.actions.followLink' +
-      '</span>');
+    expect(wrapper.attributes('title')).toBe('livedata.displayer.actions.followLink')
+    expect(wrapper.attributes('class')).toBe('livedata-base-action btn')
+    expect(wrapper.text()).toBe('')
+    expect(wrapper.find('span span').attributes('class')).toBe('icon-placeholder')
 
     // Substitutes the actual window.location by a mock to be able to write an assertion on its new value
     // after the click on the action.

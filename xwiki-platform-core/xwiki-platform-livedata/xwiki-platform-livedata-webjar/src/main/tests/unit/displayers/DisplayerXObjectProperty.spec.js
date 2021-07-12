@@ -77,9 +77,9 @@ describe('DisplayerXObjectProperty.vue', () => {
       return $(wrapper.element).find('#editField')
     })
 
-    const viewerDiv = wrapper.find('.view');
-    // Send the edit event and wait for the asynchronous operation to finish before testing.
-    await viewerDiv.trigger('dblclick')
+    // Switch to edit mode and manually call updateEdit, instead of using the actions.
+    await wrapper.setData({isView: false})
+    wrapper.vm.updateEdit()
     await Vue.nextTick()
 
     // Checks that the edition form is properly retrieved and displayed.

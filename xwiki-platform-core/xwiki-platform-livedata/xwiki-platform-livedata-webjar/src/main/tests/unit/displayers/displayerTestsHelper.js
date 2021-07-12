@@ -20,6 +20,8 @@
 
 import {mount} from '@vue/test-utils'
 import $ from "jquery";
+import Vue from "vue";
+import Vue2TouchEvents from "vue2-touch-events";
 
 /**
  * Generic Vue component initializer for the displayers tests. Calls `mount()` from `@vue/test-utils` with preconfigured
@@ -99,6 +101,12 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
     document.body.appendChild(elem)
   }
 
+  // Vue2TouchEvents needs to be explicitly registered because otherwise it is initialize by a parent component, hence
+  // not initialized for the tests.
+  Vue.use(Vue2TouchEvents, {
+    disableClick: true
+  })
+
   return mount(displayer, {
     attachTo: elem,
     propsData: Object.assign({
@@ -148,7 +156,8 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
             isEditable()
             {
               return true;
-            }
+            },
+            onAnyEvent: () => {}
           }, editBus)
         },
         footnotes: {

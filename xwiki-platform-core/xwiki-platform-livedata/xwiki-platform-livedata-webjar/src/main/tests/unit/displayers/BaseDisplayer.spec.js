@@ -27,11 +27,10 @@ describe('BaseDisplayer.vue', () => {
     expect(wrapper.text()).toMatch('red')
   })
 
-  it('Send event on double click', async () => {
+  it('Switch to edit mode',  () => {
     const wrapper = initWrapper(BaseDisplayer, {});
 
-    const viewerDiv = wrapper.find('div.view');
-    await viewerDiv.trigger('dblclick');
+    wrapper.vm.setEdit();
 
     expect(wrapper.emitted()).toEqual({"update:isView": [[false]]})
   })
@@ -56,11 +55,11 @@ describe('BaseDisplayer.vue', () => {
 
     wrapper.find('input').setValue('test-value');
 
-    await wrapper.find('.edit [tabindex="0"]').trigger('keypress.enter');
+    await wrapper.find('.edit > div').trigger('keypress.enter');
 
     let events = wrapper.emitted();
     // Checks that the value is sent on the save event.
-    // Thens checks that we switch back to the view mode.
+    // Then checks that we switch back to the view mode.
     expect(events.saveEdit[0]).toEqual(['test-value']);
     expect(events['update:isView'][0]).toEqual([true]);
   })
@@ -80,7 +79,7 @@ describe('BaseDisplayer.vue', () => {
       }
     });
 
-    expect(wrapper.find('div.view > div').html()).toBe('<div tabindex="0"><span></span> <span>livedata.displayer.emptyValue</span></div>');
+    expect(wrapper.find('div.view > div').html()).toBe('<div><span></span> <span>livedata.displayer.emptyValue</span></div>');
   })
 
   it('Renders a viewable entry with an empty content', () => {
@@ -92,9 +91,7 @@ describe('BaseDisplayer.vue', () => {
       }
     });
 
-    expect(wrapper.find('div .view > div').html()).toBe('<div tabindex="0"><span></span>\n' +
-      '  <!---->\n' +
-      '</div>');
+    expect(wrapper.find('div .view > div').text()).toBe('');
   })
 
   it('Renders an entry when isEmpty is set to false', () => {
@@ -110,9 +107,7 @@ describe('BaseDisplayer.vue', () => {
     // Even when the action is not allowed and the property value is undefined, 'N/A' is not displayed
     // if the props isEmpty is set to false.
     // This is useful when a displayed has his own way to present empty values, such as the link displayer.
-    expect(wrapper.find('div.view > div').html()).toBe('<div tabindex="0"><span></span>\n' +
-      '  <!---->\n' +
-      '</div>');
+    expect(wrapper.find('div.view > div').text()).toBe('');
   })
 
 })

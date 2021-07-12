@@ -35,6 +35,7 @@
     :property-id="propertyId"
     :entry="entry"
     :is-empty="actions.length === 0"
+    :intercept-touch="false"
   >
 
     <!-- Provide the Action Viewer widget to the `viewer` slot -->

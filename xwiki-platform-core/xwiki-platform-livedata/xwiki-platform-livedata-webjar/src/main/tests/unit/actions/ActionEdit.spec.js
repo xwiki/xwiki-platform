@@ -29,7 +29,8 @@ function initWrapper({isEditable = true, setEdit = undefined}) {
 
   return mount(ActionEdit, {
     propsData: {
-      displayer: {isEditable, setEdit}
+      displayer: {isEditable, setEdit},
+      closePopover: () => {}
     },
     mocks: {
       $t: (key) => key
@@ -42,11 +43,10 @@ describe('ActionEdit.vue', () => {
     const setEdit = jest.fn();
     const wrapper = initWrapper({setEdit});
 
-    expect(wrapper.html()).toBe(
-      '<span title="livedata.displayer.actions.edit" class="livedata-base-action btn">' +
-      '<span class="icon-placeholder"></span> ' +
-      'livedata.displayer.actions.edit' +
-      '</span>');
+    expect(wrapper.attributes('title')).toBe('livedata.displayer.actions.edit');
+    expect(wrapper.attributes('class')).toBe('livedata-base-action btn');
+    expect(wrapper.text()).toBe('');
+    expect(wrapper.find('span span').attributes('class')).toBe('icon-placeholder')
   })
 
   it('Renders when not editable', async () => {

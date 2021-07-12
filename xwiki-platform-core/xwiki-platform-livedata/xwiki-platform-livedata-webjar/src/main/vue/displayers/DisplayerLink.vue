@@ -45,9 +45,9 @@
         so we create an explicit "no value" message in that case
       -->
       <a v-if="linkContent && hasViewRight"
-         :href="href"
-         :class="{'explicit-empty-value': !html && !htmlValue}"
-         v-html="linkContent"
+        :href="href"
+        :class="{'explicit-empty-value': !html && !htmlValue}"
+        v-html="linkContent"
       ></a>
       <span v-else v-html="linkContent"></span>
     </template>
@@ -55,12 +55,6 @@
 
     <!-- Keep the default Editor widget -->
     <template #editor></template>
-
-
-    <!-- Link specific actions added in addition to the generic actions provided by the Base displayer.  -->
-<!--    <template #popover-actions="{closePopover}">-->
-<!--      <ActionFollowLink :displayer="{ href }" v-if="isEditable" :close-popover="closePopover"/>-->
-<!--    </template>-->
 
   </BaseDisplayer>
 </template>
@@ -71,7 +65,6 @@ import displayerMixin from "./displayerMixin.js";
 import displayerLinkMixin from "./displayerLinkMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin";
 import BaseDisplayer from "./BaseDisplayer.vue";
-import ActionFollowLink from "./actions/ActionFollowLink.vue";
 
 export default {
 
@@ -79,7 +72,6 @@ export default {
 
   components: {
     BaseDisplayer,
-    ActionFollowLink,
   },
 
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
@@ -117,16 +109,6 @@ export default {
       return this.logic.isActionAllowed('view', this.entry)
     }
   },
-  methods: {
-    // Intercept the click event when the link displayed is editable, to let the popover be displayed instead, 
-    // allowing to choose between editing the cell, following the link or other actions.
-    // When the link displayer is not editable, the link behave as a standard link.
-    // interceptClick(event) {
-    //   if (this.isEditable) {
-    //     event.preventDefault();
-    //   }
-    // }
-  }
 };
 </script>
 

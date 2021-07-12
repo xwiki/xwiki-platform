@@ -43,9 +43,7 @@ describe('DisplayerDate.vue', () => {
   it('Switch to edit when double click', async () => {
     const wrapper = initWrapper(DisplayerDate, {});
 
-    const viewerDiv = wrapper.find('.view div[tabindex="0"]');
-
-    await viewerDiv.trigger('dblclick')
+    await wrapper.setData({isView: false});
 
     const input = wrapper.find('.editor-date');
     expect(input.element.value).toMatch('formatted date')

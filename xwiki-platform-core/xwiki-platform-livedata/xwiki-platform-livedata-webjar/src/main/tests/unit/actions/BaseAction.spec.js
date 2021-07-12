@@ -24,7 +24,8 @@ import BaseAction from "../../../displayers/actions/BaseAction";
 function initWrapper(options) {
   return mount(BaseAction, _.merge({
     propsData: {
-      titleTranslationKey: 'title.translation.key'
+      titleTranslationKey: 'title.translation.key',
+      closePopover: () => {}
     },
     mocks: {
       $t: (key) => key

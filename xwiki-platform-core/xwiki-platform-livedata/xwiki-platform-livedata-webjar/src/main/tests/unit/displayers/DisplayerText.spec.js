@@ -30,8 +30,7 @@ describe('DisplayerText.vue', () => {
   it('Renders an entry in edit mode', async () => {
     const wrapper = initWrapper(DisplayerText, {})
 
-    const viewerDiv = wrapper.find('div[tabindex="0"]');
-    await viewerDiv.trigger('dblclick');
+    await wrapper.setData({isView: false})
 
     expect(wrapper.find('input').element.value).toBe('red')
     expect(wrapper.find('input').element).toHaveFocus()

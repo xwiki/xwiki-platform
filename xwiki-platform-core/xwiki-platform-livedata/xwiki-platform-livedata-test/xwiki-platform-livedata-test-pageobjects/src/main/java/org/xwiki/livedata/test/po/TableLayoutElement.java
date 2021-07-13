@@ -685,9 +685,10 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
 
-        // Double click on the cell.
-        new Actions(getDriver().getWrappedDriver()).doubleClick(element).perform();
-
+        // Hover on the property and click on the edit button on the displayed popover.
+        new Actions(getDriver().getWrappedDriver()).moveToElement(element).perform();
+        getDriver().findElement(By.cssSelector(".displayer-action-list span[title='Edit']")).click();
+        
         // Selector of the edited field.
         By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
 
@@ -696,7 +697,7 @@ public class TableLayoutElement extends BaseElement
 
         // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements 
         // displayed in the live data (they are the same as the one of the inline edit mode).
-        new FormContainerElement(By.cssSelector(".livedata-displayer.edit"))
+        new FormContainerElement(By.cssSelector(".livedata-displayer .edit"))
             .setFieldValue(element.findElement(selector), newValue);
 
         userAction.run();

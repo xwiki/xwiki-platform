@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>XWiki WebSocket Module</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -41,7 +41,7 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -52,6 +52,13 @@
     <dependency>
       <groupId>javax.websocket</groupId>
       <artifactId>javax.websocket-api</artifactId>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

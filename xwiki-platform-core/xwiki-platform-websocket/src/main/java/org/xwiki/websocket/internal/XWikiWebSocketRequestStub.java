@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -158,7 +158,7 @@ public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
 
     private static Map<String, String[]> adaptParameterMap(Map<String, List<String>> params)
     {
-        Map<String, String[]> parameters = new HashMap<>();
+        Map<String, String[]> parameters = new LinkedHashMap<>();
         for (Map.Entry<String, List<String>> entry : params.entrySet()) {
             parameters.put(entry.getKey(), entry.getValue().toArray(new String[] {}));
         }

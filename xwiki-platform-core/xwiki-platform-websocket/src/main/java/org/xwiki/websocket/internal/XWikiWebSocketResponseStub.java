@@ -21,12 +21,13 @@ package org.xwiki.websocket.internal;
 
 import java.net.HttpCookie;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +65,7 @@ public class XWikiWebSocketResponseStub extends XWikiServletResponseStub
     {
         List<String> values = this.response.getHeaders().getOrDefault(name, new ArrayList<>());
         values.add(value);
-        this.response.getHeaders().put(value, values);
+        this.response.getHeaders().put(name, values);
     }
 
     @Override
@@ -100,7 +101,7 @@ public class XWikiWebSocketResponseStub extends XWikiServletResponseStub
     @Override
     public Collection<String> getHeaderNames()
     {
-        return new HashSet<>(this.response.getHeaders().keySet());
+        return new LinkedHashSet<>(this.response.getHeaders().keySet());
     }
 
     @Override
@@ -129,7 +130,7 @@ public class XWikiWebSocketResponseStub extends XWikiServletResponseStub
 
     private String toDateString(long date)
     {
-        return DateTimeFormatter.RFC_1123_DATE_TIME.format(Instant.ofEpochMilli(date));
+        return DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.of("GMT")).format(Instant.ofEpochMilli(date));
     }
 
     @Override

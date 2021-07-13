@@ -91,8 +91,10 @@ public class WebSocketScriptService implements ScriptService
 
             URL serverURL = xcontext.getURLFactory().getServerURL(xcontext);
             String scheme = "https".equals(serverURL.getProtocol()) ? "wss" : "ws";
-            return new URI(scheme, null, serverURL.getHost(), serverURL.getPort(), path.toString(), null, null)
-                .toString();
+            // We have to add the path afterwards because the URI constructor double encodes it.
+            // See https://bugs.openjdk.java.net/browse/JDK-8151244 (URI Constructor Doesn't Encode Path Correctly)
+            return new URI(scheme, null, serverURL.getHost(), serverURL.getPort(), null, null, null).toString()
+                + path.toString();
         } catch (Exception e) {
             this.logger.warn("Failed to create WebSocket URL for [{}]. Root cause is [{}].", pathOrRoleHint,
                 ExceptionUtils.getRootCauseMessage(e));

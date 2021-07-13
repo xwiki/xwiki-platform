@@ -136,6 +136,13 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- WebSocket -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-websocket</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- ********************************************************************** -->
     <!-- Core extension (what we absolutely require in a minimum XWiki runtime) -->

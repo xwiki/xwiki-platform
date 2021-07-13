@@ -38,9 +38,9 @@
     theme="light-border"
     placement="bottom"
     arrow
-    ref="tippy">
+    ref="tippy"
+  >
     <template #trigger>
-
       <div
         :class="{ view: isView, edit: !isView, editable: isEditable }"
         ref="displayerRoot"
@@ -67,8 +67,11 @@
             -->
             <span>{{ value }}</span>
           </slot>
-        <span v-if="!isViewable" v-html="$t('livedata.displayer.emptyValue')"></span>
-    </div>
+          <span
+            v-if="!isViewable"
+            v-html="$t('livedata.displayer.emptyValue')"
+          ></span>
+        </div>
 
         <!-- The slot containing the displayer Editor widget -->
         <div @keypress.enter="applyEdit"
@@ -103,11 +106,17 @@
     <!-- Popover content -->
     <template>
       <div class="displayer-action-list">
-        <ActionEdit :displayer="{ isEditable, setEdit: () => { setEdit() } }" :close-popover="closePopover"/>
-        <ActionFollowLink :displayer="{ href }" v-if="href" :close-popover="closePopover"/>
+        <ActionEdit
+          :displayer="{ isEditable, setEdit: () => { setEdit() } }"
+          :close-popover="closePopover"
+        />
+        <ActionFollowLink
+          :displayer="{ href }"
+          v-if="href"
+          :close-popover="closePopover"
+        />
       </div>
     </template>
-
   </TippyComponent>
 </template>
 
@@ -127,10 +136,10 @@ export default {
   mixins: [displayerMixin],
 
   components: {
-    ActionFollowLink,
-    XWikiLoader,
-    TippyComponent,
     ActionEdit,
+    ActionFollowLink,
+    TippyComponent,
+    XWikiLoader
   },
 
   data () {

@@ -83,18 +83,10 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
     return {show: jest.fn()}
   });
 
-  // Mock $.getJson
-  global.$.getJSON = jest.fn(() => {
-    // Default promise for the Icons component.
-    let promise = {
-      done: (fn) => {
-        fn({icons: [{cssClass: 'fa-minus'}]})
-        return promise;
-      },
-      fail: () => promise
-    };
-    return promise;
-  })
+  // Mock fetch.
+  global.fetch = jest.fn(() => ({
+    json: jest.fn()
+  }));
 
   // Creates a div in the document body. It will be used as the attach point when mounting the Vue component.
   // This is useful for some assertions, for instance when testing which element is on focus.

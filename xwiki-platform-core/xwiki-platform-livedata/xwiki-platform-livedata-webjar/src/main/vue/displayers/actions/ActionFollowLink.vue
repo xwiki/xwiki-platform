@@ -16,11 +16,13 @@
 -->
 
 <template>
-  <BaseAction 
-    title-translation-key="livedata.displayer.actions.followLink" 
-    :icon-descriptor="{ name: 'link' }" 
-    :handler="handler"
-    :close-popover="closePopover"/>
+  <a :href="displayer.href">
+    <BaseAction
+      title-translation-key="livedata.displayer.actions.followLink"
+      :icon-descriptor="{ name: 'link' }"
+      :close-popover="closePopover"
+    />
+  </a>
 </template>
 
 <script>
@@ -43,11 +45,6 @@ export default {
       required: true
     }
   },
-  methods: {
-    handler() {
-      window.location.href = this.displayer.href;
-    }
-  }
 };
 </script>
 

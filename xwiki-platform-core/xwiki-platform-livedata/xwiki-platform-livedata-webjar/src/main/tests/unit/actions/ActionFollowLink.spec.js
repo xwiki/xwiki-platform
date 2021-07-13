@@ -28,6 +28,11 @@ function initWrapper() {
     currentWiki: 'xwiki'
   })
 
+  // Mock fetch.
+  global.fetch = jest.fn(() => ({
+    json: jest.fn()
+  }));
+
   return mount(ActionFollowLink, {
     propsData: {
       displayer: {
@@ -45,20 +50,9 @@ function initWrapper() {
 describe('ActionFollowLink.vue', () => {
   it('Renders and click', async () => {
     const wrapper = initWrapper();
-
-    expect(wrapper.attributes('title')).toBe('livedata.displayer.actions.followLink')
-    expect(wrapper.attributes('class')).toBe('livedata-base-action btn')
-    expect(wrapper.text()).toBe('')
-    expect(wrapper.find('span span').attributes('class')).toBe('icon-placeholder')
-
-    // Substitutes the actual window.location by a mock to be able to write an assertion on its new value
-    // after the click on the action.
-    delete global.window.location;
-    global.window = Object.create(window);
-    window.location = { href: ''}
-
-    await wrapper.trigger('click');
-
-    expect(window.location.href).toBe('https://link/')
+    const actionSpan = wrapper.find('a > span');
+    expect(actionSpan.attributes('title')).toBe('livedata.displayer.actions.followLink')
+    expect(actionSpan.attributes('class')).toBe('livedata-base-action btn')
+    expect(wrapper.attributes('href')).toBe('https://link/')
   })
 })

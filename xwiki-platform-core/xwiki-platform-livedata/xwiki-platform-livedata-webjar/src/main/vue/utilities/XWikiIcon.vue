@@ -19,15 +19,24 @@
  -->
 
 <template>
-  <img v-if="isImage" :src="url" :class="additionalClasses"/>
-  <span v-else-if="isFont" :class="[cssClass, ...additionalClasses]"></span>
-  <span v-else class="icon-placeholder"></span>
+  <img
+    v-if="isImage"
+    :src="url"
+  />
+  <span
+    v-else-if="isFont"
+    :class="cssClass"
+  ></span>
+  <span
+    v-else
+    class="icon-placeholder"
+  ></span>
 </template>
 
 
 <script>
 
-import $ from "jquery";
+import "whatwg-fetch"
 
 // This cache stores the metadata of the already resolved icons as well as the Promises for the icons currently being 
 // asynchronously resolved.
@@ -39,10 +48,7 @@ export default {
   name: "XWikiIcon",
 
   props: {
-    iconDescriptor: Object,
-    additionalClasses: {
-      default: () => ([])
-    }
+    iconDescriptor: Object
   },
 
   data: () => ({
@@ -79,46 +85,45 @@ export default {
   },
 
   methods: {
-    fetchRemoteIconDescriptor(iconName) {
-      return new Promise((resolve, reject) => {
-        const iconURL = `/xwiki/rest/wikis/${XWiki.currentWiki}/iconThemes/icons`;
-        $.getJSON(iconURL, {name: iconName})
-          .done((data) => {
-            if (!data || (data.missingIcons || []).length > 0 || (data.icons || []).length < 1) {
-              console.error("Malformed icon response", data);
-              reject();
-            } else {
-              resolve(data.icons[0]);
-            }
-          })
-          .fail((jqxhr, textStatus, error) => {
-            console.error(textStatus, error)
-            reject();
-          })
-      });
+    async fetchRemoteIconDescriptor(iconName) {
+      try {
+        const iconURL = `/xwiki/rest/wikis/${XWiki.currentWiki}/iconThemes/icons?name=${encodeURIComponent(iconName)}`;
+        const response = await window.fetch(iconURL, {
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        const jsonResponse = await response.json();
+        iconCache[iconName] = jsonResponse?.icons[0];
+        return jsonResponse?.icons[0];
+      } catch (err) {
+        console.error(err);
+      }
     },
   },
 
   watch: {
     iconDescriptor: {
-      handler(iconDescriptor) {
+      async handler(iconDescriptor) {
+        if (this.isImage || this.isFont) {
+          return;
+        }
         const iconName = iconDescriptor?.name;
         if (!iconName) {
           return;
         }
         // If the icon was not already fetched, fetch it!
         if (!iconCache[iconName]) {
-          // We set the iconCache value to the promise object, so that every other request
-          // of the same icon whether they occur during the first request or after,
-          // will use the same promise and will not create another request.
+          // We set the iconCache value to the promise object, so that every other request of the same icon whether they
+          // occur during the first request or after,// will use the same promise and will not create another request.
           iconCache[iconName] = this.fetchRemoteIconDescriptor(iconName);
         }
         // Set the icon to the resolved value of the promise.
-        iconCache[iconName].then(value => this.remoteIconDescriptor = value)
+        this.remoteIconDescriptor = await iconCache[iconName];
       },
       immediate: true
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -27,6 +27,11 @@ function initWrapper({isEditable = true, setEdit = undefined}) {
     currentWiki: 'xwiki'
   })
 
+  // Mock fetch.
+  global.fetch = jest.fn(() => ({
+    json: jest.fn()
+  }));
+
   return mount(ActionEdit, {
     propsData: {
       displayer: {isEditable, setEdit},
@@ -41,20 +46,18 @@ function initWrapper({isEditable = true, setEdit = undefined}) {
 describe('ActionEdit.vue', () => {
   it('Renders and edit on click', async () => {
     const setEdit = jest.fn();
-    const stop = jest.fn();
+    const stopPropagation = jest.fn();
 
     const wrapper = initWrapper({setEdit});
     expect(wrapper.attributes('title')).toBe('livedata.displayer.actions.edit');
     expect(wrapper.attributes('class')).toBe('livedata-base-action btn');
     expect(wrapper.text()).toBe('');
 
-    expect(wrapper.find('span span').attributes('class')).toBe('icon-placeholder')
-    // The stop attribute is not available in the event by default, adding it to make the handler pass as well
-    // as being able to assert its call.
-    await wrapper.trigger('click', {stop});
+    // Overriding the stopPropagation method to be able to assert it after the event.
+    await wrapper.trigger('click', {stopPropagation});
 
     expect(setEdit.mock.calls.length).toBe(1)
-    expect(stop.mock.calls.length).toBe(1)
+    expect(stopPropagation.mock.calls.length).toBe(1)
   })
 
   it('Renders when not editable', async () => {

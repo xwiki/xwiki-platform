@@ -20,7 +20,8 @@
         @click="trigger"
         @keypress.self.enter="trigger"
         :title="$t(titleTranslationKey)"
-        tabindex="0">
+        tabindex="0"
+  >
     <XWikiIcon :icon-descriptor="iconDescriptor"/>
     <template v-if="labelTranslationKey"> {{ $t(labelTranslationKey) }}</template>
   </span>

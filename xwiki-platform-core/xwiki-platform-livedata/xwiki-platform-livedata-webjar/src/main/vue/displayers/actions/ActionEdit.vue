@@ -21,7 +21,8 @@
     title-translation-key="livedata.displayer.actions.edit"
     :icon-descriptor="{ name: 'edit' }"
     :handler="handler"
-    :close-popover="closePopover"/>
+    :close-popover="closePopover"
+  />
 </template>
 
 <script>
@@ -47,7 +48,7 @@ export default {
 
   methods: {
     handler(event) {
-      event.stop();
+      event.stopPropagation();
       this.displayer.setEdit();
     },
   },

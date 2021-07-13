@@ -141,6 +141,27 @@
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
   $(document).ready(function() {
+
+    /** Add autocomplete attributes for accessibility purpose. */
+    const prefix = 'XWiki.XWikiUsers_0_';
+    var fieldsPurposes = {
+      'first_name': 'given-name',
+      'last_name': 'family-name',
+      'company': 'organization',
+      'email': 'email',
+      'phone': 'tel',
+      'address': 'street-address',
+      'blog': 'url'
+    };
+    for (const entry of Object.entries(fieldsPurposes)) {
+      var name = entry[0];
+      var purpose = entry[1];
+      var selector = '#' + (prefix + name).replace(/\./g, '\\.');
+      var inputField = $(selector);
+      if (inputField.length === 1)
+        inputField.attr('autocomplete', purpose);
+    }
+
     /**
      * Save the new user status.
      */

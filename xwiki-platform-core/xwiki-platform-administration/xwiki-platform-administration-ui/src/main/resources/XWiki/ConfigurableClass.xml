@@ -177,10 +177,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       #set($configurableObjs = [])
       #foreach($configurableObj in $allConfigurableObjs)
         #if($app.getValue('displayInSection', $configurableObj) == $section)
-          ## If this is space admin, then don't display global, if global don't display space.
-          #if($globaladmin == ($app.getValue('configureGlobally', $configurableObj) == 1))
-            #set($discard = $configurableObjs.add($configurableObj))
-          #end
+          #set($discard = $configurableObjs.add($configurableObj))
         #end
       #end
       #if($configurableObjs.size() == 0)
@@ -320,7 +317,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   &lt;/script&gt;
   {{/html}}##
   ##
-#else
+#elseif ($currentDoc != 'XWiki.ConfigurableClass')
   ##
   ##------------------------------------------------------------------------------------------------------------
   ## If section is not set then we are viewing the main administration page.
@@ -520,21 +517,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       <valueField/>
       <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </configurationClass>
-    <configureGlobally>
-      <customDisplay/>
-      <defaultValue/>
-      <disabled>0</disabled>
-      <displayFormType>checkbox</displayFormType>
-      <displayType/>
-      <hint/>
-      <name>configureGlobally</name>
-      <number>4</number>
-      <prettyName>configureGlobally</prettyName>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-    </configureGlobally>
     <displayBeforeCategory>
       <customDisplay/>
       <disabled>0</disabled>
@@ -644,6 +626,31 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       <values/>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </propertiesToShow>
+    <scope>
+      <cache>0</cache>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <freeText/>
+      <hint/>
+      <largeStorage>0</largeStorage>
+      <multiSelect>0</multiSelect>
+      <name>scope</name>
+      <number>12</number>
+      <picker>1</picker>
+      <prettyName>scope</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>WIKI|SPACE|ALL_SPACES|WIKI+ALL_SPACES</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </scope>
     <sectionOrder>
       <customDisplay/>
       <disabled>0</disabled>

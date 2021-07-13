@@ -281,17 +281,17 @@
       #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
         &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('edit', 'category=preferences')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.preferences.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
       #end
-      &lt;h1&gt;$services.localization.render('platform.core.profile.section.displayPreferences')&lt;/h1&gt;
+      &lt;h2&gt;$services.localization.render('platform.core.profile.section.displayPreferences')&lt;/h2&gt;
       &lt;dl&gt;
         #displayField('displayHiddenDocuments', 'platform.core.profile.displayHiddenDocuments', '0')
         #displayField('accessibility'         , 'platform.core.profile.enableAccessibility'   , '0')
       &lt;/dl&gt;
-      &lt;h1&gt;$services.localization.render('platform.core.profile.section.localizationPreferences')&lt;/h1&gt;
+      &lt;h2&gt;$services.localization.render('platform.core.profile.section.localizationPreferences')&lt;/h2&gt;
       &lt;dl&gt;
         #set ($defaultValue = $xwiki.getXWikiPreference('timezone'))
         #displayField('timezone'              , 'platform.core.profile.timezone'              , $defaultValue)
       &lt;/dl&gt;
-      &lt;h1&gt;$services.localization.render('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
+      &lt;h2&gt;$services.localization.render('platform.core.profile.section.editorPreferences')&lt;/h2&gt;
       &lt;dl&gt;
         #set ($defaultValue = $xwiki.getXWikiPreference('editor'))
         #if ("$!defaultValue" == '')
@@ -300,7 +300,7 @@
         #displayField('editor'                , 'platform.core.profile.editor'                , $defaultValue)
         #displayField('usertype'              , 'platform.core.profile.userType'              , 'Simple')
       &lt;/dl&gt;
-      &lt;h1&gt;$services.localization.render('platform.core.profile.section.extensionPreferences')&lt;/h1&gt;
+      &lt;h2&gt;$services.localization.render('platform.core.profile.section.extensionPreferences')&lt;/h2&gt;
       &lt;dl&gt;
         #set ($defaultValue = $xwiki.getXWikiPreference('extensionConflictSetup'))
         #if ("$!defaultValue" == '')
@@ -314,7 +314,7 @@
   #if(($isMyProfile || $hasAdmin) &amp;&amp; ($xcontext.action == 'view') &amp;&amp; !$doc.getObject('XWiki.LDAPProfileClass'))
     &lt;div class="half column"&gt;
       &lt;div class="passwordManagement"&gt;
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.security')&lt;/h1&gt;
+        &lt;h2&gt;$services.localization.render('platform.core.profile.section.security')&lt;/h2&gt;
         &lt;span class="buttonwrapper"&gt;&lt;a id="changePassword" href="$doc.getURL('view', 'xpage=passwd')"&gt;$services.localization.render('platform.core.profile.changePassword')&lt;/a&gt;&lt;/span&gt;
       &lt;/div&gt;
     &lt;/div&gt;

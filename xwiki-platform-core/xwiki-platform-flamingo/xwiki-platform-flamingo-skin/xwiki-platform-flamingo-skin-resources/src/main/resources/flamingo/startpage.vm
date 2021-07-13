@@ -20,6 +20,11 @@
 #template("xwikivars.vm")
 #template("layoutvars.vm")
 #template("htmlheader.vm")
+#if ("$!xcontext.action" == 'view')
+  <p class="skip-nav">
+    <a class="btn btn-default" href="#xwikicontent">$services.localization.render('skipTo.content')</a>
+  </p>
+#end
 #if($displayMainMenu)
   <div id="menuview">
     #template("menus_view.vm")

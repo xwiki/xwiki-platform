@@ -338,3 +338,15 @@
   border-left-color: fade((@xwiki-border-color), 80%);
   border-right-color: fade((@xwiki-border-color), 80%);
 }
+
+.skip-nav {
+  margin: 0;
+  a {
+    position: absolute;
+    top: -20em;
+    z-index: 10;
+    &:focus, &:active {
+      top: 0;
+    }
+  }
+}

@@ -142,7 +142,7 @@
   'use strict';
   $(document).ready(function() {
 
-    /** Add autocomplete attributes for accessibility purpose. */
+    /** Add autocomplete attributes to ease form filling. */
     const prefix = 'XWiki.XWikiUsers_0_';
     var fieldsPurposes = {
       'first_name': 'given-name',

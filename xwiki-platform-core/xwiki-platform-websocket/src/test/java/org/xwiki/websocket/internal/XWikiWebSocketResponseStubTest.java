@@ -20,6 +20,7 @@
 package org.xwiki.websocket.internal;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -59,21 +60,34 @@ class XWikiWebSocketResponseStubTest
 
         XWikiRequest request = mock(XWikiRequest.class);
         Cookie cookie = new Cookie("bar", "abc");
-        cookie.setMaxAge(3600);
+        cookie.setDomain("xwiki.org");
         cookie.setPath("/xwiki/websocket");
+        cookie.setMaxAge(3600);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
         when(request.getCookie("bar")).thenReturn(cookie);
         stub.removeCookie("bar", request);
 
+        stub.setDateHeader("datE", 1626247690000L);
         stub.addDateHeader("Date", 1212491130000L);
         stub.addHeader("Content-Type", "application/json");
+        stub.addHeader("content-type", "text/plain");
         stub.addIntHeader("Size", 123);
+        stub.setIntHeader("sIze", 321);
 
-        assertEquals("Tue, 3 Jun 2008 11:05:30 GMT", stub.getHeader("Date"));
-        assertEquals(new LinkedHashSet<String>(Arrays.asList("Set-Cookie", "Date", "Content-Type", "Size")),
+        assertEquals("Wed, 14 Jul 2021 07:28:10 GMT", stub.getHeader("dAte"));
+        assertEquals(Arrays.asList("Wed, 14 Jul 2021 07:28:10 GMT", "Tue, 3 Jun 2008 11:05:30 GMT"),
+            stub.getHeaders("DATE"));
+        assertEquals(new LinkedHashSet<String>(Arrays.asList("Set-Cookie", "datE", "Content-Type", "sIze")),
             stub.getHeaderNames());
-        assertEquals(Arrays.asList("foo=bar", "bar=abc"), stub.getHeaders("Set-Cookie"));
+        assertEquals(
+            Arrays.asList("foo=\"bar\"",
+                "bar=\"abc\"; Domain=xwiki.org; Path=/xwiki/websocket; Max-Age=0; HttpOnly; Secure"),
+            stub.getHeaders("set-cOOkie"));
+        assertEquals("321", stub.getHeader("SiZe"));
+        assertEquals(Collections.singletonList("321"), stub.getHeaders("SIZE"));
 
-        assertTrue(stub.containsHeader("Date"));
+        assertTrue(stub.containsHeader("dATe"));
         assertFalse(stub.containsHeader("Age"));
     }
 }

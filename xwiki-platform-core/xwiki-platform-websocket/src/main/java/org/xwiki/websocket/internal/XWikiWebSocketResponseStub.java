@@ -19,7 +19,6 @@
  */
 package org.xwiki.websocket.internal;
 
-import java.net.HttpCookie;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +29,8 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
 import javax.websocket.HandshakeResponse;
@@ -63,15 +64,19 @@ public class XWikiWebSocketResponseStub extends XWikiServletResponseStub
     @Override
     public void addHeader(String name, String value)
     {
-        List<String> values = this.response.getHeaders().getOrDefault(name, new ArrayList<>());
+        List<String> values = getHeaderValues(name);
+        if (values == null) {
+            values = new ArrayList<>();
+            this.response.getHeaders().put(name, values);
+        }
         values.add(value);
-        this.response.getHeaders().put(name, values);
     }
 
     @Override
     public boolean containsHeader(String name)
     {
-        return this.response.getHeaders().containsKey(name);
+        List<String> values = getHeaderValues(name);
+        return values != null && !values.isEmpty();
     }
 
     @Override
@@ -107,6 +112,9 @@ public class XWikiWebSocketResponseStub extends XWikiServletResponseStub
     @Override
     public void setHeader(String name, String value)
     {
+        Set<String> namesToRemove = this.response.getHeaders().keySet().stream()
+            .filter(headerName -> StringUtils.equalsIgnoreCase(name, headerName)).collect(Collectors.toSet());
+        this.response.getHeaders().keySet().removeAll(namesToRemove);
         this.response.getHeaders().put(name, new ArrayList<>(Arrays.asList(value)));
     }
 
@@ -142,15 +150,26 @@ public class XWikiWebSocketResponseStub extends XWikiServletResponseStub
     @Override
     public void addCookie(Cookie cookie)
     {
-        HttpCookie httpCookie = new HttpCookie(cookie.getName(), cookie.getValue());
-        httpCookie.setComment(cookie.getComment());
-        httpCookie.setDomain(cookie.getDomain());
-        httpCookie.setHttpOnly(cookie.isHttpOnly());
-        httpCookie.setMaxAge(cookie.getMaxAge());
-        httpCookie.setPath(cookie.getPath());
-        httpCookie.setSecure(cookie.getSecure());
-        httpCookie.setVersion(cookie.getVersion());
-        addHeader("Set-Cookie", httpCookie.toString());
+        StringBuilder header = new StringBuilder();
+
+        header.append(cookie.getName()).append("=\"").append(cookie.getValue()).append('"');
+        if (cookie.getDomain() != null) {
+            header.append("; Domain=").append(cookie.getDomain());
+        }
+        if (cookie.getPath() != null) {
+            header.append("; Path=").append(cookie.getPath());
+        }
+        if (cookie.getMaxAge() >= 0) {
+            header.append("; Max-Age=").append(cookie.getMaxAge());
+        }
+        if (cookie.isHttpOnly()) {
+            header.append("; HttpOnly");
+        }
+        if (cookie.getSecure()) {
+            header.append("; Secure");
+        }
+
+        addHeader("Set-Cookie", header.toString());
     }
 
     @Override

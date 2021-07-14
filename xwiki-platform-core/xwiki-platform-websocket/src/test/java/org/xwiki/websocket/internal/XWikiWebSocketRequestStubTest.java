@@ -81,9 +81,11 @@ class XWikiWebSocketRequestStubTest
         assertEquals("xyz", stub.getCookie("validation").getValue());
         assertEquals(5, stub.getCookies().length);
 
-        assertEquals(1212491130000L, stub.getDateHeader("Date"));
-        assertEquals(12, stub.getIntHeader("Int"));
-        assertEquals(2, Collections.list(stub.getHeaders("Int")).size());
+        assertEquals(1212491130000L, stub.getDateHeader("daTe"));
+        assertEquals(-1, stub.getDateHeader("missing"));
+        assertEquals(12, stub.getIntHeader("iNt"));
+        assertEquals(-1, stub.getIntHeader("Missing"));
+        assertEquals(2, Collections.list(stub.getHeaders("inT")).size());
         assertEquals(Arrays.asList("Cookie", "Date", "Int"), Collections.list(stub.getHeaderNames()));
 
         assertEquals("GET", stub.getMethod());

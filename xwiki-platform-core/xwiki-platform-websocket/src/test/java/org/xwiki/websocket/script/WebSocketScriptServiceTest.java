@@ -19,13 +19,17 @@
  */
 package org.xwiki.websocket.script;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -35,6 +39,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,6 +59,9 @@ class WebSocketScriptServiceTest
 
     @Mock
     private XWikiContext xcontext;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setup() throws Exception
@@ -88,5 +96,17 @@ class WebSocketScriptServiceTest
     void urlWithRoleHint()
     {
         assertEquals("ws://www.xwiki.org:80/xwiki/websocket/test/one%2Ftwo", this.service.url("one/two"));
+    }
+
+    @Test
+    void urlWithException() throws Exception
+    {
+        when(this.xcontext.getURLFactory().getServerURL(this.xcontext))
+            .thenThrow(new MalformedURLException("Invalid server URL!"));
+
+        assertNull(this.service.url("test"));
+        assertEquals(
+            "Failed to create WebSocket URL for [test]. Root cause is [MalformedURLException: Invalid server URL!].",
+            this.logCapture.getMessage(0));
     }
 }

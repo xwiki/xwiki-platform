@@ -24,7 +24,7 @@ describe('BaseDisplayer.vue', () => {
   it('Renders an entry in view mode', () => {
     const wrapper = initWrapper(BaseDisplayer, {});
 
-    expect(wrapper.text()).toMatch('red') 
+    expect(wrapper.text()).toMatch('red')
   })
 
   it('Switch to edit mode', () => {

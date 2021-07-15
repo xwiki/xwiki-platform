@@ -687,13 +687,17 @@ public class TableLayoutElement extends BaseElement
 
         // Hover on the property and click on the edit button on the displayed popover.
         new Actions(getDriver().getWrappedDriver()).moveToElement(element).perform();
-        getDriver().findElement(By.cssSelector(".displayer-action-list span[title='Edit']")).click();
+        By editActionSelector = By.cssSelector(".displayer-action-list span[title='Edit']");
+        // Waits until the popover hovered while going from on property to the other fades away. This is not perceptible
+        // by end users but can cause issue with Selenium, because several edit actions are selectable at the same time.
+        getDriver().waitUntilCondition(input -> getDriver().findElementsWithoutWaiting(editActionSelector).size() == 1);
+        getDriver().findElementWithoutWaiting(editActionSelector).click();
         
         // Selector of the edited field.
         By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
 
         // Waits for the text input to be displayed.
-        getDriver().waitUntilCondition(input -> !element.findElements(selector).isEmpty());
+        getDriver().waitUntilCondition(input -> !getDriver().findElementsWithoutWaiting(element, selector).isEmpty());
 
         // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements 
         // displayed in the live data (they are the same as the one of the inline edit mode).

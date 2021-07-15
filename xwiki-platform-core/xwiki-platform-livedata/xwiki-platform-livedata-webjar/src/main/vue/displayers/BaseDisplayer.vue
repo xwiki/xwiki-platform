@@ -314,9 +314,11 @@ export default {
   width: 100%;
 }
 
-.livedata-displayer .popover {
-  width: auto;
+.displayer-actions-popover > div {
+  width: 100%;
   height: auto;
+  min-height: 1em;
+  display: inline-block;
 }
 </style>
 

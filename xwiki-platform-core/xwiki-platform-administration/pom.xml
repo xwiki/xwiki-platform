@@ -32,7 +32,6 @@
   <packaging>pom</packaging>
   <description>Application for administrating wiki features like users, groups, rights etc.</description>
   <modules>
-    <module>xwiki-platform-administration-default</module>
     <module>xwiki-platform-administration-ui</module>
   </modules>
   <profiles>

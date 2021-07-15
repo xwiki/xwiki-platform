@@ -54,7 +54,6 @@
       <categoryIcon>
         <customDisplay/>
         <disabled>0</disabled>
-        <hint/>
         <name>categoryIcon</name>
         <number>11</number>
         <picker>0</picker>
@@ -66,11 +65,9 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </categoryIcon>
       <codeToExecute>
-        <contenttype>VelocityWiki</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
-        <hint/>
+        <editor>Text</editor>
         <name>codeToExecute</name>
         <number>7</number>
         <picker>0</picker>
@@ -86,13 +83,10 @@
         <cache>0</cache>
         <classname/>
         <customDisplay/>
-        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
-        <freeText/>
         <hint/>
         <idField/>
-        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>configurationClass</name>
         <number>3</number>
@@ -110,10 +104,23 @@
         <valueField/>
         <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </configurationClass>
+      <configureGlobally>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>configureGlobally</name>
+        <number>4</number>
+        <prettyName>configureGlobally</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </configureGlobally>
       <displayBeforeCategory>
         <customDisplay/>
         <disabled>0</disabled>
-        <hint/>
         <name>displayBeforeCategory</name>
         <number>10</number>
         <picker>0</picker>
@@ -127,7 +134,6 @@
       <displayInCategory>
         <customDisplay/>
         <disabled>0</disabled>
-        <hint/>
         <name>displayInCategory</name>
         <number>9</number>
         <picker>0</picker>
@@ -141,7 +147,6 @@
       <displayInSection>
         <customDisplay/>
         <disabled>0</disabled>
-        <hint/>
         <name>displayInSection</name>
         <number>1</number>
         <picker>0</picker>
@@ -155,7 +160,6 @@
       <heading>
         <customDisplay/>
         <disabled>0</disabled>
-        <hint/>
         <name>heading</name>
         <number>2</number>
         <picker>0</picker>
@@ -169,7 +173,6 @@
       <iconAttachment>
         <customDisplay/>
         <disabled>0</disabled>
-        <hint/>
         <name>iconAttachment</name>
         <number>8</number>
         <picker>0</picker>
@@ -183,7 +186,6 @@
       <linkPrefix>
         <customDisplay/>
         <disabled>0</disabled>
-        <hint/>
         <name>linkPrefix</name>
         <number>5</number>
         <picker>0</picker>
@@ -197,12 +199,8 @@
       <propertiesToShow>
         <cache>0</cache>
         <customDisplay/>
-        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
-        <freeText/>
-        <hint/>
-        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>propertiesToShow</name>
         <number>6</number>
@@ -219,35 +217,9 @@
         <values/>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </propertiesToShow>
-      <scope>
-        <cache>0</cache>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText/>
-        <hint/>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>12</number>
-        <picker>1</picker>
-        <prettyName>scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <sort/>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>WIKI|SPACE|ALL_SPACES|WIKI+ALL_SPACES</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
       <sectionOrder>
         <customDisplay/>
         <disabled>0</disabled>
-        <hint/>
         <name>sectionOrder</name>
         <number>12</number>
         <numberType>integer</numberType>
@@ -267,6 +239,9 @@
     </property>
     <property>
       <configurationClass>XWiki.Like.LikeConfigurationClass</configurationClass>
+    </property>
+    <property>
+      <configureGlobally>1</configureGlobally>
     </property>
     <property>
       <displayBeforeCategory>other</displayBeforeCategory>
@@ -290,9 +265,6 @@
       <propertiesToShow/>
     </property>
     <property>
-      <scope>WIKI</scope>
-    </property>
-    <property>
       <sectionOrder>100</sectionOrder>
     </property>
   </object>
@@ -310,6 +282,21 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <enabled>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>enabled</name>
+        <number>1</number>
+        <prettyName>enabled</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </enabled>
       <alwaysDisplayButton>
         <customDisplay/>
         <defaultValue/>
@@ -339,30 +326,15 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
       </cacheCapacity>
-      <enabled>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <hint/>
-        <name>enabled</name>
-        <number>1</number>
-        <prettyName>enabled</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </enabled>
     </class>
+    <property>
+      <enabled>1</enabled>
+    </property>
     <property>
       <alwaysDisplayButton>1</alwaysDisplayButton>
     </property>
     <property>
       <cacheCapacity>500</cacheCapacity>
-    </property>
-    <property>
-      <enabled>1</enabled>
     </property>
   </object>
 </xwikidoc>

@@ -104,7 +104,9 @@ define('xwiki-livedata', [
    */
   const Logic = function (element) {
     this.element = element;
-    this.data = JSON.parse(element.getAttribute("data-config") || "{}");
+    const data= JSON.parse(element.getAttribute("data-config") || "{}");
+    data.data = Object.freeze(data.data)
+    this.data = data;
     this.currentLayoutId = "";
     this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = {
@@ -124,6 +126,9 @@ define('xwiki-livedata', [
       messages: {},
       silentFallbackWarn: true,
     });
+
+    // Vue.config.devtools = true
+    // Vue.config.performance = true
 
     // create Vuejs instance
     new Vue({
@@ -513,7 +518,7 @@ define('xwiki-livedata', [
     updateEntries () {
       return this.fetchEntries()
         .then(data => {
-          this.data.data = data
+          this.data.data = Object.freeze(data);
           // Remove the outdated footnotes, they will be recomputed by the new entries.
           this.footnotes.reset()
         })

@@ -688,10 +688,13 @@ public class TableLayoutElement extends BaseElement
         // Hover on the property and click on the edit button on the displayed popover.
         new Actions(getDriver().getWrappedDriver()).moveToElement(element).perform();
         By editActionSelector = By.cssSelector(".displayer-action-list span[title='Edit']");
-        // Waits until the popover hovered while going from on property to the other fades away. This is not perceptible
-        // by end users but can cause issue with Selenium, because several edit actions are selectable at the same time.
-        getDriver().waitUntilCondition(input -> getDriver().findElementsWithoutWaiting(editActionSelector).size() == 1);
-        getDriver().findElementWithoutWaiting(editActionSelector).click();
+        // Waits to have at least one popover visible and click on the edit action of the last one. While it does not
+        // seems to be possible in normal conditions, using selenium and moveToElement, several popover can be visible
+        // at the same time (especially on Chrome). We select the latest edit action, which is the one of the targeted
+        // property because the popover actions are appended at the end of the document.
+        getDriver().waitUntilCondition(input -> !getDriver().findElementsWithoutWaiting(editActionSelector).isEmpty());
+        List<WebElement> popoverActions = getDriver().findElementsWithoutWaiting(editActionSelector);
+        popoverActions.get(popoverActions.size() - 1).click();
         
         // Selector of the edited field.
         By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));

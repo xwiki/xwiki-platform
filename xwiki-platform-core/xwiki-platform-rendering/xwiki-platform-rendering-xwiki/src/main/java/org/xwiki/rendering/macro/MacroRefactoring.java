@@ -19,11 +19,14 @@
  */
 package org.xwiki.rendering.macro;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -54,4 +57,17 @@ public interface MacroRefactoring
     Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
         throws MacroRefactoringException;
+
+    /**
+     * Extract references used in the macro so that they can be used for example for creating backlinks.
+     *
+     * @param macroBlock the macro block in which to look for references.
+     * @return a set of references contained in the macro, in its content or parameters.
+     * @throws MacroRefactoringException in case of problem to parse the macro content.
+     * @since 13.7RC1
+     */
+    default Set<ResourceReference> extractReferences(MacroBlock macroBlock) throws MacroRefactoringException
+    {
+        return Collections.emptySet();
+    }
 }

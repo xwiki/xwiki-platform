@@ -131,6 +131,7 @@ import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
+import org.xwiki.rendering.internal.parser.LinkParser;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ContentParser;
@@ -309,9 +310,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private static final LocalStringEntityReferenceSerializer LOCAL_REFERENCE_SERIALIZER =
         new LocalStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
-    private static final Set<ResourceType> SUPPORTED_BACKLINK_TYPES = new HashSet<>(
-        Arrays.asList(ResourceType.SPACE, ResourceType.DOCUMENT, ResourceType.ATTACHMENT, ResourceType.PAGE));
-
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks.
@@ -393,6 +391,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private static SyntaxRegistry getSyntaxRegistry()
     {
         return Utils.getComponent(SyntaxRegistry.class);
+    }
+
+    /**
+     * Used to retrieve backlinks from an XDOM.
+     */
+    private static LinkParser getLinkParser() {
+        return Utils.getComponent(LinkParser.class);
     }
 
     private String title;
@@ -5459,58 +5464,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
-    // TODO: Move that in a generic rendering tool
     private void getUniqueLinkedEntityReferences(XDOM dom, EntityType entityType, Set<EntityReference> references)
     {
-        // TODO: Add support for macro as well.
-
-        List<LinkBlock> linkBlocks = dom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
-        List<ImageBlock> imageBlocks = dom.getBlocks(new ClassBlockMatcher(ImageBlock.class), Block.Axes.DESCENDANT);
-
-        // Links
-        for (LinkBlock linkBlock : linkBlocks) {
-            addReference(linkBlock.getReference(), entityType, references);
-        }
-
-        // Images
-        for (ImageBlock imageBlock : imageBlocks) {
-            addReference(imageBlock.getReference(), entityType, references);
-        }
-    }
-
-    private void addReference(ResourceReference reference, EntityType entityType, Set<EntityReference> references)
-    {
-        String referenceString = reference.getReference();
-        ResourceType resourceType = reference.getType();
-
-        if (!SUPPORTED_BACKLINK_TYPES.contains(resourceType)) {
-            // We are only interested in resources leading to a document
-            return;
-        }
-
-        // Optimization: If the reference is empty, the link is an autolink and we don`t include it.
-        if (StringUtils.isEmpty(referenceString)) {
-            return;
-        }
-
-        // Get the EntityReference corresponding to the ResourceReference in the current context
-        EntityReference linkEntityReference =
-            getResourceReferenceEntityReferenceResolver().resolve(reference, entityType);
-
-        // Get the DocumentReference corresponding the the EntityReference (the document version of a page reference,
-        // the document of an attachment, etc.)
-        DocumentReference linkDocumentReference =
-            getCurrentReferenceDocumentReferenceResolver().resolve(linkEntityReference, EntityType.DOCUMENT);
-
-        // Verify after resolving it that the link is not an autolink(i.e. a link to the current document)
-        if (!linkDocumentReference.equals(getDocumentReference())) {
-            // Since this method is used for saving backlinks and since backlinks must be
-            // saved with the space and page name but without the wiki part, we remove the wiki
-            // part before serializing.
-            // This is a bit of a hack since the default serializer should theoretically fail
-            // if it's passed an invalid reference.
-            references.add(linkEntityReference);
-        }
+        Set<EntityReference> uniqueLinkedEntityReferences =
+            getLinkParser().getUniqueLinkedEntityReferences(dom, entityType, getDocumentReference());
+        references.addAll(uniqueLinkedEntityReferences);
     }
 
     private Set<DocumentReference> toDocumentReferenceSet(Collection<? extends EntityReference> entityReferences,

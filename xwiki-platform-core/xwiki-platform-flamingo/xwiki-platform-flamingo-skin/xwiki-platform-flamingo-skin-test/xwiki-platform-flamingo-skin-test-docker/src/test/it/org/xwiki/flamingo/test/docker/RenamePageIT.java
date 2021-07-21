@@ -290,53 +290,168 @@ public class RenamePageIT
     {
         // FIXME: Using WebHome locations and not terminal page, since it's not properly supported yet.
         // Improve the test whenever XWIKI-18634 is fixed
-        String sourcePageLocation = RenamePageIT.class.getSimpleName() + ".SourceTestPageToBeLinked";
+        // Fixture: we're creating 5 different pages to ensure that the backlinks, rename are working properly
+        // and independently in different situations.
         String sourcePageName = "WebHome";
-        String sourcePage = sourcePageLocation + "." + sourcePageName;
+        String sourcePageLocation1 = RenamePageIT.class.getSimpleName() + ".StandardLink";
+        String sourcePage1 = sourcePageLocation1 + "." + sourcePageName;
+
+        String sourcePageLocation2 = RenamePageIT.class.getSimpleName() + ".StandardMacroLink";
+        String sourcePage2 = sourcePageLocation2 + "." + sourcePageName;
+
+        String sourcePageLocation3 = RenamePageIT.class.getSimpleName() + ".NestedMacroLink";
+        String sourcePage3 = sourcePageLocation3 + "." + sourcePageName;
+
+        String sourcePageLocation4 = RenamePageIT.class.getSimpleName() + ".ImageLink";
+        String sourcePage4 = sourcePageLocation4 + "." + sourcePageName;
+
+        String sourcePageLocation5 = RenamePageIT.class.getSimpleName() + ".IncludeLink";
+        String sourcePage5 = sourcePageLocation5 + "." + sourcePageName;
 
         String targetPageSubSpace = RenamePageIT.class.getSimpleName() + ".SubSpace";
-        String targetPageLastSpace = "TargetTestPageToBeLinked";
-        String targetPage = targetPageSubSpace + "." + targetPageLastSpace + ".WebHome";
+        String targetPageLastSpace1 = "TargetStandardLink";
+        String targetPage1 = targetPageSubSpace + "." + targetPageLastSpace1 + ".WebHome";
 
-        EntityReference sourcePageReference = setup.resolveDocumentReference(sourcePage);
-        EntityReference targetPageReference = setup.resolveDocumentReference(targetPage);
-        setup.rest().delete(sourcePageReference);
-        setup.rest().delete(targetPageReference);
+        String targetPageLastSpace2 = "TargetStandardMacroLink";
+        String targetPage2 = targetPageSubSpace + "." + targetPageLastSpace2 + ".WebHome";
+
+        String targetPageLastSpace3 = "TargetNestedMacroLink";
+        String targetPage3 = targetPageSubSpace + "." + targetPageLastSpace3 + ".WebHome";
+
+        String targetPageLastSpace4 = "TargetImageLink";
+        String targetPage4 = targetPageSubSpace + "." + targetPageLastSpace4 + ".WebHome";
+
+        String targetPageLastSpace5 = "TargetIncludeLink";
+        String targetPage5 = targetPageSubSpace + "." + targetPageLastSpace5 + ".WebHome";
+
+        EntityReference sourcePageReference1 = setup.resolveDocumentReference(sourcePage1);
+        EntityReference sourcePageReference2 = setup.resolveDocumentReference(sourcePage2);
+        EntityReference sourcePageReference3 = setup.resolveDocumentReference(sourcePage3);
+        EntityReference sourcePageReference4 = setup.resolveDocumentReference(sourcePage4);
+        EntityReference sourcePageReference5 = setup.resolveDocumentReference(sourcePage5);
+
+        EntityReference targetPageReference1 = setup.resolveDocumentReference(targetPage1);
+        EntityReference targetPageReference2 = setup.resolveDocumentReference(targetPage2);
+        EntityReference targetPageReference3 = setup.resolveDocumentReference(targetPage3);
+        EntityReference targetPageReference4 = setup.resolveDocumentReference(targetPage4);
+        EntityReference targetPageReference5 = setup.resolveDocumentReference(targetPage5);
+
+        setup.rest().delete(sourcePageReference1);
+        setup.rest().delete(sourcePageReference2);
+        setup.rest().delete(sourcePageReference3);
+        setup.rest().delete(sourcePageReference4);
+        setup.rest().delete(sourcePageReference5);
+
+        setup.rest().delete(targetPageReference1);
+        setup.rest().delete(targetPageReference2);
+        setup.rest().delete(targetPageReference3);
+        setup.rest().delete(targetPageReference4);
+        setup.rest().delete(targetPageReference5);
+
         setup.rest().delete(testReference);
 
-        ViewPage pageToBeLinked = setup.createPage(sourcePageReference, "Some content to be included");
-        AttachmentsPane attachmentsPane = pageToBeLinked.openAttachmentsDocExtraPane();
+        ViewPage standardLinkPage = setup.createPage(sourcePageReference1,
+            "Some content to be linked. number 1");
+        ViewPage standardMacroLinkPage = setup.createPage(sourcePageReference2,
+            "Some content to be linked in macro. number 2");
+        ViewPage nestedMacroLinkPage = setup.createPage(sourcePageReference3,
+            "Some content to be linked in nested macro. number 3");
+        ViewPage imageLinkPage = setup.createPage(sourcePageReference4,
+            "A page with image to be linked. number 4");
+        AttachmentsPane attachmentsPane = imageLinkPage.openAttachmentsDocExtraPane();
         File image = new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/image.gif");
         attachmentsPane.setFileToUpload(image.getAbsolutePath());
         attachmentsPane.waitForUploadToFinish("image.gif");
 
+        ViewPage includeLinkPage = setup.createPage(sourcePageReference5, "A page to be included. number 5");
+
         String testPageContent = "Check out this page: [[type the link label>>doc:%1$s]]\n"
             + "\n"
             + "{{warning}}\n"
-            + "Withing a macro: Check out this page: [[type the link label>>doc:%1$s]]\n"
+            + "Withing a macro: Check out this page: [[type the link label>>doc:%2$s]]\n"
             + "\n"
             + "{{error}}\n"
-            + "And in nested macro: Check out this page: [[type the link label>>doc:%1$s]]\n"
+            + "And in nested macro: Check out this page: [[type the link label>>doc:%3$s]]\n"
             + "{{/error}}\n"
             + "\n"
             + " \n"
             + "{{/warning}}\n"
             + "\n"
-            + "Picture: [[image:%1$s@image.gif]]\n"
-            + "Display macro:\n"
+            + "Picture: [[image:%4$s@image.gif]]\n"
+            + "Include macro:\n"
             + "\n"
-            + "{{include reference=\"%1$s\"/}}";
-        setup.createPage(testReference, String.format(testPageContent, sourcePage, sourcePageLocation));
-        ViewPage viewPage = setup.gotoPage(sourcePageReference);
+            + "{{include reference=\"%5$s\"/}}";
+        setup.createPage(testReference,
+            String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5));
+
+        // rename link 1
+        ViewPage viewPage = setup.gotoPage(sourcePageReference1);
         RenamePage rename = viewPage.rename();
         DocumentPicker documentPicker = rename.getDocumentPicker();
         documentPicker.setParent(targetPageSubSpace);
-        documentPicker.setName(targetPageLastSpace);
+        documentPicker.setName(targetPageLastSpace1);
         rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
         rename.clickRenameButton().waitUntilFinished();
+
         viewPage = setup.gotoPage(testReference);
         WikiEditPage wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format(testPageContent, targetPage),
+        assertEquals(String.format(testPageContent, targetPage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5),
+            wikiEditPage.getContent());
+
+        // rename link 2
+        viewPage = setup.gotoPage(sourcePageReference2);
+        rename = viewPage.rename();
+        documentPicker = rename.getDocumentPicker();
+        documentPicker.setParent(targetPageSubSpace);
+        documentPicker.setName(targetPageLastSpace2);
+        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.clickRenameButton().waitUntilFinished();
+
+        viewPage = setup.gotoPage(testReference);
+        wikiEditPage = viewPage.editWiki();
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, sourcePage3, sourcePage4, sourcePage5),
+            wikiEditPage.getContent());
+
+        // rename link 3
+        viewPage = setup.gotoPage(sourcePageReference3);
+        rename = viewPage.rename();
+        documentPicker = rename.getDocumentPicker();
+        documentPicker.setParent(targetPageSubSpace);
+        documentPicker.setName(targetPageLastSpace3);
+        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.clickRenameButton().waitUntilFinished();
+
+        viewPage = setup.gotoPage(testReference);
+        wikiEditPage = viewPage.editWiki();
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, sourcePage4, sourcePage5),
+            wikiEditPage.getContent());
+
+        // rename link 4
+        viewPage = setup.gotoPage(sourcePageReference4);
+        rename = viewPage.rename();
+        documentPicker = rename.getDocumentPicker();
+        documentPicker.setParent(targetPageSubSpace);
+        documentPicker.setName(targetPageLastSpace4);
+        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.clickRenameButton().waitUntilFinished();
+
+        viewPage = setup.gotoPage(testReference);
+        wikiEditPage = viewPage.editWiki();
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, sourcePage5),
+            wikiEditPage.getContent());
+
+        // rename link 5
+        viewPage = setup.gotoPage(sourcePageReference5);
+        rename = viewPage.rename();
+        documentPicker = rename.getDocumentPicker();
+        documentPicker.setParent(targetPageSubSpace);
+        documentPicker.setName(targetPageLastSpace5);
+        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.clickRenameButton().waitUntilFinished();
+
+        viewPage = setup.gotoPage(testReference);
+        wikiEditPage = viewPage.editWiki();
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, targetPage5),
             wikiEditPage.getContent());
     }
 }

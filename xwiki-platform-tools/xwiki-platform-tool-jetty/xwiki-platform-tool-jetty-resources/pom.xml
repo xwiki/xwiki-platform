@@ -114,6 +114,19 @@
       <version>${jetty.version}</version>
       <optional>true</optional>
     </dependency>
+    <!-- We need to bundle the WebSocket API in the Jetty JARs. This is normally drawn transitively by the
+      javax-websocket-server-impl artifact above. However, since we declare the WebSocket API dependency
+      (javax.websocket:javax.websocket-api) with a "provided" scope in our top level POM, the Assembly plugin
+      doesn't include it by default. -->
+    <dependency>
+      <groupId>javax.websocket</groupId>
+      <artifactId>javax.websocket-api</artifactId>
+      <!-- In addition we need to specify the version so that it's the one that is required by the version of Jetty used.
+        Jetty 9 supports WebSocket 1.0, Jetty 10 supports WebSocket 1.1 and Jetty 11 supports WebSocket 2.0. -->
+      <version>1.0</version>
+      <optional>true</optional>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

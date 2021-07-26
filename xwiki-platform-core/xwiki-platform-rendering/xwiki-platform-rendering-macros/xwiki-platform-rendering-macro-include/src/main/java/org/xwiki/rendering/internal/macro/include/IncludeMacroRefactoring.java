@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering.internal.macro.include;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +33,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.macro.MacroRefactoring;
 import org.xwiki.rendering.macro.MacroRefactoringException;
 
@@ -85,5 +89,25 @@ public class IncludeMacroRefactoring implements MacroRefactoring
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Set<ResourceReference> extractReferences(MacroBlock macroBlock) throws MacroRefactoringException
+    {
+        String referenceParameter = macroBlock.getParameter(REFERENCE_MACRO_PARAMETER);
+        String documentParameter = macroBlock.getParameter(DOCUMENT_MACRO_PARAMETER);
+
+        Set<ResourceReference> result = Collections.emptySet();
+        ResourceReference resourceReference = null;
+        if (!StringUtils.isEmpty(referenceParameter)) {
+            resourceReference = new DocumentResourceReference(referenceParameter);
+        } else if (!StringUtils.isEmpty(documentParameter)) {
+            resourceReference = new DocumentResourceReference(documentParameter);
+        }
+
+        if (resourceReference != null) {
+            result = Collections.singleton(resourceReference);
+        }
+        return result;
     }
 }

@@ -19,7 +19,6 @@
  */
 package org.xwiki.ratings.internal.migration;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +35,6 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -300,7 +298,8 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
                         .setStart(0)
                         .setRows(1);
                     likeClient.query(solrQuery);
-                } catch (SolrServerException | IOException e) {
+                // we catch Throwable here since Solr create Runtime exceptions in case of client issues.
+                } catch (Throwable e) {
                     // in case of exception we consider that the client is null.
                     likeClient = null;
                     // and we log a debug message in case it's another issue

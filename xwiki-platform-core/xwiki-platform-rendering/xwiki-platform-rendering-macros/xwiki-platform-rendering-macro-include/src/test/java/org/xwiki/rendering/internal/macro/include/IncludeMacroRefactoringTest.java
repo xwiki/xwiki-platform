@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.include;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import javax.inject.Named;
@@ -29,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.macro.MacroRefactoringException;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -117,5 +119,22 @@ class IncludeMacroRefactoringTest
         assertEquals(Optional.of(expectedBlock), this.includeMacroRefactoring.replaceReference(this.macroBlock,
             this.currentDocumentReference, this.sourceReference, this.targetReference, false));
         verify(expectedBlock).setParameter(IncludeMacroRefactoring.DOCUMENT_MACRO_PARAMETER, targetReference);
+    }
+
+    @Test
+    void extractReferences() throws MacroRefactoringException
+    {
+        assertEquals(Collections.emptySet(), this.includeMacroRefactoring.extractReferences(this.macroBlock));
+        String referenceParam = "foo";
+        when(this.macroBlock.getParameter(IncludeMacroRefactoring.DOCUMENT_MACRO_PARAMETER))
+            .thenReturn(referenceParam);
+        assertEquals(Collections.singleton(new DocumentResourceReference(referenceParam)),
+            this.includeMacroRefactoring.extractReferences(this.macroBlock));
+
+        String otherReferenceParam = "bar";
+        when(this.macroBlock.getParameter(IncludeMacroRefactoring.REFERENCE_MACRO_PARAMETER))
+            .thenReturn(otherReferenceParam);
+        assertEquals(Collections.singleton(new DocumentResourceReference(otherReferenceParam)),
+            this.includeMacroRefactoring.extractReferences(this.macroBlock));
     }
 }

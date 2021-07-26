@@ -58,9 +58,13 @@
         The cards (= the entries)
         Implement property reorder
       -->
+      <!-- 
+        We include the entry index in the key in case of inconsistent data, in this case duplicated entry IDs.
+        That way even if two entries have the same id, the keys will not be equals. 
+      -->
       <LayoutCardsCard
-        v-for="entry in entries"
-        :key="logic.getEntryId(entry)"
+        v-for="(entry, idx) in entries"
+        :key="`card-${logic.getEntryId(entry)}-${idx}`"
         :entry="entry"
       />
 

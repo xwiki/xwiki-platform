@@ -32,7 +32,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.internal.AbstractResourceReferenceResolver;
@@ -57,14 +56,14 @@ public class ExtendedURLTemporaryResourceReferenceResolver extends AbstractResou
 
     @Override
     public TemporaryResourceReference resolve(ExtendedURL extendedURL, ResourceType resourceType,
-        Map<String, Object> parameters) throws CreateResourceReferenceException, UnsupportedResourceReferenceException
+        Map<String, Object> parameters) throws CreateResourceReferenceException
     {
         TemporaryResourceReference reference;
         List<String> segments = extendedURL.getSegments();
 
         if (segments.size() < 3) {
             throw new CreateResourceReferenceException(
-                String.format("Invalid temporary resource URL format [%s].", extendedURL.toString()));
+                String.format("Invalid temporary resource URL format [%s].", extendedURL));
         } else {
             // The first segment is the module id.
             String moduleId = segments.get(0);

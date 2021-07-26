@@ -39,7 +39,7 @@ import org.xwiki.stability.Unstable;
  * Base class for WebSocket end-points that require the XWiki execution context to be properly set-up.
  * 
  * @version $Id$
- * @since 13.6RC1
+ * @since 13.7RC1
  */
 @Unstable
 public abstract class AbstractXWikiEndpoint extends Endpoint implements EndpointComponent

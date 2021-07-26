@@ -50,7 +50,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
  * when receiving messages.
  * 
  * @version $Id$
- * @since 13.6RC1
+ * @since 13.7RC1
  */
 @Component
 @Singleton

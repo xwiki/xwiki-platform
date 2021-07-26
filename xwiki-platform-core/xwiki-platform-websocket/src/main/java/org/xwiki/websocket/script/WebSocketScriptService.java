@@ -41,7 +41,7 @@ import com.xpn.xwiki.XWikiContext;
  * Script-related WebSocket APIs.
  * 
  * @version $Id$
- * @since 13.6RC1
+ * @since 13.7RC1
  */
 @Component
 @Named("websocket")

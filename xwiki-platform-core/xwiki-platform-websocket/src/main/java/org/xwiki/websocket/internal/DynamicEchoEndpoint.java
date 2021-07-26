@@ -37,7 +37,7 @@ import org.xwiki.websocket.AbstractXWikiEndpoint;
  * A dynamically registered WebSocket end-point that echoes all messages is receives.
  * 
  * @version $Id$
- * @since 13.6RC1
+ * @since 13.7RC1
  */
 @Component
 @Named("echo")

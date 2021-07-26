@@ -42,6 +42,7 @@ import org.xwiki.websocket.WebSocketContext;
  * A statically registered WebSocket end-point that echoes all messages is receives.
  * 
  * @version $Id$
+ * @since 13.7RC1
  */
 @Component
 @Named("org.xwiki.websocket.internal.StaticEchoEndpoint")

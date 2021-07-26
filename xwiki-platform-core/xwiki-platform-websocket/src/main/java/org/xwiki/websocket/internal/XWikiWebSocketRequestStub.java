@@ -46,7 +46,7 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  * Adapts a {@link HandshakeRequest} to {@link XWikiRequest}.
  * 
  * @version $Id$
- * @since 13.6RC1
+ * @since 13.7RC1
  */
 public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
 {

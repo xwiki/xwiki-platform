@@ -438,14 +438,7 @@ public class PdfExportImpl implements PdfExport
     {
         String xsl = getPDFTemplateProperty(propertyName, context);
         if (!StringUtils.isBlank(xsl)) {
-            try {
-                return IOUtils.toInputStream(xsl, context.getWiki().getEncoding());
-            } catch (IOException e) {
-                // This really shouldn't happen since it would mean that the encoding is either invalid or doesn't
-                // exist in the JVM.
-                LOGGER.error("Couldn't get XSLT for PDF exporting. Invalid or not existing encoding [{}]",
-                    context.getWiki().getEncoding(), e);
-            }
+            return IOUtils.toInputStream(xsl, context.getWiki().getEncoding());
         }
         return getClass().getClassLoader().getResourceAsStream(fallbackFile);
     }

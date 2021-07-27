@@ -98,6 +98,7 @@ import org.xwiki.bridge.event.DocumentRollingBackEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.bridge.event.DocumentVersionRangeDeletedEvent;
+import org.xwiki.bridge.event.DocumentVersionRangeDeletingEvent;
 import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
@@ -4682,8 +4683,6 @@ public class XWiki implements EventListener
 
         // Remove the versions
         archive.removeVersions(upperBound, lowerBound, context);
-        context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
-        document.setDocumentArchive(archive);
 
         // Is this the last remaining version? If so, then recycle the document.
         if (archive.getLatestVersion() == null) {
@@ -4698,6 +4697,15 @@ public class XWiki implements EventListener
                 }
             });
         } else {
+            // Notify before versions delete
+            getObservationManager()
+                .notify(new DocumentVersionRangeDeletingEvent(document.getDocumentReferenceWithLocale(),
+                    lowerBound.toString(), upperBound.toString()), document, context);
+
+            // Update the archive
+            context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
+            document.setDocumentArchive(archive);
+
             // There are still some versions left.
             // If we delete the most recent (current) version, then rollback to latest undeleted version.
             Version previousVersion = archive.getLatestVersion();
@@ -4705,7 +4713,7 @@ public class XWiki implements EventListener
                 context.getWiki().rollback(document, previousVersion.toString(), false, context);
             }
 
-            // Notify about versions delete
+            // Notify after versions delete
             getObservationManager()
                 .notify(new DocumentVersionRangeDeletedEvent(document.getDocumentReferenceWithLocale(),
                     lowerBound.toString(), upperBound.toString()), document, context);

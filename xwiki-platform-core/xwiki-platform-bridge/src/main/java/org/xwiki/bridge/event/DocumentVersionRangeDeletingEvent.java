@@ -20,11 +20,11 @@
 package org.xwiki.bridge.event;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.event.EndEvent;
+import org.xwiki.observation.event.BeginEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered after one or several versions of a document history have been deleted.
+ * An event triggered before one or several versions of a document history have been deleted.
  * <p>
  * The event also send the following parameters:
  * </p>
@@ -34,9 +34,9 @@ import org.xwiki.observation.event.filter.EventFilter;
  * </ul>
  * 
  * @version $Id$
- * @since 13.5RC1
+ * @since 13.7RC1
  */
-public class DocumentVersionRangeDeletedEvent extends AbstractDocumentEvent implements EndEvent
+public class DocumentVersionRangeDeletingEvent extends AbstractDocumentEvent implements BeginEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -49,9 +49,9 @@ public class DocumentVersionRangeDeletedEvent extends AbstractDocumentEvent impl
     private String to;
 
     /**
-     * Matches all {@link DocumentVersionRangeDeletedEvent} events.
+     * Matches all {@link DocumentVersionRangeDeletingEvent} events.
      */
-    public DocumentVersionRangeDeletedEvent()
+    public DocumentVersionRangeDeletingEvent()
     {
     }
 
@@ -60,7 +60,7 @@ public class DocumentVersionRangeDeletedEvent extends AbstractDocumentEvent impl
      * @param from the oldest version deleted
      * @param to the most recent version deleted
      */
-    public DocumentVersionRangeDeletedEvent(DocumentReference documentReference, String from, String to)
+    public DocumentVersionRangeDeletingEvent(DocumentReference documentReference, String from, String to)
     {
         super(documentReference);
 
@@ -73,7 +73,7 @@ public class DocumentVersionRangeDeletedEvent extends AbstractDocumentEvent impl
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public DocumentVersionRangeDeletedEvent(EventFilter eventFilter)
+    public DocumentVersionRangeDeletingEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

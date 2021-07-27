@@ -52,7 +52,7 @@ import com.xpn.xwiki.XWikiContext;
  * Expose Mail Storage API to scripts.
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 12.4RC1
  */
 @Component
 @Named("mail.storage")

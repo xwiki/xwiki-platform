@@ -142,7 +142,7 @@
             if (isScriptAllowed(script)) {
               return script;
             }
-          }          
+          }
         }
       };
 

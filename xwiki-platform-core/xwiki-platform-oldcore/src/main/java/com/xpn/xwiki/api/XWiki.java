@@ -1011,18 +1011,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
-     * RequestDispatcher, buffering the output, then returning it as a string.
-     *
-     * @param url URL of the servlet
-     * @return text result of the servlet
-     */
-    public String invokeServletAndReturnAsString(String url)
-    {
-        return this.xwiki.invokeServletAndReturnAsString(url, getXWikiContext());
-    }
-
-    /**
      * Return the URL of the static file provided by the current skin The file is first looked in the skin active for
      * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the "parent
      * skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.

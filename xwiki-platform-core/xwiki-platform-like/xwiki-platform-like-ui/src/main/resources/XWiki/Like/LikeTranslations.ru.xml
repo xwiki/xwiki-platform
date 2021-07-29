@@ -36,11 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>rightsmanager.like=Нравиться
-like.unlike.modal.title=Не нравиться
+  <content>rightsmanager.like=Нравится
+like.unlike.modal.title=Не нравится
 like.unlike.modal.body=Вы действительно хотите удалить отметку "Нравится" для страницы {0}?
 like.unlike.modal.closeButton=Закрыть
-like.unlike.modal.unlikeButton=Не нравиться
+like.unlike.modal.unlikeButton=Не нравится
 like.unlike.modal.viewLikersButton=Просмотреть отметки "Нравится"
 like.newlike.success=Страница "Нравится".
 like.newlike.error=Ошибка при попытке поставить "Нравится" странице.
@@ -56,11 +56,11 @@ like.likers.title="Нравится" {0} чел.
 like.livetable.column.title=Название
 like.livetable.column.location=Расположение
 like.livetable.column.likes=Понравившиеся страницы
-like.configuration.heading=Настройки "Нравиться"
+like.configuration.heading=Настройки "Нравится"
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Всегда отображать кнопку "Нравится"
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Отображать кнопку, даже если у пользователя нет прав на взаимодействие с ней. Используйте его, если хотите, чтобы счетчик отметок "Нравится" всегда отображался.
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Емкость кеш-памяти
-XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Количество отметок "Нравиться" хранящихся в кеше. Обратите внимание, что вам необходимо перезапустить XWiki, чтобы это изменение параметра было учтено.
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Количество отметок "Нравится" хранящихся в кеше. Обратите внимание, что вам необходимо перезапустить XWiki, чтобы это изменение параметра было учтено.
 XWiki.Like.LikeConfigurationClass_enabled=Включить отметки "Нравится"
 XWiki.Like.LikeConfigurationClass_enabled.hint=Если этот флажок не установлен, функция «Нравится» будет отключена, а информация, связанная с оценкой «Нравится», будет скрыта.
 </content>

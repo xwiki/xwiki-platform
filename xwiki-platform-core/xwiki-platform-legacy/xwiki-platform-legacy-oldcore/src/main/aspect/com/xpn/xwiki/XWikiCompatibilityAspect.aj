@@ -34,6 +34,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.commons.lang3.StringUtils;
@@ -76,6 +79,7 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
@@ -1362,5 +1366,25 @@ public privileged aspect XWikiCompatibilityAspect
         deleteDocument(doc, context);
 
         return renamedDoc;
+    }
+
+    /**
+     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
+     * RequestDispatcher, buffering the output, then returning it as a string.
+     * 
+     * @deprecated since 12.10.9, 13.4.3, 13.7RC1
+     */
+    @Deprecated
+    public String XWiki.invokeServletAndReturnAsString(String url, XWikiContext xwikiContext)
+    {
+        HttpServletRequest servletRequest = xwikiContext.getRequest();
+        HttpServletResponse servletResponse = xwikiContext.getResponse();
+
+        try {
+            return IncludeServletAsString.invokeServletAndReturnAsString(url, servletRequest, servletResponse);
+        } catch (Exception e) {
+            LOGGER.warn("Exception including url: " + url, e);
+            return "Exception including \"" + url + "\", see logs for details.";
+        }
     }
 }

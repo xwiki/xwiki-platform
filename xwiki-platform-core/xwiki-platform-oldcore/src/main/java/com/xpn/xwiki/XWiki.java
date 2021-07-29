@@ -66,8 +66,6 @@ import javax.mail.internet.MimeMessage;
 import javax.naming.NamingException;
 import javax.script.ScriptContext;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -265,7 +263,6 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
-import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
 @Serializable(false)
 public class XWiki implements EventListener
@@ -2576,25 +2573,6 @@ public class XWiki implements EventListener
             LOGGER.error("Failed to render template [" + template + "]", ex);
             return parseTemplate(template, context);
         }
-    }
-
-    /**
-     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
-     * RequestDispatcher, buffering the output, then returning it as a string.
-     */
-    public String invokeServletAndReturnAsString(String url, XWikiContext xwikiContext)
-    {
-
-        HttpServletRequest servletRequest = xwikiContext.getRequest();
-        HttpServletResponse servletResponse = xwikiContext.getResponse();
-
-        try {
-            return IncludeServletAsString.invokeServletAndReturnAsString(url, servletRequest, servletResponse);
-        } catch (Exception e) {
-            LOGGER.warn("Exception including url: " + url, e);
-            return "Exception including \"" + url + "\", see logs for details.";
-        }
-
     }
 
     /**

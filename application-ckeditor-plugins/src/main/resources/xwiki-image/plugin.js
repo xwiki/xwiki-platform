@@ -28,6 +28,15 @@
   CKEDITOR.plugins.add('xwiki-image', {
     requires: 'xwiki-marker,xwiki-resource,balloontoolbar',
 
+    beforeInit: function(editor) {
+      editor.on('widgetDefinition', function (event) {
+        var widgetDefinition = event.data;
+        if (widgetDefinition.name === "image" && widgetDefinition.dialog === "image2") {
+          this.overrideImageWidget(editor, widgetDefinition);
+        }
+      }, this);
+    },
+
     init: function(editor) {
       editor.plugins['xwiki-marker'].addMarkerHandler(editor, 'image', {
         // startImageComment: CKEDITOR.htmlParser.comment
@@ -81,16 +90,7 @@
       });
     },
 
-    afterInit: function(editor) {
-      this.overrideImageWidget(editor);
-    },
-
-    overrideImageWidget: function(editor) {
-      var imageWidget = editor.widgets.registered.image;
-      if (!imageWidget) {
-        return;
-      }
-
+    overrideImageWidget: function(editor, imageWidget) {
       var originalInit = imageWidget.init;
       imageWidget.init = function() {
         originalInit.call(this);
@@ -109,6 +109,53 @@
             .serializeResourceReference(resourceReference));
         }
         originalData.call(this);
+      };
+
+      //
+      // Don't remove the width/height if they are specified using percentage.
+      // See CKEDITOR-122: CKEditor removes image width when specified as percentage
+      //
+
+      // @param {CKEDITOR.htmlParser.element} image
+      // @param {String} dimension ('width' or 'height')
+      var maybeProtectDimension = function(image, dimension) {
+        var value = typeof image.attributes[dimension] === 'string' && image.attributes[dimension].trim();
+        if (value.length && value.charAt(value.length - 1) === '%') {
+          image[dimension + '%'] = image.attributes[dimension];
+          delete image.attributes[dimension];
+          return true;
+        }
+      };
+
+      // @param {CKEDITOR.htmlParser.element} image
+      // @param {String} dimension ('width' or 'height')
+      var maybeUnprotectDimension = function(image, dimension) {
+        if (image[dimension + '%']) {
+          image.attributes[dimension] = image[dimension + '%'];
+          delete image[dimension + '%'];
+        }
+      };
+
+      var originalUpcast = imageWidget.upcast;
+      // @param {CKEDITOR.htmlParser.element} element
+      // @param {Object} data
+      imageWidget.upcast = function(element, data) {
+        var imagesUsingPercent = [];
+        element.forEach(function(childElement) {
+          // Note that we're using the Bitwise OR (|) operator because we want to protect both attributes.
+          if (element.name === 'img' && (maybeProtectDimension(element, 'width') |
+              maybeProtectDimension(element, 'height'))) {
+            imagesUsingPercent.push(element);
+          }
+        }, CKEDITOR.NODE_ELEMENT);
+        try {
+          return originalUpcast.apply(this, arguments);
+        } finally {
+          imagesUsingPercent.forEach(function(image) {
+            maybeUnprotectDimension(image, 'width');
+            maybeUnprotectDimension(image, 'height');
+          });
+        }
       };
     }
   });
@@ -141,6 +188,9 @@
       });
       CKEDITOR.plugins.xwikiResource.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
         ['info', 'resourceReference'], ['Upload', 'uploadButton']);
+
+      // See CKEDITOR-122: CKEditor removes image width when specified as percentage
+      allowRelativeDimensions(dialogDefinition);
     }
   });
 
@@ -156,6 +206,20 @@
       // Insert the new element before the hidden parent.
       path[2].element.children.splice(path[1].position, 0, pickerDefinition);
     }
+  };
+
+  var allowRelativeDimensions = function(imageDialog) {
+    var infoTab = imageDialog.getContents('info');
+    allowRelativeDimension(infoTab, 'width');
+    allowRelativeDimension(infoTab, 'height');
+  };
+
+  var regexPercent = /^\s*(\d+\%)\s*$/i;
+  var allowRelativeDimension = function(infoTab, dimension) {
+    var originalValidate = infoTab.get(dimension).validate;
+    infoTab.get(dimension).validate = function() {
+      return this.getValue().match(regexPercent) || originalValidate.apply(this, arguments);
+    };
   };
 
   // Free-standing images have only the source attribute set.

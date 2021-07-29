@@ -259,10 +259,6 @@
             });
           }
         },
-        scrollIntoViewAndFocus: function() {
-          this.wrapper.scrollIntoView();
-          (this.editables.$content || this).focus();
-        },
         data: function(event) {
           this.element.setAttribute('data-macro', macroPlugin.serializeMacroCall(this.data));
           this.pathName = editor.localization.get('xwiki-macro.placeholder', this.data.name);

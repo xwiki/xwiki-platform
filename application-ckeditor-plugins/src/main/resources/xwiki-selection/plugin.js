@@ -43,7 +43,7 @@
         var widget = editor.widgets && getWidgetToSelect(editor);
         if (widget) {
           // Select the widget.
-          widget.scrollIntoViewAndFocus();
+          scrollIntoViewAndFocusWidget(widget);
         } else {
           // Just notify the editor that the selection has changed so that it can update the tool bar for instance.
           editor.selectionChange();
@@ -157,6 +157,11 @@
       }
     }
     return range.collapsed;
+  };
+
+  var scrollIntoViewAndFocusWidget = function(widget) {
+    widget.wrapper.scrollIntoView();
+    (widget.editables.$content || widget).focus();
   };
 })();
 

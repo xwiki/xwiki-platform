@@ -101,6 +101,7 @@ import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.classloader.ClassLoaderManager;
+import org.xwiki.classloader.NamespaceURLClassLoader;
 import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -7871,26 +7872,15 @@ public class XWiki implements EventListener
 
     private void onJobFinished(JobFinishedEvent event)
     {
-        // Skip it if:
-        // * the authenticator was not yet initialized
-        // * we are using the standard authenticator
-        // * the event is not related to an install job
-        if (this.authService == null || this.authService.getClass() == XWikiAuthServiceImpl.class
-            || !event.getJobType().equals(InstallJob.JOBTYPE)) {
-            return;
-        }
+        if (this.authService != null) {
+            ClassLoader authClassLoader = this.authService.getClass().getClassLoader();
 
-        try {
-            // Get the class corresponding to the configuration
-            Class<? extends XWikiAuthService> authClass = getAuthServiceClass();
-
-            // If the class does not have the same reference anymore it means it's coming from a different classloader
-            // which generally imply that it's coming from an extension which has been reloaded or upgraded
-            if (this.authService.getClass() != authClass) {
-                setAuthService(authClass);
+            // If the classloader has been closed it means it's coming from an extension (or extension versions) which
+            // is no longer loaded so we need to reinit it
+            if (authClassLoader instanceof NamespaceURLClassLoader
+                && ((NamespaceURLClassLoader) authClassLoader).isClosed()) {
+                this.authService = null;
             }
-        } catch (ClassNotFoundException e) {
-            LOGGER.error("Failed to get the class of the configured authenticator, setting standard authenticator.", e);
         }
     }
 

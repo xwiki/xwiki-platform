@@ -501,6 +501,12 @@
                 <annotation>@javax.ws.rs.Encoded</annotation>
                 <justification>Not a breakage from the point of the view of the code using the REST API (URLs). It affects only the REST API implementation provided by XWiki.</justification>
               </item>
+              <item>
+                <ignore>true</ignore>
+                <code>java.method.removed</code>
+                <old>method java.lang.String com.xpn.xwiki.XWiki::invokeServletAndReturnAsString(java.lang.String, com.xpn.xwiki.XWikiContext)</old>
+                <justification>Not a breackage. Moved to legacy.</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

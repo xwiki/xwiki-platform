@@ -223,7 +223,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     }
 
     private void validateLastExtensions(Map<String, SortedSet<Version>> indexedExtensions,
-        Map<String, Set<Namespace>> missingExtension) throws SolrServerException, IOException
+        Map<String, Set<Namespace>> missingExtension)
     {
         this.progress.pushLevelProgress(getRequest().getNamespaces().size(), getRequest().getNamespaces());
 
@@ -542,7 +542,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     }
 
     private void validateExtensions(Namespace namespace, Map<String, SortedSet<Version>> indexedExtensions,
-        Map<String, Set<Namespace>> missingExtensions) throws SolrServerException, IOException
+        Map<String, Set<Namespace>> missingExtensions)
     {
         this.progress.pushLevelProgress(indexedExtensions.size(), indexedExtensions);
 
@@ -554,7 +554,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
 
             try {
                 if (validateExtension(extensionId, namespace, indexedVersions, missingExtensions)) {
-                    // Commit right way since validating an extension can be very slow and we want to get as many
+                    // Commit right away since validating an extension can be very slow and we want to get as many
                     // extensions as possible as fast as possible in the search result
                     this.indexStore.commit();
                 }

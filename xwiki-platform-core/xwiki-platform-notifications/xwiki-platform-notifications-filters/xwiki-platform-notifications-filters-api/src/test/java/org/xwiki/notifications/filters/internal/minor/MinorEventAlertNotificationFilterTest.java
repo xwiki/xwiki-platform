@@ -17,36 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal;
+package org.xwiki.notifications.filters.internal.minor;
 
 import java.util.Collections;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.internal.minor.MinorEventAlertNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MinorEventAlertNotificationFilterTest
+/**
+ * Tests for {@link MinorEventAlertNotificationFilter}.
+ */
+@ComponentTest
+class MinorEventAlertNotificationFilterTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<MinorEventAlertNotificationFilter> mocker =
-            new MockitoComponentMockingRule<>(MinorEventAlertNotificationFilter.class);
+    @InjectMockComponents
+    private MinorEventAlertNotificationFilter filter;
 
     @Test
-    public void filterEvent() throws Exception
+    void filterEvent()
     {
         DocumentReference randomUser = new DocumentReference("xwiki", "XWiki", "UserA");
         Event event1 = mock(Event.class);
@@ -59,55 +61,58 @@ public class MinorEventAlertNotificationFilterTest
         when(event3.getType()).thenReturn("update");
         when(event3.getDocumentVersion()).thenReturn("2.1");
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                mocker.getComponentUnderTest().filterEvent(event1, randomUser, Collections.emptyList(),
+                this.filter.filterEvent(event1, randomUser, Collections.emptyList(),
                         NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event2, randomUser, Collections.emptyList(),
+            this.filter.filterEvent(event1, randomUser, Collections.emptyList(),
+                NotificationFormat.EMAIL));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                this.filter.filterEvent(event2, randomUser, Collections.emptyList(),
                         NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event3, randomUser, Collections.emptyList(),
+                this.filter.filterEvent(event3, randomUser, Collections.emptyList(),
                         NotificationFormat.ALERT));
     }
 
     @Test
-    public void filterExpression() throws Exception
+    void filterExpression()
     {
         NotificationPreference fakePreference = mock(NotificationPreference.class);
 
         DocumentReference randomUser = new DocumentReference("xwiki", "XWiki", "UserA");
-        assertNull(mocker.getComponentUnderTest().filterExpression(randomUser, Collections.emptyList(), fakePreference));
+        assertNull(this.filter.filterExpression(randomUser, Collections.emptyList(), fakePreference));
         assertEquals("NOT ((TYPE = \"update\" AND NOT (DOCUMENT_VERSION ENDS WITH \".1\")))",
-                mocker.getComponentUnderTest().filterExpression(randomUser, Collections.emptyList(),
+                this.filter.filterExpression(randomUser, Collections.emptyList(),
                         NotificationFilterType.EXCLUSIVE,
                         NotificationFormat.ALERT).toString());
     }
 
     @Test
-    public void filterExpressionWithWrongParameters() throws Exception
+    void filterExpressionWithWrongParameters()
     {
         DocumentReference randomUser = new DocumentReference("xwiki", "XWiki", "UserA");
-        assertNull(mocker.getComponentUnderTest().filterExpression(randomUser, Collections.emptyList(),
+        assertNull(this.filter.filterExpression(randomUser, Collections.emptyList(),
                         NotificationFilterType.INCLUSIVE, NotificationFormat.ALERT));
-        assertNull(mocker.getComponentUnderTest().filterExpression(randomUser, Collections.emptyList(),
+        assertNull(this.filter.filterExpression(randomUser, Collections.emptyList(),
                 NotificationFilterType.EXCLUSIVE, NotificationFormat.EMAIL));
     }
 
     @Test
-    public void matchesPreference() throws Exception
+    void matchesPreference()
     {
-        assertFalse(mocker.getComponentUnderTest().matchesPreference(mock(NotificationPreference.class)));
+        assertFalse(this.filter.matchesPreference(mock(NotificationPreference.class)));
     }
 
     @Test
-    public void getName() throws Exception
+    void getName()
     {
-        assertEquals(MinorEventAlertNotificationFilter.FILTER_NAME, mocker.getComponentUnderTest().getName());
+        assertEquals(MinorEventAlertNotificationFilter.FILTER_NAME, this.filter.getName());
     }
 
     @Test
-    public void getFormats() throws Exception
+    void getFormats()
     {
-        assertEquals(1, mocker.getComponentUnderTest().getFormats().size());
-        assertTrue(mocker.getComponentUnderTest().getFormats().contains(NotificationFormat.ALERT));
+        assertEquals(1, this.filter.getFormats().size());
+        assertTrue(this.filter.getFormats().contains(NotificationFormat.ALERT));
     }
 }

@@ -48,12 +48,14 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 @Named("RecordableEventListener")
 public class RecordableEventListener extends AbstractEventListener
 {
+    // Event only contains a single method so the whole class can be replaced by a lambda.
     private static final BeginFoldEvent IGNORED_EVENTS = otherEvent -> otherEvent instanceof BeginFoldEvent;
 
     @Inject
     private EventStore eventStore;
 
     @Inject
+    @Named("context")
     private ComponentManager componentManager;
 
     @Inject

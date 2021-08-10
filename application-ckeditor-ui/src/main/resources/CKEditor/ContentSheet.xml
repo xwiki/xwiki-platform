@@ -67,7 +67,7 @@
     #set ($serializedSpaceReference = $services.model.serialize($source.documentReference.parent, 'local'))
     &lt;body id="body" class="skin-flamingo viewbody main wiki-$xcontext.database
         space-$escapetool.xml($serializedSpaceReference.replaceAll(' ', '_'))"&gt;##
-      #getRenderedContent($source)
+      #ckeditor_getRenderedContent($source)
       ## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
       ## The result must be unescaped before being passed to the CKEditor as input.
       ## CKEDITOR-134: Unclosed {{html}} results in addition of closing tag even when macro isn't actually evaluated

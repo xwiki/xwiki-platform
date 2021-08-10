@@ -145,7 +145,7 @@
 #macro (getMacroDescriptor $macroDescriptor)
   ## Translate the macro name and description.
   #set ($macroTranslationKey = "rendering.macro.$macroDescriptor.id")
-  #initRequiredSkinExtensions()
+  #ckeditor_initRequiredSkinExtensions()
   #set ($data = {
     'id': $macroDescriptor.id,
     'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",
@@ -232,7 +232,7 @@
   #if ($groupDescriptorTree.groups)
     #set ($data.groupDescriptorTree = $groupDescriptorTree.groups)
   #end
-  #set ($data.requiredSkinExtensions = "#getRequiredSkinExtensions()")
+  #set ($data.requiredSkinExtensions = "#ckeditor_getRequiredSkinExtensions()")
 #end
 
 #macro (fixDescriptorType $descriptor)

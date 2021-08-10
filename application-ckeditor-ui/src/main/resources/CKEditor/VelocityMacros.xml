@@ -40,7 +40,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
-#macro (convert $text $toHTML $fromHTML $stripHTMLEnvelope)
+#macro (ckeditor_convert $text $toHTML $fromHTML $stripHTMLEnvelope)
   #set ($sourceSyntax = $request.sourceSyntax)
   #if ("$!sourceSyntax" != '')
     #set ($sourceSyntax = $services.rendering.resolveSyntax($sourceSyntax))
@@ -63,14 +63,14 @@
       ## directly in the current page, e.g. when CKEditor is used in-line (no iframe). We still need to send back the
       ## required style sheets and JavaScript files because some of them might not be available in the target page, e.g.
       ## when a macro is inserted and it needs resource files not available on every page.
-      #initRequiredSkinExtensions()
-      #set ($output = "#getRenderedContent($source)$!html")
-      #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', "#getRequiredSkinExtensions()"))
+      #ckeditor_initRequiredSkinExtensions()
+      #set ($output = "#ckeditor_getRenderedContent($source)$!html")
+      #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', "#ckeditor_getRequiredSkinExtensions()"))
     #else
       ## Returns a full HTML page, including the HEAD tag with the style sheets and possibly the JavaScript includes.
       ## This is needed when the edited content is loaded in an iframe, which is the case when CKEditor replaces a text
       ## area (classical editor).
-      #set ($output = "#renderContentSheet($source)")
+      #set ($output = "#ckeditor_renderContentSheet($source)")
     #end
   #else
     #set ($output = $services.wysiwyg.fromAnnotatedXHTML($text, $sourceSyntax.toIdString()))
@@ -88,7 +88,7 @@
   #end
 #end
 
-#macro (renderContentSheet $source)
+#macro (ckeditor_renderContentSheet $source)
   ## The $source variable is used inside the content sheet.
   #set ($output = $services.wysiwyg.render('CKEditor.ContentSheet'))
   #if ("$!output" == '' &amp;&amp; $output != '')
@@ -108,7 +108,7 @@
   $!output.replace('&amp;amp;#123;&amp;amp;#123;', '{{')##
 #end
 
-#macro (getRenderedContent $source)
+#macro (ckeditor_getRenderedContent $source)
   #if ($source.html)
     #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference))
     #if ("$!html" == '' &amp;&amp; $html != '')
@@ -129,13 +129,13 @@
   #end
 #end
 
-#macro (importCSS $groupId $artifactId $path $evaluate)
+#macro (ckeditor_importCSS $groupId $artifactId $path $evaluate)
   #set ($url = $services.webjars.url("$groupId:$artifactId", $path, {'evaluate': $evaluate}))
   #set ($discard = $xwiki.linkx.use($url, {'type': 'text/css', 'rel': 'stylesheet'}))
 #end
 
 #macro (importCKEditorCSS $path $evaluate)
-  #importCSS('org.xwiki.contrib' 'application-ckeditor-webjar' $path $evaluate)
+  #ckeditor_importCSS('org.xwiki.contrib' 'application-ckeditor-webjar' $path $evaluate)
 #end
 
 #macro (importCKEditorResources)
@@ -220,7 +220,7 @@
     'syntax': $sourceDocument.syntax,
     'content': $parameters.content
   })
-  #set ($content = "#renderContentSheet($source)")
+  #set ($content = "#ckeditor_renderContentSheet($source)")
   &gt;$!escapetool.xml($content)&lt;/textarea&gt;
 #end
 
@@ -253,7 +253,7 @@
 #macro (displayCKEditorConfig $configDoc $action)
   #set ($discard = $xwiki.ssx.use('CKEditor.ConfigSheet'))
   #set ($discard = $xwiki.jsx.use('CKEditor.ConfigSheet'))
-  #importCSS('org.webjars' 'bootstrap-select' 'css/bootstrap-select.min.css')
+  #ckeditor_importCSS('org.webjars' 'bootstrap-select' 'css/bootstrap-select.min.css')
   &lt;dl class="ckeditor-config#if ($configDoc.isNew()) new#end"&gt;
     #displayCKEditorConfigProperty($configDoc 'removePlugins' $action)
     #displayCKEditorConfigProperty($configDoc 'removeButtons' $action)
@@ -269,7 +269,7 @@
   &lt;/dl&gt;
 #end
 
-#macro (initRequiredSkinExtensions)
+#macro (ckeditor_initRequiredSkinExtensions)
   #set ($requiredSkinExtensions = $collectiontool.orderedMap)
   #if ("$!requiredSkinExtensions" == '')
     ## For XWiki versions older than 12.1RC1 fallback on the old $collectionstool (available since 4.0M1).
@@ -282,7 +282,7 @@
   #end
 #end
 
-#macro (getRequiredSkinExtensions)
+#macro (ckeditor_getRequiredSkinExtensions)
   #foreach ($entry in $requiredSkinExtensions.entrySet())
     #set ($importString = $xwiki.get($entry.key).importString)
     ## Remove the always used skin extensions, keep only those that have been requested by the macro parameter pickers.
@@ -290,7 +290,7 @@
   #end
 #end
 
-#macro (defineSortTool $sortToolVariable)
+#macro (ckeditor_defineSortTool $sortToolVariable)
   #set ($checkedExtension = "org.xwiki.commons:xwiki-commons-velocity")
   ## Because of an API collision, $collectionstool has been replaced by $collectiontool in XCOMMONS-1861
   #if ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo("12.1-SNAPSHOT") &gt;= 0)
@@ -304,6 +304,6 @@
   #end
 #end
 
-#defineSortTool("$resolvedSortTool")
+#ckeditor_defineSortTool("$resolvedSortTool")
 {{/velocity}}</content>
 </xwikidoc>

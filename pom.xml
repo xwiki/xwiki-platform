@@ -798,15 +798,8 @@
       <!-- Mails -->
       <dependency>
         <groupId>com.icegreen</groupId>
-        <artifactId>greenmail</artifactId>
-        <version>1.5.13</version>
-        <exclusions>
-          <!-- Not the right id -->
-          <exclusion>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-          </exclusion>
-        </exclusions>
+        <artifactId>greenmail-junit5</artifactId>
+        <version>1.6.4</version>
       </dependency>
 
       <!-- Make sure to use a version of the Jetty client libraries matching the Jetty version we package -->

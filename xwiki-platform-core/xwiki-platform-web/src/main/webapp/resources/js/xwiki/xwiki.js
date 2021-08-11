@@ -1862,3 +1862,86 @@ document.observe("xwiki:dom:loaded", function() {
     }
   }
 });
+
+/**
+ * Intercept asynchronous HTTP requests and look for the custom X-XWIKI-HTML-HEAD and X-XWIKI-HTML-SCRIPTS response
+ * headers that are used by the server to extend the page HTML head asynchronously.
+ */
+require(['jquery'], function($) {
+  /**
+   * Collect the URLs of all the external stylesheets an JavaScript files that are already loaded (or in the process of
+   * being loaded) because their associated tag is in the DOM.
+   */
+  var getLoadedResources = function() {
+    return $('link[href], script[src]').map(function() {
+      return $(this).attr('href') || $(this).attr('src');
+    }).get();
+  };
+
+  /**
+   * Injects the given HTML into the page head after removing the stylesheets and JavaScript files that are already
+   * present in the page head (othewise they may be loaded again).
+   *
+   * @param {String} html the HTML to extend the page head with
+   */
+  var extendPageHead = function(html) {
+    var loadedResources;
+    var contentToInject = $('<div/>').html(html);
+    // Remove resources that are already loaded.
+    contentToInject.find('link[href], script[src]').filter(function() {
+      if (!loadedResources) {
+        loadedResources = getLoadedResources();
+      }
+      var url = $(this).attr('href') || $(this).attr('src');
+      return loadedResources.indexOf(url) >= 0;
+    }).remove();
+    // Inject the remaining part into the page head.
+    contentToInject.contents().appendTo('head');
+  };
+
+  /**
+   * Handles some of XWiki's custom HTTP response headers.
+   *
+   * @param {Function} getHeader the function that can be used to access the response headers
+   */
+  var handleResponseHeaders = function(getHeader) {
+    extendPageHead(getHeader('X-XWIKI-HTML-HEAD'));
+    // Preserve the behavior from async.js where the scripts were injected after the response body was injected. The
+    // delayed execution allows other request listeners (including the one from async.js) to be called before the
+    // scripts are injected (because in-line scripts may look up the HTML elements from the response body right away so
+    // the response body needs to be injected before).
+    setTimeout(function() {
+      extendPageHead(getHeader('X-XWIKI-HTML-SCRIPTS'));
+    }, 0);
+  };
+
+  /**
+   * Overwrite the XMLHttpRequest#open() method in order to add our load listener on all requests made from this page.
+   */
+  var interceptXMLHttpRequest = function() {
+    var originalOpen = window.XMLHttpRequest.prototype.open;
+    window.XMLHttpRequest.prototype.open = function() {
+      this.addEventListener('load', function() {
+        handleResponseHeaders($.proxy(this, 'getResponseHeader'));
+      });
+      return originalOpen.apply(this, arguments);
+    };
+  };
+
+  /**
+   * Overwrite the fetch function in order to add our own response callback on all fetch requests made from this page.
+   */
+  var interceptFetch = function() {
+    var originalFetch = window.fetch;
+    if (originalFetch) {
+      window.fetch = function() {
+        return originalFetch.apply(this, arguments).then(function(response) {
+          handleResponseHeaders($.proxy(response.headers, 'get'));
+        });
+      };
+    }
+  };
+
+  $(interceptXMLHttpRequest);
+  $(interceptFetch);
+});

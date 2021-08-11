@@ -289,6 +289,11 @@
       },
       commit: function(data) {
         var resourceReference = this.getValue();
+        if (resourceReference.type === 'url' && resourceReference.reference &&
+            resourceReference.reference.indexOf('://') < 0) {
+          // The users often omit the protocol / scheme when typing URLs.
+          resourceReference.reference = 'https://' + resourceReference.reference;
+        }
         if (typeof resourceReference.typed !== 'boolean') {
           resourceReference.typed = resourceReference.type !== 'doc' &&
             (resourceReference.type !== 'url' || resourceReference.reference.indexOf('://') < 0);

@@ -34,6 +34,7 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -47,7 +48,11 @@ import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -55,11 +60,13 @@ import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -93,6 +100,12 @@ public class RatingsScriptServiceTest
     @MockComponent
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @MockComponent
+    private ContextualAuthorizationManager authorizationManager;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     private RatingsConfiguration ratingsConfiguration;
 
@@ -298,5 +311,16 @@ public class RatingsScriptServiceTest
 
         // Ensure that we stop the loop whenever we found a match.
         verify(inputRef, never()).hasParent(lastExcludedRef);
+    }
+
+    @Test
+    void recomputeAverageRating() throws RatingsException
+    {
+        DocumentReference docRef = mock(DocumentReference.class);
+
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
+        AverageRating averageRating = mock(AverageRating.class);
+        when(this.defaultManager.recomputeAverageRating(docRef)).thenReturn(averageRating);
+        assertEquals(Optional.of(averageRating), this.scriptService.recomputeAverageRating(docRef));
     }
 }

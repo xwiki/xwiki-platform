@@ -132,7 +132,7 @@ public class RatingsScriptServiceTest
         RatingsManager ratingsManager = mock(RatingsManager.class);
         when(this.ratingsManagerFactory.getRatingsManager(requestedHint)).thenReturn(ratingsManager);
         DefaultScriptRatingsManager scriptRatingsManager = mock(DefaultScriptRatingsManager.class);
-        when(this.componentManager.getInstance(DefaultScriptRatingsManager.class, requestedHint))
+        when(this.componentManager.getInstance(DefaultScriptRatingsManager.class))
             .thenReturn(scriptRatingsManager);
 
         assertEquals(scriptRatingsManager, this.scriptService.get(requestedHint));

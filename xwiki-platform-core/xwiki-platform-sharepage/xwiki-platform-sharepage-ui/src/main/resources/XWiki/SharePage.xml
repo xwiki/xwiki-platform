@@ -731,7 +731,7 @@ Guten Tag ${recipientName},
 }
 
 body &gt; .selectize-dropdown {
-  z-index: 1051;
+  z-index: 10051;
 }</code>
     </property>
     <property>

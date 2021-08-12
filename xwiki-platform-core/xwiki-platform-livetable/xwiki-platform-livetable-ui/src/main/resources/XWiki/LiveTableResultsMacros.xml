@@ -919,11 +919,15 @@
   #end
 #end
 
-
 #**
- * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
- *#
-#macro (livetable_filterStringProperty)
+  * Initialize the match type with a default value when needed.
+  * The default match type depends on the type of the matched property.
+  * Notes:
+  * - This macro expects to find $matchType and $propMetaClass in the caller's scope
+  * - This macro updates the $matchType with the default value
+  * @since 
+  *#
+#macro (livetable_initializeMatchType)
   #if ("$!matchType" == '')
     #if ($propMetaClass.endsWith('ListClass'))
       ## Perform exact matching by default for StaticListClass, DBListClass and DBTreeListClass
@@ -934,6 +938,12 @@
       #set ($matchType = 'partial')
     #end
   #end
+#end
+#**
+ * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
+ *#
+#macro (livetable_filterStringProperty)
+  #livetable_initializeMatchType()
   #if ($whereParams.entrySet())
     #set ($paramPrefix = "${safe_tableAlias}_value_")
   #else
@@ -942,8 +952,9 @@
   #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType false $valueCount $paramPrefix)")
   #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
-    #set ($actualMatchType = $request.getParameterValues("${colname}_match").get($foreach.count - 1))
-    #livetable_addFilterParam($filterValue $actualMatchType $whereParams "${paramPrefix}${foreach.count}")
+    #set ($matchType = $request.getParameterValues("${colname}_match").get($foreach.count - 1))
+    #livetable_initializeMatchType()
+    #livetable_addFilterParam($filterValue $matchType $whereParams "${paramPrefix}${foreach.count}")
   #end
 #end
 

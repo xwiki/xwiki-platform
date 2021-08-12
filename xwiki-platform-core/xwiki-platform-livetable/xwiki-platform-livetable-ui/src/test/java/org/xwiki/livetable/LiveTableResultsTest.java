@@ -322,6 +322,43 @@ public class LiveTableResultsTest extends PageTest
         verify(this.query).bindValues(values);
     }
 
+    /**
+     * When no match type is explicitly defined for a matcher on a short text, the matcher must be partial (i.e., the
+     * filtering must match on substrings).
+     */
+    @Test
+    void filteringShortTextShouldMatchSubstrings() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "Test", "MyPage"));
+        document.getXClass().addTextField("shortText", "Short Text", 10);
+        this.xwiki.saveDocument(document, "creates my page", true, this.context);
+        setColumns("shortText");
+        setClassName("Test.MyPage");
+        setFilter("shortText", "X");
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+
+        renderPage();
+
+        verify(this.queryService).hql(", BaseObject as obj , StringProperty as prop_shortText  "
+            + "where obj.name=doc.fullName "
+            + "and obj.className = :className "
+            + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+            + "and obj.id = prop_shortText.id.id "
+            + "and prop_shortText.id.name = :prop_shortText_id_name "
+            + "and (upper(prop_shortText.value) like upper(:prop_shortText_value_1)) ");
+
+        Map<String, Object> values = new HashMap<>();
+        values.put("className", "Test.MyPage");
+        values.put("classTemplate1", "Test.MyPageTemplate");
+        values.put("classTemplate2", "Test.MyPage");
+        values.put("prop_shortText_id_name", "shortText");
+        values.put("prop_shortText_value_1", "%X%");
+        verify(this.query).bindValues(values);
+    }
+
 
     //
     // Helper methods

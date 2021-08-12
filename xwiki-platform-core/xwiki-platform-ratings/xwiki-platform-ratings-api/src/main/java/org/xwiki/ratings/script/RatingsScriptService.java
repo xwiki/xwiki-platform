@@ -100,8 +100,7 @@ public class RatingsScriptService extends AbstractScriptRatingsManager implement
         } else {
             try {
                 RatingsManager ratingsManager = this.ratingsManagerFactory.getRatingsManager(managerHint);
-                scriptRatingsManager = this.componentManager
-                    .getInstance(DefaultScriptRatingsManager.class, managerHint);
+                scriptRatingsManager = this.componentManager.getInstance(DefaultScriptRatingsManager.class);
                 scriptRatingsManager.setRatingsManager(ratingsManager);
                 executionContext.setProperty(executionContextCacheKey, scriptRatingsManager);
             } catch (RatingsException e) {

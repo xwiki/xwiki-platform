@@ -819,6 +819,8 @@ define('editInPlace', [
       $('&lt;input type="hidden" name="form_token" /&gt;').val(xcontext.form_token).appendTo(actionButtons);
       // We need a place where actionButtons.js can add more hidden inputs.
       actionButtons.append('&lt;div class="hidden extra"/&gt;');
+      // Let the others know that the DOM has been updated, in order to enhance it.
+      $(document).trigger('xwiki:dom:updated', {'elements': actionButtons.toArray()});
       var deferred = $.Deferred();
       require(['xwiki-actionButtons', 'xwiki-diff', 'xwiki-autoSave'], function() {
         overrideEditActions();

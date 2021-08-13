@@ -27,27 +27,27 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.same;
@@ -58,106 +58,72 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class SpacesConfigurationSourceTest
+@ComponentTest
+class SpacesConfigurationSourceTest
 {
-    @Rule
-    public MockitoComponentMockingRule<SpacesConfigurationSource> mocker =
-        new MockitoComponentMockingRule<>(SpacesConfigurationSource.class);
+    @InjectMockComponents
+    private SpacesConfigurationSource spacesSource;
 
+    @MockComponent
+    private Provider<XWikiContext> xcontextProvider;
+    
+    @MockComponent
+    @Named("space")
+    private ConfigurationSource spaceConfiguration;
+    
     private Map<String, Map<String, String>> spacesPreferences = new HashMap<>();
 
     private XWikiContext xcontext;
 
-    @Before
-    public void before() throws ComponentLookupException
+    @BeforeEach
+    void before()
     {
         this.xcontext = new XWikiContext();
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-
-        ConfigurationSource spaceConfiguration = this.mocker.getInstance(ConfigurationSource.class, "space");
-
-        when(spaceConfiguration.getProperty(any(), same(String.class))).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                Map<String, String> spacePreferences = getSpacePreferences();
-                if (spacePreferences != null) {
-                    return spacePreferences.get(invocation.getArgument(0));
-                }
-
-                return null;
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        when(this.spaceConfiguration.getProperty(any(), same(String.class))).then((Answer<String>) invocation -> {
+            Map<String, String> spacePreferences = getSpacePreferences();
+            if (spacePreferences != null) {
+                return spacePreferences.get(invocation.getArgument(0));
             }
+            return null;
         });
-        when(spaceConfiguration.getProperty(any())).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                Map<String, String> spacePreferences = getSpacePreferences();
-                if (spacePreferences != null) {
-                    return spacePreferences.get(invocation.getArgument(0));
-                }
-
-                return null;
+        when(spaceConfiguration.getProperty(any())).then(invocation -> {
+            Map<String, String> spacePreferences = getSpacePreferences();
+            if (spacePreferences != null) {
+                return spacePreferences.get(invocation.getArgument(0));
             }
+            return null;
         });
-        when(spaceConfiguration.getProperty(any(), anyString())).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                Map<String, String> spacePreferences = getSpacePreferences();
-                if (spacePreferences != null) {
-                    String key = invocation.getArgument(0);
-                    if (spacePreferences.containsKey(key)) {
-                        return spacePreferences.get(key);
-                    }
+        when(spaceConfiguration.getProperty(any(), anyString())).then(invocation -> {
+            Map<String, String> spacePreferences = getSpacePreferences();
+            if (spacePreferences != null) {
+                String key = invocation.getArgument(0);
+                if (spacePreferences.containsKey(key)) {
+                    return spacePreferences.get(key);
                 }
-
-                return invocation.getArgument(1);
             }
+            return invocation.getArgument(1);
         });
-
-        when(spaceConfiguration.containsKey(any())).then(new Answer<Boolean>()
-        {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable
-            {
-                Map<String, String> spacePreferences = getSpacePreferences();
-                if (spacePreferences != null) {
-                    return spacePreferences.containsKey(invocation.getArgument(0));
-                }
-
-                return false;
+        when(spaceConfiguration.containsKey(any())).then((Answer<Boolean>) invocation -> {
+            Map<String, String> spacePreferences = getSpacePreferences();
+            if (spacePreferences != null) {
+                return spacePreferences.containsKey(invocation.getArgument(0));
             }
+            return false;
         });
-        when(spaceConfiguration.getKeys()).then(new Answer<List<String>>()
-        {
-            @Override
-            public List<String> answer(InvocationOnMock invocation) throws Throwable
-            {
-                Map<String, String> spacePreferences = getSpacePreferences();
-                if (spacePreferences != null) {
-                    return new ArrayList<>(spacePreferences.keySet());
-                }
-
-                return Collections.emptyList();
+        when(spaceConfiguration.getKeys()).then((Answer<List<String>>) invocation -> {
+            Map<String, String> spacePreferences = getSpacePreferences();
+            if (spacePreferences != null) {
+                return new ArrayList<>(spacePreferences.keySet());
             }
+            return Collections.emptyList();
         });
-        when(spaceConfiguration.isEmpty()).then(new Answer<Boolean>()
-        {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable
-            {
-                Map<String, String> spacePreferences = getSpacePreferences();
-                if (spacePreferences != null) {
-                    return spacePreferences.isEmpty();
-                }
-
-                return true;
+        when(spaceConfiguration.isEmpty()).then((Answer<Boolean>) invocation -> {
+            Map<String, String> spacePreferences = getSpacePreferences();
+            if (spacePreferences != null) {
+                return spacePreferences.isEmpty();
             }
+            return true;
         });
     }
 
@@ -171,7 +137,7 @@ public class SpacesConfigurationSourceTest
     }
 
     @Test
-    public void containsKey() throws Exception
+    void containsKey()
     {
         WikiReference wikiReference = new WikiReference("wiki");
         SpaceReference space1Reference = new SpaceReference("space1", wikiReference);
@@ -188,47 +154,45 @@ public class SpacesConfigurationSourceTest
 
         // Tests
 
-        ConfigurationSource spaces = this.mocker.getComponentUnderTest();
+        assertTrue(this.spacesSource.isEmpty());
+        assertFalse(this.spacesSource.containsKey("nopref"));
+        assertEquals(Arrays.asList(), this.spacesSource.getKeys());
+        assertNull(this.spacesSource.getProperty("nopref"));
+        assertNull(this.spacesSource.getProperty("nopref", String.class));
+        assertEquals("defaultvalue", this.spacesSource.getProperty("nopref", "defaultvalue"));
 
-        assertTrue(spaces.isEmpty());
-        assertFalse(spaces.containsKey("nopref"));
-        assertEquals(Arrays.asList(), spaces.getKeys());
-        assertNull(spaces.getProperty("nopref"));
-        assertNull(spaces.getProperty("nopref", String.class));
-        assertEquals("defaultvalue", spaces.getProperty("nopref", "defaultvalue"));
+        this.xcontext.setDoc(new XWikiDocument(new DocumentReference("document", space1Reference)));
+        assertFalse(this.spacesSource.isEmpty());
+        assertFalse(this.spacesSource.containsKey("nopref"));
+        assertEquals(Arrays.asList("pref", "pref1"), this.spacesSource.getKeys());
+        assertNull(this.spacesSource.getProperty("nopref"));
+        assertNull(this.spacesSource.getProperty("nopref", String.class));
+        assertEquals("defaultvalue", this.spacesSource.getProperty("nopref", "defaultvalue"));
+        assertTrue(this.spacesSource.containsKey("pref"));
+        assertEquals("prefvalue1", this.spacesSource.getProperty("pref"));
+        assertEquals("prefvalue1", this.spacesSource.getProperty("pref", String.class));
+        assertEquals("prefvalue1", this.spacesSource.getProperty("pref", "defaultvalue"));
+        assertTrue(this.spacesSource.containsKey("pref1"));
+        assertEquals("pref1value1", this.spacesSource.getProperty("pref1"));
+        assertEquals("pref1value1", this.spacesSource.getProperty("pref1", String.class));
+        assertFalse(this.spacesSource.containsKey("pref2"));
+        assertNull(this.spacesSource.getProperty("pref2"));
 
-        xcontext.setDoc(new XWikiDocument(new DocumentReference("document", space1Reference)));
-        assertFalse(spaces.isEmpty());
-        assertFalse(spaces.containsKey("nopref"));
-        assertEquals(Arrays.asList("pref", "pref1"), spaces.getKeys());
-        assertNull(spaces.getProperty("nopref"));
-        assertNull(spaces.getProperty("nopref", String.class));
-        assertEquals("defaultvalue", spaces.getProperty("nopref", "defaultvalue"));
-        assertTrue(spaces.containsKey("pref"));
-        assertEquals("prefvalue1", spaces.getProperty("pref"));
-        assertEquals("prefvalue1", spaces.getProperty("pref", String.class));
-        assertEquals("prefvalue1", spaces.getProperty("pref", "defaultvalue"));
-        assertTrue(spaces.containsKey("pref1"));
-        assertEquals("pref1value1", spaces.getProperty("pref1"));
-        assertEquals("pref1value1", spaces.getProperty("pref1", String.class));
-        assertFalse(spaces.containsKey("pref2"));
-        assertNull(spaces.getProperty("pref2"));
-
-        xcontext.setDoc(new XWikiDocument(new DocumentReference("document", space2Reference)));
-        assertFalse(spaces.isEmpty());
-        assertFalse(spaces.containsKey("nopref"));
-        assertEquals(Arrays.asList("pref", "pref2", "pref1"), spaces.getKeys());
-        assertNull(spaces.getProperty("nopref"));
-        assertNull(spaces.getProperty("nopref", String.class));
-        assertEquals("defaultvalue", spaces.getProperty("nopref", "defaultvalue"));
-        assertTrue(spaces.containsKey("pref"));
-        assertNull(spaces.getProperty("nopref"));
-        assertEquals("defaultvalue", spaces.getProperty("nopref", "defaultvalue"));
-        assertTrue(spaces.containsKey("pref1"));
-        assertEquals("prefvalue2", spaces.getProperty("pref"));
-        assertEquals("prefvalue2", spaces.getProperty("pref", "defaultvalue"));
-        assertEquals("pref1value1", spaces.getProperty("pref1"));
-        assertTrue(spaces.containsKey("pref2"));
-        assertEquals("pref2value2", spaces.getProperty("pref2"));
+        this.xcontext.setDoc(new XWikiDocument(new DocumentReference("document", space2Reference)));
+        assertFalse(this.spacesSource.isEmpty());
+        assertFalse(this.spacesSource.containsKey("nopref"));
+        assertEquals(Arrays.asList("pref", "pref2", "pref1"), this.spacesSource.getKeys());
+        assertNull(this.spacesSource.getProperty("nopref"));
+        assertNull(this.spacesSource.getProperty("nopref", String.class));
+        assertEquals("defaultvalue", this.spacesSource.getProperty("nopref", "defaultvalue"));
+        assertTrue(this.spacesSource.containsKey("pref"));
+        assertNull(this.spacesSource.getProperty("nopref"));
+        assertEquals("defaultvalue", this.spacesSource.getProperty("nopref", "defaultvalue"));
+        assertTrue(this.spacesSource.containsKey("pref1"));
+        assertEquals("prefvalue2", this.spacesSource.getProperty("pref"));
+        assertEquals("prefvalue2", this.spacesSource.getProperty("pref", "defaultvalue"));
+        assertEquals("pref1value1", this.spacesSource.getProperty("pref1"));
+        assertTrue(this.spacesSource.containsKey("pref2"));
+        assertEquals("pref2value2", this.spacesSource.getProperty("pref2"));
     }
 }

@@ -40,7 +40,7 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
  * @version $Id$
  */
 @OldcoreTest
-public class SpacePreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
+class SpacePreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
     private static final DocumentReference SPACE_DOCUMENT =
         new DocumentReference(CURRENT_WIKI, "currentspace", SpacePreferencesConfigurationSource.DOCUMENT_NAME);

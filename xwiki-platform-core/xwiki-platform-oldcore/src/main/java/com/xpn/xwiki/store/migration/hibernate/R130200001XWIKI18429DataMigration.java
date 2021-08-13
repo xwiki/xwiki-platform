@@ -24,12 +24,15 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.boot.Metadata;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
@@ -42,14 +45,17 @@ import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Selectable;
 import org.hibernate.mapping.Table;
 import org.hibernate.mapping.Value;
+import org.hibernate.query.NativeQuery;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.store.DatabaseProduct;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -59,7 +65,6 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  *
  * @version $Id$
  * @since 13.2RC1
- * @since 12.10.6
  */
 @Component
 @Named("R130200001XWIKI18429")
@@ -113,7 +118,6 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
             DatabaseMetaData databaMetadata = this.hibernateStore.getDatabaseMetaData();
 
-            // Impossible to apply this migration on MySQL lower than 5.7
             try {
                 String productName = databaMetadata.getDatabaseProductName();
 
@@ -121,12 +125,14 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
                 Version version = new DefaultVersion(versionString);
 
                 if (productName.equalsIgnoreCase("mariadb")) {
+                    // Impossible to apply this migration on MariaDB lower than 10.2
                     if (version.compareTo(MARIADB102) < 0) {
                         warnDatabaTooOld("MariaDB", MARIADB102);
 
                         return false;
                     }
                 } else {
+                    // Impossible to apply this migration on MySQL lower than 5.7
                     if (version.compareTo(MYSQL57) < 0) {
                         warnDatabaTooOld("MySQL", MYSQL57);
 
@@ -137,6 +143,7 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
                 this.logger.warn("Failed to get database information: {}", ExceptionUtils.getRootCauseMessage(e));
             }
         } else if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MSSQL) {
+            // Impossible to apply this migration on Microsoft SQL Server
             this.logger.warn("The migration cannot run on Microsoft SQL Server");
 
             return false;
@@ -226,18 +233,14 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
             try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
                 DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-                for (PersistentClass entity : this.hibernateStore.getConfigurationMetadata().getEntityBindings()) {
-                    // Check if the table exist
-                    if (exists(entity, databaseMetaData)) {
-                        // Find properties to update
-                        for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
-                            updateProperty(it.next(), databaseMetaData, builder);
-                        }
-
-                        // Check the key
-                        updateValue(entity.getKey(), databaseMetaData, builder);
-                    }
+                // Remove combined UNIQUE KEY affecting xwikiattrecyclebin#XDA_FILENAME column since those are not
+                // supposed to exist anymore and it can prevent the resize on MySQL/MariaDB
+                if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
+                    removeAttachmentRecycleFilenameMultiKey(builder);
                 }
+
+                // Update collumns for which the size changed
+                updateColumns(databaseMetaData, builder);
             }
         } catch (SQLException e) {
             throw new DataMigrationException("Error while extracting metadata", e);
@@ -249,6 +252,59 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         }
 
         return null;
+    }
+
+    private void removeAttachmentRecycleFilenameMultiKey(StringBuilder builder) throws DataMigrationException
+    {
+        PersistentClass persistentClass =
+            this.hibernateStore.getConfigurationMetadata().getEntityBinding(DeletedAttachment.class.getName());
+        String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
+        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
+
+        for (String key : getUniqueKeys(databaseName, tableName)) {
+            builder.append("<dropUniqueConstraint");
+            appendXmlAttribute("constraintName", key, builder);
+            appendXmlAttribute("tableName", tableName, builder);
+            builder.append("/>");
+        }
+    }
+
+    private List<String> getUniqueKeys(String databaseName, String tableName) throws DataMigrationException
+    {
+        try {
+            return getStore().executeRead(getXWikiContext(), new HibernateCallback<List<String>>()
+            {
+                @Override
+                public List<String> doInHibernate(Session session) throws HibernateException, XWikiException
+                {
+                    NativeQuery<String> query = session
+                        .createNativeQuery("SELECT DISTINCT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS "
+                            + "WHERE TABLE_SCHEMA = :schema AND TABLE_NAME = :table AND CONSTRAINT_TYPE = 'UNIQUE'");
+                    query.setParameter("schema", databaseName);
+                    query.setParameter("table", tableName);
+
+                    return query.list();
+                }
+            });
+        } catch (XWikiException e) {
+            throw new DataMigrationException("Failed to get unique keys", e);
+        }
+    }
+
+    private void updateColumns(DatabaseMetaData databaseMetaData, StringBuilder builder) throws SQLException
+    {
+        for (PersistentClass entity : this.hibernateStore.getConfigurationMetadata().getEntityBindings()) {
+            // Check if the table exist
+            if (exists(entity, databaseMetaData)) {
+                // Find properties to update
+                for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
+                    updateProperty(it.next(), databaseMetaData, builder);
+                }
+
+                // Check the key
+                updateValue(entity.getKey(), databaseMetaData, builder);
+            }
+        }
     }
 
     private boolean exists(PersistentClass entity, DatabaseMetaData databaseMetaData) throws SQLException
@@ -264,6 +320,21 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         }
 
         return resultSet.next();
+    }
+
+    private ResultSet getTables(PersistentClass entity, DatabaseMetaData databaseMetaData) throws SQLException
+    {
+        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
+        String tableName = this.hibernateStore.getConfiguredTableName(entity);
+
+        ResultSet resultSet;
+        if (this.hibernateStore.isCatalog()) {
+            resultSet = databaseMetaData.getTables(databaseName, null, tableName, null);
+        } else {
+            resultSet = databaseMetaData.getTables(null, databaseName, tableName, null);
+        }
+
+        return resultSet;
     }
 
     private void update(Column column, StringBuilder builder)

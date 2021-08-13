@@ -85,7 +85,7 @@ public class DefaultAverageRating implements AverageRating
     {
         float newTotal = (this.averageVote * this.totalVote) - rating;
         this.totalVote--;
-        this.averageVote = newTotal / this.totalVote;
+        this.averageVote = (this.totalVote > 0) ? newTotal / this.totalVote : 0;
         this.updatedAt = new Date();
         return this;
     }

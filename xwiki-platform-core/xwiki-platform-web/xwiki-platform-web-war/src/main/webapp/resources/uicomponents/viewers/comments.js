@@ -599,30 +599,12 @@ viewers.Comments = Class.create({
           number: commentNbr,
           name: name,
           content: content
-        }), function (data, status, jqXHR) {
-          function loadRequiredSkinExtensions(requiredSkinExtensions)
-          {
-            var existingSkinExtensions;
-            var getExistingSkinExtensions = function () {
-              return $('link, script').map(function () {
-                return $(this).attr('href') || $(this).attr('src');
-              }).get();
-            };
-            $('<div/>').html(requiredSkinExtensions).find('link, script').filter(function () {
-              if (!existingSkinExtensions) {
-                existingSkinExtensions = getExistingSkinExtensions();
-              }
-              var url = $(this).attr('href') || $(this).attr('src');
-              return existingSkinExtensions.indexOf(url) < 0;
-            }).appendTo('head');
-          }
-
+        }), function (data) {
           const wf = $(wfClass);
           wf.empty();
           wf.append(data);
           wf.show();
           $(document).trigger('xwiki:dom:updated', {'elements': wf.toArray()});
-          loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
           if ($("#commentCaptcha").size() > 0) {
             // FIXME: this solution is not good right now since it implies to always display the CAPTCHA
             // however since the idea is now to have a button "Add a comment", I won't got further: we should

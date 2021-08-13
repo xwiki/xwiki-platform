@@ -145,6 +145,14 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed, as otherwise mockito fails with a NPE (checker-qual brings the @NonNull annotation used in
+         JODConverter's LocalConverter class and if not present at runtime it makes Mockito fail), see
+         https://github.com/sbraconnier/jodconverter/issues/264 -->
+    <dependency>
+      <groupId>org.checkerframework</groupId>
+      <artifactId>checker-qual</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

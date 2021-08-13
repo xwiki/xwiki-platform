@@ -119,8 +119,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       property: editableProperty.data('property'),
       type: editableProperty.data('propertyType'),
       language: xcontext.locale
-    }).done(function(html, textStatus, jqXHR) {
-      loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
+    }).done(function(html) {
       // Replace the edit action with the save and cancel actions.
       editIcon.hide();
       editableProperty.find('.editableProperty-save, .editableProperty-cancel').show();
@@ -187,8 +186,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       property: editableProperty.data('property'),
       type: editableProperty.data('propertyType'),
       language: xcontext.locale
-    }).done(function(html, textStatus, jqXHR) {
-      loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
+    }).done(function(html) {
       // Update the viewer.
       var viewer = editableProperty.next('.editableProperty-viewer').html(html);
       // Cancel the edit if needed.
@@ -202,24 +200,6 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
 
   var saveAndView = function(editableProperty) {
     return save(editableProperty).then($.proxy(view, null, editableProperty));
-  };
-
-  // Helpers
-
-  var loadRequiredSkinExtensions = function(requiredSkinExtensions) {
-    var existingSkinExtensions;
-    var getExistingSkinExtensions = function() {
-      return $('link, script').map(function() {
-        return $(this).attr('href') || $(this).attr('src');
-      }).get();
-    };
-    $('<div/>').html(requiredSkinExtensions).find('link, script').filter(function() {
-      if (!existingSkinExtensions) {
-        existingSkinExtensions = getExistingSkinExtensions();
-      }
-      var url = $(this).attr('href') || $(this).attr('src');
-      return existingSkinExtensions.indexOf(url) < 0;
-    }).appendTo('head');
   };
 });
 

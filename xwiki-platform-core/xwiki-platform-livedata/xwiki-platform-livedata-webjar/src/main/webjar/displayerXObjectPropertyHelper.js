@@ -47,23 +47,6 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
       return className + '[0].' + propertyName;
     }
   }
-
-  // TODO: fix duplicate.
-  function loadRequiredSkinExtensions(requiredSkinExtensions) {
-    var existingSkinExtensions;
-    var getExistingSkinExtensions = function() {
-      return $('link, script').map(function() {
-        return $(this).attr('href') || $(this).attr('src');
-      }).get();
-    };
-    $('<div/>').html(requiredSkinExtensions).find('link, script').filter(function() {
-      if (!existingSkinExtensions) {
-        existingSkinExtensions = getExistingSkinExtensions();
-      }
-      var url = $(this).attr('href') || $(this).attr('src');
-      return existingSkinExtensions.indexOf(url) < 0;
-    }).appendTo('head');
-  }
   
   function load(mode, documentReference, property, className) {
     const targetUrl = computeTargetURL(documentReference, 'get');
@@ -75,8 +58,7 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
         property: getPropertyReference(property, className),
         type: property.startsWith('doc.') ? 'document' : 'object',
         language: xcontext.locale
-      }).done((html, textStatus, jqXHR) => {
-        loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
+      }).done((html) => {
         // Update the viewer.
         resolve(html);
       }).fail(() => {

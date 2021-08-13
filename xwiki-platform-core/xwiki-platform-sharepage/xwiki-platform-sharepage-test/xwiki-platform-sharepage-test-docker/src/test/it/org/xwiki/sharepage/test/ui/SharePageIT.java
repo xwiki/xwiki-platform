@@ -21,21 +21,19 @@ package org.xwiki.sharepage.test.ui;
 
 import javax.mail.internet.MimeMessage;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.sharepage.test.po.ShareDialog;
 import org.xwiki.sharepage.test.po.ShareResultDialog;
 import org.xwiki.sharepage.test.po.ShareableViewPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 
-import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,26 +65,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 )
 public class SharePageIT
 {
-    private GreenMail mail;
+    @RegisterExtension
+    static GreenMailExtension mail = new GreenMailExtension(ServerSetupTest.SMTP);
 
     private String testClassName;
 
     private String testMethodName;
-
-    @BeforeAll
-    public void startMail()
-    {
-        this.mail = new GreenMail(ServerSetupTest.SMTP);
-        this.mail.start();
-    }
-
-    @AfterAll
-    public void stopMail()
-    {
-        if (this.mail != null) {
-            this.mail.stop();
-        }
-    }
 
     @BeforeEach
     public void setup(TestUtils setup, TestInfo info)

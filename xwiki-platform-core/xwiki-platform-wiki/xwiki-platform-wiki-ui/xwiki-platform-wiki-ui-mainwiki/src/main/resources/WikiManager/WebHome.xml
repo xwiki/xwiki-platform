@@ -59,7 +59,7 @@
     'propertyDescriptors': [
       { 'id': 'wikiprettyname', 'displayer': { 'id': 'link', 'propertyHref': 'wikiprettyname_url' } },
       { 'id': 'owner', 'editable': false},
-      { 'id': 'membershipType', 'sortable': false, 'filterable': false },
+      { 'id': 'membershipType', 'sortable': false, 'filterable': false, 'editable': false },
       { 
         'id': '_actions',
         'displayer': {

@@ -87,9 +87,11 @@ class WikiManagerTest extends PageTest
             new JSONObject(htmlDocument.getElementById("wikis").attr("data-config"))
                 .getJSONObject("meta")
                 .getJSONArray("propertyDescriptors");
-        Optional<JSONObject> propertyDescriptor = findObjectById(propertyDescriptors, "owner");
+        Optional<JSONObject> ownerPropertyDescriptor = findObjectById(propertyDescriptors, "owner");
+        assertFalse(ownerPropertyDescriptor.get().getBoolean("editable"));
 
-        assertFalse(propertyDescriptor.map(it -> it.optBoolean("editable", true)).orElse(true));
+        Optional<JSONObject> membershipTypePropertyDescriptor = findObjectById(propertyDescriptors, "membershipType");
+        assertFalse(membershipTypePropertyDescriptor.get().getBoolean("editable"));
     }
 
     /**

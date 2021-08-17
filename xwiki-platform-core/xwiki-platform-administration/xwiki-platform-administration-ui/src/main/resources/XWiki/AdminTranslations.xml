@@ -152,6 +152,25 @@ administration.section.analytics.status.hint=Determine if the tracking in Google
 admin.social=Social
 admin.social.description=Configuration for social features.
 
+# Configurable Class
+XWiki.ConfigurableClass_displayInSection=Display in section
+XWiki.ConfigurableClass_heading=Heading
+XWiki.ConfigurableClass_configurationClass=Configuration class
+XWiki.ConfigurableClass_linkPrefix=Link prefix
+XWiki.ConfigurableClass_propertiesToShow=Properties to show
+XWiki.ConfigurableClass_codeToExecute=Code to execute
+XWiki.ConfigurableClass_iconAttachment=Icon attachment
+XWiki.ConfigurableClass_displayInCategory=Display in category
+XWiki.ConfigurableClass_displayBeforeCategory=Display before category
+XWiki.ConfigurableClass_categoryIcon=Category icon
+XWiki.ConfigurableClass_scope=Scope
+XWiki.ConfigurableClass_scope_WIKI=Wiki
+XWiki.ConfigurableClass_scope_SPACE=Current space
+XWiki.ConfigurableClass_scope_ALL_SPACES=All spaces
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki and all spaces
+XWiki.ConfigurableClass_sectionOrder=Section order
+
+
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 

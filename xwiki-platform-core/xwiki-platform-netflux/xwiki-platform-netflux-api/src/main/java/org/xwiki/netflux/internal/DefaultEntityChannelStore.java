@@ -76,16 +76,16 @@ public class DefaultEntityChannelStore implements EntityChannelStore
     }
 
     @Override
-    public synchronized EntityChannel createChannel(EntityReference entityReference, String type)
+    public synchronized EntityChannel createChannel(EntityReference entityReference, List<String> path)
     {
-        Optional<EntityChannel> existingChannel = getChannel(entityReference, type);
+        Optional<EntityChannel> existingChannel = getChannel(entityReference, path);
         if (existingChannel.isPresent()) {
             // Return existing channel.
             return existingChannel.get();
         }
 
         // Create new channel.
-        EntityChannel channel = new EntityChannel(entityReference, this.channelStore.create().getKey(), type);
+        EntityChannel channel = new EntityChannel(entityReference, path, this.channelStore.create().getKey());
         List<EntityChannel> channels = this.entityChannels.get(entityReference);
         if (channels == null) {
             channels = new ArrayList<>();

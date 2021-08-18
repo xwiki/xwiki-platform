@@ -64,32 +64,32 @@ public class NetfluxScriptService implements ScriptService
     }
 
     /**
-     * Looks for a channel associated to the specified entity and having the specified type.
+     * Looks for a channel associated to the specified entity and having the specified path.
      * 
      * @param entityReference the entity the channel is associated with
-     * @param type the channel type (since multiple channels can be associated to the same entity)
+     * @param path the channel path, used to identify the channel among all the channels associated to the same entity
      * @return the found channel
      */
-    public EntityChannel getChannel(EntityReference entityReference, String type)
+    public EntityChannel getChannel(EntityReference entityReference, List<String> path)
     {
         if (this.authorization.hasAccess(Right.EDIT, entityReference)) {
-            return this.channelStore.getChannel(entityReference, type).orElse(null);
+            return this.channelStore.getChannel(entityReference, path).orElse(null);
         } else {
             return null;
         }
     }
 
     /**
-     * Create a new channel of the given type and associate it with the specified entity.
+     * Associate a new channel to the specified entity, having the given path.
      * 
      * @param entityReference the entity to associate the channel with
-     * @param type the channel type (since multiple channels can be associated to the same entity)
+     * @param path the channel path, used to identify the channel among all the channels associated to the same entity
      * @return information about the created channel
      */
-    public EntityChannel createChannel(EntityReference entityReference, String type)
+    public EntityChannel createChannel(EntityReference entityReference, List<String> path)
     {
         if (this.authorization.hasAccess(Right.EDIT, entityReference)) {
-            return this.createChannel(entityReference, type);
+            return this.channelStore.createChannel(entityReference, path);
         } else {
             return null;
         }

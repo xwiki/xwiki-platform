@@ -44,24 +44,24 @@ public interface EntityChannelStore
     List<EntityChannel> getChannels(EntityReference entityReference);
 
     /**
-     * Looks for a channel associated to the specified entity and having the specified type.
+     * Looks for a channel associated to the specified entity and having the specified path.
      * 
      * @param entityReference the entity the channel is associated with
-     * @param type the channel type (since multiple channels can be associated to the same entity)
+     * @param path the channel path, used to identify the channel among all the channels associated to the same entity
      * @return the found channel
      */
-    default Optional<EntityChannel> getChannel(EntityReference entityReference, String type)
+    default Optional<EntityChannel> getChannel(EntityReference entityReference, List<String> path)
     {
         return getChannels(entityReference).stream().filter(Objects::nonNull)
-            .filter(channel -> Objects.equals(channel.getType(), type)).findFirst();
+            .filter(channel -> Objects.equals(channel.getPath(), path)).findFirst();
     }
 
     /**
-     * Create a new channel of the given type and associate it with the specified entity.
+     * Associate a new channel to the specified entity, having the given path.
      * 
      * @param entityReference the entity to associate the channel with
-     * @param type the channel type (since multiple channels can be associated to the same entity)
+     * @param path the channel path, used to identify the channel among all the channels associated to the same entity
      * @return information about the created channel
      */
-    EntityChannel createChannel(EntityReference entityReference, String type);
+    EntityChannel createChannel(EntityReference entityReference, List<String> path);
 }

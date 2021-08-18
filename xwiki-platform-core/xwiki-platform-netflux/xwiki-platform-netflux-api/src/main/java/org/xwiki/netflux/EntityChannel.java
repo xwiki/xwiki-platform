@@ -19,6 +19,8 @@
  */
 package org.xwiki.netflux;
 
+import java.util.List;
+
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
@@ -33,9 +35,9 @@ public class EntityChannel
 {
     private final EntityReference entityReference;
 
-    private final String key;
+    private final List<String> path;
 
-    private final String type;
+    private final String key;
 
     private int userCount;
 
@@ -43,14 +45,14 @@ public class EntityChannel
      * Creates a new channel.
      * 
      * @param entityReference the entity this channel is associated with
+     * @param path the channel path, used to identify the channel among all the channels associated to the same entity
      * @param key the channel key
-     * @param type the channel type
      */
-    public EntityChannel(EntityReference entityReference, String key, String type)
+    public EntityChannel(EntityReference entityReference, List<String> path, String key)
     {
         this.entityReference = entityReference;
+        this.path = path;
         this.key = key;
-        this.type = type;
     }
 
     /**
@@ -62,19 +64,19 @@ public class EntityChannel
     }
 
     /**
+     * @return the channel path, used to identify the channel among all the channels associated to the same entity
+     */
+    public List<String> getPath()
+    {
+        return path;
+    }
+
+    /**
      * @return the channel key
      */
     public String getKey()
     {
         return key;
-    }
-
-    /**
-     * @return the channel type
-     */
-    public String getType()
-    {
-        return type;
     }
 
     /**

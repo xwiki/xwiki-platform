@@ -53,6 +53,7 @@ import org.xwiki.extension.version.internal.DefaultVersion;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
+import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
@@ -237,6 +238,7 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
                 // supposed to exist anymore and it can prevent the resize on MySQL/MariaDB
                 if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
                     removeAttachmentRecycleFilenameMultiKey(builder);
+                    removeRecycleFilenameMultiKey(builder);
                 }
 
                 // Update collumns for which the size changed
@@ -259,6 +261,21 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         PersistentClass persistentClass =
             this.hibernateStore.getConfigurationMetadata().getEntityBinding(DeletedAttachment.class.getName());
         String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
+
+        removeFilenameMultiKey(tableName, builder);
+    }
+
+    private void removeRecycleFilenameMultiKey(StringBuilder builder) throws DataMigrationException
+    {
+        PersistentClass persistentClass =
+            this.hibernateStore.getConfigurationMetadata().getEntityBinding(XWikiDeletedDocument.class.getName());
+        String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
+
+        removeFilenameMultiKey(tableName, builder);
+    }
+
+    private void removeFilenameMultiKey(String tableName, StringBuilder builder) throws DataMigrationException
+    {
         String databaseName = this.hibernateStore.getDatabaseFromWikiName();
 
         for (String key : getUniqueKeys(databaseName, tableName)) {

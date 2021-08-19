@@ -410,12 +410,12 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
                 // Try to limit the conflicts caused by cache invalidation.
                 // There is still one entry removed from the cache but retries should help deal with that.
-                invalidationWriteLock.lock();
+                suspendInvalidation();
                 try {
                     disconnectFromParents();
                     disposeChildren();
                 } finally {
-                    invalidationWriteLock.unlock();
+                    resumeInvalidation();
                 }
             }
         }

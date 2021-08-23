@@ -99,6 +99,11 @@ $response.setContentType("application/json")
 #set ($limit = $numbertool.toNumber($request.get('limit')).intValue())
 #if (!$limit)
   #set ($limit = 15)
+#else
+  #set ($maxlimit = $services.security.query.getLimit())
+  #if ($isGuest && $limit > $maxlimit)
+    #set ($limit = $maxlimit)
+  #end
 #end
 ##
 ## Build the query

@@ -671,6 +671,12 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# The default is:
 # security.script.save.checkAuthor=true
 
+#-# [Since 13.7]
+#-# Ensure a query made from a template does not contain more results than it can be handled.
+#-#
+#-# The default is:
+# security.query.maxlimit=100
+
 #-------------------------------------------------------------------------------------
 # URL
 #-------------------------------------------------------------------------------------

@@ -25,9 +25,14 @@
 ##
 ## JavaScript libraries
 ##
-## We load require.js first because it is used by other JavaScript modules to load their dependencies.
-<script src="$services.webjars.url('requirejs', "require$jsExtension")"
-  data-wysiwyg="true"></script>
+## We load RequireJS first because it is used by other JavaScript modules to load their dependencies.
+<script src="$services.webjars.url('requirejs', "require$jsExtension")" data-wysiwyg="true"></script>
+## FIXME: We still have code depending on Prototype.js without declaring it (i.e. without using RequireJS). Short term
+## goal is to stop loading Prototype.js by default and change the existing code to load it when needed. Long term goal is
+## to stop relying on Prototype.js . Note that we load Prototype.js before the following inline script because we have to
+## fix some incompatibilities between Bootstrap and Prototype.js . In the future we should use the 'deferred' RequireJS
+## plugin to fix the incompatibilities only if / when Prototype.js is loaded.
+<script src="$xwiki.getSkinFile('js/prototype/prototype.js')"></script>
 ##
 ## Define the global require.js configuration
 ##
@@ -167,7 +172,6 @@ window.docgeturl = "${doc.getURL('get')}";
 ##
 ## Top-level JavaScript libraries (that are loaded directly)
 ##
-$xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})##
 ## xwiki.bundle.min.js and xwiki.bundle.min.css aggregate a couple of JavaScript and CSS files that are used on each
 ## page. In order to help debugging we provide/bundle the individual files also and you can load them instead of the
 ## aggregated files by passing 'minify=false' in the request query string or setting debug.minify property in

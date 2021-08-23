@@ -143,7 +143,7 @@ public class TreeElement extends BaseElement
      */
     public TreeElement waitForNodeSelected(String nodeId)
     {
-        String selectedNodeXPath = String.format(".//*[@id = '%s_anchor' and @aria-selected = 'true']", nodeId);
+        String selectedNodeXPath = String.format(".//*[@id = '%s' and @aria-selected = 'true']", nodeId);
         getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));
         return this;
     }

@@ -259,6 +259,7 @@ public class LiveTableElement extends BaseElement
             getDriver().waitUntilCondition(driver -> {
                 // Refresh the current page since we need the livetable to fetch the JSON again
                 driver.navigate().refresh();
+                this.waitUntilReady();
                 int count = driver.findElements(by).size();
                 LOGGER.info("LiveTableElement#waitUntilRowCountGreaterThan/refresh(): count = [{}]", count);
                 return count >= minimalExpectedRowCount;
@@ -268,6 +269,7 @@ public class LiveTableElement extends BaseElement
             getDriver().waitUntilCondition(driver -> {
                 // Refresh the current page since we need the livetable to fetch the JSON again
                 driver.get(driver.getCurrentUrl());
+                this.waitUntilReady();
                 int count = driver.findElements(by).size();
                 LOGGER.info("LiveTableElement#waitUntilRowCountGreaterThan/get(): count = [{}]", count);
                 return count >= minimalExpectedRowCount;

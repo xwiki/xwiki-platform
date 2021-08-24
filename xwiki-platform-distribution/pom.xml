@@ -559,7 +559,6 @@
                       <!-- Ensure that emory-util-classloader and dependencies using it are not bundled anymore -->
                       <exclude>org.xwiki.commons:xwiki-commons-legacy-classloader-api:*</exclude>
                       <exclude>edu.emory.mathcs.util:emory-util-classloader:*</exclude>
-                      <exclude>org.xwiki.commons:xwiki-commons-legacy-protocol-jar:*</exclude>
                     </excludes>
                   </bannedDependencies>
                 </rules>

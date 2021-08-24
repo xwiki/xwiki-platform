@@ -256,7 +256,8 @@ public class LiveTableResultsTest extends PageTest
                 + "where obj.name=doc.fullName and obj.className = :className "
                 + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
                 + "and obj.id = prop_category.id.id and prop_category.id.name = :prop_category_id_name "
-                + "and (prop_category.value = :prop_category_value_1 OR prop_category.value = :prop_category_value_2) "
+                + "and ((prop_category.value like :prop_category_value_1 or prop_category.value is null) "
+                + "OR prop_category.value = :prop_category_value_2) "
                 + "and obj.id=prop_name.id.id and prop_name.name = :prop_name_name   "
                 + "order by lower(prop_name.value) asc, prop_name.value asc");
         Map<String, Object> values = new HashMap<>();

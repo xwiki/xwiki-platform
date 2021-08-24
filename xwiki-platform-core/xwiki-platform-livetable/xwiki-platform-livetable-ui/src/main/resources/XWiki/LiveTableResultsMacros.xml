@@ -1022,6 +1022,11 @@
   #end
   #if ($matchType == 'partial' || $matchType == 'prefix')
     #livetable_repeatParams("upper($column) like upper(?)", " $joinOperator ", $valueCount, $paramPrefix, $paramOffset)
+  #elseif($matchType == 'empty')
+    ## Check if the value of the column is like the empty parameter (which is often the empty string), or if the value 
+    ## of the column is null (to be compliant with Oracle which stores the empty string as a NULL value).
+    #livetable_repeatParams("($column like ? or $column is null)", " $joinOperator ", $valueCount, $paramPrefix, 
+    $paramOffset)
   #elseif ($isList)
     #livetable_repeatParams("? in elements($column)", " $joinOperator ", $valueCount, $paramPrefix, $paramOffset)
   #elseif ($valueCount &gt; 1 &amp;&amp; $joinOperator == 'OR')

@@ -29,6 +29,7 @@ import java.util.jar.JarOutputStream;
 
 import javax.inject.Named;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.internal.DefaultClassLoaderManager;
@@ -39,7 +40,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.TestEnvironment;
+import org.xwiki.test.XWikiTempDirUtil;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -47,7 +48,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -57,9 +57,11 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @ComponentList({AttachmentURLStreamHandler.class, ExtendedURLStreamHandlerFactory.class,
-    DefaultClassLoaderManager.class, JarExtendedURLStreamHandler.class, TestEnvironment.class})
+    DefaultClassLoaderManager.class, JarExtendedURLStreamHandler.class})
 class AttachmentURLClassLoaderTest
 {
+    private final File temporaryDirectory = XWikiTempDirUtil.createTemporaryDirectory();
+
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
@@ -68,7 +70,16 @@ class AttachmentURLClassLoaderTest
     private AttachmentReferenceResolver<String> arf;
 
     @MockComponent
+    private Environment environment;
+
+    @MockComponent
     private DocumentAccessBridge dab;
+
+    @BeforeEach
+    void beforeEach()
+    {
+        when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
+    }
 
     /**
      * Verify that resource located in a URI with an attachmentjar protocol can be found.

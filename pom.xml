@@ -56,7 +56,7 @@
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.14</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>2.0.0</tika.version>
+    <tika.version>2.1.0</tika.version>
     <pdfbox.version>2.0.24</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 
@@ -115,9 +115,6 @@
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://downloadarchive.documentfoundation.org/libreoffice/old/ -->
     <libreoffice.version>7.0.6.2</libreoffice.version>
-
-    <!-- Tika -->
-    <tika.version>2.1.0</tika.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>

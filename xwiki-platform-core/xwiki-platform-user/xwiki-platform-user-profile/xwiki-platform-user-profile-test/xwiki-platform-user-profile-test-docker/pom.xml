@@ -60,19 +60,6 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
-    <!-- Runtime dependencies required by the Live Data macro. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livedata-macro</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livedata-livetable</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

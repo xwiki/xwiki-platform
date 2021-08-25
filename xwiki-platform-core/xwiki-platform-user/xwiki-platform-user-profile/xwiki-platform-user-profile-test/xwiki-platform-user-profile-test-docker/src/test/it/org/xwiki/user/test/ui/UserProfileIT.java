@@ -49,10 +49,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.10
  */
-@UITest(extraJARs = {
-    // The Solr store is not ready yet to be installed as an extension so we need to add it to WEB-INF/lib manually
-    "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
-})
+@UITest(properties = {
+    // We need the notifications feature because the User Profile UI draws the Notifications Macro used in the user
+    // profile for the user's activity stream. As a consequence, when a user is created in the test, the
+    // UserAddedEventListener is called and global default user notifications filters are copied for the new user,
+    // requiring the notifications HBM mapping file.
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // In addition this jar cannot currently be installed as an extension (e.g. the CM won't find the
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as an extension so we need to add it to WEB-INF/lib manually
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+    })
 class UserProfileIT
 {
     private static final String IMAGE_NAME = "avatar.png";

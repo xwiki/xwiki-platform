@@ -115,6 +115,9 @@
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://downloadarchive.documentfoundation.org/libreoffice/old/ -->
     <libreoffice.version>7.0.6.2</libreoffice.version>
+
+    <!-- Tika -->
+    <tika.version>2.1.0</tika.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -204,7 +207,7 @@
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-advancedmedia-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
         <exclusions>
           <!-- XWiki does not support JAX-RC 2 for now -->
           <exclusion>
@@ -221,47 +224,47 @@
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-scientific-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-sqlite3-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-crypto-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-news-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-miscoffice-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-mail-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-cad-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-apple-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-pdf-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
         <exclusions>
           <exclusion>
             <!-- We are using Slf4J in XWiki -->
@@ -273,64 +276,54 @@
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-pkg-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-microsoft-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
           </exclusion>
-
-          <!-- Remove when https://issues.apache.org/jira/browse/TIKA-3509 is fixed -->
-          <exclusion>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-xml-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-font-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-html-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-code-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-text-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-audiovideo-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-image-module</artifactId>
-        <version>2.0.0</version>
+        <version>${tika.version}</version>
       </dependency>
 
       <!-- Rome is used in rss macro and feed api modules and in Tika -->

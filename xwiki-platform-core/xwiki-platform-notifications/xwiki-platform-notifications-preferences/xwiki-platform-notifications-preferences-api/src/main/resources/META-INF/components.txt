@@ -1,5 +1,7 @@
 org.xwiki.notifications.preferences.internal.CachedModelBridge
 org.xwiki.notifications.preferences.internal.DefaultNotificationPreferenceManager
+org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheInvalidatorListener
+org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheManager
 org.xwiki.notifications.preferences.internal.email.DefaultNotificationEmailUserPreferenceManager
 org.xwiki.notifications.preferences.internal.DefaultTargetableNotificationPreferenceBuilder
 org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider

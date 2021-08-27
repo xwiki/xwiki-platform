@@ -153,12 +153,12 @@ public class BaseElement
         // machine, etc).
         try {
             getDriver().waitUntilJavascriptCondition(
-                "return typeof window !== 'undefined' && window != null && typeof window.jQuery() !== 'undefined' "
+                "return typeof window !== 'undefined' && window != null && typeof window.jQuery !== 'undefined' "
                     + "&& window.jQuery != null && window.jQuery().dropdown != null");
         } catch (TimeoutException e) {
             LOGGER.error("Wait for JQuery took more than [{}] seconds", getDriver().getTimeout(), e);
             getDriver().waitUntilJavascriptCondition(
-                "return typeof window !== 'undefined' && window != null && typeof window.jQuery() !== 'undefined' "
+                "return typeof window !== 'undefined' && window != null && typeof window.jQuery !== 'undefined' "
                     + "&& window.jQuery != null && window.jQuery().dropdown != null");
         }
 

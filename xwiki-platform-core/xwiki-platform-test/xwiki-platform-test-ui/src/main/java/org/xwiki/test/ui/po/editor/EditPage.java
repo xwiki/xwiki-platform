@@ -290,8 +290,10 @@ public class EditPage extends BasePage
 
         // // Actionbuttons javascript for saving the page.
         getDriver().waitUntilJavascriptCondition(
-            "return XWiki.actionButtons != undefined && " + "XWiki.actionButtons.EditActions != undefined && "
-                + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
+            "return typeof XWiki !== 'undefined' "
+                + "&& XWiki.actionButtons != undefined "
+                + "&& XWiki.actionButtons.EditActions != undefined "
+                + "&& XWiki.actionButtons.AjaxSaveAndContinue != undefined");
     }
 
     protected Set<Locale> getExistingLocales(List<WebElement> elements)

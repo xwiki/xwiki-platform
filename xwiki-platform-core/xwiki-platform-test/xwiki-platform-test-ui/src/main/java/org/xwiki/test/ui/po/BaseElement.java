@@ -152,22 +152,18 @@ public class BaseElement
         // If it helps, then we might need to dive deeper and understand why it can take more than 10s (underpowered
         // machine, etc).
         try {
-            getDriver().waitUntilJavascriptCondition(
-                "return typeof window !== 'undefined' && window != null && typeof window.jQuery() !== 'undefined' "
-                    + "&& window.jQuery != null && window.jQuery().dropdown != null");
+            getDriver()
+                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
         } catch (TimeoutException e) {
             LOGGER.error("Wait for JQuery took more than [{}] seconds", getDriver().getTimeout(), e);
-            getDriver().waitUntilJavascriptCondition(
-                "return typeof window !== 'undefined' && window != null && typeof window.jQuery() !== 'undefined' "
-                    + "&& window.jQuery != null && window.jQuery().dropdown != null");
+            getDriver()
+                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
         }
 
         // Make sure all asynchronous elements have been executed
-        // Note: document.getElementsByClassName() always return a non-null array so we don't need to test for null.
-        getDriver().waitUntilJavascriptCondition("return typeof document !== 'undefined' && document != null "
-            + "&& !document.getElementsByClassName('xwiki-async').length");
+        getDriver().waitUntilJavascriptCondition("return !document.getElementsByClassName('xwiki-async').length");
 
         // Make sure the shortcuts are loaded
-        getDriver().waitUntilJavascriptCondition("return typeof shortcut !== 'undefined' && shortcut != null");
+        getDriver().waitUntilJavascriptCondition("return shortcut != null && shortcut != undefined");
     }
 }

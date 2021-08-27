@@ -21,5 +21,7 @@ export default {
 </script>
 
 <style scoped>
-
+.footnotes .footnote {
+  padding: 0.1em 1em;
+}
 </style>

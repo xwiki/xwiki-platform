@@ -89,7 +89,6 @@ class DatabaseMailStatusStoreTest
     @Test
     void logsForloadMailStatus() throws Exception
     {
-        //Provider<XWikiContext> xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         when(xcontext.getWikiId()).thenReturn("wiki");

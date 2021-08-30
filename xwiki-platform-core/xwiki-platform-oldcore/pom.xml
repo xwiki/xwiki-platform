@@ -67,11 +67,15 @@
     <!-- CSS4J (used for PDF export) -->
     <dependency>
       <groupId>io.sf.carte</groupId>
-      <artifactId>xml-dtd</artifactId>
+      <artifactId>css4j</artifactId>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.sf.carte</groupId>
+      <artifactId>xml-dtd</artifactId>
     </dependency>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->

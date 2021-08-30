@@ -60,9 +60,6 @@
     <pdfbox.version>2.0.24</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 
-    <!-- CSS4J/Carte -->
-    <css4j.version>3.5.1</css4j.version>
-
     <!-- Jetty version -->
     <jetty.version>9.4.29.v20200521</jetty.version>
 
@@ -669,10 +666,17 @@
       </dependency>
 
       <!-- Carte CSS4J -->
+      <!-- Note: the dep order is important since css4j-dom4j depends on css4j and we they don't have the same version.
+           We need to depend on the latest from css4j. -->
+      <dependency>
+        <groupId>io.sf.carte</groupId>
+        <artifactId>css4j</artifactId>
+        <version>3.6.1</version>
+      </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
-        <version>${css4j.version}</version>
+        <version>3.6.0</version>
       </dependency>
 
       <!-- Carte XML DTD -->

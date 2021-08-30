@@ -666,8 +666,6 @@
       </dependency>
 
       <!-- Carte CSS4J -->
-      <!-- Note: the dep order is important since css4j-dom4j depends on css4j and we they don't have the same version.
-           We need to depend on the latest from css4j. -->
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>

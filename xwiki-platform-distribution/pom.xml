@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>13.7-SNAPSHOT</version>
+    <version>13.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -45,7 +45,7 @@
   </modules>
   <properties>
     <!-- The version of Maven used during XWiki runtime (more recent than the one used during the build to benefit from bugfixes and improvements)-->
-    <maven.version>3.8.1</maven.version>
+    <maven.version>3.8.2</maven.version>
     <maven.resolver.version>1.6.3</maven.resolver.version>
 
     <!-- Flavors known to be valid with the current distribution -->
@@ -167,13 +167,13 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>13.7-SNAPSHOT</version>
+        <version>13.8-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-security-script</artifactId>
-        <version>13.7-SNAPSHOT</version>
+        <version>13.8-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>
@@ -184,7 +184,7 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tree-webjar</artifactId>
-        <version>13.7-SNAPSHOT</version>
+        <version>13.8-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -501,7 +501,6 @@
                       <!-- Ensure that emory-util-classloader and dependencies using it are not bundled anymore -->
                       <exclude>org.xwiki.commons:xwiki-commons-legacy-classloader-api:*</exclude>
                       <exclude>edu.emory.mathcs.util:emory-util-classloader:*</exclude>
-                      <exclude>org.xwiki.commons:xwiki-commons-legacy-protocol-jar:*</exclude>
                     </excludes>
                   </bannedDependencies>
                 </rules>

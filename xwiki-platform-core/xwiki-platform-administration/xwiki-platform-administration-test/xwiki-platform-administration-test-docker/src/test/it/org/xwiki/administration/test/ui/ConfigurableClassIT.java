@@ -71,7 +71,7 @@ class ConfigurableClassIT
         setupConfigurableApplication(setup, testReference,
             "displayInSection", testReference.getLastSpaceReference().getName(),
             "heading", "Some Heading",
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "configurationClass", setup.serializeReference(testReference),
             "linkPrefix", "TheLinkPrefix");
 
@@ -101,14 +101,14 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", app1Section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean");
 
         setup.addObject(testReference, "XWiki.ConfigurableClass",
             "displayInSection", app2Section,
-            "configureGlobally", "false",
+            "scope", "SPACE",
             "heading", "Some Other Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "TextArea, Select");
@@ -183,7 +183,7 @@ class ConfigurableClassIT
             + "T${code}uld also be displayed.";
         setupConfigurableApplication(setup, testReference,
             "displayInSection", testReference.getLastSpaceReference().getName(),
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "codeToExecute", codeToExecute,
             "heading", heading
             );
@@ -232,7 +232,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -260,7 +260,7 @@ class ConfigurableClassIT
         assertFalse(asp.hasHeading(2, "HSomeHeading"));
 
         // Switch application to non-global
-        setup.updateObject(testReference, "XWiki.ConfigurableClass", 0, "configureGlobally", false);
+        setup.updateObject(testReference, "XWiki.ConfigurableClass", 0, "scope", "SPACE");
 
         // Check that it is available in space section.
         asp = AdministrationSectionPage.gotoSpaceAdministration(testReference.getLastSpaceReference(), section);
@@ -307,7 +307,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -354,7 +354,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -384,7 +384,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "codeToExecute", test);
@@ -410,7 +410,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "codeToExecute", test,
@@ -418,7 +418,7 @@ class ConfigurableClassIT
 
         setup.addObject(testReference, "XWiki.ConfigurableClass",
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Other Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "TextArea, Select");
@@ -444,7 +444,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -489,14 +489,14 @@ class ConfigurableClassIT
 
         setupConfigurableApplication(false, setup, page1,
             "displayInSection", section1,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(page1),
             "propertiesToShow", "String, Boolean, TextArea, Select");
 
         setupConfigurableApplication(false, setup, page2,
             "displayInSection", section2,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(page2),
             "propertiesToShow", "String, Boolean, TextArea, Select");

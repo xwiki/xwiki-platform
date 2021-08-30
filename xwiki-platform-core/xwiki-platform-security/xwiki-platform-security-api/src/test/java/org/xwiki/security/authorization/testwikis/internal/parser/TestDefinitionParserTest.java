@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.security.authorization.testwikis.internal.parser;
 
 import java.io.File;
@@ -25,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
@@ -45,14 +44,15 @@ import org.xwiki.security.authorization.testwikis.TestDocument;
 import org.xwiki.security.authorization.testwikis.TestGroup;
 import org.xwiki.security.authorization.testwikis.TestSpace;
 import org.xwiki.security.authorization.testwikis.TestWiki;
-import org.xwiki.test.ComponentManagerRule;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Test of the test definition parser itself.
@@ -60,6 +60,7 @@ import static org.junit.Assert.assertThat;
  * @version $Id$
  * @since 5.0M2
  */
+@ComponentTest
 @ComponentList({
     DefaultStringEntityReferenceResolver.class,
     DefaultStringEntityReferenceSerializer.class,
@@ -67,13 +68,13 @@ import static org.junit.Assert.assertThat;
     DefaultModelConfiguration.class,
     DefaultSymbolScheme.class
 })
-public class TestDefinitionParserTest
+class TestDefinitionParserTest
 {
-    @Rule
-    public final ComponentManagerRule componentManager = new ComponentManagerRule();
+    @InjectComponentManager
+    private ComponentManager componentManager;
 
     @Test
-    public void testDefinitionTestParser() throws Exception
+    void definitionTestParser() throws Exception
     {
         TestDefinitionParser parser = new DefaultTestDefinitionParser();
 
@@ -147,7 +148,8 @@ public class TestDefinitionParserTest
         TestSpace space = mainwiki.getSpace("space1");
 
         assertThat("Main wiki should have a space named 'space1'", space, notNullValue());
-        assertThat("'space1' of main wiki should have description 'space 1'", space.getDescription(), equalTo("space 1"));
+        assertThat("'space1' of main wiki should have description 'space 1'", space.getDescription(),
+            equalTo("space 1"));
 
         rules = space.getAccessRules();
 
@@ -180,15 +182,16 @@ public class TestDefinitionParserTest
         TestDocument document = space.getDocument("document1");
 
         assertThat("Space 1 of main wiki should have a document named 'document1'", document, notNullValue());
-        assertThat("'document1' of 'space1' of main wiki should have description 'Document 1'", document.getDescription(), equalTo("Document 1"));
+        assertThat("'document1' of 'space1' of main wiki should have description 'Document 1'",
+            document.getDescription(), equalTo("Document 1"));
 
         rules = document.getAccessRules();
 
         assertThat("There must be 7 access rules on document 1", rules.size(), equalTo(7));
 
-        userRefs = new ArrayList<DocumentReference>();
-        rights = new ArrayList<Right>();
-        states = new ArrayList<RuleState>();
+        userRefs = new ArrayList<>();
+        rights = new ArrayList<>();
+        states = new ArrayList<>();
 
         for (TestAccessRule rule : rules) {
             userRefs.add(rule.getUser());
@@ -207,7 +210,6 @@ public class TestDefinitionParserTest
         assertThat("State in access rules of document 1 of space 1 of main wiki mismatch", states, hasItems(
             RuleState.ALLOW
         ));
-
     }
 }
 

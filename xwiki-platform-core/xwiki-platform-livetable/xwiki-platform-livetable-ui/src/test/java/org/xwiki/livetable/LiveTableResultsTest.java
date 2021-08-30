@@ -256,7 +256,8 @@ public class LiveTableResultsTest extends PageTest
                 + "where obj.name=doc.fullName and obj.className = :className "
                 + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
                 + "and obj.id = prop_category.id.id and prop_category.id.name = :prop_category_id_name "
-                + "and (prop_category.value in (:prop_category_value_1, :prop_category_value_2)) "
+                + "and ((prop_category.value like :prop_category_value_1 or prop_category.value is null) "
+                + "OR prop_category.value = :prop_category_value_2) "
                 + "and obj.id=prop_name.id.id and prop_name.name = :prop_name_name   "
                 + "order by lower(prop_name.value) asc, prop_name.value asc");
         Map<String, Object> values = new HashMap<>();
@@ -319,6 +320,96 @@ public class LiveTableResultsTest extends PageTest
         values.put("prop_category_textValue_1", "%||%");
         values.put("prop_category_textValue_2", "%|Information|%");
         values.put("prop_name_name", "name");
+        verify(this.query).bindValues(values);
+    }
+
+    /**
+     * Verify that we can filter String properties by multiple values and that the filter values are grouped by match
+     * type (in order to optimize the query).
+     */
+    @Test
+    void filterStringMultipleValues() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "Panels", "PanelClass"));
+        StaticListClass category = document.getXClass().addStaticListField("category");
+        this.xwiki.saveDocument(document, "creates PanelClass", true, this.context);
+
+        setColumns("name,description,category");
+        setSort("name", true);
+        setClassName("Panels.PanelClass");
+        setFilter("category_match", "partial");
+        setFilter("category", "a");
+        setFilter("category_match", "prefix");
+        setFilter("category", "b");
+        setFilter("category_match", "exact");
+        setFilter("category", "c");
+        setFilter("category_match", "exact");
+        setFilter("category", "d");
+        this.request.put("category/join_mode", "OR");
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+
+        renderPage();
+
+        verify(this.queryService)
+            .hql(", BaseObject as obj , StringProperty as prop_category, StringProperty prop_name  "
+                + "where obj.name=doc.fullName and obj.className = :className "
+                + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+                + "and obj.id = prop_category.id.id and prop_category.id.name = :prop_category_id_name "
+                + "and (upper(prop_category.value) like upper(:prop_category_value_1) OR"
+                + " upper(prop_category.value) like upper(:prop_category_value_2) OR"
+                + " prop_category.value in (:prop_category_value_3, :prop_category_value_4)) "
+                + "and obj.id=prop_name.id.id and prop_name.name = :prop_name_name   "
+                + "order by lower(prop_name.value) asc, prop_name.value asc");
+        Map<String, Object> values = new HashMap<>();
+        values.put("className", "Panels.PanelClass");
+        values.put("classTemplate1", "Panels.PanelClassTemplate");
+        values.put("classTemplate2", "Panels.PanelTemplate");
+        values.put("prop_category_id_name", "category");
+        values.put("prop_category_value_1", "%a%");
+        values.put("prop_category_value_2", "b%");
+        values.put("prop_category_value_3", "c");
+        values.put("prop_category_value_4", "d");
+        values.put("prop_name_name", "name");
+        verify(this.query).bindValues(values);
+    }
+
+    /**
+     * When no match type is explicitly defined for a matcher on a short text, the matcher must be partial (i.e., the
+     * filtering must match on substrings).
+     */
+    @Test
+    void filterStringNoMatcherSpecified() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "Test", "MyPage"));
+        document.getXClass().addTextField("shortText", "Short Text", 10);
+        this.xwiki.saveDocument(document, "creates my page", true, this.context);
+        setColumns("shortText");
+        setClassName("Test.MyPage");
+        setFilter("shortText", "X");
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+
+        renderPage();
+
+        verify(this.queryService).hql(", BaseObject as obj , StringProperty as prop_shortText  "
+            + "where obj.name=doc.fullName "
+            + "and obj.className = :className "
+            + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+            + "and obj.id = prop_shortText.id.id "
+            + "and prop_shortText.id.name = :prop_shortText_id_name "
+            + "and (upper(prop_shortText.value) like upper(:prop_shortText_value_1)) ");
+
+        Map<String, Object> values = new HashMap<>();
+        values.put("className", "Test.MyPage");
+        values.put("classTemplate1", "Test.MyPageTemplate");
+        values.put("classTemplate2", "Test.MyPage");
+        values.put("prop_shortText_id_name", "shortText");
+        values.put("prop_shortText_value_1", "%X%");
         verify(this.query).bindValues(values);
     }
 

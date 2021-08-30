@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tika</artifactId>
-    <version>13.7-SNAPSHOT</version>
+    <version>13.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tika-parsers</artifactId>
   <name>XWiki Platform - Tika - Parsers</name>
@@ -56,11 +56,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- Bring back when https://issues.apache.org/jira/browse/TIKA-3510 is fixed -->
-    <!-- <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-parser-scientific-module</artifactId>
-    </dependency> -->
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parser-crypto-module</artifactId>

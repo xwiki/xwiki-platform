@@ -49,14 +49,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @ComponentTest
 @AllComponents
-public class CommonsConfigurationSourceTest
+class CommonsConfigurationSourceTest
 {
     private Configuration configuration;
 
     private CommonsConfigurationSource source;
 
     @BeforeEach
-    public void setUp(ComponentManager componentManager) throws Exception
+    void setUp(ComponentManager componentManager) throws Exception
     {
         this.source = new CommonsConfigurationSource();
         ConverterManager converterManager = componentManager.getInstance(ConverterManager.class);
@@ -66,7 +66,7 @@ public class CommonsConfigurationSourceTest
     }
 
     @Test
-    void testDefaultValue()
+    void defaultValue()
     {
         this.configuration.setProperty("string", "value");
 
@@ -76,7 +76,7 @@ public class CommonsConfigurationSourceTest
     }
 
     @Test
-    void testStringProperty()
+    void stringProperty()
     {
         this.configuration.setProperty("string", "value");
 
@@ -88,7 +88,7 @@ public class CommonsConfigurationSourceTest
     }
 
     @Test
-    void testStringPropertyWhenConversionError()
+    void stringPropertyWhenConversionError()
     {
         this.configuration.setProperty("string", "value");
 
@@ -99,7 +99,7 @@ public class CommonsConfigurationSourceTest
     }
 
     @Test
-    void testBooleanPropertyWhenConversionError()
+    void booleanPropertyWhenConversionError()
     {
         this.configuration.setProperty("property", "");
 
@@ -110,7 +110,7 @@ public class CommonsConfigurationSourceTest
     }
 
     @Test
-    void testBooleanProperty()
+    void booleanProperty()
     {
         // Test boolean value
         this.configuration.setProperty("boolean", true);
@@ -122,13 +122,13 @@ public class CommonsConfigurationSourceTest
     }
 
     @Test
-    void testUnknownBooleanProperty()
+    void unknownBooleanProperty()
     {
         assertNull(this.source.getProperty("unknown", Boolean.class));
     }
 
     @Test
-    void testListProperty()
+    void listProperty()
     {
         this.configuration.setProperty("list", "value1");
         this.configuration.addProperty("list", "value2");
@@ -151,7 +151,7 @@ public class CommonsConfigurationSourceTest
     }
 
     @Test
-    void testPropertiesProperty()
+    void propertiesProperty()
     {
         this.configuration.setProperty("properties", "key1=value1");
         this.configuration.addProperty("properties", "key2=value2");
@@ -167,7 +167,7 @@ public class CommonsConfigurationSourceTest
     }
 
     @Test
-    void testIsEmpty()
+    void isEmpty()
     {
         assertTrue(this.configuration.isEmpty());
 

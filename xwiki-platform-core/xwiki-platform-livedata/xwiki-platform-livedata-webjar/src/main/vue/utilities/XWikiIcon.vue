@@ -87,7 +87,8 @@ export default {
   methods: {
     async fetchRemoteIconDescriptor(iconName) {
       try {
-        const iconURL = `/xwiki/rest/wikis/${XWiki.currentWiki}/iconThemes/icons?name=${encodeURIComponent(iconName)}`;
+        const parameters = `name=${encodeURIComponent(iconName)}`;
+        const iconURL = `${XWiki.contextPath}/rest/wikis/${XWiki.currentWiki}/iconThemes/icons?${parameters}`;
         const response = await window.fetch(iconURL, {
           headers: {
             'Accept': 'application/json'

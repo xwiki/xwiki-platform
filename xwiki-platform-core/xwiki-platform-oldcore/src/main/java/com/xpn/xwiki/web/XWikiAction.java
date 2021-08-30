@@ -43,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
 import org.xwiki.container.servlet.ServletContainerException;
@@ -73,13 +72,9 @@ import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.resource.NotFoundResourceHandlerException;
 import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceManager;
-import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
-import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -542,37 +537,6 @@ public abstract class XWikiAction implements LegacyAction
                 }
 
                 // Call the Actions
-
-                getProgress().startStep(this, "Search and execute entity resource handler");
-
-                // Call the new Entity Resource Reference Handler.
-                ResourceReferenceHandler entityResourceReferenceHandler = Utils.getComponent(
-                    new DefaultParameterizedType(null, ResourceReferenceHandler.class, ResourceType.class), "bin");
-                EntityResourceReference entityResourceReference =
-                    (EntityResourceReference) Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
-
-                // We save the current action set since:
-                // - by default the action is set to "view" for Extensions not installed as root and contributing some
-                // new Entity Action (see https://jira.xwiki.org/browse/XWIKI-15182).
-                // - we want to set back the action in case no ResourceReferenceHandler was found to handle the URL
-                // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-14947 is fixed
-                String originalAction = context.getAction();
-                try {
-                    // Force the action in the context because of https://jira.xwiki.org/browse/XWIKI-15182.
-                    // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-14947 is fixed
-                    context.setAction(entityResourceReference.getAction().getActionName());
-                    entityResourceReferenceHandler.handle(entityResourceReference,
-                        DefaultResourceReferenceHandlerChain.EMPTY);
-                    // Don't let the old actions kick in!
-                    return;
-                } catch (NotFoundResourceHandlerException e) {
-                    // No Entity Resource Action has been found. Don't do anything and let it go through
-                    // so that the old Action system kicks in...
-                    // Put back the action, because of https://jira.xwiki.org/browse/XWIKI-15182
-                    // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-14947 is fixed
-                    context.setAction(originalAction);
-                }
-
                 getProgress().startStep(this, "Execute action render");
 
                 // Handle the XWiki.RedirectClass object that can be attached to the current document

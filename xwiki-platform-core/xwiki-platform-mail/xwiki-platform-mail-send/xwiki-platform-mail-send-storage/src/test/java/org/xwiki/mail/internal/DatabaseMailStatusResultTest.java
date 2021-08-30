@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -47,7 +46,7 @@ class DatabaseMailStatusResultTest
         MailStatusStore store = mock(MailStatusStore.class);
         MailStatus status = new MailStatus();
         when(store.load(Collections.singletonMap("batchId", "batchid"), 0, 0, "date", true))
-            .thenReturn(Arrays.asList(status));
+            .thenReturn(Collections.singletonList(status));
 
         DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);
         result.setBatchId("batchid");

@@ -19,7 +19,7 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -101,7 +101,7 @@ class DatabaseMailStatusStoreTest
         status.setMessageId("messageid");
         status.setState(MailState.PREPARE_SUCCESS);
         status.setRecipients("recipients");
-        when(hibernateStore.executeRead(eq(xcontext), any())).thenReturn(Arrays.asList(status));
+        when(hibernateStore.executeRead(eq(xcontext), any())).thenReturn(Collections.singletonList(status));
 
         Map<String, Object> filterMap = new LinkedHashMap<>();
         filterMap.put("status", "failed");

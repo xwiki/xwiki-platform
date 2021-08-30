@@ -31,7 +31,7 @@ import org.xwiki.stability.Unstable;
  * The component used to create and associate channels to XWiki entities.
  * 
  * @version $Id$
- * @since 13.7RC1
+ * @since 13.8RC1
  */
 @Role
 @Unstable

@@ -37,7 +37,7 @@ import org.xwiki.security.authorization.Right;
  * Script-related APIs for real-time synchronization.
  * 
  * @version $Id$
- * @since 13.7RC1
+ * @since 13.8RC1
  */
 @Component
 @Singleton

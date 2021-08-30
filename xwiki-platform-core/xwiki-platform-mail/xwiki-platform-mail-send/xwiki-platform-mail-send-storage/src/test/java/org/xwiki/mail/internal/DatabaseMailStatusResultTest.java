@@ -23,14 +23,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusStore;
-import org.xwiki.test.AllLogRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.DatabaseMailStatusResult}.
@@ -38,17 +38,15 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.4RC1
  */
-public class DatabaseMailStatusResultTest
+@ComponentTest
+class DatabaseMailStatusResultTest
 {
-    @Rule
-    public AllLogRule logRule = new AllLogRule();
-
     @Test
-    public void getAll() throws Exception
+    void getAll() throws Exception
     {
         MailStatusStore store = mock(MailStatusStore.class);
         MailStatus status = new MailStatus();
-        when(store.load(Collections.<String, Object>singletonMap("batchId", "batchid"), 0, 0, "date", true))
+        when(store.load(Collections.singletonMap("batchId", "batchid"), 0, 0, "date", true))
             .thenReturn(Arrays.asList(status));
 
         DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);

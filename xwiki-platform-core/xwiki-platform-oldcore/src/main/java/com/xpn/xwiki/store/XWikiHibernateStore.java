@@ -578,18 +578,34 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     bclass.setDirty(false);
                 }
 
-                if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
-                    saveAttachmentList(doc, context);
-                }
                 // Remove attachments planned for removal
                 if (!doc.getAttachmentsToRemove().isEmpty()) {
                     for (XWikiAttachmentToRemove attachmentToRemove : doc.getAttachmentsToRemove()) {
                         XWikiAttachment attachment = attachmentToRemove.getAttachment();
-                        XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);
-                        store.deleteXWikiAttachment(attachment, false, context, false);
+
+                        XWikiAttachment attachmentToAdd = doc.getAttachment(attachment.getFilename());
+                        if (attachmentToAdd != null && attachmentToAdd.getId() == attachment.getId()) {
+                            // Hibernate does not like when the "same" database entity (from identifier point of view)
+                            // is manipulated through two different Java objects in the same session. But it also refuse
+                            // to delete and insert the "same" entity (still from id point of view) in the same
+                            // sessions. So when we hit such a case we only remove the attachment history and let the
+                            // saveAttachmentList code below update the current attachment content.
+                            AttachmentVersioningStore store = getAttachmentVersioningStore(attachment);
+                            store.deleteArchive(attachment, context, bTransaction);
+                            // Keep the same content store since we need to overwrite existing data
+                            attachmentToAdd.setContentStore(attachment.getContentStore());
+                        } else {
+                            XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);
+                            store.deleteXWikiAttachment(attachment, false, context, false);
+                        }
                     }
-                    doc.clearAttachmentsToRemove();
                 }
+                // Update/add new attachments
+                if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
+                    saveAttachmentList(doc, context);
+                }
+                // Reset the list of attachments to remove
+                doc.clearAttachmentsToRemove();
 
                 // Handle the latest text file
                 if (doc.isContentDirty() || doc.isMetaDataDirty()) {
@@ -1834,6 +1850,17 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
+    private boolean isDeleted(XWikiAttachment attachment, XWikiDocument doc)
+    {
+        for (XWikiAttachmentToRemove attachmentToRemove : doc.getAttachmentsToRemove()) {
+            if (attachmentToRemove.getAttachment().getFilename().equals(attachment.getFilename())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void saveAttachmentList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         try {
@@ -1841,7 +1868,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             List<XWikiAttachment> list = doc.getAttachmentList();
             for (XWikiAttachment attachment : list) {
-                saveAttachment(attachment, context);
+                saveAttachment(attachment, isDeleted(attachment, doc), context);
             }
 
         } catch (Exception e) {
@@ -1852,7 +1879,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private void saveAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
+    private void saveAttachment(XWikiAttachment attachment, boolean deleted, XWikiContext context) throws XWikiException
     {
         try {
             // If the comment is larger than the max size supported by the Storage, then abbreviate it
@@ -1870,9 +1897,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             boolean saveContent;
             if (exist) {
+                // Don't update the history if the document was actually not supposed to exist
                 // Don't update the attachment version if document metadata dirty is forced false (any modification to
                 // the attachment automatically set document metadata dirty to true)
-                if (attachment.isContentDirty() && attachment.getDoc().isMetaDataDirty()) {
+                if (!deleted && attachment.isContentDirty() && attachment.getDoc().isMetaDataDirty()) {
                     attachment.updateContentArchive(context);
                 }
 
@@ -3357,6 +3385,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
 
         return this.attachmentContentStore;
+    }
+
+    private AttachmentVersioningStore getAttachmentVersioningStore(XWikiAttachment attachment)
+        throws ComponentLookupException
+    {
+        String storeHint = attachment.getArchiveStore();
+
+        if (storeHint != null && !storeHint.equals(HINT)) {
+            return this.componentManager.getInstance(AttachmentVersioningStore.class, storeHint);
+        }
+
+        return this.attachmentArchiveStore;
     }
 
     @Override

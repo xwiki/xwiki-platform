@@ -110,4 +110,10 @@ public class AllITs
     class NestedInformationIT extends InformationIT
     {
     }
+
+    @Nested
+    @DisplayName("Page history manipulation tests")
+    class NestedVersionIT extends VersionIT
+    {
+    }
 }

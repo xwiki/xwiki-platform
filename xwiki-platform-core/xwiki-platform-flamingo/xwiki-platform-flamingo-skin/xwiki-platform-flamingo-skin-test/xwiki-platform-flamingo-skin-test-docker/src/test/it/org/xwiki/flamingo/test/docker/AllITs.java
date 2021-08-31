@@ -116,4 +116,10 @@ public class AllITs
     class NestedViewersIT extends ViewersIT
     {
     }
+
+    @Nested
+    @DisplayName("Page history manipulation tests")
+    class NestedVersionIT extends VersionIT
+    {
+    }
 }

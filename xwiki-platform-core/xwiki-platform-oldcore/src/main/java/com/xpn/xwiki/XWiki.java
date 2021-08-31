@@ -2033,7 +2033,7 @@ public class XWiki implements EventListener
                 if (hasAttachmentRecycleBin(context)) {
                     for (XWikiAttachmentToRemove attachment : document.getAttachmentsToRemove()) {
                         if (attachment.isToRecycleBin()) {
-                            // Make sure the attachment will be deleted with its history
+                            // Make sure the attachment will be stored with its history
                             attachment.getAttachment().loadArchive(context);
                             getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(),
                                 context.getUser(), new Date(), context, true);

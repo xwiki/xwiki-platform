@@ -143,24 +143,41 @@
   $(document).ready(function() {
 
     /** Add autocomplete attributes to ease form filling. */
-    const prefix = 'XWiki.XWikiUsers_0_';
-    var fieldsPurposes = {
-      'first_name': 'given-name',
-      'last_name': 'family-name',
-      'company': 'organization',
-      'email': 'email',
-      'phone': 'tel',
-      'address': 'street-address',
-      'blog': 'url'
-    };
-    for (const entry of Object.entries(fieldsPurposes)) {
-      var name = entry[0];
-      var purpose = entry[1];
-      var selector = '#' + (prefix + name).replace(/\./g, '\\.');
-      var inputField = $(selector);
+    var fieldsPurposes = [
+        {
+          'name': 'first_name',
+          'purpose': 'given-name'
+        },
+        {
+          'name': 'last_name',
+          'purpose': 'family-name'
+        },
+        {
+          'name': 'company',
+          'purpose': 'organization'
+        },
+        {
+          'name': 'email',
+          'purpose': 'email'
+        },
+        {
+          'name': 'phone',
+          'purpose': 'tel'
+        },
+        {
+          'name': 'address',
+          'purpose': 'street-address'
+        },
+        {
+          'name': 'blog',
+          'purpose': 'url'
+        }
+      ];
+    fieldsPurposes.forEach(function (entry) {
+      var inputField = $('[name$="' + entry.name + '"]');
       if (inputField.length === 1)
-        inputField.attr('autocomplete', purpose);
-    }
+        inputField.attr('autocomplete', entry.purpose);
+    });
 
     /**
      * Save the new user status.

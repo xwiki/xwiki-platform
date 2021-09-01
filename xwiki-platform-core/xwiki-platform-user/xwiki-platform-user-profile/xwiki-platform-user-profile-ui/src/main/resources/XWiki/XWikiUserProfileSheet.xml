@@ -175,8 +175,9 @@
       ];
     fieldsPurposes.forEach(function (entry) {
       var inputField = $('[name$="' + entry.name + '"]');
-      if (inputField.length === 1)
+      if (inputField.length === 1) {
         inputField.attr('autocomplete', entry.purpose);
+      }
     });
 
     /**

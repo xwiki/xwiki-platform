@@ -41,14 +41,14 @@
       <artifactId>jquery</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.webjars.bowergithub.xwiki-contrib</groupId>
-      <artifactId>chainpad</artifactId>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>chainpad-webjar</artifactId>
       <version>5.2.5</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.webjars.bowergithub.xwiki-labs</groupId>
-      <artifactId>chainpad-netflux</artifactId>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>chainpad-netflux-webjar</artifactId>
       <version>0.12.9</version>
       <scope>runtime</scope>
     </dependency>

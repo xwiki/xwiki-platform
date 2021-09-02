@@ -63,7 +63,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilterStreamTest
+public abstract class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilterStreamTest
 {
     protected BeanOutputFilterStreamFactory<FilterXMLOutputProperties> xmlOutputFilterStreamFactory;
 
@@ -77,12 +77,10 @@ public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilte
     {
         super.beforeEach();
 
-        this.xmlOutputFilterStreamFactory =
-            this.oldcore.getMocker().getInstance(OutputFilterStreamFactory.class,
-                FilterStreamType.FILTER_XML.serialize());
-        this.inputFilterStreamFactory =
-            this.oldcore.getMocker().getInstance(InputFilterStreamFactory.class,
-                FilterStreamType.XWIKI_INSTANCE.serialize());
+        this.xmlOutputFilterStreamFactory = this.oldcore.getMocker().getInstance(OutputFilterStreamFactory.class,
+            FilterStreamType.FILTER_XML.serialize());
+        this.inputFilterStreamFactory = this.oldcore.getMocker().getInstance(InputFilterStreamFactory.class,
+            FilterStreamType.XWIKI_INSTANCE.serialize());
 
         // Query manager
 
@@ -106,8 +104,8 @@ public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilte
         });
 
         // Spaces
-        when(this.instanceModelMock.getSpaceReferences(any(WikiReference.class))).thenAnswer(
-            new Answer<EntityReferenceTreeNode>()
+        when(this.instanceModelMock.getSpaceReferences(any(WikiReference.class)))
+            .thenAnswer(new Answer<EntityReferenceTreeNode>()
             {
                 @Override
                 public EntityReferenceTreeNode answer(InvocationOnMock invocation) throws Throwable
@@ -127,8 +125,8 @@ public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilte
             });
 
         // Documents
-        when(this.instanceModelMock.getDocumentReferences(any(SpaceReference.class))).thenAnswer(
-            new Answer<List<DocumentReference>>()
+        when(this.instanceModelMock.getDocumentReferences(any(SpaceReference.class)))
+            .thenAnswer(new Answer<List<DocumentReference>>()
             {
                 @Override
                 public List<DocumentReference> answer(InvocationOnMock invocation) throws Throwable
@@ -156,8 +154,8 @@ public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilte
         this.instanceModelMock = this.oldcore.getMocker().registerMockComponent(InstanceModel.class);
     }
 
-    protected void assertXML(String resource, InstanceInputProperties instanceProperties) throws FilterException,
-        IOException
+    protected void assertXML(String resource, InstanceInputProperties instanceProperties)
+        throws FilterException, IOException
     {
         if (instanceProperties == null) {
             instanceProperties = new InstanceInputProperties();
@@ -170,6 +168,13 @@ public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilte
 
         expected = StringUtils.removeStart(expected, "<?xml version=\"1.1\" encoding=\"UTF-8\"?>\n\n");
 
+        String actual = toXML(instanceProperties);
+
+        assertEquals(expected, actual);
+    }
+
+    protected String toXML(InstanceInputProperties instanceProperties) throws FilterException, IOException
+    {
         InputFilterStream inputFilterStream = this.inputFilterStreamFactory.createInputFilterStream(instanceProperties);
 
         StringWriterOutputTarget writer = new StringWriterOutputTarget();
@@ -184,7 +189,7 @@ public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilte
         inputFilterStream.close();
         outputFilterStream.close();
 
-        assertEquals(expected, writer.getBuffer().toString());
+        return writer.getBuffer().toString();
     }
 
     protected void assertXML(String resource, InstanceOutputProperties outputProperties,

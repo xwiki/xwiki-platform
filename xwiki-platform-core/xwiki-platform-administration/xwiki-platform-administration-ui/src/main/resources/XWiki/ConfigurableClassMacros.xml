@@ -85,35 +85,35 @@
   ## this choice has been made to avoid any problem during the upgrade of old wikis.
   ## And we are doing this look in a separate query for performance reason: adding a or statement is very bad
   ## in terms of performance. This all should be improved in the future with proper caching.
-
+  ##
   #set ($fromClauseWithoutGlobal = [
     'BaseObject as obj',
     'StringProperty as category',
     'IntegerProperty as sectionOrder'
   ])
-
+  ##
   #set ($fromClause = [])
   #set ($discard = $fromClause.addAll($fromClauseWithoutGlobal))
   #set ($discard = $fromClause.add('StringProperty as global'))
-
+  ##
   #set ($fromClauseDeprecated = [])
   #set ($discard = $fromClauseDeprecated.addAll($fromClauseWithoutGlobal))
   #set ($discard = $fromClauseDeprecated.add('IntegerProperty as deprecatedGlobal'))
-
+  ##
   #set ($whereClauseWithoutGlobal = [
     "obj.name = doc.fullName and obj.className = :className",
     "category.id = obj.id and category.name = 'displayInCategory'",
     "sectionOrder.id = obj.id and sectionOrder.name = 'sectionOrder'"
   ])
-
+  ##
   #set ($whereClause = [])
   #set ($discard = $whereClause.addAll($whereClauseWithoutGlobal))
   #set ($discard = $whereClause.add("global.id = obj.id and global.name = 'scope' and global.value in (:global)"))
-
-    #set ($whereClauseDeprecated = [])
-    #set ($discard = $whereClauseDeprecated.addAll($whereClauseWithoutGlobal))
-    #set ($discard = $whereClauseDeprecated.add("deprecatedGlobal.id = obj.id and deprecatedGlobal.name = 'configureGlobally' and deprecatedGlobal.value = :deprecatedGlobal"))
-
+  ##
+  #set ($whereClauseDeprecated = [])
+  #set ($discard = $whereClauseDeprecated.addAll($whereClauseWithoutGlobal))
+  #set ($discard = $whereClauseDeprecated.add("deprecatedGlobal.id = obj.id and deprecatedGlobal.name = 'configureGlobally' and deprecatedGlobal.value = :deprecatedGlobal"))
+  ##
   #set ($params = {'className' : $nameOfThisDocument})
   ## Order by category and section priority, leaving empty/null category at the end, because we want to read the
   ## category meta data from the first (most important) section in each category.
@@ -148,13 +148,13 @@
   #set ($statementDeprecated = ', ' + $stringtool.join($fromClauseDeprecated, ', ') +
     ' where ' + $stringtool.join($whereClauseDeprecated, ' and ') +
     ' order by ' + $stringtool.join($orderByClause, ', '))
-
+  ##
   #set ($deprecatedParams = {})
   #set ($discard = $deprecatedParams.putAll($params))
   #set ($discard = $deprecatedParams.remove('global'))
   #set ($discard = $deprecatedParams.remove('space'))
   #set ($discard = $params.remove('deprecatedGlobal'))
-
+  ##
   ## We can't remove duplicates using the unique filter because the select clause will be extended with the information
   ## needed by the order by clause. Thus we remove the duplicates after we get the results.
   #set ($orderedSetOfAppNames = $collectiontool.orderedSet)

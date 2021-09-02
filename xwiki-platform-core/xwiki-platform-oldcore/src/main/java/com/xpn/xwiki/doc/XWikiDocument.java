@@ -4925,13 +4925,28 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         xarProperties.setPreserveVersion(bWithVersions);
         xarProperties.setEncoding(encoding);
         xarProperties.setFormat(format);
+        xarProperties.setTarget(out);
 
+        toXML(documentProperties, xarProperties);
+    }
+
+    /**
+     * Serialize the document to an OutputStream.
+     *
+     * @param xarProperties the configuration of the output filter
+     * @param documentProperties the configuration of the input filter
+     * @throws XWikiException when an errors occurs during wiki operations
+     * @since 13.8RC1
+     */
+    public void toXML(DocumentInstanceInputProperties documentProperties, XAROutputProperties xarProperties)
+        throws XWikiException
+    {
         try {
-            Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this, out, xarProperties,
-                documentProperties);
+            Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this, xarProperties.getTarget(),
+                xarProperties, documentProperties);
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
-                "Error parsing xml", e, null);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_DOC_EXPORT,
+                "Error serializing XML", e, null);
         }
     }
 

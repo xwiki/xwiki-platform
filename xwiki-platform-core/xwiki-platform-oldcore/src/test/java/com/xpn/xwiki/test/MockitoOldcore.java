@@ -87,6 +87,7 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -142,6 +143,8 @@ public class MockitoOldcore
     private XWikiHibernateStore mockXWikiHibernateStore;
 
     private XWikiVersioningStoreInterface mockVersioningStore;
+
+    private AttachmentVersioningStore mockAttachmentVersioningStore;
 
     private XWikiRightService mockRightService;
 
@@ -241,6 +244,8 @@ public class MockitoOldcore
             this.mockXWikiHibernateStore);
         this.mockVersioningStore =
             getMocker().registerMockComponent(XWikiVersioningStoreInterface.class, XWikiHibernateBaseStore.HINT);
+        this.mockAttachmentVersioningStore =
+            getMocker().registerMockComponent(AttachmentVersioningStore.class, XWikiHibernateBaseStore.HINT);
         this.mockRightService = mock(XWikiRightService.class);
         this.mockGroupService = mock(XWikiGroupService.class);
         this.mockAuthService = mock(XWikiAuthService.class);
@@ -249,6 +254,7 @@ public class MockitoOldcore
 
         this.spyXWiki.setStore(this.mockXWikiHibernateStore);
         this.spyXWiki.setVersioningStore(this.mockVersioningStore);
+        this.spyXWiki.setDefaultAttachmentArchiveStore(this.mockAttachmentVersioningStore);
         this.spyXWiki.setRightService(this.mockRightService);
         this.spyXWiki.setAuthService(this.mockAuthService);
         this.spyXWiki.setGroupService(this.mockGroupService);

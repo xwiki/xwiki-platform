@@ -30,7 +30,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestComponent;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 /**
  * Exception mapper for all {@link Exception} exceptions. Allowing to log all exceptions that are not inheriting from
@@ -71,10 +72,10 @@ public class ExceptionExceptionMapper implements ExceptionMapper<Exception>, XWi
         this.logger.error("A REST endpoint failed with an unmapped exception.", cause);
 
         // Returns an error response to the client, with some detail about the exception in the response.
-        String message =
-            String.format("No ExceptionMapper was found for [%s]. Cause: [%s].", cause, getRootCauseMessage(cause));
+        String message = String.format("No ExceptionMapper was found for [%s].%n%s", cause, getStackTrace(cause));
         return Response.serverError()
             .entity(message)
-            .type(javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE).build();
+            .type(TEXT_PLAIN_TYPE)
+            .build();
     }
 }

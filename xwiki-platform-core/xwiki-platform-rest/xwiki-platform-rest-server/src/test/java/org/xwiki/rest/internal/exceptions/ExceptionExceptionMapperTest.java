@@ -31,6 +31,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static ch.qos.logback.classic.Level.ERROR;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -58,8 +59,9 @@ class ExceptionExceptionMapperTest
         IOException cause = new IOException("file not found");
         Response response = this.exceptionExceptionMapper.toResponse(cause);
 
-        assertEquals("No ExceptionMapper was found for [java.io.IOException: file not found]. "
-            + "Cause: [IOException: file not found].", response.getEntity());
+        assertEquals(String.format(
+            "No ExceptionMapper was found for [java.io.IOException: file not found].%n%s",
+            getStackTrace(cause)), response.getEntity());
         assertEquals(500, response.getStatus());
         assertEquals(1, this.logCapture.size());
         assertEquals("A REST endpoint failed with an unmapped exception.", this.logCapture.getMessage(0));

@@ -18,31 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 // This file defines functions which are used in RTWiki/RTWysiwyg, and address components of the user interface.
-define(['jquery'], function ($) {
+define('xwiki-rte-interface', ['jquery'], function($) {
   'use strict';
 
   var Interface = {};
 
-  var debug = function(x) {console.log(x);};
-
   var uid = Interface.uid = function() {
     return 'realtime-uid-' + String(Math.random()).substring(2);
-  };
-
-  var setStyle = Interface.setStyle = function() {
-    $('head').append([
-      '<style>',
-      '.realtime-merge {',
-      '  float: left',
-      '}',
-      '#secret-merge {',
-      '  opacity: 0;',
-      '}',
-      '#secret-merge:hover {',
-      '  opacity: 1;',
-      '}',
-      '</style>'
-     ].join(''));
   };
 
   var LOCALSTORAGE_DISALLOW;
@@ -50,83 +32,55 @@ define(['jquery'], function ($) {
     LOCALSTORAGE_DISALLOW = key;
   };
 
-  //This hides a DIFFERENT autosave, not the one included in the realtime. This is a checkbox which is off by default.
-  // We hide it so that it can't be turned on, because that would cause some problems.
-  var setAutosaveHiddenState = function(hidden) {
-    var elem = $('#autosaveControl');
-    if (hidden) {
-      elem.hide();
-    } else {
-      elem.show();
-    }
-  };
-  // Stub for old versions
-  Interface.setAutosaveHiddenState = function() {};
-
   var allowed = false;
   var realtimeAllowed = Interface.realtimeAllowed = function(bool) {
-    if (typeof bool === 'undefined') {
-      return allowed;
-    } else {
-      allowed = bool;
-      setAutosaveHiddenState(bool);
-      return bool;
+    if (arguments.length) {
+      // Change the value.
+      allowed = !!bool;
+      // The real-time edit doesn't support the standard auto-save feature (it provides instead its own auto-save).
+      $('#autosaveControl').toggle(!allowed);
     }
+    return allowed;
   };
 
   var createAllowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox = function(id, checked, message) {
-    $('head').append([
-      '<style>',
-      '.realtime-allow-outerdiv {',
-      '  display: inline;',
-      '  white-space: nowrap;',
-      '}',
-      '</style>'
-     ].join(''));
-    $('.buttons').append(
+    var checkbox = $(
       '<div class="realtime-allow-outerdiv">' +
-        '<label class="realtime-allow-label" for="' + id + '">' +
-          '<input type="checkbox" class="realtime-allow" id="' + id + '" ' +
-            checked + '" />' +
-          ' ' + message +
+        '<label class="realtime-allow-label" for="">' +
+          '<input type="checkbox" class="realtime-allow" id=""/>' +
         '</label>' +
       '</div>'
-    );
+    ).appendTo('.buttons');
+    checkbox.find('label').attr('for', id).append(document.createTextNode(message))
+      .find('input').attr('id', id).prop('checked', !!checked);
   };
 
-  // TODO: move into Interface (after factoring out more arguments). Maybe this should go in autosaver instead?
   var createMergeMessageElement = Interface.createMergeMessageElement = function(container, messages) {
-    setStyle();
-    var id = uid();
-    $(container).prepend( '<div class="realtime-merge" id="'+id+'"></div>');
-    var $merges = $('#'+id);
+    var $merges = $('<div class="realtime-merge"/>').attr('id', uid()).prependTo(container);
 
     var timeout;
 
-    // drop a method into the lastSaved object which handles messages
-    return function (msgType, args) {
-      // keep multiple message sequences from fighting over resources
+    // Drop a method into the lastSaved object which handles messages.
+    return function (messageKey, args) {
+      // Keep multiple message sequences from fighting over resources.
       clearTimeout(timeout);
 
-      var formattedMessage = messages[msgType].replace(/\{(\d+)\}/g, function(all, token) {
-        // if you pass an insufficient number of arguments
-        // it will return 'undefined'
+      var formattedMessage = messages[messageKey].replace(/\{(\d+)\}/g, function(all, token) {
+        // If you pass an insufficient number of arguments it will return 'undefined'.
         return args[token];
       });
 
-      debug(formattedMessage);
+      console.log(formattedMessage);
 
-      // set the message, handle all types
+      // Set the message, handle all types.
       $merges.text(formattedMessage);
 
-      // clear the message box in five seconds
-      // 1.5s message fadeout time
+      // Clear the message box in 10 seconds (1.5s message fadeout time).
       timeout = setTimeout(function() {
         $merges.fadeOut(1500, function() {
-          $merges.text('');
-          $merges.show();
+          $merges.empty().show();
         });
-      },10000);
+      }, 10000);
     };
   };
 

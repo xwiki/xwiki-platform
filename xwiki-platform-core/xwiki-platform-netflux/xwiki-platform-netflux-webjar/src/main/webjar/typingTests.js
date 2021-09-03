@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define(function () {
+define('xwiki-rte-typingTests', function () {
   'use strict';
   var setRandomizedInterval = function(func, target, range) {
     var timeout;
@@ -30,54 +30,50 @@ define(function () {
     again();
     return {
       cancel: function() {
-        if (timeout) {
-          clearTimeout(timeout);
-          timeout = undefined;
-        }
+        clearTimeout(timeout);
       }
     };
   };
 
-  var testInput = function(doc, el, offset, cb) {
+  var testInput = function(rootElement, textNode, offset, callback) {
     var i = 0,
       j = offset,
-      input = " The quick red fox jumps over the lazy brown dog.",
-      l = input.length,
+      textInput = " The quick red fox jumps over the lazy brown dog.",
       errors = 0,
       maxErrors = 15,
       interval;
     var cancel = function() {
-      if (interval) {interval.cancel();}
+      interval.cancel();
     };
 
     interval = setRandomizedInterval(function() {
-      cb();
+      callback();
       try {
-        el.replaceData(Math.min(j, el.length), 0, input.charAt(i));
-      } catch (err) {
+        // "Type" the next character from the text input inside the given text node.
+        textNode.insertData(Math.min(j, textNode.length), textInput.charAt(i));
+      } catch (error) {
         errors++;
         if (errors >= maxErrors) {
-          console.log("Max error number exceeded");
+          console.log('Max error number exceeded.');
           cancel();
         }
 
-        console.error(err);
-        var next = document.createTextNode("");
-        doc.appendChild(next);
-        el = next;
+        console.error(error);
+        // Continue typing in a new text node.
+        textNode = document.createTextNode('');
+        rootElement.appendChild(textNode);
         j = -1;
       }
-      i = (i + 1) % l;
+      // Type again the text input when we finish it.
+      i = (i + 1) % textInput.length;
       j++;
     }, 200, 50);
 
-    return {
-      cancel: cancel
-    };
+    return {cancel};
   };
 
   return {
-    testInput: testInput,
-    setRandomizedInterval: setRandomizedInterval
+    testInput,
+    setRandomizedInterval
   };
 });

@@ -17,28 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define([
-  'RTFrontend_treesome',
-  'RTFrontend_rangy',
-], function (Tree, Rangy, saveRestore) {
+define('xwiki-rte-cursor', ['rangy-core'], function (Rangy) {
   'use strict';
-
-  window.Rangy = Rangy;
-  window.Tree = Tree;
-  // do some function for the start and end of the cursor
-
   var verbose = function(x) {
     if (window.verboseMode) {
       console.log(x);
     }
   };
 
-  /* accepts the document used by the editor */
-  return function(inner) {
+  /**
+   * @param editableElement the root DOM element of the editable area used by the real-time editor
+   */
+  return function(editableElement) {
     var cursor = {};
 
-    // there ought to only be one cursor at a time, so let's just
-    // keep it internally
+    // There ought to be only one cursor at a time, so let's just keep it internally.
     var Range = cursor.Range = {
       start: {
         el: null,
@@ -56,19 +49,21 @@ define([
      *
      * @return an error string if no range is found
      */
-    cursor.update = function(sel, root) {
-      verbose("cursor.update");
-      root = root || inner;
-      sel = sel || Rangy.getSelection(root);
+    cursor.update = function(selection, root) {
+      verbose('cursor.update');
+      root = root || editableElement;
+      selection = selection || Rangy.getSelection(root);
 
-      // if the root element has no focus, there will be no range
-      if (!sel.rangeCount) { return; }
-      var range = sel.getRangeAt(0);
+      // If the root element has no focus there will be no range.
+      if (!selection.rangeCount) {
+        return;
+      }
+      var range = selection.getRangeAt(0);
 
-      // Big R Range is caught in closure, and maintains persistent state
+      // Big R Range is caught in closure, and maintains persistent state.
       ['start', 'end'].forEach(function (pos) {
-        Range[pos].el = range[pos+'Container'];
-        Range[pos].offset = range[pos+'Offset'];
+        Range[pos].el = range[pos + 'Container'];
+        Range[pos].offset = range[pos + 'Offset'];
       });
     };
 
@@ -76,81 +71,76 @@ define([
       return (Range.start.el ? 1 : 0) | (Range.end.el ? 2 : 0);
     };
 
-    /*
-      0 if neither
-      1 if start
-      2 if end
-      3 if start and end
-    */
-    cursor.inNode = function(el) {
+    /**
+     * Checks if the cursor end-points are included in the given node.
+     *
+     * @return 0 if neither, 1 if only start, 2 if only end, 3 if both start and end are included
+     */
+    cursor.inNode = function(node) {
       var state = ['start', 'end'].map(function (pos, i) {
-        return Tree.contains(el, Range[pos].el) ? i + 1 : 0;
+        return (
+          // Text node
+          node === Range[pos].el ||
+          // Element node
+          (node && node.contains && node.contains(Range[pos].el))
+        ) ? i + 1 : 0;
       });
       return state[0] | state[1];
     };
 
-    cursor.confineOffsetToElement = function(el, offset) {
-      return Math.max(Math.min(offset, el.textContent.length), 0);
+    cursor.confineOffsetToElement = function(element, offset) {
+      return Math.max(Math.min(offset, element.textContent.length), 0);
     };
 
     cursor.makeSelection = function() {
-      var sel = Rangy.getSelection(inner);
-      return sel;
+      return Rangy.getSelection(editableElement);
     };
 
     cursor.makeRange = function() {
       return Rangy.createRange();
     };
 
-    cursor.fixStart = function(el, offset) {
-      Range.start.el = el;
-      Range.start.offset = cursor.confineOffsetToElement(el,
+    cursor.fixStart = function(element, offset) {
+      Range.start.el = element;
+      Range.start.offset = cursor.confineOffsetToElement(element,
         (typeof offset !== 'undefined') ? offset : Range.start.offset);
     };
 
-    cursor.fixEnd = function(el, offset) {
-      Range.end.el = el;
-      Range.end.offset = cursor.confineOffsetToElement(el,
+    cursor.fixEnd = function(element, offset) {
+      Range.end.el = element;
+      Range.end.offset = cursor.confineOffsetToElement(element,
         (typeof offset !== 'undefined') ? offset : Range.end.offset);
     };
 
-    cursor.fixSelection = function(sel, range) {
-      if (Tree.contains(Range.start.el, inner) && Tree.contains(Range.end.el, inner)) {
-        var order = Tree.orderOfNodes(Range.start.el, Range.end.el, inner);
-        var backward;
+    cursor.fixSelection = function(selection, range) {
+      if (editableElement.contains(Range.start.el) && editableElement.contains(Range.end.el)) {
+        var domRange = editableElement.ownerDocument.createRange();
+        domRange.setStart(Range.start.el, Range.start.offset);
+        domRange.setEnd(Range.end.el, Range.end.offset);
 
-        // this could all be one line but nobody would be able to read it
-        if (order === -1) {
-          // definitely backward
-          backward = true;
-        } else if (order === 0) {
-          // might be backward, check offsets to know for sure
-          backward = (Range.start.offset > Range.end.offset);
-        } else {
-          // definitely not backward
-          backward = false;
-        }
-
-        if (backward) {
+        if (domRange.compareBoundaryPoints(window.Range.END_TO_START, domRange) > 0) {
+          // The range start if after the range end. We need to swap the start with the end.
           range.setStart(Range.end.el, Range.end.offset);
           range.setEnd(Range.start.el, Range.start.offset);
         } else {
+          // The range start is either before or equal to the range end.
           range.setStart(Range.start.el, Range.start.offset);
           range.setEnd(Range.end.el, Range.end.offset);
         }
 
-        // actually set the cursor to the new range
-        sel.setSingleRange(range);
+        // Actually set the cursor to the new range.
+        selection.setSingleRange(range);
       } else {
-        var errText = "[cursor.fixSelection] At least one of the " +
-          "cursor nodes did not exist, could not fix selection";
-        console.error(errText);
-        return errText;
+        var error = "[cursor.fixSelection] At least one of the cursor nodes did not exist, could not fix selection";
+        console.error(error);
+        return error;
       }
     };
 
     cursor.pushDelta = function(oldVal, newVal, offset) {
-      if (oldVal === newVal) { return; }
+      if (oldVal === newVal) {
+        return;
+      }
       var commonStart = 0;
       while (oldVal.charAt(commonStart) === newVal.charAt(commonStart)) {
         commonStart++;
@@ -158,74 +148,47 @@ define([
 
       var commonEnd = 0;
       while (oldVal.charAt(oldVal.length - 1 - commonEnd) === newVal.charAt(newVal.length - 1 - commonEnd) &&
-        commonEnd + commonStart < oldVal.length && commonEnd + commonStart < newVal.length) {
+          commonEnd + commonStart < oldVal.length && commonEnd + commonStart < newVal.length) {
         commonEnd++;
       }
 
       var insert = false, remove = false;
       if (oldVal.length !== commonStart + commonEnd) {
-        // there was a removal?
+        // There was a removal?
         remove = true;
       }
       if (newVal.length !== commonStart + commonEnd) {
-        // there was an insertion?
+        // There was an insertion?
         insert = true;
       }
 
       var lengthDelta = newVal.length - oldVal.length;
 
       return {
-        commonStart: commonStart,
-        commonEnd: commonEnd,
+        commonStart,
+        commonEnd,
         delta: lengthDelta,
-        insert: insert,
-        remove: remove
+        insert,
+        remove
       };
-    };
-
-    /* getLength assumes that both nodes exist inside of the active editor. */
-    // unused currently
-    cursor.getLength = function() {
-      if (Range.start.el === Range.end.el) {
-        return Math.abs(Range.end.offset - Range.start.offset);
-      } else {
-        var start, end, order = Tree.orderOfNodes(Range.start.el, Range.end.el, inner);
-        if (order === 1) {
-          start = Range.start;
-          end = Range.end;
-        } else if (order === -1) {
-          start = Range.end;
-          end = Range.start;
-        } else {
-          console.error("unexpected ordering of nodes...");
-          return null;
-        }
-        var L = (start.el.textContent.length - start.offset);
-        var cur = Tree.nextNode(start.el, inner);
-        while (cur && cur !== end.el) {
-          L += cur.textContent.length;
-          cur = Tree.nextNode(cur, inner);
-        }
-        L += end.offset;
-        return L;
-      }
     };
 
     cursor.brFix = function() {
       cursor.update();
       var start = Range.start;
       var end = Range.end;
-      if (!start.el) {return;}
+      if (!start.el) {
+        return;
+      }
 
       if (start.el === end.el && start.offset === end.offset) {
         if (start.el.tagName === 'BR') {
           var br = start.el;
 
-          var P = (Tree.indexOfNode(br) === 0 ?
-            br.parentNode: br.previousSibling);
+          var nodeToFix = br.previousSibling || br.parentNode;
 
-          [cursor.fixStart, cursor.fixEnd].forEach(function(f) {
-            f(P, 0);
+          [cursor.fixStart, cursor.fixEnd].forEach(function(fix) {
+            fix(nodeToFix, 0);
           });
 
           cursor.fixSelection(cursor.makeSelection(), cursor.makeRange());

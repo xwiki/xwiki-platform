@@ -28,7 +28,7 @@
 
   <artifactId>xwiki-platform-security-authentication</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Security - Authentication</name>
+  <name>XWiki Platform - Security - Authentication - Parent POM</name>
   <description>XWiki Platform - Security - Authentication contains the mechanism related to authentication</description>
   <modules>
     <module>xwiki-platform-security-authentication-api</module>

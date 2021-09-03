@@ -33,7 +33,6 @@ import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -43,15 +42,10 @@ import org.xwiki.stability.Unstable;
  * @since 6.1RC1
  */
 @Component
-@Named(SecurityScriptService.ROLEHINT + '.' + SecurityAuthorizationScriptService.ID)
+@Named("security.authorization")
 @Singleton
 public class SecurityAuthorizationScriptService implements ScriptService
 {
-    /**
-     * The role hint of this component.
-     */
-    public static final String ID = "authorization";
-
     @Inject
     private AuthorizationManager authorizationManager;
 

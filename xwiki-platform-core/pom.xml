@@ -184,6 +184,218 @@
                   <old>method java.lang.String com.xpn.xwiki.api.XWiki::invokeServletAndReturnAsString(java.lang.String)</old>
                   <justification>Not a breackage. Moved to legacy.</justification>
                 </item>
+                <!-- Refactoring of the security module -->
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.DefaultSecurityReferenceFactory</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.GroupSecurityReference</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.SecurityReference</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.SecurityReferenceFactory</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.UserSecurityReference</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.AccessDeniedException</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorExecutor</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.AuthorizationException</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorizationManager</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorizationManagerConfiguration</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorizationSettler</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.ContextualAuthorizationManager</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.DefaultAuthorizationManager</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.EntityTypeNotSupportedException</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.Right</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.RightDescription</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.RightMap&lt;V&gt;</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.RightSet</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>enum org.xwiki.security.authorization.RuleState</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityAccess</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityAccessEntry</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityEntry</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityEntryReader</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityEntryReaderExtra</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityRule</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityRuleEntry</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.UnableToRegisterRightException</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.cache.ConflictingInsertionException</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.cache.ParentEntryEvictedException</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityCache</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityCacheLoader</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityShadowEntry</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.event.RightUpdatedEvent</old>
+                  <justification>Not a breakage, code moved to another module.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.removedWithConstant</code>
+                  <old>field org.xwiki.security.authentication.script.AuthenticationScriptService.ID</old>
+                  <justification>Constant field should never has been public in the first place and
+                    shouldn't be used</justification>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

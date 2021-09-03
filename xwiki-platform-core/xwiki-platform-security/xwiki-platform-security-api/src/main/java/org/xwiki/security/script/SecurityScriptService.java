@@ -17,21 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.query;
+package org.xwiki.security.script;
 
-import org.xwiki.component.annotation.Role;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.script.service.ScriptServiceManager;
 
 /**
- * Configuration of queries made from Velocity templates.
+ * Entry point for all security related script services.
  *
  * @version $Id$
- * @since 13.7RC1
+ * @since 6.1RC1
  */
-@Role
-public interface QueryConfiguration
+@Component
+@Named("security")
+@Singleton
+public class SecurityScriptService implements ScriptService
 {
+    @Inject
+    private ScriptServiceManager scriptServiceManager;
+
     /**
-     * @return the maximum size limit for a query to retrieve items.
+     * @param <S> the type of the {@link ScriptService}
+     * @param serviceName the name of the sub {@link ScriptService}
+     * @return the {@link ScriptService} or null of none could be found
      */
-    int getLimit();
+    @SuppressWarnings("unchecked")
+    public <S extends ScriptService> S get(String serviceName)
+    {
+        return (S) this.scriptServiceManager.get("security." + serviceName);
+    }
 }

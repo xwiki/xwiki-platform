@@ -17,44 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.query.script;
+package org.xwiki.security;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.security.query.QueryConfiguration;
-import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
- * Security Query Script Service.
+ * Provide configuration for the security module.
  *
  * @version $Id$
- * @since 13.7
+ * @since 13.8RC1
  */
-@Component
-@Named(SecurityScriptService.ROLEHINT + '.' + SecurityQueryScriptService.ID)
-@Singleton
-public class SecurityQueryScriptService implements ScriptService
+@Role
+@Unstable
+public interface SecurityConfiguration
 {
     /**
-     * The role hint of this component.
+     * @return the number used to limit how many items are retrieved through queries (for example inside Velocity
+     *         templates). This limit can be customized in xwiki.properties file in order to allow retrieving more or
+     *         less items. Default value is 100 (this number corresponds to the LiveTable/LiveData max items view
+     *         limit).
      */
-    public static final String ID = "query";
-
-    @Inject
-    private QueryConfiguration queryConfiguration;
-
-    /**
-     * Get the maximum size limit for a query to retrieve items.
-     *
-     * @return {@code DefaultQueryConfiguration.MAX_LIMIT}
-     */
-    public int getLimit()
-    {
-        return queryConfiguration.getLimit();
-    }
+    int getQueryItemsLimit();
 }
-

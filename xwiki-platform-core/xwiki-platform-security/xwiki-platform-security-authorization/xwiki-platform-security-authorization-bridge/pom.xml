@@ -24,31 +24,43 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-wiki</artifactId>
-    <version>13.7-SNAPSHOT</version>
+    <artifactId>xwiki-platform-security-authorization</artifactId>
+    <version>13.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wiki-script</artifactId>
-  <name>XWiki Platform - Wiki - Script services</name>
-  <description>Script services for the wiki module.</description>
+  <artifactId>xwiki-platform-security-authorization-bridge</artifactId>
+  <name>XWiki Platform - Security - Authorization - Bridge</name>
+  <description>XWiki Platform - Security - Authorization - Bridge contains stuffs that depends/bridge oldcore and that
+    are expected to be improved later</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
-    </properties>
+    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Not very clean, but we want to access the document of a descriptor. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-default</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-context</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-text</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-api</artifactId>
+      <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -56,20 +68,16 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- TODO: Remove the need for this dependency. It shouldn't be the role of WikiManagerScriptService to expose
-         an API that tells if the wiki is configured in path mode or not. This should be provided by the URL module.-->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-scheme-standard</artifactId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- Test Dependencies -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>test</scope>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
@@ -77,9 +85,26 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-standard</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-authorization-api</artifactId>
-      <version>13.8-SNAPSHOT</version>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

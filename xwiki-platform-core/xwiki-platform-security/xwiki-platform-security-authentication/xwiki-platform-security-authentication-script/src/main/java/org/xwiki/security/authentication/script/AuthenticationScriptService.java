@@ -47,7 +47,6 @@ import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
@@ -62,15 +61,10 @@ import com.xpn.xwiki.XWikiContext;
  * @since 11.6RC1
  */
 @Component
-@Named(SecurityScriptService.ROLEHINT + '.' + AuthenticationScriptService.ID)
+@Named("security.authentication")
 @Singleton
 public class AuthenticationScriptService implements ScriptService
 {
-    /**
-     * The role hint of this component.
-     */
-    public static final String ID = "authentication";
-
     @Inject
     private AuthenticationFailureManager authenticationFailureManager;
 

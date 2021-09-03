@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.query.internal;
+package org.xwiki.security.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,37 +25,43 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.security.internal.AbstractSecurityConfiguration;
-import org.xwiki.security.query.QueryConfiguration;
+import org.xwiki.security.SecurityConfiguration;
 
 /**
- * Configuration for {@link QueryConfiguration}.
+ * Default configuration implementation taking its values from {@code xwiki.properties}.
  *
  * @version $Id$
- * @since 13.7RC1
+ * @since 13.8RC1
  */
 @Component
 @Singleton
-public class DefaultQueryConfiguration extends AbstractSecurityConfiguration
-    implements QueryConfiguration
+public class DefaultSecurityConfiguration extends AbstractSecurityConfiguration implements SecurityConfiguration
 {
-    /** Prefix for query limit configuration keys. */
-    private static final String QUERY = AbstractSecurityConfiguration.SECURITY + ".query";
+    /**
+     * Prefix for security configuration script service.
+     */
+    private static final String CONFIG = AbstractSecurityConfiguration.SECURITY + ".config";
 
-    /** Prefix for query limit configuration keys. */
-    private static final String MAX_LIMIT = QUERY + ".maxlimit";
+    /**
+     * Prefix for query items limit configuration.
+     */
+    private static final String QUERY_ITEMS_LIMIT = CONFIG + ".queryItemsLimit";
 
-    /** Default hint for component manager. */
-    private static final int DEFAULT_MAX_LIMIT = 100;
+    /**
+     * Default query items limit is set to 100 because it corresponds to the LiveTable/LiveData max items view limit.
+     */
+    private static final int DEFAULT_QUERY_ITEMS_LIMIT = 100;
 
-    /** Obtain configuration from the xwiki.properties file. */
+    /**
+     * Obtain configuration from the xwiki.properties file.
+     */
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
     @Override
-    public int getLimit()
+    public int getQueryItemsLimit()
     {
-        return configuration.getProperty(MAX_LIMIT, DEFAULT_MAX_LIMIT);
+        return this.configuration.getProperty(QUERY_ITEMS_LIMIT, DEFAULT_QUERY_ITEMS_LIMIT);
     }
 }

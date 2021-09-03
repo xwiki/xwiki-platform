@@ -25,7 +25,6 @@
     <version>13.7-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-
   <artifactId>xwiki-platform-security-authentication-api</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - Security - Authentication - API</name>
@@ -74,5 +73,4 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
   </dependencies>
-
 </project>

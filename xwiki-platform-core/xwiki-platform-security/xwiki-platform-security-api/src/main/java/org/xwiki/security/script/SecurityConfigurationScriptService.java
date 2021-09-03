@@ -25,35 +25,34 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.security.SecurityConfiguration;
+import org.xwiki.stability.Unstable;
 
 /**
- * Entry point for all security related script services.
+ * Security Configuration Script Service.
  *
  * @version $Id$
- * @since 6.1RC1
+ * @since 13.8RC1
  */
 @Component
-@Named(SecurityScriptService.ROLEHINT)
+@Named("security.config")
 @Singleton
-public class SecurityScriptService implements ScriptService
+@Unstable
+public class SecurityConfigurationScriptService implements ScriptService
 {
-    /**
-     * The role hint of this component.
-     */
-    public static final String ROLEHINT = "security";
-
     @Inject
-    private ScriptServiceManager scriptServiceManager;
+    private SecurityConfiguration securityConfiguration;
 
     /**
-     * @param <S> the type of the {@link ScriptService}
-     * @param serviceName the name of the sub {@link ScriptService}
-     * @return the {@link ScriptService} or null of none could be found
+     * Get the query items limit in order to limit how many items are retrieved for example inside Velocity templates
+     * through queries. This limit can be customized in xwiki.properties file in order to allow retrieving more items.
+     * Default value is 100, the LiveTable items view limit.
+     *
+     * @return the query items limit number.
      */
-    @SuppressWarnings("unchecked")
-    public <S extends ScriptService> S get(String serviceName)
+    public int getQueryItemsLimit()
     {
-        return (S) this.scriptServiceManager.get(ROLEHINT + '.' + serviceName);
+        return this.securityConfiguration.getQueryItemsLimit();
     }
 }
+

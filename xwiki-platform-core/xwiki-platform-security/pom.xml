@@ -26,8 +26,9 @@
     <version>13.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security</artifactId>
-  <name>XWiki Platform - Security</name>
-  <description>XWiki Platform - Security is a replacement for the old xwiki rights service (experimental)</description>
+  <name>XWiki Platform - Security - Parent POM</name>
+  <description>XWiki Platform - Security is a replacement for the old xwiki rights service (experimental)
+    - Parent POM</description>
   <packaging>pom</packaging>
   <dependencies>
     <dependency>
@@ -44,8 +45,7 @@
   </dependencies>
   <modules>
     <module>xwiki-platform-security-api</module>
-    <module>xwiki-platform-security-bridge</module>
-    <module>xwiki-platform-security-script</module>
     <module>xwiki-platform-security-authentication</module>
+    <module>xwiki-platform-security-authorization</module>
   </modules>
 </project>

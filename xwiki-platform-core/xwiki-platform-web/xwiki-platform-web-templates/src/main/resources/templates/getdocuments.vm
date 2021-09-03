@@ -100,9 +100,10 @@ $response.setContentType("application/json")
 #if (!$limit)
   #set ($limit = 15)
 #else
-  #set ($maxlimit = $services.security.query.getLimit())
-  #if ($isGuest && $limit > $maxlimit)
-    #set ($limit = $maxlimit)
+  ## Security protection for guest users: limit the number of items returned to avoid DOS attacks.
+  #if ($isGuest)
+    #set ($maxlimit = $services.security.config.getQueryItemsLimit())
+    #set ($limit = $mathtool.min($limit, $maxlimit))
   #end
 #end
 ##

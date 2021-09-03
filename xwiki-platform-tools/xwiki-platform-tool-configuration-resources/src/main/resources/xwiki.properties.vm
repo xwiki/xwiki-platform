@@ -662,20 +662,20 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# The identifier provided here is matched with the component role hint.
 #-#
 #-# The default is:
-# security.authorization.settler=default
+# security.authorization.settler = default
 
 #-# [Since 13.0]
 #-# Control if document save API should also check the right of the script author when saving a document.
 #-# When false only the current user right is checked.
 #-#
 #-# The default is:
-# security.script.save.checkAuthor=true
+# security.script.save.checkAuthor = true
 
-#-# [Since 13.7]
-#-# Ensure a query made from a template does not contain more results than it can be handled.
+#-# [Since 13.8]
+#-# Prevent against DOS attacks by limiting the number of entries returned by DB queries, for guest users.
 #-#
 #-# The default is:
-# security.query.maxlimit=100
+# security.config.queryItemsLimit = 100
 
 #-------------------------------------------------------------------------------------
 # URL

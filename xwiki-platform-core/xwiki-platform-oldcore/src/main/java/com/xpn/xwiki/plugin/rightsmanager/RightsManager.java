@@ -28,7 +28,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -942,7 +941,8 @@ public final class RightsManager
         }
 
         if (needUpdate) {
-            right.setStringValue(userOrGroupField, StringUtils.join(usersOrGroups, USERGROUPLISTFIELD_SEP));
+            right.setLargeStringValue(userOrGroupField,
+                ListClass.getStringFromList(usersOrGroups, USERGROUPLISTFIELD_SEP));
         }
 
         return needUpdate;
@@ -982,8 +982,8 @@ public final class RightsManager
                 needUpdate |=
                     removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
 
-                if (needUpdate && bobj.getStringValue(RIGHTSFIELD_USERS).trim().length() == 0
-                    && bobj.getStringValue(RIGHTSFIELD_GROUPS).trim().length() == 0) {
+                if (needUpdate && bobj.getLargeStringValue(RIGHTSFIELD_USERS).trim().length() == 0
+                    && bobj.getLargeStringValue(RIGHTSFIELD_GROUPS).trim().length() == 0) {
                     rightsDocument.removeXObject(bobj);
                 }
             }
@@ -1095,7 +1095,8 @@ public final class RightsManager
         }
 
         if (needUpdate) {
-            right.setStringValue(userOrGroupField, StringUtils.join(usersOrGroups, USERGROUPLISTFIELD_SEP));
+            right.setLargeStringValue(userOrGroupField, ListClass.getStringFromList(usersOrGroups,
+                USERGROUPLISTFIELD_SEP));
         }
 
         return needUpdate;

@@ -89,29 +89,29 @@ public class ExceptionExceptionMapper implements ExceptionMapper<Exception>, XWi
         // Returns an error response to the client, with some detail about the exception in the response.
         String message;
         String templateName = "rest/exception.vm";
-        MediaType textPlainType;
+        MediaType mediaType;
         try {
             ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
             scriptContext.setAttribute("cause", cause, ScriptContext.ENGINE_SCOPE);
-            // Make the media type html by default.
-            textPlainType = MediaType.TEXT_HTML_TYPE;
+            // The message generated from the template is in HTML. 
+            mediaType = MediaType.TEXT_HTML_TYPE;
             message = this.templateManager.render(templateName);
         } catch (Exception e) {
             this.logger.warn("Failed to render the response using template [{}]. Cause: [{}].", templateName,
                 getRootCauseMessage(e));
             // Fallback to a formatted string when the template rendering fails.
-            // We use a hardcoded \n because the message is used in an HTTP response.
-            String translation =
-                this.contextLocalization.getTranslationPlain("rest.exception.noMapper", getRootCauseMessage(cause));
             // In case of failure when generating the message content from a template, a text content is generated 
-            // instead, and the media type is updated to text.
-            textPlainType = TEXT_PLAIN_TYPE;
+            // instead.
+            String translation =
+                this.contextLocalization.getTranslationPlain("rest.exception.noMapper", cause.getClass().getName());
+            mediaType = TEXT_PLAIN_TYPE;
+            // We use a hardcoded \n because the message is used in an HTTP response.
             message = String.format("%s\n%s", translation, getStackTrace(cause));
         }
 
         return Response.serverError()
             .entity(message)
-            .type(textPlainType)
+            .type(mediaType)
             .build();
     }
 }

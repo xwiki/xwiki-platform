@@ -40,8 +40,9 @@ import static ch.qos.logback.classic.Level.ERROR;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.MediaType.TEXT_HTML_TYPE;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -110,18 +111,17 @@ class ExceptionExceptionMapperTest
     void toResponseUncheckedTemplateRenderError() throws Exception
     {
         IOException cause = new IOException("file not found");
-        String expectedMessage = String.format(
-            "No ExceptionMapper was found for [java.io.IOException: file not found].\n%s",
-            getStackTrace(cause));
+        String expectedMessage = String.format("No ExceptionMapper was found for [java.io.IOException].%n"
+            + "java.io.IOException: file not found%n");
 
-        when(this.contextLocalization.getTranslationPlain("rest.exception.noMapper", getRootCauseMessage(cause)))
-            .thenReturn("No ExceptionMapper was found for [java.io.IOException: file not found].");
+        when(this.contextLocalization.getTranslationPlain("rest.exception.noMapper", cause.getClass().getName()))
+            .thenReturn("No ExceptionMapper was found for [java.io.IOException].");
         when(this.scriptContextManager.getScriptContext()).thenReturn(this.scriptContext);
         when(this.templateManager.render("rest/exception.vm")).thenThrow(new IOException("template not found"));
 
         Response response = this.exceptionExceptionMapper.toResponse(cause);
 
-        assertEquals(expectedMessage, response.getEntity());
+        assertThat(String.valueOf(response.getEntity()), startsWith(expectedMessage));
         assertEquals(TEXT_PLAIN_TYPE, response.getMetadata().get(CONTENT_TYPE).get(0));
         assertEquals(500, response.getStatus());
         assertEquals(1, this.logCapture.size());

@@ -25,5 +25,5 @@
  * @since 13.7.1
  * @since 13.4.4
  *#
-#set ($rootCause = $escapetool.html($exceptiontool.getRootCauseMessage($cause)))
+#set ($rootCause = $escapetool.html($cause.class.name))
 #displayException("$services.localization.render('rest.exception.noMapper', [$rootCause])" $cause)

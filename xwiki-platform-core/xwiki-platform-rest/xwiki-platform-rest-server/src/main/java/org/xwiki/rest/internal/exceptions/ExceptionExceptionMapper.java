@@ -22,15 +22,21 @@ package org.xwiki.rest.internal.exceptions;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.script.ScriptContext;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rest.XWikiRestComponent;
+import org.xwiki.script.ScriptContextManager;
+import org.xwiki.template.TemplateManager;
 
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 /**
@@ -56,6 +62,15 @@ public class ExceptionExceptionMapper implements ExceptionMapper<Exception>, XWi
     @Inject
     private Logger logger;
 
+    @Inject
+    private TemplateManager templateManager;
+
+    @Inject
+    private ScriptContextManager scriptContextManager;
+
+    @Inject
+    private ContextualLocalizationManager contextLocalization;
+
     @Override
     public Response toResponse(Exception cause)
     {
@@ -72,10 +87,31 @@ public class ExceptionExceptionMapper implements ExceptionMapper<Exception>, XWi
         this.logger.error("A REST endpoint failed with an unmapped exception.", cause);
 
         // Returns an error response to the client, with some detail about the exception in the response.
-        String message = String.format("No ExceptionMapper was found for [%s].%n%s", cause, getStackTrace(cause));
+        String message;
+        String templateName = "rest/exception.vm";
+        MediaType textPlainType;
+        try {
+            ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
+            scriptContext.setAttribute("cause", cause, ScriptContext.ENGINE_SCOPE);
+            // Make the media type html by default.
+            textPlainType = MediaType.TEXT_HTML_TYPE;
+            message = this.templateManager.render(templateName);
+        } catch (Exception e) {
+            this.logger.warn("Failed to render the response using template [{}]. Cause: [{}].", templateName,
+                getRootCauseMessage(e));
+            // Fallback to a formatted string when the template rendering fails.
+            // We use a hardcoded \n because the message is used in an HTTP response.
+            String translation =
+                this.contextLocalization.getTranslationPlain("rest.exception.noMapper", getRootCauseMessage(cause));
+            // In case of failure when generating the message content from a template, a text content is generated 
+            // instead, and the media type is updated to text.
+            textPlainType = TEXT_PLAIN_TYPE;
+            message = String.format("%s\n%s", translation, getStackTrace(cause));
+        }
+
         return Response.serverError()
             .entity(message)
-            .type(TEXT_PLAIN_TYPE)
+            .type(textPlainType)
             .build();
     }
 }

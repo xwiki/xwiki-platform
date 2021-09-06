@@ -52,6 +52,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-security-authorization-api</artifactId>
+        <version>13.8-SNAPSHOT</version>
+      </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>

@@ -18,13 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define([
-  'RTFrontend_realtime_input',
-  'RTFrontend_errorbox',
   'jquery',
-  'RTFrontend_crypto',
+  'chainpad-netflux',
   'json.sortify',
-  'xwiki-meta'
-], /* jshint maxparams:false */ function(realtimeInput, ErrorBox, $, Crypto, stringify, xwikiMeta) {
+  'xwiki-rte-crypto',
+  'xwiki-meta',
+  'xwiki-rte-errorBox'
+], /* jshint maxparams:false */ function($, chainpadNetflux, jsonSortify, Crypto, xwikiMeta, ErrorBox) {
   'use strict';
 
   var warn = function(x) {
@@ -34,7 +34,7 @@ define([
   }, verbose = function(x) {};
 
   var SAVE_DOC_TIME = 60000,
-    // how often to check if the document has been saved recently
+    // How often to check if the document has been saved recently.
     SAVE_DOC_CHECK_CYCLE = 20000;
 
   var now = function() {
@@ -45,7 +45,7 @@ define([
 
   var mainConfig = Saver.mainConfig = {};
 
-  // Contains the realtime data
+  // Contains the realtime data.
   var rtData = {};
 
   var lastSaved = window.lastSaved = Saver.lastSaved = {
@@ -53,8 +53,7 @@ define([
     time: 0,
     // http://jira.xwiki.org/browse/RTWIKI-37
     hasModifications: false,
-    // for future tracking of 'edited since last save'
-    // only show the merge dialog to those who have edited
+    // For future tracking of 'edited since last save'. Only show the merge dialog to those who have edited.
     wasEditedLocally: false,
     receivedISAVE: false,
     shouldRedirect: false,
@@ -96,23 +95,22 @@ define([
   isaveInterrupt = Saver.interrupt = function() {
     if (lastSaved.receivedISAVE) {
       warn("Another client sent an ISAVED message.");
-      warn("Aborting save action");
-      // unset the flag, or else it will persist
+      warn("Aborting save action.");
+      // Unset the flag, or else it will persist.
       lastSaved.receivedISAVE = false;
-      // return true such that calling functions know to abort
+      // Return true such that calling functions know to abort.
       return true;
     }
     return false;
   },
 
   /**
-   * Retrieves attributes about the local document for the purposes of ajax merge (just data-xwiki-document and
+   * Retrieves attributes about the local document for the purposes of AJAX merge (just data-xwiki-document and
    * lastSaved.version).
    */
   getDocumentStatistics = function() {
     var $html = $('html'),
       fields = [
-        // 'space', 'page',
         'wiki',
         'document' // includes space and page
       ],
@@ -123,7 +121,7 @@ define([
     result.version = lastSaved.version;
 
     fields.forEach(function (field) {
-      result[field] = $html.data('xwiki-'+field);
+      result[field] = $html.data('xwiki-' + field);
     });
 
     result.language = mainConfig.language;
@@ -142,7 +140,7 @@ define([
       stats.convertHTML = 1;
     }
 
-    verbose("Posting with the following stats");
+    verbose('Posting with the following stats:');
     verbose(stats);
 
     $.ajax({
@@ -151,17 +149,15 @@ define([
       dataType: 'json',
       success: function (data) {
         try {
-          // data is already an "application/json"
+          // Data is already an "application/json".
           var merge = data;
-          var error = merge.conflicts &&
-            merge.conflicts.length &&
-            merge.conflicts[0].formattedMessage;
+          var error = merge.conflicts && merge.conflicts.length && merge.conflicts[0].formattedMessage;
           if (error) {
-            merge.error=error;
+            merge.error = error;
             cb(error, merge);
           } else {
-            // let the callback handle textarea writes
-            cb(null,merge);
+            // Let the callback handle textarea writes.
+            cb(null, merge);
           }
         } catch (err) {
           var debugLog = {
@@ -194,7 +190,7 @@ define([
   },
 
   // Check a server-side api for the version string of the document.
-  ajaxVersion = function(cb) {
+  ajaxVersion = function(callback) {
     var url = mainConfig.ajaxVersionUrl + '?xpage=plain';
     var stats = getDocumentStatistics();
     $.ajax({
@@ -202,11 +198,11 @@ define([
       method: 'POST',
       dataType: 'json',
       success: function(data) {
-        cb(null, data);
+        callback(null, data);
       },
       data: stats,
-      error: function(err) {
-        cb(err, null);
+      error: function(error) {
+        callback(error, null);
       }
     });
   },
@@ -245,17 +241,11 @@ define([
     }
   },
 
-  getFormToken = Saver.getFormToken = function() {
-    return $('meta[name="form_token"]').attr('content');
-  },
-
-
   // http://jira.xwiki.org/browse/RTWIKI-29
   saveDocument = function(data, andThen) {
     /* RT_event-on_save */
 
     var defaultData = {
-      // title if can be done realtime
       xredirect: '',
       xeditaction: 'edit',
       // TODO make this translatable
@@ -263,7 +253,8 @@ define([
       'action_saveandcontinue': 'Save & Continue',
       minorEdit: 1,
       ajax: true,
-      'form_token': getFormToken(),
+      /* jshint camelcase:false */
+      'form_token': xwikiMeta.form_token,
       language: mainConfig.language
     };
 
@@ -375,7 +366,7 @@ define([
 
       function() {
         debug("User chose to use the realtime version!");
-        // unset the merge dialog flag
+        // Unset the merge dialog flag.
         mergeDialogCurrentlyDisplayed = false;
         deferred.resolve();
       },
@@ -385,7 +376,7 @@ define([
 
       function() {
         debug("User chose to use the remote version!");
-        // unset the merge dialog flag
+        // Unset the merge dialog flag.
         mergeDialogCurrentlyDisplayed = false;
         var restURL = XWiki.currentDocument.getRestURL();
         if (mainConfig.language !== 'default' && !/\/pages\/(.+)\/translations\//.test(restURL)) {
@@ -398,7 +389,7 @@ define([
           dataType: 'json',
           success: function (data) {
             mainConfig.setTextValue(data.content, true, function() {
-              debug("Overwrote the realtime session's content with the latest saved state");
+              debug("Overwrote the realtime session's content with the latest saved state.");
               bumpVersion(function () {
                 lastSaved.mergeMessage('merge overwrite', []);
               }, null);
@@ -407,7 +398,7 @@ define([
           },
           error: function (error) {
             mainConfig.safeCrash('keepremote');
-            warn("Encountered an error while fetching remote content");
+            warn("Encountered an error while fetching remote content.");
             warn(error);
             deferred.reject();
           }
@@ -484,7 +475,7 @@ define([
       setLocalEditFlag(false);
 
     // http://jira.xwiki.org/browse/RTWIKI-34
-    // Give Messages when merging
+    // Give Messages when merging.
     } else if (merge.merged) {
       // TODO update version field with merge.currentVersion
       console.log("Force updating version to: " + merge.currentVersion);
@@ -509,26 +500,22 @@ define([
   },
 
   mergeRoutine = function(andThen) {
-    // post your current version to the server to see if it must merge
-    // remember the current state so you can check if it has changed.
+    // Post your current version to the server to see if it must merge. Remember the current state so you can check if
+    // it has changed.
     var preMergeContent = mainConfig.getTextValue();
     ajaxMerge(preMergeContent, $.proxy(mergeCallback, null, preMergeContent, andThen));
   },
 
   onMessage = function(data) {
-    // set a flag so any concurrent processes know to abort
+    // Set a flag so any concurrent processes know to abort.
     lastSaved.receivedISAVE = true;
 
-    /* RT_event-on_isave_receive
-
-      clients update lastSaved.version when they perform a save,
-      then they send an ISAVED with the version
-      a single user might have multiple windows open, for some reason
-      but might still have different save cycles
-      checking whether the received version matches the local version
-      tells us whether the ISAVED was set by our *browser*
-      if not, we should treat it as foreign.
-    */
+    // RT_event-on_isave_receive
+    //
+    // Clients update lastSaved.version when they perform a save, then they send an ISAVED with the version. A single
+    // user might have multiple windows open, for some reason, but might still have different save cycles. Checking
+    // whether the received version matches the local version tells us whether the ISAVED was set by our *browser*. If
+    // not, we should treat it as foreign.
 
     var newSave = function(type, msg) {
       var msgSender = msg.by;
@@ -538,14 +525,14 @@ define([
       var msgEditorName = msg.editorName;
 
       var displaySaverName = function(isMerged) {
-        // a merge dialog might be open, if so, remove it and say as much
+        // A merge dialog might be open, if so, remove it and say as much.
         destroyDialog(function(dialogDestroyed) {
           if (dialogDestroyed) {
-            // tell the user about the merge resolution
+            // Tell the user about the merge resolution.
             lastSaved.mergeMessage('conflictResolved', [msgVersion]);
           } else if (!mainConfig.initializing) {
             var sender;
-            // otherwise say there was a remote save
+            // Otherwise say there was a remote save.
             // http://jira.xwiki.org/browse/RTWIKI-34
             if (mainConfig.userList) {
               sender = msgSender.replace(/^.*-([^-]*)%2d[0-9]*$/, function(all, one) {
@@ -566,7 +553,7 @@ define([
           displaySaverName(true);
 
           if (!mainConfig.initializing) {
-            debug('A remote client saved and incremented the latest common ancestor');
+            debug('A remote client saved and incremented the latest common ancestor.');
           }
 
           // update lastSaved attributes
@@ -589,17 +576,19 @@ define([
       }
     };
 
-    // If the channel data is empty, do nothing (initial call in onReady)
+    // If the channel data is empty, do nothing (initial call in onReady).
     if (Object.keys(data).length === 0) {
       return;
     }
     for (var editor in data) {
       if (typeof data[editor] !== "object" || Object.keys(data[editor]).length !== 4) {
+        // Corrupted data.
         continue;
-      } // corrupted data
-      if (rtData[editor] && stringify(rtData[editor]) === stringify(data[editor])) {
+      }
+      if (rtData[editor] && jsonSortify(rtData[editor]) === jsonSortify(data[editor])) {
+        // No change.
         continue;
-      } // no change
+      }
       newSave(editor, data[editor]);
       if (xwikiMeta.refreshVersion) {
         xwikiMeta.refreshVersion();
@@ -622,10 +611,10 @@ define([
   mergeDialogCurrentlyDisplayed = false,
   createSaver = Saver.create = function(config) {
     $.extend(mainConfig, {
-      getTextValue: config.getTextValue || null,
-      getSaveValue: config.getSaveValue || null,
-      setTextValue: config.setTextValue || null,
-      formId: config.formId || "edit",
+      getTextValue: config.getTextValue,
+      getSaveValue: config.getSaveValue,
+      setTextValue: config.setTextValue,
+      formId: config.formId || 'edit',
       userList: config.userList,
       userName: config.userName,
       realtime: config.realtime
@@ -643,9 +632,8 @@ define([
 
     var onOpen = function(chan) {
       var network = netfluxNetwork;
-      // originally implemented as part of 'saveRoutine', abstracted logic
-      // such that the merge/save algorithm can terminate with different
-      // callbacks for different use cases
+      // Originally implemented as part of 'saveRoutine', abstracted logic such that the merge/save algorithm can
+      // terminate with different callbacks for different use cases.
       var saveFinalizer = function(e, shouldSave) {
         var toSave = mainConfig.getTextValue();
         if (toSave === null) {
@@ -653,38 +641,35 @@ define([
         }
         if (e) {
           warn(e);
-          return;
         } else if (shouldSave) {
           saveDocument(mainConfig.getSaveValue(), function() {
-            // cache this because bumpVersion will increment it
+            // Cache this because bumpVersion will increment it.
             var lastVersion = lastSaved.version;
 
-            // update values in lastSaved
+            // Update values in lastSaved.
             updateLastSaved(toSave);
 
-            // get document version
+            // Get document version.
             bumpVersion(function(out) {
-              if (out.version === "1.1") {
-                debug("Created document version 1.1");
+              if (out.version === '1.1') {
+                debug('Created document version 1.1');
               } else {
-                debug("Version bumped from " + lastVersion + " to " + out.version + ".");
+                debug(`Version bumped from ${lastVersion} to ${out.version}.`);
               }
-              lastSaved.mergeMessage('saved',[out.version]);
+              lastSaved.mergeMessage('saved', [out.version]);
             }, null);
           });
-          return;
         } else {
           // local content matches that of the latest version
           verbose("No save was necessary");
           lastSaved.content = toSave;
           // didn't save, don't need a callback
           bumpVersion();
-          return;
         }
       };
 
       var saveRoutine = function(andThen, force, autosave) {
-        // if this is ever true in your save routine, complain and abort
+        // If this is ever true in your save routine, complain and abort.
         lastSaved.receivedISAVE = false;
 
         var toSave = mainConfig.getTextValue();
@@ -694,7 +679,7 @@ define([
         }
 
         if (lastSaved.content === toSave && !force ) {
-          verbose("No changes made since last save. Avoiding unnecessary commits");
+          verbose("No changes made since last save. Avoiding unnecessary commits.");
           return;
         }
 
@@ -708,39 +693,36 @@ define([
             andThen(null, true);
           });
         }
-      }; // end saveRoutine
+      };
 
       var saveButtonAction = function(cont) {
         debug("createSaver.saveand" + (cont ? 'view' : 'continue'));
 
-        // name this flag for readability
-        var force = true;
         saveRoutine(function(e) {
           if (e) {
             warn(e);
           }
 
           lastSaved.shouldRedirect = cont;
-          // fire save event
           document.fire('xwiki:actions:save', {
-            form: $('#'+config.formId)[0],
+            form: $('#' + config.formId)[0],
             continue: 1
           });
-        }, force, cont);
+        }, /* force: */ true, cont);
       };
 
-      // replace callbacks for the save and view button
+      // Replace callbacks for the save and view button.
       $('[name="action_save"]').off('click').click(function(e) {
         e.preventDefault();
         if ($(this).attr('disabled') === 'disabled') {
           return;
         }
-        // arg is 'shouldRedirect'
-        saveButtonAction(true);
+        saveButtonAction(/* shouldRedirect: */ true);
       });
 
-      // replace callbacks for the save and continue button
+      // Replace callbacks for the save and continue button.
       var $sac = $('[name="action_saveandcontinue"]');
+      // FIXME: Find a way to remove the event listeners without using Prototype.js API.
       $sac[0].stopObserving();
       $sac.off('click').click(function(e) {
         e.preventDefault();
@@ -748,33 +730,31 @@ define([
         if ($(this).attr('disabled') === 'disabled') {
           return;
         }
-        saveButtonAction(false);
+        saveButtonAction(/* shouldRedirect: */ false);
       });
 
-      // there's a very small chance that the preview button might cause
-      // problems, so let's just get rid of it
+      // There's a very small chance that the preview button might cause problems, so let's just get rid of it.
       $('[name="action_preview"]').remove();
 
-      // wait to get saved event
-      var onSavedHandler = mainConfig.onSaved = function(ev) {
-        // this means your save has worked
-        // cache the last version
+      // Wait to get saved event.
+      var onSavedHandler = mainConfig.onSaved = function(event) {
+        // This means your save has worked. Cache the last version.
         var lastVersion = lastSaved.version;
         var toSave = mainConfig.getTextValue();
-        // update your content
+        // Update your content.
         updateLastSaved(toSave);
 
         ajaxVersion(function(e, out) {
           if (e) {
-            // there was an error (probably ajax)
+            // There was an error (probably AJAX).
             warn(e);
             ErrorBox.show('save');
           } else if (out.isNew) {
-            // it didn't actually save?
+            // It didn't actually save?
             ErrorBox.show('save');
           } else {
             lastSaved.onReceiveOwnIsave = function() {
-              // once you get your isaved back, redirect
+              // Once you get your isaved back, redirect.
               debug("lastSaved.shouldRedirect " + lastSaved.shouldRedirect);
               if (lastSaved.shouldRedirect) {
                 debug('createSaver.saveandview.receivedOwnIsaved');
@@ -783,24 +763,25 @@ define([
               } else {
                 debug('createSaver.saveandcontinue.receivedOwnIsaved');
               }
-              // clean up after yourself..
+              // Clean up after yourself..
               lastSaved.onReceiveOwnIsave = null;
             };
-            // bump the version, fire your isaved
+            // Bump the version, fire your isaved.
             bumpVersion(function(out) {
-              if (out.version === "1.1") {
-                debug("Created document version 1.1");
+              if (out.version === '1.1') {
+                debug('Created document version 1.1');
               } else {
-                debug("Version bumped from " + lastVersion + " to " + out.version + ".");
+                debug(`Version bumped from ${lastVersion} to ${out.version}.`);
               }
-              lastSaved.mergeMessage("saved", [out.version]);
+              lastSaved.mergeMessage('saved', [out.version]);
             }, out);
           }
         });
         return true;
       };
+      // FIXME: Find a way to remove the old listener without using Prototype.js API.
       document.stopObserving('xwiki:document:saved');
-      document.observe('xwiki:document:saved', onSavedHandler);
+      $(document).on('xwiki:document:saved.rte', onSavedHandler);
 
       var onSaveFailedHandler = mainConfig.onSaveFailed = function(ev) {
         var debugLog = {
@@ -818,8 +799,9 @@ define([
          console.log(ev);
         }
       };
+      // FIXME: Find a way to remove the old listener without using Prototype.js API.
       document.stopObserving('xwiki:document:saveFailed');
-      document.observe("xwiki:document:saveFailed", onSaveFailedHandler);
+      $(document).on('xwiki:document:saveFailed.rte', onSaveFailedHandler);
 
       // TimeOut
       var check = function() {
@@ -828,7 +810,7 @@ define([
         var periodDuration = Math.random() * SAVE_DOC_CHECK_CYCLE;
         mainConfig.autosaveTimeout = setTimeout(check, periodDuration);
 
-        verbose("Will attempt to save again in " + periodDuration +"ms.");
+        verbose(`Will attempt to save again in ${periodDuration} ms.`);
 
         if (!lastSaved.wasEditedLocally) {
           verbose("Skipping save routine because no changes have been made locally");
@@ -840,30 +822,16 @@ define([
           verbose("(Now - lastSaved.time) < SAVE_DOC_TIME");
           return;
         }
-        // avoid queuing up multiple merge dialogs
-        if (mergeDialogCurrentlyDisplayed) {
-          return;
-        }
-
-        // demoMode lets the user preview realtime behaviour
-        // without actually requiring permission to save
-        if (demoMode) {
+        // Avoid queuing up multiple merge dialogs.
+        // demoMode lets the user preview realtime behaviour without actually requiring permission to save.
+        if (mergeDialogCurrentlyDisplayed || demoMode) {
           return;
         }
 
         saveRoutine(saveFinalizer);
-      }; // end check
+      };
 
       check();
-
-      /* Stop the autosaver when the websocket connection is closed. If reconnecting-websocket
-        manages to reconnect, update only the version. If the application using the autosaver 
-        handles reconnections, it has to recreate the saver when the websockets are up again.
-
-        NOTE: A reconnection script directly in saver.js may break the entire saving system of the
-           document. If the saver manages reconnections but not the main application, it would result
-           in merges of an offline document (with potential merge errors due to version mismatch)
-      */
     };
 
     var rtConfig = {
@@ -871,7 +839,7 @@ define([
       network: netfluxNetwork,
       userName: mainConfig.userName || '',
       channel: channel,
-      crypto: Crypto || null
+      crypto: Crypto
     };
     var module = window.SAVER_MODULE = {};
     mainConfig.initializing = true;
@@ -903,7 +871,7 @@ define([
       if (mainConfig.initializing) {
         return;
       }
-      var sjson = stringify(rtData);
+      var sjson = jsonSortify(rtData);
       module.chainpad.contentUpdate(sjson);
       if (module.chainpad.getUserDoc() !== sjson) {
         warn("Saver: userDoc !== sjson");
@@ -912,10 +880,10 @@ define([
     var onAbort = rtConfig.onAbort = function() {
       Saver.stop();
     };
-    realtimeInput.start(rtConfig);
+    chainpadNetflux.start(rtConfig);
   }; // END createSaver
 
-  // Stop the autosaver/merge when the user disallows realtime or when the websocket is disconnected
+  // Stop the autosaver / merge when the user disallows realtime or when the WebSocket is disconnected.
   Saver.stop = function() {
     if (mainConfig.realtime) {
       mainConfig.realtime.abort();
@@ -926,11 +894,9 @@ define([
     }
     clearTimeout(mainConfig.autosaveTimeout);
     rtData = {};
-    // Remove the merge routine from the save buttons
-    document.stopObserving('xwiki:document:saved');
-    document.stopObserving('xwiki:document:saveFailed');
-    // remove callbacks for the save and view button
-    // the button will now submit the "Save and view" form
+    // Remove the merge routine from the save buttons.
+    $(document).off('xwiki:document:saved.rte xwiki:document:saveFailed.rte');
+    // remove callbacks for the save and view button. The button will now submit the "Save and view" form.
     $('[name="action_save"]').off('click').click(function(e) {
       if ($(this).attr('disabled') === 'disabled') {
         e.preventDefault();
@@ -938,15 +904,14 @@ define([
       }
     });
 
-    // replace callbacks for the save and continue button
+    // Replace callbacks for the save and continue button.
     $('[name="action_saveandcontinue"]').off('click').click(function(e) {
       e.preventDefault();
       if ($(this).attr('disabled') === 'disabled') {
         return;
       }
-      // fire save event
       document.fire('xwiki:actions:save', {
-        form: $('#'+mainConfig.formId)[0],
+        form: $('#' + mainConfig.formId)[0],
         continue: 1
       });
     });

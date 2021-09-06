@@ -73,7 +73,7 @@ define('xwiki-rte-typingTests', function () {
   };
 
   return {
-    testInput,
-    setRandomizedInterval
+    setRandomizedInterval,
+    testInput: testInput
   };
 });

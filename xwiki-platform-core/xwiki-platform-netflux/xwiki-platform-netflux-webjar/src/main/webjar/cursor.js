@@ -141,6 +141,7 @@ define('xwiki-rte-cursor', ['rangy-core'], function (Rangy) {
       if (oldVal === newVal) {
         return;
       }
+
       var commonStart = 0;
       while (oldVal.charAt(commonStart) === newVal.charAt(commonStart)) {
         commonStart++;
@@ -152,24 +153,14 @@ define('xwiki-rte-cursor', ['rangy-core'], function (Rangy) {
         commonEnd++;
       }
 
-      var insert = false, remove = false;
-      if (oldVal.length !== commonStart + commonEnd) {
-        // There was a removal?
-        remove = true;
-      }
-      if (newVal.length !== commonStart + commonEnd) {
-        // There was an insertion?
-        insert = true;
-      }
-
-      var lengthDelta = newVal.length - oldVal.length;
-
       return {
         commonStart,
         commonEnd,
-        delta: lengthDelta,
-        insert,
-        remove
+        // There was an insertion?
+        insert: newVal.length !== commonStart + commonEnd,
+        // There was a removal?
+        remove: oldVal.length !== commonStart + commonEnd,
+        delta: newVal.length - oldVal.length
       };
     };
 

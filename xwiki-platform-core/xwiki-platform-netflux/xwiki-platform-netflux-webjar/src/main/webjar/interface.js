@@ -17,7 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-// This file defines functions which are used in RTWiki/RTWysiwyg, and address components of the user interface.
+// This file defines functions which are used by the real-time editors (Wiki / WYSIWYG) and address components of the
+// user interface.
 define('xwiki-rte-interface', ['jquery'], function($) {
   'use strict';
 

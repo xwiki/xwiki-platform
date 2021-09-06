@@ -1,0 +1,47 @@
+.rt-toolbar-leftside div {
+  float: left;
+}
+.rt-toolbar-leftside {
+  float: left;
+}
+.rt-toolbar-rightside {
+  float: right;
+}
+.rt-lag {
+  float: right;
+}
+.rt-spinner {
+  float: left;
+}
+.rt-user-link {
+  cursor: pointer;
+  color: #0088CC;
+}
+.rt-user-link:hover {
+  text-decoration: underline;
+  color: #005580;
+}
+.rt-user-avatar {
+  vertical-align: top;
+  border: 1px solid #AAAAAA;
+  cursor: pointer;
+}
+.rt-user-fake-avatar {
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  display: inline-block;
+  text-align: center;
+  background: #CCCCFF;
+  color: #3333FF;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid #AAAAAA;
+}
+#secret-merge {
+  opacity: 0;
+}
+#secret-merge:hover {
+  opacity: 1;
+}

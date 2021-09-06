@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define(['RTFrontend_realtime_input', 'json.sortify'], function(realtimeInput, stringify) {
+define('xwiki-rte-userData', ['chainpad-netflux', 'json.sortify'], function(chainpadNetflux, jsonSortify) {
   'use strict';
   var userData, onChange;
   var updateUserData = function(textData) {
@@ -30,7 +30,7 @@ define(['RTFrontend_realtime_input', 'json.sortify'], function(realtimeInput, st
         onChange(userData);
       }
     } catch (e) {
-      console.log(textData);
+      console.log('Failed to parse user data: ' + textData);
       console.error(e);
     }
   };
@@ -55,10 +55,10 @@ define(['RTFrontend_realtime_input', 'json.sortify'], function(realtimeInput, st
 
       onLocal: function() {
         if (!initializing && online) {
-          var shjson = stringify(userData);
-          module.chainpad.contentUpdate(shjson);
-          if (module.chainpad.getUserDoc() !== shjson) {
-            console.warn('userDoc !== shjson');
+          var strHyperJSON = jsonSortify(userData);
+          module.chainpad.contentUpdate(strHyperJSON);
+          if (module.chainpad.getUserDoc() !== strHyperJSON) {
+            console.warn('userDoc !== strHyperJSON');
           }
         }
       },
@@ -126,7 +126,7 @@ define(['RTFrontend_realtime_input', 'json.sortify'], function(realtimeInput, st
     userData.leave = function() {
       clearInterval(intervalId);
       try {
-        // Don't throw error if the channel is already removed
+        // Don't throw error if the channel is already removed.
         module.leave();
       } catch (e) {
         console.error(e);
@@ -149,7 +149,7 @@ define(['RTFrontend_realtime_input', 'json.sortify'], function(realtimeInput, st
     var config = createConfig(network, key, configData);
     userData = createUserData(configData, config);
 
-    realtimeInput.start(config);
+    chainpadNetflux.start(config);
 
     return userData;
   };

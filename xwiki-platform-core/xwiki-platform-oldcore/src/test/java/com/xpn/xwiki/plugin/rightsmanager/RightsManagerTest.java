@@ -25,9 +25,6 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
 
@@ -40,37 +37,49 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 
 /**
- * Test for the RightsManager
+ * Test for the RightsManager.
  *
- * @since 13.8
  * @version $Id$
  */
 @OldcoreTest
 @AllComponents
-public class RightsManagerTest
+class RightsManagerTest
 {
     @InjectMockitoOldcore
-    MockitoOldcore oldcore;
+    private MockitoOldcore oldcore;
 
     /**
-     * instance under test
+     * Instance under test.
      */
     private RightsManager rights;
 
+    /**
+     * A rights object storing e.g. group information.
+     */
+    private BaseObject rightsObject;
+
     @BeforeEach
-    protected void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         rights = RightsManager.getInstance();
 
-        doReturn(true).when(oldcore.getSpyXWiki()).checkAccess(any(), any(), any());
+        XWikiDocument rightsDocument = new XWikiDocument(
+            new DocumentReference("xwiki", Collections.singletonList("Some"), "Page"));
+        rightsDocument.setLocale(Locale.ROOT);
+
+        rightsDocument.newXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS, oldcore.getXWikiContext());
+        rightsObject = rightsDocument.getXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
+
+        oldcore.getSpyXWiki().saveDocument(rightsDocument, this.oldcore.getXWikiContext());
+        doReturn(Collections.singletonList(rightsDocument)).when(oldcore.getMockStore()).searchDocuments(any(), any(),
+            eq(oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testRenameGroup() throws Exception
+    void replaceUserOrGroupFromAllRights() throws Exception
     {
         DocumentReference oldGroupName = new DocumentReference("xwiki", Collections.singletonList("XWiki"),
             "GroupBefore");
@@ -78,85 +87,24 @@ public class RightsManagerTest
             "GroupAfter");
         String oldValue = "XWiki.GroupBefore,XWiki.Some\\,OtherGroup";
         String expectedValue = "XWiki.Some\\,OtherGroup,XWiki.GroupAfter";
-        // ThreadLocal: only to have this final and use it in the answer
-        final ThreadLocal<String> actualValue = new ThreadLocal<String>();
 
-        XWikiDocument rightsDocument = createMockDocument();
-
-        doReturn(Collections.singletonList(rightsDocument)).when(oldcore.getMockStore()).searchDocuments(any(), any(),
-            eq(oldcore.getXWikiContext()));
-
-        BaseObject rightsObject = Mockito.mock(BaseObject.class);
-        doReturn(Collections.singletonList(rightsObject)).when(rightsDocument)
-            .getXObjects(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
-        doReturn(oldValue).when(rightsObject).getLargeStringValue("groups");
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                actualValue.set((String) invocation.getArgument(1));
-                return null;
-            }
-        }).when(rightsObject).setLargeStringValue(eq("groups"), any());
+        rightsObject.setLargeStringValue("groups", oldValue);
 
         rights.replaceUserOrGroupFromAllRights(oldGroupName, newGroupName, false, oldcore.getXWikiContext());
 
-        assertEquals(expectedValue, actualValue.get());
+        assertEquals(expectedValue, rightsObject.getLargeStringValue("groups"));
     }
 
     @Test
-    public void testRemoveGroup() throws Exception
+    void removeUserOrGroupFromAllRights() throws Exception
     {
         String oldValue = "XWiki.SomeGroup,XWiki.GroupToRemove,XWiki.Some\\,OtherGroup";
         String expectedValue = "XWiki.SomeGroup,XWiki.Some\\,OtherGroup";
-        // ThreadLocal: only to have this final and use it in the answer
-        final ThreadLocal<String> actualValue = new ThreadLocal<String>();
 
-        XWikiDocument rightsDocument = createMockDocument();
-
-        doReturn(Collections.singletonList(rightsDocument)).when(oldcore.getMockStore()).searchDocuments(any(), any(),
-            eq(oldcore.getXWikiContext()));
-
-        BaseObject rightsObject = Mockito.mock(BaseObject.class);
-        doReturn(Collections.singletonList(rightsObject)).when(rightsDocument)
-            .getXObjects(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
-        doReturn(oldValue).when(rightsObject).getLargeStringValue("groups");
-        doReturn("").when(rightsObject).getLargeStringValue("users");
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                actualValue.set((String) invocation.getArgument(1));
-                return null;
-            }
-        }).when(rightsObject).setLargeStringValue(eq("groups"), any());
+        rightsObject.setLargeStringValue("groups", oldValue);
 
         rights.removeUserOrGroupFromAllRights("xwiki", "XWiki", "GroupToRemove", false, oldcore.getXWikiContext());
 
-        assertEquals(expectedValue, actualValue.get());
-    }
-
-    /**
-     * create a mock document that can be saved via the mock store
-     *
-     * @return the mocked document
-     */
-    private XWikiDocument createMockDocument()
-    {
-        XWikiDocument rightsDocument = Mockito.mock(XWikiDocument.class);
-
-        // this seems to be necessary to save the document with the mock store
-        DocumentReference rightsDocumentRef = new DocumentReference("xwiki", Collections.singletonList("Some"), "Page");
-        DocumentReference rightsDocumentRefWithLocale = new DocumentReference(rightsDocumentRef, Locale.ROOT);
-        doReturn(rightsDocumentRef).when(rightsDocument).getDocumentReference();
-        doReturn(rightsDocumentRefWithLocale).when(rightsDocument).getDocumentReferenceWithLocale();
-        doReturn(rightsDocument).when(rightsDocument).clone();
-        doReturn(false).when(rightsDocument).isNew();
-
-        oldcore.getDocuments().put(rightsDocumentRefWithLocale, rightsDocument);
-        return rightsDocument;
+        assertEquals(expectedValue, rightsObject.getLargeStringValue("groups"));
     }
 }
-

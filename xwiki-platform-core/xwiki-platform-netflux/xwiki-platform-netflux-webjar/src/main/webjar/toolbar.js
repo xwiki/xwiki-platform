@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-rte-toolbar', ['jquery', 'xwiki-rte-messages'], function($, Messages) {
+define('xwiki-rte-toolbar', ['jquery', 'xwiki-l10n!xwiki-rte-messages'], function($, Messages) {
   'use strict';
 
   var uid = function() {

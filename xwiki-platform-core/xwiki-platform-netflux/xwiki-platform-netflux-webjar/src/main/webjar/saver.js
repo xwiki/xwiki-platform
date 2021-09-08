@@ -358,11 +358,9 @@ define('xwiki-rte-saver', [
 
     var deferred = $.Deferred();
     presentMergeDialog(
-      /* jshint camelcase:false */
-      mainConfig.messages.mergeDialog_prompt,
+      mainConfig.messages['mergeDialog.prompt'],
 
-      /* jshint camelcase:false */
-      mainConfig.messages.mergeDialog_keepRealtime,
+      mainConfig.messages['mergeDialog.keepRealtime'],
 
       function() {
         debug("User chose to use the realtime version!");
@@ -371,8 +369,7 @@ define('xwiki-rte-saver', [
         deferred.resolve();
       },
 
-      /* jshint camelcase:false */
-      mainConfig.messages.mergeDialog_keepRemote,
+      mainConfig.messages['mergeDialog.keepRemote'],
 
       function() {
         debug("User chose to use the remote version!");
@@ -391,7 +388,7 @@ define('xwiki-rte-saver', [
             mainConfig.setTextValue(data.content, true, function() {
               debug("Overwrote the realtime session's content with the latest saved state.");
               bumpVersion(function () {
-                lastSaved.mergeMessage('merge overwrite', []);
+                lastSaved.mergeMessage('mergeOverwrite', []);
               }, null);
               deferred.resolve();
             });

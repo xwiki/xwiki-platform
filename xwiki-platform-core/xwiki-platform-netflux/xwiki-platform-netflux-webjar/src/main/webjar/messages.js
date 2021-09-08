@@ -17,31 +17,59 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define(function () {
-  'use strict';
-
-  // FIXME: Load the translation messages asynchronously using the dedicated REST API.
-  if (document.documentElement.lang === 'fr') {
-    return {
-      editingAlone: 'Edition seul(e)',
-      editingWithOneOtherPerson: 'Edition avec une autre personne',
-      editingWith: 'Edition avec',
-      otherPeople: 'autres personnes',
-      disconnected: 'Déconnecté',
-      synchronizing: 'Synchronisation',
-      reconnecting: 'Reconnection...',
-      lag: 'Lag'
-    };
-  } else {
-    return {
-      editingAlone: 'Editing alone',
-      editingWithOneOtherPerson: 'Editing with one other person',
-      editingWith: 'Editing with',
-      otherPeople: 'other people',
-      disconnected: 'Disconnected',
-      synchronizing: 'Synchronizing',
-      reconnecting: 'Reconnecting...',
-      lag: 'Lag'
-    };
-  }
+define('xwiki-rte-messages', {
+  prefix: 'rte.',
+  keys: [
+    'editingAlone',
+    'editingWithOneOtherPerson',
+    'editingWith',
+    'otherPeople',
+    'disconnected',
+    'synchronizing',
+    'reconnecting',
+    'lag',
+    'allowRealtime',
+    'sessionInProgress',
+    'saved',
+    'mergeOverwrite=',
+    'savedRemote',
+    'savedRemoteNoMerge',
+    'conflictResolved',
+    'mergeDialog.prompt',
+    'mergeDialog.keepRealtime',
+    'mergeDialog.keepRemote',
+    'redirectDialog.pluralPrompt',
+    'redirectDialog.create',
+    'waiting',
+    'requestASession',
+    'requestDialog.prompt',
+    'requestDialog.create',
+    'requestDialog.reject',
+    'requestDialog.autoAccept',
+    'requestDialog.saveError',
+    'rejectDialog.prompt',
+    'rejectDialog.invalid',
+    'rejectDialog.ok',
+    'conflictsWarning',
+    'conflictsWarningInfoRt',
+    'conflictsWarningInfo',
+    'conflictsWarningInfoLink',
+    'wsError',
+    'wsErrorInfo',
+    'wsErrorConflicts',
+    'connectingBox',
+    'connectionLost',
+    'connectionLostInfo',
+    'reloadDialog.prompt',
+    'reloadDialog.reload',
+    'reloadDialog.exit',
+    'disableDialog.prompt',
+    'disableDialog.ok',
+    'disableDialog.exit',
+    'versionDialog.prompt',
+    'versionDialog.old',
+    'versionDialog.latest',
+    'versionDialog.link',
+    'autoAcceptSave'
+  ]
 });

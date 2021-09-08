@@ -24,30 +24,21 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-localization</artifactId>
     <version>13.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-localization</artifactId>
-  <name>XWiki Platform - Localization - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Localization - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-localization-api</module>
-    <module>xwiki-platform-localization-rest</module>
-    <module>xwiki-platform-localization-sources</module>
-    <module>xwiki-platform-localization-syntaxes</module>
-    <module>xwiki-platform-localization-script</module>
-    <module>xwiki-platform-localization-macro</module>
-    <module>xwiki-platform-localization-webjar</module>
-  </modules>
-
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-localization-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <packaging>webjar</packaging>
+  <artifactId>xwiki-platform-localization-webjar</artifactId>
+  <name>XWiki Platform - Localization - WebJar</name>
+  <description>A JavaScript API to load localization messages.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
+  </dependencies>
 </project>
-

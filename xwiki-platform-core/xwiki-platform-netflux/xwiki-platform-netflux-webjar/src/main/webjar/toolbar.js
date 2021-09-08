@@ -191,10 +191,10 @@ define('xwiki-rte-toolbar', ['jquery', 'xwiki-rte-messages'], function($, Messag
     }, 3000);
 
     return {
-      toolbar: toolbar,
+      toolbar,
       failed: function() {
         connected = false;
-        userListElement.textContent = 'Disconnected';
+        userListElement.textContent = Messages.disconnected;
         lagElement.textContent = '';
       },
       reconnecting: function(userId) {

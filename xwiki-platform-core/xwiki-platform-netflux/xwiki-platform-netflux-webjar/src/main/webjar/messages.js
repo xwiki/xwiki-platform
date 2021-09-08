@@ -23,11 +23,6 @@ define(function () {
   // FIXME: Load the translation messages asynchronously using the dedicated REST API.
   if (document.documentElement.lang === 'fr') {
     return {
-      'errorBox_errorType_disconnected': 'Connection Perdue',
-      'errorBox_errorExplanation_disconnected': [
-        'La connection au serveur a été perdue, vous pouvez vous reconnecter en rechargeant la page ',
-        'en cliquant en dehors de cette boîte de dialogue.'
-      ].join(''),
       editingAlone: 'Edition seul(e)',
       editingWithOneOtherPerson: 'Edition avec une autre personne',
       editingWith: 'Edition avec',
@@ -35,22 +30,10 @@ define(function () {
       disconnected: 'Déconnecté',
       synchronizing: 'Synchronisation',
       reconnecting: 'Reconnection...',
-      lag: 'Lag',
-      initialState: [
-        '<p>',
-        '</p>',
-      ].join(''),
-      codeInitialState: [
-        '\n'
-      ].join('')
+      lag: 'Lag'
     };
   } else {
     return {
-      'errorBox_errorType_disconnected': 'Connection Lost',
-      'errorBox_errorExplanation_disconnected': [
-        'Lost connection to server, you may reconnect by reloading the page or review your work ',
-        'by clicking outside of this box.'
-      ].join(''),
       editingAlone: 'Editing alone',
       editingWithOneOtherPerson: 'Editing with one other person',
       editingWith: 'Editing with',
@@ -58,14 +41,7 @@ define(function () {
       disconnected: 'Disconnected',
       synchronizing: 'Synchronizing',
       reconnecting: 'Reconnecting...',
-      lag: 'Lag',
-      initialState: [
-        '<p>',
-        '</p>',
-      ].join(''),
-      codeInitialState: [
-        '\n'
-      ].join('')
+      lag: 'Lag'
     };
   }
 });

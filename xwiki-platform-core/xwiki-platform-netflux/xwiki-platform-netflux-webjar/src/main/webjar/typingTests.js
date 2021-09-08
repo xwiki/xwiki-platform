@@ -74,6 +74,6 @@ define('xwiki-rte-typingTests', function () {
 
   return {
     setRandomizedInterval,
-    testInput: testInput
+    testInput
   };
 });

@@ -40,7 +40,7 @@ define('xwiki-rte-userData', ['chainpad-netflux', 'json.sortify'], function(chai
     var initializing = true;
     return {
       initialState: '{}',
-      network: network,
+      network,
       userName: configData.userName,
       channel: key,
       crypto: configData.crypto || null,

@@ -54,7 +54,7 @@ import static org.mockito.Mockito.doReturn;
  */
 @OldcoreTest
 @AllComponents
-public class AbstractInstanceFilterStreamTest
+public abstract class AbstractInstanceFilterStreamTest
 {
     private static final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z", Locale.ENGLISH);
 

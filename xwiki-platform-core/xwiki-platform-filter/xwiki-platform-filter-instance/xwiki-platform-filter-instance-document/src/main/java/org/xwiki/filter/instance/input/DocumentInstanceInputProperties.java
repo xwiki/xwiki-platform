@@ -19,6 +19,9 @@
  */
 package org.xwiki.filter.instance.input;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyName;
 
@@ -47,6 +50,11 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
      * @see #isWithWikiAttachmentsContent()
      */
     private boolean withWikiAttachmentsContent = true;
+
+    /**
+     * @see #getAttachmentsContent()
+     */
+    private Set<String> attachmentsContent;
 
     /**
      * @see #isWithWikiAttachmentsRevisions()
@@ -148,6 +156,24 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     public void setWithWikiAttachmentsContent(boolean withWikiAttachmentsContent)
     {
         this.withWikiAttachmentsContent = withWikiAttachmentsContent;
+    }
+
+    /**
+     * @return the attachments for which to generate content events
+     * @since 13.8RC1
+     */
+    public Set<String> getAttachmentsContent()
+    {
+        return this.attachmentsContent != null ? this.attachmentsContent : Collections.emptySet();
+    }
+
+    /**
+     * @param attachmentsContent the attachments for which to generate content events
+     * @since 13.8RC1
+     */
+    public void setAttachmentsContent(Set<String> attachmentsContent)
+    {
+        this.attachmentsContent = attachmentsContent;
     }
 
     /**

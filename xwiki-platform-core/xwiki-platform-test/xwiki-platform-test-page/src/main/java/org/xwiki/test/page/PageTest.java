@@ -79,8 +79,6 @@ import static org.mockito.Mockito.when;
 @PageComponentList
 public class PageTest
 {
-    private static final String SKIN_PROPERTIES_PATH = "/skins/flamingo/skin.properties";
-
     @InjectMockitoOldcore
     protected MockitoOldcore oldcore;
 

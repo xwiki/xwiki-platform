@@ -139,7 +139,7 @@
       </plugin>
       <!-- Skip jsHint because we use ESLint through the frontend-maven-plugin -->
       <plugin>
-        <groupId>com.cj.jshintmojo</groupId>
+        <groupId>org.xwiki.contrib</groupId>
         <artifactId>jshint-maven-plugin</artifactId>
         <executions>
           <execution>

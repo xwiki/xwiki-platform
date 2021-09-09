@@ -36,7 +36,7 @@ import org.xwiki.skin.Skin;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
- * Common abstract classes for the skins that manipulates resources.
+ * Common abstract class for the skins that manipulate resources.
  *
  * @version $Id$
  * @since 13.8RC1

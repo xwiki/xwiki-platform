@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.template;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -46,6 +47,7 @@ import org.xwiki.template.Template;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
+import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -88,6 +90,9 @@ class TemplateManagerTest
 
     @MockComponent
     private URLConfiguration urlConfiguration;
+
+    @XWikiTempDir
+    private File tmpDir;
 
     @AfterComponent
     void afterComponent() throws Exception
@@ -166,6 +171,9 @@ class TemplateManagerTest
         when(this.environmentMock.getResource("/templates/../secure[]")).thenReturn(new URL("file://secure[]"));
         when(this.environmentMock.getResourceAsStream("/templates/../template[]"))
             .thenReturn(new ByteArrayInputStream("source".getBytes("UTF8")));
+        // Return an arbitrary temporary file to make make the skin seen as existing. 
+        when(this.environmentMock.getResource("/skins/flamingo/skin.properties")).thenReturn(
+            this.tmpDir.toURI().toURL());
 
         mockVelocity("source", "KO");
 

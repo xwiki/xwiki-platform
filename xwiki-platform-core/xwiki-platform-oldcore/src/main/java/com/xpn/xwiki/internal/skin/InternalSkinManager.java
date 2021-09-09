@@ -115,11 +115,11 @@ public class InternalSkinManager implements Initializable
                 XWikiDocument document = (XWikiDocument) source;
 
                 if (document.getXObject(WikiSkinUtils.SKINCLASS_REFERENCE) != null
-                    || document.getOriginalDocument().getXObject(WikiSkinUtils.SKINCLASS_REFERENCE) != null) {
+                    || document.getOriginalDocument().getXObject(WikiSkinUtils.SKINCLASS_REFERENCE) != null)
+                {
                     // TODO: lower the granularity
                     InternalSkinManager.this.cache.removeAll();
                 }
-
             }
         });
     }
@@ -148,8 +148,17 @@ public class InternalSkinManager implements Initializable
         if (this.wikiSkinUtils.isWikiSkin(id)) {
             skin = new WikiSkin(id, this, this.skinConfiguration, this.wikiSkinUtils, this.logger);
         } else {
-            skin = new EnvironmentSkin(id, this, this.skinConfiguration, this.logger, this.environment,
-                this.xcontextProvider, this.urlConfiguration);
+            EnvironmentSkin environmentSkin =
+                new EnvironmentSkin(id, this, this.skinConfiguration, this.logger, this.environment,
+                    this.xcontextProvider, this.urlConfiguration);
+            // Check if the environment skin actually exists on the environment before returning it.
+            // Other fallbacks to a classloader skin.
+            if (environmentSkin.exists()) {
+                skin = environmentSkin;
+            } else {
+                skin = new ClassLoaderSkin(id, this, this.skinConfiguration, this.logger, this.xcontextProvider,
+                    this.urlConfiguration);
+            }
         }
 
         return skin;

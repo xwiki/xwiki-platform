@@ -126,7 +126,7 @@ define('xwiki-livedata', [
     });
 
     // create Vuejs instance
-    new Vue({
+    const vue = new Vue({
       el: this.element,
       components: {
         "XWikiLivedata": XWikiLivedata,
@@ -163,7 +163,7 @@ define('xwiki-livedata', [
     }
 
     // Load needed translations for the Livedata
-    this.loadTranslations({
+    const translationsPromise = this.loadTranslations({
       prefix: "livedata.",
       keys: [
         "dropdownMenu.title",
@@ -212,9 +212,16 @@ define('xwiki-livedata', [
         "filter.list.emptyLabel",
         "footnotes.computedTitle",
         "footnotes.propertyNotViewable",
-        "bottombar.noEntries"
+        "bottombar.noEntries",
+        "error.updateEntriesFailed"
       ],
     });
+
+    this.translate = async (key, ...args) => {
+      // Make sure that the translations are loaded from the server before translating.
+      await translationsPromise;
+      return vue.$t(key, args);
+    }
 
     // Fetch the data if we don't have any.
     if (!this.data.data.entries.length) {
@@ -504,9 +511,9 @@ define('xwiki-livedata', [
       return liveDataSource.getEntries(this.data.query)
         .then(data => {
           // After fetch event
-          this.triggerEvent("afterEntryFetch");
           return data
-        });
+        })
+        .finally(() => this.triggerEvent("afterEntryFetch"));
     },
 
 
@@ -517,7 +524,11 @@ define('xwiki-livedata', [
           // Remove the outdated footnotes, they will be recomputed by the new entries.
           this.footnotes.reset()
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+          this.translate('livedata.error.updateEntriesFailed')
+            .then(value => new XWiki.widgets.Notification(value, 'error'));
+          console.error('Failed to fetch the entries', err)
+        });
     },
 
 

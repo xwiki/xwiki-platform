@@ -46,10 +46,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  *
  * @version $Id$
  * @since 13.8RC1
- * @since 13.7.1
- * @since 13.4.4
  */
-public abstract class AbstractSkinResourceResource extends AbstractResource<InputSource>
+public abstract class AbstractSkinResource extends AbstractResource<InputSource>
 {
     protected Provider<XWikiContext> xcontextProvider;
 
@@ -64,7 +62,7 @@ public abstract class AbstractSkinResourceResource extends AbstractResource<Inpu
      * @param xcontextProvider the context provider, used to access the context when resolving the resources URLs
      * @param urlConfiguration the url configuration, used when resolving the resources URLs
      */
-    public AbstractSkinResourceResource(String path, String resourceName, ResourceRepository repository,
+    public AbstractSkinResource(String path, String resourceName, ResourceRepository repository,
         Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
     {
         super(path, path, resourceName, repository);

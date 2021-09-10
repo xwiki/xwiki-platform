@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.template;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -47,7 +46,6 @@ import org.xwiki.template.Template;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
-import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -58,6 +56,7 @@ import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -91,9 +90,6 @@ class TemplateManagerTest
     @MockComponent
     private URLConfiguration urlConfiguration;
 
-    @XWikiTempDir
-    private File tmpDir;
-
     @AfterComponent
     void afterComponent() throws Exception
     {
@@ -101,6 +97,7 @@ class TemplateManagerTest
         this.componentManager.registerMockComponent(TransformationManager.class);
         this.componentManager.registerMockComponent(ObservationManager.class);
         this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        this.componentManager.registerMockComponent(WikiDescriptorManager.class);
 
         this.authorizationMock = this.componentManager.registerMockComponent(AuthorizationManager.class);
         this.environmentMock = this.componentManager.registerMockComponent(Environment.class);
@@ -171,9 +168,6 @@ class TemplateManagerTest
         when(this.environmentMock.getResource("/templates/../secure[]")).thenReturn(new URL("file://secure[]"));
         when(this.environmentMock.getResourceAsStream("/templates/../template[]"))
             .thenReturn(new ByteArrayInputStream("source".getBytes("UTF8")));
-        // Return an arbitrary temporary file to make make the skin seen as existing. 
-        when(this.environmentMock.getResource("/skins/flamingo/skin.properties")).thenReturn(
-            this.tmpDir.toURI().toURL());
 
         mockVelocity("source", "KO");
 

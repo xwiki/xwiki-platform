@@ -85,7 +85,7 @@ import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.internal.skin.AbstractSkinResourceResource;
+import com.xpn.xwiki.internal.skin.AbstractSkinResource;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiResource;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -228,9 +228,9 @@ public class InternalTemplateManager implements Initializable
         }
     }
 
-    private class EnvironmentTemplate extends AbtractTemplate<FilesystemTemplateContent, AbstractSkinResourceResource>
+    private class EnvironmentTemplate extends AbtractTemplate<FilesystemTemplateContent, AbstractSkinResource>
     {
-        EnvironmentTemplate(AbstractSkinResourceResource resource)
+        EnvironmentTemplate(AbstractSkinResource resource)
         {
             super(resource);
         }
@@ -905,8 +905,8 @@ public class InternalTemplateManager implements Initializable
     {
         Template template;
 
-        if (resource instanceof AbstractSkinResourceResource) {
-            template = new EnvironmentTemplate((AbstractSkinResourceResource) resource);
+        if (resource instanceof AbstractSkinResource) {
+            template = new EnvironmentTemplate((AbstractSkinResource) resource);
         } else {
             template = new DefaultTemplate(resource);
         }

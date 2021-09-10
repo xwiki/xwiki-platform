@@ -40,8 +40,6 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  *
  * @version $Id$
  * @since 13.8RC1
- * @since 13.7.1
- * @since 13.4.4
  */
 public abstract class AbstractResourceSkin extends AbstractSkin
 {

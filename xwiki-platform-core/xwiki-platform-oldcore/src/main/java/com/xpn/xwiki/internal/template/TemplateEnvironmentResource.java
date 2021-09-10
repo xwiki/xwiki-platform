@@ -24,13 +24,13 @@ import java.io.InputStream;
 import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.environment.Environment;
 
-import com.xpn.xwiki.internal.skin.AbstractSkinResourceResource;
+import com.xpn.xwiki.internal.skin.AbstractSkinResource;
 
 /**
  * @version $Id$
  * @since 6.4M1
  */
-public class TemplateEnvironmentResource extends AbstractSkinResourceResource
+public class TemplateEnvironmentResource extends AbstractSkinResource
 {
     private final Environment environment;
 

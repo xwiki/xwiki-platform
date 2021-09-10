@@ -19,9 +19,7 @@
  */
 package com.xpn.xwiki.internal.skin;
 
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 
 import javax.inject.Provider;
 
@@ -30,8 +28,6 @@ import org.xwiki.environment.Environment;
 import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
-
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Represents a skin stored in the file system.
@@ -93,21 +89,10 @@ public class EnvironmentSkin extends AbstractResourceSkin
      * Check if the skin exists by checking if a directory exists and contains a {@code skin.properties} file.
      *
      * @return {@code true} if the skin exists, {@code false} otherwise
+     * @since 13.8RC1
      */
     public boolean exists()
     {
-        String propertiesPath = getPropertiesPath();
-        URL resource = getResourceURL(propertiesPath);
-        if (resource == null) {
-            return false;
-        }
-        try {
-            return Paths.get(resource.toURI()).toFile().exists();
-        } catch (URISyntaxException e) {
-            LOGGER.warn("Failed to create an URI from the resource [{}] for the skin id [{}]. Cause: [{}]", resource,
-                this.id,
-                getRootCauseMessage(e));
-            return false;
-        }
+        return getResourceURL(getPropertiesPath()) != null;
     }
 }

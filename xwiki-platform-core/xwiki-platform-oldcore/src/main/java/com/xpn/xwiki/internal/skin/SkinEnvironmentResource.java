@@ -35,7 +35,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 6.4M1
  */
-public class SkinEnvironmentResource extends AbstractSkinResourceResource
+public class SkinEnvironmentResource extends AbstractSkinResource
 {
     private final Environment environment;
 

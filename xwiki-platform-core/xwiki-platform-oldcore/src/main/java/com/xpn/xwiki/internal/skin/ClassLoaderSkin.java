@@ -33,8 +33,6 @@ import com.xpn.xwiki.XWikiContext;
  *
  * @version $Id$
  * @since 13.8RC1
- * @since 13.7.1
- * @since 13.4.4
  */
 public class ClassLoaderSkin extends AbstractResourceSkin
 {
@@ -54,14 +52,15 @@ public class ClassLoaderSkin extends AbstractResourceSkin
      * @param xcontextProvider a wiki context provide, used to give access to the context when resolving the skin's
      *     rsources.
      * @param urlConfiguration the url configuration used to resolve the url of the skin's resources
+     * @param classLoader the class loader used to lookup the skin
      */
     public ClassLoaderSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
         Logger logger, Provider<XWikiContext> xcontextProvider,
-        URLConfiguration urlConfiguration)
+        URLConfiguration urlConfiguration, ClassLoader classLoader)
     {
         super(id, skinManager, configuration, logger);
 
-        this.classloader = Thread.currentThread().getContextClassLoader();
+        this.classloader = classLoader;
         this.xcontextProvider = xcontextProvider;
         this.urlConfiguration = urlConfiguration;
     }

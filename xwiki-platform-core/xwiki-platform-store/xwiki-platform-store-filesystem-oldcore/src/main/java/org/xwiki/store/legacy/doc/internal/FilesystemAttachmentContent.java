@@ -91,6 +91,12 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     }
 
     @Override
+    public boolean exists()
+    {
+        return this.storageFile.exists();
+    }
+
+    @Override
     @Deprecated
     public byte[] getContent()
     {

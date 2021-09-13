@@ -258,6 +258,10 @@ export default {
         setTimeout(() => this.applyEdit(), 200);
       } else {
         const displayerElement = this.$refs['displayerRoot'];
+        
+        if(!displayerElement) {
+          return;
+        }
 
         if (displayerElement.contains(evt.target)) {
           return;

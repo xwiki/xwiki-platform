@@ -57,7 +57,6 @@
     :is="displayerComponent"
     :property-id="propertyId"
     :entry="entry"
-    :timestamp="new Date().getTime()"
   ></component>
 
   <!--
@@ -71,6 +70,15 @@
 
 <script>
 import XWikiLoader from "../utilities/XWikiLoader.vue";
+import DisplayerActions from "./DisplayerActions.vue"
+import DisplayerBoolean from "./DisplayerBoolean.vue"
+import DisplayerDate from "./DisplayerDate.vue"
+import DisplayerDocTitle from "./DisplayerDocTitle.vue"
+import DisplayerHtml from "./DisplayerHtml.vue"
+import DisplayerLink from "./DisplayerLink.vue"
+import DisplayerNumber from "./DisplayerNumber.vue"
+import DisplayerText from "./DisplayerText.vue"
+import DisplayerXObjectProperty from "./DisplayerXObjectProperty.vue"
 
 export default {
 
@@ -78,6 +86,15 @@ export default {
 
   components: {
     XWikiLoader,
+    DisplayerActions,
+    DisplayerBoolean,
+    DisplayerDate,
+    DisplayerDocTitle,
+    DisplayerHtml,
+    DisplayerLink,
+    DisplayerNumber,
+    DisplayerText,
+    DisplayerXObjectProperty,
   },
 
   inject: ["logic"],

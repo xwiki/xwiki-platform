@@ -63,6 +63,11 @@
 
 <script>
 import XWikiLoader from "../utilities/XWikiLoader.vue";
+import FilterBoolean from "./FilterBoolean.vue"
+import FilterDate from "./FilterDate.vue"
+import FilterList from "./FilterList.vue"
+import FilterNumber from "./FilterNumber.vue"
+import FilterText from "./FilterText.vue"
 
 export default {
 
@@ -72,6 +77,11 @@ export default {
 
   components: {
     XWikiLoader,
+    FilterBoolean,
+    FilterDate,
+    FilterList,
+    FilterNumber,
+    FilterText,
   },
 
   // The two props defining the Filter

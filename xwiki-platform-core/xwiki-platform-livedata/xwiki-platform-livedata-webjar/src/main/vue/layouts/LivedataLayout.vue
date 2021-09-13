@@ -55,9 +55,12 @@
 
 
 <script>
+import LayoutTable from "./table/LayoutTable.vue";
 export default {
 
   name: "LivedataLayout",
+  
+  components: { LayoutTable },
 
   inject: ["logic"],
 

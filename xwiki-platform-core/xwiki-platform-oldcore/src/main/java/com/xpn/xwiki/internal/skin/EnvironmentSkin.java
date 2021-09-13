@@ -73,9 +73,9 @@ public class EnvironmentSkin extends AbstractResourceSkin
     }
 
     @Override
-    protected SkinEnvironmentResource createResource(String resourcePath, String resourceName)
+    protected EnvironmentSkinResource createResource(String resourcePath, String resourceName)
     {
-        return new SkinEnvironmentResource(resourcePath, resourceName, this, this.environment, this.xcontextProvider,
+        return new EnvironmentSkinResource(resourcePath, resourceName, this, this.environment, this.xcontextProvider,
             this.urlConfiguration);
     }
 

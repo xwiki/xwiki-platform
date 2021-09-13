@@ -17,20 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.template;
+package com.xpn.xwiki.internal.skin;
 
 import java.io.InputStream;
 
-import org.apache.commons.lang3.NotImplementedException;
-import org.xwiki.environment.Environment;
+import javax.inject.Provider;
 
-import com.xpn.xwiki.internal.skin.AbstractSkinResource;
+import org.xwiki.environment.Environment;
+import org.xwiki.skin.ResourceRepository;
+import org.xwiki.url.URLConfiguration;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
+ * Skin resource for the {@link ClassLoaderSkin}, where the skin's resources are resolved using the environment.
+ *
  * @version $Id$
  * @since 6.4M1
  */
-public class TemplateEnvironmentResource extends AbstractSkinResource
+public class EnvironmentSkinResource extends AbstractSkinResource
 {
     private final Environment environment;
 
@@ -39,19 +44,17 @@ public class TemplateEnvironmentResource extends AbstractSkinResource
      *
      * @param path the path of the resource in the skin (for instance, {@code "/templates/display.vm"})
      * @param resourceName the name of the resource (for instance, {@code "display.vm"})
+     * @param repository the resource repository, used to access the respository's id
      * @param environment the environment used to resolve the resources
+     * @param xcontextProvider the context provider, used to access the context when resolving the resources URLs
+     * @param urlConfiguration the url configuration, used when resolving the resources URLs
      */
-    public TemplateEnvironmentResource(String path, String resourceName, Environment environment)
+    public EnvironmentSkinResource(String path, String resourceName, ResourceRepository repository,
+        Environment environment, Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
     {
-        super(path, resourceName, null, null, null);
-        this.environment = environment;
-    }
+        super(path, resourceName, repository, xcontextProvider, urlConfiguration);
 
-    @Override
-    public String getURL(boolean forceSkinAction) throws Exception
-    {
-        // Does not make any sense in this case
-        throw new NotImplementedException("Method not implemented");
+        this.environment = environment;
     }
 
     @Override

@@ -23,21 +23,20 @@ import java.io.InputStream;
 
 import javax.inject.Provider;
 
-import org.xwiki.environment.Environment;
 import org.xwiki.skin.ResourceRepository;
 import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Skin resource for the {@link ClassLoaderSkin}, where the skin's resources are resolved using the environment.
+ * Skin resource for the {@link ClassLoaderSkin}, where the skin's resources are resolved using the class loader.
  *
  * @version $Id$
- * @since 6.4M1
+ * @since 13.8RC1
  */
-public class SkinEnvironmentResource extends AbstractSkinResource
+public class ClassLoaderSkinResource extends AbstractSkinResource
 {
-    private final Environment environment;
+    private final ClassLoader classLoader;
 
     /**
      * Default constructor.
@@ -45,21 +44,21 @@ public class SkinEnvironmentResource extends AbstractSkinResource
      * @param path the path of the resource in the skin (for instance, {@code "/templates/display.vm"})
      * @param resourceName the name of the resource (for instance, {@code "display.vm"})
      * @param repository the resource repository, used to access the respository's id
-     * @param environment the environment used to resolve the resources
+     * @param classloader the classloader used to resolve the resources
      * @param xcontextProvider the context provider, used to access the context when resolving the resources URLs
      * @param urlConfiguration the url configuration, used when resolving the resources URLs
      */
-    public SkinEnvironmentResource(String path, String resourceName, ResourceRepository repository,
-        Environment environment, Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
+    public ClassLoaderSkinResource(String path, String resourceName, ResourceRepository repository,
+        ClassLoader classloader, Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
     {
         super(path, resourceName, repository, xcontextProvider, urlConfiguration);
 
-        this.environment = environment;
+        this.classLoader = classloader;
     }
 
     @Override
     public InputStream getResourceAsStream(String path)
     {
-        return this.environment.getResourceAsStream(path);
+        return this.classLoader.getResourceAsStream(path);
     }
 }

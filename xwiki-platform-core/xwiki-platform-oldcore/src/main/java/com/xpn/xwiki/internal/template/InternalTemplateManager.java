@@ -884,7 +884,7 @@ public class InternalTemplateManager implements Initializable
         String path = getTemplateResourcePath(templateName);
 
         return path != null
-            ? new EnvironmentTemplate(new TemplateEnvironmentResource(path, templateName, this.environment)) : null;
+            ? new EnvironmentTemplate(new TemplateSkinResource(path, templateName, this.environment)) : null;
     }
 
     private Template getClassloaderTemplate(String suffixPath, String templateName)

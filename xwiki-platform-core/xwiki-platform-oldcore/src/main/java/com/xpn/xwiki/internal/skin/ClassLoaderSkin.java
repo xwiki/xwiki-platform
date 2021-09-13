@@ -72,9 +72,9 @@ public class ClassLoaderSkin extends AbstractResourceSkin
     }
 
     @Override
-    protected SkinClassLoaderResource createResource(String resourcePath, String resourceName)
+    protected ClassLoaderSkinResource createResource(String resourcePath, String resourceName)
     {
-        return new SkinClassLoaderResource(resourcePath, resourceName, this, this.classloader, this.xcontextProvider,
+        return new ClassLoaderSkinResource(resourcePath, resourceName, this, this.classloader, this.xcontextProvider,
             this.urlConfiguration);
     }
 }

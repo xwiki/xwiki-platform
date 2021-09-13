@@ -17,48 +17,46 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.skin;
+package com.xpn.xwiki.internal.template;
 
 import java.io.InputStream;
 
-import javax.inject.Provider;
+import org.apache.commons.lang3.NotImplementedException;
+import org.xwiki.environment.Environment;
 
-import org.xwiki.skin.ResourceRepository;
-import org.xwiki.url.URLConfiguration;
-
-import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.skin.AbstractSkinResource;
 
 /**
- * Skin resource for the {@link ClassLoaderSkin}, where the skin's resources are resolved using the class loader.
- *
  * @version $Id$
- * @since 13.8RC1
+ * @since 6.4M1
  */
-public class SkinClassLoaderResource extends AbstractSkinResource
+public class TemplateSkinResource extends AbstractSkinResource
 {
-    private final ClassLoader classLoader;
+    private final Environment environment;
 
     /**
      * Default constructor.
      *
      * @param path the path of the resource in the skin (for instance, {@code "/templates/display.vm"})
      * @param resourceName the name of the resource (for instance, {@code "display.vm"})
-     * @param repository the resource repository, used to access the respository's id
-     * @param classloader the classloader used to resolve the resources
-     * @param xcontextProvider the context provider, used to access the context when resolving the resources URLs
-     * @param urlConfiguration the url configuration, used when resolving the resources URLs
+     * @param environment the environment used to resolve the resources
      */
-    public SkinClassLoaderResource(String path, String resourceName, ResourceRepository repository,
-        ClassLoader classloader, Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
+    public TemplateSkinResource(String path, String resourceName, Environment environment)
     {
-        super(path, resourceName, repository, xcontextProvider, urlConfiguration);
+        super(path, resourceName, null, null, null);
+        this.environment = environment;
+    }
 
-        this.classLoader = classloader;
+    @Override
+    public String getURL(boolean forceSkinAction) throws Exception
+    {
+        // Does not make any sense in this case
+        throw new NotImplementedException("Method not implemented");
     }
 
     @Override
     public InputStream getResourceAsStream(String path)
     {
-        return this.classLoader.getResourceAsStream(path);
+        return this.environment.getResourceAsStream(path);
     }
 }

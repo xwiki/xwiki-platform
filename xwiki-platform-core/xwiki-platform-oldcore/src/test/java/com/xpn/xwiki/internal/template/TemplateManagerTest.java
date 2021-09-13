@@ -56,6 +56,7 @@ import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -96,6 +97,7 @@ class TemplateManagerTest
         this.componentManager.registerMockComponent(TransformationManager.class);
         this.componentManager.registerMockComponent(ObservationManager.class);
         this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        this.componentManager.registerMockComponent(WikiDescriptorManager.class);
 
         this.authorizationMock = this.componentManager.registerMockComponent(AuthorizationManager.class);
         this.environmentMock = this.componentManager.registerMockComponent(Environment.class);

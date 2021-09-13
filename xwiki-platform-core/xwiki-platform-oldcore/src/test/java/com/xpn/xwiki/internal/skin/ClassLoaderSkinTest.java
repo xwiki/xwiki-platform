@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.slf4j.Logger;
-import org.xwiki.environment.Environment;
 import org.xwiki.skin.Resource;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -38,27 +37,27 @@ import org.xwiki.url.URLConfiguration;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link EnvironmentSkin}.
+ * Unit tests for {@link ClassLoaderSkin}.
  *
  * @version $Id$
+ * @since 13.8RC1
  */
 @ComponentTest
-class EnvironmentSkinTest
+class ClassLoaderSkinTest
 {
+    private ClassLoaderSkin skin;
+
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
-    private EnvironmentSkin skin;
-
     @Mock
-    private Environment environment;
+    private ClassLoader classLoader;
 
     @BeforeEach
     void setUp()
@@ -69,16 +68,19 @@ class EnvironmentSkinTest
         when(xcontextProvider.get()).thenReturn(xcontext);
         URLConfiguration urlConfiguration = mock(URLConfiguration.class);
 
-        this.skin = new EnvironmentSkin("test", mock(InternalSkinManager.class), mock(InternalSkinConfiguration.class),
-            mock(Logger.class), this.environment, xcontextProvider, urlConfiguration);
+        this.skin = new ClassLoaderSkin("test", mock(InternalSkinManager.class), mock(InternalSkinConfiguration.class),
+            mock(Logger.class), xcontextProvider, urlConfiguration, this.classLoader);
     }
 
     @Test
     void getLocalResource() throws Exception
     {
         String relativePath = "o;ne/t?w&o/../t=hr#e e";
-        String fullPath = "/skins/test/" + relativePath;
-        when(this.environment.getResource(fullPath)).thenReturn(new URL("http://resourceURL"));
+        String fullPath = "skins/test/" + relativePath;
+
+        doReturn(new URL("file:/skins/test/o;ne/t?w&o/../t=hr#e e"))
+            .when(this.classLoader)
+            .getResource("skins/test/o;ne/t?w&o/../t=hr#e e");
 
         Resource<?> resource = this.skin.getLocalResource(relativePath);
         assertEquals(fullPath, resource.getPath());
@@ -87,17 +89,9 @@ class EnvironmentSkinTest
     @Test
     void getLocalResourceWithBreakInAttempt()
     {
-        assertNull(this.skin.getLocalResource("one/../../two"));
-        assertEquals("Direct access to skin file [/skins/two] refused. Possible break-in attempt!",
+        assertNull(this.skin.getLocalResource("../../notskin/a"));
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Direct access to skin file [notskin/a] refused. Possible break-in attempt!",
             this.logCapture.getMessage(0));
-    }
-
-    @Test
-    void exists() throws Exception
-    {
-        when(this.environment.getResource("/skins/test/skin.properties"))
-            .thenReturn(new URL("http://resourceURL"), (URL) null);
-        assertTrue(this.skin.exists());
-        assertFalse(this.skin.exists());
     }
 }

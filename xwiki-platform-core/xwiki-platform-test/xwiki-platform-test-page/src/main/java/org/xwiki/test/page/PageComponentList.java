@@ -135,8 +135,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     // Request
     DefaultXWikiStubContextProvider.class,
 
-    //Environment. Look for resources in the classloader
-    TestEnvironment.class,
+    // Looks for resources in the target/classes directory only, other resources are loaded through the classloader
+    PageTestEnvironment.class,
 
     // Rendering
     XWikiRenderingContext.class,

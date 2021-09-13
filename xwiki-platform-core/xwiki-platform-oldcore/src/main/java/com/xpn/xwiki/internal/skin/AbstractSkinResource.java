@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,7 +30,8 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
-import org.xwiki.environment.Environment;
+import org.xwiki.filter.input.DefaultInputStreamInputSource;
+import org.xwiki.filter.input.InputSource;
 import org.xwiki.skin.ResourceRepository;
 import org.xwiki.url.URLConfiguration;
 
@@ -39,30 +41,45 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
+ * An abstract skin resource class used by all the skin resources that needs to resolve resources by {@link URL}, and
+ * get resources as stream.
+ *
  * @version $Id$
- * @since 6.4M1
+ * @since 13.8RC1
  */
-public class SkinEnvironmentResource extends AbstractEnvironmentResource
+public abstract class AbstractSkinResource extends AbstractResource<InputSource>
 {
     protected Provider<XWikiContext> xcontextProvider;
 
-    private URLConfiguration urlConfiguration;
+    protected URLConfiguration urlConfiguration;
 
-    public SkinEnvironmentResource(String path, String resourceName, ResourceRepository repository,
-        Environment environment, Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
+    /**
+     * Default constructor.
+     *
+     * @param path the path of the resource in the skin (for instance, {@code "/templates/display.vm"})
+     * @param resourceName the name of the resource (for instance, {@code "display.vm"})
+     * @param repository the resource repository, used to access the respository's id
+     * @param xcontextProvider the context provider, used to access the context when resolving the resources URLs
+     * @param urlConfiguration the url configuration, used when resolving the resources URLs
+     */
+    public AbstractSkinResource(String path, String resourceName, ResourceRepository repository,
+        Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
     {
-        super(path, resourceName, repository, environment);
-
+        super(path, path, resourceName, repository);
         this.xcontextProvider = xcontextProvider;
         this.urlConfiguration = urlConfiguration;
     }
 
-    private URLConfiguration getURLConfiguration() {
-        if (this.urlConfiguration == null) {
-            this.urlConfiguration = Utils.getComponent(URLConfiguration.class);
+    @Override
+    public InputSource getInputSource()
+    {
+        String path = getPath();
+        InputStream inputStream = getResourceAsStream(path);
+        if (inputStream != null) {
+            return new DefaultInputStreamInputSource(inputStream, true);
         }
 
-        return this.urlConfiguration;
+        return null;
     }
 
     @Override
@@ -96,4 +113,21 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
 
         return urlf.getURL(url, xcontext);
     }
+
+    private URLConfiguration getURLConfiguration()
+    {
+        if (this.urlConfiguration == null) {
+            this.urlConfiguration = Utils.getComponent(URLConfiguration.class);
+        }
+
+        return this.urlConfiguration;
+    }
+
+    /**
+     * Resolve an {@link InputStream} from a resource path.
+     *
+     * @param path the resource path
+     * @return the resolved input stream
+     */
+    public abstract InputStream getResourceAsStream(String path);
 }

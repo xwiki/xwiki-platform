@@ -85,7 +85,7 @@ import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.internal.skin.AbstractEnvironmentResource;
+import com.xpn.xwiki.internal.skin.AbstractSkinResource;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiResource;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -228,9 +228,9 @@ public class InternalTemplateManager implements Initializable
         }
     }
 
-    private class EnvironmentTemplate extends AbtractTemplate<FilesystemTemplateContent, AbstractEnvironmentResource>
+    private class EnvironmentTemplate extends AbtractTemplate<FilesystemTemplateContent, AbstractSkinResource>
     {
-        EnvironmentTemplate(AbstractEnvironmentResource resource)
+        EnvironmentTemplate(AbstractSkinResource resource)
         {
             super(resource);
         }
@@ -884,7 +884,7 @@ public class InternalTemplateManager implements Initializable
         String path = getTemplateResourcePath(templateName);
 
         return path != null
-            ? new EnvironmentTemplate(new TemplateEnvironmentResource(path, templateName, this.environment)) : null;
+            ? new EnvironmentTemplate(new TemplateSkinResource(path, templateName, this.environment)) : null;
     }
 
     private Template getClassloaderTemplate(String suffixPath, String templateName)
@@ -905,8 +905,8 @@ public class InternalTemplateManager implements Initializable
     {
         Template template;
 
-        if (resource instanceof AbstractEnvironmentResource) {
-            template = new EnvironmentTemplate((AbstractEnvironmentResource) resource);
+        if (resource instanceof AbstractSkinResource) {
+            template = new EnvironmentTemplate((AbstractSkinResource) resource);
         } else {
             template = new DefaultTemplate(resource);
         }

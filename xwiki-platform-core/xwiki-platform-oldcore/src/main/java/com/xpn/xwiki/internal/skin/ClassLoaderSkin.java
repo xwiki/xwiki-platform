@@ -24,20 +24,19 @@ import java.net.URL;
 import javax.inject.Provider;
 
 import org.slf4j.Logger;
-import org.xwiki.environment.Environment;
 import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Represents a skin stored in the file system.
+ * Represents a skin than can be access using the classloader (for instance, stored in a jar).
  *
  * @version $Id$
- * @since 6.4M1
+ * @since 13.8RC1
  */
-public class EnvironmentSkin extends AbstractResourceSkin
+public class ClassLoaderSkin extends AbstractResourceSkin
 {
-    private final Environment environment;
+    private final ClassLoader classloader;
 
     private final Provider<XWikiContext> xcontextProvider;
 
@@ -50,49 +49,32 @@ public class EnvironmentSkin extends AbstractResourceSkin
      * @param skinManager the skin manager that instantiates this skin
      * @param configuration the skin internal configuration, used to access the default parent skin id
      * @param logger a logger used to log warning in case of error when parsing a skin's syntax
-     * @param environment the wiki environment, this is where this skin load its resources from
      * @param xcontextProvider a wiki context provide, used to give access to the context when resolving the skin's
      *     rsources.
      * @param urlConfiguration the url configuration used to resolve the url of the skin's resources
+     * @param classLoader the class loader used to lookup the skin
      */
-    public EnvironmentSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
-        Logger logger, Environment environment, Provider<XWikiContext> xcontextProvider,
-        URLConfiguration urlConfiguration)
+    public ClassLoaderSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
+        Logger logger, Provider<XWikiContext> xcontextProvider,
+        URLConfiguration urlConfiguration, ClassLoader classLoader)
     {
         super(id, skinManager, configuration, logger);
 
-        this.environment = environment;
+        this.classloader = classLoader;
         this.xcontextProvider = xcontextProvider;
         this.urlConfiguration = urlConfiguration;
     }
 
     @Override
-    protected URL getResourceURL(String propertiesPath)
+    protected URL getResourceURL(String resourcePath)
     {
-        return this.environment.getResource(propertiesPath);
+        return this.classloader.getResource(resourcePath);
     }
 
     @Override
-    protected EnvironmentSkinResource createResource(String resourcePath, String resourceName)
+    protected ClassLoaderSkinResource createResource(String resourcePath, String resourceName)
     {
-        return new EnvironmentSkinResource(resourcePath, resourceName, this, this.environment, this.xcontextProvider,
+        return new ClassLoaderSkinResource(resourcePath, resourceName, this, this.classloader, this.xcontextProvider,
             this.urlConfiguration);
-    }
-
-    @Override
-    protected String getSkinFolder()
-    {
-        return '/' + super.getSkinFolder();
-    }
-
-    /**
-     * Check if the skin exists by checking if a directory exists and contains a {@code skin.properties} file.
-     *
-     * @return {@code true} if the skin exists, {@code false} otherwise
-     * @since 13.8RC1
-     */
-    public boolean exists()
-    {
-        return getResourceURL(getPropertiesPath()) != null;
     }
 }

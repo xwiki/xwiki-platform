@@ -28,7 +28,7 @@ define('xwiki-rte-cursor', ['rangy-core'], function (Rangy) {
   /**
    * @param editableElement the root DOM element of the editable area used by the real-time editor
    */
-  return function(editableElement) {
+  var Cursor = function(editableElement) {
     var cursor = {};
 
     // There ought to be only one cursor at a time, so let's just keep it internally.
@@ -189,4 +189,6 @@ define('xwiki-rte-cursor', ['rangy-core'], function (Rangy) {
 
     return cursor;
   };
+
+  return Cursor;
 });

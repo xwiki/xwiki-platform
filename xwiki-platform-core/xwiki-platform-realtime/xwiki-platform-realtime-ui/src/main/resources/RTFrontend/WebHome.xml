@@ -615,26 +615,32 @@
     <property>
       <content>{{velocity}}
 {{html clean="false"}}
-## FIXME: This is not consistent with the Version service (time vs. versionTime).
-#set ($versionInfo = {
-  'version': $tdoc.version,
-  'locale': $tdoc.locale,
-  'time': $tdoc.date.time
-})
 #set ($configRef = $services.model.resolveDocument('RTFrontend.WebHome'))
 #set ($configObj = $xwiki.getDocument($configRef).getObject('RTFrontend.ConfigurationClass'))
 #if ("$!configObj.getValue('useGlobalConfig')" != '0' &amp;&amp; !$xcontext.isMainWiki())
     #set ($configRef = $services.model.createDocumentReference($xcontext.mainWikiName, 'RTFrontend', 'WebHome'))
     #set ($configObj = $xwiki.getDocument($configRef).getObject('RTFrontend.ConfigurationClass'))
 #end
+#getUserAvatarURL($xcontext.userReference $avatarURL 120)
+## FIXME: This is not consistent with the Version service (time vs. versionTime).
 #set ($config = {
+  'webSocketURL': $services.websocket.url('netflux'),
+  'user': {
+    'name': $xwiki.getUserName($xcontext.user, false),
+    'avatarURL': $avatarURL.url,
+    'advanced': $isAdvancedUser
+  },
+  'versionInfo': {
+    'version': $tdoc.version,
+    'locale': $tdoc.realLocale,
+    'time': $tdoc.date.time
+  },
   'toolbarUserlist': $configObj.getValue('toolbarUserlist'),
   'marginAvatar': $configObj.getValue('marginAvatar'),
-  'enableMerge': $configObj.getValue('enableMerge')
+  'enableMerge': $configObj.getValue('enableMerge'),
+  'demoMode': $stringtool.equals($request.demoMode, 'true')
 })
-&lt;script id="realtime-frontend-getversion" type="application/json"&gt;$jsontool.serialize($versionInfo).replace(
-  '&lt;', '\u003C')&lt;/script&gt;
-&lt;script id="realtime-frontend-getconfig" type="application/json"&gt;$jsontool.serialize($config).replace(
+&lt;script id="realtime-config" type="application/json"&gt;$jsontool.serialize($config).replace(
   '&lt;', '\u003C')&lt;/script&gt;
 {{/html}}
 {{/velocity}}</content>

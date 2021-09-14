@@ -17,27 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-rte-loader', [
+define('xwiki-realtime-loader', [
   'jquery',
   'xwiki-meta',
-  'xwiki-l10n!xwiki-rte-messages',
+  'xwiki-l10n!xwiki-realtime-messages',
   'xwiki-events-bridge'
 ], function($, xm, Messages) {
   'use strict';
 
-  var context = JSON.parse($('#rte-context').text());
+  var realtimeConfig = JSON.parse($('#realtime-config').text());
 
-  if (!context?.webSocketURL) {
+  if (!realtimeConfig.webSocketURL) {
     console.log('The WebSocket URL is missing. Aborting attempt to configure a realtime session.');
     return false;
   }
 
   var module = {messages: Messages},
   documentReference = XWiki.Model.serialize(xm.documentReference),
-  versionJSON = JSON.parse($('#realtime-frontend-getversion').html() || '{}'),
-  language = versionJSON.locale || 'default',
-  version = versionJSON.version,
-  versionTime = versionJSON.time,
+  language = realtimeConfig.versionInfo?.locale || 'default',
+  version = realtimeConfig.versionInfo?.version,
+  versionTime = realtimeConfig.versionInfo?.time,
 
   getDocLock = module.getDocLock = function() {
     var lockedBy = document.querySelectorAll('p.xwikimessage .wikilink a');
@@ -77,17 +76,17 @@ define('xwiki-rte-loader', [
         version,
         safeSave
       },
-      WebsocketURL: context.webSocketURL,
+      WebsocketURL: realtimeConfig.webSocketURL,
       htmlConverterUrl: new XWiki.Document('ConvertHTML', 'RTFrontend').getURL('get'),
       // userId === <userReference>-encoded(<userName>)%2d<random number>
-      userName: userReference + '-' + encodeURIComponent(context.user.name + '-').replace(/-/g, '%2d') +
+      userName: userReference + '-' + encodeURIComponent(realtimeConfig.user.name + '-').replace(/-/g, '%2d') +
         String(Math.random()).substring(2),
       language,
       reference: documentReference,
-      DEMO_MODE: context.demoMode,
+      DEMO_MODE: realtimeConfig.demoMode,
       LOCALSTORAGE_DISALLOW: 'realtime-disallow',
-      userAvatarURL: context.user.avatarURL,
-      isAdvancedUser: context.user.advanced,
+      userAvatarURL: realtimeConfig.user.avatarURL,
+      isAdvancedUser: realtimeConfig.user.advanced,
       network: allRt.network,
       abort: $.proxy(module, 'onRealtimeAbort'),
       onKeysChanged: $.proxy(module, 'onKeysChanged'),
@@ -685,7 +684,7 @@ define('xwiki-rte-loader', [
     getKeys(keyData, function(data) {
       var channelKey = data?.[config.reference]?.[config.language + '/events']?.all.key;
       if (channelKey) {
-        require(['netflux-client', 'xwiki-rte-errorBox'], function(Netflux, ErrorBox) {
+        require(['netflux-client', 'xwiki-realtime-errorBox'], function(Netflux, ErrorBox) {
           var onError = function (error) {
             allRt.error = true;
             displayWsWarning();

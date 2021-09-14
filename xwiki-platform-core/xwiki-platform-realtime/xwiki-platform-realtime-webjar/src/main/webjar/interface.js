@@ -19,7 +19,7 @@
  */
 // This file defines functions which are used by the real-time editors (Wiki / WYSIWYG) and address components of the
 // user interface.
-define('xwiki-rte-interface', ['jquery'], function($) {
+define('xwiki-realtime-interface', ['jquery'], function($) {
   'use strict';
 
   var Interface = {};

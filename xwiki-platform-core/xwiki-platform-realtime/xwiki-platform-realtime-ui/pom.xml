@@ -24,11 +24,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-netflux</artifactId>
+    <artifactId>xwiki-platform-realtime</artifactId>
     <version>13.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-netflux-ui</artifactId>
-  <name>XWiki Platform - Netflux - UI</name>
+  <artifactId>xwiki-platform-realtime-ui</artifactId>
+  <name>XWiki Platform - Realtime - UI</name>
   <packaging>xar</packaging>
   <dependencies>
     <dependency>
@@ -66,7 +66,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-netflux-webjar</artifactId>
+      <artifactId>xwiki-platform-realtime-webjar</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

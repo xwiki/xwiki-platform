@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-rte-messages', {
-  prefix: 'rte.',
+define('xwiki-realtime-messages', {
+  prefix: 'realtime.',
   keys: [
     'editingAlone',
     'editingWithOneOtherPerson',
@@ -31,7 +31,7 @@ define('xwiki-rte-messages', {
     'allowRealtime',
     'sessionInProgress',
     'saved',
-    'mergeOverwrite=',
+    'mergeOverwrite',
     'savedRemote',
     'savedRemoteNoMerge',
     'conflictResolved',

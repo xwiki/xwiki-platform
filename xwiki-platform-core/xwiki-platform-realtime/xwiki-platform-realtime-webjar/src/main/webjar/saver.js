@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-rte-saver', [
+define('xwiki-realtime-saver', [
   'jquery',
   'chainpad-netflux',
   'json.sortify',
-  'xwiki-rte-crypto',
+  'xwiki-realtime-crypto',
   'xwiki-meta',
-  'xwiki-rte-errorBox'
+  'xwiki-realtime-errorBox'
 ], /* jshint maxparams:false */ function($, chainpadNetflux, jsonSortify, Crypto, xwikiMeta, ErrorBox) {
   'use strict';
 

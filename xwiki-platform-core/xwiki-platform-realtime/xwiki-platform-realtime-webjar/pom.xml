@@ -24,12 +24,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-netflux</artifactId>
+    <artifactId>xwiki-platform-realtime</artifactId>
     <version>13.8-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
-  <artifactId>xwiki-platform-netflux-webjar</artifactId>
-  <name>XWiki Platform - Netflux - WebJar</name>
+  <artifactId>xwiki-platform-realtime-webjar</artifactId>
+  <name>XWiki Platform - Realtime - WebJar</name>
   <description>JavaScript resources required by the real-time editors.</description>
   <dependencies>
     <dependency>

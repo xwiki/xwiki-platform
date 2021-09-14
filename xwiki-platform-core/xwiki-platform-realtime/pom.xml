@@ -27,11 +27,12 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>13.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-netflux</artifactId>
-  <name>XWiki Platform - Netflux</name>
+  <artifactId>xwiki-platform-realtime</artifactId>
+  <name>XWiki Platform - Realtime</name>
   <packaging>pom</packaging>
-  <description>The Netflux modules used to support real-time synchronization in XWiki.</description>
+  <description>Adds support for real-time editing in XWiki.</description>
   <modules>
-    <module>xwiki-platform-netflux-api</module>
+    <module>xwiki-platform-realtime-ui</module>
+    <module>xwiki-platform-realtime-webjar</module>
   </modules>
 </project>

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-rte-cursor', ['rangy-core'], function (Rangy) {
+define('xwiki-realtime-cursor', ['rangy-core'], function (Rangy) {
   'use strict';
   var verbose = function(x) {
     if (window.verboseMode) {

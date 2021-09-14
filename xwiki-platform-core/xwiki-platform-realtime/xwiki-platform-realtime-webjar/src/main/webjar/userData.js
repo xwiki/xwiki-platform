@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-rte-userData', ['chainpad-netflux', 'json.sortify'], function(chainpadNetflux, jsonSortify) {
+define('xwiki-realtime-userData', ['chainpad-netflux', 'json.sortify'], function(chainpadNetflux, jsonSortify) {
   'use strict';
   var userData, onChange;
   var updateUserData = function(textData) {

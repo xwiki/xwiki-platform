@@ -206,6 +206,10 @@ class VersionIT
         // Delete attachment (3.1)
         utils.rest().deleteAttachement(attachmentReference);
 
+        // Make sure those two attachments are not saved at during the same second since the granularity is the second
+        // in some databases
+        Thread.sleep(1000);
+
         // Add a new attachment with the same name (4.1)
         utils.rest().attachFile(attachmentReference, "2".getBytes(), true);
 
@@ -213,8 +217,6 @@ class VersionIT
         AttachmentsPane attachmentsPane = viewPage.openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("file.txt"));
         assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
-        attachmentsPane.getAttachmentLink("file.txt").click();
-        assertEquals("2", utils.getDriver().findElement(By.tagName("html")).getText());
 
         // Revert to first attachment (2.1)
         viewPage = utils.gotoPage(testReference);

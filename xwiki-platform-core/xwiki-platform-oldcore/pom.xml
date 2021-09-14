@@ -45,6 +45,9 @@
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+
+    <!-- Workaround a limitation in Eclipse M2E which prevent using classes from OldCore test-jar in other module's main classes -->
+    <m2e.disableTestClasspathFlag>true</m2e.disableTestClasspathFlag>
   </properties>
   <dependencies>
     <dependency>

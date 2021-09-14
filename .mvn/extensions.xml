@@ -26,4 +26,9 @@
     <artifactId>gradle-enterprise-maven-extension</artifactId>
     <version>1.10.5</version>
   </extension>
+  <extension>
+    <groupId>com.gradle</groupId>
+    <artifactId>common-custom-user-data-maven-extension</artifactId>
+    <version>1.7.3</version>
+  </extension>
 </extensions>

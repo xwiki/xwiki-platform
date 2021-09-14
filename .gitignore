@@ -26,6 +26,9 @@ bin
 # NetBeans
 nbproject
 
+# Gradle Enterprise
+.mvn/.gradle-enterprise
+
 # Other
 *.log.*
 *.log

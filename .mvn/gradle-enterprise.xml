@@ -20,12 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<gradleEnterprise>
+<gradleEnterprise
+  xmlns="https://www.gradle.com/gradle-enterprise-maven" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://www.gradle.com/gradle-enterprise-maven https://www.gradle.com/schema/gradle-enterprise-maven.xsd">
   <server>
     <url>https://ge.xwiki.org</url>
-    <allowUntrusted>true</allowUntrusted>
   </server>
   <buildScan>
+    <publishIfAuthenticated>true</publishIfAuthenticated>
     <publish>ALWAYS</publish>
     <captureGoalInputFiles>true</captureGoalInputFiles>
     <!-- Use background scans only locally to avoid potential issues on CI (the ephemeral docker agent could terminate

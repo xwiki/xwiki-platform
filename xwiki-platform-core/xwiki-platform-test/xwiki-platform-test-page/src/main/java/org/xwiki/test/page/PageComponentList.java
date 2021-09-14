@@ -24,6 +24,8 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.xwiki.classloader.internal.DefaultClassLoaderManager;
+import org.xwiki.classloader.internal.ExtendedURLStreamHandlerFactory;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.display.internal.ConfiguredDocumentDisplayer;
@@ -78,7 +80,6 @@ import org.xwiki.script.internal.service.DefaultScriptServiceManager;
 import org.xwiki.script.internal.service.ServicesScriptContextInitializer;
 import org.xwiki.sheet.internal.DefaultSheetManager;
 import org.xwiki.sheet.internal.SheetDocumentDisplayer;
-import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.velocity.internal.DefaultVelocityConfiguration;
 import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
@@ -209,6 +210,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     InternalSkinManager.class,
     InternalSkinConfiguration.class,
     WikiSkinUtils.class,
+    DefaultClassLoaderManager.class,
+    ExtendedURLStreamHandlerFactory.class,
 
     // Velocity Macro
     VelocityMacro.class,

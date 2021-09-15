@@ -65,7 +65,7 @@ class RightsManagerTest
     {
         rights = RightsManager.getInstance();
 
-        rightsDocReference = new DocumentReference("xwiki", Collections.singletonList("Some"), "Page");
+        rightsDocReference = new DocumentReference("xwiki", "Some", "Page");
         XWikiDocument rightsDocument = loadTestDocumentFromStore();
 
         rightsDocument.newXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS, oldcore.getXWikiContext());
@@ -80,10 +80,8 @@ class RightsManagerTest
     @Test
     void replaceUserOrGroupFromAllRights() throws Exception
     {
-        DocumentReference oldGroupName = new DocumentReference("xwiki", Collections.singletonList("XWiki"),
-            "GroupBefore");
-        DocumentReference newGroupName = new DocumentReference("xwiki", Collections.singletonList("XWiki"),
-            "GroupAfter");
+        DocumentReference oldGroupName = new DocumentReference("xwiki", "XWiki", "GroupBefore");
+        DocumentReference newGroupName = new DocumentReference("xwiki", "XWiki", "GroupAfter");
         String oldValue = "XWiki.GroupBefore,XWiki.Some\\,OtherGroup";
         String expectedValue = "XWiki.Some\\,OtherGroup,XWiki.GroupAfter";
 

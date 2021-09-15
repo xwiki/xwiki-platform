@@ -24,18 +24,14 @@ define('xwiki-realtime-toolbar', ['jquery', 'xwiki-l10n!xwiki-realtime-messages'
     return 'rt-uid-' + String(Math.random()).substring(2);
   };
 
-  // The CSS class used on the toolbar (the element that contains the user list, debug link and lag).
-  var TOOLBAR_CLS = 'rt-toolbar';
+  // The element that contains the user list, debug link and lag.
   var createRealtimeToolbar = function($container) {
     return $(
-      '<div>' +
+      '<div class="rt-toolbar">' +
         '<div class="rt-toolbar-leftside"/>' +
         '<div class="rt-toolbar-rightside"/>' +
       '</div>'
-    ).attr({
-      'id': uid(),
-      'class': TOOLBAR_CLS
-    }).prependTo($container.first());
+    ).attr('id', uid()).prependTo($container.first());
   };
 
   var createSpinner = function($container) {
@@ -209,9 +205,5 @@ define('xwiki-realtime-toolbar', ['jquery', 'xwiki-l10n!xwiki-realtime-messages'
     };
   };
 
-  return { 
-    create,
-    TOOLBAR_CLS,
-    DEBUG_LINK_CLS: 'rt-debug-link'
-  };
+  return {create};
 });

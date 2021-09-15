@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,22 +16,41 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+define('xwiki-realtime-textCursor', [], function() {
+  'use strict';
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>13.8-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-realtime</artifactId>
-  <name>XWiki Platform - Realtime</name>
-  <packaging>pom</packaging>
-  <description>Adds support for real-time editing in XWiki.</description>
-  <modules>
-    <module>xwiki-platform-realtime-ui</module>
-    <module>xwiki-platform-realtime-webjar</module>
-    <module>xwiki-platform-realtime-wiki</module>
-  </modules>
-</project>
+  var module = {exports: {}};
+
+  var transformCursor = function(cursor, op) {
+    if (!op) {
+      return cursor;
+    }
+
+    var pos = op.offset;
+    var remove = op.toRemove;
+    var insert = op.toInsert.length;
+    if (typeof cursor === 'undefined') {
+      return;
+    }
+    if (typeof remove === 'number' && pos < cursor) {
+      cursor -= Math.min(remove, cursor - pos);
+    }
+    if (typeof insert === 'number' && pos < cursor) {
+      cursor += insert;
+    }
+    return cursor;
+  };
+
+  module.exports.transformCursor = function(cursor, ops) {
+    if (!Array.isArray(ops)) {
+      ops = [ops];
+    }
+    for (var i = ops.length - 1; i >= 0; i--) {
+      cursor = transformCursor(cursor, ops[i]);
+    }
+    return cursor;
+  };
+
+  return module.exports;
+});

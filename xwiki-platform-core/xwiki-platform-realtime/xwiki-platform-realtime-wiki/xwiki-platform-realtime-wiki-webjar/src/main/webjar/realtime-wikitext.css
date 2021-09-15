@@ -1,0 +1,17 @@
+.rt-toolbar {
+  width: 100%;
+  color: #666;
+  font-weight: bold;
+  background-color: #f0f0ee;
+  border: 0, none;
+  height: 24px;
+  float: left;
+}
+
+.rt-toolbar div {
+  padding: 0 10px 0 5px;
+  height: 1.5em;
+  background: #f0f0ee;
+  line-height: 25px;
+  height: 24px;
+}

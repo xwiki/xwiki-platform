@@ -24,16 +24,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-realtime-wiki</artifactId>
     <version>13.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-realtime</artifactId>
-  <name>XWiki Platform - Realtime</name>
-  <packaging>pom</packaging>
-  <description>Adds support for real-time editing in XWiki.</description>
-  <modules>
-    <module>xwiki-platform-realtime-ui</module>
-    <module>xwiki-platform-realtime-webjar</module>
-    <module>xwiki-platform-realtime-wiki</module>
-  </modules>
+  <packaging>webjar</packaging>
+  <artifactId>xwiki-platform-realtime-wiki-webjar</artifactId>
+  <name>XWiki Platform - Realtime - Wiki - WebJar</name>
+  <description>JavaScript resources required by the real-time wiki syntax (text) editor.</description>
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-realtime-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
+  </dependencies>
 </project>

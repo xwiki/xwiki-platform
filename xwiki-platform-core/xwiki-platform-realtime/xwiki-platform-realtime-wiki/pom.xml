@@ -24,16 +24,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-realtime</artifactId>
     <version>13.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-realtime</artifactId>
-  <name>XWiki Platform - Realtime</name>
+  <artifactId>xwiki-platform-realtime-wiki</artifactId>
+  <name>XWiki Platform - Realtime - Wiki</name>
   <packaging>pom</packaging>
-  <description>Adds support for real-time editing in XWiki.</description>
+  <description>Adds support for real-time wiki syntax (text) editing in XWiki.</description>
   <modules>
-    <module>xwiki-platform-realtime-ui</module>
-    <module>xwiki-platform-realtime-webjar</module>
-    <module>xwiki-platform-realtime-wiki</module>
+    <module>xwiki-platform-realtime-wiki-ui</module>
+    <module>xwiki-platform-realtime-wiki-webjar</module>
   </modules>
 </project>

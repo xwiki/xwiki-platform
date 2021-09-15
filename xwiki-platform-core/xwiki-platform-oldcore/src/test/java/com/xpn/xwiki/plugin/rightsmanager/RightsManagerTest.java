@@ -21,7 +21,6 @@
 package com.xpn.xwiki.plugin.rightsmanager;
 
 import java.util.Collections;
-import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,25 +56,25 @@ class RightsManagerTest
     private RightsManager rights;
 
     /**
-     * A rights object storing e.g. group information.
+     * A reference to the document storing the rights object under test.
      */
-    private BaseObject rightsObject;
+    private DocumentReference rightsDocReference;
 
     @BeforeEach
     void beforeEach() throws Exception
     {
         rights = RightsManager.getInstance();
 
-        XWikiDocument rightsDocument = new XWikiDocument(
-            new DocumentReference("xwiki", Collections.singletonList("Some"), "Page"));
-        rightsDocument.setLocale(Locale.ROOT);
+        rightsDocReference = new DocumentReference("xwiki", Collections.singletonList("Some"), "Page");
+        XWikiDocument rightsDocument = loadTestDocumentFromStore();
 
         rightsDocument.newXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS, oldcore.getXWikiContext());
-        rightsObject = rightsDocument.getXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
 
-        oldcore.getSpyXWiki().saveDocument(rightsDocument, this.oldcore.getXWikiContext());
-        doReturn(Collections.singletonList(rightsDocument)).when(oldcore.getMockStore()).searchDocuments(any(), any(),
-            eq(oldcore.getXWikiContext()));
+        oldcore.getSpyXWiki().saveDocument(rightsDocument, oldcore.getXWikiContext());
+
+        XWikiDocument savedRightsDocument = loadTestDocumentFromStore();
+        doReturn(Collections.singletonList(savedRightsDocument)).when(oldcore.getMockStore()).searchDocuments(any(),
+            any(), eq(oldcore.getXWikiContext()));
     }
 
     @Test
@@ -88,11 +87,15 @@ class RightsManagerTest
         String oldValue = "XWiki.GroupBefore,XWiki.Some\\,OtherGroup";
         String expectedValue = "XWiki.Some\\,OtherGroup,XWiki.GroupAfter";
 
+        XWikiDocument rightsDocument = loadTestDocumentFromStore();
+        BaseObject rightsObject = rightsDocument.getXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
         rightsObject.setLargeStringValue("groups", oldValue);
+        oldcore.getSpyXWiki().saveDocument(rightsDocument, oldcore.getXWikiContext());
 
         rights.replaceUserOrGroupFromAllRights(oldGroupName, newGroupName, false, oldcore.getXWikiContext());
 
-        assertEquals(expectedValue, rightsObject.getLargeStringValue("groups"));
+        BaseObject updatedRightsObject = loadTestDocumentFromStore().getXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
+        assertEquals(expectedValue, updatedRightsObject.getLargeStringValue("groups"));
     }
 
     @Test
@@ -101,10 +104,19 @@ class RightsManagerTest
         String oldValue = "XWiki.SomeGroup,XWiki.GroupToRemove,XWiki.Some\\,OtherGroup";
         String expectedValue = "XWiki.SomeGroup,XWiki.Some\\,OtherGroup";
 
+        XWikiDocument rightsDocument = loadTestDocumentFromStore();
+        BaseObject rightsObject = rightsDocument.getXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
         rightsObject.setLargeStringValue("groups", oldValue);
+        oldcore.getSpyXWiki().saveDocument(rightsDocument, oldcore.getXWikiContext());
 
         rights.removeUserOrGroupFromAllRights("xwiki", "XWiki", "GroupToRemove", false, oldcore.getXWikiContext());
 
-        assertEquals(expectedValue, rightsObject.getLargeStringValue("groups"));
+        BaseObject updatedRightsObject = loadTestDocumentFromStore().getXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
+        assertEquals(expectedValue, updatedRightsObject.getLargeStringValue("groups"));
+    }
+
+    private XWikiDocument loadTestDocumentFromStore() throws Exception
+    {
+        return oldcore.getSpyXWiki().getDocument(rightsDocReference, oldcore.getXWikiContext());
     }
 }

@@ -19,10 +19,14 @@
  -->
 
 <template>
-
+<!-- 
+v-show is used here instead of v-if to prevent the loader to be re-rendered each time the show data field changes.
+This change can happen two times in a short time span, once when the component is first rendered, then when the timout 
+is switched to true (by default 200ms after the component is mounted). 
+-->
   <div
     class="xwiki-loader"
-    v-if="show"
+    v-show="show"
   ></div>
 
 </template>

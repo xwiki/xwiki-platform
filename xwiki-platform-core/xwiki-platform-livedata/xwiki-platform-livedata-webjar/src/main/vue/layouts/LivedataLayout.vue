@@ -55,6 +55,7 @@
 
 
 <script>
+// We import explicitly the most used layout to avoid having to load it dynamically during the component rendering.
 import LayoutTable from "./table/LayoutTable.vue";
 export default {
 

@@ -17,7 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-realtime-toolbar', ['jquery', 'xwiki-l10n!xwiki-realtime-messages'], function($, Messages) {
+define('xwiki-realtime-toolbar', [
+  'jquery',
+  'xwiki-realtime-config',
+  'xwiki-l10n!xwiki-realtime-messages'
+], function($, Config, Messages) {
   'use strict';
 
   var uid = function() {
@@ -35,9 +39,7 @@ define('xwiki-realtime-toolbar', ['jquery', 'xwiki-l10n!xwiki-realtime-messages'
   };
 
   var createSpinner = function($container) {
-    var id = uid();
-    $container.append('<div class="rt-spinner" id="'+id+'"></div>');
-    return $container.find('#'+id)[0];
+    return $('<div class="rt-spinner"/>').attr('id', uid()).appendTo($container)[0];
   };
 
   var SPINNER_DISAPPEAR_TIME = 3000;
@@ -57,13 +59,7 @@ define('xwiki-realtime-toolbar', ['jquery', 'xwiki-l10n!xwiki-realtime-messages'
   };
 
   var getOtherUsers = function(myUserId, userList, usersData) {
-    var config = {};
-    try {
-      config = JSON.parse($('#realtime-config').text());
-    } catch (e) {
-      console.error(e);
-    }
-    var displayConfig = config.toolbarUserlist;
+    var displayConfig = Config.toolbarUserlist;
     return userList.map(function(userId) {
       // Collect the user data.
       if (userId !== myUserId) {
@@ -95,7 +91,7 @@ define('xwiki-realtime-toolbar', ['jquery', 'xwiki-l10n!xwiki-realtime-messages'
       if (displayConfig === undefined || displayConfig === 'name' || displayConfig === 'both') {
         userDisplay += user.name;
       }
-      var linkClass = config.marginAvatar === '1' ? 'rt-user-link' : '';
+      var linkClass = Config.marginAvatar === '1' ? 'rt-user-link' : '';
       return `<span class="${linkClass}" data-id="${user.id}">${userDisplay}</span>`;
     }).join(displayConfig === 'avatar' ? ' ' : ', ');
   };

@@ -20,12 +20,11 @@
 define('xwiki-realtime-loader', [
   'jquery',
   'xwiki-meta',
+  'xwiki-realtime-config',
   'xwiki-l10n!xwiki-realtime-messages',
   'xwiki-events-bridge'
-], function($, xm, Messages) {
+], function($, xm, realtimeConfig, Messages) {
   'use strict';
-
-  var realtimeConfig = JSON.parse($('#realtime-config').text());
 
   if (!realtimeConfig.webSocketURL) {
     console.log('The WebSocket URL is missing. Aborting attempt to configure a realtime session.');

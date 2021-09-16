@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-realtime-wikitext', [
+  'xwiki-realtime-config',
   'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
@@ -32,7 +33,8 @@ define('xwiki-realtime-wikitext', [
   'jquery'
 ], function(
   /* jshint maxparams:false */
-  ErrorBox, Toolbar, realtimeInput, UserData, TypingTest, JSONSortify, TextCursor, Interface, Saver, Chainpad, Crypto, $
+  realtimeConfig, ErrorBox, Toolbar, realtimeInput, UserData, TypingTest, JSONSortify, TextCursor, Interface, Saver,
+    Chainpad, Crypto, $
 ) {
   'use strict';
 
@@ -42,37 +44,18 @@ define('xwiki-realtime-wikitext', [
 
   var module = {}, editorId = 'wikitext';
 
-  var main = module.main = function(editorConfig, docKeys) {
-    var webSocketURL = editorConfig.WebsocketURL;
-    var userName = editorConfig.userName;
-    var DEMO_MODE = editorConfig.DEMO_MODE;
-    var language = editorConfig.language;
-    var userAvatar = editorConfig.userAvatarURL;
-
-    var parsedConfig;
-    try {
-      parsedConfig = JSON.parse($('#realtime-config').text());
-    } catch (e) {
-      console.error(e);
-    }
-
+  module.main = function(editorConfig, docKeys) {
     var saverConfig = $.extend(editorConfig.saverConfig, {
       chainpad: Chainpad,
       editorType: editorId,
       editorName: 'Wiki',
       isHTML: false,
-      mergeContent: parsedConfig?.enableMerge !== 0
-    });
+      mergeContent: realtimeConfig.enableMerge !== 0
+    }),
 
-    // Key in the localStore which indicates realtime activity should be disallowed.
-    var LOCALSTORAGE_DISALLOW = editorConfig.LOCALSTORAGE_DISALLOW;
-
-    var $contentInner = $('#xwikieditcontentinner');
-    var $textArea = $('#content');
-
-    var channel = docKeys[editorId];
-    var eventsChannel = docKeys.events;
-    var userdataChannel = docKeys.userdata;
+    channel = docKeys[editorId],
+    eventsChannel = docKeys.events,
+    userdataChannel = docKeys.userdata;
 
     /**
      * Update the channel keys for reconnecting WebSocket.
@@ -97,17 +80,17 @@ define('xwiki-realtime-wikitext', [
     };
 
     // START DISALLOW REALTIME
-    var uid = Interface.uid;
-    var allowRealtimeCbId = uid();
-    Interface.setLocalStorageDisallow(LOCALSTORAGE_DISALLOW);
+    // Key in the localStore which indicates realtime activity should be disallowed.
+    Interface.setLocalStorageDisallow(editorConfig.LOCALSTORAGE_DISALLOW);
 
-    Interface.createAllowRealtimeCheckbox(allowRealtimeCbId, Interface.realtimeAllowed(),
+    var allowRealtimeCheckboxId = Interface.uid();
+    Interface.createAllowRealtimeCheckbox(allowRealtimeCheckboxId, Interface.realtimeAllowed(),
       saverConfig.messages.allowRealtime);
 
-    var $disallowButton = $('#' + allowRealtimeCbId);
+    var $disallowButton = $('#' + allowRealtimeCheckboxId);
     $disallowButton.change(function() {
       var checked = $(this).prop('checked');
-      if (checked || DEMO_MODE) {
+      if (checked || editorConfig.DEMO_MODE) {
         Interface.realtimeAllowed(true);
         // TODO: Join the realtime session without reloading the page.
         window.location.reload();
@@ -129,8 +112,6 @@ define('xwiki-realtime-wikitext', [
     console.log("Creating realtime toggle");
 
     var whenReady = function() {
-      var codemirror = !!$('.CodeMirror').prop('CodeMirror');
-
       var cursorToPos = function(cursor, oldText) {
         var cLine = cursor.line;
         var cCh = cursor.ch;
@@ -139,8 +120,7 @@ define('xwiki-realtime-wikitext', [
         for (var line = 0; line <= cLine; line++) {
           if (line < cLine) {
             pos += textLines[line].length + 1;
-          }
-          else if (line === cLine) {
+          } else if (line === cLine) {
             pos += cCh;
           }
         }
@@ -159,6 +139,7 @@ define('xwiki-realtime-wikitext', [
       };
 
       // Default wiki behaviour.
+      var $textArea = $('#content');
       var editor = {
         getValue: function() {
           return $textArea.val();
@@ -186,38 +167,43 @@ define('xwiki-realtime-wikitext', [
       // Wiki
       var useCodeMirror = function() {
         editor._ = $('.CodeMirror')[0].CodeMirror;
-        editor.getValue = function() { return editor._.getValue(); };
+        editor.getValue = function() {
+          return editor._.getValue();
+        };
         editor.setValue = function (text) {
           editor._.setValue(text);
           editor._.save();
         };
-        editor.setReadOnly = function (bool) {
+        editor.setReadOnly = function(bool) {
           editor._.setOption('readOnly', bool);
         };
-        editor.onChange = function (handler) {
+        editor.onChange = function(handler) {
           editor._.off('change');
           editor._.on('change', handler);
         };
-        editor.getCursor = function () {
+        editor.getCursor = function() {
           var doc = canonicalize(editor.getValue());
           return {
             selectionStart : cursorToPos(editor._.getCursor('from'), doc),
             selectionEnd : cursorToPos(editor._.getCursor('to'), doc)
           };
         };
-        editor.setCursor = function (start, end) {
+        editor.setCursor = function(start, end) {
           var doc = canonicalize(editor.getValue());
-          if(start === end) {
+          if (start === end) {
             editor._.setCursor(posToCursor(start, doc));
-          }
-          else {
+          } else {
             editor._.setSelection(posToCursor(start, doc), posToCursor(end, doc));
           }
         };
         editor.onChange(onChangeHandler);
       };
 
-      if (codemirror) { useCodeMirror(); }
+      if ($('.CodeMirror').prop('CodeMirror')) {
+        // CodeMirror already loaded.
+        useCodeMirror();
+      }
+
       // Change the editor to CodeMirror if it is completely loaded after the initializaion of real-time wiki editor.
       $('body').on('DOMNodeInserted', function(e) {
         if ($(e.target).is('.CodeMirror')) {
@@ -232,189 +218,176 @@ define('xwiki-realtime-wikitext', [
         }
       });
 
-      var setEditable = module.setEditable = function (bool) {
+      module.setEditable = function(bool) {
         editor.setReadOnly(!bool);
       };
 
-      // don't let the user edit until the pad is ready
-      setEditable(false);
+      // Don't let the user edit until the editor is ready.
+      module.setEditable(false);
 
       var initializing = true;
 
-      var userData; // List of pretty name of all users (mapped with their server ID)
-      var userList; // List of users still connected to the channel (server IDs)
-      var myId; // My server ID
+      // List of pretty name of all users (mapped with their server ID).
+      var userData;
 
-      var realtimeOptions = {
-        // provide initialstate...
-        initialState: editor.getValue() || '',
-
-        // the websocket URL
-        websocketURL: webSocketURL,
-
-        // our username
-        userName: userName,
-
-        // the channel we will communicate over
-        channel: channel,
-
-        // Crypto object to avoid loading it twice in Cryptpad
-        crypto: Crypto,
-      };
-
-      var setValueWithCursor = function (newValue) {
+      var setValueWithCursor = function(newValue) {
         var oldValue = canonicalize(editor.getValue());
-
         var ops = Chainpad.Diff.diff(oldValue, newValue);
-
         var oldCursor = editor.getCursor();
         var selects = ['selectionStart', 'selectionEnd'].map(function (attr) {
           return TextCursor.transformCursor(oldCursor[attr], ops);
         });
 
         editor.setValue(newValue);
-
         editor.setCursor(selects[0], selects[1]);
       };
 
-      var createSaver = function (info) {
-        if(!DEMO_MODE) {
-          // this function displays a message notifying users that there was a merge
-          Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(toolbar.toolbar
-            .find('.rt-toolbar-rightside'),
-            saverConfig.messages);
-          Saver.setLastSavedContent(editor.getValue());
-          var saverCreateConfig = {
-            formId: "edit", // Id of the wiki page form
-            setTextValue: function(newText, toConvert, callback) {
-              setValueWithCursor(newText);
-              callback();
-              onLocal();
-            },
-            getSaveValue: function() {
-              return Object.toQueryString({ content: editor.getValue() });
-            },
-            getTextValue: function() { return editor.getValue(); },
+      var createSaver = function(info) {
+        if (editorConfig.DEMO_MODE) {
+          return;
+        }
+        // This function displays a message notifying users that there was a merge.
+        Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(
+          toolbar.toolbar.find('.rt-toolbar-rightside'), saverConfig.messages);
+        Saver.setLastSavedContent(editor.getValue());
+        Saver.create({
+          // Id of the Wiki edit mode form.
+          formId: 'edit',
+          setTextValue: function(newText, toConvert, callback) {
+            setValueWithCursor(newText);
+            callback();
+            realtimeOptions.onLocal();
+          },
+          getSaveValue: function() {
+            return Object.toQueryString({content: editor.getValue()});
+          },
+          getTextValue: function() {
+            return editor.getValue();
+          },
+          realtime: info.realtime,
+          userList: info.userList,
+          userName: editorConfig.userName,
+          network: info.network,
+          channel: eventsChannel,
+          demoMode: editorConfig.DEMO_MODE,
+          safeCrash: function(reason, debugLog) {
+            module.onAbort(null, reason, debugLog);
+          }
+        });
+      };
+
+      var realtimeOptions = {
+        // Provide initial state...
+        initialState: editor.getValue() || '',
+        websocketURL: editorConfig.WebsocketURL,
+        userName: editorConfig.userName,
+        // The channel we will communicate over.
+        channel,
+        // The object responsible for encrypting the messages.
+        crypto: Crypto,
+
+        onInit: function(info) {
+          // Create the toolbar.
+          toolbar = Toolbar.create({
+            '$container': $('#xwikieditcontentinner'),
+            myUserName: info.myID,
             realtime: info.realtime,
+            getLag: info.getLag,
             userList: info.userList,
-            userName: userName,
-            network: info.network,
-            channel: eventsChannel,
-            demoMode: DEMO_MODE,
-            safeCrash: function(reason, debugLog) { module.onAbort(null, reason, debugLog); }
-          };
-          Saver.create(saverCreateConfig);
+            config: {userData}
+          });
+        },
+
+        onReady: function(info) {
+          module.chainpad = info.realtime;
+          module.leaveChannel = info.leave;
+
+          // Update the user list to link the wiki name to the user id.
+          userData = UserData.start(info.network, userdataChannel, {
+            myId: info.myId,
+            userName: editorConfig.userName,
+            userAvatar: editorConfig.userAvatarURL,
+            onChange: info.userList.onChange,
+            crypto: Crypto,
+            editor: editorId
+          });
+
+          editor.setValue(module.chainpad.getUserDoc());
+
+          console.log('Unlocking editor');
+          initializing = false;
+          module.setEditable(true);
+
+          this.onLocal();
+          createSaver(info);
+        },
+
+        onRemote: function(info) {
+          if (!initializing) {
+            setValueWithCursor(info.realtime.getUserDoc());
+          }
+        },
+
+        onLocal: function() {
+          if (initializing) {
+            return;
+          }
+
+          // Serialize your DOM into an object.
+          var serializedHyperJSON = canonicalize(editor.getValue());
+
+          module.chainpad.contentUpdate(serializedHyperJSON);
+
+          if (module.chainpad.getUserDoc() !== serializedHyperJSON) {
+            console.error('chainpad.getUserDoc() !== serializedHyperJSON');
+            module.chainpad.contentUpdate(serializedHyperJSON, true);
+          }
+        },
+
+        onAbort: function(info, reason, debug) {
+          console.log("Aborting the session!");
+          module.chainpad.abort();
+          module.leaveChannel();
+          module.aborted = true;
+          Saver.stop();
+          toolbar.failed();
+          toolbar.toolbar.remove();
+          if (typeof userData.leave === 'function') {
+            userData.leave();
+          }
+          // FIXME: I think this condition is always false because we mark the module as aborted above.
+          if ($disallowButton[0].checked && !module.aborted) {
+            ErrorBox.show(reason || 'disconnected', debug);
+          }
+        },
+
+        beforeReconnecting: function (callback) {
+          updateKeys(function() {
+            callback(channel, editor.getValue());
+          });
+        },
+
+        onConnectionChange: function(info) {
+          console.log('Connection status: ' + info.state);
+          toolbar.failed();
+          if (info.state) {
+            ErrorBox.hide();
+            initializing = true;
+            toolbar.reconnecting(info.myId);
+          } else {
+            module.setEditable(false);
+            ErrorBox.show('disconnected');
+          }
         }
       };
 
-      var onRemote = realtimeOptions.onRemote = function (info) {
-        if (initializing) { return; }
-
-        var newValue = info.realtime.getUserDoc();
-        setValueWithCursor(newValue);
-      };
-
-      var onInit = realtimeOptions.onInit = function (info) {
-        // Create the toolbar
-        var $bar = $contentInner;
-        userList = info.userList;
-        var config = {
-          userData: userData
-        };
-        toolbar = Toolbar.create({
-          '$container': $bar,
-          'myUserName': info.myID,
-          'realtime': info.realtime,
-          'getLag': info.getLag,
-          'userList': info.userList,
-          config
-        });
-      };
-
-      var onReady = realtimeOptions.onReady = function (info) {
-        module.chainpad = info.realtime;
-        module.leaveChannel = info.leave;
-        var userDoc = module.chainpad.getUserDoc();
-        myId = info.myId;
-
-        // Update the user list to link the wiki name to the user id
-        var userdataConfig = {
-          myId: info.myId,
-          userName: userName,
-          userAvatar: userAvatar,
-          onChange: userList.onChange,
-          crypto: Crypto,
-          editor: editorId
-        };
-
-        userData = UserData.start(info.network, userdataChannel, userdataConfig);
-
-        editor.setValue(userDoc);
-
-        console.log("Unlocking editor");
-        initializing = false;
-        setEditable(true);
-
-        onLocal();
-        createSaver(info);
-      };
-
-      var onAbort = module.onAbort = realtimeOptions.onAbort = function (info, reason, debug) {
-        console.log("Aborting the session!");
-        var msg = reason || 'disconnected';
-        module.chainpad.abort();
-        module.leaveChannel();
-        module.aborted = true;
-        Saver.stop();
-        toolbar.failed();
-        toolbar.toolbar.remove();
-        if (userData.leave && typeof userData.leave === "function") { userData.leave(); }
-        if($disallowButton[0].checked && !module.aborted) {
-          ErrorBox.show(msg, debug);
-        }
-      };
-
-      var onConnectionChange = realtimeOptions.onConnectionChange = function (info) {
-        console.log("Connection status : "+info.state);
-        toolbar.failed();
-        if (info.state) {
-          ErrorBox.hide();
-          initializing = true;
-          toolbar.reconnecting(info.myId);
-        } else {
-          setEditable(false);
-          ErrorBox.show('disconnected');
-        }
-      };
-
-      var beforeReconnecting = realtimeOptions.beforeReconnecting = function (callback) {
-        updateKeys(function () {
-          callback(channel, editor.getValue());
-        });
-      };
-
-      var onLocal = realtimeOptions.onLocal = function () {
-        if (initializing) { return; }
-
-        // serialize your DOM into an object
-        var shjson = canonicalize(editor.getValue());
-
-        module.chainpad.contentUpdate(shjson);
-
-        if (module.chainpad.getUserDoc() !== shjson) {
-          console.error("chainpad.getUserDoc() !== shjson");
-          module.chainpad.contentUpdate(shjson, true);
-        }
-      };
-
-      var rti = module.realtimeInput = realtimeInput.start(realtimeOptions);
+      module.onAbort = realtimeOptions.onAbort;
+      module.realtimeInput = realtimeInput.start(realtimeOptions);
 
       var onChangeHandler = function() {
-        // We can't destroy the dialog here otherwise sometimes it is impossible to take an action
-        // during a merge conflict :
-        // Saver.destroyDialog();
+        // We can't destroy the dialog here because sometimes it's impossible to take an action during a merge conflict.
         Saver.setLocalEditFlag(true);
-        onLocal();
+        realtimeOptions.onLocal();
       };
       editor.onChange(onChangeHandler);
     };

@@ -46,7 +46,7 @@ export default {
 
   computed: {
     loading () {
-      return this.loadingData || this.loadingLayout;
+      return this.loadingData || this.logic.firstEntriesLoading || this.loadingLayout;
     }
   },
 

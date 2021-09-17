@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-realtime-wikitext-loader', [
+define('xwiki-realtime-wikiEditor-loader', [
   'jquery',
   'xwiki-realtime-config',
   'xwiki-realtime-loader',
@@ -37,7 +37,7 @@ define('xwiki-realtime-wikitext-loader', [
   var lock = Loader.getDocLock();
   var wikiLock = getWikiLock();
 
-  var editorId = 'wikitext', info = {
+  var editorId = 'wiki', info = {
     type: editorId,
     href: '&editor=wiki&force=1',
     name: 'Wiki'
@@ -64,7 +64,7 @@ define('xwiki-realtime-wikitext-loader', [
     } else if (!keysResultEvents) {
       console.error('Missing event keys in the document keys.');
     } else if (!keysResultContent[editorId] || !keysResultEvents['1.0']) {
-      console.error('Missing mandatory "wikitext" key in the document keys.');
+      console.error(`Missing mandatory "${editorId}" key in the document keys.`);
     } else {
       keys[editorId] = keysResultContent[editorId].key;
       keys[editorId + '_users'] = keysResultContent[editorId].users;
@@ -91,7 +91,7 @@ define('xwiki-realtime-wikitext-loader', [
   };
 
   var launchRealtime = function(config, keys) {
-    require(['jquery', 'xwiki-realtime-wikitext'], function ($, RTWiki) {
+    require(['jquery', 'xwiki-realtime-wikiEditor'], function ($, RTWiki) {
       if (RTWiki && RTWiki.main) {
         keys._update = updateKeys;
         RTWiki.main(config, keys);

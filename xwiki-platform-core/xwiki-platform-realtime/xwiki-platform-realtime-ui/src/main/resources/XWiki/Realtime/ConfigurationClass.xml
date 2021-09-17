@@ -20,25 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="RTFrontend.ConfigurationClass" locale="">
-  <web>RTFrontend</web>
+<xwikidoc version="1.4" reference="XWiki.Realtime.ConfigurationClass" locale="">
+  <web>XWiki.Realtime</web>
   <name>ConfigurationClass</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>xwiki:XWiki.WebHome</parent>
+  <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Configuration Class</title>
+  <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content/>
   <class>
-    <name>RTFrontend.ConfigurationClass</name>
+    <name>XWiki.Realtime.ConfigurationClass</name>
     <customClass/>
     <customMapping/>
     <defaultViewSheet/>
@@ -52,9 +52,10 @@
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint>Try to merge the content when saving a document (disable only if it causes issues)</hint>
       <name>enableMerge</name>
       <number>4</number>
-      <prettyName>Try to merge the content when saving a document (disable only if it causes issues)</prettyName>
+      <prettyName>Merge on save</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
@@ -66,9 +67,10 @@
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint>Show on the side of the editing area the avatars of the users that are currently typing</hint>
       <name>marginAvatar</name>
       <number>3</number>
-      <prettyName>Show avatars in the margin (if available)</prettyName>
+      <prettyName>Show editing users</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
@@ -77,13 +79,17 @@
     <toolbarUserlist>
       <cache>0</cache>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>select</displayType>
+      <freeText/>
+      <hint>Show the list of connected users at the top of the editing area</hint>
+      <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>toolbarUserlist</name>
       <number>2</number>
       <picker>0</picker>
-      <prettyName>Connected user list in the toolbar</prettyName>
+      <prettyName>Show connected users</prettyName>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
       <separators>|, </separators>
@@ -92,7 +98,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>name=Display only usernames|avatar=Display only avatars|both=Display usernames and avatars</values>
+      <values>name=Display only user names|avatar=Display only user avatars|both=Display both user names and avatars</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </toolbarUserlist>
     <useGlobalConfig>
@@ -101,9 +107,10 @@
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint>Use the main wiki configuration</hint>
       <name>useGlobalConfig</name>
       <number>1</number>
-      <prettyName>Use the main wiki configuration</prettyName>
+      <prettyName>Global configuration</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>

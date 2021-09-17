@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-realtime-typingTests', function () {
+define('xwiki-realtime-typingTests', function() {
   'use strict';
   var setRandomizedInterval = function(func, target, range) {
     var timeout;

@@ -20,31 +20,40 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="RTFrontend.WebHome" locale="">
-  <web>RTFrontend</web>
-  <name>WebHome</name>
+<xwikidoc version="1.4" reference="XWiki.Realtime.WikiEditor" locale="">
+  <web>XWiki.Realtime</web>
+  <name>WikiEditor</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>xwiki:XWiki.WebHome</parent>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Realtime WebHome</title>
+  <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{info}}This document contains the internal code which makes the realtime editors work.{{/info}}
-</content>
+  <content>{{velocity output="false"}}
+$xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-webjar', 'webjar.bundle.min.css'),
+  {'type': 'text/css', 'rel': 'stylesheet'})
+$xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-wiki-webjar',
+  'webjar.bundle.min.css'), {'type': 'text/css', 'rel': 'stylesheet'})
+## TODO: Load the JavaScript code directly from the WebJar when XWIKI-12788 (Introduce skin extension plugins for webjar
+## resources) gets implemented.
+$xwiki.jsx.use('XWiki.Realtime.WikiEditor')
+{{/velocity}}
+
+{{template name="editors/xdomText.vm"/}}</content>
   <object>
-    <name>RTFrontend.WebHome</name>
+    <name>XWiki.Realtime.WikiEditor</name>
     <number>0</number>
-    <className>RTFrontend.ConfigurationClass</className>
-    <guid>e494f23d-7d7c-4b73-ad77-d91a32053155</guid>
+    <className>XWiki.EditorClass</className>
+    <guid>5f31e270-965a-4bdb-8f78-89173acc7f54</guid>
     <class>
-      <name>RTFrontend.ConfigurationClass</name>
+      <name>XWiki.EditorClass</name>
       <customClass/>
       <customMapping/>
       <defaultViewSheet/>
@@ -52,90 +61,98 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
-      <enableMerge>
-        <customDisplay/>
-        <defaultValue/>
+      <category>
         <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <name>enableMerge</name>
-        <number>4</number>
-        <prettyName>Try to merge the content when saving a document (disable only if it causes issues)</prettyName>
+        <name>category</name>
+        <number>5</number>
+        <prettyName>Category</prettyName>
+        <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </enableMerge>
-      <marginAvatar>
-        <customDisplay/>
-        <defaultValue/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </category>
+      <code>
         <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <name>marginAvatar</name>
+        <editor>Text</editor>
+        <name>code</name>
         <number>3</number>
-        <prettyName>Show avatars in the margin (if available)</prettyName>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </marginAvatar>
-      <toolbarUserlist>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <dataType>
+        <disabled>0</disabled>
+        <name>dataType</name>
+        <number>1</number>
+        <prettyName>Data Type</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </dataType>
+      <icon>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>4</number>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <roleHint>
+        <disabled>0</disabled>
+        <name>roleHint</name>
+        <number>2</number>
+        <prettyName>Role Hint</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </roleHint>
+      <scope>
         <cache>0</cache>
-        <customDisplay/>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
-        <name>toolbarUserlist</name>
-        <number>2</number>
-        <picker>0</picker>
-        <prettyName>Connected user list in the toolbar</prettyName>
+        <name>scope</name>
+        <number>6</number>
+        <prettyName>Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators>|, </separators>
         <size>1</size>
-        <sort>none</sort>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>name=Display only usernames|avatar=Display only avatars|both=Display usernames and avatars</values>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </toolbarUserlist>
-      <useGlobalConfig>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <name>useGlobalConfig</name>
-        <number>1</number>
-        <prettyName>Use the main wiki configuration</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </useGlobalConfig>
+      </scope>
     </class>
     <property>
-      <enableMerge>1</enableMerge>
+      <category>text</category>
     </property>
     <property>
-      <marginAvatar>1</marginAvatar>
+      <code>{{include reference="XWiki.Realtime.WikiEditor" /}}</code>
     </property>
     <property>
-      <toolbarUserlist>both</toolbarUserlist>
+      <dataType>org.xwiki.rendering.syntax.SyntaxContent</dataType>
     </property>
     <property>
-      <useGlobalConfig>1</useGlobalConfig>
+      <icon/>
+    </property>
+    <property>
+      <roleHint>realtime-wiki</roleHint>
+    </property>
+    <property>
+      <scope>wiki</scope>
     </property>
   </object>
   <object>
-    <name>RTFrontend.WebHome</name>
-    <number>0</number>
-    <className>XWiki.ConfigurableClass</className>
-    <guid>ceaf1c43-5341-4adb-8840-b2785a7967b4</guid>
+    <name>XWiki.Realtime.WikiEditor</name>
+    <number>1</number>
+    <className>XWiki.EditorClass</className>
+    <guid>056f6e46-a71a-4656-9f6e-ec723b98e786</guid>
     <class>
-      <name>XWiki.ConfigurableClass</name>
+      <name>XWiki.EditorClass</name>
       <customClass/>
       <customMapping/>
       <defaultViewSheet/>
@@ -143,246 +160,96 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
-      <categoryIcon>
-        <customDisplay/>
+      <category>
         <disabled>0</disabled>
-        <hint/>
-        <name>categoryIcon</name>
-        <number>11</number>
-        <picker>0</picker>
-        <prettyName>categoryIcon</prettyName>
+        <name>category</name>
+        <number>5</number>
+        <prettyName>Category</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </categoryIcon>
-      <codeToExecute>
-        <contenttype>VelocityWiki</contenttype>
-        <customDisplay/>
+      </category>
+      <code>
         <disabled>0</disabled>
-        <editor>---</editor>
-        <hint/>
-        <name>codeToExecute</name>
-        <number>7</number>
-        <picker>0</picker>
-        <prettyName>codeToExecute</prettyName>
-        <rows>5</rows>
+        <editor>Text</editor>
+        <name>code</name>
+        <number>3</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </codeToExecute>
-      <configurationClass>
-        <cache>0</cache>
-        <classname/>
-        <customDisplay/>
-        <defaultValue/>
+      </code>
+      <dataType>
         <disabled>0</disabled>
-        <displayType>input</displayType>
-        <freeText/>
-        <hint/>
-        <idField/>
+        <name>dataType</name>
+        <number>1</number>
+        <prettyName>Data Type</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </dataType>
+      <icon>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>4</number>
+        <prettyName>Icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <roleHint>
+        <disabled>0</disabled>
+        <name>roleHint</name>
+        <number>2</number>
+        <prettyName>Role Hint</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </roleHint>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
         <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
-        <name>configurationClass</name>
-        <number>3</number>
-        <picker>1</picker>
-        <prettyName>configurationClass</prettyName>
+        <name>scope</name>
+        <number>6</number>
+        <prettyName>Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators/>
-        <size>30</size>
-        <sort>none</sort>
-        <sql/>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <valueField/>
-        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
-      </configurationClass>
-      <configureGlobally>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <hint/>
-        <name>configureGlobally</name>
-        <number>4</number>
-        <prettyName>configureGlobally</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </configureGlobally>
-      <displayBeforeCategory>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>displayBeforeCategory</name>
-        <number>10</number>
-        <picker>0</picker>
-        <prettyName>displayBeforeCategory</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </displayBeforeCategory>
-      <displayInCategory>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>displayInCategory</name>
-        <number>9</number>
-        <picker>0</picker>
-        <prettyName>displayInCategory</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </displayInCategory>
-      <displayInSection>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>displayInSection</name>
-        <number>1</number>
-        <picker>0</picker>
-        <prettyName>displayInSection</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </displayInSection>
-      <heading>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>heading</name>
-        <number>2</number>
-        <picker>0</picker>
-        <prettyName>heading</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </heading>
-      <iconAttachment>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>iconAttachment</name>
-        <number>8</number>
-        <picker>0</picker>
-        <prettyName>iconAttachment</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </iconAttachment>
-      <linkPrefix>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>linkPrefix</name>
-        <number>5</number>
-        <picker>0</picker>
-        <prettyName>linkPrefix</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </linkPrefix>
-      <propertiesToShow>
-        <cache>0</cache>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <freeText/>
-        <hint/>
-        <largeStorage>0</largeStorage>
-        <multiSelect>1</multiSelect>
-        <name>propertiesToShow</name>
-        <number>6</number>
-        <picker>0</picker>
-        <prettyName>propertiesToShow</prettyName>
-        <relationalStorage>1</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>20</size>
-        <sort>none</sort>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values/>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </propertiesToShow>
-      <sectionOrder>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>sectionOrder</name>
-        <number>12</number>
-        <numberType>integer</numberType>
-        <prettyName>sectionOrder</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-      </sectionOrder>
+      </scope>
     </class>
     <property>
-      <categoryIcon/>
+      <category>text</category>
     </property>
     <property>
-      <codeToExecute>#set ($discard = $xwiki.jsx.use('RTFrontend.WebHome'))</codeToExecute>
+      <code>{{include reference="XWiki.Realtime.WikiEditor" /}}</code>
     </property>
     <property>
-      <configurationClass>RTFrontend.ConfigurationClass</configurationClass>
+      <dataType>org.xwiki.rendering.block.XDOM</dataType>
     </property>
     <property>
-      <configureGlobally>1</configureGlobally>
+      <icon/>
     </property>
     <property>
-      <displayBeforeCategory/>
+      <roleHint>realtime-wiki</roleHint>
     </property>
     <property>
-      <displayInCategory/>
-    </property>
-    <property>
-      <displayInSection>Realtime Editors</displayInSection>
-    </property>
-    <property>
-      <heading>Commons</heading>
-    </property>
-    <property>
-      <iconAttachment/>
-    </property>
-    <property>
-      <linkPrefix/>
-    </property>
-    <property>
-      <propertiesToShow/>
-    </property>
-    <property>
-      <sectionOrder/>
+      <scope>wiki</scope>
     </property>
   </object>
   <object>
-    <name>RTFrontend.WebHome</name>
+    <name>XWiki.Realtime.WikiEditor</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
-    <guid>21a44d03-8679-493a-8408-8ae799a82faf</guid>
+    <guid>3ab613d2-29d0-4f94-8edd-0ea434ef157b</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -465,19 +332,9 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function ($) {
-  var form = $('#realtime\\ editors_RTFrontend\\.WebHome');
-  if (XWiki.mainWiki === XWiki.currentWiki) {
-    form.find('dt:first').hide();
-    return;
-  }
-  var onChange = function () {
-    var useGlobal = $(this).prop('checked');
-    form.find('input:visible, textarea:visible, select:visible').prop('disabled', useGlobal);
-    $(this).prop('disabled', false);
-  };
-  $('#RTFrontend\\.WebHome_RTFrontend\\.ConfigurationClass_0_useGlobalConfig').change(onChange).trigger('change');
-});</code>
+      <code>// TODO: Drop this JSX when XWIKI-12788 (Introduce skin extension plugins for webjar resources) gets implemented. We use
+// it only to load JavaScript code of the real-time Wiki Editor from the WebJar.
+require(['xwiki-realtime-wikiEditor-loader'], function() {});</code>
     </property>
     <property>
       <name/>
@@ -490,10 +347,10 @@
     </property>
   </object>
   <object>
-    <name>RTFrontend.WebHome</name>
+    <name>XWiki.Realtime.WikiEditor</name>
     <number>0</number>
     <className>XWiki.UIExtensionClass</className>
-    <guid>7d75c87f-14d2-4d68-9b96-7e7fbc4dcaaf</guid>
+    <guid>1fd7aea3-aecc-4683-8839-d457945ad6f2</guid>
     <class>
       <name>XWiki.UIExtensionClass</name>
       <customClass/>
@@ -613,46 +470,17 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content>{{velocity}}
-{{html clean="false"}}
-#set ($configRef = $services.model.resolveDocument('RTFrontend.WebHome'))
-#set ($configObj = $xwiki.getDocument($configRef).getObject('RTFrontend.ConfigurationClass'))
-#if ("$!configObj.getValue('useGlobalConfig')" != '0' &amp;&amp; !$xcontext.isMainWiki())
-    #set ($configRef = $services.model.createDocumentReference($xcontext.mainWikiName, 'RTFrontend', 'WebHome'))
-    #set ($configObj = $xwiki.getDocument($configRef).getObject('RTFrontend.ConfigurationClass'))
-#end
-#getUserAvatarURL($xcontext.userReference $avatarURL 120)
-## FIXME: This is not consistent with the Version service (time vs. versionTime).
-#set ($config = {
-  'webSocketURL': $services.websocket.url('netflux'),
-  'user': {
-    'name': $xwiki.getUserName($xcontext.user, false),
-    'avatarURL': $avatarURL.url,
-    'advanced': $isAdvancedUser
-  },
-  'versionInfo': {
-    'version': $tdoc.version,
-    'locale': $tdoc.realLocale,
-    'time': $tdoc.date.time
-  },
-  'toolbarUserlist': $configObj.getValue('toolbarUserlist'),
-  'marginAvatar': $configObj.getValue('marginAvatar'),
-  'enableMerge': $configObj.getValue('enableMerge'),
-  'demoMode': $stringtool.equals($request.demoMode, 'true')
-})
-&lt;script id="realtime-config" type="application/json"&gt;$jsontool.serialize($config).replace(
-  '&lt;', '\u003C')&lt;/script&gt;
-{{/html}}
-{{/velocity}}</content>
+      <content/>
     </property>
     <property>
-      <extensionPointId>org.xwiki.platform.template.header.after</extensionPointId>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
     </property>
     <property>
-      <name>header.rtfrontend.getVersion</name>
+      <name>org.xwiki.platform.requirejs.module.realtime.wikieditor.loader</name>
     </property>
     <property>
-      <parameters/>
+      <parameters>id=xwiki-realtime-wikiEditor-loader
+path=$services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-wiki-webjar', 'webjar.bundle.min.js')</parameters>
     </property>
     <property>
       <scope>wiki</scope>

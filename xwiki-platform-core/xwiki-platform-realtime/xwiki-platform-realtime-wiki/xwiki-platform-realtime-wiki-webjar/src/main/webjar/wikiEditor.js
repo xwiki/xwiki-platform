@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-realtime-wikitext', [
+define('xwiki-realtime-wikiEditor', [
   'xwiki-realtime-config',
   'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
@@ -42,7 +42,7 @@ define('xwiki-realtime-wikitext', [
     return text.replace(/\r\n/g, '\n');
   };
 
-  var module = {}, editorId = 'wikitext';
+  var module = {}, editorId = 'wiki';
 
   module.main = function(editorConfig, docKeys) {
     var saverConfig = $.extend(editorConfig.saverConfig, {

@@ -17,18 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal;
+package org.xwiki.notifications.preferences.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceAddOrUpdatedEvent;
-import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceDeletedEvent;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceAddedEvent;
+import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceDeletedEvent;
+import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceUpdatedEvent;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
@@ -48,41 +47,26 @@ public class CachedModelBridgeInvalidatorListener extends AbstractEventListener
     /**
      * The name of the listener.
      */
-    public static final String NAME = "org.xwiki.notifications.filters.internal.CachedModelBridgeInvalidatorListener";
+    public static final String NAME =
+        "org.xwiki.notifications.preferences.internal.CachedModelBridgeInvalidatorListener";
 
     @Inject
     @Named("cached")
     private ModelBridge bridge;
-
-    @Inject
-    private DocumentReferenceResolver<String> resolver;
 
     /**
      * The default constructor.
      */
     public CachedModelBridgeInvalidatorListener()
     {
-        super(NAME, new NotificationFilterPreferenceAddOrUpdatedEvent(),
-            new NotificationFilterPreferenceDeletedEvent());
+        super(NAME, new NotificationPreferenceAddedEvent(), new NotificationPreferenceUpdatedEvent(),
+            new NotificationPreferenceDeletedEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (source instanceof DefaultNotificationFilterPreference) {
-            DefaultNotificationFilterPreference preferences = (DefaultNotificationFilterPreference) source;
-
-            String owner = preferences.getOwner();
-
-            if (owner != null) {
-                if (StringUtils.contains(owner, ':')) {
-                    // Assume it's a document reference
-                    ((CachedModelBridge) this.bridge).invalidatePreferencefilter(this.resolver.resolve(owner));
-                } else {
-                    // Assume it's a wiki reference
-                    ((CachedModelBridge) this.bridge).invalidatePreferencefilter(new WikiReference(owner));
-                }
-            }
-        }
+        // Assume it's a wiki reference
+        ((CachedModelBridge) this.bridge).invalidatePreference((EntityReference) source);
     }
 }

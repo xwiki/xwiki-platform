@@ -52,39 +52,30 @@ define('xwiki-realtime-wikitext-loader', [
   };
 
   var parseKeyData = function(config, keysResultDoc) {
-    var keys = {};
-    var keysResult = keysResultDoc[config.reference];
+    var keys = {},
+      keysResult = keysResultDoc[config.reference],
+      keysResultContent = keysResult[config.language + '/content'],
+      keysResultEvents = keysResult[config.language + '/events'];
+
     if (!keysResult) {
       console.error('Unexpected error with the document keys.');
-      return keys;
-    }
-
-    var keysResultContent = keysResult[config.language + '/content'];
-    if (!keysResultContent) {
+    } else if (!keysResultContent) {
       console.error('Missing content keys in the document keys.');
-      return keys;
-    }
-
-    var keysResultEvents = keysResult[config.language + '/events'];
-    if (!keysResultEvents) {
-      console.error('Missing event keys in the document keys');
-      return keys;
-    }
-
-    if (keysResultContent[editorId] && keysResultEvents['1.0']) {
+    } else if (!keysResultEvents) {
+      console.error('Missing event keys in the document keys.');
+    } else if (!keysResultContent[editorId] || !keysResultEvents['1.0']) {
+      console.error('Missing mandatory "wikitext" key in the document keys.');
+    } else {
       keys[editorId] = keysResultContent[editorId].key;
       keys[editorId + '_users'] = keysResultContent[editorId].users;
       keys.events = keysResultEvents['1.0'].key;
       keys.userdata = keysResultEvents.userdata.key;
-    } else {
-      console.error('Missing mandatory "wikitext" key in the document keys.');
-      return keys;
-    }
 
-    keys.active = {};
-    for (var key in keysResultContent) {
-      if (key !== editorId && keysResultContent[key].users > 0) {
-        keys.active[key] = keysResultContent[key];
+      keys.active = {};
+      for (var key in keysResultContent) {
+        if (key !== editorId && keysResultContent[key].users > 0) {
+          keys.active[key] = keysResultContent[key];
+        }
       }
     }
 

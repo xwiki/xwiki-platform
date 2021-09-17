@@ -123,4 +123,9 @@ public class CachedModelBridge implements ModelBridge, Initializable
     {
         this.modelBridge.saveNotificationsPreferences(userReference, notificationPreferences);
     }
+
+    void invalidatePreference(EntityReference reference)
+    {
+        this.preferenceCache.remove(reference);
+    }
 }

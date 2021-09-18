@@ -243,7 +243,7 @@ We were unable to update the WYSIWYG editor with the merged content.
   var errorMessages = {};
   // FIXME: Load the error messages in a separate request instead of including them in the JavaScript code (which
   // prevents the code from being cached and also creates problems if we want to translate the error messages).
-  $('&lt;div/&gt;').html(PAGE_CONTENT).find('div.hidden &gt; div[class^="realtime-"]').forEach(function() {
+  $('&lt;div/&gt;').html(PAGE_CONTENT).find('div.hidden &gt; div[class^="realtime-"]').each(function() {
     errorMessages[this.className.substring('realtime-'.length)] = this;
   });
 

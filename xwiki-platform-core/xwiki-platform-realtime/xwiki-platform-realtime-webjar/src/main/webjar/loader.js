@@ -135,8 +135,7 @@ define('xwiki-realtime-loader', [
       url: path,
       data: 'data=' + encodeURIComponent(JSON.stringify(editorData)),
       type: 'POST'
-    }).done(function(dataText) {
-      var data = JSON.parse(dataText);
+    }).done(function(data) {
       if (data.error) {
         console.error("You don't have permissions to edit that document.");
         return;

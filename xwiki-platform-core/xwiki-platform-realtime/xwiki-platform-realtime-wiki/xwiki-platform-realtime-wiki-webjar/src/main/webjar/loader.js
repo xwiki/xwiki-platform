@@ -129,7 +129,7 @@ define('xwiki-realtime-wikiEditor-loader', [
   }
 
   var displayButtonModal = function() {
-    var button;
+    var button = $();
     if ($('.realtime-button-rtwiki').length) {
       button = $('<button class="btn btn-success"/>').text(Loader.messages.get('redirectDialog.join', 'Wiki'));
       $('.realtime-button-rtwiki').prepend(button).prepend('<br/>');

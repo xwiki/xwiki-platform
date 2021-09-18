@@ -36,17 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity output="false"}}
-$xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-webjar', 'webjar.bundle.min.css'),
-  {'type': 'text/css', 'rel': 'stylesheet'})
-$xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-wiki-webjar',
-  'webjar.bundle.min.css'), {'type': 'text/css', 'rel': 'stylesheet'})
-## TODO: Load the JavaScript code directly from the WebJar when XWIKI-12788 (Introduce skin extension plugins for webjar
-## resources) gets implemented.
-$xwiki.jsx.use('XWiki.Realtime.WikiEditor')
-{{/velocity}}
-
-{{template name="editors/xdomText.vm"/}}</content>
+  <content>{{velocity}}
+#if ($edit)
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-webjar',
+    'webjar.bundle.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-wiki-webjar',
+    'webjar.bundle.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+  ## TODO: Load the JavaScript code directly from the WebJar when XWIKI-12788 (Introduce skin extension plugins for
+  ## webjar resources) gets implemented.
+  #set ($discard = $xwiki.jsx.use('XWiki.Realtime.WikiEditor'))
+  {{template name="editors/xdomText.vm"/}}
+#end
+{{/velocity}}</content>
   <object>
     <name>XWiki.Realtime.WikiEditor</name>
     <number>0</number>
@@ -131,7 +132,7 @@ $xwiki.jsx.use('XWiki.Realtime.WikiEditor')
       <category>text</category>
     </property>
     <property>
-      <code>{{include reference="XWiki.Realtime.WikiEditor" /}}</code>
+      <code>{{include reference="XWiki.Realtime.WikiEditor"/}}</code>
     </property>
     <property>
       <dataType>org.xwiki.rendering.syntax.SyntaxContent</dataType>
@@ -230,7 +231,7 @@ $xwiki.jsx.use('XWiki.Realtime.WikiEditor')
       <category>text</category>
     </property>
     <property>
-      <code>{{include reference="XWiki.Realtime.WikiEditor" /}}</code>
+      <code>{{include reference="XWiki.Realtime.WikiEditor"/}}</code>
     </property>
     <property>
       <dataType>org.xwiki.rendering.block.XDOM</dataType>

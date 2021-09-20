@@ -30,5 +30,5 @@
     ## Point at '#mainContentArea' which is present in all pages that include "startpage.vm"
     #set ($targetNav = '#mainContentArea')
   #end
-  <a class="btn btn-default" href="$targetNav">$services.localization.render('skipTo.content')</a>
+  <a class="btn btn-default" href="$targetNav">$services.localization.render('skin.skipnav.links.content.title')</a>
 </div>

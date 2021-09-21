@@ -184,6 +184,22 @@
                   <old>method java.lang.String com.xpn.xwiki.api.XWiki::invokeServletAndReturnAsString(java.lang.String)</old>
                   <justification>Not a breackage. Moved to legacy.</justification>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method boolean org.xwiki.filter.instance.input.InstanceInputProperties::isVerbose()</old>
+                  <new>method boolean org.xwiki.filter.instance.input.InstanceInputProperties::isVerbose()</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyDescription("Indicate if the filter should produce verbose log")</annotation>
+                  <justification>Not a breackage</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method boolean org.xwiki.filter.instance.input.InstanceInputProperties::isVerbose()</old>
+                  <new>method boolean org.xwiki.filter.instance.input.InstanceInputProperties::isVerbose()</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyName("Verbose")</annotation>
+                  <justification>Not a breackage</justification>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

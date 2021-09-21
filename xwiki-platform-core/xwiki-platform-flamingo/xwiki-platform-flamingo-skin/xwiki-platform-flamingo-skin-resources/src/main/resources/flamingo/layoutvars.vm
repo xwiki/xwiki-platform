@@ -135,7 +135,7 @@
 #set($displayPageHeader = false) ## page header containing the logo and the banner taken from ColorTheme
 #set ($displayQuickSearch = true)
 
-## the language choice only makes sense when a doc is declared.
+## The language choice only makes sense when a doc is declared.
 #set ($displayLanguageChoice = $docIsDefined)
 
 #if ($xcontext.action=='preview')

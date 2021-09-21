@@ -106,11 +106,17 @@ export default {
   watch: {
     iconDescriptor: {
       async handler(iconDescriptor) {
-        if (this.isImage || this.isFont) {
+        // If the new icon descriptor already has an icon type, we consider it is not needed to fetch its metadata
+        // remotely. The remote icon descriptor is set to undefined and the iconDescriptor prop value are directly used
+        // to render the icon.
+        const iconSetType = iconDescriptor?.iconSetType
+        if (iconSetType === 'IMAGE' || iconSetType === 'FONT') {
+          this.remoteIconDescriptor = undefined
           return;
         }
         const iconName = iconDescriptor?.name;
         if (!iconName) {
+          this.remoteIconDescriptor = undefined
           return;
         }
         // If the icon was not already fetched, fetch it!

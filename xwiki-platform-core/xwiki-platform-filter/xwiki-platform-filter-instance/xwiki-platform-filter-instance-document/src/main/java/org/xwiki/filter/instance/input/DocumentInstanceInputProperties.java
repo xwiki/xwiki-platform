@@ -162,6 +162,8 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
      * @return the attachments for which to generate content events
      * @since 13.8RC1
      */
+    @PropertyName("Content of attachments")
+    @PropertyDescription("The attchments names for which to generate events")
     public Set<String> getAttachmentsContent()
     {
         return this.attachmentsContent != null ? this.attachmentsContent : Collections.emptySet();

@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 12.9RC1
  */
 @UITest
-public class PageTemplatesIT
+class PageTemplatesIT
 {
     /**
      * Name of the template.
@@ -69,7 +69,7 @@ public class PageTemplatesIT
      */
     @Test
     @Order(1)
-    public void createPagesFromTemplate(TestUtils setup, TestReference testReference) throws Exception
+    void createPagesFromTemplate(TestUtils setup, TestReference testReference) throws Exception
     {
         // Step 0: Setup the correct environment for the test
 
@@ -208,7 +208,7 @@ public class PageTemplatesIT
      */
     @Test
     @Order(2)
-    public void createExistingPageAndSpace(TestUtils setup, TestReference testReference) throws Exception
+    void createExistingPageAndSpace(TestUtils setup, TestReference testReference) throws Exception
     {
         // Step 0: Setup the correct environment for the test
 
@@ -289,7 +289,7 @@ public class PageTemplatesIT
      */
     @Test
     @Order(3)
-    public void createPageWithSaveAndEditTemplate(TestUtils setup, TestReference testReference) throws Exception
+    void createPageWithSaveAndEditTemplate(TestUtils setup, TestReference testReference) throws Exception
     {
         cleanUp(setup, testReference);
 

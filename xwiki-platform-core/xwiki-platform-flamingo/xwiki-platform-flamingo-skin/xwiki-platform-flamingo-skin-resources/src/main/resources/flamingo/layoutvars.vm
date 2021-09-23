@@ -119,6 +119,9 @@
  #end
 #end
 
+## Check that the doc velocity variable is defined: it might not be the case when using some resource handlers.
+#set ($docIsDefined = ($doc != $NULL))
+
 #set($displayContentMenu = true) ## menu on the top of the page with create/edit/more actions
 #set($displayCreateMenu = true) ## create menu
 #set($displayEditMenu = true) ## edit menu
@@ -131,7 +134,9 @@
 #set($displayShortcuts = true)
 #set($displayPageHeader = false) ## page header containing the logo and the banner taken from ColorTheme
 #set ($displayQuickSearch = true)
-#set ($displayLanguageChoice = true)
+
+## The language choice only makes sense when a doc is declared.
+#set ($displayLanguageChoice = $docIsDefined)
 
 #if ($xcontext.action=='preview')
   #set($displayContentMenu = false)

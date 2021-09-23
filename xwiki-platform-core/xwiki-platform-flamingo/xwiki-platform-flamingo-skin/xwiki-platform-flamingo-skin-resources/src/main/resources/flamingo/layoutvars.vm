@@ -120,7 +120,7 @@
 #end
 
 ## Check that the doc velocity variable is defined: it might not be the case when using some resource handlers.
-#set ($docIsDefined = ("$!doc" != ''))
+#set ($docIsDefined = ($doc != $NULL))
 
 #set($displayContentMenu = true) ## menu on the top of the page with create/edit/more actions
 #set($displayCreateMenu = true) ## create menu

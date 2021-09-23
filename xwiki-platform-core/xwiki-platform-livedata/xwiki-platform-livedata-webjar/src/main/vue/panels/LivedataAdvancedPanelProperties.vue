@@ -37,7 +37,7 @@
   >
     <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
-      <span class="fa fa-list-ul"></span>
+      <XWikiIcon :icon-descriptor="{name: 'list-bullets'}"/>
       {{ $t('livedata.panel.properties.title') }}
     </template>
 
@@ -92,12 +92,14 @@
 import LivedataBaseAdvancedPanel from "./LivedataBaseAdvancedPanel.vue";
 import XWikiDraggable from "../utilities/XWikiDraggable.vue";
 import XWikiDraggableItem from "../utilities/XWikiDraggableItem.vue";
+import XWikiIcon from "../utilities/XWikiIcon";
 
 export default {
 
   name: "LivedataAdvancedPanelProperties",
 
   components: {
+    XWikiIcon,
     LivedataBaseAdvancedPanel,
     XWikiDraggable,
     XWikiDraggableItem,

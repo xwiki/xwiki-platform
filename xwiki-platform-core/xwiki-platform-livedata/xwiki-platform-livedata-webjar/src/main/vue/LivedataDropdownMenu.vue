@@ -41,7 +41,7 @@
       aria-expanded="true"
       role="button"
     >
-      <span class="fa fa-ellipsis-v"></span>
+      <XWikiIcon :icon-descriptor="{name: 'more-vertical'}" />
     </a>
 
     <!-- Drowpdown body -->
@@ -53,7 +53,8 @@
       <li>
         <!-- Refresh -->
         <a href="#" @click.prevent="logic.updateEntries()">
-          <span class="fa fa-repeat"></span> {{ $t('livedata.action.refresh') }}
+          <XWikiIcon :icon-descriptor="{name: 'repeat'}" /> 
+          {{ $t('livedata.action.refresh') }}
         </a>
       </li>
 
@@ -85,21 +86,21 @@
       <!-- Properties Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'propertiesPanel')">
-          <span class="fa fa-list-ul"></span> {{ $t('livedata.dropdownMenu.panels.properties') }}
+          <XWikiIcon :icon-descriptor="{name: 'list-bullets'}" /> {{ $t('livedata.dropdownMenu.panels.properties') }}
         </a>
       </li>
 
       <!-- Sort Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'sortPanel')">
-          <span class="fa fa-sort"></span> {{ $t('livedata.dropdownMenu.panels.sort') }}
+          <XWikiIcon :icon-descriptor="{name: 'table_sort'}"/> {{ $t('livedata.dropdownMenu.panels.sort') }}
         </a>
       </li>
 
       <!-- Filter Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'filterPanel')">
-          <span class="fa fa-filter"></span> {{ $t('livedata.dropdownMenu.panels.filter') }}
+          <XWikiIcon :icon-descriptor="{name: 'filter'}"/> {{ $t('livedata.dropdownMenu.panels.filter') }}
         </a>
       </li>
 

@@ -38,7 +38,7 @@
   >
     <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
-      <span class="fa fa-sort"></span>
+      <XWikiIcon :icon-descriptor="{name: 'table_sort'}"/>
       {{ $t('livedata.panel.sort.title') }}
     </template>
 
@@ -96,7 +96,7 @@
             @click.prevent="logic.removeSort(sortEntry.property)"
             :title="$t('livedata.panel.sort.delete')"
           >
-            <span class="fa fa-trash-o"></span>
+            <XWikiIcon :icon-descriptor="{name: 'trash'}" />
           </a>
         </XWikiDraggableItem>
       </XWikiDraggable>
@@ -146,12 +146,14 @@
 import LivedataBaseAdvancedPanel from "./LivedataBaseAdvancedPanel.vue";
 import XWikiDraggable from "../utilities/XWikiDraggable.vue";
 import XWikiDraggableItem from "../utilities/XWikiDraggableItem.vue";
+import XWikiIcon from "../utilities/XWikiIcon";
 
 export default {
 
   name: "LivedataAdvancedPanelSort",
 
   components: {
+    XWikiIcon,
     LivedataBaseAdvancedPanel,
     XWikiDraggable,
     XWikiDraggableItem,

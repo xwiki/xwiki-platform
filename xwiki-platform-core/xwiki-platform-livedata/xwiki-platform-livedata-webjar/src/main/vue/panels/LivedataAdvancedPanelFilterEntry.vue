@@ -62,7 +62,7 @@
       @click.prevent="logic.removeFilter(propertyId, filterIndex)"
       :title="$t('livedata.panel.filter.delete')"
     >
-      <span class="fa fa-trash-o"></span>
+      <XWikiIcon :icon-descriptor="{name: 'trash'}"/>
     </a>
 
   </div>
@@ -71,6 +71,7 @@
 
 <script>
 import LivedataFilter from "../filters/LivedataFilter.vue";
+import XWikiIcon from "../utilities/XWikiIcon";
 
 export default {
 
@@ -78,6 +79,7 @@ export default {
 
   components: {
     LivedataFilter,
+    XWikiIcon
   },
 
   inject: ["logic"],

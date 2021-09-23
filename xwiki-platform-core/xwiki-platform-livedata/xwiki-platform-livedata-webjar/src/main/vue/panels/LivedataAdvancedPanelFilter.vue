@@ -40,7 +40,7 @@
   >
     <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
-      <span class="fa fa-filter"></span>
+      <XWikiIcon :icon-descriptor="{name: 'filter'}"/>
       {{ $t('livedata.panel.filter.title')}}
     </template>
 
@@ -78,7 +78,7 @@
             @click.prevent="logic.removeAllFilters(filterGroup.property)"
             :title="$t('livedata.panel.filter.deleteAll')"
           >
-            <span class="fa fa-trash-o"></span>
+            <XWikiIcon :icon-descriptor="{name: 'trash'}"/>
           </a>
         </div>
 
@@ -179,12 +179,14 @@ import LivedataBaseAdvancedPanel from "./LivedataBaseAdvancedPanel.vue";
 import LivedataAdvancedPanelFilterEntry from "./LivedataAdvancedPanelFilterEntry.vue";
 import XWikiDraggable from "../utilities/XWikiDraggable.vue";
 import XWikiDraggableItem from "../utilities/XWikiDraggableItem.vue";
+import XWikiIcon from "../utilities/XWikiIcon";
 
 export default {
 
   name: "LivedataAdvancedPanelFilter",
 
   components: {
+    XWikiIcon,
     LivedataBaseAdvancedPanel,
     LivedataAdvancedPanelFilterEntry,
     XWikiDraggable,

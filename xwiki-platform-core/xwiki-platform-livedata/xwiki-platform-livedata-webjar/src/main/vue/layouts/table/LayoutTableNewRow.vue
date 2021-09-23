@@ -45,7 +45,7 @@
         href="#"
         @click.prevent="logic.addEntry()"
       >
-        <span class="fa fa-plus-circle"></span>
+        <XWikiIcon :icon-descriptor="{name: 'add'}"/>
         {{ $t('livedata.action.addEntry') }}
       </a>
     </td>
@@ -55,9 +55,13 @@
 
 
 <script>
+import XWikiIcon from "../../utilities/XWikiIcon";
+
 export default {
 
   name: "LayoutTableNewRow",
+
+  components: {XWikiIcon},
 
   inject: ["logic"],
 

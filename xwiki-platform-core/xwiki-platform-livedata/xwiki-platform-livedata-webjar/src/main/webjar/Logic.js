@@ -105,7 +105,10 @@ define('xwiki-livedata', [
   const Logic = function (element) {
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-config") || "{}");
-    this.data.entries = Object.freeze(this.data.entries);
+    if(this.data.entries) {
+      // Calling Object.freeze(undefined) on IE11 triggers an exception. 
+      this.data.entries = Object.freeze(this.data.entries);
+    }
     // Fetch the data if we don't have any. This call must be made as soon as possible to display the data to the user
     // early.
     // We use a dedicated field for the first load as the fetch start/end events can be triggered before the loader 
@@ -526,7 +529,12 @@ define('xwiki-livedata', [
     updateEntries () {
       return this.fetchEntries()
         .then(data => {
-          this.data.data = Object.freeze(data)
+          if(data) {
+            // Calling Object.freeze(undefined) on IE11 triggers an exception.
+            this.data.data = Object.freeze(data);
+          } else {
+            this.data.data = undefined;
+          }
           // Remove the outdated footnotes, they will be recomputed by the new entries.
           this.footnotes.reset()
         })

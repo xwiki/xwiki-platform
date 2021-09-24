@@ -203,7 +203,15 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
             new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)),
                 this.renderingContext.getDefaultSyntax(), this.renderingContext.isRestricted());
 
-        transformationContext.setId(this.transformationId);
+        // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally
+        // by Velocity as a cache index key for caching macros.
+        String tId = this.renderingContext.getTransformationId();
+        if (tId == null) {
+            // We need to set a top level id (otherwise Velocity macros won't be able to share vmacros for example)
+            tId = this.template.getId() != null ? this.template.getId() : "unknown namespace";
+        }
+        transformationContext.setId(tId);
+
         transformationContext.setTargetSyntax(this.targetSyntax);
 
         transform(block, transformationContext);

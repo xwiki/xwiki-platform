@@ -36,8 +36,9 @@ import org.xwiki.observation.event.Event;
  * A listener used to invalidate the notification event cache when a new event is stored.
  * 
  * @version $Id$
- * @since 10.11.4
- * @since 11.2
+ * @since 13.4.4
+ * @since 12.10.10
+ * @since 13.8RC1
  */
 @Component
 @Singleton

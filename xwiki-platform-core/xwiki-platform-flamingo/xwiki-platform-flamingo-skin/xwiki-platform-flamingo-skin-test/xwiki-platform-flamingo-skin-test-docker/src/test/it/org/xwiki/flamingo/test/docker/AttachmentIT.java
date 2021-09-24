@@ -53,11 +53,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     // Add the FileUploadPlugin which is needed by the test to upload attachment files
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
 })
-public class AttachmentIT
+class AttachmentIT
 {
-    private static String firstAttachment = "SmallAttachment.txt";
-    private static String secondAttachment = "SmallAttachment2.txt";
-    private static String imageAttachment = "image.gif";
+    private static final String FIRST_ATTACHMENT = "SmallAttachment.txt";
+    private static final String SECOND_ATTACHMENT = "SmallAttachment2.txt";
+    private static final String IMAGE_ATTACHMENT = "image.gif";
 
     @BeforeAll
     public void setup(TestUtils setup)
@@ -75,33 +75,34 @@ public class AttachmentIT
      */
     @Test
     @Order(1)
-    public void uploadAttachments(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    void uploadAttachments(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
     {
         String testPageName = setup.serializeReference(testReference).split(":")[1];
+        setup.deletePage(testReference);
         ViewPage viewPage = setup.createPage(testReference, "", "");
         AttachmentsPane attachmentsPane = viewPage.openAttachmentsDocExtraPane();
 
         // Upload two attachments and check them
-        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, firstAttachment).getAbsolutePath());
-        attachmentsPane.waitForUploadToFinish(firstAttachment);
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, FIRST_ATTACHMENT).getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish(FIRST_ATTACHMENT);
         attachmentsPane.clickHideProgress();
-        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, secondAttachment).getAbsolutePath());
-        attachmentsPane.waitForUploadToFinish(secondAttachment);
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, SECOND_ATTACHMENT).getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish(SECOND_ATTACHMENT);
         attachmentsPane.clickHideProgress();
         assertEquals(2, attachmentsPane.getNumberOfAttachments());
-        assertTrue(attachmentsPane.attachmentExistsByFileName(firstAttachment));
-        assertTrue(attachmentsPane.attachmentExistsByFileName(secondAttachment));
-        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment(firstAttachment));
-        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment(secondAttachment));
+        assertTrue(attachmentsPane.attachmentExistsByFileName(FIRST_ATTACHMENT));
+        assertTrue(attachmentsPane.attachmentExistsByFileName(SECOND_ATTACHMENT));
+        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment(FIRST_ATTACHMENT));
+        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment(SECOND_ATTACHMENT));
 
         String attachmentURLScheme = String.format("%sdownload/%s/%%s?rev=1.1", setup.getBaseBinURL(),
             testPageName.replace('.', '/'));
-        assertEquals(String.format(attachmentURLScheme, firstAttachment),
-            attachmentsPane.getAttachmentLink(firstAttachment).getAttribute("href"));
-        assertEquals(String.format(attachmentURLScheme, secondAttachment),
-            attachmentsPane.getAttachmentLink(secondAttachment).getAttribute("href"));
+        assertEquals(String.format(attachmentURLScheme, FIRST_ATTACHMENT),
+            attachmentsPane.getAttachmentLink(FIRST_ATTACHMENT).getAttribute("href"));
+        assertEquals(String.format(attachmentURLScheme, SECOND_ATTACHMENT),
+            attachmentsPane.getAttachmentLink(SECOND_ATTACHMENT).getAttribute("href"));
 
-        attachmentsPane.getAttachmentLink(firstAttachment).click();
+        attachmentsPane.getAttachmentLink(FIRST_ATTACHMENT).click();
         assertEquals("This is a small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
 
@@ -109,7 +110,7 @@ public class AttachmentIT
         setup.getDriver().navigate().refresh();
         viewPage.waitForDocExtraPaneActive("attachments");
 
-        attachmentsPane.getAttachmentLink(secondAttachment).click();
+        attachmentsPane.getAttachmentLink(SECOND_ATTACHMENT).click();
         assertEquals("This is another small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
         // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
@@ -117,36 +118,36 @@ public class AttachmentIT
         viewPage.waitForDocExtraPaneActive("attachments");
 
         // Upload another version of the first attachment
-        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, "v2/" + firstAttachment).getAbsolutePath());
-        attachmentsPane.waitForUploadToFinish(firstAttachment);
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, "v2/" + FIRST_ATTACHMENT).getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish(FIRST_ATTACHMENT);
         attachmentsPane.clickHideProgress();
-        assertTrue(attachmentsPane.attachmentExistsByFileName(firstAttachment));
-        assertEquals("1.2", attachmentsPane.getLatestVersionOfAttachment(firstAttachment));
+        assertTrue(attachmentsPane.attachmentExistsByFileName(FIRST_ATTACHMENT));
+        assertEquals("1.2", attachmentsPane.getLatestVersionOfAttachment(FIRST_ATTACHMENT));
         String attachmentURL = String.format("%sdownload/%s/%s?rev=1.2", setup.getBaseBinURL(),
-            testPageName.replace('.', '/'), firstAttachment);
-        assertEquals(attachmentURL, attachmentsPane.getAttachmentLink(firstAttachment).getAttribute("href"));
-        attachmentsPane.getAttachmentLink(firstAttachment).click();
+            testPageName.replace('.', '/'), FIRST_ATTACHMENT);
+        assertEquals(attachmentURL, attachmentsPane.getAttachmentLink(FIRST_ATTACHMENT).getAttribute("href"));
+        attachmentsPane.getAttachmentLink(FIRST_ATTACHMENT).click();
         assertEquals("This is a small attachment v2.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
         // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
         setup.getDriver().navigate().refresh();
         viewPage.waitForDocExtraPaneActive("attachments");
 
-        attachmentsPane.deleteAttachmentByFileByName(firstAttachment);
+        attachmentsPane.deleteAttachmentByFileByName(FIRST_ATTACHMENT);
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
-        assertTrue(attachmentsPane.attachmentExistsByFileName(secondAttachment));
+        assertTrue(attachmentsPane.attachmentExistsByFileName(SECOND_ATTACHMENT));
 
         // Go back to the page so we can check that the right attachment has really been deleted
         viewPage = setup.gotoPage(testReference);
         attachmentsPane = viewPage.openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
-        assertEquals(String.format(attachmentURLScheme, secondAttachment),
-            attachmentsPane.getAttachmentLink(secondAttachment).getAttribute("href"));
+        assertEquals(String.format(attachmentURLScheme, SECOND_ATTACHMENT),
+            attachmentsPane.getAttachmentLink(SECOND_ATTACHMENT).getAttribute("href"));
     }
 
     @Test
     @Order(2)
-    public void attachAndViewGifImage(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    void attachAndViewGifImage(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
     {
         // Prepare the page to display the GIF image. We explicitly set the width to a value greater than the actual
         // image width because we want the code that resizes the image on the server side to be executed (even if the
@@ -156,14 +157,14 @@ public class AttachmentIT
 
         // Attach the GIF image.
         AttachmentsPane attachmentsPane = viewPage.openAttachmentsDocExtraPane();
-        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, imageAttachment).getAbsolutePath());
-        attachmentsPane.waitForUploadToFinish(imageAttachment);
-        assertTrue(attachmentsPane.attachmentExistsByFileName(imageAttachment));
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, IMAGE_ATTACHMENT).getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish(IMAGE_ATTACHMENT);
+        assertTrue(attachmentsPane.attachmentExistsByFileName(IMAGE_ATTACHMENT));
     }
 
     @Test
     @Order(3)
-    public void diffWithDeletedAttachments(TestUtils setup, TestReference testReference,
+    void diffWithDeletedAttachments(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
     {
         // v1.1
@@ -237,7 +238,7 @@ public class AttachmentIT
      */
     @Test
     @Order(4)
-    public void rollbackAttachmentFromRestoredPage(TestUtils setup, TestReference testReference) throws Exception
+    void rollbackAttachmentFromRestoredPage(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.deletePage(testReference);
 

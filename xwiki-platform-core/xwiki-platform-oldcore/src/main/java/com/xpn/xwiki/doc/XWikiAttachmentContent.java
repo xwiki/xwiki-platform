@@ -98,7 +98,7 @@ public class XWikiAttachmentContent implements Cloneable
         this.setAttachment(attachment);
         this.file = f;
     }
-
+    
     /**
      * @return the underlying storage file.
      * @since 5.2M1
@@ -232,6 +232,17 @@ public class XWikiAttachmentContent implements Cloneable
         if (contentDirty && this.ownerDocument != null) {
             this.ownerDocument.setMetaDataDirty(contentDirty);
         }
+    }
+
+    /**
+     * @return true of the content of this attachment still exist in the store
+     * @since 13.8RC1
+     * @since 13.4.4
+     * @since 12.10.10
+     */
+    public boolean exists()
+    {
+        return true;
     }
 
     /**

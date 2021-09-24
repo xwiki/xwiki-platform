@@ -26,6 +26,8 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
+
 /**
  * Represents the actions possible on the Attachment Pane at the bottom of a page.
  * 
@@ -85,13 +87,21 @@ public class AttachmentsPane extends BaseElement
     }
 
     /**
+     * Return the {@code a} tag of an attachment link according to its name.
+     *
+     * @param attachmentName the name of the attachment (for instance {@code "my_doc.txt"})
+     * @return the {@link WebElement} of the {@code a} tag with the requested name
      * @since 3.2M3
      */
     public WebElement getAttachmentLink(String attachmentName)
     {
-        return getDriver().findElement(
-            By.xpath("//div[@id='_attachments']//a[@title = 'Download this attachment' and contains(@href, '"
-                + attachmentName + "')]"));
+        By attachementLinkSelector = By.xpath(
+            String.format("//div[@id='_attachments']//a[@title = 'Download this attachment' and contains(@href, '%s')]",
+                attachmentName));
+        // Make sure that the element is visible and can be clicked before returning it to prevent interacting too 
+        // early with the attachment link.
+        getDriver().waitUntilCondition(elementToBeClickable(attachementLinkSelector));
+        return getDriver().findElementWithoutWaiting(attachementLinkSelector);
     }
 
     /**

@@ -147,8 +147,8 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
 
                     if (!this.migratedDeletedAttachment.contains(path)) {
                         File directory = new File(path);
-                        if (!directory.exists()) {
-                            this.logger.warn("[{}] does not exist, trying to find the new location", directory);
+                        if (!directory.getCanonicalPath().startsWith(getStoreRootDirectory().getCanonicalPath())) {
+                            this.logger.warn("[{}] is the wrong path, trying to find the new location", directory);
 
                             directory = findNewPath(path);
 

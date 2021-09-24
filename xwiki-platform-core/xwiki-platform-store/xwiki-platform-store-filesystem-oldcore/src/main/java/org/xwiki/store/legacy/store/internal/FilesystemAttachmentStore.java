@@ -222,6 +222,16 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     }
 
     @Override
+    public boolean attachmentContentExists(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
+        throws XWikiException
+    {
+        File attachFile =
+            this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
+
+        return attachFile.exists();
+    }
+
+    @Override
     public void deleteXWikiAttachment(final XWikiAttachment attachment, final XWikiContext context,
         final boolean bTransaction) throws XWikiException
     {

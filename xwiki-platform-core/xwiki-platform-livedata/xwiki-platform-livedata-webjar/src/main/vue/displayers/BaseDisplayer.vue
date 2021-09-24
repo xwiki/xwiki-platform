@@ -39,6 +39,7 @@
     placement="bottom"
     arrow
     ref="tippy"
+    :ignoreAttributes="true"
   >
     <template #trigger>
       <div
@@ -107,7 +108,8 @@
     <template>
       <div class="displayer-action-list">
         <ActionEdit
-          :displayer="{ isEditable, setEdit: () => { setEdit() } }"
+          v-if="isEditable"
+          :displayer="{ setEdit: () => { setEdit() } }"
           :close-popover="closePopover"
         />
         <ActionFollowLink
@@ -258,6 +260,10 @@ export default {
         setTimeout(() => this.applyEdit(), 200);
       } else {
         const displayerElement = this.$refs['displayerRoot'];
+        
+        if(!displayerElement) {
+          return;
+        }
 
         if (displayerElement.contains(evt.target)) {
           return;

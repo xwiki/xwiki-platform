@@ -105,6 +105,23 @@ define('xwiki-livedata', [
   const Logic = function (element) {
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-config") || "{}");
+    if(this.data.entries) {
+      // Calling Object.freeze(undefined) on IE11 triggers an exception. 
+      this.data.entries = Object.freeze(this.data.entries);
+    }
+    // Fetch the data if we don't have any. This call must be made as soon as possible to display the data to the user
+    // early.
+    // We use a dedicated field for the first load as the fetch start/end events can be triggered before the loader 
+    // components is loaded (and in this case the loader is never hidden even once the entries are displayed).
+    this.firstEntriesLoading = true;
+    if (!this.data.data.entries.length) {
+      this.updateEntries()
+        // Marks the loaded as finish, even if it fails as the loader should stop and an message be displayed to the 
+        // user in this case.
+        .finally(() => this.firstEntriesLoading = false);
+    } else {
+      this.firstEntriesLoading = false;
+    }
     this.currentLayoutId = "";
     this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = {
@@ -126,7 +143,7 @@ define('xwiki-livedata', [
     });
 
     // create Vuejs instance
-    new Vue({
+    const vue = new Vue({
       el: this.element,
       components: {
         "XWikiLivedata": XWikiLivedata,
@@ -163,7 +180,7 @@ define('xwiki-livedata', [
     }
 
     // Load needed translations for the Livedata
-    this.loadTranslations({
+    const translationsPromise = this.loadTranslations({
       prefix: "livedata.",
       keys: [
         "dropdownMenu.title",
@@ -212,13 +229,15 @@ define('xwiki-livedata', [
         "filter.list.emptyLabel",
         "footnotes.computedTitle",
         "footnotes.propertyNotViewable",
-        "bottombar.noEntries"
+        "bottombar.noEntries",
+        "error.updateEntriesFailed"
       ],
     });
 
-    // Fetch the data if we don't have any.
-    if (!this.data.data.entries.length) {
-      this.updateEntries();
+    this.translate = async (key, ...args) => {
+      // Make sure that the translations are loaded from the server before translating.
+      await translationsPromise;
+      return vue.$t(key, args);
     }
   };
 
@@ -504,20 +523,29 @@ define('xwiki-livedata', [
       return liveDataSource.getEntries(this.data.query)
         .then(data => {
           // After fetch event
-          this.triggerEvent("afterEntryFetch");
           return data
-        });
+        })
+        .finally(() => this.triggerEvent("afterEntryFetch"));
     },
 
 
     updateEntries () {
       return this.fetchEntries()
         .then(data => {
-          this.data.data = data
+          if(data) {
+            // Calling Object.freeze(undefined) on IE11 triggers an exception.
+            this.data.data = Object.freeze(data);
+          } else {
+            this.data.data = undefined;
+          }
           // Remove the outdated footnotes, they will be recomputed by the new entries.
           this.footnotes.reset()
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+          this.translate('livedata.error.updateEntriesFailed')
+            .then(value => new XWiki.widgets.Notification(value, 'error'));
+          console.error('Failed to fetch the entries', err)
+        });
     },
 
 

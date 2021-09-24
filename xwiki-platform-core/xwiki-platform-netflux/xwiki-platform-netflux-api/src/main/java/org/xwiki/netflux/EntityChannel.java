@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * A channel associated to an XWiki entity.
  * 
  * @version $Id$
- * @since 13.8RC1
+ * @since 13.9RC1
  */
 @Unstable
 public class EntityChannel

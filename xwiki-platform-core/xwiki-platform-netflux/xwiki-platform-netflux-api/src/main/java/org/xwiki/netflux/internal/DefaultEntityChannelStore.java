@@ -39,7 +39,7 @@ import org.xwiki.netflux.EntityChannelStore;
  * Default {@link EntityChannelStore} implementation.
  * 
  * @version $Id$
- * @since 13.8RC1
+ * @since 13.9RC1
  */
 @Component
 @Singleton

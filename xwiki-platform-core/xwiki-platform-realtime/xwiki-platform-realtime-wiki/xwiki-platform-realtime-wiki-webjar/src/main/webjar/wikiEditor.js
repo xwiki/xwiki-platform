@@ -33,8 +33,8 @@ define('xwiki-realtime-wikiEditor', [
   'jquery'
 ], function(
   /* jshint maxparams:false */
-  realtimeConfig, ErrorBox, Toolbar, realtimeInput, UserData, TypingTest, JSONSortify, TextCursor, Interface, Saver,
-    Chainpad, Crypto, $
+  realtimeConfig, ErrorBox, Toolbar, ChainPadNetflux, UserData, TypingTest, JSONSortify, TextCursor, Interface, Saver,
+    ChainPad, Crypto, $
 ) {
   'use strict';
 
@@ -46,7 +46,7 @@ define('xwiki-realtime-wikiEditor', [
 
   module.main = function(editorConfig, docKeys) {
     var saverConfig = $.extend(editorConfig.saverConfig, {
-      chainpad: Chainpad,
+      chainpad: ChainPad,
       editorType: editorId,
       editorName: 'Wiki',
       isHTML: false,
@@ -79,32 +79,21 @@ define('xwiki-realtime-wikiEditor', [
       });
     };
 
-    // START DISALLOW REALTIME
-    // Key in the localStore which indicates realtime activity should be disallowed.
-    Interface.setLocalStorageDisallow(editorConfig.LOCALSTORAGE_DISALLOW);
-
-    var allowRealtimeCheckboxId = Interface.uid();
-    Interface.createAllowRealtimeCheckbox(allowRealtimeCheckboxId, Interface.realtimeAllowed(),
-      saverConfig.messages.allowRealtime);
-
-    var $disallowButton = $('#' + allowRealtimeCheckboxId);
-    $disallowButton.change(function() {
-      var checked = $(this).prop('checked');
-      if (checked || editorConfig.DEMO_MODE) {
-        Interface.realtimeAllowed(true);
-        // TODO: Join the realtime session without reloading the page.
-        window.location.reload();
-      } else {
-        Interface.realtimeAllowed(false);
-        module.onAbort();
-      }
-    });
-
-    if (!Interface.realtimeAllowed()) {
-      console.log('Realtime is disallowed. Quitting');
-      return;
+    Interface.realtimeAllowed(true);
+    var allowRealtimeCheckbox = $('.buttons input[type=checkbox].realtime-allow');
+    if (!allowRealtimeCheckbox.length) {
+      allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(true, saverConfig.messages.allowRealtime);
+      allowRealtimeCheckbox.change(function() {
+        if (allowRealtimeCheckbox.prop('checked')) {
+          module.main(editorConfig, docKeys);
+        } else {
+          Interface.realtimeAllowed(false);
+          module.onAbort();
+        }
+      });
     }
-    // END DISALLOW REALTIME
+    // Disable while real-time framework is loading.
+    allowRealtimeCheckbox.prop('disabled', true);
 
     // Configure Saver with the merge URL and language settings.
     Saver.configure(saverConfig);
@@ -232,7 +221,7 @@ define('xwiki-realtime-wikiEditor', [
 
       var setValueWithCursor = function(newValue) {
         var oldValue = canonicalize(editor.getValue());
-        var ops = Chainpad.Diff.diff(oldValue, newValue);
+        var ops = ChainPad.Diff.diff(oldValue, newValue);
         var oldCursor = editor.getCursor();
         var selects = ['selectionStart', 'selectionEnd'].map(function (attr) {
           return TextCursor.transformCursor(oldCursor[attr], ops);
@@ -243,9 +232,6 @@ define('xwiki-realtime-wikiEditor', [
       };
 
       var createSaver = function(info) {
-        if (editorConfig.DEMO_MODE) {
-          return;
-        }
         // This function displays a message notifying users that there was a merge.
         Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(
           toolbar.toolbar.find('.rt-toolbar-rightside'), saverConfig.messages);
@@ -269,7 +255,6 @@ define('xwiki-realtime-wikiEditor', [
           userName: editorConfig.userName,
           network: info.network,
           channel: eventsChannel,
-          demoMode: editorConfig.DEMO_MODE,
           safeCrash: function(reason, debugLog) {
             module.onAbort(null, reason, debugLog);
           }
@@ -285,6 +270,7 @@ define('xwiki-realtime-wikiEditor', [
         channel,
         // The object responsible for encrypting the messages.
         crypto: Crypto,
+        network: editorConfig.network,
 
         onInit: function(info) {
           // Create the toolbar.
@@ -317,6 +303,8 @@ define('xwiki-realtime-wikiEditor', [
           console.log('Unlocking editor');
           initializing = false;
           module.setEditable(true);
+          // Renable the allow real-time checkbox now that the framework is ready.
+          allowRealtimeCheckbox.prop('disabled', false);
 
           this.onLocal();
           createSaver(info);
@@ -345,7 +333,7 @@ define('xwiki-realtime-wikiEditor', [
         },
 
         onAbort: function(info, reason, debug) {
-          console.log("Aborting the session!");
+          console.log('Aborting the session!');
           module.chainpad.abort();
           module.leaveChannel();
           module.aborted = true;
@@ -355,8 +343,7 @@ define('xwiki-realtime-wikiEditor', [
           if (typeof userData.leave === 'function') {
             userData.leave();
           }
-          // FIXME: I think this condition is always false because we mark the module as aborted above.
-          if ($disallowButton[0].checked && !module.aborted) {
+          if (reason || debug) {
             ErrorBox.show(reason || 'disconnected', debug);
           }
         },
@@ -382,7 +369,7 @@ define('xwiki-realtime-wikiEditor', [
       };
 
       module.onAbort = realtimeOptions.onAbort;
-      module.realtimeInput = realtimeInput.start(realtimeOptions);
+      module.realtimeInput = ChainPadNetflux.start(realtimeOptions);
 
       var onChangeHandler = function() {
         // We can't destroy the dialog here because sometimes it's impossible to take an action during a merge conflict.

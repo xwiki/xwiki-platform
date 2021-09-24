@@ -618,7 +618,6 @@ define('xwiki-realtime-saver', [
     });
     var netfluxNetwork = config.network;
     var channel = config.channel;
-    var demoMode = config.demoMode;
     var firstConnection = true;
 
     if (typeof config.safeCrash === 'function') {
@@ -820,8 +819,7 @@ define('xwiki-realtime-saver', [
           return;
         }
         // Avoid queuing up multiple merge dialogs.
-        // demoMode lets the user preview realtime behaviour without actually requiring permission to save.
-        if (mergeDialogCurrentlyDisplayed || demoMode) {
+        if (mergeDialogCurrentlyDisplayed) {
           return;
         }
 

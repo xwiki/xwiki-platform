@@ -28,11 +28,6 @@ define('xwiki-realtime-interface', ['jquery'], function($) {
     return 'realtime-uid-' + String(Math.random()).substring(2);
   };
 
-  var LOCALSTORAGE_DISALLOW;
-  var setLocalStorageDisallow = Interface.setLocalStorageDisallow = function(key) {
-    LOCALSTORAGE_DISALLOW = key;
-  };
-
   var allowed = false;
   var realtimeAllowed = Interface.realtimeAllowed = function(bool) {
     if (arguments.length) {
@@ -44,7 +39,7 @@ define('xwiki-realtime-interface', ['jquery'], function($) {
     return allowed;
   };
 
-  var createAllowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox = function(id, checked, message) {
+  var createAllowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox = function(checked, message) {
     var checkbox = $(
       '<div class="realtime-allow-outerdiv">' +
         '<label class="realtime-allow-label" for="">' +
@@ -52,7 +47,8 @@ define('xwiki-realtime-interface', ['jquery'], function($) {
         '</label>' +
       '</div>'
     ).appendTo('.buttons');
-    checkbox.find('label').attr('for', id).append(document.createTextNode(message))
+    var id = uid();
+    return checkbox.find('label').attr('for', id).append(document.createTextNode(message))
       .find('input').attr('id', id).prop('checked', !!checked);
   };
 

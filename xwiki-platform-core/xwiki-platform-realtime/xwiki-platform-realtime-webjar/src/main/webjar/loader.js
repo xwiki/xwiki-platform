@@ -43,13 +43,14 @@ define('xwiki-realtime-loader', [
     return (lockedBy.length && force.length) ? force[0] : false;
   },
 
-  isForced = module.isForced = window.location.href.indexOf("force=1") >= 0,
-  isRt = module.isRt = window.location.href.indexOf("realtime=1") >= 0,
+  isForced = module.isForced = window.location.href.indexOf('force=1') >= 0,
+  // Real-time enabled by default.
+  isRt = module.isRt = window.location.href.indexOf('realtime=false') < 0,
 
   getRTEditorURL = module.getEditorURL = function(href, info) {
     href = href.replace(/\?(.*)$/, function (all, args) {
       return '?' + args.split('&').filter(
-        arg => !/^editor=/.test(arg) && !/^section=/.test(arg) && ['force=1', 'realtime=1'].indexOf(arg) < 0
+        arg => ['editor', 'section', 'force', 'realtime'].indexOf(arg.split('=', 1)[0]) < 0
       ).join('&');
     });
     if (href.indexOf('?') < 0) {
@@ -82,8 +83,6 @@ define('xwiki-realtime-loader', [
         String(Math.random()).substring(2),
       language,
       reference: documentReference,
-      DEMO_MODE: realtimeConfig.demoMode,
-      LOCALSTORAGE_DISALLOW: 'realtime-disallow',
       userAvatarURL: realtimeConfig.user.avatarURL,
       isAdvancedUser: realtimeConfig.user.advanced,
       network: allRt.network,
@@ -591,7 +590,7 @@ define('xwiki-realtime-loader', [
         case 'join': return onJoinMessage(data, sender, channel, network);
         // Someone wants to know if we're editing offline to know if the warning message should be displayed.
         case 'isSomeoneOffline': return onIsSomeoneOfflineMessage(sender, network);
-      }      
+      }
     });
   },
 

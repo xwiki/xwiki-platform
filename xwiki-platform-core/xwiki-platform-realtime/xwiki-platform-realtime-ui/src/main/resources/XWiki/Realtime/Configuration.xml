@@ -647,8 +647,7 @@
   },
   'toolbarUserlist': $configObj.getValue('toolbarUserlist'),
   'marginAvatar': $configObj.getValue('marginAvatar'),
-  'enableMerge': $configObj.getValue('enableMerge'),
-  'demoMode': $stringtool.equals($request.demoMode, 'true')
+  'enableMerge': $configObj.getValue('enableMerge')
 })
 &lt;script id="realtime-config" type="application/json"&gt;$jsontool.serialize($config).replace(
   '&lt;', '\u003C')&lt;/script&gt;

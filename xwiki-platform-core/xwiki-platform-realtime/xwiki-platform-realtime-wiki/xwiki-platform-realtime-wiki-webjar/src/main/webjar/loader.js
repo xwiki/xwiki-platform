@@ -90,13 +90,26 @@ define('xwiki-realtime-wikiEditor-loader', [
     });
   };
 
-  var launchRealtime = function(config, keys) {
-    require(['jquery', 'xwiki-realtime-wikiEditor'], function ($, RTWiki) {
-      if (RTWiki && RTWiki.main) {
+  var beforeLaunchRealtime = function(keys) {
+    if (Loader.isRt) {
+      Loader.whenReady(function(wsAvailable) {
+        Loader.isRt = wsAvailable;
+        launchRealtime(keys);
+      });
+    } else {
+      launchRealtime(keys);
+    }
+  };
+
+  var launchRealtime = function(keys) {
+    require(['jquery', 'xwiki-realtime-wikiEditor'], function ($, RealtimeWikiEditor) {
+      if (RealtimeWikiEditor && RealtimeWikiEditor.main) {
         keys._update = updateKeys;
-        RTWiki.main(config, keys);
+        var config = Loader.getConfig();
+        config.rtURL = Loader.getEditorURL(window.location.href, info);
+        RealtimeWikiEditor.main(config, keys);
       } else {
-        console.error("Couldn't find RTWiki.main, aborting.");
+        console.error("Couldn't find RealtimeWikiEditor.main, aborting.");
       }
     });
   };
@@ -104,35 +117,31 @@ define('xwiki-realtime-wikiEditor-loader', [
   if (lock) {
     // Found a lock link. Check active sessions.
     Loader.checkSessions(info);
-  } else if (window.XWiki.editor === 'wiki' || realtimeConfig.demoMode) {
+  } else if (window.XWiki.editor === 'wiki') {
     // No lock and we are using wiki editor. Start realtime.
-    var config = Loader.getConfig();
     updateKeys(function (keys) {
       if (!keys[editorId] || !keys.events) {
         ErrorBox.show('unavailable');
-        console.error("You are not allowed to create a new realtime session for that document.");
+        console.error('You are not allowed to create a new realtime session for that document.');
       }
       if (Object.keys(keys.active).length > 0) {
         if (keys[editorId + '_users'] > 0 || Loader.isForced) {
-          launchRealtime(config, keys);
+          beforeLaunchRealtime(keys);
         } else {
-          var callback = function() {
-            launchRealtime(config, keys);
-          };
-          console.log("Join the existing realtime session or create a new one");
-          Loader.displayModal(editorId, Object.keys(keys.active), callback, info);
+          console.log('Join the existing realtime session or create a new one.');
+          Loader.displayModal(editorId, Object.keys(keys.active), $.proxy(beforeLaunchRealtime, null, keys), info);
         }
       } else {
-        launchRealtime(config, keys);
+        beforeLaunchRealtime(keys);
       }
     });
   }
 
   var displayButtonModal = function() {
     var button = $();
-    if ($('.realtime-button-rtwiki').length) {
+    if ($('.realtime-button-' + editorId).length) {
       button = $('<button class="btn btn-success"/>').text(Loader.messages.get('redirectDialog.join', 'Wiki'));
-      $('.realtime-button-rtwiki').prepend(button).prepend('<br/>');
+      $('.realtime-button-' + editorId).prepend(button).prepend('<br/>');
     } else if (lock && wikiLock) {
       button = $('<button class="btn btn-primary"/>').text(Loader.messages.get('redirectDialog.create', 'Wiki'));
       $('.realtime-buttons').append('<br/>').append(button);

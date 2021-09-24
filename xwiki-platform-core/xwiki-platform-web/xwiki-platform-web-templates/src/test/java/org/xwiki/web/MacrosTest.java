@@ -22,18 +22,24 @@ package org.xwiki.web;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.internal.XWikiDateTool;
 import org.xwiki.velocity.tools.EscapeTool;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @version $Id$
  */
+@ComponentList(XWikiDateTool.class)
 class MacrosTest extends PageTest
 {
     private VelocityManager velocityManager;
@@ -49,8 +56,11 @@ class MacrosTest extends PageTest
     @BeforeEach
     void setup() throws Exception
     {
-        this.velocityManager = oldcore.getMocker().getInstance(VelocityManager.class);
+        this.velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
         this.velocityManager.getVelocityContext().put("escapetool", new EscapeTool());
+        this.velocityManager.getVelocityContext()
+            .put("datetool", this.componentManager.getInstance(XWikiDateTool.class));
+        this.velocityManager.getVelocityContext().put("numbertool", new NumberTool());
     }
 
     @Test
@@ -139,5 +149,77 @@ class MacrosTest extends PageTest
         assertEquals(1, map.get("returnedrows"));
         assertEquals(1, ((List<?>) map.get("rows")).size());
         assertTrue(((List<Map<String, Boolean>>) map.get("rows")).get(0).get("doc_viewable"));
+    }
+
+    @Test
+    void parseDateRangeAfter() throws Exception
+    {
+        String dateValue = "2021-09-22T00:00:00+02:00";
+
+        this.velocityManager.getVelocityContext().put("dateRange", new HashMap<>());
+        this.velocityManager.getVelocityContext().put("dateValue", dateValue);
+
+        String script = "#parseDateRange('after' $dateValue $dateRange)";
+        StringWriter out = new StringWriter();
+        this.velocityManager.evaluate(out, "parseDateRangeAfter", new StringReader(script));
+
+        Map<Object, Object> dateRange =
+            (Map<Object, Object>) this.velocityManager.getVelocityContext().get("dateRange");
+        assertEquals("Wed Sep 22 00:00:00 CEST 2021", dateRange.get("start").toString());
+        assertNull(dateRange.get("end"));
+    }
+
+    @Test
+    void parseDateRangeBefore() throws Exception
+    {
+        String dateValue = "2021-09-22T23:59:59+02:00";
+
+        this.velocityManager.getVelocityContext().put("dateRange", new HashMap<>());
+        this.velocityManager.getVelocityContext().put("dateValue", dateValue);
+
+        String script = "#parseDateRange('before' $dateValue $dateRange)";
+        StringWriter out = new StringWriter();
+        this.velocityManager.evaluate(out, "parseDateRangeAfter", new StringReader(script));
+
+        Map<Object, Object> dateRange =
+            (Map<Object, Object>) this.velocityManager.getVelocityContext().get("dateRange");
+        assertNull(dateRange.get("start"));
+        assertEquals("Wed Sep 22 23:59:59 CEST 2021", dateRange.get("end").toString());
+    }
+
+    @Test
+    void parseDateRangeBetween() throws Exception
+    {
+        String dateValue = "2021-09-22T00:00:00+02:00/2021-09-22T23:59:59+02:00";
+
+        this.velocityManager.getVelocityContext().put("dateRange", new HashMap<>());
+        this.velocityManager.getVelocityContext().put("dateValue", dateValue);
+
+        String script = "#parseDateRange('between' $dateValue $dateRange)";
+        StringWriter out = new StringWriter();
+        this.velocityManager.evaluate(out, "parseDateRangeAfter", new StringReader(script));
+
+        Map<Object, Object> dateRange =
+            (Map<Object, Object>) this.velocityManager.getVelocityContext().get("dateRange");
+        assertEquals("Wed Sep 22 00:00:00 CEST 2021", dateRange.get("start").toString());
+        assertEquals("Wed Sep 22 23:59:59 CEST 2021", dateRange.get("end").toString());
+    }
+
+    @Test
+    void parseDateRangeTimestampRange() throws Exception
+    {
+        String dateValue = "1607295600000-1632347999999";
+
+        this.velocityManager.getVelocityContext().put("dateRange", new HashMap<>());
+        this.velocityManager.getVelocityContext().put("dateValue", dateValue);
+
+        String script = "#parseDateRange('after' $dateValue $dateRange)";
+        StringWriter out = new StringWriter();
+        this.velocityManager.evaluate(out, "parseDateRangeAfter", new StringReader(script));
+
+        Map<Object, Object> dateRange =
+            (Map<Object, Object>) this.velocityManager.getVelocityContext().get("dateRange");
+        assertEquals("Mon Dec 07 00:00:00 CET 2020", dateRange.get("start").toString());
+        assertEquals("Wed Sep 22 23:59:59 CEST 2021", dateRange.get("end").toString());
     }
 }

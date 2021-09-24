@@ -24,7 +24,7 @@ package org.xwiki.test.ui;
  * 
  * @version $Id$
  */
-public class Upgrade1110Test extends UpgradeTest
+public class Upgrade1210Test extends UpgradeTest
 {
     @Override
     protected void setupLogs()

@@ -19,12 +19,16 @@
  */
 package org.xwiki.rendering.internal.macro.script;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -32,11 +36,10 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import javax.inject.Named;
-import java.util.Arrays;
-import java.util.Collections;
-
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link PermissionCheckerListener}.
@@ -44,7 +47,7 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  */
 @ComponentTest
-public class PermissionCheckerListenerTest
+class PermissionCheckerListenerTest
 {
     @InjectMockComponents
     private PermissionCheckerListener listener;
@@ -54,7 +57,7 @@ public class PermissionCheckerListenerTest
     private MacroPermissionPolicy macroPermissionPolicy;
 
     @Test
-    public void checkWhenPermission()
+    void checkWhenPermission()
     {
         CancelableEvent event = mock(CancelableEvent.class);
         MacroTransformationContext context = new MacroTransformationContext();
@@ -70,7 +73,7 @@ public class PermissionCheckerListenerTest
     }
 
     @Test
-    public void checkWhenNoPermissionAndNoSourceMetaData()
+    void checkWhenNoPermissionAndNoSourceMetaData()
     {
         CancelableEvent event = mock(CancelableEvent.class);
         MacroTransformationContext context = new MacroTransformationContext();
@@ -86,7 +89,7 @@ public class PermissionCheckerListenerTest
     }
 
     @Test
-    public void checkWhenNoPermissionAndSourceMetaData()
+    void checkWhenNoPermissionAndSourceMetaData()
     {
         CancelableEvent event = mock(CancelableEvent.class);
         MacroTransformationContext context = new MacroTransformationContext();

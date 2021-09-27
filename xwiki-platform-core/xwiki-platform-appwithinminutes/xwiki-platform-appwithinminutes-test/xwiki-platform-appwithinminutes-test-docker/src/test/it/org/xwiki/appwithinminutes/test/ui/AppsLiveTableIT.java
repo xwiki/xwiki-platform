@@ -35,7 +35,6 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -48,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 11.10
  */
 @UITest
-public class AppsLiveTableIT
+class AppsLiveTableIT
 {
     private static final String USERNAME = AppsLiveTableIT.class.getSimpleName();
     private static final String PASSWORD = "simplepassword";
@@ -90,7 +89,7 @@ public class AppsLiveTableIT
 
     @Order(1)
     @Test
-    public void deleteApplication()
+    void deleteApplication()
     {
         // Check the the applications live table lists the created application.
         ApplicationsLiveTableElement appsLiveTable = appWithinMinutesHomePage.getAppsLiveTable();
@@ -119,7 +118,7 @@ public class AppsLiveTableIT
 
     @Order(2)
     @Test
-    public void testEditApplication()
+    void testEditApplication()
     {
         // Edit the application.
         ApplicationsLiveTableElement appsLiveTable = appWithinMinutesHomePage.getAppsLiveTable();
@@ -142,7 +141,7 @@ public class AppsLiveTableIT
 
     @Order(3)
     @Test
-    public void testActionRights(TestUtils testUtils, TestReference testReference)
+    void testActionRights(TestUtils testUtils, TestReference testReference)
     {
         // set some rights before the test
         DocumentReference xwikiPreferences = new DocumentReference("xwiki", "XWiki", "XWikiPreferences");

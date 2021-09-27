@@ -22,7 +22,6 @@ package org.xwiki.security.authorization;
 
 import java.io.File;
 
-import org.junit.Rule;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
@@ -45,7 +44,6 @@ import org.xwiki.security.authorization.testwikis.internal.parser.XWikiConstants
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.xwiki.security.authorization.Right.ADMIN;
 import static org.xwiki.security.authorization.Right.CREATE_WIKI;

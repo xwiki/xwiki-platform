@@ -35,8 +35,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;

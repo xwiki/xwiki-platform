@@ -23,7 +23,6 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.like.LikeManager;
@@ -46,7 +45,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DeletedEntityLikeListenerTest
+class DeletedEntityLikeListenerTest
 {
     @InjectMockComponents
     private DeletedEntityLikeListener listener;

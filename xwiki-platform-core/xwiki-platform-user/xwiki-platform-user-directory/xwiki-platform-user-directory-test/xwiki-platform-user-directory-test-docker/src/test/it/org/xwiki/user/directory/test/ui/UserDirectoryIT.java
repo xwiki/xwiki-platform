@@ -19,7 +19,6 @@
  */
 package org.xwiki.user.directory.test.ui;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -29,7 +28,6 @@ import org.xwiki.user.directory.test.po.UserDirectoryPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.xwiki.test.ui.AbstractTest.validateConsole;
 
 /**
  * Tests the User Directory feature.
@@ -58,10 +56,10 @@ import static org.xwiki.test.ui.AbstractTest.validateConsole;
         // Notifications, as otherwise even streams won't have a store.
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     })
-public class UserDirectoryIT
+class UserDirectoryIT
 {
     @Test
-    public void verifyUserIsListed(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
+    void verifyUserIsListed(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
         setup.loginAsSuperAdmin();
 

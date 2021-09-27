@@ -28,7 +28,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.XWikiContext;
@@ -37,7 +36,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
 /**

@@ -22,7 +22,6 @@ package org.xwiki.ratings.internal;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
@@ -30,8 +29,6 @@ import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-
-import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

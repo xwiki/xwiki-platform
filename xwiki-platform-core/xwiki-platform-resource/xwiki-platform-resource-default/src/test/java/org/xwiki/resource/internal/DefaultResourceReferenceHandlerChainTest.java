@@ -19,11 +19,8 @@
  */
 package org.xwiki.resource.internal;
 
-import java.util.Collections;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.ResourceReferenceHandler;
 
 import static org.mockito.Mockito.mock;
 
@@ -33,10 +30,10 @@ import static org.mockito.Mockito.mock;
  * @version $Id$
  * @since 6.1M2
  */
-public class DefaultResourceReferenceHandlerChainTest
+class DefaultResourceReferenceHandlerChainTest
 {
     @Test
-    public void executeNextWhenNoMoreAction() throws Exception
+    void executeNextWhenNoMoreAction() throws Exception
     {
         DefaultResourceReferenceHandlerChain chain = DefaultResourceReferenceHandlerChain.EMPTY;
 

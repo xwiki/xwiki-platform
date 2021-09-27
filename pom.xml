@@ -669,7 +669,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>3.5.1</version>
+        <version>3.6.1</version>
       </dependency>
 
       <!-- Carte CSS4J -->
@@ -689,7 +689,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>xml-dtd</artifactId>
         <!-- Note: has a different release cycle than CSS4J -->
-        <version>3.5.1</version>
+        <version>3.5.2</version>
       </dependency>
 
       <!-- Restlet -->

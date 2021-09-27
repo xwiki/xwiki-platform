@@ -19,10 +19,17 @@
  */
 package org.xwiki.resource.internal;
 
+import java.util.Queue;
+
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceHandler;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultResourceReferenceHandlerChain}.
@@ -36,7 +43,13 @@ class DefaultResourceReferenceHandlerChainTest
     void executeNextWhenNoMoreAction() throws Exception
     {
         DefaultResourceReferenceHandlerChain chain = DefaultResourceReferenceHandlerChain.EMPTY;
+        Queue<ResourceReferenceHandler> queue = mock(Queue.class);
+        when(queue.isEmpty()).thenReturn(true);
+        ReflectionUtils.setFieldValue(chain, "handlerStack", queue);
 
         chain.handleNext(mock(ResourceReference.class));
+
+        // Verify that we don't get a ResourceReferenceHandler since the queue is empty.
+        verify(queue, never()).poll();
     }
 }

@@ -51,7 +51,7 @@
 
     <!-- The slot containing the displayer Editor widget -->
     <div @keypress.enter="applyEdit"
-         @keydown.esc="cancelEdit"
+         @keydown.esc.capture="cancelEdit"
          v-if="!isView && !isLoading"
          tabindex="0"
          ref="editBlock"

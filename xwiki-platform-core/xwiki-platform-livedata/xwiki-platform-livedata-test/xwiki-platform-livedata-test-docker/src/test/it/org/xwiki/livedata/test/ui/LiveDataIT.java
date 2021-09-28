@@ -120,7 +120,9 @@ class LiveDataIT
         createXClass(testUtils, testReference);
 
         // Creates corresponding XObjects.
-        addXObject(testUtils, new DocumentReference("O1", (SpaceReference) testReference.getParent()), className,
+        DocumentReference o1 = new DocumentReference("O1", (SpaceReference) testReference.getParent());
+        testUtils.createPage(o1, "", "O1");
+        addXObject(testUtils, o1, className,
             NAME_LYNDA, CHOICE_A, "U1");
         DocumentReference o2 = new DocumentReference("O2", (SpaceReference) testReference.getParent());
         // Make 02 not viewable by guests to test the footnotes.
@@ -138,7 +140,7 @@ class LiveDataIT
         TableLayoutElement tableLayout = liveDataElement.getTableLayout();
         assertEquals(3, tableLayout.countRows());
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O1");
-        tableLayout.assertRow(DOC_TITLE_COLUMN, "O2");
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "O2 1");
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O3 1");
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
         tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);

@@ -33,15 +33,29 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
 {
     private final String property;
 
+    private final boolean parameter;
+
     /**
      * @param reversed true if the condition should be reversed
      * @param property the name of the property
      */
     public AbstractPropertyQueryCondition(boolean reversed, String property)
     {
+        this(reversed, property, false);
+    }
+
+    /**
+     * @param reversed true if the condition should be reversed
+     * @param property the name of the property
+     * @param parameter true if it's a custom event parameter
+     * @since 13.9RC1
+     */
+    public AbstractPropertyQueryCondition(boolean reversed, String property, boolean parameter)
+    {
         super(reversed);
 
         this.property = property;
+        this.parameter = parameter;
     }
 
     /**
@@ -52,6 +66,15 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
         return this.property;
     }
 
+    /**
+     * @return true if it's a custom event parameter
+     * @since 13.9RC1
+     */
+    public boolean isParameter()
+    {
+        return this.parameter;
+    }
+
     @Override
     public int hashCode()
     {
@@ -59,6 +82,7 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
 
         builder.appendSuper(super.hashCode());
         builder.append(getProperty());
+        builder.append(isParameter());
 
         return builder.build();
     }
@@ -71,7 +95,8 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
         }
 
         if (super.equals(obj) && obj instanceof AbstractPropertyQueryCondition) {
-            return getProperty().contentEquals(((AbstractPropertyQueryCondition) obj).getProperty());
+            return getProperty().equals(((AbstractPropertyQueryCondition) obj).getProperty())
+                && isParameter() == ((AbstractPropertyQueryCondition) obj).isParameter();
         }
 
         return false;
@@ -84,6 +109,7 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
 
         builder.appendSuper(super.toString());
         builder.append("property", getProperty());
+        builder.append("custom", isParameter());
 
         return builder.build();
     }

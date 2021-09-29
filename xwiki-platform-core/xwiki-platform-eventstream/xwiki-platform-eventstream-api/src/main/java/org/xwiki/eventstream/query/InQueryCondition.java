@@ -49,6 +49,20 @@ public class InQueryCondition extends AbstractPropertyQueryCondition
     }
 
     /**
+     * @param reversed true if the condition should be reversed
+     * @param property the name of the property
+     * @param custom true if the property is a custom parameter
+     * @param values the values to compare to the property value
+     * @since 13.9RC1
+     */
+    public InQueryCondition(boolean reversed, String property, boolean custom, List<Object> values)
+    {
+        super(reversed, property, custom);
+
+        this.values = values;
+    }
+
+    /**
      * @return the values
      */
     public List<Object> getValues()

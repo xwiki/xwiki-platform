@@ -1,0 +1,188 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.web;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.xwiki.icon.IconManagerScriptService;
+import org.xwiki.icon.internal.DefaultIconManagerComponentList;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.query.internal.ScriptQuery;
+import org.xwiki.query.script.QueryManagerScriptService;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.script.SecurityAuthorizationScriptService;
+import org.xwiki.security.script.SecurityScriptServiceComponentList;
+import org.xwiki.template.TemplateManager;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.page.PageTest;
+import org.xwiki.velocity.tools.EscapeTool;
+import org.xwiki.velocity.tools.JSONTool;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.xmlunit.builder.Input.fromStream;
+import static org.xmlunit.builder.Input.fromString;
+import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
+
+/**
+ * Test of the {@code uorgsuggest.vm} Velocity template.
+ *
+ * @version $Id$
+ * @since 13.9RC1
+ * @since 13.8.1
+ * @since 13.4.4
+ */
+@SecurityScriptServiceComponentList
+@DefaultIconManagerComponentList
+@ComponentList({
+    ModelScriptService.class,
+    IconManagerScriptService.class
+})
+class UorgsuggestTest extends PageTest
+{
+    private static final String UORGSUGGEST = "uorgsuggest.vm";
+
+    private TemplateManager templateManager;
+
+    @Mock
+    private QueryManagerScriptService queryManagerScriptService;
+
+    @Mock
+    private ScriptQuery query;
+
+    @Mock
+    private SecurityAuthorizationScriptService securityAuthorizationScriptService;
+
+    @BeforeEach
+    void setUp() throws Exception
+    {
+        this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
+        this.componentManager.registerComponent(ScriptService.class, "query", this.queryManagerScriptService);
+        when(this.queryManagerScriptService.xwql(anyString())).thenReturn(this.query);
+        when(this.query.setWiki(any())).thenReturn(this.query);
+        when(this.query.addFilter(anyString())).thenReturn(this.query);
+        when(this.query.bindValue(anyString(), any())).thenReturn(this.query);
+
+        this.componentManager.registerComponent(ScriptService.class, "security.authorization",
+            this.securityAuthorizationScriptService);
+
+        registerVelocityTool("escapetool", new EscapeTool());
+        registerVelocityTool("jsontool", new JSONTool());
+    }
+
+    @Test
+    void usersGlobalXML() throws Exception
+    {
+        when(this.xwiki.getPlainUserName(new DocumentReference("xwiki", "XWiki", "U1"), this.context))
+            .thenReturn("User 1");
+
+        // U2 is excluded from the results because the current user does not have read access to this user.
+        // U12 is excluded from the results because after U11, the 10 maximum results are already aggregated.
+        when(this.query.execute()).thenReturn(
+            asList("XWiki.U1", "XWiki.U2", "XWiki.U3", "XWiki.U4", "XWiki.U5", "XWiki.U6", "XWiki.U7",
+                "XWiki.U8", "XWiki.U9", "XWiki.U10", "XWiki.U11", "XWiki.U12"));
+        when(this.securityAuthorizationScriptService.hasAccess(any(), any()))
+            .thenReturn(true, false, true, true, true, true, true, true, true, true, true, true);
+
+        this.request.put("uorg", "user");
+
+        String render = this.templateManager.render(UORGSUGGEST).trim();
+
+        verify(this.queryManagerScriptService).xwql(
+            "from doc.object(XWiki.XWikiUsers) as user " + "where lower(doc.name) like :input "
+                + "or concat(concat(lower(user.first_name), ' '), lower(user.last_name)) like :input "
+                + "order by lower(user.first_name), user.first_name, lower(user.last_name), user.last_name");
+        InputStream inputStream = getClass().getResourceAsStream("/uorgsuggest/users.xml");
+        assertThat(fromString(render), isIdenticalTo(fromStream(inputStream)).ignoreWhitespace());
+    }
+
+    @Test
+    void usersGlobalJson() throws Exception
+    {
+        when(this.xwiki.getPlainUserName(new DocumentReference("xwiki", "XWiki", "U1"), this.context))
+            .thenReturn("User 1");
+
+        // U2 is excluded from the results because the current user does not have read access to this user.
+        // U12 is excluded from the results because after U11, the 10 maximum results are already aggregated.
+        when(this.query.execute()).thenReturn(
+            asList("XWiki.U1", "XWiki.U2", "XWiki.U3", "XWiki.U4", "XWiki.U5", "XWiki.U6", "XWiki.U7",
+                "XWiki.U8", "XWiki.U9", "XWiki.U10", "XWiki.U11", "XWiki.U12"));
+        when(this.securityAuthorizationScriptService.hasAccess(any(), any()))
+            .thenReturn(true, false, true, true, true, true, true, true, true, true, true, true);
+
+        this.request.put("uorg", "user");
+        this.request.put("media", "json");
+
+        String render = this.templateManager.render(UORGSUGGEST).trim();
+
+        verify(this.queryManagerScriptService).xwql(
+            "from doc.object(XWiki.XWikiUsers) as user " + "where lower(doc.name) like :input "
+                + "or concat(concat(lower(user.first_name), ' '), lower(user.last_name)) like :input "
+                + "order by lower(user.first_name), user.first_name, lower(user.last_name), user.last_name");
+
+        InputStream inputStream = getClass().getResourceAsStream("/uorgsuggest/users.json");
+        JSONAssert.assertEquals(IOUtils.toString(inputStream, StandardCharsets.UTF_8), render, true);
+    }
+
+    @Test
+    void groupsGlobalXML() throws Exception
+    {
+        when(this.query.execute()).thenReturn(asList("XWiki.G1", "XWiki.G2"));
+        when(this.securityAuthorizationScriptService.hasAccess(any(), any())).thenReturn(true, false);
+
+        String render = this.templateManager.render(UORGSUGGEST).trim();
+
+        verify(this.queryManagerScriptService).xwql(
+            "from doc.object(XWiki.XWikiGroups) as groups " + "where lower(doc.name) like :input "
+                + "and doc.fullName <> 'XWiki.XWikiGroupTemplate' " + "order by lower(doc.name), doc.name");
+
+        InputStream inputStream = getClass().getResourceAsStream("/uorgsuggest/groups.xml");
+        assertThat(fromString(render), isIdenticalTo(fromStream(inputStream)).ignoreWhitespace());
+    }
+
+    @Test
+    void groupsGlobalJson() throws Exception
+    {
+        when(this.query.execute()).thenReturn(asList("XWiki.G1", "XWiki.G2"));
+        when(this.securityAuthorizationScriptService.hasAccess(any(), any())).thenReturn(true, false);
+
+        this.request.put("media", "json");
+
+        String render = this.templateManager.render(UORGSUGGEST).trim();
+
+        verify(this.queryManagerScriptService).xwql(
+            "from doc.object(XWiki.XWikiGroups) as groups " + "where lower(doc.name) like :input "
+                + "and doc.fullName <> 'XWiki.XWikiGroupTemplate' " + "order by lower(doc.name), doc.name");
+
+        InputStream inputStream = getClass().getResourceAsStream("/uorgsuggest/groups.json");
+        JSONAssert.assertEquals(IOUtils.toString(inputStream, StandardCharsets.UTF_8), render, true);
+    }
+}

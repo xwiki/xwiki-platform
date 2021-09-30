@@ -58,5 +58,12 @@
       <version>1.3.0</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <!-- Unfortunately we cannot reuse the JSON.sortify module bundled with ChainPad. -->
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>json.sortify</artifactId>
+      <version>2.2.2</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

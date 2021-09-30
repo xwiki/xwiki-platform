@@ -64,12 +64,12 @@ define('xwiki-realtime-loader', [
     state: false
   },
 
-  ajaxVersionURL = new XWiki.Document('Version', 'RTFrontend').getURL('get'),
+  ajaxVersionURL = new XWiki.Document('Version', 'RTFrontend').getURL('get', 'xpage=plain'),
   getConfig = module.getConfig = function() {
     var userReference = xm.userReference ? XWiki.Model.serialize(xm.userReference) : 'xwiki:XWiki.XWikiGuest';
     return {
       saverConfig: {
-        ajaxMergeUrl: new XWiki.Document('Ajax', 'RTFrontend').getURL('get'),
+        ajaxMergeURL: new XWiki.Document('Ajax', 'RTFrontend').getURL('get', 'xpage=plain&outputSyntax=plain'),
         ajaxVersionURL,
         messages: Messages,
         language,
@@ -521,7 +521,7 @@ define('xwiki-realtime-loader', [
 
   checkVersion = function (callback) {
     $.ajax({
-      url: ajaxVersionURL + '?xpage=plain',
+      url: ajaxVersionURL,
       method: 'POST',
       dataType: 'json',
       success: function(data) {

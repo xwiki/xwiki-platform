@@ -63,8 +63,8 @@ define('xwiki-realtime-saver', [
 
   configure = Saver.configure = function(config) {
     $.extend(mainConfig, {
-      ajaxMergeUrl: config.ajaxMergeUrl + '?xpage=plain&outputSyntax=plain',
-      ajaxVersionUrl: config.ajaxVersionUrl,
+      ajaxMergeURL: config.ajaxMergeURL,
+      ajaxVersionURL: config.ajaxVersionURL,
       language: config.language,
       messages: config.messages,
       version: config.version,
@@ -130,8 +130,6 @@ define('xwiki-realtime-saver', [
   },
 
   ajaxMerge = function(content, cb) {
-    var url = mainConfig.ajaxMergeUrl;
-
     // version, document
     var stats = getDocumentStatistics();
 
@@ -144,7 +142,7 @@ define('xwiki-realtime-saver', [
     verbose(stats);
 
     $.ajax({
-      url: url,
+      url: mainConfig.ajaxMergeURL,
       method: 'POST',
       dataType: 'json',
       success: function (data) {
@@ -191,16 +189,14 @@ define('xwiki-realtime-saver', [
 
   // Check a server-side api for the version string of the document.
   ajaxVersion = function(callback) {
-    var url = mainConfig.ajaxVersionUrl + '?xpage=plain';
-    var stats = getDocumentStatistics();
     $.ajax({
-      url: url,
+      url: mainConfig.ajaxVersionURL,
       method: 'POST',
       dataType: 'json',
       success: function(data) {
         callback(null, data);
       },
-      data: stats,
+      data: getDocumentStatistics(),
       error: function(error) {
         callback(error, null);
       }

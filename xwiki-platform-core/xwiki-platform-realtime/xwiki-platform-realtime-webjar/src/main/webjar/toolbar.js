@@ -80,19 +80,25 @@ define('xwiki-realtime-toolbar', [
       return user;
     }).map(function(user) {
       // Display the users.
-      var userDisplay = '';
+      var userDisplay = $('<span/>').attr({
+        'class': Config.marginAvatar === '1' ? 'rt-user-link' : '',
+        'data-id': user.id
+      });
+      if (displayConfig === undefined || displayConfig === 'name' || displayConfig === 'both') {
+        userDisplay.text(user.name);
+      }
       if (displayConfig === 'avatar' || displayConfig === 'both') {
         if (user.avatar) {
-          userDisplay += `<img class="rt-user-avatar" src="${user.avatar}?width=25" alt="" title="${user.name}" />`;
+          $('<img class="rt-user-avatar"/>').attr({
+            src: user.avatar,
+            title: user.name
+          }).prependTo(userDisplay);
         } else if (user.avatar === '') {
-          userDisplay += `<span class="rt-user-fake-avatar" title="${user.name}">${user.name.substr(0, 1)}</span>`;
+          $('<span class="rt-user-fake-avatar"/>').attr('title', user.name).text(user.name.substring(0, 1))
+            .prependTo(userDisplay);
         }
       }
-      if (displayConfig === undefined || displayConfig === 'name' || displayConfig === 'both') {
-        userDisplay += user.name;
-      }
-      var linkClass = Config.marginAvatar === '1' ? 'rt-user-link' : '';
-      return `<span class="${linkClass}" data-id="${user.id}">${userDisplay}</span>`;
+      return userDisplay.html();
     }).join(displayConfig === 'avatar' ? ' ' : ', ');
   };
 

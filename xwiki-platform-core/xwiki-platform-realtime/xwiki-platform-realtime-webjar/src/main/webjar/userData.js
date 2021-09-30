@@ -17,7 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-realtime-userData', ['chainpad-netflux', 'json.sortify'], function(chainpadNetflux, jsonSortify) {
+define('xwiki-realtime-userData', [
+  'chainpad',
+  'chainpad-netflux',
+  'json.sortify'
+], function(ChainPad, chainpadNetflux, jsonSortify) {
   'use strict';
   var userData, onChange;
   var updateUserData = function(textData) {
@@ -44,6 +48,8 @@ define('xwiki-realtime-userData', ['chainpad-netflux', 'json.sortify'], function
       userName: configData.userName,
       channel: key,
       crypto: configData.crypto || null,
+      // Operational Transformation
+      patchTransformer: ChainPad.SmartJSONTransformer,
 
       onReady: function(info) {
         module.leave = info.leave;
@@ -91,7 +97,7 @@ define('xwiki-realtime-userData', ['chainpad-netflux', 'json.sortify'], function
       myUserData['cursor_' + configData.editor] = cursor;
     }
     if (typeof configData.userAvatar === 'string') {
-      myUserData.avatar = userAvatar;
+      myUserData.avatar = configData.userAvatar;
     }
     return myUserData;
   };
@@ -133,6 +139,7 @@ define('xwiki-realtime-userData', ['chainpad-netflux', 'json.sortify'], function
       }
     };
 
+    return userData;
   };
 
   module.start = function(network, key, configData) {

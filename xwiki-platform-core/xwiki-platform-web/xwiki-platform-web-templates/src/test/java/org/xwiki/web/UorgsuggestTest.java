@@ -39,6 +39,7 @@ import org.xwiki.security.authorization.script.SecurityAuthorizationScriptServic
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.velocity.tools.JSONTool;
@@ -84,6 +85,8 @@ class UorgsuggestTest extends PageTest
     @BeforeEach
     void setUp() throws Exception
     {
+        IconSetup.setUp(this, "/icons/default.iconset");
+
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         this.componentManager.registerComponent(ScriptService.class, "query", this.queryManagerScriptService);
         when(this.queryManagerScriptService.xwql(anyString())).thenReturn(this.query);

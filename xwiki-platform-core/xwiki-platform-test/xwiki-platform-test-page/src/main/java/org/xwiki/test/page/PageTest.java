@@ -34,7 +34,6 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.environment.Environment;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.model.reference.DocumentReference;
@@ -59,12 +58,10 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
-import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
@@ -244,8 +241,6 @@ public class PageTest
         // Configure mocks from OldcoreRule
         context = oldcore.getXWikiContext();
         xwiki = oldcore.getSpyXWiki();
-        
-        initializeEngineContext();
 
         // We need this one because some component in its init creates a query...
         when(oldcore.getQueryManager().createQuery(any(String.class), any(String.class))).thenReturn(mock(Query.class));
@@ -277,18 +272,6 @@ public class PageTest
 
         // Set up Skin Extensions
         SkinExtensionSetup.setUp(xwiki, context);
-    }
-
-    private void initializeEngineContext()
-    {
-        XWikiEngineContext xWikiEngineContext = mock(XWikiEngineContext.class);
-        when(this.xwiki.getEngineContext()).thenReturn(xWikiEngineContext);
-        when(xWikiEngineContext.getResourceAsStream(anyString())).thenAnswer(invocationOnMock -> {
-            String resourcePath = invocationOnMock.getArgument(0);
-            Environment instance = this.componentManager.getInstance(Environment.class);
-            String resourceName = resourcePath.replaceFirst("/resources", "");
-            return instance.getResourceAsStream(resourceName);
-        });
     }
 
     /**

@@ -3,7 +3,7 @@
     "value": "XWiki.U1",
     "label": "User 1",
     "icon": {
-      "iconSetName": "default",
+      "iconSetName": "FakeIconTheme",
       "cssClass": "",
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
@@ -14,7 +14,7 @@
     "value": "XWiki.U3",
     "label": "U3",
     "icon": {
-      "iconSetName": "default",
+      "iconSetName": "FakeIconTheme",
       "cssClass": "",
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
@@ -25,7 +25,7 @@
     "value": "XWiki.U4",
     "label": "U4",
     "icon": {
-      "iconSetName": "default",
+      "iconSetName": "FakeIconTheme",
       "cssClass": "",
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
@@ -36,7 +36,7 @@
     "value": "XWiki.U5",
     "label": "U5",
     "icon": {
-      "iconSetName": "default",
+      "iconSetName": "FakeIconTheme",
       "cssClass": "",
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
@@ -47,7 +47,7 @@
     "value": "XWiki.U6",
     "label": "U6",
     "icon": {
-      "iconSetName": "default",
+      "iconSetName": "FakeIconTheme",
       "cssClass": "",
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
@@ -58,7 +58,7 @@
     "value": "XWiki.U7",
     "label": "U7",
     "icon": {
-      "iconSetName": "default",
+      "iconSetName": "FakeIconTheme",
       "cssClass": "",
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
@@ -69,7 +69,7 @@
     "value": "XWiki.U8",
     "label": "U8",
     "icon": {
-      "iconSetName": "default",
+      "iconSetName": "FakeIconTheme",
       "cssClass": "",
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
@@ -80,7 +80,7 @@
     "value": "XWiki.U9",
     "label": "U9",
     "icon": {
-      "iconSetName": "default",
+      "iconSetName": "FakeIconTheme",
       "cssClass": "",
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
@@ -91,7 +91,7 @@
     "value": "XWiki.U10",
     "label": "U10",
     "icon": {
-      "iconSetName": "default",
+      "iconSetName": "FakeIconTheme",
       "cssClass": "",
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"
@@ -102,7 +102,7 @@
     "value": "XWiki.U11",
     "label": "U11",
     "icon": {
-      "iconSetName": "default",
+      "iconSetName": "FakeIconTheme",
       "cssClass": "",
       "iconSetType": "IMAGE",
       "url": "/xwiki/skins/flamingo/icons/silk/user.png"

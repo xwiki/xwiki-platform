@@ -49,7 +49,7 @@
 ## Check if the translation in the requested language exists.
 ## If the translation does not exist, i.e. "getTranslatedDocument" is the default document, it means it's a new
 ## translation. In that case we have to set the version and "isNew" to the correct values.
-#if ($language != 'default' &amp;&amp; $translatedDocument.locale != $language)
+#if ($language != 'default' &amp;&amp; $translatedDocument.realLocale != $language)
   #set ($isNew = true)
   #set ($currentVersion = '1.1')
   #set ($currentVersionTime = 0)

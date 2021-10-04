@@ -703,26 +703,15 @@ define('xwiki-realtime-saver', [
         }, /* force: */ true, cont);
       };
 
-      // Replace callbacks for the save and view button.
-      $('[name="action_save"]').off('click').click(function(e) {
-        e.preventDefault();
-        if ($(this).attr('disabled') === 'disabled') {
-          return;
-        }
-        saveButtonAction(/* shouldRedirect: */ true);
-      });
-
-      // Replace callbacks for the save and continue button.
-      var $sac = $('[name="action_saveandcontinue"]');
-      // FIXME: Find a way to remove the event listeners without using Prototype.js API.
-      $sac[0].stopObserving();
-      $sac.off('click').click(function(e) {
-        e.preventDefault();
-        // should redirect?
-        if ($(this).attr('disabled') === 'disabled') {
-          return;
-        }
-        saveButtonAction(/* shouldRedirect: */ false);
+      // Replace callbacks for the save buttons.
+      $('[name="action_save"], [name="action_saveandcontinue"]').each(function() {
+        // TODO: Update this if we rewrite actionButtons.js to use jQuery instead of Prototype.js
+        var clickListeners = Event.cache[this._prototypeUID || this.uniqueID]?.click?.map(entry => entry.handler);
+        $(this).data('prototype.js/clickListeners', clickListeners);
+        this.stopObserving('click');
+      }).off('click.realtime-saver').on('click.realtime-saver', function(event) {
+        event.preventDefault();
+        saveButtonAction(/* shouldRedirect: */ $(this).attr('name') === 'action_save');
       });
 
       // There's a very small chance that the preview button might cause problems, so let's just get rid of it.
@@ -773,7 +762,7 @@ define('xwiki-realtime-saver', [
       };
       // FIXME: Find a way to remove the old listener without using Prototype.js API.
       document.stopObserving('xwiki:document:saved');
-      $(document).on('xwiki:document:saved.rte', onSavedHandler);
+      $(document).on('xwiki:document:saved.realtime-saver', onSavedHandler);
 
       var onSaveFailedHandler = mainConfig.onSaveFailed = function(ev) {
         var debugLog = {
@@ -793,7 +782,7 @@ define('xwiki-realtime-saver', [
       };
       // FIXME: Find a way to remove the old listener without using Prototype.js API.
       document.stopObserving('xwiki:document:saveFailed');
-      $(document).on('xwiki:document:saveFailed.rte', onSaveFailedHandler);
+      $(document).on('xwiki:document:saveFailed.realtime-saver', onSaveFailedHandler);
 
       // TimeOut
       var check = function() {
@@ -886,25 +875,10 @@ define('xwiki-realtime-saver', [
     clearTimeout(mainConfig.autosaveTimeout);
     rtData = {};
     // Remove the merge routine from the save buttons.
-    $(document).off('xwiki:document:saved.rte xwiki:document:saveFailed.rte');
-    // remove callbacks for the save and view button. The button will now submit the "Save and view" form.
-    $('[name="action_save"]').off('click').click(function(e) {
-      if ($(this).attr('disabled') === 'disabled') {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    });
-
-    // Replace callbacks for the save and continue button.
-    $('[name="action_saveandcontinue"]').off('click').click(function(e) {
-      e.preventDefault();
-      if ($(this).attr('disabled') === 'disabled') {
-        return;
-      }
-      document.fire('xwiki:actions:save', {
-        form: $('#' + mainConfig.formId)[0],
-        continue: 1
-      });
+    $(document).off('xwiki:document:saved.realtime-saver xwiki:document:saveFailed.realtime-saver');
+    // Remove our custom click listeners from the save buttons and restore the original click listeners.
+    $('[name="action_save"], [name="action_saveandcontinue"]').off('click.realtime-saver').each(function() {
+      $(this).data('prototype.js/clickListeners')?.forEach($.proxy(this, 'observe', 'click'));
     });
   };
 

@@ -142,7 +142,7 @@ $response.setContentType("application/json")
   #set ($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${docName}"))
   #set ($row = {'doc_viewable' : $viewable})
   #if (!$viewable)
-    #set ($discard = $row.put('doc_fullName', "${xcontext.database}:${item}"))
+    #set ($discard = $row.put('doc_fullName', 'obfuscated'))
   #else
     #set ($itemDoc = $xwiki.getDocument($docName))
     ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
@@ -203,7 +203,21 @@ $response.setContentType("application/json")
   #end
   #set ($discard = $rows.add($row))
 #end
-#set ($discard = $map.put('rows', $rows))
+## When the total number of rows is lower than the limit, we remove the obfuscated results from the response since
+## this has no impact on the pagination.
+#if ($map.get('totalrows') <= $limit)
+  #set ($filteredRows = [])
+  #foreach ($row in $rows) 
+    #if($row['doc_viewable'])
+      #set ($discard = $filteredRows.add($row))
+    #end
+  #end
+  #set($discard = $map.put('totalrows', $filteredRows.size()))
+  #set($discard = $map.put('returnedrows', $filteredRows.size()))
+#else
+  #set ($filteredRows = $rows)
+#end
+#set ($discard = $map.put('rows', $filteredRows))
 ##
 ## Serialize the JSON
 ##

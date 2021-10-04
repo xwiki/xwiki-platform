@@ -31,13 +31,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
-import org.xwiki.query.Query;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.script.SecurityAuthorizationScriptService;
+import org.xwiki.security.authorization.script.internal.RightConverter;
+import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax20ComponentList;
 import org.xwiki.velocity.tools.EscapeTool;
@@ -50,11 +55,14 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.plugin.tag.TagPluginApi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -66,11 +74,19 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @XWikiSyntax20ComponentList
+@ComponentList({
+    // SecurityScriptService
+    SecurityScriptService.class,
+    RightConverter.class,
+    EntityReferenceConverter.class,
+    // SecurityAuthorizationScriptService
+    SecurityAuthorizationScriptService.class,
+    // ModelScriptService
+    ModelScriptService.class
+})
 class LiveTableResultsTest extends PageTest
 {
     private QueryManagerScriptService queryService;
-
-    private ModelScriptService modelService;
 
     private Map<String, Object> results;
 
@@ -91,10 +107,6 @@ class LiveTableResultsTest extends PageTest
         // Prepare mock Query Service so that tests can control what the DB returns.
         this.queryService = mock(QueryManagerScriptService.class);
         this.oldcore.getMocker().registerComponent(ScriptService.class, "query", this.queryService);
-
-        // Prepare mock ModelScriptService so that tests can control what the model returns.
-        this.modelService = mock(ModelScriptService.class);
-        this.oldcore.getMocker().registerComponent(ScriptService.class, "model", this.modelService);
 
         // The LiveTableResultsMacros page uses the tag plugin for the LT tag cloud feature
         TagPluginApi tagPluginApi = mock(TagPluginApi.class);
@@ -131,28 +143,20 @@ class LiveTableResultsTest extends PageTest
         when(this.query.count()).thenReturn(17L);
         when(this.query.execute()).thenReturn(Arrays.asList("A.B", "X.Y"));
 
-        DocumentReference abReference = new DocumentReference("wiki", "A", "B");
-        when(this.modelService.resolveDocument("A.B")).thenReturn(abReference);
-        when(this.modelService.serialize(abReference.getParent(), "local")).thenReturn("A");
-
-        DocumentReference xyReference = new DocumentReference("wiki", "X", "Y");
-        when(this.modelService.resolveDocument("X.Y")).thenReturn(xyReference);
-        when(this.modelService.serialize(xyReference.getParent(), "local")).thenReturn("X");
-
         renderPage();
 
         assertEquals(17L, getTotalRowCount());
         assertEquals(2, getRowCount());
         assertEquals(13, getOffset());
 
-        List<Map<String, String>> rows = getRows();
+        List<Map<String, Object>> rows = getRows();
         assertEquals(2, rows.size());
 
-        Map<String, String> ab = rows.get(0);
+        Map<String, Object> ab = rows.get(0);
         assertEquals("A", ab.get("doc_space"));
         assertEquals("B", ab.get("doc_name"));
 
-        Map<String, String> xy = rows.get(1);
+        Map<String, Object> xy = rows.get(1);
         assertEquals("X", xy.get("doc_space"));
         assertEquals("Y", xy.get("doc_name"));
     }
@@ -166,6 +170,12 @@ class LiveTableResultsTest extends PageTest
         setColumns("where");
         setSort("where", true);
         setClassName("My.Class");
+
+        when(this.queryService.hql(any())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
 
         renderPage();
 
@@ -183,6 +193,12 @@ class LiveTableResultsTest extends PageTest
     @Test
     void orderByLocation() throws Exception
     {
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
+
         setSort("doc.location", false);
 
         renderPage();
@@ -204,11 +220,11 @@ class LiveTableResultsTest extends PageTest
         setLocation("Hello");
         setFilter("doc.location", "test");
 
-        Query query = mock(Query.class);
-        when(this.queryService.hql(any(String.class))).thenReturn(query);
-        when(query.setLimit(anyInt())).thenReturn(query);
-        when(query.setOffset(anyInt())).thenReturn(query);
-        when(query.bindValues(anyMap())).thenReturn(query);
+        when(this.queryService.hql(any(String.class))).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(anyMap())).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
 
         renderPage();
 
@@ -248,6 +264,8 @@ class LiveTableResultsTest extends PageTest
         when(this.queryService.hql(anyString())).thenReturn(this.query);
         when(this.query.setLimit(anyInt())).thenReturn(this.query);
         when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
 
         renderPage();
 
@@ -296,6 +314,8 @@ class LiveTableResultsTest extends PageTest
         when(this.queryService.hql(anyString())).thenReturn(this.query);
         when(this.query.setLimit(anyInt())).thenReturn(this.query);
         when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
 
         renderPage();
 
@@ -331,7 +351,7 @@ class LiveTableResultsTest extends PageTest
     void filterStringMultipleValues() throws Exception
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "Panels", "PanelClass"));
-        StaticListClass category = document.getXClass().addStaticListField("category");
+        document.getXClass().addStaticListField("category");
         this.xwiki.saveDocument(document, "creates PanelClass", true, this.context);
 
         setColumns("name,description,category");
@@ -350,6 +370,8 @@ class LiveTableResultsTest extends PageTest
         when(this.queryService.hql(anyString())).thenReturn(this.query);
         when(this.query.setLimit(anyInt())).thenReturn(this.query);
         when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
 
         renderPage();
 
@@ -393,6 +415,8 @@ class LiveTableResultsTest extends PageTest
         when(this.queryService.hql(anyString())).thenReturn(this.query);
         when(this.query.setLimit(anyInt())).thenReturn(this.query);
         when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
 
         renderPage();
 
@@ -413,6 +437,58 @@ class LiveTableResultsTest extends PageTest
         verify(this.query).bindValues(values);
     }
 
+    @Test
+    void nonViewableResultsAreObfuscated() throws Exception
+    {
+        this.request.put("limit", "2");
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(3L);
+        when(this.query.execute()).thenReturn(Arrays.asList("XWiki.NotViewable", "XWiki.Viewable"));
+
+        when(this.oldcore.getMockContextualAuthorizationManager()
+            .hasAccess(same(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "NotViewable")))).thenReturn(false);
+
+        renderPage();
+
+        List<Map<String, Object>> rows = getRows();
+        assertEquals(2, rows.size());
+        assertEquals(2, getRowCount());
+        Map<String, Object> obfuscated = rows.get(0);
+        assertFalse((boolean) obfuscated.get("doc_viewable"));
+        assertEquals("obfuscated", obfuscated.get("doc_fullName"));
+
+        Map<String, Object> viewable = rows.get(1);
+        assertTrue((boolean) viewable.get("doc_viewable"));
+        assertEquals("XWiki.Viewable", viewable.get("doc_fullName"));
+    }
+
+    @Test
+    void removeObuscatedResultsWhenTotalrowsLowerThanLimit() throws Exception
+    {
+        this.request.put("limit", "2");
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(2L);
+        when(this.query.execute()).thenReturn(Arrays.asList("XWiki.NotViewable", "XWiki.Viewable"));
+
+        when(this.oldcore.getMockContextualAuthorizationManager()
+            .hasAccess(same(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "NotViewable")))).thenReturn(false);
+
+        renderPage();
+
+        List<Map<String, Object>> rows = getRows();
+        assertEquals(1, rows.size());
+        assertEquals(1, getRowCount());
+
+        Map<String, Object> viewable = rows.get(0);
+        assertTrue((boolean) viewable.get("doc_viewable"));
+        assertEquals("XWiki.Viewable", viewable.get("doc_fullName"));
+    }
 
     //
     // Helper methods
@@ -498,8 +574,8 @@ class LiveTableResultsTest extends PageTest
     }
 
     @SuppressWarnings("unchecked")
-    private List<Map<String, String>> getRows()
+    private List<Map<String, Object>> getRows()
     {
-        return (List<Map<String, String>>) this.results.get("rows");
+        return (List<Map<String, Object>>) this.results.get("rows");
     }
 }

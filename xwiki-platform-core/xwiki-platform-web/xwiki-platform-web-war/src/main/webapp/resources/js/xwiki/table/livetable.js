@@ -452,6 +452,13 @@ XWiki.widgets.LiveTable = Class.create({
           }
           container.update(text.escapeHTML());
         }
+
+        // When a cell is part of a non-viewable row, we display a content indicating that the content is not present
+        // because the current user does not have the right to view it.
+        if (!row['doc_viewable'] && !row[column]) {
+          td.update($(table.domNodeName + '-inaccessible-cell').innerHTML + '<sup>*</sup>')
+        }
+        
         tr.appendChild(td);
       }
     });

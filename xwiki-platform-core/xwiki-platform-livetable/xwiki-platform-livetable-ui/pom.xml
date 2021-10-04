@@ -80,5 +80,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Security Script Component List for the Page Tests -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-script</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

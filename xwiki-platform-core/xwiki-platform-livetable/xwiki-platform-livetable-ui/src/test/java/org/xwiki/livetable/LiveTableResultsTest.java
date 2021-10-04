@@ -31,7 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.query.internal.ScriptQuery;
@@ -39,9 +38,7 @@ import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authorization.script.SecurityAuthorizationScriptService;
-import org.xwiki.security.authorization.script.internal.RightConverter;
-import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax20ComponentList;
@@ -74,14 +71,8 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @XWikiSyntax20ComponentList
+@SecurityScriptServiceComponentList
 @ComponentList({
-    // SecurityScriptService
-    SecurityScriptService.class,
-    RightConverter.class,
-    EntityReferenceConverter.class,
-    // SecurityAuthorizationScriptService
-    SecurityAuthorizationScriptService.class,
-    // ModelScriptService
     ModelScriptService.class
 })
 class LiveTableResultsTest extends PageTest

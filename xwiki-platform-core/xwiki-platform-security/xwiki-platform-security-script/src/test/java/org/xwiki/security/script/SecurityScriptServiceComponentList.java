@@ -25,6 +25,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
+import org.xwiki.security.authorization.script.SecurityAuthorizationScriptService;
 import org.xwiki.security.authorization.script.internal.RightConverter;
 import org.xwiki.test.annotation.ComponentList;
 
@@ -48,6 +49,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     SecurityScriptService.class,
     RightConverter.class,
     EntityReferenceConverter.class,
+    SecurityAuthorizationScriptService.class
 })
 @Inherited
 public @interface SecurityScriptServiceComponentList

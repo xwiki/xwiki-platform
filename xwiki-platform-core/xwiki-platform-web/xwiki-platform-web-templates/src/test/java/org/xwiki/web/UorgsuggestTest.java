@@ -34,6 +34,7 @@ import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.script.SecurityAuthorizationScriptService;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
@@ -44,6 +45,8 @@ import org.xwiki.velocity.tools.JSONTool;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.verify;
@@ -78,9 +81,6 @@ class UorgsuggestTest extends PageTest
     @Mock
     private ScriptQuery query;
 
-    @Mock
-    private SecurityAuthorizationScriptService securityAuthorizationScriptService;
-
     @BeforeEach
     void setUp() throws Exception
     {
@@ -90,9 +90,6 @@ class UorgsuggestTest extends PageTest
         when(this.query.setWiki(any())).thenReturn(this.query);
         when(this.query.addFilter(anyString())).thenReturn(this.query);
         when(this.query.bindValue(anyString(), any())).thenReturn(this.query);
-
-        this.componentManager.registerComponent(ScriptService.class, "security.authorization",
-            this.securityAuthorizationScriptService);
 
         registerVelocityTool("escapetool", new EscapeTool());
         registerVelocityTool("jsontool", new JSONTool());
@@ -107,10 +104,11 @@ class UorgsuggestTest extends PageTest
         // U2 is excluded from the results because the current user does not have read access to this user.
         // U12 is excluded from the results because after U11, the 10 maximum results are already aggregated.
         when(this.query.execute()).thenReturn(
-            asList("XWiki.U1", "XWiki.U2", "XWiki.U3", "XWiki.U4", "XWiki.U5", "XWiki.U6", "XWiki.U7",
-                "XWiki.U8", "XWiki.U9", "XWiki.U10", "XWiki.U11", "XWiki.U12"));
-        when(this.securityAuthorizationScriptService.hasAccess(any(), any()))
-            .thenReturn(true, false, true, true, true, true, true, true, true, true, true, true);
+            asList("xwiki:XWiki.U1", "xwiki:XWiki.U2", "xwiki:XWiki.U3", "xwiki:XWiki.U4", "xwiki:XWiki.U5",
+                "xwiki:XWiki.U6", "xwiki:XWiki.U7", "xwiki:XWiki.U8", "xwiki:XWiki.U9", "xwiki:XWiki.U10",
+                "xwiki:XWiki.U11", "xwiki:XWiki.U12"));
+        when(this.oldcore.getMockContextualAuthorizationManager()
+            .hasAccess(same(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "U2")))).thenReturn(false);
 
         this.request.put("uorg", "user");
 
@@ -132,11 +130,12 @@ class UorgsuggestTest extends PageTest
 
         // U2 is excluded from the results because the current user does not have read access to this user.
         // U12 is excluded from the results because after U11, the 10 maximum results are already aggregated.
-        when(this.query.execute()).thenReturn(
-            asList("XWiki.U1", "XWiki.U2", "XWiki.U3", "XWiki.U4", "XWiki.U5", "XWiki.U6", "XWiki.U7",
-                "XWiki.U8", "XWiki.U9", "XWiki.U10", "XWiki.U11", "XWiki.U12"));
-        when(this.securityAuthorizationScriptService.hasAccess(any(), any()))
-            .thenReturn(true, false, true, true, true, true, true, true, true, true, true, true);
+        when(this.query.execute())
+            .thenReturn(asList("xwiki:XWiki.U1", "xwiki:XWiki.U2", "xwiki:XWiki.U3", "xwiki:XWiki.U4", "xwiki:XWiki.U5",
+                "xwiki:XWiki.U6", "xwiki:XWiki.U7", "xwiki:XWiki.U8", "xwiki:XWiki.U9", "xwiki:XWiki.U10",
+                "xwiki:XWiki.U11", "xwiki:XWiki.U12"));
+        when(this.oldcore.getMockContextualAuthorizationManager()
+            .hasAccess(same(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "U2")))).thenReturn(false);
 
         this.request.put("uorg", "user");
         this.request.put("media", "json");
@@ -155,8 +154,9 @@ class UorgsuggestTest extends PageTest
     @Test
     void groupsGlobalXML() throws Exception
     {
-        when(this.query.execute()).thenReturn(asList("XWiki.G1", "XWiki.G2"));
-        when(this.securityAuthorizationScriptService.hasAccess(any(), any())).thenReturn(true, false);
+        when(this.query.execute()).thenReturn(asList("xwiki:XWiki.G1", "xwiki:XWiki.G2"));
+        when(this.oldcore.getMockContextualAuthorizationManager()
+            .hasAccess(same(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "G2")))).thenReturn(false);
 
         String render = this.templateManager.render(UORGSUGGEST).trim();
 
@@ -171,9 +171,9 @@ class UorgsuggestTest extends PageTest
     @Test
     void groupsGlobalJson() throws Exception
     {
-        when(this.query.execute()).thenReturn(asList("XWiki.G1", "XWiki.G2"));
-        when(this.securityAuthorizationScriptService.hasAccess(any(), any())).thenReturn(true, false);
-
+        when(this.query.execute()).thenReturn(asList("xwiki:XWiki.G1", "xwiki:XWiki.G2"));
+        when(this.oldcore.getMockContextualAuthorizationManager()
+            .hasAccess(same(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "G2")))).thenReturn(false);
         this.request.put("media", "json");
 
         String render = this.templateManager.render(UORGSUGGEST).trim();

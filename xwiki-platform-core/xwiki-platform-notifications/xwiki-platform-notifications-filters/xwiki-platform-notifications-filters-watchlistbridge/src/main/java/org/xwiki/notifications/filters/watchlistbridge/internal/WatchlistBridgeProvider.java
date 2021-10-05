@@ -32,6 +32,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.SetUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -49,7 +50,6 @@ import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 import org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheManager;
 
-import com.google.common.collect.Sets;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -197,7 +197,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
         pref.setId(id);
         pref.setEnabled(true);
-        pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
+        pref.setNotificationFormats(SetUtils.hashSet(NotificationFormat.values()));
         pref.setProviderHint(PROVIDER_HINT);
         pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         pref.setFilterType(NotificationFilterType.INCLUSIVE);

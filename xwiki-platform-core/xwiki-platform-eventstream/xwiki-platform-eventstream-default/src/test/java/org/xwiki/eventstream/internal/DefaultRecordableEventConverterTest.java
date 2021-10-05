@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.collections4.SetUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -39,7 +40,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import com.google.common.collect.Sets;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -77,7 +77,7 @@ class DefaultRecordableEventConverterTest
 
     private static final WikiReference CURRENT_WIKI = new WikiReference("wiki");
 
-    private static final Set<String> TARGETS = Sets.newHashSet("userB", "groupC");
+    private static final Set<String> TARGETS = SetUtils.hashSet("userB", "groupC");
 
     @BeforeEach
     void setUp() throws Exception

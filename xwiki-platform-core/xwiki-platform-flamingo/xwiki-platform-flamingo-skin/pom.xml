@@ -33,6 +33,7 @@
   <description>XWiki Platform - Flamingo - Skin - Parent POM</description>
   <modules>
     <module>xwiki-platform-flamingo-skin-resources</module>
+    <module>xwiki-platform-flamingo-skin-resources-page-test</module>
   </modules>
   <profiles>
     <profile>

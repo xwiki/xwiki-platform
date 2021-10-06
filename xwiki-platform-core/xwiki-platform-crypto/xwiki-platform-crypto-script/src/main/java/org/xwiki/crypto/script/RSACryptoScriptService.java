@@ -21,7 +21,6 @@ package org.xwiki.crypto.script;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Date;
@@ -81,8 +80,6 @@ public class RSACryptoScriptService implements ScriptService
      * The role hint of this component.
      */
     public static final String ROLEHINT = "rsa";
-
-    private static final Charset UTF8 = Charset.forName("UTF-8");
 
     @Inject
     @Named("RSA")
@@ -330,7 +327,7 @@ public class RSACryptoScriptService implements ScriptService
             params = new X509CertificateParameters(
                 extensionBuilder.get().addSubjectAltName(false, subjectAltName.toArray(new X509GeneralName[]{}))
                     .build());
-            Set<String> extUsage = new HashSet<String>();
+            Set<String> extUsage = new HashSet<>();
             for (X509GeneralName genName : subjectAltName) {
                 if (genName instanceof X509Rfc822Name) {
                     extUsage.add(ExtendedKeyUsages.EMAIL_PROTECTION);
@@ -410,7 +407,7 @@ public class RSACryptoScriptService implements ScriptService
             }
         }
 
-        Set<CertifiedPublicKey> certs = new HashSet<CertifiedPublicKey>();
+        Set<CertifiedPublicKey> certs = new HashSet<>();
         if (existingSignature != null && existingSignature.getCertificates() != null) {
             certs.addAll(existingSignature.getCertificates());
         }

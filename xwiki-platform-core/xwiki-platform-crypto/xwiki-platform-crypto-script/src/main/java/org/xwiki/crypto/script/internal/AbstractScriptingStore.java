@@ -19,8 +19,6 @@
  */
 package org.xwiki.crypto.script.internal;
 
-import java.nio.charset.Charset;
-
 import org.xwiki.crypto.store.StoreReference;
 import org.xwiki.crypto.store.WikiStoreReference;
 import org.xwiki.security.authorization.AccessDeniedException;
@@ -35,8 +33,6 @@ import org.xwiki.security.authorization.Right;
  */
 public abstract class AbstractScriptingStore
 {
-    protected static final Charset UTF8 = Charset.forName("UTF-8");
-
     protected StoreReference storeReference;
 
     private ContextualAuthorizationManager contextualAuthorizationManager;

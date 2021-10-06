@@ -24,12 +24,9 @@ import org.junit.Before;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.observation.EventListener;
-import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
-import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;

@@ -45,7 +45,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @since 12.4RC1
  */
 @ComponentTest
-public class NormalUserConfigurationSourceAuthorizationTest
+class NormalUserConfigurationSourceAuthorizationTest
 {
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
 

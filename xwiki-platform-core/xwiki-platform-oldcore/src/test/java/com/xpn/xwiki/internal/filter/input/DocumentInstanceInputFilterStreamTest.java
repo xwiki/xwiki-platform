@@ -26,7 +26,6 @@ import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.filter.FilterException;
-import org.xwiki.filter.input.StringInputSource;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.model.reference.DocumentReference;

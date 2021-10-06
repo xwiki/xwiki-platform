@@ -21,7 +21,6 @@ package org.xwiki.notifications.notifiers.internal.email.live;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.EntityEvent;
-import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.MailEntityAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
@@ -40,7 +39,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class PrefilteringLiveNotificationEmailListenerTest
+class PrefilteringLiveNotificationEmailListenerTest
 {
     private static final MailEntityAddedEvent EVENT = new MailEntityAddedEvent();
 

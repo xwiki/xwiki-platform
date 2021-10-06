@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,8 +134,17 @@ public class FormContainerElement extends BaseElement
                 select.selectByValue(value);
             }
         } else {
-            fieldElement.clear();
-            fieldElement.sendKeys(value);
+            List<String> classes = Arrays.asList(fieldElement.getAttribute("class").split("\\s+"));
+            // If the field is a date time picker, calling sendKeys after clear triggers a focus and the field,
+            // and the picker fills the field with the current date and time before sendKeys is calls, leading to an
+            // invalid content field. In this case, we use a javascript expression to set the value without interacting
+            // with the UI.
+            if (classes.contains("datetime")) {
+                getDriver().executeJavascript("arguments[0].value = arguments[1]", fieldElement, value);
+            } else {
+                fieldElement.clear();
+                fieldElement.sendKeys(value);
+            }
         }
     }
 

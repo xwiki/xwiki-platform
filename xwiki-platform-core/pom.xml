@@ -156,36 +156,7 @@
                    </differences>
                  </revapi.differences>
             -->
-            <revapi.differences>
-              <criticality>highlight</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.returnTypeChanged</code>
-                  <old>method javax.mail.internet.InternetAddress org.xwiki.security.authentication.script.AuthenticationScriptService::requestResetPassword(org.xwiki.user.UserReference) throws org.xwiki.security.authentication.ResetPasswordException</old>
-                  <new>method void org.xwiki.security.authentication.script.AuthenticationScriptService::requestResetPassword(org.xwiki.user.UserReference) throws org.xwiki.security.authentication.ResetPasswordException</new>
-                  <justification>Unstable API: this API was not properly designed and shouldn't have returned that in first place.</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method javax.mail.internet.InternetAddress org.xwiki.security.authentication.ResetPasswordRequestResponse::getUserEmail()</old>
-                  <justification>Unstable API: this API was not properly designed and shouldn't have returned that in first place.</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.XWiki::invokeServletAndReturnAsString(java.lang.String, com.xpn.xwiki.XWikiContext)</old>
-                  <justification>Not a breackage. Moved to legacy.</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::invokeServletAndReturnAsString(java.lang.String)</old>
-                  <justification>Not a breackage. Moved to legacy.</justification>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

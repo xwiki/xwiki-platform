@@ -59,7 +59,6 @@ import ch.qos.logback.classic.Level;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.followOutput;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getAgentName;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getResultFileLocation;
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isLocal;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.setLogbackLoggerLevel;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreenshot;

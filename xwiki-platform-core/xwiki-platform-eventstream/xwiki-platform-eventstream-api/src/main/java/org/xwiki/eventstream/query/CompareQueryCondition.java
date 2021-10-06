@@ -94,6 +94,22 @@ public class CompareQueryCondition extends AbstractPropertyQueryCondition
     }
 
     /**
+     * @param property the name of the property
+     * @param custom true if the property is a custom parameter
+     * @param value the value the property should be equal to
+     * @param type the type of comparison
+     * @param reversed true if the condition should be reversed
+     * @since 13.9RC1
+     */
+    public CompareQueryCondition(String property, boolean custom, Object value, CompareType type, boolean reversed)
+    {
+        super(reversed, property, custom);
+
+        this.value = value;
+        this.type = type;
+    }
+
+    /**
      * @return the value the property should be equal to
      */
     public Object getValue()

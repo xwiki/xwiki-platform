@@ -24,7 +24,6 @@ import java.util.Map;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
-import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.internet.MimeMessage;
 
@@ -67,7 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-mail-send-storage"
     }
 )
-public class ForgotUsernameIT
+class ForgotUsernameIT
 {
     private GreenMail mail;
 
@@ -152,7 +151,7 @@ public class ForgotUsernameIT
     }
 
     @Test
-    public void retrieveUsername(TestUtils testUtils) throws Exception
+    void retrieveUsername(TestUtils testUtils) throws Exception
     {
         // We create three users, two of them are sharing the same email
         String user1Login = "realuser1";

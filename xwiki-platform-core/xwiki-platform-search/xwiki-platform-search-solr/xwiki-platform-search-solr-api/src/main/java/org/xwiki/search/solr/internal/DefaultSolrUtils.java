@@ -258,6 +258,12 @@ public class DefaultSolrUtils implements SolrUtils
     }
 
     @Override
+    public String getMapFieldName(String key, String mapFieldName, Type type)
+    {
+        return getMapFieldName(key, mapFieldName, CLASS_SUFFIX_MAPPING.get(type));
+    }
+
+    @Override
     public Map<String, Object> getMap(String mapFieldName, SolrDocument document)
     {
         Map<String, Object> map = new HashMap<>();

@@ -32,7 +32,6 @@ define('xwiki-realtime-loader', [
   }
 
   var module = {messages: Messages},
-  documentReference = XWiki.Model.serialize(xm.documentReference),
   language = realtimeConfig.versionInfo?.locale || 'default',
   version = realtimeConfig.versionInfo?.version,
   versionTime = realtimeConfig.versionInfo?.time,
@@ -82,7 +81,7 @@ define('xwiki-realtime-loader', [
       userName: userReference + '-' + encodeURIComponent(realtimeConfig.user.name + '-').replace(/-/g, '%2d') +
         String(Math.random()).substring(2),
       language,
-      reference: documentReference,
+      reference: xm.documentReference,
       userAvatarURL: realtimeConfig.user.avatarURL,
       isAdvancedUser: realtimeConfig.user.advanced,
       network: allRt.network,
@@ -92,54 +91,39 @@ define('xwiki-realtime-loader', [
     };
   },
 
-  checkSocket = function(callback) {
-    var path = new XWiki.Document('GetKey', 'RTFrontend').getURL('get', 'outputSyntax=plain');
-    // TODO: Pass the channel path instead of separate mod and editor parameters.
-    var editorData = [{doc: documentReference, mod: language + '/content', editor: ''}];
-    $.ajax({
-      url: path,
-      data: 'data=' + encodeURIComponent(JSON.stringify(editorData)),
-      type: 'POST'
-    }).done(function(dataText) {
-      var data = JSON.parse(dataText);
-      var types = [];
-      if (data.error) {
-        console.error("You don't have permissions to edit that document.");
-        return;
-      }
-      var mods = data[documentReference];
-      if (!mods) {
-        console.error('Unknown error');
-        return;
-      }
-      var content = mods[language + '/content'];
-      if (!content) {
-        console.error("Unknown error");
-        return;
-      }
-      for (var editor in content) {
-        // FIXME: We pass editor:'' above and the server will return only the channel for this editor.
-        if (editor && content[editor].users && content[editor].users > 0) {
-          types.push(editor);
-        }
-      }
-      callback(types);
+  // Returns a promise that resolves with the list of editor channels available for the content field of the current
+  // document in the current language.
+  checkSocket = function() {
+    var path = language + '/content/';
+    return getKeys({path}).then(function(channels) {
+      return channels.filter(channel => channel?.path?.length > 2 && channel?.userCount > 0)
+        .map(channel => channel.path.slice(2).join('/'));
     });
   },
 
-  getKeys = module.getKeys = function(editorData, callback) {
-    var path = new XWiki.Document('GetKey', 'RTFrontend').getURL('get', 'outputSyntax=plain');
-    var dataList = [];
-    $.ajax({
-      url: path,
-      data: 'data=' + encodeURIComponent(JSON.stringify(editorData)),
-      type: 'POST'
-    }).done(function(data) {
-      if (data.error) {
+  channelListAPI = {
+    getByPath: function(path) {
+      return this.filter(channel => JSON.stringify(channel.path) === JSON.stringify(path))[0];
+    },
+    getByPathPrefix: function(pathPrefix) {
+      return this.filter(channel => channel.path.length >= pathPrefix.length &&
+        JSON.stringify(channel.path.slice(0, pathPrefix.length)) === JSON.stringify(pathPrefix));
+    }
+  },
+
+  getKeys = module.getKeys = function({documentReference, path, create}) {
+    documentReference = documentReference || xm.documentReference;
+    if (typeof documentReference === 'string') {
+      documentReference = XWiki.Model.resolve(documentReference, XWiki.EntityType.DOCUMENT);
+    }
+    var url = new XWiki.Document(documentReference).getRestURL('channels');
+    return $.getJSON(url, $.param({path, create}, true)).then(function(data) {
+      if (!Array.isArray(data)) {
         console.error("You don't have permissions to edit that document.");
-        return;
+        return $.Deferred().reject(data).promise();
+      } else {
+        return $.extend(data, channelListAPI);
       }
-      callback(data);
     });
   },
 
@@ -148,7 +132,7 @@ define('xwiki-realtime-loader', [
   module.checkSessions = function(info) {
     if (lock) {
       // Found an edit lock link.
-      checkSocket(function(types) {
+      checkSocket().done(function(types) {
         // Determine if it's a realtime session.
         if (types.length) {
           console.log('Found an active realtime session.');
@@ -673,13 +657,13 @@ define('xwiki-realtime-loader', [
 
   joinAllUsers = function() {
     var config = getConfig();
-    var keyData = [{
-      doc: config.reference,
-      mod: config.language + '/events',
-      editor: 'all'
-    }];
-    getKeys(keyData, function(data) {
-      var channelKey = data?.[config.reference]?.[config.language + '/events']?.all.key;
+    var keyData = {
+      documentReference: config.reference,
+      path: config.language + '/events/all',
+      create: true
+    };
+    getKeys(keyData).done(function(channels) {
+      var channelKey = channels[0].key;
       if (channelKey) {
         require(['netflux-client', 'xwiki-realtime-errorBox'], function(Netflux, ErrorBox) {
           var onError = function (error) {
@@ -722,9 +706,8 @@ define('xwiki-realtime-loader', [
     network.on('reconnect', function() {
       hideWarning();
       hideWsError();
-      getKeys(keyData, function(data) {
-        var channelKey = data?.[config.reference]?.[config.language + '/events']?.all.key;
-        network.join(channelKey).then(onOpen, onError);
+      getKeys(keyData).done(function(channels) {
+        network.join(channels[0].key).then(onOpen, onError);
       });
     });
     network.on('disconnect', function() {
@@ -766,25 +749,18 @@ define('xwiki-realtime-loader', [
     });
 
     // Replace the save actions to check the version first.
-    var saveButton = $('#mainEditArea').find('input[name="action_save"]');
-    // FIXME: Find a way to remove the click listeners without using the Prototype.js API.
-    saveButton[0]?.stopObserving();
-    saveButton.off('click').click(function (event) {
+    $('#mainEditArea').find('input[name="action_save"], input[name="action_saveandcontinue"]').each(function() {
+      // TODO: Update this if we rewrite actionButtons.js to use jQuery instead of Prototype.js
+      var clickListeners = Event.cache[this._prototypeUID || this.uniqueID]?.click?.map(entry => entry.handler);
+      $(this).data('prototype.js/clickListeners', clickListeners);
+      this.stopObserving('click');
+    }).off('click.realtime-loader').on('click.realtime-loader', function(event) {
       event.preventDefault();
       event.stopPropagation();
-      safeSave(false);
+      safeSave(/* continue: */ $(this).attr('name') !== 'action_save');
     });
 
-    var saveAndContinueButton = $('#mainEditArea').find('input[name="action_saveandcontinue"]');
-    // FIXME: Find a way to remove the click listeners without using the Prototype.js API.
-    saveAndContinueButton[0]?.stopObserving();
-    saveAndContinueButton.off('click').click(function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      safeSave(true);
-    });
-
-    previewButton.click(function (event) {
+    previewButton.click(function(event) {
       if (previewButton.data('checked')) {
         previewButton.data('checked', false);
       } else {

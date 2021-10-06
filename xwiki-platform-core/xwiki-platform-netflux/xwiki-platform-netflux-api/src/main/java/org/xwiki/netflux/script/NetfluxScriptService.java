@@ -64,6 +64,22 @@ public class NetfluxScriptService implements ScriptService
     }
 
     /**
+     * Looks for the channels associated to the specified entity and having the specified path prefix.
+     * 
+     * @param entityReference an entity reference
+     * @param pathPrefix the path prefix used to match the channels
+     * @return all existing channels associated to the specified entity and having the specified path prefix
+     */
+    public List<EntityChannel> getChannels(EntityReference entityReference, List<String> pathPrefix)
+    {
+        if (this.authorization.hasAccess(Right.EDIT, entityReference)) {
+            return this.channelStore.getChannels(entityReference, pathPrefix);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Looks for a channel associated to the specified entity and having the specified path.
      * 
      * @param entityReference the entity the channel is associated with

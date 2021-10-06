@@ -27,22 +27,29 @@
     <artifactId>xwiki-platform-netflux</artifactId>
     <version>13.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-netflux-api</artifactId>
-  <name>XWiki Platform - Netflux - API</name>
+  <artifactId>xwiki-platform-netflux-rest</artifactId>
+  <name>XWiki Platform - Netflux - REST</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
-  </properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Netflux REST Services</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.82</xwiki.jacoco.instructionRatio>
+    </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-netflux</artifactId>
-      <version>${commons.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-netflux-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
+    <!-- Netflux REST resources extend XWikiResource -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-security-api</artifactId>
+      <artifactId>xwiki-platform-rest-server</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
     </dependency>
     <!-- Test dependencies -->
     <dependency>
@@ -51,10 +58,37 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>javax.websocket</groupId>
-      <artifactId>javax.websocket-api</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+        <configuration>
+          <generatePackage>org.xwiki.netflux.rest.model.jaxb</generatePackage>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>org/xwiki/netflux/rest/model/jaxb/*.java</excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

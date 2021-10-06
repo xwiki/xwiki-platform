@@ -60,22 +60,17 @@ define('xwiki-realtime-wikiEditor', [
     /**
      * Update the channel keys for reconnecting WebSocket.
      */
-    var updateKeys = function(callback) {
-      docKeys._update(function(keys) {
-        var changes = [];
+    var updateKeys = function() {
+      return docKeys._update().done(function(keys) {
         if (keys[editorId] && keys[editorId] !== channel) {
           channel = keys[editorId];
-          changes.push(editorId);
         }
         if (keys.events && keys.events !== eventsChannel) {
           eventsChannel = keys.events;
-          changes.push('events');
         }
         if (keys.userdata && keys.userdata !== userdataChannel) {
           userdataChannel = keys.userdata;
-          changes.push('userdata');
         }
-        callback(changes);
       });
     };
 
@@ -349,7 +344,7 @@ define('xwiki-realtime-wikiEditor', [
         },
 
         beforeReconnecting: function (callback) {
-          updateKeys(function() {
+          updateKeys().done(function() {
             callback(channel, editor.getValue());
           });
         },

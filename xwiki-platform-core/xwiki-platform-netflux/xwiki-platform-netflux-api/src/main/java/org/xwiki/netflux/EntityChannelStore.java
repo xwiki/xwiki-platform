@@ -22,6 +22,7 @@ package org.xwiki.netflux;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
@@ -42,6 +43,21 @@ public interface EntityChannelStore
      * @return all existing channels associated to the specified entity
      */
     List<EntityChannel> getChannels(EntityReference entityReference);
+
+    /**
+     * Looks for the channels associated to the specified entity and having the specified path prefix.
+     * 
+     * @param entityReference an entity reference
+     * @param pathPrefix the path prefix used to match the channels
+     * @return all existing channels associated to the specified entity and having the specified path prefix
+     */
+    default List<EntityChannel> getChannels(EntityReference entityReference, List<String> pathPrefix)
+    {
+        return getChannels(entityReference).stream().filter(Objects::nonNull).filter(channel -> {
+            return channel.getPath().size() >= pathPrefix.size()
+                && Objects.equals(channel.getPath().subList(0, pathPrefix.size()), pathPrefix);
+        }).collect(Collectors.toList());
+    }
 
     /**
      * Looks for a channel associated to the specified entity and having the specified path.

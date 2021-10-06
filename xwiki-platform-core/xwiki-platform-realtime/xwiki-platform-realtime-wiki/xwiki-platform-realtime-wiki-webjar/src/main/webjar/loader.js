@@ -44,50 +44,48 @@ define('xwiki-realtime-wikiEditor-loader', [
   };
 
   var getKeyData = function(config) {
-    return [
-      {doc: config.reference, mod: config.language + '/events', editor: '1.0'},
-      {doc: config.reference, mod: config.language + '/events', editor: 'userdata'},
-      {doc: config.reference, mod: config.language + '/content', editor: editorId}
-    ];
+    return {
+      documentReference: config.reference,
+      path: [
+        config.language + '/events/1.0',
+        config.language + '/events/userdata',
+        config.language + '/content/' + editorId,
+        // Check also if the content is edited in real-time with other editors at the same time.
+        config.language + '/content/',
+      ],
+      create: true
+    };
   };
 
-  var parseKeyData = function(config, keysResultDoc) {
-    var keys = {},
-      keysResult = keysResultDoc[config.reference],
-      keysResultContent = keysResult[config.language + '/content'],
-      keysResultEvents = keysResult[config.language + '/events'];
-
-    if (!keysResult) {
-      console.error('Unexpected error with the document keys.');
-    } else if (!keysResultContent) {
-      console.error('Missing content keys in the document keys.');
-    } else if (!keysResultEvents) {
-      console.error('Missing event keys in the document keys.');
-    } else if (!keysResultContent[editorId] || !keysResultEvents['1.0']) {
-      console.error(`Missing mandatory "${editorId}" key in the document keys.`);
+  var parseKeyData = function(config, channels) {
+    var keys = {};
+    var eventsChannel = channels.getByPath([config.language, 'events', '1.0']);
+    var userDataChannel = channels.getByPath([config.language, 'events', 'userdata']);
+    var editorChannel = channels.getByPath([config.language, 'content', editorId]);
+    if (!eventsChannel || !userDataChannel || !editorChannel) {
+      console.error('Missing document channels.');
     } else {
-      keys[editorId] = keysResultContent[editorId].key;
-      keys[editorId + '_users'] = keysResultContent[editorId].users;
-      keys.events = keysResultEvents['1.0'].key;
-      keys.userdata = keysResultEvents.userdata.key;
-
-      keys.active = {};
-      for (var key in keysResultContent) {
-        if (key !== editorId && keysResultContent[key].users > 0) {
-          keys.active[key] = keysResultContent[key];
+      keys = $.extend(keys, {
+        [editorId]: editorChannel.key,
+        [editorId + '_users']: editorChannel.userCount,
+        events: eventsChannel.key,
+        userdata: userDataChannel.key,
+        active: {}
+      });
+      // Collect the other active real-time editing session (for the document content field) that are using a different
+      // editor (e.g. the WYSIWYG editor).
+      channels.getByPathPrefix([config.language, 'content']).forEach(channel => {
+        if (channel.userCount > 0 && JSON.stringify(channel.path) !== JSON.stringify(editorChannel.path)) {
+          keys.active[channel.path.slice(2).join('/')] = channel;
         }
-      }
+      });
     }
-
     return keys;
   };
 
-  var updateKeys = function(callback) {
+  var updateKeys = function() {
     var config = Loader.getConfig();
-    Loader.getKeys(getKeyData(config), function(keysResultDoc) {
-      var keys = parseKeyData(config, keysResultDoc);
-      callback(keys);
-    });
+    return Loader.getKeys(getKeyData(config)).then($.proxy(parseKeyData, null, config));
   };
 
   var beforeLaunchRealtime = function(keys) {
@@ -119,7 +117,7 @@ define('xwiki-realtime-wikiEditor-loader', [
     Loader.checkSessions(info);
   } else if (window.XWiki.editor === 'wiki') {
     // No lock and we are using wiki editor. Start realtime.
-    updateKeys(function (keys) {
+    updateKeys().done(function(keys) {
       if (!keys[editorId] || !keys.events) {
         ErrorBox.show('unavailable');
         console.error('You are not allowed to create a new realtime session for that document.');

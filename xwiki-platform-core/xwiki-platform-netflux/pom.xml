@@ -33,5 +33,6 @@
   <description>The Netflux modules used to support real-time synchronization in XWiki.</description>
   <modules>
     <module>xwiki-platform-netflux-api</module>
+    <module>xwiki-platform-netflux-rest</module>
   </modules>
 </project>

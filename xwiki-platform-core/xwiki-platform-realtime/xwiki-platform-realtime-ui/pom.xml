@@ -33,7 +33,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-netflux-api</artifactId>
+      <artifactId>xwiki-platform-netflux-rest</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

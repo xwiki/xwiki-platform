@@ -38,7 +38,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * @version $Id$
  * @since 13.9RC1
- * @since 13.8.1
  * @since 13.4.4
  */
 public final class IconSetup

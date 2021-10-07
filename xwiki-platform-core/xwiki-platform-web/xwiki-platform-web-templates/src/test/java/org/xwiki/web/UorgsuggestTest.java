@@ -61,7 +61,6 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
  *
  * @version $Id$
  * @since 13.9RC1
- * @since 13.8.1
  * @since 13.4.4
  */
 @SecurityScriptServiceComponentList

@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
@@ -36,7 +37,6 @@ import org.xwiki.velocity.tools.JSONTool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -44,6 +44,7 @@ import static org.mockito.Mockito.verify;
  *
  * @version $Id$
  * @since 13.9RC1
+ * @since 13.4.4
  */
 @ComponentList(XWikiDateTool.class)
 class GetdocumentsTest extends PageTest
@@ -54,27 +55,24 @@ class GetdocumentsTest extends PageTest
 
     private VelocityManager velocityManager;
 
+    @Mock
     private QueryManagerScriptService queryManagerScriptService;
 
     @BeforeEach
     void setUp() throws Exception
     {
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
-        this.queryManagerScriptService = mock(QueryManagerScriptService.class);
         this.oldcore.getMocker().registerComponent(ScriptService.class, "query", this.queryManagerScriptService);
         registerVelocityTool("jsontool", new JSONTool());
 
         this.velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
-        this.velocityManager.getVelocityContext().put("escapetool", new EscapeTool());
-        this.velocityManager.getVelocityContext()
-            .put("datetool", this.componentManager.getInstance(XWikiDateTool.class));
-        this.velocityManager.getVelocityContext().put("numbertool", new NumberTool());
+        registerVelocityTool("escapetool", new EscapeTool());
+        registerVelocityTool("datetool", this.componentManager.getInstance(XWikiDateTool.class));
+        registerVelocityTool("numbertool", new NumberTool());
     }
 
     /**
-     * Request the {@code doc.date} field, filtered by a date range using ISO 8601 time intervals.
-     *
-     * @throws Exception case of error during the test execution
+     * Request the {@code doc.date} field, filtered by a date range using ISO 8601 based time intervals.
      */
     @Test
     void dateFilterBetweenISO8601() throws Exception
@@ -96,6 +94,9 @@ class GetdocumentsTest extends PageTest
         assertEquals("Wed Sep 22 23:59:59 CEST 2021", queryParams.get(3).toString());
     }
 
+    /**
+     * Request the {@code doc.date} field, filtered by a date range using timestamp based time intervals.
+     */
     @Test
     void dateFilterBetweenTimestamp() throws Exception
     {

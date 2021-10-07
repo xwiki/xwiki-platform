@@ -2949,7 +2949,7 @@ Recursive title display detected!##
 ## the two substrings are parsed as timestamps.
 ##
 ## @since 13.9RC1
-## @since 13.4.x?
+## @since 13.4.4
 ##
 #macro (parseDateRange $matchType $filterValue $dateRange)
   ## Transform the filter value into a date range if needed.

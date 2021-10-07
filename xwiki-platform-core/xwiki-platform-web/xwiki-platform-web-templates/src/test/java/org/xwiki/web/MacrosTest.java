@@ -57,10 +57,9 @@ class MacrosTest extends PageTest
     void setup() throws Exception
     {
         this.velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
-        this.velocityManager.getVelocityContext().put("escapetool", new EscapeTool());
-        this.velocityManager.getVelocityContext()
-            .put("datetool", this.componentManager.getInstance(XWikiDateTool.class));
-        this.velocityManager.getVelocityContext().put("numbertool", new NumberTool());
+        registerVelocityTool("escapetool", new EscapeTool());
+        registerVelocityTool("datetool", this.componentManager.getInstance(XWikiDateTool.class));
+        registerVelocityTool("numbertool", new NumberTool());
     }
 
     @Test

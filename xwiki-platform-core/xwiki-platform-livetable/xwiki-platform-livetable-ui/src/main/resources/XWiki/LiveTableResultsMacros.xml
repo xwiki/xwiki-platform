@@ -342,7 +342,7 @@
   #foreach($item in $items)
     #gridresult_buildRowJSON($item $rows)
   #end
-  ## When the total number of rows is lower than the limit, we remove the obfuscated results from the response since
+  ## When the total number of rows not bigger than the limit, we remove the obfuscated results from the response since
   ## this has no impact on the pagination. 
   #if ($map.get('totalrows') &lt;= $limit)
     #set ($filteredRows = [])

@@ -281,6 +281,11 @@
   <div id="${htmlLiveTableId}-computed-title-docs" class="hidden">
     #info("(<span class='docTitleComputed'></span>)&nbsp;$services.localization.render('platform.livetable.docTitleComputedHint')")
   </div>
+  ## Hidden div containing the translated message used to inform the user that a cell cannot be viewed because they do
+  ## not have the right to view it.
+  <div id="${htmlLiveTableId}-inaccessible-cell" class="hidden">
+    $services.localization.render('livetable.cell.emptyValue')
+  </div>
 </div>## xwiki-livetable-container
 #end## end-livetable-macro
 

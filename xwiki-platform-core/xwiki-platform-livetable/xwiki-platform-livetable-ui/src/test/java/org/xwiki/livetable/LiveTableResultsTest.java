@@ -457,7 +457,7 @@ class LiveTableResultsTest extends PageTest
     }
 
     @Test
-    void removeObuscatedResultsWhenTotalrowsLowerThanLimit() throws Exception
+    void removeObfuscatedResultsWhenTotalrowsLowerThanLimit() throws Exception
     {
         this.request.put("limit", "2");
         when(this.queryService.hql(anyString())).thenReturn(this.query);

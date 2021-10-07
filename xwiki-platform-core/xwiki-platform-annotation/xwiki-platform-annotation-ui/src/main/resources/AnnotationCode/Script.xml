@@ -645,6 +645,7 @@ XWiki.Annotation = Class.create({
   // the currently set filter (pair of field names and their values) that all annotations should be fetched according to.
   // It will be updated any time a changed filter event is received
   currentFilter : {},
+  annotatedElementPlainText: "",
 
   initialize : function (displayHighlighted, annotatedElt, displayedByDefault) {
     this.displayHighlight = displayHighlighted;
@@ -996,6 +997,126 @@ XWiki.Annotation = Class.create({
     if (andShow) {
       this.toggleAnnotations(true);
     }
+  },
+
+  /**
+   * Mark the given annotations inside the content by using the start and end offset computed on the server.
+   * With these, a DOM Range will be created and each node inside it will be marked.
+   *
+   * @param annotations object with information about all the annotations on the page
+  */
+  markAnnotations: function(annotations) {
+    var annSystem = this;
+    annotations.each(function(ann) {
+      var plainTextStartOffset = ann.fields.find(field =&gt; field.name == 'plainTextStartOffset').value
+      var plainTextEndOffset = ann.fields.find(field =&gt; field.name == 'plainTextEndOffset').value
+      var annDOMRange = annSystem.getDOMRange(annSystem.annotatedElement, plainTextStartOffset, plainTextEndOffset);
+
+      // All the nodes inside this range are extracted. Each node it is wrapped inside the annotation marker span.
+      var nodes = annSystem.getTextNodesInRange(annDOMRange);
+      for(var i = 0; i &lt; nodes.length; i++) {
+        var node = nodes[i];
+        annSystem.markAnnotation(nodes[i], ann);
+      }
+    });
+    this.addAnnotationMarkers(annotations);
+    this.toggleAnnotations(true)
+  },
+
+  /**
+   * Surround this node with a span corresponding to it's annotation.
+   *
+   * @param markedNode the node that corresponds to the current annotation
+   * @param ann object holding information about the annotation
+  */
+  markAnnotation: function(markedNode, ann) {
+    var wrapper = document.createElement('span');
+    wrapper.addClassName('annotation');
+    wrapper.addClassName('ID' + ann.annotationId);
+
+    var parentNode = markedNode.parentElement;
+    parentNode.replaceChild(wrapper, markedNode);
+    wrapper.appendChild(markedNode);
+  },
+
+  /**
+   * Create a DOM Range by knowing the start and end index from inside the plain content of the element.
+   *
+   * @param annotatedElement the element from where the range is constructed
+   * @param startIndex start offset where the range begins
+   * @param endIndex end offset where the range end
+  */
+  getDOMRange: function(annotatedElement, startIndex, endIndex) {
+    // traverse dom and construct a plainText out of it.
+    this.annotatedElementPlainText = "";
+    var startPosition = this.getElementAtOffset(annotatedElement, startIndex);
+    this.annotatedElementPlainText = "";
+    var endPosition = this.getElementAtOffset(annotatedElement, endIndex);
+    var range = new Range();
+    range.setStart(startPosition.element, startPosition.offset);
+    range.setEnd(endPosition.element, endPosition.offset);
+    return range;
+  },
+
+  /**
+   * Knowing the offset relative to the full plain content of the root element, get the corresponding child node that contains it and the offset
+   * specific to the new node. The DOM is traversed recursively starting with the root node and the plain content is computed to know when the
+   * wanted element is found.
+   *
+   * @param rootElement the element where the search is done
+   * @param offset the offset relative to the full plain content
+  */
+  getElementAtOffset: function(rootElement, offset) {
+    var childNodes = rootElement.childNodes;
+    var child;
+    for (let i = 0; i &lt; childNodes.length; i++) {
+      child = childNodes[i];
+      if (child &amp;&amp; child.nodeType == 3) {
+        var initialLength = this.annotatedElementPlainText.length;
+        this.annotatedElementPlainText += child.textContent.replace(/\s/g, '');
+        if (offset &lt; this.annotatedElementPlainText.length) {
+          var elementSpecificOffset = offset - initialLength;
+          return {"element": child, 'offset': elementSpecificOffset};
+        }
+      }
+      if (child.childNodes.length &gt; 0) {
+        var maybeFoundElement = this.getElementAtOffset(child, offset);
+        if (maybeFoundElement) {
+          return maybeFoundElement;
+        }
+      }
+    }
+  },
+
+  /**
+   * Filter only the text nodes inside a DOM Range.
+   *
+   * @param range a DOM Range
+  */
+  getTextNodesInRange: function(range) {
+    var rangeIterator = document.createNodeIterator(
+      range.commonAncestorContainer,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: function (node) {
+          // Only accept nodes that have content other than whitespace.
+          if (/\S/.test(node.data)) {
+            return NodeFilter.FILTER_ACCEPT
+          }
+        }
+      }
+    );
+    var nodes = [];
+    while (rangeIterator.nextNode()) {
+      if (nodes.length === 0 &amp;&amp; rangeIterator.referenceNode !== range.startContainer) {
+        continue;
+      }
+      nodes.push(rangeIterator.referenceNode);
+      if (rangeIterator.referenceNode === range.endContainer) {
+        break;
+      }
+    }
+    return nodes;
   },
 
   reloadTab : function(navigateToPane) {
@@ -1616,7 +1737,8 @@ XWiki.Annotation = Class.create({
           return;
         }
         this.setAnnotationVisibility(true);
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, true);
+        this.markAnnotations(response.responseJSON.annotatedContent.annotations);
+        //this.loadAnnotatedContent(response.responseJSON.annotatedContent, true);
         this.fetchedAnnotations = true;
         form._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.success')", 'done');
         // and hide the create bubble, skipping selection highlight clear

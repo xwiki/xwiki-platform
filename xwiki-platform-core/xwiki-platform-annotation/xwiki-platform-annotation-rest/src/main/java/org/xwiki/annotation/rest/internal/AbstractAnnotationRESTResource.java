@@ -25,8 +25,10 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -180,12 +182,16 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     {
         ObjectFactory factory = new ObjectFactory();
         List<AnnotationStub> set = new ArrayList<AnnotationStub>();
+
+        Set<String> actualRequestedFields = new LinkedHashSet<>(requestedFields);
+        actualRequestedFields.add(Annotation.PLAIN_TEXT_START_OFFSET_FIELD);
+        actualRequestedFields.add(Annotation.PLAIN_TEXT_END_OFFSET_FIELD);
         for (Annotation xwikiAnnotation : annotations) {
             AnnotationStub annotation = factory.createAnnotationStub();
             annotation.setAnnotationId(xwikiAnnotation.getId());
             annotation.setState(xwikiAnnotation.getState().toString());
             // for all the requested extra fields, get them from the annotation and send them
-            for (String extraField : requestedFields) {
+            for (String extraField : actualRequestedFields) {
                 Object value = xwikiAnnotation.get(extraField);
                 AnnotationField field = new AnnotationField();
                 field.setName(extraField);

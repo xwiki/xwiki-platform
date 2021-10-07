@@ -40,6 +40,7 @@ import org.xwiki.rendering.listener.QueueListener;
 import org.xwiki.rendering.listener.chaining.ChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
  * Chaining listener that maps the annotations on the events that it receives, holds the state of annotations on these
@@ -98,16 +99,21 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     private Map<Event, SortedMap<Integer, List<AnnotationEvent>>> bookmarks =
         new HashMap<Event, SortedMap<Integer, List<AnnotationEvent>>>();
 
+    private RawBlockTextExtracter textExtracter;
+
     /**
      * Builds an annotation generator listener from the passed link generator in the passed chain.
      *
      * @param selectionAlterer cleaner for the annotation selection text, so that it can be mapped on the content
      * @param listenerChain the chain in which this listener is part of
+     * @param textExtracter text extracter
      */
-    public AnnotationGeneratorChainingListener(ContentAlterer selectionAlterer, ListenerChain listenerChain)
+    public AnnotationGeneratorChainingListener(ContentAlterer selectionAlterer, ListenerChain listenerChain,
+        RawBlockTextExtracter textExtracter)
     {
         this.chain = listenerChain;
         this.selectionAlterer = selectionAlterer;
+        this.textExtracter = textExtracter;
     }
 
     @Override
@@ -156,11 +162,17 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     @Override
     public void onRawText(String text, Syntax syntax)
     {
+        String textContent = text;
+        if (syntax.getType().equals(SyntaxType.XHTML) || syntax.getType().equals(SyntaxType.HTML)) {
+            // Text could be from within a html block.
+            textContent = textExtracter.getTextContent(text);
+        }
+
         // Store the raw text as it is ftm. Should handle syntax in the future
         super.onRawText(text, syntax);
         // Similar approach to verbatim FTM. In the future, syntax specific cleaner could be used for various syntaxes
         // (which would do the great job for HTML, for example)
-        handleRawText(text);
+        handleRawText(textContent);
     }
 
     /**
@@ -221,6 +233,8 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
                 // alteredSelection.length() - 1
                 Object[] startEvt = getEventAndOffset(contextIndex + alteredSelectionStartIndex, false);
                 Object[] endEvt = getEventAndOffset(contextIndex + alteredSelectionEndIndex, true);
+                ann.set(Annotation.PLAIN_TEXT_START_OFFSET_FIELD, contextIndex + alteredSelectionStartIndex);
+                ann.set(Annotation.PLAIN_TEXT_END_OFFSET_FIELD, contextIndex + alteredSelectionEndIndex);
                 if (startEvt != null & endEvt != null) {
                     // store the bookmarks
                     addBookmark((Event) startEvt[0], new AnnotationEvent(AnnotationEventType.START, ann),

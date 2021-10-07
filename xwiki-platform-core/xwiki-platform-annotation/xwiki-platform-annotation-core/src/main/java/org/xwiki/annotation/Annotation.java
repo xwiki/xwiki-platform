@@ -85,6 +85,16 @@ public class Annotation
     public static final String TARGET_FIELD = "target";
 
     /**
+     * Todo.
+     */
+    public static final String PLAIN_TEXT_START_OFFSET_FIELD = "plainTextStartOffset";
+
+    /**
+     * Todo.
+     */
+    public static final String PLAIN_TEXT_END_OFFSET_FIELD = "plainTextEndOffset";
+
+    /**
      * The unique identifier of this annotation, which should be unique among all the annotations on the same target.
      */
     protected final String id;

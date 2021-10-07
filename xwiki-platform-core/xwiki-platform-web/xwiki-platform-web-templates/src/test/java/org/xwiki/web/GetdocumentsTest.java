@@ -56,6 +56,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  * @since 13.9RC1
+ * @since 13.4.4
  */
 @ComponentList({
     XWikiDateTool.class,

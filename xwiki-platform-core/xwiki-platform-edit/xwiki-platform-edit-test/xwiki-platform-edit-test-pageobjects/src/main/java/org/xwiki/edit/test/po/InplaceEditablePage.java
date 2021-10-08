@@ -99,7 +99,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage setDocumentTitle(String title)
     {
-        WebElement titleInput = getDriver().findElementById("document-title-input");
+        WebElement titleInput = getDriver().findElement(By.id("document-title-input"));
         titleInput.clear();
         titleInput.sendKeys(title);
         return this;
@@ -125,7 +125,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage cancel()
     {
-        getDriver().findElementByCssSelector("input[name='action_cancel']").click();
+        getDriver().findElement(By.cssSelector("input[name='action_cancel']")).click();
         return waitForView();
     }
 
@@ -160,7 +160,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage save(String expectedSuccessMessage)
     {
-        getDriver().findElementByCssSelector("input[name='action_saveandcontinue']").click();
+        getDriver().findElement(By.cssSelector("input[name='action_saveandcontinue']")).click();
         if (expectedSuccessMessage != null) {
             waitForNotificationSuccessMessage(expectedSuccessMessage);
         }
@@ -199,7 +199,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage saveAndView(String expectedSuccessMessage)
     {
-        getDriver().findElementByCssSelector("input[name='action_save']").click();
+        getDriver().findElement(By.cssSelector("input[name='action_save']")).click();
         if (expectedSuccessMessage != null) {
             waitForNotificationSuccessMessage(expectedSuccessMessage);
             return waitForView();

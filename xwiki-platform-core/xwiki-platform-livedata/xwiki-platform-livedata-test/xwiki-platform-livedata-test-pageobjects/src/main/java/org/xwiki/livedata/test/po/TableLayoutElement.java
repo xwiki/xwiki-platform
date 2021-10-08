@@ -646,7 +646,7 @@ public class TableLayoutElement extends BaseElement
 
     private WebElement getRoot()
     {
-        return getDriver().findElementById(this.liveDataId);
+        return getDriver().findElement(By.id(this.liveDataId));
     }
 
     private int findColumnIndex(String columnLabel)

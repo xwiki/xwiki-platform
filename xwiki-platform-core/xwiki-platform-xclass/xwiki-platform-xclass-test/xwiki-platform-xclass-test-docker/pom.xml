@@ -31,6 +31,10 @@
   <name>XWiki Platform - XClass - Tests - Functional Docker Tests</name>
   <packaging>jar</packaging>
   <description>Tests for the XClass Application with Docker</description>
+  <properties>
+    <!-- Functional tests are allowed to output content to the console -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -69,7 +69,7 @@ class ClassSheetIT
             setup.deletePage(spaceName, pageName);
 
             // Create the class document.
-            DataTypesPage dataTypesPage = DataTypesPage.gotoPage().waitUntilPageIsLoaded();
+            DataTypesPage dataTypesPage = DataTypesPage.gotoPage();
             String dataTypesPageTitle = dataTypesPage.getDocumentTitle();
             assertTrue(dataTypesPage.isClassListed("XWiki", "XWikiRights"));
             assertFalse(dataTypesPage.isClassListed(spaceName, classDocName));

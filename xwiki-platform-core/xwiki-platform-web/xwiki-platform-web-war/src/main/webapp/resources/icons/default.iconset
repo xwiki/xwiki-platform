@@ -1158,3 +1158,6 @@ xhtml_valid = xhtml_valid
 zoom = zoom
 zoom_in = zoom_in
 zoom_out = zoom_out
+filter = find
+fast-backward = control_rewind
+arrow_in = arrow_in

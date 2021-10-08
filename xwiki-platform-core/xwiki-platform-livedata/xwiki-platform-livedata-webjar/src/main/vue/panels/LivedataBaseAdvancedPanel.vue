@@ -59,15 +59,15 @@
           class="action collapse-button"
           @click="collapsed = !collapsed"
         >
-          <span v-if="!collapsed" class="fa fa-chevron-circle-down"></span>
-          <span v-else class="fa fa-chevron-circle-right"></span>
+          <XWikiIcon v-if="!collapsed" :icon-descriptor="{name: 'arrow_in'}"/>
+          <XWikiIcon v-else :icon-descriptor="{name: 'arrow_out'}"/>
         </span>
         <!-- Close panel button -->
         <span
           class="action close-button"
           @click="logic.uniqueArrayRemove(logic.openedPanels, panelId)"
         >
-          <span class="fa fa-times"></span>
+          <XWikiIcon :icon-descriptor="{name: 'cross'}" />
         </span>
 
       </div>
@@ -89,9 +89,12 @@
 
 
 <script>
+import XWikiIcon from "../utilities/XWikiIcon";
 export default {
 
   name: "LivedataBaseAdvancedPanel",
+
+  components: {XWikiIcon},
 
   inject: ["logic"],
 

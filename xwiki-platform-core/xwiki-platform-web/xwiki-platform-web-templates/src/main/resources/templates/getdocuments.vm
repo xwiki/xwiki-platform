@@ -203,7 +203,7 @@ $response.setContentType("application/json")
   #end
   #set ($discard = $rows.add($row))
 #end
-## When the total number of rows is lower than the limit, we remove the obfuscated results from the response since
+## When the total number of rows is not bigger than the limit, we remove the obfuscated results from the response since
 ## this has no impact on the pagination.
 #if ($map.get('totalrows') <= $limit)
   #set ($filteredRows = [])

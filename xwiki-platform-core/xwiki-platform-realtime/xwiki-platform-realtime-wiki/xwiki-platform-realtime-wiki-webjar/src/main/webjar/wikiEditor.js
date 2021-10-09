@@ -45,15 +45,7 @@ define('xwiki-realtime-wikiEditor', [
   var module = {}, editorId = 'wiki';
 
   module.main = function(editorConfig, docKeys) {
-    var saverConfig = $.extend(editorConfig.saverConfig, {
-      chainpad: ChainPad,
-      editorType: editorId,
-      editorName: 'Wiki',
-      isHTML: false,
-      mergeContent: realtimeConfig.enableMerge !== 0
-    }),
-
-    channel = docKeys[editorId],
+    var channel = docKeys[editorId],
     eventsChannel = docKeys.events,
     userdataChannel = docKeys.userdata;
 
@@ -77,7 +69,7 @@ define('xwiki-realtime-wikiEditor', [
     Interface.realtimeAllowed(true);
     var allowRealtimeCheckbox = $('.buttons input[type=checkbox].realtime-allow');
     if (!allowRealtimeCheckbox.length) {
-      allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(true, saverConfig.messages.allowRealtime);
+      allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(true);
       allowRealtimeCheckbox.change(function() {
         if (allowRealtimeCheckbox.prop('checked')) {
           module.main(editorConfig, docKeys);
@@ -90,8 +82,13 @@ define('xwiki-realtime-wikiEditor', [
     // Disable while real-time framework is loading.
     allowRealtimeCheckbox.prop('disabled', true);
 
-    // Configure Saver with the merge URL and language settings.
-    Saver.configure(saverConfig);
+    Saver.configure({
+      chainpad: ChainPad,
+      editorType: editorId,
+      editorName: 'Wiki',
+      isHTML: false,
+      mergeContent: realtimeConfig.enableMerge !== 0
+    });
 
     console.log("Creating realtime toggle");
 
@@ -229,7 +226,7 @@ define('xwiki-realtime-wikiEditor', [
       var createSaver = function(info) {
         // This function displays a message notifying users that there was a merge.
         Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(
-          toolbar.toolbar.find('.rt-toolbar-rightside'), saverConfig.messages);
+          toolbar.toolbar.find('.rt-toolbar-rightside'));
         Saver.setLastSavedContent(editor.getValue());
         Saver.create({
           // Id of the Wiki edit mode form.
@@ -240,7 +237,9 @@ define('xwiki-realtime-wikiEditor', [
             realtimeOptions.onLocal();
           },
           getSaveValue: function() {
-            return Object.toQueryString({content: editor.getValue()});
+            return {
+              content: editor.getValue()
+            };
           },
           getTextValue: function() {
             return editor.getValue();

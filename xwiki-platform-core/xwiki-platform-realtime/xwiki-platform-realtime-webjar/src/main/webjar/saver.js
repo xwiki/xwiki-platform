@@ -23,8 +23,10 @@ define('xwiki-realtime-saver', [
   'json.sortify',
   'xwiki-realtime-crypto',
   'xwiki-meta',
+  'xwiki-realtime-document',
+  'xwiki-l10n!xwiki-realtime-messages',
   'xwiki-realtime-errorBox'
-], /* jshint maxparams:false */ function($, chainpadNetflux, jsonSortify, Crypto, xwikiMeta, ErrorBox) {
+], /* jshint maxparams:false */ function($, chainpadNetflux, jsonSortify, Crypto, xwikiMeta, doc, Messages, ErrorBox) {
   'use strict';
 
   var warn = function(x) {
@@ -62,25 +64,14 @@ define('xwiki-realtime-saver', [
   },
 
   configure = Saver.configure = function(config) {
-    $.extend(mainConfig, {
-      ajaxMergeURL: config.ajaxMergeURL,
-      ajaxVersionURL: config.ajaxVersionURL,
-      language: config.language,
-      messages: config.messages,
-      version: config.version,
-      chainpad: config.chainpad,
-      editorType: config.editorType,
-      isHTML: config.isHTML,
-      mergeContent: config.mergeContent,
-      editorName: config.editorName,
+    $.extend(mainConfig, config, {
       safeCrash: function(reason) {
         warn(reason);
-      },
-      safeSave: config.safeSave
+      }
     });
     $.extend(lastSaved, {
-      version: config.version,
-      time: config.versionTime
+      version: doc.version,
+      time: doc.modified
     });
   },
 
@@ -124,7 +115,7 @@ define('xwiki-realtime-saver', [
       result[field] = $html.data('xwiki-' + field);
     });
 
-    result.language = mainConfig.language;
+    result.language = doc.language;
 
     return result;
   },
@@ -142,7 +133,7 @@ define('xwiki-realtime-saver', [
     verbose(stats);
 
     $.ajax({
-      url: mainConfig.ajaxMergeURL,
+      url: new XWiki.Document('Ajax', 'RTFrontend').getURL('get', 'xpage=plain&outputSyntax=plain'),
       method: 'POST',
       dataType: 'json',
       success: function (data) {
@@ -187,25 +178,23 @@ define('xwiki-realtime-saver', [
     });
   },
 
-  // Check a server-side api for the version string of the document.
-  ajaxVersion = function(callback) {
-    $.ajax({
-      url: mainConfig.ajaxVersionURL,
-      method: 'POST',
-      dataType: 'json',
-      success: function(data) {
-        callback(null, data);
-      },
-      data: getDocumentStatistics(),
-      error: function(error) {
-        callback(error, null);
-      }
-    });
-  },
-
   bumpVersion = function(callback, versionData) {
-    var callbackWrapper = function(error, out) {
-      if (error) {
+    var success = function(doc) {
+      debug('Triggering lastSaved refresh on remote clients.');
+      lastSaved.version = doc.version;
+      lastSaved.content = doc.content;
+      /* jshint camelcase:false */
+      var contentHash = (mainConfig.chainpad && mainConfig.chainpad.hex_sha256 &&
+        mainConfig.chainpad.hex_sha256(doc.content)) || '';
+      saveMessage(lastSaved.version, contentHash);
+      if (typeof callback === 'function') {
+        callback(doc);
+      }
+    };
+    if (versionData) {
+      success(versionData);
+    } else {
+      doc.reload().done(success).fail(function(error) {
         var debugLog = {
           state: 'bumpVersion',
           lastSavedVersion: lastSaved.version,
@@ -215,77 +204,26 @@ define('xwiki-realtime-saver', [
         };
         mainConfig.safeCrash('updateversion', JSON.stringify(debugLog));
         warn(error);
-      } else if (out) {
-        debug('Triggering lastSaved refresh on remote clients');
-        lastSaved.version = out.version;
-        lastSaved.content = out.content;
-        /* jshint camelcase:false */
-        var contentHash = (mainConfig.chainpad && mainConfig.chainpad.hex_sha256 &&
-          mainConfig.chainpad.hex_sha256(out.content)) || '';
-        saveMessage(lastSaved.version, contentHash);
-        if (typeof callback === 'function') {
-          callback(out);
-        }
-      } else {
-        throw new Error();
-      }
-    };
-    if (versionData) {
-      callbackWrapper(null, versionData);
-    } else {
-      ajaxVersion(callbackWrapper);
+      });
     }
   },
 
   // http://jira.xwiki.org/browse/RTWIKI-29
-  saveDocument = function(data, andThen) {
-    /* RT_event-on_save */
-
-    var defaultData = {
-      xredirect: '',
-      xeditaction: 'edit',
+  saveDocument = function(data) {
+    return doc.save($.extend({
       // TODO make this translatable
-      comment: 'Auto-Saved by Realtime Session',
-      'action_saveandcontinue': 'Save & Continue',
-      minorEdit: 1,
-      ajax: true,
-      /* jshint camelcase:false */
-      'form_token': xwikiMeta.form_token,
-      language: mainConfig.language
-    };
-
-    // Remove from the data the properties we want to override.
-    data.split('&').filter(function(arg) {
-      var name = (arg.split('=').length > 1) ? arg.split('=')[0] : arg;      
-      return Object.keys(defaultData).indexOf(name) < 0;
-    }).join('&');
-    data += '&' + Object.toQueryString(defaultData);
-
-    $.ajax({
-      url: window.docsaveurl,
-      type: "POST",
-      async: true,
-      dataType: 'text',
-
-      // http://jira.xwiki.org/browse/RTWIKI-36
-      // Don't worry about hijacking and resuming. If you can just add the usual fields to this, simply steal the event.
-      data: data,
-      success: function() {
-        andThen();
-      },
-      error: function(jqxhr, err, cause) {
-        var debugLog = {
-          state: 'saveDocument',
-          lastSavedVersion: lastSaved.version,
-          lastSavedContent: lastSaved.content,
-          cUser: mainConfig.userName,
-          cContent: mainConfig.getTextValue(),
-          err: err
-        };
-        ErrorBox.show('save', JSON.stringify(debugLog));
-        warn(err);
-        // Don't callback, this way in case of error we will keep trying.
-      }
+      comment: 'Auto-Saved by Realtime Session'
+    }, data)).fail(function(jqXHR, textStatus, errorThrown) {
+      var debugLog = {
+        state: 'saveDocument',
+        lastSavedVersion: lastSaved.version,
+        lastSavedContent: lastSaved.content,
+        cUser: mainConfig.userName,
+        cContent: mainConfig.getTextValue(),
+        err: textStatus
+      };
+      ErrorBox.show('save', JSON.stringify(debugLog));
+      warn(textStatus);
     });
   },
 
@@ -354,26 +292,26 @@ define('xwiki-realtime-saver', [
 
     var deferred = $.Deferred();
     presentMergeDialog(
-      mainConfig.messages['mergeDialog.prompt'],
+      Messages['mergeDialog.prompt'],
 
-      mainConfig.messages['mergeDialog.keepRealtime'],
+      Messages['mergeDialog.keepRealtime'],
 
       function() {
-        debug("User chose to use the realtime version!");
+        debug('User chose to use the realtime version!');
         // Unset the merge dialog flag.
         mergeDialogCurrentlyDisplayed = false;
         deferred.resolve();
       },
 
-      mainConfig.messages['mergeDialog.keepRemote'],
+      Messages['mergeDialog.keepRemote'],
 
       function() {
-        debug("User chose to use the remote version!");
+        debug('User chose to use the remote version!');
         // Unset the merge dialog flag.
         mergeDialogCurrentlyDisplayed = false;
         var restURL = XWiki.currentDocument.getRestURL();
-        if (mainConfig.language !== 'default' && !/\/pages\/(.+)\/translations\//.test(restURL)) {
-          restURL = restURL + mainConfig.language;
+        if (doc.language && !/\/pages\/(.+)\/translations\//.test(restURL)) {
+          restURL = restURL + doc.language;
         }
 
         $.ajax({
@@ -383,9 +321,9 @@ define('xwiki-realtime-saver', [
           success: function (data) {
             mainConfig.setTextValue(data.content, true, function() {
               debug("Overwrote the realtime session's content with the latest saved state.");
-              bumpVersion(function () {
+              bumpVersion(function() {
                 lastSaved.mergeMessage('mergeOverwrite', []);
-              }, null);
+              });
               deferred.resolve();
             });
           },
@@ -583,9 +521,7 @@ define('xwiki-realtime-saver', [
         continue;
       }
       newSave(editor, data[editor]);
-      if (xwikiMeta.refreshVersion) {
-        xwikiMeta.refreshVersion();
-      }
+      xwikiMeta.refreshVersion();
     }
     rtData = data;
 
@@ -603,22 +539,11 @@ define('xwiki-realtime-saver', [
    */
   mergeDialogCurrentlyDisplayed = false,
   createSaver = Saver.create = function(config) {
-    $.extend(mainConfig, {
-      getTextValue: config.getTextValue,
-      getSaveValue: config.getSaveValue,
-      setTextValue: config.setTextValue,
-      formId: config.formId || 'edit',
-      userList: config.userList,
-      userName: config.userName,
-      realtime: config.realtime
-    });
+    $.extend(mainConfig, config);
+    mainConfig.formId = mainConfig.formId || 'edit';
     var netfluxNetwork = config.network;
     var channel = config.channel;
     var firstConnection = true;
-
-    if (typeof config.safeCrash === 'function') {
-      mainConfig.safeCrash = config.safeCrash;
-    }
 
     lastSaved.time = now();
 
@@ -634,7 +559,7 @@ define('xwiki-realtime-saver', [
         if (e) {
           warn(e);
         } else if (shouldSave) {
-          saveDocument(mainConfig.getSaveValue(), function() {
+          saveDocument(mainConfig.getSaveValue()).done(function(doc) {
             // Cache this because bumpVersion will increment it.
             var lastVersion = lastSaved.version;
 
@@ -642,14 +567,14 @@ define('xwiki-realtime-saver', [
             updateLastSaved(toSave);
 
             // Get document version.
-            bumpVersion(function(out) {
-              if (out.version === '1.1') {
+            bumpVersion(function(doc) {
+              if (doc.version === '1.1') {
                 debug('Created document version 1.1');
               } else {
-                debug(`Version bumped from ${lastVersion} to ${out.version}.`);
+                debug(`Version bumped from ${lastVersion} to ${doc.version}.`);
               }
-              lastSaved.mergeMessage('saved', [out.version]);
-            }, null);
+              lastSaved.mergeMessage('saved', [doc.version]);
+            }, doc);
           });
         } else {
           // local content matches that of the latest version
@@ -678,12 +603,7 @@ define('xwiki-realtime-saver', [
         if (mainConfig.mergeContent) {
           mergeRoutine(andThen);
         } else {
-          mainConfig.safeSave(false, false, {
-            version: lastSaved.version,
-            versionTime: lastSaved.time
-          }, function() {
-            andThen(null, true);
-          });
+          andThen(null, true);
         }
       };
 
@@ -725,12 +645,8 @@ define('xwiki-realtime-saver', [
         // Update your content.
         updateLastSaved(toSave);
 
-        ajaxVersion(function(e, out) {
-          if (e) {
-            // There was an error (probably AJAX).
-            warn(e);
-            ErrorBox.show('save');
-          } else if (out.isNew) {
+        doc.reload().done(function(doc) {
+          if (doc.isNew) {
             // It didn't actually save?
             ErrorBox.show('save');
           } else {
@@ -748,16 +664,20 @@ define('xwiki-realtime-saver', [
               lastSaved.onReceiveOwnIsave = null;
             };
             // Bump the version, fire your isaved.
-            bumpVersion(function(out) {
-              if (out.version === '1.1') {
+            bumpVersion(function(doc) {
+              if (doc.version === '1.1') {
                 debug('Created document version 1.1');
               } else {
-                debug(`Version bumped from ${lastVersion} to ${out.version}.`);
+                debug(`Version bumped from ${lastVersion} to ${doc.version}.`);
               }
-              lastSaved.mergeMessage('saved', [out.version]);
-            }, out);
+              lastSaved.mergeMessage('saved', [doc.version]);
+            }, doc);
           }
+        }).fail(function(error) {
+          warn(error);
+          ErrorBox.show('save');
         });
+
         return true;
       };
       // FIXME: Find a way to remove the old listener without using Prototype.js API.

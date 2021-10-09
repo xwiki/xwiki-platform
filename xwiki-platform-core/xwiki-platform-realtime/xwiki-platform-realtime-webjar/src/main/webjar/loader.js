@@ -21,9 +21,10 @@ define('xwiki-realtime-loader', [
   'jquery',
   'xwiki-meta',
   'xwiki-realtime-config',
+  'xwiki-realtime-document',
   'xwiki-l10n!xwiki-realtime-messages',
   'xwiki-events-bridge'
-], function($, xm, realtimeConfig, Messages) {
+], function($, xm, realtimeConfig, doc, Messages) {
   'use strict';
 
   if (!realtimeConfig.webSocketURL) {
@@ -32,10 +33,9 @@ define('xwiki-realtime-loader', [
   }
 
   var module = {messages: Messages},
-  language = realtimeConfig.versionInfo?.locale || 'default',
-  version = realtimeConfig.versionInfo?.version,
-  versionTime = realtimeConfig.versionInfo?.time,
 
+  // FIXME: The real-time JavaScript code is not loaded anymore on the "lock" page so this code is not really used. We
+  // need to decide if we want to re-add the real-time JavaScript code on the lock page and how.
   getDocLock = module.getDocLock = function() {
     var lockedBy = document.querySelectorAll('p.xwikimessage .wikilink a');
     var force = document.querySelectorAll('a[href*="force=1"][href*="/edit/"]');
@@ -63,25 +63,14 @@ define('xwiki-realtime-loader', [
     state: false
   },
 
-  ajaxVersionURL = new XWiki.Document('Version', 'RTFrontend').getURL('get', 'xpage=plain'),
   getConfig = module.getConfig = function() {
     var userReference = xm.userReference ? XWiki.Model.serialize(xm.userReference) : 'xwiki:XWiki.XWikiGuest';
     return {
-      saverConfig: {
-        ajaxMergeURL: new XWiki.Document('Ajax', 'RTFrontend').getURL('get', 'xpage=plain&outputSyntax=plain'),
-        ajaxVersionURL,
-        messages: Messages,
-        language,
-        version,
-        safeSave
-      },
       WebsocketURL: realtimeConfig.webSocketURL,
       htmlConverterUrl: new XWiki.Document('ConvertHTML', 'RTFrontend').getURL('get'),
       // userId === <userReference>-encoded(<userName>)%2d<random number>
       userName: userReference + '-' + encodeURIComponent(realtimeConfig.user.name + '-').replace(/-/g, '%2d') +
         String(Math.random()).substring(2),
-      language,
-      reference: xm.documentReference,
       userAvatarURL: realtimeConfig.user.avatarURL,
       isAdvancedUser: realtimeConfig.user.advanced,
       network: allRt.network,
@@ -94,36 +83,10 @@ define('xwiki-realtime-loader', [
   // Returns a promise that resolves with the list of editor channels available for the content field of the current
   // document in the current language.
   checkSocket = function() {
-    var path = language + '/content/';
-    return getKeys({path}).then(function(channels) {
+    var path = doc.language + '/content/';
+    return doc.getChannels({path}).then(function(channels) {
       return channels.filter(channel => channel?.path?.length > 2 && channel?.userCount > 0)
         .map(channel => channel.path.slice(2).join('/'));
-    });
-  },
-
-  channelListAPI = {
-    getByPath: function(path) {
-      return this.filter(channel => JSON.stringify(channel.path) === JSON.stringify(path))[0];
-    },
-    getByPathPrefix: function(pathPrefix) {
-      return this.filter(channel => channel.path.length >= pathPrefix.length &&
-        JSON.stringify(channel.path.slice(0, pathPrefix.length)) === JSON.stringify(pathPrefix));
-    }
-  },
-
-  getKeys = module.getKeys = function({documentReference, path, create}) {
-    documentReference = documentReference || xm.documentReference;
-    if (typeof documentReference === 'string') {
-      documentReference = XWiki.Model.resolve(documentReference, XWiki.EntityType.DOCUMENT);
-    }
-    var url = new XWiki.Document(documentReference).getRestURL('channels');
-    return $.getJSON(url, $.param({path, create}, true)).then(function(data) {
-      if (!Array.isArray(data)) {
-        console.error("You don't have permissions to edit that document.");
-        return $.Deferred().reject(data).promise();
-      } else {
-        return $.extend(data, channelListAPI);
-      }
     });
   },
 
@@ -496,28 +459,6 @@ define('xwiki-realtime-loader', [
     }
   },
 
-  getDocumentStatistics = function() {
-    return {
-      document: $('html').data('xwiki-document'),
-      language
-    };
-  },
-
-  checkVersion = function (callback) {
-    $.ajax({
-      url: ajaxVersionURL,
-      method: 'POST',
-      dataType: 'json',
-      success: function(data) {
-        callback(null, data);
-      },
-      data: getDocumentStatistics(),
-      error: function(error) {
-        callback(error, null);
-      }
-    });
-  },
-
   editForm = $('#edit').length ? $('#edit') : $('#inline'),
   shouldRedirect = false,
   previewButton = $('#mainEditArea').find('input[name="action_preview"]'),
@@ -532,12 +473,6 @@ define('xwiki-realtime-loader', [
         continue: 1
       });
     }
-  },
-
-  safeSave = function(cont, preview, old, callback) {
-    old = old || {version, versionTime};
-    callback = callback || save;
-    callback(cont, preview);
   },
 
   // Join a channel with all users on this page (realtime, offline AND lock page)
@@ -657,12 +592,11 @@ define('xwiki-realtime-loader', [
 
   joinAllUsers = function() {
     var config = getConfig();
-    var keyData = {
-      documentReference: config.reference,
-      path: config.language + '/events/all',
+    var getChannels = $.proxy(doc, 'getChannels', {
+      path: doc.language + '/events/all',
       create: true
-    };
-    getKeys(keyData).done(function(channels) {
+    });
+    getChannels().done(function(channels) {
       var channelKey = channels[0].key;
       if (channelKey) {
         require(['netflux-client', 'xwiki-realtime-errorBox'], function(Netflux, ErrorBox) {
@@ -672,14 +606,14 @@ define('xwiki-realtime-loader', [
             console.error(error);
           };
           // Connect to the websocket server.
-          Netflux.connect(config.WebsocketURL).then($.proxy(onNetfluxConnect, null, config, keyData, channelKey,
+          Netflux.connect(config.WebsocketURL).then($.proxy(onNetfluxConnect, null, config, getChannels, channelKey,
             onError), onError);
         });
       }
     });
   },
 
-  onNetfluxConnect = function(config, keyData, channelKey, onError, network) {
+  onNetfluxConnect = function(config, getChannels, channelKey, onError, network) {
     allRt.network = network;
     var onOpen = function(channel) {
       allRt.userList = channel.members;
@@ -706,7 +640,7 @@ define('xwiki-realtime-loader', [
     network.on('reconnect', function() {
       hideWarning();
       hideWsError();
-      getKeys(keyData).done(function(channels) {
+      getChannels().done(function(channels) {
         network.join(channels[0].key).then(onOpen, onError);
       });
     });
@@ -725,13 +659,8 @@ define('xwiki-realtime-loader', [
       return;
     }
 
-    $(document).on('xwiki:document:saved', function () {
-      checkVersion(function(error, data) {
-        if (!error && data && data.version) {
-          version = data.version;
-          versionTime = data.versionTime;
-        }
-      });
+    $(document).on('xwiki:document:saved', function() {
+      doc.reload();
       if (!shouldRedirect) {
         return;
       }
@@ -757,7 +686,7 @@ define('xwiki-realtime-loader', [
     }).off('click.realtime-loader').on('click.realtime-loader', function(event) {
       event.preventDefault();
       event.stopPropagation();
-      safeSave(/* continue: */ $(this).attr('name') !== 'action_save');
+      save(/* continue: */ $(this).attr('name') !== 'action_save');
     });
 
     previewButton.click(function(event) {
@@ -766,7 +695,7 @@ define('xwiki-realtime-loader', [
       } else {
         event.preventDefault();
         event.stopPropagation();
-        safeSave(null, true);
+        save(false, true);
       }
     });
   };

@@ -19,7 +19,7 @@
  */
 // This file defines functions which are used by the real-time editors (Wiki / WYSIWYG) and address components of the
 // user interface.
-define('xwiki-realtime-interface', ['jquery'], function($) {
+define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-messages'], function($, Messages) {
   'use strict';
 
   var Interface = {};
@@ -39,7 +39,7 @@ define('xwiki-realtime-interface', ['jquery'], function($) {
     return allowed;
   };
 
-  var createAllowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox = function(checked, message) {
+  var createAllowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox = function(checked) {
     var checkbox = $(
       '<div class="realtime-allow-outerdiv">' +
         '<label class="realtime-allow-label" for="">' +
@@ -48,11 +48,11 @@ define('xwiki-realtime-interface', ['jquery'], function($) {
       '</div>'
     ).appendTo('.buttons');
     var id = uid();
-    return checkbox.find('label').attr('for', id).append(document.createTextNode(message))
+    return checkbox.find('label').attr('for', id).append(document.createTextNode(Messages.allowRealtime))
       .find('input').attr('id', id).prop('checked', !!checked);
   };
 
-  var createMergeMessageElement = Interface.createMergeMessageElement = function(container, messages) {
+  var createMergeMessageElement = Interface.createMergeMessageElement = function(container) {
     var $merges = $('<div class="realtime-merge"/>').attr('id', uid()).prependTo(container);
 
     var timeout;
@@ -62,10 +62,7 @@ define('xwiki-realtime-interface', ['jquery'], function($) {
       // Keep multiple message sequences from fighting over resources.
       clearTimeout(timeout);
 
-      var formattedMessage = messages[messageKey].replace(/\{(\d+)\}/g, function(all, token) {
-        // If you pass an insufficient number of arguments it will return 'undefined'.
-        return args[token];
-      });
+      var formattedMessage = Messages.get.apply(Messages, [messageKey, ...args]);
 
       console.log(formattedMessage);
 

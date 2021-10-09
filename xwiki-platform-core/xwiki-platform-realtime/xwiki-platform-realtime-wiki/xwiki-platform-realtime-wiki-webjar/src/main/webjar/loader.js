@@ -21,8 +21,9 @@ define('xwiki-realtime-wikiEditor-loader', [
   'jquery',
   'xwiki-realtime-config',
   'xwiki-realtime-loader',
+  'xwiki-realtime-document',
   'xwiki-realtime-errorBox'
-], function($, realtimeConfig, Loader, ErrorBox) {
+], function($, realtimeConfig, Loader, doc, ErrorBox) {
   'use strict';
 
   if (!Loader) {
@@ -43,25 +44,11 @@ define('xwiki-realtime-wikiEditor-loader', [
     name: 'Wiki'
   };
 
-  var getKeyData = function(config) {
-    return {
-      documentReference: config.reference,
-      path: [
-        config.language + '/events/1.0',
-        config.language + '/events/userdata',
-        config.language + '/content/' + editorId,
-        // Check also if the content is edited in real-time with other editors at the same time.
-        config.language + '/content/',
-      ],
-      create: true
-    };
-  };
-
-  var parseKeyData = function(config, channels) {
+  var parseKeyData = function(channels) {
     var keys = {};
-    var eventsChannel = channels.getByPath([config.language, 'events', '1.0']);
-    var userDataChannel = channels.getByPath([config.language, 'events', 'userdata']);
-    var editorChannel = channels.getByPath([config.language, 'content', editorId]);
+    var eventsChannel = channels.getByPath([doc.language, 'events', '1.0']);
+    var userDataChannel = channels.getByPath([doc.language, 'events', 'userdata']);
+    var editorChannel = channels.getByPath([doc.language, 'content', editorId]);
     if (!eventsChannel || !userDataChannel || !editorChannel) {
       console.error('Missing document channels.');
     } else {
@@ -74,7 +61,7 @@ define('xwiki-realtime-wikiEditor-loader', [
       });
       // Collect the other active real-time editing session (for the document content field) that are using a different
       // editor (e.g. the WYSIWYG editor).
-      channels.getByPathPrefix([config.language, 'content']).forEach(channel => {
+      channels.getByPathPrefix([doc.language, 'content']).forEach(channel => {
         if (channel.userCount > 0 && JSON.stringify(channel.path) !== JSON.stringify(editorChannel.path)) {
           keys.active[channel.path.slice(2).join('/')] = channel;
         }
@@ -84,8 +71,16 @@ define('xwiki-realtime-wikiEditor-loader', [
   };
 
   var updateKeys = function() {
-    var config = Loader.getConfig();
-    return Loader.getKeys(getKeyData(config)).then($.proxy(parseKeyData, null, config));
+    return doc.getChannels({
+      path: [
+        doc.language + '/events/1.0',
+        doc.language + '/events/userdata',
+        doc.language + '/content/' + editorId,
+        // Check also if the content is edited in real-time with other editors at the same time.
+        doc.language + '/content/',
+      ],
+      create: true
+    }).then(parseKeyData);
   };
 
   var beforeLaunchRealtime = function(keys) {

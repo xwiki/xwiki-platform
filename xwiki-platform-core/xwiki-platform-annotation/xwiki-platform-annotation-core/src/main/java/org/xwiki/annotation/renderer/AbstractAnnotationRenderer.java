@@ -65,7 +65,7 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
     protected StreamParser plainTextParser;
 
     @Inject
-    protected RawBlockTextExtracter textExtracter;
+    protected RawBlockTextExtracter htmlTextExtracter;
 
     /**
      * The annotations generator listener to use in this renderer.
@@ -80,7 +80,7 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
 
         // create the annotations generator
         annotationsGenerator =
-            new AnnotationGeneratorChainingListener(selectionAlterer, chain, textExtracter);
+            new AnnotationGeneratorChainingListener(selectionAlterer, chain, htmlTextExtracter);
 
         // chain'em all
         // Construct the listener chain in the right order. Listeners early in the chain are called before listeners

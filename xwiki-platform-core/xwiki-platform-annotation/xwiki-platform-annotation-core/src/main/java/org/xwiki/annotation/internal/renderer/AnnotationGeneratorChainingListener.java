@@ -85,7 +85,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     /**
      * The collection of annotations to generate annotation events for, by default the empty list.
      */
-    private Collection<Annotation> annotations = Collections.<Annotation> emptyList();
+    private Collection<Annotation> annotations = Collections.<Annotation>emptyList();
 
     /**
      * Cleaner for the annotation selection text, so that it can be mapped on the content.
@@ -99,21 +99,21 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     private Map<Event, SortedMap<Integer, List<AnnotationEvent>>> bookmarks =
         new HashMap<Event, SortedMap<Integer, List<AnnotationEvent>>>();
 
-    private RawBlockTextExtracter textExtracter;
+    private RawBlockTextExtracter htmlTextExtracter;
 
     /**
      * Builds an annotation generator listener from the passed link generator in the passed chain.
      *
      * @param selectionAlterer cleaner for the annotation selection text, so that it can be mapped on the content
      * @param listenerChain the chain in which this listener is part of
-     * @param textExtracter text extracter
+     * @param htmlTextExtracter text content extracter from HTML
      */
     public AnnotationGeneratorChainingListener(ContentAlterer selectionAlterer, ListenerChain listenerChain,
-        RawBlockTextExtracter textExtracter)
+        RawBlockTextExtracter htmlTextExtracter)
     {
         this.chain = listenerChain;
         this.selectionAlterer = selectionAlterer;
-        this.textExtracter = textExtracter;
+        this.htmlTextExtracter = htmlTextExtracter;
     }
 
     @Override
@@ -164,8 +164,9 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     {
         String textContent = text;
         if (syntax.getType().equals(SyntaxType.XHTML) || syntax.getType().equals(SyntaxType.HTML)) {
-            // Text could be from within a html block.
-            textContent = textExtracter.getTextContent(text);
+            // Since text could come from within a HTML macro, it's content should be parsed, cleaned and transformed
+            // into plain text, as the user sees it when he adds the annotation.
+            textContent = htmlTextExtracter.getTextContent(text);
         }
 
         // Store the raw text as it is ftm. Should handle syntax in the future

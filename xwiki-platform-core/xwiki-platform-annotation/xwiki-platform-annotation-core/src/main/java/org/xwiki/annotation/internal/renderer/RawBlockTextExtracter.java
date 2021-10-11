@@ -45,7 +45,7 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
 
 /**
- * Todo.
+ * Helper for transforming an HTML content into valid XHTML and getting it's text content.
  * 
  * @version $Id$
  */
@@ -53,8 +53,6 @@ import org.xwiki.xml.html.HTMLUtils;
 @Singleton
 public class RawBlockTextExtracter implements Initializable
 {
-    protected static final String ROLE_HINT = "RawBlockTextExtracter";
-
     @Inject
     private HTMLCleaner htmlCleaner;
 
@@ -79,10 +77,10 @@ public class RawBlockTextExtracter implements Initializable
     }
 
     /**
-     * Todo.
+     * Parse and clean a HTML given as string and compute it's text content.
      *
-     * @param html html as string
-     * @return string content
+     * @param html an HTML as string
+     * @return text content of the HTML document
      */
     public String getTextContent(String html)
     {

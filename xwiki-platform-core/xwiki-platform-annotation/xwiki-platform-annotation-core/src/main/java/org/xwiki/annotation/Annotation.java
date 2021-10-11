@@ -85,12 +85,12 @@ public class Annotation
     public static final String TARGET_FIELD = "target";
 
     /**
-     * Todo.
+     * The name of the field of this annotation start offset relative to the plain text.
      */
     public static final String PLAIN_TEXT_START_OFFSET_FIELD = "plainTextStartOffset";
 
     /**
-     * Todo.
+     * The name of the field of this annotation end offset relative to the plain text.
      */
     public static final String PLAIN_TEXT_END_OFFSET_FIELD = "plainTextEndOffset";
 

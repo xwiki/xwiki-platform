@@ -63,7 +63,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -198,7 +198,7 @@ public class DocumentMergeImporterTest
 
         verify(this.xcontext, times(1)).getUserReference();
         verifyNoMoreInteractions(this.xcontext);
-        verifyZeroInteractions(this.xwiki);
+        verifyNoInteractions(this.xwiki);
     }
 
     @Test
@@ -207,7 +207,7 @@ public class DocumentMergeImporterTest
         this.documentMergeImporter.importDocument("comment", this.previousDocument, null, this.nextDocument,
             this.configuration);
 
-        verifyZeroInteractions(this.xwiki, this.xcontext);
+        verifyNoInteractions(this.xwiki, this.xcontext);
     }
 
     @Test
@@ -246,7 +246,7 @@ public class DocumentMergeImporterTest
         this.documentMergeImporter.importDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
-        verifyZeroInteractions(this.jobStatus);
+        verifyNoInteractions(this.jobStatus);
         verify(this.xwiki).saveDocument(same(this.mergedDocument), eq("comment"), eq(false), same(this.xcontext));
     }
 
@@ -281,7 +281,7 @@ public class DocumentMergeImporterTest
         this.documentMergeImporter.importDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
-        verifyZeroInteractions(this.jobStatus);
+        verifyNoInteractions(this.jobStatus);
         verify(this.xwiki).saveDocument(same(this.nextDocument), eq("comment"), eq(false), same(this.xcontext));
     }
 
@@ -323,7 +323,7 @@ public class DocumentMergeImporterTest
 
         verify(this.xcontext, times(2)).getUserReference();
         verifyNoMoreInteractions(this.xcontext);
-        verifyZeroInteractions(this.xwiki);
+        verifyNoInteractions(this.xwiki);
     }
 
     @Test
@@ -463,6 +463,6 @@ public class DocumentMergeImporterTest
         this.documentMergeImporter.importDocument("comment", null, this.currentDocument, this.nextDocument,
             this.configuration);
 
-        verifyZeroInteractions(this.xwiki, this.xcontext);
+        verifyNoInteractions(this.xwiki, this.xcontext);
     }
 }

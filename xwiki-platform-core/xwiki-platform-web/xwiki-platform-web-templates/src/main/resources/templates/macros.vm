@@ -1718,7 +1718,6 @@ $displayName##
  *#
 ##
 #macro (livetable_filterObfuscated $map)
-  >> map $map
   ## When the total number of rows is not bigger than the limit, we remove the obfuscated results from the response since
   ## this has no impact on the pagination.
   #set ($rows = $map.get('rows'))

@@ -49,9 +49,9 @@ import org.xwiki.xml.html.HTMLUtils;
  * 
  * @version $Id$
  */
-@Component(roles = RawBlockTextExtracter.class)
+@Component(roles = HTMLTextExtracter.class)
 @Singleton
-public class RawBlockTextExtracter implements Initializable
+public class HTMLTextExtracter implements Initializable
 {
     @Inject
     private HTMLCleaner htmlCleaner;

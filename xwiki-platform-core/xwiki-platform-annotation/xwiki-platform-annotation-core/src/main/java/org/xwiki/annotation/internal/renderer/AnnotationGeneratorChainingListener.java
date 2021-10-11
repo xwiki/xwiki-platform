@@ -99,7 +99,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     private Map<Event, SortedMap<Integer, List<AnnotationEvent>>> bookmarks =
         new HashMap<Event, SortedMap<Integer, List<AnnotationEvent>>>();
 
-    private RawBlockTextExtracter htmlTextExtracter;
+    private HTMLTextExtracter htmlTextExtracter;
 
     /**
      * Builds an annotation generator listener from the passed link generator in the passed chain.
@@ -109,7 +109,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
      * @param htmlTextExtracter text content extracter from HTML
      */
     public AnnotationGeneratorChainingListener(ContentAlterer selectionAlterer, ListenerChain listenerChain,
-        RawBlockTextExtracter htmlTextExtracter)
+        HTMLTextExtracter htmlTextExtracter)
     {
         this.chain = listenerChain;
         this.selectionAlterer = selectionAlterer;

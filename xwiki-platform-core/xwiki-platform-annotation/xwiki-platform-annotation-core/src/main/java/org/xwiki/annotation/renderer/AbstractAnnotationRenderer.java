@@ -27,7 +27,7 @@ import javax.inject.Named;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.content.ContentAlterer;
 import org.xwiki.annotation.internal.renderer.AnnotationGeneratorChainingListener;
-import org.xwiki.annotation.internal.renderer.RawBlockTextExtracter;
+import org.xwiki.annotation.internal.renderer.HTMLTextExtracter;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
@@ -65,7 +65,7 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
     protected StreamParser plainTextParser;
 
     @Inject
-    protected RawBlockTextExtracter htmlTextExtracter;
+    protected HTMLTextExtracter htmlTextExtracter;
 
     /**
      * The annotations generator listener to use in this renderer.

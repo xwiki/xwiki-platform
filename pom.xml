@@ -1355,7 +1355,7 @@
     <repository>
       <id>nexus.xwiki.org</id>
       <name>XWiki Maven Remote Repository for Releases</name>
-      <url>http://nexus.xwiki.org/nexus/content/repositories/releases/</url>
+      <url>https://nexus.xwiki.org/nexus/content/repositories/releases/</url>
     </repository>
   </distributionManagement>
 </project>

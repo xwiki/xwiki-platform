@@ -342,21 +342,8 @@
   #foreach($item in $items)
     #gridresult_buildRowJSON($item $rows)
   #end
-  ## When the total number of rows is not bigger than the limit, we remove the obfuscated results from the 
-  ## response since this has no impact on the pagination. 
-  #if ($map.get('totalrows') &lt;= $limit)
-    #set ($filteredRows = [])
-    #foreach ($row in $rows) 
-      #if($row['doc_viewable'])
-        #set ($discard = $filteredRows.add($row))
-      #end
-    #end
-    #set($discard = $map.put('totalrows', $filteredRows.size()))
-    #set($discard = $map.put('returnedrows', $filteredRows.size()))
-  #else
-    #set ($filteredRows = $rows)
-  #end
-  #set($discard = $map.put('rows', $filteredRows))
+  #set ($discard = $map.put('rows', $rows))
+  #livetable_filterObfuscated($map)
 #end
 
 

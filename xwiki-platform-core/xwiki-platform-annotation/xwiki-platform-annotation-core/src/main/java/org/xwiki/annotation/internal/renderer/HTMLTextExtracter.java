@@ -47,6 +47,7 @@ import org.xwiki.xml.html.HTMLUtils;
  * Helper for transforming an HTML content into valid XHTML and getting it's text content.
  * 
  * @version $Id$
+ * @since 13.9RC1
  */
 @Component(roles = HTMLTextExtracter.class)
 @Singleton

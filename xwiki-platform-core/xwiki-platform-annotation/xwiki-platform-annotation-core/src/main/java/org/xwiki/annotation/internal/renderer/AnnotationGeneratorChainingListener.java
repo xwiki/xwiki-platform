@@ -163,7 +163,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     public void onRawText(String text, Syntax syntax)
     {
         String textContent = text;
-        if (syntax.getType().equals(SyntaxType.XHTML) || syntax.getType().equals(SyntaxType.HTML)) {
+        if (SyntaxType.HTML_TYPES.contains(syntax.getType())) {
             // Since text could come from within a HTML macro, it's content should be parsed, cleaned and transformed
             // into plain text, as the user sees it when he adds the annotation.
             textContent = htmlTextExtracter.getTextContent(text);

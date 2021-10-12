@@ -86,11 +86,15 @@ public class Annotation
 
     /**
      * The name of the field of this annotation start offset relative to the plain text.
+     *
+     * @since 13.9RC1
      */
     public static final String PLAIN_TEXT_START_OFFSET_FIELD = "plainTextStartOffset";
 
     /**
      * The name of the field of this annotation end offset relative to the plain text.
+     *
+     * @since 13.9RC1
      */
     public static final String PLAIN_TEXT_END_OFFSET_FIELD = "plainTextEndOffset";
 

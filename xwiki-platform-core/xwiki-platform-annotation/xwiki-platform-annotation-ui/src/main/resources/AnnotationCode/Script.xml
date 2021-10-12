@@ -1648,7 +1648,7 @@ XWiki.Annotation = Class.create({
       this.setAnnotationVisibility(!this.displayingAnnotations);
       this.toggleAnnotations(this.displayingAnnotations);
       if (!this.displayingAnnotations) {
-        this.removeAnnotationMarkers();
+        this.removeAnnotationsAndSelectionSignatures();
       }
     } else {
       this.fetchAnnotations(true);

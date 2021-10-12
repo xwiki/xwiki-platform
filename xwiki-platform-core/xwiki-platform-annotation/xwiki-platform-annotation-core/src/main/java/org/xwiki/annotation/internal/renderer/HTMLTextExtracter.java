@@ -31,7 +31,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -53,15 +52,15 @@ import org.xwiki.xml.html.HTMLUtils;
 @Singleton
 public class HTMLTextExtracter implements Initializable
 {
-    @Inject
-    private HTMLCleaner htmlCleaner;
-
     /**
      * Helper object for manipulating DOM Level 3 Load and Save APIs.
      **/
     private DOMImplementationLS lsImpl;
 
     private Map<String, String> htmlCleanerParametersMap;
+
+    @Inject
+    private HTMLCleaner htmlCleaner;
 
     @Override
     public void initialize() throws InitializationException
@@ -89,14 +88,12 @@ public class HTMLTextExtracter implements Initializable
         XPath xPath = XPathFactory.newInstance().newXPath();
         try {
             NodeList textNodes = (NodeList) xPath.compile("//text()").evaluate(htmlDoc, XPathConstants.NODESET);
-            Node node;
             for (int i = 0; i < textNodes.getLength(); i++) {
-                node = textNodes.item(i);
-                String textContent = node.getTextContent();
+                String textContent = textNodes.item(i).getTextContent();
                 fullContent = fullContent.concat(textContent);
             }
         } catch (XPathExpressionException e) {
-            return fullContent;
+            // This should not happen. In case it does, the content will remain empty.
         }
         return fullContent;
     }

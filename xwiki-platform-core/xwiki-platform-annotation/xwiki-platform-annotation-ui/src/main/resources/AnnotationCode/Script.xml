@@ -926,7 +926,7 @@ XWiki.Annotation = Class.create({
           // hide message at page bottom
           this._x_notification.hide();
           // load the received annotated content in the page, along with annotations and annotations markers.
-          this.loadAnnotations(response.responseJSON.annotatedContent.annotations, andShow, false, force)
+          this.loadAnnotations(response.responseJSON.annotatedContent.annotations, andShow, false, force);
           // store the state of the annotations
           this.fetchedAnnotations = true;
           this.setAnnotationVisibility(andShow);

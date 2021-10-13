@@ -59,11 +59,12 @@ public final class IconSetup
     public static void setUp(PageTest pageTest, String iconSetPath)
         throws XWikiException, ComponentLookupException, IOException
     {
+        String xwiki = "xwiki";
         XWikiDocument document =
-            pageTest.xwiki.getDocument(new DocumentReference("xwiki", "Fake", "IconTheme"), pageTest.context);
+            pageTest.xwiki.getDocument(new DocumentReference(xwiki, "Fake", "IconTheme"), pageTest.context);
         document.setContent(IOUtils.toString(IconSetup.class.getResourceAsStream(iconSetPath), UTF_8));
         BaseObject iconThemeObject = new BaseObject();
-        iconThemeObject.setXClassReference(new DocumentReference("xwiki", "IconThemesCode", "IconThemeClass"));
+        iconThemeObject.setXClassReference(new DocumentReference(xwiki, "IconThemesCode", "IconThemeClass"));
         iconThemeObject.setStringValue("name", "FakeIconTheme");
         document.addXObject(iconThemeObject);
         pageTest.xwiki.saveDocument(document, pageTest.context);

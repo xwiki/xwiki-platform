@@ -35,7 +35,6 @@ import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authorization.script.SecurityAuthorizationScriptService;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
@@ -69,7 +68,7 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
     ModelScriptService.class,
     IconManagerScriptService.class
 })
-class UorgsuggestTest extends PageTest
+class UorgsuggestPageTest extends PageTest
 {
     private static final String UORGSUGGEST = "uorgsuggest.vm";
 

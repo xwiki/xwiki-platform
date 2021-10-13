@@ -52,7 +52,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test the {@code getdocuments.vm} template. Assert that the hql queries are well-formed.
+ * Test the {@code getdocuments.vm} template. Assert that the returned results are well-formed.
  *
  * @version $Id$
  * @since 13.9RC1
@@ -62,7 +62,7 @@ import static org.mockito.Mockito.when;
     XWikiDateTool.class,
     ModelScriptService.class,
 })
-class GetdocumentsTest extends PageTest
+class GetdocumentsPageTest extends PageTest
 {
     private static final String GETDOCUMENTS = "getdocuments.vm";
 
@@ -87,7 +87,7 @@ class GetdocumentsTest extends PageTest
     }
 
     @Test
-    void nonViewableResultsAreObfuscated() throws Exception
+    void removeObuscatedResultsWhenTotalrowsLowerThanLimit() throws Exception
     {
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("view"), any(), any(), any()))
             .thenReturn(false, true);
@@ -115,7 +115,7 @@ class GetdocumentsTest extends PageTest
     }
 
     @Test
-    void removeObuscatedResultsWhenTotalrowsLowerThanLimit() throws Exception
+    void nonViewableResultsAreObfuscated() throws Exception
     {
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("view"), any(), any(), any())).thenReturn(false,
             true);

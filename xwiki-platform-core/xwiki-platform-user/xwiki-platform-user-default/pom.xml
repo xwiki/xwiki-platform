@@ -101,7 +101,7 @@
             </goals>
             <configuration>
               <includes>
-                <include>**/UserComponentList.class</include>
+                <include>**/DefaultUserComponentList.class</include>
               </includes>
             </configuration>
           </execution>

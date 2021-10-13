@@ -89,7 +89,7 @@ class LiveDataIT
     private static final String FOOTNOTE_COMPUTED_TITLE =
         "(1) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
             + "pages.";
-    
+
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
      * and two XObjects, then edit the XObjects properties from the live data.

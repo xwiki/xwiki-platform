@@ -152,5 +152,5 @@
   #end
   #set ($discard = $data.rows.add($row))
 #end
-#livetable_filterObfuscated($row)
+#livetable_filterObfuscated($data)
 #jsonResponse($data)

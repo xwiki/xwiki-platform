@@ -25,6 +25,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.xwiki.configuration.internal.DocumentsConfigurationSource;
+import org.xwiki.configuration.internal.SpacesConfigurationSource;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.user.internal.AllGuestConfigurationSource;
 import org.xwiki.user.internal.AllSuperAdminConfigurationSource;
@@ -43,6 +44,9 @@ import org.xwiki.user.internal.document.NormalUserConfigurationSourceAuthorizati
 import org.xwiki.user.internal.document.NormalUserPreferencesConfigurationSource;
 import org.xwiki.user.internal.document.SecureUserDocumentUserPropertiesResolver;
 import org.xwiki.user.internal.document.UserPreferencesConfigurationSource;
+import org.xwiki.user.internal.group.DefaultGroupManager;
+import org.xwiki.user.internal.group.GroupsCache;
+import org.xwiki.user.internal.group.MembersCache;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
@@ -60,27 +64,32 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
 @ComponentList({
-        // UserReferenceSerializer
-        DocumentDocumentReferenceUserReferenceSerializer.class,
-        CurrentUserReferenceResolver.class,
-        DocumentDocumentReferenceUserReferenceResolver.class,
-        ConfiguredStringUserReferenceSerializer.class,
-        // User Script Service
-        SecureUserPropertiesResolver.class,
-        SuperAdminConfigurationSource.class,
-        GuestConfigurationSource.class,
-        SecureAllUserPropertiesResolver.class,
-        AllSuperAdminConfigurationSource.class,
-        DocumentsConfigurationSource.class,
-        AllGuestConfigurationSource.class,
-        DefaultUserManager.class,
-        DefaultConfiguredStringUserReferenceResolver.class,
-        SecureUserDocumentUserPropertiesResolver.class,
-        UserPreferencesConfigurationSource.class,
-        NormalUserPreferencesConfigurationSource.class,
-        NormalUserConfigurationSourceAuthorization.class,
-        // User Configuration
-        DefaultUserConfiguration.class
+    // UserReferenceSerializer
+    DocumentDocumentReferenceUserReferenceSerializer.class,
+    CurrentUserReferenceResolver.class,
+    DocumentDocumentReferenceUserReferenceResolver.class,
+    ConfiguredStringUserReferenceSerializer.class,
+    // User Script Service
+    SecureUserPropertiesResolver.class,
+    SuperAdminConfigurationSource.class,
+    GuestConfigurationSource.class,
+    SecureAllUserPropertiesResolver.class,
+    AllSuperAdminConfigurationSource.class,
+    DocumentsConfigurationSource.class,
+    AllGuestConfigurationSource.class,
+    DefaultUserManager.class,
+    DefaultConfiguredStringUserReferenceResolver.class,
+    SecureUserDocumentUserPropertiesResolver.class,
+    UserPreferencesConfigurationSource.class,
+    NormalUserPreferencesConfigurationSource.class,
+    NormalUserConfigurationSourceAuthorization.class,
+    // User Configuration
+    DefaultUserConfiguration.class,
+    // Group Script Service
+    DefaultGroupManager.class,
+    GroupsCache.class,
+    MembersCache.class,
+    SpacesConfigurationSource.class
 })
 @Inherited
 public @interface DefaultUserComponentList

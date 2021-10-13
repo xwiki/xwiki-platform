@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<results>
+  <rs id="/xwiki/bin/view/XWiki/U1" icon="/xwiki/skins/flamingo/icons/silk/user.png"
+    info="User 1">XWiki.U1
+  </rs>
+  <rs id="/xwiki/bin/view/XWiki/U3" icon="/xwiki/skins/flamingo/icons/silk/user.png"
+    info="U3">XWiki.U3
+  </rs>
+  <rs id="/xwiki/bin/view/XWiki/U4" icon="/xwiki/skins/flamingo/icons/silk/user.png"
+    info="U4">XWiki.U4
+  </rs>
+  <rs id="/xwiki/bin/view/XWiki/U5" icon="/xwiki/skins/flamingo/icons/silk/user.png"
+    info="U5">XWiki.U5
+  </rs>
+  <rs id="/xwiki/bin/view/XWiki/U6" icon="/xwiki/skins/flamingo/icons/silk/user.png"
+    info="U6">XWiki.U6
+  </rs>
+  <rs id="/xwiki/bin/view/XWiki/U7" icon="/xwiki/skins/flamingo/icons/silk/user.png"
+    info="U7">XWiki.U7
+  </rs>
+  <rs id="/xwiki/bin/view/XWiki/U8" icon="/xwiki/skins/flamingo/icons/silk/user.png"
+    info="U8">XWiki.U8
+  </rs>
+  <rs id="/xwiki/bin/view/XWiki/U9" icon="/xwiki/skins/flamingo/icons/silk/user.png"
+    info="U9">XWiki.U9
+  </rs>
+  <rs id="/xwiki/bin/view/XWiki/U10" icon="/xwiki/skins/flamingo/icons/silk/user.png"
+    info="U10">XWiki.U10
+  </rs>
+  <rs id="/xwiki/bin/view/XWiki/U11" icon="/xwiki/skins/flamingo/icons/silk/user.png"
+    info="U11">XWiki.U11
+  </rs>
+</results>

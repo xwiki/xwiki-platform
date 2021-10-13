@@ -17,7 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.crypto.script.internal;
+package org.xwiki.crypto.script;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.xwiki.crypto.store.StoreReference;
 import org.xwiki.crypto.store.WikiStoreReference;
@@ -29,10 +32,16 @@ import org.xwiki.security.authorization.Right;
  * Common base class for scripting stores.
  *
  * @version $Id$
- * @since 8.4RC1
+ * @since 13.9RC1
  */
 public abstract class AbstractScriptingStore
 {
+    /**
+     * @deprecated use {@link StandardCharsets#UTF_8} instead
+     */
+    @Deprecated
+    protected static final Charset UTF8 = Charset.forName("UTF-8");
+
     protected StoreReference storeReference;
 
     private ContextualAuthorizationManager contextualAuthorizationManager;

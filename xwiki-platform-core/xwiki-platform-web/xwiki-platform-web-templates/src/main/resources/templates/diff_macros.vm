@@ -145,9 +145,6 @@
     <dt id="#diffAnchor($documentReference)" #diffDataReference($documentReference)>
       #diffIcon('file-text' 'change')
       $services.localization.render('web.history.changes.summary.documentProperties')
-      <span class="hint">
-        $escapetool.xml($services.model.serialize($documentReference, 'local'))
-      </span>
     </dt>
     <dd>
       <dl>
@@ -292,12 +289,9 @@
       #set ($classReference = $services.model.resolveDocument($className))
       #set ($classPropertyReference = $services.model.createEntityReference($propertyDiff.propName, 'CLASS_PROPERTY',
         $classReference))
-      <dt id="#diffAnchor($classPropertyReference)" #diffDataReference($classPropertyReference)>
+      <dt id="#diffAnchor($classPropertyReference)" #diffDataReference($classPropertyReference) title="$escapetool.xml($className)">
         #diffIcon('cube' $propertyDiff.action)
         $propertyDiff.propName
-        <span class="hint">
-          ($escapetool.xml($className))
-        </span>
       </dt>
       ## Unfortunately the class property diff doesn't tell us much except for the action.
       #set ($oldProperty = $oldClass.get($propertyDiff.propName))

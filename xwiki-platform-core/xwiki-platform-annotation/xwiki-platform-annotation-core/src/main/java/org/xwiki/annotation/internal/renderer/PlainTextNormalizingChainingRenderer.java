@@ -20,7 +20,9 @@
 package org.xwiki.annotation.internal.renderer;
 
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.content.AlteredContent;
 import org.xwiki.annotation.content.ContentAlterer;
@@ -29,6 +31,7 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
  * Plain text renderer that normalizes spaces in the printed text.
@@ -39,10 +42,21 @@ import org.xwiki.rendering.syntax.Syntax;
 public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintRenderer
 {
     /**
+     * Syntaxes that are from the HTML family.
+     */
+    private static final Set<SyntaxType> HTML_FAMILY_TYPES =
+        SetUtils.hashSet(SyntaxType.XHTML, SyntaxType.HTML, SyntaxType.ANNOTATED_XHTML, SyntaxType.ANNOTATED_HTML);
+
+    /**
      * Normalizer for the content serialized by this listener, to clean all texts such as protected strings in various
      * events.
      */
     private ContentAlterer textCleaner;
+
+    /**
+     * Helper for extracting the text content of an HTML.
+     */
+    private HTMLTextExtracter htmlTextExtracter;
 
     /**
      * Flag to signal that the renderer is currently rendering whitespaces (has rendered the first one) and should not
@@ -60,11 +74,14 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
      * Builds an abstract plain text normalizing renderer with the passed text cleaner.
      *
      * @param textCleaner the text cleaner used to normalize the texts produced by the events
+     * @param htmlTextExtracter text content extracter from HTML
      * @param listenerChain the listeners chain this listener is part of
      */
-    public PlainTextNormalizingChainingRenderer(ContentAlterer textCleaner, ListenerChain listenerChain)
+    public PlainTextNormalizingChainingRenderer(ContentAlterer textCleaner, HTMLTextExtracter htmlTextExtracter,
+        ListenerChain listenerChain)
     {
         this.textCleaner = textCleaner;
+        this.htmlTextExtracter = htmlTextExtracter;
         setListenerChain(listenerChain);
     }
 
@@ -110,7 +127,13 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
                 printSpace();
             }
 
-            AlteredContent cleanedContent = textCleaner.alter(text);
+            String textContent = text;
+            if (HTML_FAMILY_TYPES.contains(syntax.getType())) {
+                // Since text could come from within an HTML macro, it's content should be parsed, cleaned and
+                // transformed into plain text, as the users see it.
+                textContent = htmlTextExtracter.getTextContent(text);
+            }
+            AlteredContent cleanedContent = textCleaner.alter(textContent);
             printText(cleanedContent.getContent().toString());
 
             if (Character.isWhitespace(text.charAt(text.length() - 1))) {

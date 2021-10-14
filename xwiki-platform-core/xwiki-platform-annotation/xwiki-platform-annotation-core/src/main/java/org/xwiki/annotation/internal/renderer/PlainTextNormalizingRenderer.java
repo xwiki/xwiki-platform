@@ -68,6 +68,12 @@ public class PlainTextNormalizingRenderer extends AbstractChainingPrintRenderer 
     @Inject
     private LinkLabelGenerator linkLabelGenerator;
 
+    /**
+     * Helper for extracting the text content of an HTML.
+     */
+    @Inject
+    private HTMLTextExtracter htmlTextExtracter;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -82,6 +88,6 @@ public class PlainTextNormalizingRenderer extends AbstractChainingPrintRenderer 
         // empty block listener is needed by the label generator
         chain.addListener(new GeneratorEmptyBlockChainingListener(chain));
         chain.addListener(new LinkLabelGeneratorChainingListener(linkLabelGenerator, plainTextParser, chain));
-        chain.addListener(new PlainTextNormalizingChainingRenderer(textCleaner, chain));
+        chain.addListener(new PlainTextNormalizingChainingRenderer(textCleaner, htmlTextExtracter, chain));
     }
 }

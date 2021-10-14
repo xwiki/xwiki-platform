@@ -1702,7 +1702,8 @@ $displayName##
 #end
 
 #**
- * Internal macro - Remove the obfuscated results (i.e., non-viewable rows) from the 
+ * Internal macro - Remove the obfuscated results (i.e., non-viewable rows) from the map when the total number of 
+ * returned rows is larger or equal to the total number of counted rows.
  *
  * @param map the response map returned to the user. This map is expected to have a totalrows and returnedrows fields
  *            with numeric values and a rows field containing a arrow of objects containing a doc_viewable boolean

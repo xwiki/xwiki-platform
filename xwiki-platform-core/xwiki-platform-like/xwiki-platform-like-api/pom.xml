@@ -97,7 +97,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-user-default</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope><!-- TODO: check if scope is test or runtime. -->
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

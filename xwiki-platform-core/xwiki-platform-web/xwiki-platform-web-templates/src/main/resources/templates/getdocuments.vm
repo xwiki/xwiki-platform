@@ -142,7 +142,7 @@ $response.setContentType("application/json")
   #set ($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${docName}"))
   #set ($row = {'doc_viewable' : $viewable})
   #if (!$viewable)
-    #set ($discard = $row.put('doc_fullName', "${xcontext.database}:${item}"))
+    #set ($discard = $row.put('doc_fullName', 'obfuscated'))
   #else
     #set ($itemDoc = $xwiki.getDocument($docName))
     ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
@@ -204,6 +204,7 @@ $response.setContentType("application/json")
   #set ($discard = $rows.add($row))
 #end
 #set ($discard = $map.put('rows', $rows))
+#livetable_filterObfuscated($map)
 ##
 ## Serialize the JSON
 ##

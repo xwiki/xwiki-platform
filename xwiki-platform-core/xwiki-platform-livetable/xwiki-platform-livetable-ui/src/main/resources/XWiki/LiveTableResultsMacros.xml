@@ -342,7 +342,8 @@
   #foreach($item in $items)
     #gridresult_buildRowJSON($item $rows)
   #end
-  #set($discard = $map.put('rows', $rows))
+  #set ($discard = $map.put('rows', $rows))
+  #livetable_filterObfuscated($map)
 #end
 
 
@@ -365,64 +366,75 @@
     #set($docLanguage = '')
   #end
   #set ($docReference = $services.model.resolveDocument($docName))
-  #set ($row = {
-    'doc_viewable': $services.security.authorization.hasAccess('view', $docReference),
-    'doc_fullName': $services.model.serialize($docReference, 'local'),
-    'doc_space': $services.model.serialize($docReference.parent, 'local'),
-    'doc_location': "#hierarchy($docReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})",
-    'doc_url': $xwiki.getURL($docReference),
-    'doc_space_url': $xwiki.getURL($docReference.parent),
-    'doc_wiki': $docReference.wikiReference.name,
-    'doc_wiki_url': $xwiki.getURL($docReference.wikiReference),
-    'doc_hasadmin': $xwiki.hasAdminRights(),
-    'doc_hasedit': $services.security.authorization.hasAccess('edit', $docReference),
-    'doc_hasdelete': $services.security.authorization.hasAccess('delete', $docReference),
-    'doc_edit_url': $xwiki.getURL($docReference, 'edit'),
-    'doc_copy_url': $xwiki.getURL($docReference, 'view', 'xpage=copy'),
-    'doc_delete_url': $xwiki.getURL($docReference, 'delete'),
-    'doc_rename_url': $xwiki.getURL($docReference, 'view', 'xpage=rename&amp;step=1')
-  })
-  #set ($isTranslation = "$!docLanguage" != '' &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
-  ## Display the language after the document name so that not all translated documents have the same name displayed.
-  #set ($row.doc_name = "$docReference.name#if ($isTranslation) ($docLanguage)#end")
-  #set ($row.doc_hascopy = $row.doc_viewable)
-  #set ($row.doc_hasrename = $row.doc_hasdelete)
-  #set ($row.doc_hasrights = $row.doc_hasedit &amp;&amp; $isAdvancedUser)
-  #if ($docReference.name == 'WebHome')
-    ## For nested pages, use the page administration.
-    #set ($webPreferencesReference = $services.model.createDocumentReference('WebPreferences', $docReference.lastSpaceReference))
-    #set ($row.doc_rights_url = $xwiki.getURL($webPreferencesReference, 'admin', 'editor=spaceadmin&amp;section=PageRights'))
-  #else
-    ## For terminal pages, use the old rights editor.
-    ## TODO: We should create a page administration for terminal pages too.
-    #set ($row.doc_rights_url = $xwiki.getURL($docReference, 'edit', 'editor=rights'))
-  #end
-  #if ($row.doc_viewable)
-    #set ($itemDoc = $xwiki.getDocument($docReference))
-    ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
-    ## result is a translation.
-    #if ($isTranslation)
-      #set ($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
+  #set ($isViewable = $services.security.authorization.hasAccess('view', $docReference))
+  #if ($isViewable)
+    #set ($row = {
+      'doc_viewable': $isViewable,
+      'doc_fullName': $services.model.serialize($docReference, 'local'),
+      'doc_space': $services.model.serialize($docReference.parent, 'local'),
+      'doc_location': "#hierarchy($docReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})",
+      'doc_url': $xwiki.getURL($docReference),
+      'doc_space_url': $xwiki.getURL($docReference.parent),
+      'doc_wiki': $docReference.wikiReference.name,
+      'doc_wiki_url': $xwiki.getURL($docReference.wikiReference),
+      'doc_hasadmin': $xwiki.hasAdminRights(),
+      'doc_hasedit': $services.security.authorization.hasAccess('edit', $docReference),
+      'doc_hasdelete': $services.security.authorization.hasAccess('delete', $docReference),
+      'doc_edit_url': $xwiki.getURL($docReference, 'edit'),
+      'doc_copy_url': $xwiki.getURL($docReference, 'view', 'xpage=copy'),
+      'doc_delete_url': $xwiki.getURL($docReference, 'delete'),
+      'doc_rename_url': $xwiki.getURL($docReference, 'view', 'xpage=rename&amp;step=1')
+    })
+    #set ($isTranslation = "$!docLanguage" != '' &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
+    ## Display the language after the document name so that not all translated documents have the same name displayed.
+    #set ($row.doc_name = "$docReference.name#if ($isTranslation) ($docLanguage)#end")
+    #set ($row.doc_hascopy = $row.doc_viewable)
+    #set ($row.doc_hasrename = $row.doc_hasdelete)
+    #set ($row.doc_hasrights = $row.doc_hasedit &amp;&amp; $isAdvancedUser)
+    #if ($docReference.name == 'WebHome')
+    
+      ## For nested pages, use the page administration.
+      #set ($webPreferencesReference = $services.model.createDocumentReference(
+        'WebPreferences', $docReference.lastSpaceReference))
+      #set ($row.doc_rights_url = $xwiki.getURL($webPreferencesReference, 'admin',
+        'editor=spaceadmin&amp;section=PageRights'))
     #else
-      #set ($translatedDoc = $itemDoc.translatedDocument)
+      ## For terminal pages, use the old rights editor.
+      ## TODO: We should create a page administration for terminal pages too.
+      #set ($row.doc_rights_url = $xwiki.getURL($docReference, 'edit', 'editor=rights'))
     #end
-    #set($discard = $itemDoc.use($className))
-    #set($discard = $row.put('doc_objectCount', $itemDoc.getObjectNumbers($className)))
-    #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
-    #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
-    #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
-    #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
-    #set($rawTitle = $translatedDoc.title)
-    #if($rawTitle != $row['doc_title'])
-   #set($discard = $row.put('doc_title_raw', $rawTitle))
+    #if ($row.doc_viewable)
+      #set ($itemDoc = $xwiki.getDocument($docReference))
+      ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
+      ## result is a translation.
+      #if ($isTranslation)
+        #set ($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
+      #else
+        #set ($translatedDoc = $itemDoc.translatedDocument)
+      #end
+      #set($discard = $itemDoc.use($className))
+      #set($discard = $row.put('doc_objectCount', $itemDoc.getObjectNumbers($className)))
+      #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
+      #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
+      #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
+      #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
+      #set($rawTitle = $translatedDoc.title)
+      #if($rawTitle != $row['doc_title'])
+        #set($discard = $row.put('doc_title_raw', $rawTitle))
+      #end
+      #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($translatedDoc.authorReference)))
+      #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
+      #set($discard = $row.put('doc_creator', $xwiki.getPlainUserName($translatedDoc.creatorReference)))
+      #set($discard = $row.put('doc_hidden', $translatedDoc.isHidden()))
+      #foreach($colname in $collist)
+        #gridresult_buildColumnJSON($colname $row)
+      #end
     #end
-    #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($translatedDoc.authorReference)))
-    #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
-    #set($discard = $row.put('doc_creator', $xwiki.getPlainUserName($translatedDoc.creatorReference)))
-    #set($discard = $row.put('doc_hidden', $translatedDoc.isHidden()))
-    #foreach($colname in $collist)
-      #gridresult_buildColumnJSON($colname $row)
-    #end
+  #else
+    #set ($row = {
+      'doc_viewable': $isViewable,
+      'doc_fullName': 'obfuscated'
+    })
   #end
   #set($discard = $rows.add($row))
 #end

@@ -19,30 +19,10 @@
  */
 package org.xwiki.tool.packager;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Properties;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.velocity.VelocityContext;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.Extensions;
-import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.test.junit5.XWikiTempDir;
-import org.xwiki.test.junit5.XWikiTempDirExtension;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.tool.packager.PackageMojo}.
@@ -50,14 +30,10 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.2
  */
-@Extensions({ @ExtendWith({ XWikiTempDirExtension.class }) })
-class PackageMojoTest
+public class PackageMojoTest
 {
-    @XWikiTempDir
-    private File tmpDir;
-
     @Test
-    void replaceProperty()
+    public void replaceProperty()
     {
         VelocityContext context = new VelocityContext();
         context.put("xwikiDataDir", "/some/path");
@@ -80,36 +56,5 @@ class PackageMojoTest
             + "XWIKI_PID=$!\n"
             + "whatever";
         assertEquals(expected, mojo.replaceProperty(content, context));
-    }
-
-    @Test
-    void before() throws Exception
-    {
-        MavenProject project = mock(MavenProject.class);
-        RepositorySystem repositorySystem = mock(RepositorySystem.class);
-        Artifact artifact = mock(Artifact.class);
-
-        when(project.getProperties()).thenReturn(new Properties());
-        when(repositorySystem.resolve(any())).thenReturn(new ArtifactResolutionResult());
-        when(repositorySystem.createArtifact(any(), any(), any(), any(), any())).thenReturn(artifact);
-        // Return a malformed jar file with paths containing '../' to trigger the zip slip check.
-        File jar = Paths.get(PackageMojoTest.class.getResource("/evil.jar").toURI()).toFile();
-        when(artifact.getFile()).thenReturn(jar);
-
-        PackageMojo mojo = new PackageMojo();
-        // Mock the logs to prevent the quality checks to fail because of unexpected logs.
-        mojo.setLog(mock(Log.class));
-        ReflectionUtils.setFieldValue(mojo, "hibernateConfig", mock(File.class));
-        ReflectionUtils.setFieldValue(mojo, "project", project);
-        ReflectionUtils.setFieldValue(mojo, "repositorySystem", repositorySystem);
-        // Initialize a temporary directory otherwise the configuration files are added to the project folders.
-        ReflectionUtils.setFieldValue(mojo, "outputPackageDirectory", this.tmpDir);
-
-        MojoExecutionException exception = assertThrows(MojoExecutionException.class, mojo::before);
-        assertEquals(IOException.class, exception.getCause().getClass());
-        assertEquals(String.format(
-                "Template [%1$s/webapps/xwiki/WEB-INF/../test] is outside of the configuration file directory "
-                    + "[%1$s/webapps/xwiki/WEB-INF].", this.tmpDir.getCanonicalPath()),
-            exception.getCause().getMessage());
     }
 }

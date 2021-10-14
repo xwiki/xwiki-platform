@@ -351,6 +351,21 @@ public class PackageMojo extends AbstractOldCoreMojo
         return artifact;
     }
 
+    /**
+     * Resolve {@code xwiki-platform-tool-configuration-resources}, then look for velocity scripts inside the artifact
+     * and interpret them before copying the result to {@code configurationFileTargetDirectory}.
+     * <p>
+     * <a 
+     *   href="https://sonarcloud.io/organizations/xwiki/rules?open=javasecurity%3AS6096&rule_key=javasecurity%3AS6096">
+     *   javasecurity:S6096
+     * </a> is ignored because we trust the content of {@code xwiki-platform-tool-configuration-resources} since it is 
+     * produced by maven using source code we own.
+     *
+     * @param configurationFileTargetDirectory the root directory where the configuration files found in {@code
+     *     xwiki-platform-tool-configuration-resources} are copied ({@code "webapps/xwiki/WEB-INF"} by default)
+     * @throws MojoExecutionException when failing to resolve {@code xwiki-platform-tool-configuration-resources}
+     */
+    @SuppressWarnings("javasecurity:S6096")
     private void generateConfigurationFiles(File configurationFileTargetDirectory) throws MojoExecutionException
     {
         VelocityContext context = createVelocityContext();
@@ -367,15 +382,6 @@ public class PackageMojo extends AbstractOldCoreMojo
                 if (entry.getName().endsWith(".vm")) {
                     String fileName = entry.getName().replace(".vm", "");
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
-
-                    // Validates that the outputFile location is located inside the configuration directory.
-                    if (!outputFile.getCanonicalPath().startsWith(configurationFileTargetDirectory.getCanonicalPath()))
-                    {
-                        throw new IOException(
-                            String.format("Template [%s] is outside of the configuration file directory [%s].",
-                                outputFile, configurationFileTargetDirectory));
-                    }
-
                     OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile));
                     getLog().info("Writing config file: " + outputFile);
                     // Note: Init is done once even if this method is called several times...

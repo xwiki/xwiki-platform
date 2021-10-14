@@ -362,7 +362,7 @@ public class PackageMojo extends AbstractOldCoreMojo
      * produced by maven using source code we own.
      *
      * @param configurationFileTargetDirectory the root directory where the configuration files found in {@code
-     *     xwiki-platform-tool-configuration-resources} are copied ({@code "webapps/xwiki/WEB-INF"} by default)
+     *     xwiki-platform-tool-configuration-resources} are copied ({@code webapps/xwiki/WEB-INF} by default)
      * @throws MojoExecutionException when failing to resolve {@code xwiki-platform-tool-configuration-resources}
      */
     @SuppressWarnings("javasecurity:S6096")

@@ -353,10 +353,26 @@ XWiki.widgets.LiveTable = Class.create({
       if (descriptor.type === 'hidden') {
         return;
       }
-      // The column's display name to be used when displaying the reponsive version.
+      // The column's display name to be used when displaying the responsive version.
       var displayName = descriptor.displayName || column;
       var fieldName = column.replace(/^doc\./, 'doc_');
-      if (column === '_actions') {
+      // When a cell is part of a non-viewable row (except for the actions that simply stays empty), we display a 
+      // message indicating that the content is not present because the current user does not have the right to view it.
+      if (!row['doc_viewable'] && !row[fieldName]) {
+        const notViewableCellMessage = "$services.localization.render('livetable.cell.emptyValue')";
+        var td = new Element('td', {
+          'class': [
+            fieldName,
+            'link' + (descriptor.link || ''),
+            'type' + (descriptor.type || '')
+          ].join(' '),
+          'data-title': displayName
+        });
+        if(column !== '_actions') {
+          td.update(notViewableCellMessage + "<sup>*</sup>");
+        }
+        tr.appendChild(td);
+      } else if (column === '_actions') {
         var adminActions = ['admin', 'rename', 'rights'];
         var td = new Element('td', {
           'class': 'actions',
@@ -444,21 +460,11 @@ XWiki.widgets.LiveTable = Class.create({
           container.innerHTML = row[fieldName] || '';
         } else if (row[fieldName] !== undefined && row[fieldName] !== null) {
           var text = row[fieldName] + '';
-          if (fieldName === 'doc_name' && !row['doc_viewable']) {
-            text += '*';
-          }
           if (showFilterNote && fieldName === 'doc_title' && row['doc_title_raw'] !== undefined) {
             container.addClassName('docTitleComputed');
           }
           container.update(text.escapeHTML());
         }
-
-        // When a cell is part of a non-viewable row, we display a content indicating that the content is not present
-        // because the current user does not have the right to view it.
-        if (!row['doc_viewable'] && !row[column]) {
-          td.update($(table.domNodeName + '-inaccessible-cell').innerHTML + '<sup>*</sup>')
-        }
-        
         tr.appendChild(td);
       }
     });

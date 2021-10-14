@@ -58,7 +58,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * TODO: document me.
+ * Test the {@code getdeleteddocuments.vm} template. Assert that the returned results are well-formed.
  *
  * @version $Id$
  * @since 13.9RC1

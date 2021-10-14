@@ -1511,11 +1511,6 @@ $Msz MB##
   <div id="${htmlLiveTableId}-computed-title-docs" class="hidden">
     #info("(<span class='docTitleComputed'></span>)&nbsp;$services.localization.render('platform.livetable.docTitleComputedHint')")
   </div>
-  ## Hidden div containing the translated message used to inform the user that a cell cannot be viewed because they do
-  ## not have the right to view it.
-  <div id="${htmlLiveTableId}-inaccessible-cell" class="hidden">
-    $services.localization.render('livetable.cell.emptyValue')
-  </div>
 </div>## xwiki-livetable-container
 #end## end-livetable-macro
 
@@ -1709,7 +1704,9 @@ $displayName##
 #**
  * Internal macro - Remove the obfuscated results (i.e., non-viewable rows) from the 
  *
- * @param map TODO
+ * @param map the response map returned to the user. This map is expected to have a totalrows and returnedrows fields
+ *            with numeric values and a rows field containing a arrow of objects containing a doc_viewable boolean
+ *            field   
  *
  * @internal
  * @since 13.9RC1

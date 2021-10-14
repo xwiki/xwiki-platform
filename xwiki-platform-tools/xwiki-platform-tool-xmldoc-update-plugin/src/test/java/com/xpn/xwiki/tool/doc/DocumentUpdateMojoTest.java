@@ -85,6 +85,8 @@ public class DocumentUpdateMojoTest
         String outputContent = IOUtils.toString(new FileReader(outputFile));
         assertTrue(outputContent.contains("<attachment>\n    <filename>fileToAttach.txt</filename>"));
         assertTrue(outputContent.contains("<attachment>\n    <filename>fileToAttach.js</filename>"));
+        assertTrue(outputContent.contains("<attachment>\n    <filename>fileToAttach.txt</filename>\n    "
+            + "<mimetype>text/plain</mimetype>"));
     }
 
     private void set(AttachMojo mojo, String fieldName, Object value) throws Exception

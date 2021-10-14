@@ -84,19 +84,19 @@ public class HTMLTextExtracter implements Initializable
      */
     public String getTextContent(String html)
     {
-        String fullContent = "";
+        StringBuilder fullContent = new StringBuilder();
         Document htmlDoc = parseHTML(html);
         XPath xPath = XPathFactory.newInstance().newXPath();
         try {
             NodeList textNodes = (NodeList) xPath.compile("//text()").evaluate(htmlDoc, XPathConstants.NODESET);
             for (int i = 0; i < textNodes.getLength(); i++) {
                 String textContent = textNodes.item(i).getTextContent();
-                fullContent = fullContent.concat(textContent);
+                fullContent.append(textContent);
             }
         } catch (XPathExpressionException e) {
             // This should not happen. In case it does, the content will remain empty.
         }
-        return fullContent;
+        return fullContent.toString();
     }
 
     private Document parseHTML(String html)

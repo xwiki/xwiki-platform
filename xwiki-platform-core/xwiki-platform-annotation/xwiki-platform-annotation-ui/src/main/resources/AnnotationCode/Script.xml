@@ -645,7 +645,6 @@ XWiki.Annotation = Class.create({
   // the currently set filter (pair of field names and their values) that all annotations should be fetched according to.
   // It will be updated any time a changed filter event is received
   currentFilter : {},
-  annotatedElementPlainText: "",
 
   initialize : function (displayHighlighted, annotatedElt, displayedByDefault) {
     this.displayHighlight = displayHighlighted;
@@ -925,7 +924,7 @@ XWiki.Annotation = Class.create({
           }
           // hide message at page bottom
           this._x_notification.hide();
-          // load the received annotated content in the page, along with annotations and annotations markers.
+          // Load the received annotations, along with annotations markers.
           this.loadAnnotations(response.responseJSON.annotatedContent.annotations, andShow, false, force);
           // store the state of the annotations
           this.fetchedAnnotations = true;
@@ -983,34 +982,19 @@ XWiki.Annotation = Class.create({
    * @param annotations object with information about all the annotations on the page
    * @param andShow whether the annotations should also be shown (highlighted) on the content
    * @param navigateToPane if the document should be repositioned to the annotations tab in the document extra section.
-   * Useful when the changes on annotations are done from the tab, when the document position should still stay in the
-   * tab
+   *        Useful when the changes on annotations are done from the tab, when the document position should still stay
+   *        in the tab
    * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful
-   * for deleting annotations, which should be reflected in the annotated element even if no annotations are still left
-   * to display)
+   *        for deleting annotations, which should be reflected in the annotated element even if no annotations are
+   *        still left to display)
   */
   loadAnnotations: function(annotations, andShow, navigateToPane, force) {
     if (annotations.size() == 0 &amp;&amp; !force) {
       return;
     }
-    // For avoiding adding the same annotation twice, all the annotations signatures are removed before adding them again.
-    this.removeAnnotationsAndSelectionSignatures();
-    var annSystem = this;
-    annotations.each(function(ann) {
-      var plainTextStartOffset = ann.fields.find(field =&gt; field.name == 'plainTextStartOffset').value
-      var plainTextEndOffset = ann.fields.find(field =&gt; field.name == 'plainTextEndOffset').value
-      var annDOMRange = annSystem.getDOMRange(annSystem.annotatedElement, plainTextStartOffset, plainTextEndOffset);
-      // Since the annotation could start at a specific offset, the node is split for not wrapping the whole text and a
-      // new range is created to recalculate the new ends.
-      var strictRange = annSystem.fixRangeEnds(annDOMRange);
-
-      // All the nodes inside this range are extracted. Each node it is wrapped inside the annotation marker span.
-      var nodes = annSystem.getTextNodesInRange(strictRange);
-      for(var i = 0; i &lt; nodes.length; i++) {
-        annSystem.markAnnotation(nodes[i], ann);
-      }
-    });
-    this.addAnnotationMarkers(annotations);
+    // For avoiding adding the same annotation twice, all the annotations markups are removed before adding them again.
+    this.removeAnnotationsAndSelectionMarkups();
+    this.addAnnotationsMarkup(annotations);
     // Notify the content change.
     document.fire('xwiki:dom:updated', {elements: [this.annotatedElement]});
     // Also handle the tab 'downstairs' when the annotations list changes.
@@ -1018,6 +1002,32 @@ XWiki.Annotation = Class.create({
     if (andShow) {
       this.toggleAnnotations(true);
     }
+  },
+
+  addAnnotationsMarkup : function(annotations) {
+    annotations.each(function(item) {
+      var plainTextStartOffset = item.fields.find(field =&gt; field.name == 'plainTextStartOffset').value;
+      var plainTextEndOffset = item.fields.find(field =&gt; field.name == 'plainTextEndOffset').value;
+      var annDOMRange = this.getDOMRange(this.annotatedElement, plainTextStartOffset, plainTextEndOffset);
+      // Since the annotation could start at a specific offset, the node is splitted for not wrapping the whole text and
+      // a new range is created to recalculate the new ends.
+      var strictRange = this.fixRangeEndPoints(annDOMRange);
+
+      // All the nodes inside this range are extracted. Each node is wrapped inside the annotation marker span.
+      this.getTextNodesInRange(strictRange).forEach(textNode =&gt; this.markAnnotation(textNode, item));
+
+      // Add the marker span after the last span of this annotation.
+      var allSpans = this.annotatedElement.select('[class~=ID' + item.annotationId + ']');
+      if (allSpans.size() == 0) {
+        return;
+      }
+      var lastSpan = allSpans[allSpans.size() - 1];
+      // Create the annotation markers hidden by default, since annotations are added on the document hidden by default.
+      var markerSpan = new Element('span', {'id': 'ID' + item.annotationId, 'class' : 'hidden annotation-marker ' + item.state});
+      lastSpan.insert({after: markerSpan});
+      // Annotations are displayed on mouseover.
+      markerSpan.observe('click', this.onMarkerClick.bindAsEventListener(this, item.annotationId));
+    }.bind(this));
   },
 
   /**
@@ -1042,14 +1052,29 @@ XWiki.Annotation = Class.create({
    *
    * @param range the DOM range of the annotated text
   */
-  fixRangeEnds: function(range) {
+  fixRangeEndPoints: function(range) {
     var strictRange = new Range();
 
-    var newStartNode = range.startContainer.splitText(range.startOffset);
-    strictRange.setStart(newStartNode, 0);
+    // In case the range starts and ends in the same text node, the first split could alter the length of the node and
+    // break the second split.
+    var endOffset = range.endOffset;
+    if (range.startContainer == range.endContainer) {
+      endOffset -= range.startOffset;
+    }
 
-    var newEndNode = range.endContainer.splitText(range.endOffset);
-    strictRange.setEnd(newEndNode, 0);
+    var newStartNode = range.startContainer;
+    // The split is done only if the offset is not before first or after last character for not creating empty text nodes.
+    if (range.startOffset &gt; 0 &amp;&amp; range.startOffset &lt; (range.startContainer.length - 1)) {
+      newStartNode = range.startContainer.splitText(range.startOffset);
+    }
+    strictRange.setStartBefore(newStartNode);
+
+    var newEndNode = range.endContainer;
+    // The split is done only if the offset is not before first or after last character for not creating empty text nodes.
+    if (endOffset &gt; 0 &amp;&amp; endOffset &lt; (range.endContainer.length - 1)) {
+      newEndNode = range.endContainer.splitText(endOffset + 1);
+    }
+    strictRange.setEndAfter(range.endContainer);
 
     return strictRange;
   },
@@ -1062,61 +1087,67 @@ XWiki.Annotation = Class.create({
    * @param endIndex end offset where the range end
   */
   getDOMRange: function(annotatedElement, startIndex, endIndex) {
-    this.annotatedElementPlainText = "";
-    var startPosition = this.getElementAtOffset(annotatedElement, startIndex);
-    this.annotatedElementPlainText = "";
-    var endPosition = this.getElementAtOffset(annotatedElement, endIndex);
+    var startPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, startIndex);
+    var endPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, endIndex);
     var range = new Range();
-    range.setStart(startPosition.element, startPosition.offset);
-    range.setEnd(endPosition.element, endPosition.offset);
+    range.setStart(startPosition.node, startPosition.offset);
+    range.setEnd(endPosition.node, endPosition.offset);
     return range;
   },
 
   /**
-   * Knowing the offset relative to the full plain content of the root element, get the corresponding child node that contains it and the offset
-   * specific to the new node. The DOM is traversed recursively starting with the root node and the plain content is computed to know when the
-   * wanted element is found.
+   * Knowing the offset relative to the full plain content of the root node, get the corresponding child node that
+   * contains it and the offset specific to the new node. The DOM is traversed recursively starting with the root node
+   * and the plain content length is computed to know when the wanted element is found.
    *
-   * @param rootElement the element where the search is done
-   * @param offset the offset relative to the full plain content
+   * @param parentNode the node where the search is done
+   * @param plainTextOffset the offset relative to the full plain content
   */
-  getElementAtOffset: function(rootElement, offset) {
-    var childNodes = rootElement.childNodes;
+  getTextNodeAtPlainTextOffset: function(parentNode, plainTextOffset) {
+    var childNodes = parentNode.childNodes;
     var child;
+    var parentNodePlainTextLength = 0;
     for (let i = 0; i &lt; childNodes.length; i++) {
       child = childNodes[i];
       if (child &amp;&amp; child.nodeType == 3) {
-        var initialLength = this.annotatedElementPlainText.length;
-        this.annotatedElementPlainText += child.textContent.replace(/\s/g, '');
-        if (offset &lt; this.annotatedElementPlainText.length) {
-          var elementSpecificOffset = this.getElementSpecificOffset(child, offset - initialLength);
-          return {"element": child, 'offset': elementSpecificOffset};
+        var previousSiblingsLength = parentNodePlainTextLength;
+        // The spaces are ignored since they were removed as well on the server when the offset was computed.
+        parentNodePlainTextLength += child.textContent.replace(/\s/g, '').length;
+        if (plainTextOffset &lt; parentNodePlainTextLength) {
+          // Because plainTextOffset doesn't consider spaces, the real offset of the node needs to be recomputed so that
+          // they are included.
+          return {'node': child, 'offset': this.getNodeSpecificOffset(child, plainTextOffset - previousSiblingsLength)};
         }
       }
       if (child.childNodes.length &gt; 0) {
-        var maybeFoundElement = this.getElementAtOffset(child, offset);
-        if (maybeFoundElement) {
-          return maybeFoundElement;
+        var maybeFoundNode = this.getTextNodeAtPlainTextOffset(child, plainTextOffset - parentNodePlainTextLength);
+        if (maybeFoundNode &amp;&amp; maybeFoundNode.node) {
+          return maybeFoundNode;
+        } else {
+          parentNodePlainTextLength += maybeFoundNode.childNodeLength;
         }
       }
     }
+    return {'childNodeLength': parentNodePlainTextLength};
   },
 
   /**
-   * Get a offset knowing the offset relatively to the plain text of the element.
+   * Get a offset knowing the offset relative to the plain text of the element.
    *
    * @param node a DOM node
    * @param offset the offset relative to the plain text
   */
-  getElementSpecificOffset: function(node, offset) {
+  getNodeSpecificOffset: function(node, offset) {
     var nonSpaceCharsLength = 0;
     var chars = Array.from(node.textContent);
     for (let i = 0; i &lt; chars.length; i++) {
-      if (!/\s/.test(chars[i])) {
+      if (/\s/.test(chars[i])) {
+        continue;
+      } else {
+        if (nonSpaceCharsLength == offset) {
+          return i;
+        }
         nonSpaceCharsLength += 1;
-      }
-      if (nonSpaceCharsLength == (offset + 1)) {
-        return i;
       }
     }
   },
@@ -1140,14 +1171,22 @@ XWiki.Annotation = Class.create({
       }
     );
     var nodes = [];
+    var startContainer = range.startContainer;
+    if (startContainer.childNodes.length &gt; 0) {
+      startContainer = startContainer.childNodes[range.startOffset];
+    }
+    var endContainer = range.endContainer;
+    if (endContainer.childNodes.length &gt; 0) {
+      endContainer = endContainer.childNodes[range.endOffset];
+    }
     while (rangeIterator.nextNode()) {
-      if (nodes.length === 0 &amp;&amp; rangeIterator.referenceNode !== range.startContainer) {
+      if (nodes.length === 0 &amp;&amp; rangeIterator.referenceNode !== startContainer) {
         continue;
       }
-      nodes.push(rangeIterator.referenceNode);
-      if (rangeIterator.referenceNode === range.endContainer) {
+      if (rangeIterator.referenceNode === endContainer) {
         break;
       }
+      nodes.push(rangeIterator.referenceNode);
     }
     return nodes;
   },
@@ -1156,12 +1195,11 @@ XWiki.Annotation = Class.create({
    * Remove the wrapper and marker of annotations. The selection highlight is also removed in case the new annotation
    * was deleted.
   */
-  removeAnnotationsAndSelectionSignatures: function() {
-    document.querySelectorAll("span.annotation")
+  removeAnnotationsAndSelectionMarkups: function() {
+    document.querySelectorAll("span.annotation, span.selection-highlight")
       .forEach(annotationNode =&gt; annotationNode.replaceWith(...annotationNode.childNodes));
-    document.querySelectorAll("span.selection-highlight")
-      .forEach(selectionNode =&gt; selectionNode.replaceWith(...selectionNode.childNodes));
     document.querySelectorAll("span.annotation-marker").forEach(marker =&gt; marker.remove());
+    this.fetchedAnnotations = false;
   },
 
   reloadTab : function(navigateToPane) {
@@ -1232,7 +1270,8 @@ XWiki.Annotation = Class.create({
                 this.hideBubble(container);
               }
               this.fetchedAnnotations = true;
-              // reload the received annotated content forcing update so that deleting last annotation is reflected in the list of annotations, with scroll to tab if not in bubble
+              // Reload the received annotations forcing update so that deleting last annotation is reflected in the
+              // list of annotations, with scroll to tab if not in bubble.
               this.loadAnnotations(response.responseJSON.annotatedContent.annotations, this.displayingAnnotations, !inBubble, true);
             }.bind(this),
             onComplete : function() {
@@ -1317,22 +1356,6 @@ XWiki.Annotation = Class.create({
         }.bind(this));
       }
     }.bindAsEventListener(this));
-  },
-
-  addAnnotationMarkers : function(annotations) {
-    annotations.each(function(item){
-      // get the last span of this annotation
-      var allSpans = this.annotatedElement.select('[class~=ID' + item.annotationId + ']');
-      if (allSpans.size() == 0) {
-        return;
-      }
-      var lastSpan = allSpans[allSpans.size() - 1];
-      // create the annotation markers hidden by default, since annotations are added on the document hidden by default
-      var markerSpan = new Element('span', {'id': 'ID' + item.annotationId, 'class' : 'hidden annotation-marker ' + item.state});
-      lastSpan.insert({after: markerSpan});
-      // annotations are displayed on mouseover
-      markerSpan.observe('click', this.onMarkerClick.bindAsEventListener(this, item.annotationId));
-    }.bind(this));
   },
 
   // maybe this should be moved in a function to display a bubble from an address, to call for all dialogs for different parameters
@@ -1504,7 +1527,7 @@ XWiki.Annotation = Class.create({
           this.hideBubble(container);
         }
         this.fetchedAnnotations = true;
-        // reload the received annotated content, with scroll to tab
+        // Reload the received annotations, with scroll to tab.
         this.loadAnnotations(response.responseJSON.annotatedContent.annotations, this.displayingAnnotations, !inBubble);
       }.bind(this),
       onFailure : function(response) {
@@ -1648,7 +1671,7 @@ XWiki.Annotation = Class.create({
       this.setAnnotationVisibility(!this.displayingAnnotations);
       this.toggleAnnotations(this.displayingAnnotations);
       if (!this.displayingAnnotations) {
-        this.removeAnnotationsAndSelectionSignatures();
+        this.removeAnnotationsAndSelectionMarkups();
       }
     } else {
       this.fetchAnnotations(true);

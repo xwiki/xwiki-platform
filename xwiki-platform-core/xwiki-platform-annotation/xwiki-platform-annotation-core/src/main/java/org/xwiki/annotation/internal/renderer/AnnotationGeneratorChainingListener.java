@@ -25,9 +25,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.content.AlteredContent;
@@ -59,6 +61,12 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
      * Version number of this class.
      */
     private static final long serialVersionUID = -2790330640900288463L;
+
+    /**
+     * Syntaxes that are from the HTML family.
+     */
+    private static final Set<SyntaxType> HTML_FAMILY_TYPES =
+        SetUtils.hashSet(SyntaxType.XHTML, SyntaxType.HTML, SyntaxType.ANNOTATED_XHTML, SyntaxType.ANNOTATED_HTML);
 
     /**
      * The chain listener from which this listener is part of.
@@ -163,9 +171,9 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     public void onRawText(String text, Syntax syntax)
     {
         String textContent = text;
-        if (SyntaxType.HTML_TYPES.contains(syntax.getType())) {
-            // Since text could come from within a HTML macro, it's content should be parsed, cleaned and transformed
-            // into plain text, as the user sees it when he adds the annotation.
+        if (HTML_FAMILY_TYPES.contains(syntax.getType())) {
+            // Since text could come from within an HTML macro, it's content should be parsed, cleaned and transformed
+            // into plain text, as the users see it when they add the annotation.
             textContent = htmlTextExtracter.getTextContent(text);
         }
 

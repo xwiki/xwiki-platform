@@ -1098,7 +1098,7 @@ XWiki.Annotation = Class.create({
   /**
    * Knowing the offset relative to the full plain content of the root node, get the corresponding child node that
    * contains it and the offset specific to the new node. The DOM is traversed recursively starting with the root node
-   * and the plain content length is computed to know when the wanted element is found.
+   * and the plain content length is computed to know when the wanted node is found.
    *
    * @param parentNode the node where the search is done
    * @param plainTextOffset the offset relative to the full plain content
@@ -1171,22 +1171,24 @@ XWiki.Annotation = Class.create({
       }
     );
     var nodes = [];
+    // Get the Range start and end as text nodes.
     var startContainer = range.startContainer;
     if (startContainer.childNodes.length &gt; 0) {
       startContainer = startContainer.childNodes[range.startOffset];
     }
     var endContainer = range.endContainer;
     if (endContainer.childNodes.length &gt; 0) {
-      endContainer = endContainer.childNodes[range.endOffset];
+      // The node at the endOffset position is the boundary point of the Range.
+      endContainer = endContainer.childNodes[range.endOffset - 1];
     }
     while (rangeIterator.nextNode()) {
       if (nodes.length === 0 &amp;&amp; rangeIterator.referenceNode !== startContainer) {
         continue;
       }
+      nodes.push(rangeIterator.referenceNode);
       if (rangeIterator.referenceNode === endContainer) {
         break;
       }
-      nodes.push(rangeIterator.referenceNode);
     }
     return nodes;
   },

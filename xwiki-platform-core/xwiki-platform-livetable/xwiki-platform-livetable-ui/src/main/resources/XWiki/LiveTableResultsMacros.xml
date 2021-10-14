@@ -342,7 +342,8 @@
   #foreach($item in $items)
     #gridresult_buildRowJSON($item $rows)
   #end
-  #set($discard = $map.put('rows', $rows))
+  #set ($discard = $map.put('rows', $rows))
+  #livetable_filterObfuscated($map)
 #end
 
 
@@ -365,9 +366,10 @@
     #set($docLanguage = '')
   #end
   #set ($docReference = $services.model.resolveDocument($docName))
-  #set ($row = {
-    'doc_viewable': $services.security.authorization.hasAccess('view', $docReference),
-    'doc_fullName': $services.model.serialize($docReference, 'local'),
+  #set ($isViewable = $services.security.authorization.hasAccess('view', $docReference))
+  #if ($isViewable)
+    #set ($row = {
+      'doc_viewable': $isViewable,  'doc_fullName': $services.model.serialize($docReference, 'local'),
     'doc_space': $services.model.serialize($docReference.parent, 'local'),
     'doc_location': "#hierarchy($docReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})",
     'doc_url': $xwiki.getURL($docReference),
@@ -420,8 +422,14 @@
     #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
     #set($discard = $row.put('doc_creator', $xwiki.getPlainUserName($translatedDoc.creatorReference)))
     #foreach($colname in $collist)
-      #gridresult_buildColumnJSON($colname $row)
+        #gridresult_buildColumnJSON($colname $row)
+      #end
     #end
+  #else
+    #set ($row = {
+      'doc_viewable': $isViewable,
+      'doc_fullName': 'obfuscated'
+    })
   #end
   #set($discard = $rows.add($row))
 #end

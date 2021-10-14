@@ -1702,6 +1702,39 @@ $displayName##
 #end
 
 #**
+ * Internal macro - Remove the obfuscated results (i.e., non-viewable rows) from the map when the total number of 
+ * returned rows is larger or equal to the total number of counted rows.
+ *
+ * @param map the response map returned to the user. This map is expected to have a totalrows and returnedrows fields
+ *            with numeric values and a rows field containing a arrow of objects containing a doc_viewable boolean
+ *            field   
+ *
+ * @internal
+ * @since 13.9RC1
+ * @since 13.4.4
+ * @since 12.10.11
+ *#
+##
+#macro (livetable_filterObfuscated $map)
+  ## When the total number of rows is not bigger than the limit, we remove the obfuscated results from the response since
+  ## this has no impact on the pagination.
+  #set ($rows = $map.get('rows'))
+  #if ($map.get('totalrows') <= $map.get('returnedrows'))
+    #set ($filteredRows = [])
+    #foreach ($row in $rows)
+      #if($row['doc_viewable'])
+        #set ($discard = $filteredRows.add($row))
+      #end
+    #end
+    #set($discard = $map.put('totalrows', $filteredRows.size()))
+    #set($discard = $map.put('returnedrows', $filteredRows.size()))
+  #else
+    #set ($filteredRows = $rows)
+  #end
+  #set ($discard = $map.put('rows', $filteredRows))
+#end
+
+#**
  * Modifies the passed where clause of the query (and its parameters) to add a "location" filter.
  *
  * To be used when the passed whereParams parameter is either of type Map or of type List but the whereSQL query is

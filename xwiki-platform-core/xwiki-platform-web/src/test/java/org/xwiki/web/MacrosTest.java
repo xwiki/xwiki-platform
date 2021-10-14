@@ -19,7 +19,11 @@
  */
 package org.xwiki.web;
 
+import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
@@ -29,7 +33,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.velocity.tools.EscapeTool;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the {@code macros.vm}.
@@ -106,5 +114,43 @@ public class MacrosTest
             + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', true, 'SOMETHING')\n"
             + "$whereQL $whereParams");
         assertEquals("SOMETHING []", writer.toString().trim());
+    }
+
+    @Test
+    void livetableFilterObfuscatedTotalGreaterThanReturnedRows()
+    {
+        Map<Object, Object> mapParameter = new HashMap<>();
+        mapParameter.put("totalrows", 10);
+        mapParameter.put("returnedrows", 5);
+        List<String> dummyRows = asList("a", "b", "c");
+        mapParameter.put("rows", dummyRows);
+        this.context.put("map", mapParameter);
+        this.ve.evaluate(this.context, new StringWriter(), "livetable",
+            new StringReader("#livetable_filterObfuscated($map)"));
+        Map<Object, Object> map = (Map<Object, Object>) this.context.get("map");
+        assertEquals(10, map.get("totalrows"));
+        assertEquals(5, map.get("returnedrows"));
+        assertSame(dummyRows, map.get("rows"));
+    }
+
+    @Test
+    void livetableFilterObfuscatedTotalLowerThanReturnedRows() throws Exception
+    {
+        HashMap<Object, Object> mapParameter = new HashMap<>();
+        mapParameter.put("totalrows", 2);
+        mapParameter.put("returnedrows", 2);
+        List<Map<Object, Object>> dummyRows = asList(
+            singletonMap("doc_viewable", true),
+            singletonMap("doc_viewable", false)
+        );
+        mapParameter.put("rows", dummyRows);
+        this.context.put("map", mapParameter);
+        this.ve.evaluate(this.context, new StringWriter(), "livetable",
+            new StringReader("#livetable_filterObfuscated($map)"));
+        Map<String, Object> map = (Map<String, Object>) this.context.get("map");
+        assertEquals(1, map.get("totalrows"));
+        assertEquals(1, map.get("returnedrows"));
+        assertEquals(1, ((List<?>) map.get("rows")).size());
+        assertTrue(((List<Map<String, Boolean>>) map.get("rows")).get(0).get("doc_viewable"));
     }
 }

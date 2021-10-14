@@ -367,6 +367,15 @@ public class PackageMojo extends AbstractOldCoreMojo
                 if (entry.getName().endsWith(".vm")) {
                     String fileName = entry.getName().replace(".vm", "");
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
+
+                    // Validates that the outputFile location is located inside the configuration directory.
+                    if (!outputFile.getCanonicalPath().startsWith(configurationFileTargetDirectory.getCanonicalPath()))
+                    {
+                        throw new IOException(
+                            String.format("Template [%s] is outside of the configuration file directory [%s].",
+                                outputFile, configurationFileTargetDirectory));
+                    }
+
                     OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile));
                     getLog().info("Writing config file: " + outputFile);
                     // Note: Init is done once even if this method is called several times...

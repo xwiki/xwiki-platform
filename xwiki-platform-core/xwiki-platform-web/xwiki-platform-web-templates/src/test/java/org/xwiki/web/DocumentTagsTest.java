@@ -26,9 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authorization.script.SecurityAuthorizationScriptService;
-import org.xwiki.security.authorization.script.internal.RightConverter;
-import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.skinx.internal.async.SkinExtensionAsync;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
@@ -52,11 +50,8 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @HTML50ComponentList
+@SecurityScriptServiceComponentList
 @ComponentList({
-    // Security SS so that $service.security.* calls in the vm work and their behavior controlled.
-    SecurityScriptService.class,
-    SecurityAuthorizationScriptService.class,
-    RightConverter.class,
     // SKin Extensions so that $jsx.* and $ssx.* calls in the vm work.
     SkinExtensionAsync.class
 })

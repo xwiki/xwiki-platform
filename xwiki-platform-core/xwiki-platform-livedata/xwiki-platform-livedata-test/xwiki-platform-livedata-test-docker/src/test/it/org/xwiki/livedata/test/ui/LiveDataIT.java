@@ -90,10 +90,6 @@ class LiveDataIT
         "(1) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
             + "pages.";
 
-    private static final String FOOTNOTES_PROPERTY_NOT_VIEWABLE =
-        "(*) Displayed when some entries require special rights"
-            + " to be viewed and thus fields cannot be extracted from them.";
-
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
      * and two XObjects, then edit the XObjects properties from the live data.
@@ -183,12 +179,11 @@ class LiveDataIT
 
         liveDataElement = new LiveDataElement("test");
         tableLayout = liveDataElement.getTableLayout();
+        assertEquals(2, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
-        tableLayout.assertRow(NAME_COLUMN, "N/A*");
         tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
-        assertEquals(2, liveDataElement.countFootnotes());
-        assertThat(liveDataElement.getFootnotesText(),
-            containsInAnyOrder(FOOTNOTES_PROPERTY_NOT_VIEWABLE, FOOTNOTE_COMPUTED_TITLE));
+        assertEquals(1, liveDataElement.countFootnotes());
+        assertThat(liveDataElement.getFootnotesText(), containsInAnyOrder(FOOTNOTE_COMPUTED_TITLE));
     }
 
     /**

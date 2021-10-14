@@ -42,7 +42,31 @@ define('xwiki-realtime-document', [
     isNew: meta.isNew,
 
     reload: function() {
-      // TODO don't forget to set the real locale afterwards!
+      return $.getJSON(meta.restURL, {
+        // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
+        timestamp: new Date().getTime()
+      }).then(updatedDocument => {
+        // Reload succeeded.
+        // We were able to load the document so it's not new.
+        this.isNew = false;
+        return $.extend(this, updatedDocument, {
+          // We need the real locale.
+          language: updatedDocument.language || updatedDocument.translations['default']
+        });
+      }, jqXHR => {
+        if (jqXHR.status === 404) {
+          // The document doesn't exist anymore. Maybe it was deleted?
+          return $.Deferred().resolve($.extend(this, {
+            version: '1.1',
+            modified: 0,
+            content: '',
+            isNew: true
+          })).promise();
+        } else {
+          // Reload failed. Continue using the current data.
+          return this;
+        }
+      });
     },
 
     save: function(data) {

@@ -359,7 +359,7 @@ XWiki.widgets.LiveTable = Class.create({
       // When a cell is part of a non-viewable row (except for the actions that simply stays empty), we display a 
       // message indicating that the content is not present because the current user does not have the right to view it.
       if (!row['doc_viewable'] && !row[fieldName]) {
-        const notViewableCellMessage = "$services.localization.render('livetable.cell.emptyValue')";
+        const notViewableCellMessage = $services.localization.render('platform.livetable.docNotViewable');
         var td = new Element('td', {
           'class': [
             fieldName,
@@ -368,7 +368,7 @@ XWiki.widgets.LiveTable = Class.create({
           ].join(' '),
           'data-title': displayName
         });
-        if(column !== '_actions') {
+        if (column !== '_actions') {
           td.update(notViewableCellMessage + "<sup>*</sup>");
         }
         tr.appendChild(td);

@@ -375,6 +375,8 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         configurationFileTargetDirectory.mkdirs();
 
+        // Since the jar comes from a trusted source, there is no risk of "zip slip" attack. Consequently, the
+        // entries of the jar do not need to be validated.
         try (JarInputStream jarInputStream =
             new JarInputStream(new FileInputStream(configurationResourcesArtifact.getFile()))) {
             JarEntry entry;

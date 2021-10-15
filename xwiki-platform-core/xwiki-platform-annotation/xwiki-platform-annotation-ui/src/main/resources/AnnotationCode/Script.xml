@@ -1006,9 +1006,14 @@ XWiki.Annotation = Class.create({
 
   addAnnotationsMarkup : function(annotations) {
     annotations.each(function(item) {
-      var plainTextStartOffset = item.fields.find(field =&gt; field.name == 'plainTextStartOffset').value;
-      var plainTextEndOffset = item.fields.find(field =&gt; field.name == 'plainTextEndOffset').value;
-      var annDOMRange = this.getDOMRange(this.annotatedElement, plainTextStartOffset, plainTextEndOffset);
+      var plainTextStartOffset = item.fields.find(field =&gt; field.name == 'plainTextStartOffset');
+      var plainTextEndOffset = item.fields.find(field =&gt; field.name == 'plainTextEndOffset');
+      // Check if the annotation was found.
+      if (!plainTextStartOffset.value || !plainTextEndOffset.value) {
+        return false;
+      }
+
+      var annDOMRange = this.getDOMRange(this.annotatedElement, plainTextStartOffset.value, plainTextEndOffset.value);
       // Since the annotation could start at a specific offset, the node is splitted for not wrapping the whole text and
       // a new range is created to recalculate the new ends.
       var strictRange = this.fixRangeEndPoints(annDOMRange);

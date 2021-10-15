@@ -23,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 
 import org.xwiki.crypto.pkix.params.CertifiedKeyPair;
 import org.xwiki.crypto.pkix.params.CertifiedPublicKey;
-import org.xwiki.crypto.script.internal.AbstractScriptingStore;
 import org.xwiki.crypto.store.KeyStore;
 import org.xwiki.crypto.store.KeyStoreException;
 import org.xwiki.crypto.store.StoreReference;

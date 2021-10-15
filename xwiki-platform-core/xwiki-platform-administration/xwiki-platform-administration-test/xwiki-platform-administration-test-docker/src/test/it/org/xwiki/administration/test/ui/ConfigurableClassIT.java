@@ -508,7 +508,7 @@ class ConfigurableClassIT
 
         // We have to switch user context without logging out, logging out removes all locks.
         // We have to open a new window because otherwise the lock is removed when we leave the administration page.
-        setup.getDriver().findElementByLinkText(testPageName).sendKeys(Keys.chord(Keys.CONTROL, Keys.RETURN));
+        setup.getDriver().findElement(By.linkText(testPageName)).sendKeys(Keys.chord(Keys.CONTROL, Keys.RETURN));
         String firstTab = setup.getDriver().getWindowHandle();
 
         // It might take a bit of time for the driver to know there's another window.

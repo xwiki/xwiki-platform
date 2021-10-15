@@ -339,7 +339,7 @@ public class EditPage extends BasePage
     {
         WebElement element;
         if ("default".equals(locale)) {
-            element = getDriver().findElementByLinkText("default");
+            element = getDriver().findElement(By.linkText("default"));
         } else {
             element = getDriver().findElementWithoutWaiting(
                 By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a[text()='" + locale + "']"));

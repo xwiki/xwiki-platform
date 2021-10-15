@@ -93,7 +93,7 @@
         href="#"
         @click.prevent="changePageIndex(!isFirstPage, 0)"
       >
-        <span class="fa fa-angle-double-left"></span>
+        <XWikiIcon :icon-descriptor="{name: 'fast-backward'}"/>
       </a>
 
       <!--
@@ -110,7 +110,7 @@
         href="#"
         @click.prevent="changePageIndex(!isFirstPage, logic.getPageIndex() - 1)"
       >
-        <span class="fa fa-angle-left"></span>
+        <XWikiIcon :icon-descriptor="{name: 'step-backward'}"/>
       </a>
 
 
@@ -149,7 +149,7 @@
 
       <!--
         Go to Next Page button
-        Can be shown / hiden by the `pagination.showNextPrevious` property
+        Can be shown / hidden by the `pagination.showNextPrevious` property
         in the Livedata meta config
       -->
       <a
@@ -161,7 +161,7 @@
         href="#"
         @click.prevent="changePageIndex(!isLastPage , logic.getPageIndex() + 1)"
       >
-        <span class="fa fa-angle-right"></span>
+        <XWikiIcon :icon-descriptor="{name: 'step-forward'}"/>
       </a>
 
       <!--
@@ -178,7 +178,7 @@
         href="#"
         @click.prevent="changePageIndex(!isLastPage, logic.getPageCount() - 1)"
       >
-        <span class="fa fa-angle-double-right"></span>
+        <XWikiIcon :icon-descriptor="{name: 'fast-forward'}"/>
       </a>
 
     </nav>
@@ -188,9 +188,12 @@
 
 
 <script>
+import XWikiIcon from "./utilities/XWikiIcon";
 export default {
 
   name: "LivedataPagination",
+
+  components: {XWikiIcon},
 
   inject: ["logic"],
 

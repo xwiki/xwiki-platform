@@ -351,6 +351,21 @@ public class PackageMojo extends AbstractOldCoreMojo
         return artifact;
     }
 
+    /**
+     * Resolve {@code xwiki-platform-tool-configuration-resources}, then look for velocity scripts inside the artifact
+     * and interpret them before copying the result to {@code configurationFileTargetDirectory}.
+     * <p>
+     * <a 
+     *   href="https://sonarcloud.io/organizations/xwiki/rules?open=javasecurity%3AS6096&rule_key=javasecurity%3AS6096">
+     *   javasecurity:S6096
+     * </a> is ignored because we trust the content of {@code xwiki-platform-tool-configuration-resources} since it is 
+     * produced by maven using source code we own.
+     *
+     * @param configurationFileTargetDirectory the root directory where the configuration files found in {@code
+     *     xwiki-platform-tool-configuration-resources} are copied ({@code webapps/xwiki/WEB-INF} by default)
+     * @throws MojoExecutionException when failing to resolve {@code xwiki-platform-tool-configuration-resources}
+     */
+    @SuppressWarnings("javasecurity:S6096")
     private void generateConfigurationFiles(File configurationFileTargetDirectory) throws MojoExecutionException
     {
         VelocityContext context = createVelocityContext();
@@ -360,6 +375,8 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         configurationFileTargetDirectory.mkdirs();
 
+        // Since the jar comes from a trusted source, there is no risk of "zip slip" attack. Consequently, the
+        // entries of the jar do not need to be validated.
         try (JarInputStream jarInputStream =
             new JarInputStream(new FileInputStream(configurationResourcesArtifact.getFile()))) {
             JarEntry entry;

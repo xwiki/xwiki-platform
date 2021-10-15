@@ -159,10 +159,6 @@ System.out.println("Hello World!");
 )))|The referenced page is included in the current page
 
 {{info}}
-Radeox macros cannot be used in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}. Thus they have been rewritten as Rendering macros.
-{{/info}}
-
-{{info}}
 For the full list of available macros check the [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
 {{/info}}
 

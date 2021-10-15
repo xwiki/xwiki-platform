@@ -134,13 +134,6 @@
 
 === 2.0 Text Formatting ===
 
-{{info}}
-New in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} over XWiki Syntax 1.0:
-* Spaces are allowed just after the syntax symbols (for example in XWiki Syntax 1.0, this was not possible: * bold *).
-* Use double symbols when there was only a single symbol in XWiki Syntax 1.0 so that it's less likely that the user will mistakenly use them in text.
-* Ability to span several lines (wasn't possible in XWiki Syntax 1.0).
-{{/info}}
-
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Bold|{{{**bold**}}}|**bold**
 |Underline|{{{__underline__}}}|__underline__

@@ -74,7 +74,7 @@ public class DefaultContextualAuthorizationManagerTest
 
         this.mocker.getComponentUnderTest().checkAccess(Right.VIEW, localReference);
 
-        verify(this.authorizationManager).checkAccess(same(Right.VIEW), isNull(DocumentReference.class),
+        verify(this.authorizationManager).checkAccess(same(Right.VIEW), isNull(),
             eq(new DocumentReference(localReference, this.currentWikiReference)));
     }
 
@@ -85,7 +85,7 @@ public class DefaultContextualAuthorizationManagerTest
 
         this.mocker.getComponentUnderTest().hasAccess(Right.VIEW, localReference);
 
-        verify(this.authorizationManager).hasAccess(same(Right.VIEW), isNull(DocumentReference.class),
+        verify(this.authorizationManager).hasAccess(same(Right.VIEW), isNull(),
             eq(new DocumentReference(localReference, this.currentWikiReference)));
     }
 }

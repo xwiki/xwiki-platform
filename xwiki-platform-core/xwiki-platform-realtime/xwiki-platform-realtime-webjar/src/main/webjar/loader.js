@@ -698,9 +698,48 @@ define('xwiki-realtime-loader', [
         save(false, true);
       }
     });
+  },
+
+  parseKeyData = function(editorId, channels) {
+    var keys = {};
+    var eventsChannel = channels.getByPath([doc.language, 'events', '1.0']);
+    var userDataChannel = channels.getByPath([doc.language, 'events', 'userdata']);
+    var editorChannel = channels.getByPath([doc.language, 'content', editorId]);
+    if (!eventsChannel || !userDataChannel || !editorChannel) {
+      console.error('Missing document channels.');
+    } else {
+      keys = $.extend(keys, {
+        [editorId]: editorChannel.key,
+        [editorId + '_users']: editorChannel.userCount,
+        events: eventsChannel.key,
+        userdata: userDataChannel.key,
+        active: {}
+      });
+      // Collect the other active real-time editing session (for the document content field) that are using a different
+      // editor (e.g. the WYSIWYG editor).
+      channels.getByPathPrefix([doc.language, 'content']).forEach(channel => {
+        if (channel.userCount > 0 && JSON.stringify(channel.path) !== JSON.stringify(editorChannel.path)) {
+          keys.active[channel.path.slice(2).join('/')] = channel;
+        }
+      });
+    }
+    return keys;
   };
 
   $.extend(module, {
+    updateKeys: function(editorId) {
+      return doc.getChannels({
+        path: [
+          doc.language + '/events/1.0',
+          doc.language + '/events/userdata',
+          doc.language + '/content/' + editorId,
+          // Check also if the content is edited in real-time with other editors at the same time.
+          doc.language + '/content/',
+        ],
+        create: true
+      }).then($.proxy(parseKeyData, module, editorId));
+    },
+
     requestRt: function(type, callback) {
       if (!allRt.wChan) {
         setTimeout(function () {

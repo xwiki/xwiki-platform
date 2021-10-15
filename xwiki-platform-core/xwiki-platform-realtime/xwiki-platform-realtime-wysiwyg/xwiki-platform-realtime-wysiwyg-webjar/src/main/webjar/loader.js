@@ -20,113 +20,60 @@
 define('xwiki-realtime-wysiwygEditor-loader', [
   'jquery',
   'xwiki-realtime-loader',
+  'xwiki-realtime-document',
   'xwiki-realtime-errorBox'
-], function($, Loader, ErrorBox) {
+], function($, Loader, doc, ErrorBox) {
   'use strict';
 
-  // Protect against ckeditor cache on firefox
+  // TODO: Check if this is really needed.
+  // Protect against CKEditor cache on Firefox.
   if (sessionStorage.refreshCk) {
-    if (jQuery('#edit').length) {
+    if ($('#edit').length) {
       try {
-        jQuery('#edit')[0].reset();
+        $('#edit')[0].reset();
       } catch (e) {}
     }
-    sessionStorage.refreshCk = "";
+    sessionStorage.refreshCk = '';
   }
 
-  var getWysiwygLock = function () {
-    var selector = 'a[href*="editor=wysiwyg"][href*="force=1"][href*="/edit/"]';
-    var force = document.querySelectorAll(selector);
-    return force.length? true : false;
-  };
-
+  // TODO: This JavaScript code is not loaded anymore on the edit lock page so we need to decide what to do with it
+  // (either drop it or find a clean way to load it on the edit lock page).
   var lock = Loader.getDocLock();
-  var wysiwygLock = getWysiwygLock();
 
-  var info = {
-    type: 'rtwysiwyg',
-    href: '&editor=wysiwyg&force=1&realtime=1',
-    name: "WYSIWYG",
+  var editorId = 'wysiwyg', info = {
+    type: editorId,
+    href: '&editor=wysiwyg&force=1',
+    name: 'WYSIWYG',
     compatible: ['wysiwyg', 'wiki']
   };
 
-  var $saveButton = $('#mainEditArea').find('input[name="action_saveandcontinue"]');
-  var createRtCalled = false;
-  var createRt = function () {
-    if (createRtCalled) { return; }
+  var createRtCalled = false,
+  createRt = function() {
+    if (createRtCalled) {
+      return;
+    }
     createRtCalled = true;
+    var $saveButton = $('#mainEditArea').find('input[name="action_saveandcontinue"]');
     if ($saveButton.length) {
       var comment = $('#commentinput');
-      var old;
-      if (comment.length) {
-        old = comment.val() || '';
-        comment.val(Loader.messages.autoAcceptSave);
-      }
+      var previousComment = comment.val();
+      comment.val(Loader.messages.autoAcceptSave);
       $saveButton.click();
-      var onSaved = function () {
-        if (CKEDITOR) {
-          try {
-            CKEDITOR.instances.content.resetDirty();
-          } catch (e) {}
-        }
-        if (comment.length) { comment.val(old); }
+      $(document).one('xwiki:document:saved.createRt', function() {
+        $(document).off('xwiki:document:saveFailed.createRt');
+        comment.val(previousComment);
         window.location.href = Loader.getEditorURL(window.location.href, info);
-      };
-      document.observe('xwiki:document:saved', onSaved);
-      document.observe('xwiki:document:saveFailed', function () {
-        if (comment.length) { comment.val(old); }
+      });
+      $(document).one('xwiki:document:saveFailed.createRt', function() {
+        $(document).off('xwiki:document:saved.createRt');
+        comment.val(previousComment);
         Loader.displayRequestErrorModal();
       });
     }
   };
   Loader.setAvailableRt('wysiwyg', info, createRt);
 
-  var getKeyData = function(config) {
-    return [
-      {doc: config.reference, mod: config.language+'/events', editor: "1.0"},
-      {doc: config.reference, mod: config.language+'/events', editor: "userdata"},
-      {doc: config.reference, mod: config.language+'/content',editor: "rtwysiwyg"}
-    ];
-  };
-
-  var parseKeyData = function(config, keysResultDoc) {
-    var keys = {};
-    var keysResult = keysResultDoc[config.reference];
-    if (!keysResult) { console.error("Unexpected error with the document keys"); return keys; }
-
-    var keysResultContent = keysResult[config.language+'/content'];
-    if (!keysResultContent) { console.error("Missing content keys in the document keys"); return keys; }
-
-    var keysResultEvents = keysResult[config.language+'/events'];
-    if (!keysResultEvents) { console.error("Missing event keys in the document keys"); return keys; }
-
-    if (keysResultContent.rtwysiwyg && keysResultEvents["1.0"] && keysResultEvents["userdata"]) {
-      keys.rtwysiwyg = keysResultContent.rtwysiwyg.key;
-      keys.rtwysiwyg_users = keysResultContent.rtwysiwyg.users;
-      keys.events = keysResultEvents["1.0"].key;
-      keys.userdata = keysResultEvents["userdata"].key;
-    }
-    else { console.error("Missing mandatory RTWysiwyg key in the document keys"); return keys; }
-
-    var activeKeys = keys.active = {};
-    for (var key in keysResultContent) {
-      if (key !== "rtwysiwyg" && keysResultContent[key].users > 0) {
-        activeKeys[key] = keysResultContent[key];
-      }
-    }
-    return keys;
-  };
-
-  var updateKeys = function (cb) {
-    var config = Loader.getConfig();
-    var keysData = getKeyData(config);
-    Loader.getKeys(keysData, function(keysResultDoc) {
-      var keys = parseKeyData(config, keysResultDoc);
-      cb(keys);
-    });
-  };
-
-  var whenCkReady = function (cb) {
+  var whenCkReady = function(cb) {
     var iframe = $('iframe');
     if (window.CKEDITOR &&
       window.CKEDITOR.instances &&
@@ -140,21 +87,22 @@ define('xwiki-realtime-wysiwygEditor-loader', [
       whenCkReady(cb);
     }, 100);
   };
-  var launchRealtime = function (config, keys, realtime) {
-    require(['jquery', 'xwiki-realtime-wysiwygEditor'], function($, RTWysiwyg) {
-      if (RTWysiwyg && RTWysiwyg.main) {
-        keys._update = updateKeys;
-        RTWysiwyg.main(config, keys, realtime);
-        whenCkReady(function () {
+  var launchRealtime = function(keys, realtime) {
+    require(['xwiki-realtime-wysiwygEditor'], function(RealtimeWysiwygEditor) {
+      if (RealtimeWysiwygEditor && RealtimeWysiwygEditor.main) {
+        keys._update = $.proxy(Loader, 'updateKeys', editorId);
+        var config = Loader.getConfig();
+        config.rtURL = Loader.getEditorURL(window.location.href, info);
+        RealtimeWysiwygEditor.main(config, keys, realtime);
+        whenCkReady(function() {
           var editor = window.CKEDITOR.instances.content;
-          RTWysiwyg.currentMode = editor.mode;
+          RealtimeWysiwygEditor.currentMode = editor.mode;
           if (realtime) {
             $('.cke_button__source').remove();
           }
-          return;
         });
       } else {
-        console.error("Couldn't find RTWysiwyg.main, aborting");
+        console.error("Couldn't find RealtimeWysiwygEditor.main, aborting.");
       }
     });
   };
@@ -163,8 +111,8 @@ define('xwiki-realtime-wysiwygEditor-loader', [
     var iframe = jQuery('iframe')[0];
     var inner = iframe.contentWindow.body;
     inner.setAttribute('contenteditable', false);
-  };
-  var unlockCk = function () {
+  },
+  unlockCk = function () {
     var iframe = jQuery('iframe')[0];
     var inner = iframe.contentWindow.body;
     inner.setAttribute('contenteditable', true);
@@ -176,9 +124,7 @@ define('xwiki-realtime-wysiwygEditor-loader', [
   } else {
     var todo = function (keys, needRt) {
       if (!needRt) {
-        var config = Loader.getConfig();
-        config.rtURL = Loader.getEditorURL(window.location.href, info);
-        return void launchRealtime(config, keys);
+        return void launchRealtime(keys);
       }
       var done = false;
       whenCkReady(function () {
@@ -187,30 +133,28 @@ define('xwiki-realtime-wysiwygEditor-loader', [
       });
       Loader.whenReady(function (wsAvailable) {
         done = true;
-        var config = Loader.getConfig();
-        config.rtURL = Loader.getEditorURL(window.location.href, info);
         // 3rd argument is "enable realtime"
         Loader.isRt = wsAvailable;
         if (!wsAvailable) { setTimeout(unlockCk); }
-        launchRealtime(config, keys, wsAvailable || 0);
+        launchRealtime(keys, wsAvailable || 0);
       });
     };
-    updateKeys(function (keys) {
-      if(!keys.rtwysiwyg || !keys.events || !keys.userdata) {
+    Loader.updateKeys(editorId).done(function(keys) {
+      if(!keys[editorId] || !keys.events || !keys.userdata) {
         ErrorBox.show('unavailable');
         console.error("You are not allowed to create a new realtime session for that document.");
       }
-      var realtime = /*keys.rtwysiwyg_users > 0 || */Loader.isRt;
+      var realtime = Loader.isRt;
       if (Object.keys(keys.active).length > 0) {
         // Should only happen when there is a realtime session with another editor (wiki, inline...)
-        if (keys.rtwysiwyg_users > 0) {
+        if (keys[editorId + '_users'] > 0) {
           todo(keys, realtime);
         } else {
           var callback = function() {
             todo(keys, true);
           };
           console.log("Join the existing realtime session or create a new one");
-          Loader.displayModal("rtwysiwyg", Object.keys(keys.active), callback, info);
+          Loader.displayModal(editorId, Object.keys(keys.active), callback, info);
         }
       } else {
         todo(keys, realtime);
@@ -219,24 +163,22 @@ define('xwiki-realtime-wysiwygEditor-loader', [
   }
 
   var displayButtonModal = function() {
-    if ($('.realtime-button-rtwysiwyg').length) {
-      var button = new Element('button', {'class': 'btn btn-success'});
-      var br =  new Element('br');
-      button.insert(Loader.messages.redirectDialog_join.replace(/\{0\}/g, "Wysiwyg"));
-      $('.realtime-button-rtwysiwyg').prepend(button);
-      $('.realtime-button-rtwysiwyg').prepend(br);
+    var button, br = new Element('br');
+    if ($('.realtime-button-' + editorId).length) {
+      button = new Element('button', {'class': 'btn btn-success'});
+      button.insert(Loader.messages.get('redirectDialog.join', 'WYSIWYG'));
+      $('.realtime-button-' + editorId).prepend(button);
+      $('.realtime-button-' + editorId).prepend(br);
       $(button).on('click', function() {
         window.location.href = Loader.getEditorURL(window.location.href, info);
       });
-    } else if(lock) {
-      var button = new Element('button', {'class': 'btn btn-primary'});
-      var br =  new Element('br');
-      button.insert(Loader.messages.redirectDialog_create.replace(/\{0\}/g, "Wysiwyg"));
+    } else if (lock) {
+      button = new Element('button', {'class': 'btn btn-primary'});
+      button.insert(Loader.messages.get('redirectDialog.create', 'WYSIWYG'));
       var buttons = $('.realtime-buttons');
       buttons.append(br).append(button);
       var modal = buttons.data('modal');
       $(button).on('click', function() {
-        //modal.closeDialog();
         buttons.find('button').hide();
         var waiting = $('<div>', {style:'text-align:center;'}).appendTo(buttons);
         waiting.append($('<span>', {
@@ -250,7 +192,7 @@ define('xwiki-realtime-wysiwygEditor-loader', [
         var i = 60;
         var it = setInterval(function () {
           i--;
-          autoForce.html('<br>' + Loader.messages.redirectDialog_autoForce + i + "s");
+          autoForce.html('<br>' + Loader.messages['redirectDialog.autoForce'] + i + "s");
           if (i <= 0) {
             clearInterval(it);
             window.location.href = Loader.getEditorURL(window.location.href, info);
@@ -269,8 +211,8 @@ define('xwiki-realtime-wysiwygEditor-loader', [
           if (state === 1) {
             // Accepted
             var whenReady = function (cb) {
-              updateKeys(function (k) {
-                if (k.rtwysiwyg_users > 0) { return void cb(); }
+              Loader.updateKeys(editorId).done(function(k) {
+                if (k[editorId + '_users'] > 0) { return void cb(); }
                 setTimeout(function () {
                   whenReady(cb);
                 }, 1000);

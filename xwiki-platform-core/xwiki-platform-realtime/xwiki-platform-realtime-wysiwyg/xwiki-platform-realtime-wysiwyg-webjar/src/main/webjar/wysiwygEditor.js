@@ -158,7 +158,7 @@ define('xwiki-realtime-wysiwygEditor', [
 
     /** Update the channels keys for reconnecting websocket */
     var updateKeys = function (cb) {
-      docKeys._update(function (keys) {
+      docKeys._update().done(function(keys) {
         var changes = [];
         if (keys.rtwysiwyg && keys.rtwysiwyg !== channel) {
           channel = keys.rtwysiwyg;

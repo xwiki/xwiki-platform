@@ -99,7 +99,7 @@ public class DefaultEventStore implements EventStore, Initializable
                         this.componentManager.getInstance(EventStore.class, this.configuration.getEventStore());
                 } catch (ComponentLookupException e) {
                     throw new InitializationException(
-                        String.format("Failed to get the configured event store [%s]", hint, e));
+                        String.format("Failed to get the configured event store [%s]", hint), e);
                 }
             }
         }
@@ -112,7 +112,7 @@ public class DefaultEventStore implements EventStore, Initializable
                 this.legacyStore = this.componentManager.getInstance(EventStore.class, legacyHint);
             } catch (ComponentLookupException e) {
                 throw new InitializationException(
-                    String.format("Failed to get the legacy event stream [%s]", legacyHint, e));
+                    String.format("Failed to get the legacy event stream [%s]", legacyHint), e);
             }
         }
     }

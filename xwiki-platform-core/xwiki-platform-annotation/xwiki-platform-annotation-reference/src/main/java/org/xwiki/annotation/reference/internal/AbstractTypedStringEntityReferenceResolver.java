@@ -74,9 +74,11 @@ public abstract class AbstractTypedStringEntityReferenceResolver implements Type
      */
     private EntityType getSerializedType(String entityReferenceRepresentation)
     {
-        for (EntityType type : EntityType.values()) {
-            if (entityReferenceRepresentation.startsWith(type + "://")) {
-                return type;
+        if (entityReferenceRepresentation != null) {
+            for (EntityType type : EntityType.values()) {
+                if (entityReferenceRepresentation.startsWith(type + "://")) {
+                    return type;
+                }
             }
         }
         return null;

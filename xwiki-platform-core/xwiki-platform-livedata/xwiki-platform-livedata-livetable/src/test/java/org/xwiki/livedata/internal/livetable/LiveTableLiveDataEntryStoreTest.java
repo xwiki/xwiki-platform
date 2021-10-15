@@ -29,6 +29,7 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataException;
@@ -41,6 +42,8 @@ import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -49,6 +52,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -67,6 +72,9 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class LiveTableLiveDataEntryStoreTest
 {
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @InjectMockComponents
     private LiveTableLiveDataEntryStore entryStore;
 
@@ -213,5 +221,27 @@ class LiveTableLiveDataEntryStoreTest
         } catch (LiveDataException e) {
             assertEquals("Failed to execute the live data query.", e.getMessage());
         }
+    }
+
+    @Test
+    void xwikivarsRenderingThrowsAnException() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("foo", "XWiki", "LiveTableResults");
+        when(this.currentDocumentReferenceResolver.resolve("XWiki.LiveTableResults")).thenReturn(documentReference);
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(document);
+        when(document.getRenderedContent(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("{}");
+
+        when(this.templateManager.render("xwikivars.vm")).thenThrow(new NullPointerException());
+
+        LiveDataQuery liveDataQuery = new LiveDataQuery();
+        this.entryStore.get(liveDataQuery);
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals(
+            "Failed to evaluate [xwikivars.vm] when getting the Livetable results from page [XWiki.LiveTableResults]. "
+                + "Cause: [NullPointerException: ].", this.logCapture.getMessage(0));
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
     }
 }

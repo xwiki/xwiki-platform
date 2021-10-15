@@ -96,7 +96,8 @@
             <id>default</id>
             <configuration>
               <excludes>
-                org/xwiki/eventstream/internal/AbstractAsynchronousEventStore.java
+                org/xwiki/eventstream/internal/AbstractAsynchronousEventStore.java,
+                org/xwiki/eventstream/internal/DefaultEventStore.java
               </excludes>
             </configuration>
           </execution>

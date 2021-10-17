@@ -43,57 +43,47 @@ define('xwiki-realtime-wysiwygEditor', [
     Hyperjson
   };
 
+  var hasClass = function(actual, expected, some) {
+    var actualList = (actual || '').split(/\s+/);
+    var expectedList = (expected || '').split(/\s+/);
+    return expectedList[some ? 'some' : 'every'](expectedClass => actualList.indexOf(expectedClass) >= 0);
+  };
+
   // Filter elements to serialize
-  var isMacroStuff = function(el) {
-    var isMac = ( typeof el.getAttribute === "function" &&
-            ( el.getAttribute('data-cke-hidden-sel') ||
-            ( el.getAttribute('class') &&
-              (/cke_widget_drag/.test(el.getAttribute('class')) ||
-               el.getAttribute('class').split(' ').indexOf('cke_image_resizer') !== -1) ) ) );
+  var isMacroStuff = function(element) {
+    var isMac = typeof element.getAttribute === 'function' &&
+      (element.getAttribute('data-cke-hidden-sel') || /cke_widget_drag/.test(element.getAttribute('class')) ||
+        hasClass(element.getAttribute('class'), 'cke_image_resizer'));
     return isMac;
   };
 
-  var isNonRealtime = function(el) {
-    return (el && typeof el.getAttribute === "function" &&
-        el.getAttribute('class') &&
-        el.getAttribute('class').split(" ").indexOf("rt-non-realtime") !== -1);
+  var isNonRealtime = function(element) {
+    return hasClass(element?.getAttribute?.('class'), 'rt-non-realtime');
   };
 
   var shouldSerialize = function(el) {
     return !isNonRealtime(el) && !isMacroStuff(el);
   };
 
-  // Filter attributes in the serialized elements
-  var macroFilter = function (hj) {
-    // Send a widget ID == 0 to avoid a fight between broswers about it and
-    // prevent the container from having the "selected" class (blue border)
-    if (hj[1].class &&
-        hj[1].class.split(' ').indexOf('cke_widget_wrapper') !== -1 &&
-        hj[1].class.split(' ').indexOf('cke_widget_block') !== -1) {
-      hj[1].class = "cke_widget_wrapper cke_widget_block";
-      hj[1]['data-cke-widget-id'] = "0";
+  // Filter attributes in the serialized elements.
+  var macroFilter = function(hj) {
+    // Send a widget ID == 0 to avoid a fight between broswers about it and prevent the container from having the
+    // "selected" class (blue border).
+    if (hasClass(hj[1].class, 'cke_widget_wrapper cke_widget_block')) {
+      hj[1].class = 'cke_widget_wrapper cke_widget_block';
+      hj[1]['data-cke-widget-id'] = '0';
+    } else if (hasClass(hj[1].class, 'cke_widget_wrapper cke_widget_inline')) {
+      hj[1].class = 'cke_widget_wrapper cke_widget_inline';
+      hj[1]['data-cke-widget-id'] = '0';
+    } else if (hj[1]['data-macro'] && hasClass(hj[1].class, 'macro')) {
+      // Don't send the "upcasted" attribute which can be removed, generating a shjson != shjson2 error.
+      delete hj[1]['data-cke-widget-upcasted'];
+    } else if (hasClass(hj[1].class, 'cke_widget_drag_handler cke_image_resizer', /* some */ true)) {
+      // Remove the title attribute of the drag&drop icons since they are localized and create fights over the language
+      // to use.
+      delete hj[1].title;
     }
-    if (hj[1].class &&
-        hj[1].class.split(' ').indexOf('cke_widget_wrapper') !== -1 &&
-        hj[1].class.split(' ').indexOf('cke_widget_inline') !== -1) {
-      hj[1].class = "cke_widget_wrapper cke_widget_inline";
-      hj[1]['data-cke-widget-id'] = "0";
-    }
-    // Don't send the "upcasted" attribute which can be removed, generating a shjson != shjson2 error
-    if (hj[1].class && hj[1]['data-macro'] &&
-        hj[1].class.split(' ').indexOf('macro') !== -1) {
-      hj[1]['data-cke-widget-upcasted'] = undefined;
-    }
-    // Remove the title attribute of the drag&drop icons since they are localized and create fights over the language to
-    // use
-    if (hj[1].class &&
-        ( hj[1].class.split(' ').indexOf('cke_widget_drag_handler') ||
-          hj[1].class.split(' ').indexOf('cke_image_resizer') ) ) {
-      hj[1].title = undefined;
-    }
-    if (hj[1]["aria-label"]) {
-      hj[1]["aria-label"] = undefined;
-    }
+    delete hj[1]['aria-label'];
     return hj;
   };
   var bodyFilter = function (hj) {
@@ -335,7 +325,7 @@ define('xwiki-realtime-wysiwygEditor', [
       ];
 
       var diffOptions = {
-        preDiffApply: function (info) {
+        preDiffApply: function(info) {
           /*
             Don't accept attributes that begin with 'on'
             these are probably listeners, and we don't want to
@@ -374,19 +364,13 @@ define('xwiki-realtime-wysiwygEditor', [
           /*
             XWiki Macros filter
           */
-          // CkEditor drag&drop icon container
-          if (info.node && info.node.tagName === 'SPAN' &&
-              info.node.getAttribute('class') &&
-              info.node.getAttribute('class').split(' ').indexOf('cke_widget_drag_handler_container') !== -1) {
-            //console.log('Preventing removal of the drag&drop icon container of a macro', info.node);
+          // CKEditor drag&drop icon container.
+          if (info.node?.tagName === 'SPAN' &&
+              hasClass(info.node.getAttribute('class'), 'cke_widget_drag_handler_container')) {
             return true;
           }
-          // CKEditor drag&drop title (language fight)
-          if (info.node && info.node.getAttribute &&
-              info.node.getAttribute('class') &&
-              (info.node.getAttribute('class').split(' ').indexOf('cke_widget_drag_handler') !== -1 ||
-               info.node.getAttribute('class').split(' ').indexOf('cke_image_resizer') !== -1 ) ) {
-            //console.log('Preventing removal of the drag&drop icon container of a macro', info.node);
+          // CKEditor drag&drop title (language fight).
+          if (hasClass(info.node?.getAttribute?.('class'), 'cke_widget_drag_handler cke_image_resizer', true)) {
             return true;
           }
 

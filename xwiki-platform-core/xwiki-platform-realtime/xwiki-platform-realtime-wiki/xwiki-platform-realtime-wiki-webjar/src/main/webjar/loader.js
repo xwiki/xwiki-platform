@@ -19,24 +19,9 @@
  */
 define('xwiki-realtime-wikiEditor-loader', [
   'jquery',
-  'xwiki-realtime-config',
-  'xwiki-realtime-loader',
-  'xwiki-realtime-document',
-  'xwiki-realtime-errorBox'
-], function($, realtimeConfig, Loader, doc, ErrorBox) {
+  'xwiki-realtime-loader'
+], function($, Loader) {
   'use strict';
-
-  if (!Loader) {
-    return;
-  }
-
-  var getWikiLock = function() {
-    var force = document.querySelectorAll('a[href*="editor=wiki"][href*="force=1"][href*="/edit/"]');
-    return !!force.length;
-  };
-
-  var lock = Loader.getDocLock();
-  var wikiLock = getWikiLock();
 
   var editorId = 'wiki', info = {
     type: editorId,
@@ -45,18 +30,7 @@ define('xwiki-realtime-wikiEditor-loader', [
     compatible: ['wiki', 'wysiwyg']
   };
 
-  var beforeLaunchRealtime = function(keys) {
-    if (Loader.isRt) {
-      Loader.whenReady(function(wsAvailable) {
-        Loader.isRt = wsAvailable;
-        launchRealtime(keys);
-      });
-    } else {
-      launchRealtime(keys);
-    }
-  };
-
-  var launchRealtime = function(keys) {
+  Loader.bootstrap(info).done(function(keys) {
     require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
       if (RealtimeWikiEditor && RealtimeWikiEditor.main) {
         keys._update = $.proxy(Loader, 'updateKeys', editorId);
@@ -67,38 +41,24 @@ define('xwiki-realtime-wikiEditor-loader', [
         console.error("Couldn't find RealtimeWikiEditor.main, aborting.");
       }
     });
+  });
+
+  var getWikiLock = function() {
+    var force = document.querySelectorAll('a[href*="editor=wiki"][href*="force=1"][href*="/edit/"]');
+    return !!force.length;
   };
 
-  if (lock) {
-    // Found a lock link. Check active sessions.
-    Loader.checkSessions(info);
-  } else if (window.XWiki.editor === 'wiki') {
-    // No lock and we are using wiki editor. Start realtime.
-    Loader.updateKeys(editorId).done(function(keys) {
-      if (!keys[editorId] || !keys.events) {
-        ErrorBox.show('unavailable');
-        console.error('You are not allowed to create a new realtime session for that document.');
-      }
-      if (Object.keys(keys.active).length > 0) {
-        if (keys[editorId + '_users'] > 0 || Loader.isForced) {
-          beforeLaunchRealtime(keys);
-        } else {
-          console.log('Join the existing realtime session or create a new one.');
-          Loader.displayModal(editorId, Object.keys(keys.active), $.proxy(beforeLaunchRealtime, null, keys), info);
-        }
-      } else {
-        beforeLaunchRealtime(keys);
-      }
-    });
-  }
-
   var displayButtonModal = function() {
+    // TODO: This JavaScript code is not loaded anymore on the edit lock page so we need to decide what to do with it
+    // (either drop it or find a clean way to load it on the edit lock page).
+    var lock = Loader.getDocLock();
+    var wikiLock = getWikiLock();
     var button = $();
-    if ($('.realtime-button-' + editorId).length) {
-      button = $('<button class="btn btn-success"/>').text(Loader.messages.get('redirectDialog.join', 'Wiki'));
-      $('.realtime-button-' + editorId).prepend(button).prepend('<br/>');
+    if ($('.realtime-button-' + info.type).length) {
+      button = $('<button class="btn btn-success"/>').text(Loader.messages.get('redirectDialog.join', info.name));
+      $('.realtime-button-' + info.type).prepend(button).prepend('<br/>');
     } else if (lock && wikiLock) {
-      button = $('<button class="btn btn-primary"/>').text(Loader.messages.get('redirectDialog.create', 'Wiki'));
+      button = $('<button class="btn btn-primary"/>').text(Loader.messages.get('redirectDialog.create', info.name));
       $('.realtime-buttons').append('<br/>').append(button);
     }
     button.click(function() {

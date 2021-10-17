@@ -39,7 +39,7 @@ define('xwiki-realtime-wysiwygEditor', [
 ) {
   'use strict';
 
-  var module = {
+  var editorId = 'wysiwyg', module = {
     Hyperjson
   };
 
@@ -84,7 +84,8 @@ define('xwiki-realtime-wysiwygEditor', [
         hj[1].class.split(' ').indexOf('macro') !== -1) {
       hj[1]['data-cke-widget-upcasted'] = undefined;
     }
-    // Remove the title attribute of the drag&drop icons since they are localized and create fights over the language to use
+    // Remove the title attribute of the drag&drop icons since they are localized and create fights over the language to
+    // use
     if (hj[1].class &&
         ( hj[1].class.split(' ').indexOf('cke_widget_drag_handler') ||
           hj[1].class.split(' ').indexOf('cke_image_resizer') ) ) {
@@ -104,7 +105,7 @@ define('xwiki-realtime-wysiwygEditor', [
       if (hj[1].contenteditable) { hj[1].contenteditable = "false"; }
     }
     return hj;
-  }
+  };
   /* catch `type="_moz"` and body's inline style before it goes over the wire */
   var brFilter = function (hj) {
     if (hj[1].type === '_moz') { hj[1].type = undefined; }
@@ -115,7 +116,7 @@ define('xwiki-realtime-wysiwygEditor', [
     hj = bodyFilter(hj);
     hj = macroFilter(hj);
     return hj;
-  }
+  };
 
   var stringifyDOM = window.stringifyDOM = function (dom) {
     return JSONSortify(Hyperjson.fromDOM(dom, shouldSerialize, hjFilter));
@@ -131,7 +132,7 @@ define('xwiki-realtime-wysiwygEditor', [
     var network = editorConfig.network;
     var saverConfig = editorConfig.saverConfig || {};
     saverConfig.chainpad = Chainpad;
-    saverConfig.editorType = 'rtwysiwyg';
+    saverConfig.editorType = editorId;
     saverConfig.editorName = 'Wysiwyg';
     saverConfig.isHTML = true;
     saverConfig.mergeContent = true;
@@ -152,65 +153,26 @@ define('xwiki-realtime-wysiwygEditor', [
     /** Key in the localStore which indicates realtime activity should be disallowed. */
     var LOCALSTORAGE_DISALLOW = editorConfig.LOCALSTORAGE_DISALLOW;
 
-    var channel = docKeys.rtwysiwyg;
+    var channel = docKeys[editorId];
     var eventsChannel = docKeys.events;
     var userdataChannel = docKeys.userdata;
 
-    /** Update the channels keys for reconnecting websocket */
-    var updateKeys = function (cb) {
-      docKeys._update().done(function(keys) {
-        var changes = [];
-        if (keys.rtwysiwyg && keys.rtwysiwyg !== channel) {
-          channel = keys.rtwysiwyg;
-          changes.push('rtwysiwyg');
+    /**
+     * Update the channels keys for reconnecting WebSocket.
+     */
+    var updateKeys = function() {
+      return docKeys._update().done(function(keys) {
+        if (keys[editorId] && keys[editorId] !== channel) {
+          channel = keys[editorId];
         }
         if (keys.events && keys.events !== eventsChannel) {
           eventsChannel = keys.events;
-          changes.push('events');
         }
         if (keys.userdata && keys.userdata !== userdataChannel) {
           userdataChannel = keys.userdata;
-          changes.push('userdata');
         }
-        cb(changes);
       });
     };
-
-
-    // TOOLBAR style
-    var TOOLBAR_CLS = Toolbar.TOOLBAR_CLS;
-    var DEBUG_LINK_CLS = Toolbar.DEBUG_LINK_CLS;
-    var toolbar_style = [
-      '<style>',
-      '.' + TOOLBAR_CLS + ' {',
-      '  color: #666;',
-      '  font-weight: bold;',
-      '  height: 30px;',
-      '  margin-bottom: -3px;',
-      '  display: inline-block;',
-      '  width: 100%;',
-      '}',
-      '.' + TOOLBAR_CLS + ' div {',
-      '  padding: 0 10px;',
-      '  height: 1.5em;',
-      '  line-height: 25px;',
-      '  height: 22px;',
-      '}',
-      '.' + TOOLBAR_CLS + ' div.rt-back {',
-      '  padding: 0;',
-      '  font-weight: bold;',
-      '  cursor: pointer;',
-      '  color: #000;',
-      '}',
-      '.gwt-TabBar {',
-      '  display:none;',
-      '}',
-      '.' + DEBUG_LINK_CLS + ':link { color:transparent; }',
-      '.' + DEBUG_LINK_CLS + ':link:hover { color:blue; }',
-      '.gwt-TabPanelBottom { border-top: 0 none; }',
-      '</style>'
-    ];
-    // END TOOLBAR style
 
     // DISALLOW REALTIME
     var allowRealtimeCbId = Interface.uid();
@@ -290,15 +252,16 @@ define('xwiki-realtime-wysiwygEditor', [
       var cursor = window.cursor = Cursor(inner);
       var initializing = true;
 
-      //editor.plugins.magicline.backdoor.that.line.$.setAttribute('class', 'rt-non-realtime');
-      var ml = (editor.plugins.magicline.backdoor) ? editor.plugins.magicline.backdoor.that.line.$ : editor._.magiclineBackdoor.that.line.$;
+      var ml = editor.plugins.magicline.backdoor ? editor.plugins.magicline.backdoor.that.line.$ :
+        editor._.magiclineBackdoor.that.line.$;
       [ml, ml.parentElement].forEach(function (el) {
         el.setAttribute('class', 'rt-non-realtime');
       }); 
       // Fix the magic line issue
       var fixMagicLine = function () {
         if (editor.plugins.magicline) {
-          var ml = (editor.plugins.magicline.backdoor) ? editor.plugins.magicline.backdoor.that.line.$ : editor._.magiclineBackdoor.that.line.$;
+          var ml = editor.plugins.magicline.backdoor ? editor.plugins.magicline.backdoor.that.line.$ :
+            editor._.magiclineBackdoor.that.line.$;
           [ml, ml.parentElement].forEach(function (el) {
             el.setAttribute('class', 'rt-non-realtime');
           });
@@ -346,7 +309,7 @@ define('xwiki-realtime-wysiwygEditor', [
           fixMagicLine();
         }
       });
-      // Add the style again when modifying a macro (which reloads the iframe)
+      // Add the style again when modifying a macro (which reloads the iframe).
       iframe.onload = addStyle;
 
       var setEditable = module.setEditable = function (bool) {
@@ -418,7 +381,7 @@ define('xwiki-realtime-wysiwygEditor', [
             //console.log('Preventing removal of the drag&drop icon container of a macro', info.node);
             return true;
           }
-          // CkEditor drag&drop title (language fight)
+          // CKEditor drag&drop title (language fight)
           if (info.node && info.node.getAttribute &&
               info.node.getAttribute('class') &&
               (info.node.getAttribute('class').split(' ').indexOf('cke_widget_drag_handler') !== -1 ||
@@ -427,11 +390,11 @@ define('xwiki-realtime-wysiwygEditor', [
             return true;
           }
 
-          /*
-            Don't change the aria-label properties because they depend on the browser language and they can create fights
-          */
+          // Don't change the aria-label properties because they depend on the browser language and they can create
+          // fights.
           if (info.diff && info.diff.name === "aria-label") {
-            if (info.diff.action === "modifyAttribute" || info.diff.action === "removeAttribute" || info.diff.action === "addAttribute") {
+            if (info.diff.action === "modifyAttribute" || info.diff.action === "removeAttribute" ||
+                info.diff.action === "addAttribute") {
               return true;
             }
           }
@@ -443,7 +406,8 @@ define('xwiki-realtime-wysiwygEditor', [
           // The "style" attribute in the "body" contains the padding used to display the user position indicators.
           // It is not related to the content channel, but to the userdata channel.
           if (info.node && info.node.tagName === "BODY") {
-            if (info.diff.action === "modifyAttribute" || (info.diff.action === "removeAttribute" && info.diff.name === "style")) {
+            if (info.diff.action === "modifyAttribute" || (info.diff.action === "removeAttribute" &&
+                info.diff.name === "style")) {
               return true;
             }
           }
@@ -511,7 +475,7 @@ define('xwiki-realtime-wysiwygEditor', [
             $(el).attr('data-cke-widget-data', dataValues[idx]);
           });
         }
-      }
+      };
 
       // apply patches, and try not to lose the cursor in the process!
       var applyHjson = function (shjson) {
@@ -574,8 +538,9 @@ define('xwiki-realtime-wysiwygEditor', [
                 var patch = (DD).diff(window.inner, doc.body);
                 (DD).apply(window.inner, patch);
 
-                // If available, transform the HTML comments for XWiki macros into macros before saving (<!--startmacro:{...}-->).
-                // We can do that by using the "xwiki-refresh" command provided the by CkEditor Integration application.
+                // If available, transform the HTML comments for XWiki macros into macros before saving
+                // (<!--startmacro:{...}-->). We can do that by using the "xwiki-refresh" command provided the by
+                // CKEditor Integration application.
                 if (editor.plugins['xwiki-macro'] && findMacroComments(window.inner).length > 0) {
                   initializing = true;
                   editor.execCommand('xwiki-refresh');
@@ -597,7 +562,7 @@ define('xwiki-realtime-wysiwygEditor', [
                   andThen(data);
                 }).fail(function(err){
                   var debugLog = {
-                    state: 'rtwysiwyg/convertHTML',
+                    state: editorId + '/convertHTML',
                     postData: object
                   };
                   module.onAbort(null, 'converthtml', JSON.stringify(debugLog));
@@ -607,18 +572,20 @@ define('xwiki-realtime-wysiwygEditor', [
               }
             },
             getSaveValue: function() {
-              return Object.toQueryString({
+              return {
                 content: editor.getData(),
-                RequiresHTMLConversion: "content",
-                content_syntax: "xwiki/2.1"
-              });
+                RequiresHTMLConversion: 'content',
+                'content_syntax': 'xwiki/2.1'
+              };
             },
             getTextValue: function() {
               try {
                 return editor.getData();
               } catch (e) {
-                // ckError: "The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.",
-                // ckError: "Le contenu n'a pas pu être sauvé à cause d'une erreur interne de CKEditor. Vous devriez essayer de copier vos modifications importantes et de recharger la page.",
+                // ckError: "The content cannot be saved because of a CKEditor internal error. You should try to copy
+                //   your important changes and reload the editor.",
+                // ckError: "Le contenu n'a pas pu être sauvé à cause d'une erreur interne de CKEditor. Vous devriez
+                //   essayer de copier vos modifications importantes et de recharger la page.",
                 editor.showNotification(Messages.ckError, 'warning');
                 return null;
               }
@@ -667,10 +634,11 @@ define('xwiki-realtime-wysiwygEditor', [
         };
         toolbar = Toolbar.create({
           '$container': $bar,
-          'myUserName': info.myID,
-          info.realtime, info.getLag, info.userList, config,
-          // TODO: remove!
-          toolbar_style
+          myUserName: info.myID,
+          realtime: info.realtime,
+          getLag: info.getLag,
+          userList: info.userList,
+          config
         });
         // When someone leaves, if they used Save&View, it removes the locks from the document.
         // We're going to add it again to be sure new users will see the lock page and be able to join.
@@ -692,7 +660,7 @@ define('xwiki-realtime-wysiwygEditor', [
         var xpath = '';
         for ( ; element && element.nodeType == 1; element = element.parentNode ) {
           var id = $(element.parentNode).children(element.tagName).index(element) + 1;
-          id > 1 ? (id = '[' + id + ']') : (id = '');
+          id = id > 1 ? '[' + id + ']' : '';
           xpath = '/' + element.tagName.toLowerCase() + id + xpath;
         }
         return xpath;
@@ -702,7 +670,7 @@ define('xwiki-realtime-wysiwygEditor', [
         return (userName) ? userName.replace(/^.*-([^-]*)%2d[0-9]*$/, function(all, one) { 
           return decodeURIComponent(one);
         }) : userName;
-      }
+      };
 
       editor.on( 'toDataFormat', function( evt) {
         var root = evt.data.dataValue;
@@ -768,8 +736,9 @@ define('xwiki-realtime-wysiwygEditor', [
 
             // Set the user position
             var element = undefined; // If not declared as undefined, it keeps the previous value from the loop
-            if (data.cursor_rtwysiwyg) {
-              element = window.innerDoc.evaluate(data.cursor_rtwysiwyg, window.innerDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null ).singleNodeValue;
+            if (data['cursor_' + editorId]) {
+              element = window.innerDoc.evaluate(data['cursor_' + editorId], window.innerDoc, null,
+                XPathResult.FIRST_ORDERED_NODE_TYPE, null ).singleNodeValue;
             }
             if (element) {
               var pos = $(element).offset();
@@ -807,7 +776,7 @@ define('xwiki-realtime-wysiwygEditor', [
         }
         requiredPadding += 15;
         $(window.inner).css("padding-left", requiredPadding+'px');
-      }
+      };
 
       var first = true;
       var onReady = realtimeOptions.onReady = function (info) {
@@ -822,14 +791,14 @@ define('xwiki-realtime-wysiwygEditor', [
 
         if (first === true) {
           first = false;
-          // Update the user list to link the wiki name to the user id
+          // Update the user list to link the wiki name to the user id.
           var userdataConfig = {
             myId : info.myId,
             userName : userName,
             userAvatar : userAvatar,
             onChange : userList.onChange,
             crypto : Crypto,
-            editor : 'rtwysiwyg',
+            editor : editorId,
             getCursor : function() {
               var selection = editor.getSelection();
               if (!selection) { return ""; }
@@ -895,19 +864,19 @@ define('xwiki-realtime-wysiwygEditor', [
 
       var beforeReconnecting = realtimeOptions.beforeReconnecting = function (callback) {
         var oldChannel = channel;
-        updateKeys(function () {
+        updateKeys().done(function() {
           if (channel !== oldChannel) {
             editorConfig.onKeysChanged();
             setEditable(false);
             $disallowButton.prop('checked', false);
             onAbort();
-            return;
+          } else {
+            callback(channel, stringifyDOM(window.inner));
           }
-          callback(channel, stringifyDOM(window.inner));
         });
       };
 
-      // This function resets the realtime fields after coming back from source mode
+      // This function resets the realtime fields after coming back from source mode.
       var onLocalFromSource = realtimeOptions.onLocalFromSource = function () {
         var iframe = jQuery('iframe')[0]; 
         window.inner = iframe.contentWindow.body;
@@ -916,7 +885,7 @@ define('xwiki-realtime-wysiwygEditor', [
         iframe.onload = addStyle;
         addStyle();
         onLocal();
-      }
+      };
 
       var onLocal = realtimeOptions.onLocal = function () {
         if (initializing) { return; }

@@ -23,8 +23,12 @@ define('xwiki-realtime-loader', [
   'xwiki-realtime-config',
   'xwiki-realtime-document',
   'xwiki-l10n!xwiki-realtime-messages',
+  'xwiki-realtime-errorBox',
   'xwiki-events-bridge'
-], function($, xm, realtimeConfig, doc, Messages) {
+], function(
+  /* jshint maxparams:false */
+  $, xm, realtimeConfig, doc, Messages, ErrorBox
+) {
   'use strict';
 
   if (!realtimeConfig.webSocketURL) {
@@ -102,7 +106,7 @@ define('xwiki-realtime-loader', [
           displayModal(null, types, null, info);
         } else {
           console.log("Couldn't find an active realtime session.");
-          module.whenReady(function (rt) {
+          module.whenReady(function(rt) {
             if (rt) {
               displayModal(null, null, null, info);
             }
@@ -278,11 +282,39 @@ define('xwiki-realtime-loader', [
   };
 
   var availableRt = {};
-  module.setAvailableRt = function(type, info, cb) {
-    availableRt[type] = {info, cb};
+  module.setAvailableRt = function(info) {
+    availableRt[info.type] = {
+      info,
+      cb: $.proxy(createRt, null, info)
+    };
   };
 
-  var isEditorCompatible = function() {
+  var createRtCalled = false,
+  createRt = function(info) {
+    if (createRtCalled) {
+      return;
+    }
+    createRtCalled = true;
+    var $saveButton = $('#mainEditArea').find('input[name="action_saveandcontinue"]');
+    if ($saveButton.length) {
+      var comment = $('#commentinput');
+      var previousComment = comment.val();
+      comment.val(Messages.autoAcceptSave);
+      $saveButton.click();
+      $(document).one('xwiki:document:saved.createRt', function() {
+        $(document).off('xwiki:document:saveFailed.createRt');
+        comment.val(previousComment);
+        window.location.href = module.getEditorURL(window.location.href, info);
+      });
+      $(document).one('xwiki:document:saveFailed.createRt', function() {
+        $(document).off('xwiki:document:saved.createRt');
+        comment.val(previousComment);
+        module.displayRequestErrorModal();
+      });
+    }
+  },
+
+  isEditorCompatible = function() {
     var matchedType;
     Object.keys(availableRt).some(function(type) {
       if ((availableRt[type].info.compatible || []).indexOf(XWiki.editor) !== -1) {
@@ -700,6 +732,19 @@ define('xwiki-realtime-loader', [
     });
   },
 
+  beforeLaunchRealtime = function(keys) {
+    var deferred = $.Deferred();
+    if (module.isRt) {
+      module.whenReady(function(wsAvailable) {
+        module.isRt = wsAvailable;
+        deferred.resolve(keys);
+      });
+    } else {
+      deferred.resolve(keys);
+    }
+    return deferred.promise();
+  };
+
   parseKeyData = function(editorId, channels) {
     var keys = {};
     var eventsChannel = channels.getByPath([doc.language, 'events', '1.0']);
@@ -789,6 +834,33 @@ define('xwiki-realtime-loader', [
       // FIXME: This module shouldn't know about CKEditor.
       sessionStorage.refreshCk = 'true';
       displayCustomModal(getReloadContent());
+    },
+
+    bootstrap: function(info) {
+      var deferred = $.Deferred();
+      this.setAvailableRt(info);
+      if (lock) {
+        // Found a lock link. Check active sessions.
+        this.checkSessions(info);
+        deferred.reject();
+      } else if (window.XWiki.editor === info.type) {
+        // No lock and we are using the right editor. Start realtime.
+        this.updateKeys(info.type).done(function(keys) {
+          if (!keys[info.type] || !keys.events || !keys.userdata) {
+            ErrorBox.show('unavailable');
+            console.error('You are not allowed to create a new realtime session for that document.');
+            deferred.reject();
+          } else if (!Object.keys(keys.active).length || keys[info.type + '_users'] > 0) {
+            deferred.resolve(keys);
+          } else {
+            // Let the user choose between joining the existing real-time session (with a different editor) or create a
+            // new real-time session with the current editor.
+            console.log('Join the existing realtime session or create a new one.');
+            this.displayModal(info.type, Object.keys(keys.active), $.proxy(deferred, 'resolve', keys), info);
+          }
+        });
+      }
+      return deferred.then(beforeLaunchRealtime).promise();
     }
   });
 

@@ -20,6 +20,7 @@
 define('xwiki-realtime-wysiwygEditor', [
   'jquery',
   'xwiki-realtime-config',
+  'xwiki-l10n!xwiki-realtime-messages',
   'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
@@ -36,7 +37,7 @@ define('xwiki-realtime-wysiwygEditor', [
   'deferred!ckeditor'
 ], function (
   /* jshint maxparams:false */
-  $, realtimeConfig, ErrorBox, Toolbar, ChainPadNetflux, Hyperjson, Cursor, UserData, TypingTest, JSONSortify,
+  $, realtimeConfig, Messages, ErrorBox, Toolbar, ChainPadNetflux, Hyperjson, Cursor, UserData, TypingTest, JSONSortify,
   Interface, Saver, Chainpad, Crypto, DiffDom, ckeditorPromise
 ) {
   'use strict';
@@ -51,22 +52,6 @@ define('xwiki-realtime-wysiwygEditor', [
       expectedList = [expectedList];
     }
     return expectedList[some ? 'some' : 'every'](expectedClass => actualList.indexOf(expectedClass) >= 0);
-  };
-
-  // Filter elements to serialize
-  var isMacroStuff = function(element) {
-    var isMac = typeof element.getAttribute === 'function' &&
-      (element.getAttribute('data-cke-hidden-sel') || /cke_widget_drag/.test(element.getAttribute('class')) ||
-        hasClass(element.getAttribute('class'), 'cke_image_resizer'));
-    return isMac;
-  };
-
-  var isNonRealtime = function(element) {
-    return hasClass(element?.getAttribute?.('class'), 'rt-non-realtime');
-  };
-
-  var shouldSerialize = function(el) {
-    return !isNonRealtime(el) && !isMacroStuff(el);
   };
 
   // Filter attributes in the serialized elements.
@@ -90,22 +75,31 @@ define('xwiki-realtime-wysiwygEditor', [
     delete hj[1]['aria-label'];
     return hj;
   };
-  var bodyFilter = function (hj) {
-    if (hj[0] === "BODY") {
-      // The "style" contains the padding created for the user position indicators.
-      // We don't want to share that value since it is related to the new userdata channel and not the content channel.
+
+  var bodyFilter = function(hj) {
+    if (hj[0] === 'BODY') {
+      // The "style" contains the padding created for the user position indicators. We don't want to share that value
+      // since it is related to the new userdata channel and not the content channel.
       hj[1].style = undefined;
       // "contenteditable" in the body is changed during initialization, we should not get the new value from the wire.
-      if (hj[1].contenteditable) { hj[1].contenteditable = "false"; }
+      if (hj[1].contenteditable) {
+        hj[1].contenteditable = 'false';
+      }
     }
     return hj;
   };
-  /* catch `type="_moz"` and body's inline style before it goes over the wire */
-  var brFilter = function (hj) {
-    if (hj[1].type === '_moz') { hj[1].type = undefined; }
+
+  /**
+   * Catch `type="_moz"` before it goes over the wire.
+   */
+  var brFilter = function(hj) {
+    if (hj[1].type === '_moz') {
+      hj[1].type = undefined;
+    }
     return hj;
   };
-  var hjFilter = function (hj) {
+
+  var hjFilter = function(hj) {
     hj = brFilter(hj);
     hj = bodyFilter(hj);
     hj = macroFilter(hj);
@@ -116,42 +110,45 @@ define('xwiki-realtime-wysiwygEditor', [
     return JSONSortify(Hyperjson.fromDOM(dom, shouldSerialize, hjFilter));
   };
 
-  var waitForEditorInstance = function(name, ckeditor) {
-    var deferred = $.Deferred();
-    var editor = ckeditor.instances[name];
-    if (editor) {
-      if (editor.status === 'ready') {
-        deferred.resolve(editor);
-      } else {
-        editor.on('instanceReady', $.proxy(deferred, 'resolve', editor));
-      }
-    } else {
-      ckeditor.on('instanceReady', function(event) {
-        if (event.editor.name === name) {
+  var shouldSerialize = function(el) {
+    return !isNonRealtime(el) && !isMacroStuff(el);
+  };
+
+  var isNonRealtime = function(element) {
+    return hasClass(element?.getAttribute?.('class'), 'rt-non-realtime');
+  };
+
+  // Filter elements to serialize.
+  var isMacroStuff = function(element) {
+    var isMac = typeof element.getAttribute === 'function' &&
+      (element.getAttribute('data-cke-hidden-sel') || /cke_widget_drag/.test(element.getAttribute('class')) ||
+        hasClass(element.getAttribute('class'), 'cke_image_resizer'));
+    return isMac;
+  };
+
+  var waitForEditorInstance = function(name) {
+    name = name || 'content';
+    return ckeditorPromise.then(function(ckeditor) {
+      var deferred = $.Deferred();
+      var editor = ckeditor.instances[name];
+      if (editor) {
+        if (editor.status === 'ready') {
           deferred.resolve(editor);
+        } else {
+          editor.on('instanceReady', $.proxy(deferred, 'resolve', editor));
         }
-      });
-    }
-    return deferred.promise();
+      } else {
+        ckeditor.on('instanceReady', function(event) {
+          if (event.editor.name === name) {
+            deferred.resolve(editor);
+          }
+        });
+      }
+      return deferred.promise();
+    });
   };
 
   module.main = function(editorConfig, docKeys, useRt) {
-    var WebsocketURL = editorConfig.WebsocketURL;
-    var htmlConverterUrl = editorConfig.htmlConverterUrl;
-    var userName = editorConfig.userName;
-    var language = editorConfig.language;
-    var userAvatar = editorConfig.userAvatarURL;
-    var network = editorConfig.network;
-    var saverConfig = editorConfig.saverConfig || {};
-    saverConfig.chainpad = Chainpad;
-    saverConfig.editorType = editorId;
-    saverConfig.editorName = 'WYSIWYG';
-    saverConfig.isHTML = true;
-    saverConfig.mergeContent = true;
-    var Messages = saverConfig.messages || {};
-
-    saverConfig.mergeContent = realtimeConfig.enableMerge !== 0;
-
     var channel = docKeys[editorId];
     var eventsChannel = docKeys.events;
     var userdataChannel = docKeys.userdata;
@@ -173,84 +170,63 @@ define('xwiki-realtime-wysiwygEditor', [
       });
     };
 
-    // DISALLOW REALTIME
-    var allowRealtimeCbId = Interface.uid();
     Interface.realtimeAllowed(useRt);
-
     // Don't display the checkbox in the following cases:
     // * useRt 0 (instead of true/false) => we can't connect to the websocket service
     // * realtime is disabled and we're not an advanced user
     if (useRt !== 0 && (useRt || editorConfig.isAdvancedUser)) {
-      Interface.createAllowRealtimeCheckbox(allowRealtimeCbId, Interface.realtimeAllowed(), Messages.allowRealtime);
-
-      var $disallowButton = $('#' + allowRealtimeCbId);
-      $disallowButton.change(function() {
-        if ($disallowButton.prop('checked')) {
+      var allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(Interface.realtimeAllowed());
+      allowRealtimeCheckbox.change(function() {
+        if (allowRealtimeCheckbox.prop('checked')) {
           Interface.realtimeAllowed(true);
           // TODO: Join the RT session without reloading the page?
           window.location.href = editorConfig.rtURL;
         } else {
           editorConfig.displayDisableModal(function(state) {
             if (!state) {
-              $disallowButton.prop('checked', true);
-              return;
+              allowRealtimeCheckbox.prop('checked', true);
+            } else {
+              Interface.realtimeAllowed(false);
+              module.onAbort();
             }
-            Interface.realtimeAllowed(false);
-            module.onAbort();
           });
         }
       });
     }
 
     if (!useRt) {
-      try {
-        // When someone is offline, they may have left their tab open for a long time and
-        // the lock may have disappeared. We're refreshing it when the editor is focused
-        // so that other users will now that someone is editing the document.
-        var whenReady2 = function (editor) {
-          editor.on('focus', function(e) {
-            XWiki.EditLock = new XWiki.DocumentLock();
-            XWiki.EditLock.lock();
-          });
-        };
-        var untilThen2 = function () {
-          if (window.CKEDITOR &&
-            window.CKEDITOR.instances &&
-            window.CKEDITOR.instances.content) {
-            var editor = window.CKEDITOR.instances.content;
-            if (editor.status === "ready") {
-              whenReady2(editor, $iframe[0]);
-            } else {
-              editor.on('instanceReady', function() { whenReady2(editor); });
-            }
-            return;
-          }
-          setTimeout(untilThen2, 100);
-        };
-        untilThen2();
-      } catch (e) {}
+      // When someone is offline, they may have left their tab open for a long time and the lock may have disappeared.
+      // We're refreshing it when the editor is focused so that other users will know that someone is editing the
+      // document.
+      waitForEditorInstance().done(function(editor) {
+        editor.on('focus', function() {
+          XWiki.EditLock = new XWiki.DocumentLock();
+          XWiki.EditLock.lock();
+        });
+      });
     }
-
 
     if (!Interface.realtimeAllowed()) {
-      console.log("Realtime is disallowed. Quitting");
+      console.log('Realtime is disallowed. Quitting');
       return;
     }
-    // END DISALLOW REALTIME
 
-    // configure Saver with the merge URL and language settings
-    Saver.configure(saverConfig);
+    Saver.configure({
+      chainpad: ChainPad,
+      editorType: editorId,
+      editorName: 'WYSIWYG',
+      isHTML: true,
+      mergeContent: realtimeConfig.enableMerge !== 0
+    });
 
     var whenReady = function(editor, iframe) {
+      var inner = window.inner = iframe.contentWindow.body,
+      innerDoc = window.innerDoc = iframe.contentWindow.document,
+      cursor = window.cursor = Cursor(inner),
+      initializing = true,
 
-      var inner = window.inner = iframe.contentWindow.body;
-      var innerDoc = window.innerDoc = iframe.contentWindow.document;
-      var cursor = window.cursor = Cursor(inner);
-      var initializing = true;
-
-      
       // Fix the magic line issue.
-      var fixMagicLine = function() {
+      fixMagicLine = function() {
         if (editor.plugins.magicline) {
           var ml = editor.plugins.magicline.backdoor ? editor.plugins.magicline.backdoor.that.line.$ :
             editor._.magiclineBackdoor.that.line.$;
@@ -281,8 +257,8 @@ define('xwiki-realtime-wysiwygEditor', [
           'user-select: none;',
         '}',
         '</style>'
-      ].join('\n');
-      var addStyle = function() {
+      ].join('\n'),
+      addStyle = function() {
         var iframe = jQuery('iframe')[0];
         inner = iframe.contentWindow.body;
         innerDoc = iframe.contentWindow.document;
@@ -320,9 +296,8 @@ define('xwiki-realtime-wysiwygEditor', [
         'APPLET',
         'VIDEO',
         'AUDIO'
-      ];
-
-      var preDiffFilters = [
+      ],
+      preDiffFilters = [
         // Don't accept attributes that begin with 'on' these are probably listeners, and we don't want to send scripts
         // over the wire.
         info => {
@@ -358,9 +333,9 @@ define('xwiki-realtime-wysiwygEditor', [
         // not related to the content channel, but to the userdata channel.
         info => info.node?.tagName === 'BODY' && (info.diff.action === 'modifyAttribute' ||
           (info.diff.action === 'removeAttribute' && info.diff.name === 'style'))
-      ];
+      ],
 
-      var DD = new DiffDom({
+      DD = new DiffDom({
         preDiffApply: function(info) {
           // Apply our filters.
           if (preDiffFilters.some(filter => {
@@ -428,15 +403,14 @@ define('xwiki-realtime-wysiwygEditor', [
             cursor.fixSelection(sel, range);
           }
         }
-      });
+      }),
 
       // List of pretty name of all users (mapped with their server ID).
-      var userData = {};
+      userData = {},
       // List of users still connected to the channel (server IDs).
-      var userList;
-      var myId;
+      userList,
 
-      var fixMacros = function() {
+      fixMacros = function() {
         var dataValues = {};
         var $elements = $(window.innerDoc).find('[data-cke-widget-data]');
         $elements.each(function(idx, element) {
@@ -447,10 +421,10 @@ define('xwiki-realtime-wysiwygEditor', [
         $elements.each(function(idx, element) {
           $(element).attr('data-cke-widget-data', dataValues[idx]);
         });
-      };
+      },
 
       // Apply patches and try not to lose the cursor in the process!
-      var applyHjson = function(shjson) {
+      applyHjson = function(shjson) {
         var userDocStateDom = Hyperjson.toDOM(JSON.parse(shjson));
         userDocStateDom.setAttribute('contenteditable', 'true');
         var patch = DD.diff(window.inner, userDocStateDom);
@@ -460,9 +434,9 @@ define('xwiki-realtime-wysiwygEditor', [
         } catch (e) {
           console.log("Unable to fix the macros.", e);
         }
-      };
+      },
 
-      var findMacroComments = function(el) {
+      findMacroComments = function(el) {
         var arr = [];
         for (var i = 0; i < el.childNodes.length; i++) {
           var node = el.childNodes[i];
@@ -473,9 +447,9 @@ define('xwiki-realtime-wysiwygEditor', [
           }
         }
         return arr;
-      };
+      },
 
-      var createSaver = function(info) {
+      createSaver = function(info) {
         Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(
           toolbar.toolbar.find('.rt-toolbar-rightside'));
         Saver.setLastSavedContent(editor._.previousModeData);
@@ -510,7 +484,7 @@ define('xwiki-realtime-wysiwygEditor', [
                 convert: true,
                 text: newText
               };
-              $.post(htmlConverterUrl + '?xpage=plain&outputSyntax=plain', object).done(function(data) {
+              $.post(editorConfig.htmlConverterUrl, object).done(function(data) {
                 andThen(data);
               }).fail(function(err) {
                 var debugLog = {
@@ -534,17 +508,13 @@ define('xwiki-realtime-wysiwygEditor', [
             try {
               return editor.getData();
             } catch (e) {
-              // ckError: "The content cannot be saved because of a CKEditor internal error. You should try to copy
-              //   your important changes and reload the editor.",
-              // ckError: "Le contenu n'a pas pu être sauvé à cause d'une erreur interne de CKEditor. Vous devriez
-              //   essayer de copier vos modifications importantes et de recharger la page.",
-              editor.showNotification(Messages.ckError, 'warning');
+              editor.showNotification(Messages['realtime.editor.getContentFailed'], 'warning');
               return null;
             }
           },
           realtime: info.realtime,
           userList: info.userList,
-          userName,
+          userName: editorConfig.userName,
           network: info.network,
           channel: eventsChannel,
           safeCrash: function(reason, debugLog) {
@@ -552,9 +522,9 @@ define('xwiki-realtime-wysiwygEditor', [
           }
         };
         Saver.create(saverCreateConfig);
-      };
+      },
 
-      var getXPath = function(element) {
+      getXPath = function(element) {
         var xpath = '';
         for ( ; element && element.nodeType == 1; element = element.parentNode ) {
           var id = $(element.parentNode).children(element.tagName).index(element) + 1;
@@ -562,9 +532,9 @@ define('xwiki-realtime-wysiwygEditor', [
           xpath = '/' + element.tagName.toLowerCase() + id + xpath;
         }
         return xpath;
-      };
+      },
 
-      var getPrettyName = function(userName) {
+      getPrettyName = function(userName) {
         return userName ? userName.replace(/^.*-([^-]*)%2d[0-9]*$/, function(all, one) { 
           return decodeURIComponent(one);
         }) : userName;
@@ -668,23 +638,12 @@ define('xwiki-realtime-wysiwygEditor', [
       var isFirstOnReadyCall = true;
 
       var realtimeOptions = {
-        // provide initialstate...
         initialState: stringifyDOM(inner) || '{}',
-
-        // the websocket URL
-        websocketURL: WebsocketURL,
-
-        // our username
-        userName: userName,
-
-        // the channel we will communicate over
+        websocketURL: editorConfig.WebsocketURL,
+        userName: editorConfig.userName,
         channel: channel,
-
-        // Crypto object to avoid loading it twice in Cryptpad
         crypto: Crypto,
-
-        // Network loaded in realtime-frontend
-        network: network,
+        network: editorConfig.network,
 
         // OT
         //patchTransformer: Chainpad.NaiveJSONTransformer
@@ -723,7 +682,7 @@ define('xwiki-realtime-wysiwygEditor', [
           };
           toolbar = Toolbar.create({
             '$container': $bar,
-            myUserName: info.myID,
+            myUserName: info.myId,
             realtime: info.realtime,
             getLag: info.getLag,
             userList: info.userList,
@@ -756,15 +715,13 @@ define('xwiki-realtime-wysiwygEditor', [
           });
           var shjson = module.chainpad.getUserDoc();
 
-          myId = info.myId;
-
           if (isFirstOnReadyCall) {
             isFirstOnReadyCall = false;
             // Update the user list to link the wiki name to the user id.
             var userdataConfig = {
               myId: info.myId,
-              userName,
-              userAvatar,
+              userName: editorConfig.userName,
+              userAvatar: editorConfig.userAvatarURL,
               onChange: userList.onChange,
               crypto: Crypto,
               editor: editorId,
@@ -819,7 +776,7 @@ define('xwiki-realtime-wysiwygEditor', [
             userData.leave();
           }
           changeUserIcons({});
-          if ($disallowButton[0].checked && !module.aborted) {
+          if (allowRealtimeCheckbox.prop('checked') && !module.aborted) {
             ErrorBox.show(msg, debug);
           }
         },
@@ -845,7 +802,7 @@ define('xwiki-realtime-wysiwygEditor', [
             if (channel !== oldChannel) {
               editorConfig.onKeysChanged();
               setEditable(false);
-              $disallowButton.prop('checked', false);
+              allowRealtimeCheckbox.prop('checked', false);
               module.onAbort();
             } else {
               callback(channel, stringifyDOM(window.inner));
@@ -908,7 +865,7 @@ define('xwiki-realtime-wysiwygEditor', [
       };
     };
 
-    return ckeditorPromise.then($.proxy(waitForEditorInstance, null, 'content')).done(function(editor) {
+    return waitForEditorInstance().done(function(editor) {
       // FIXME: This works only with the stand-alone (classic) editor.
       whenReady(editor, $(editor.container.$).find('iframe')[0]);
     });

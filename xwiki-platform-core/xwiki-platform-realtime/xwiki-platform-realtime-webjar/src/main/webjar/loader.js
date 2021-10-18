@@ -71,7 +71,7 @@ define('xwiki-realtime-loader', [
     var userReference = xm.userReference ? XWiki.Model.serialize(xm.userReference) : 'xwiki:XWiki.XWikiGuest';
     return {
       WebsocketURL: realtimeConfig.webSocketURL,
-      htmlConverterUrl: new XWiki.Document('ConvertHTML', 'RTFrontend').getURL('get'),
+      htmlConverterUrl: new XWiki.Document('ConvertHTML', 'RTFrontend').getURL('get', 'xpage=plain&outputSyntax=plain'),
       // userId === <userReference>-encoded(<userName>)%2d<random number>
       userName: userReference + '-' + encodeURIComponent(realtimeConfig.user.name + '-').replace(/-/g, '%2d') +
         String(Math.random()).substring(2),

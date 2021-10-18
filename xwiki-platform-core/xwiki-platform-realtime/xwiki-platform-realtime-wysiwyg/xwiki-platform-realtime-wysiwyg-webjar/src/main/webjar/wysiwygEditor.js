@@ -32,11 +32,12 @@ define('xwiki-realtime-wysiwygEditor', [
   'xwiki-realtime-saver',
   'chainpad',
   'xwiki-realtime-crypto',
-  'diff-dom'
+  'diff-dom',
+  'deferred!ckeditor'
 ], function (
   /* jshint maxparams:false */
   $, realtimeConfig, ErrorBox, Toolbar, ChainPadNetflux, Hyperjson, Cursor, UserData, TypingTest, JSONSortify,
-  Interface, Saver, Chainpad, Crypto, DiffDom
+  Interface, Saver, Chainpad, Crypto, DiffDom, ckeditorPromise
 ) {
   'use strict';
 
@@ -111,30 +112,45 @@ define('xwiki-realtime-wysiwygEditor', [
     return hj;
   };
 
-  var stringifyDOM = window.stringifyDOM = function (dom) {
+  var stringifyDOM = window.stringifyDOM = function(dom) {
     return JSONSortify(Hyperjson.fromDOM(dom, shouldSerialize, hjFilter));
   };
 
-  var main = module.main = function (editorConfig, docKeys, useRt) {
+  var waitForEditorInstance = function(name, ckeditor) {
+    var deferred = $.Deferred();
+    var editor = ckeditor.instances[name];
+    if (editor) {
+      if (editor.status === 'ready') {
+        deferred.resolve(editor);
+      } else {
+        editor.on('instanceReady', $.proxy(deferred, 'resolve', editor));
+      }
+    } else {
+      ckeditor.on('instanceReady', function(event) {
+        if (event.editor.name === name) {
+          deferred.resolve(editor);
+        }
+      });
+    }
+    return deferred.promise();
+  };
+
+  module.main = function(editorConfig, docKeys, useRt) {
     var WebsocketURL = editorConfig.WebsocketURL;
     var htmlConverterUrl = editorConfig.htmlConverterUrl;
     var userName = editorConfig.userName;
-    var DEMO_MODE = editorConfig.DEMO_MODE;
     var language = editorConfig.language;
     var userAvatar = editorConfig.userAvatarURL;
     var network = editorConfig.network;
     var saverConfig = editorConfig.saverConfig || {};
     saverConfig.chainpad = Chainpad;
     saverConfig.editorType = editorId;
-    saverConfig.editorName = 'Wysiwyg';
+    saverConfig.editorName = 'WYSIWYG';
     saverConfig.isHTML = true;
     saverConfig.mergeContent = true;
     var Messages = saverConfig.messages || {};
 
     saverConfig.mergeContent = realtimeConfig.enableMerge !== 0;
-
-    /** Key in the localStore which indicates realtime activity should be disallowed. */
-    var LOCALSTORAGE_DISALLOW = editorConfig.LOCALSTORAGE_DISALLOW;
 
     var channel = docKeys[editorId];
     var eventsChannel = docKeys.events;
@@ -168,15 +184,13 @@ define('xwiki-realtime-wysiwygEditor', [
       Interface.createAllowRealtimeCheckbox(allowRealtimeCbId, Interface.realtimeAllowed(), Messages.allowRealtime);
 
       var $disallowButton = $('#' + allowRealtimeCbId);
-      var disallowClick = function () {
-        var checked = $disallowButton[0].checked;
-        //console.log("Value of 'allow realtime collaboration' is %s", checked);
-        if (checked || DEMO_MODE) {
+      $disallowButton.change(function() {
+        if ($disallowButton.prop('checked')) {
           Interface.realtimeAllowed(true);
-          // TODO : join the RT session without reloading the page?
+          // TODO: Join the RT session without reloading the page?
           window.location.href = editorConfig.rtURL;
         } else {
-          editorConfig.displayDisableModal(function (state) {
+          editorConfig.displayDisableModal(function(state) {
             if (!state) {
               $disallowButton.prop('checked', true);
               return;
@@ -185,8 +199,7 @@ define('xwiki-realtime-wysiwygEditor', [
             module.onAbort();
           });
         }
-      };
-      $disallowButton.on('change', disallowClick);
+      });
     }
 
     if (!useRt) {
@@ -228,33 +241,29 @@ define('xwiki-realtime-wysiwygEditor', [
     // configure Saver with the merge URL and language settings
     Saver.configure(saverConfig);
 
-    var whenReady = function (editor, iframe) {
+    var whenReady = function(editor, iframe) {
 
       var inner = window.inner = iframe.contentWindow.body;
       var innerDoc = window.innerDoc = iframe.contentWindow.document;
       var cursor = window.cursor = Cursor(inner);
       var initializing = true;
 
-      var ml = editor.plugins.magicline.backdoor ? editor.plugins.magicline.backdoor.that.line.$ :
-        editor._.magiclineBackdoor.that.line.$;
-      [ml, ml.parentElement].forEach(function (el) {
-        el.setAttribute('class', 'rt-non-realtime');
-      }); 
-      // Fix the magic line issue
-      var fixMagicLine = function () {
+      
+      // Fix the magic line issue.
+      var fixMagicLine = function() {
         if (editor.plugins.magicline) {
           var ml = editor.plugins.magicline.backdoor ? editor.plugins.magicline.backdoor.that.line.$ :
             editor._.magiclineBackdoor.that.line.$;
-          [ml, ml.parentElement].forEach(function (el) {
+          [ml, ml.parentElement].forEach(function(el) {
             el.setAttribute('class', 'rt-non-realtime');
           });
         } else {
           setTimeout(fixMagicLine, 100);
         }
-
       };
-      var afterRefresh = [];
-      // User position indicator style
+      fixMagicLine();
+
+      // User position indicator style.
       var userIconStyle = [
         '<style>',
         '.rt-user-position {',
@@ -271,7 +280,8 @@ define('xwiki-realtime-wysiwygEditor', [
           'color: #3333FF;',
           'user-select: none;',
         '}',
-        '</style>'].join('\n');
+        '</style>'
+      ].join('\n');
       var addStyle = function() {
         var iframe = jQuery('iframe')[0];
         inner = iframe.contentWindow.body;
@@ -281,28 +291,23 @@ define('xwiki-realtime-wysiwygEditor', [
       };
       addStyle();
 
-      editor.on('afterCommandExec', function(evt) {
-        if (evt && evt.data && evt.data.name && evt.data.name === "xwiki-refresh") {
+      var afterRefresh = [];
+      editor.on('afterCommandExec', function(event) {
+        if (event?.data?.name === 'xwiki-refresh') {
           initializing = false;
-          if (onLocal) { onLocal(); }
-          afterRefresh.forEach(function (el) {
-            el();
-          });
+          realtimeOptions.onLocal();
+          afterRefresh.forEach(item => item());
           afterRefresh = [];
           fixMagicLine();
         }
       });
+
       // Add the style again when modifying a macro (which reloads the iframe).
       iframe.onload = addStyle;
 
-      var setEditable = module.setEditable = function (bool) {
-        console.log('SETEDITABLE');
+      var setEditable = module.setEditable = function(bool) {
         window.inner.setAttribute('contenteditable', bool);
-        if (bool) {
-          $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').removeAttr('disabled');
-        } else {
-          $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').attr('disabled', 'disabled');
-        }
+        $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').prop('disabled', bool);
       };
 
       // Don't let the user edit until the real-time framework is ready.
@@ -355,7 +360,7 @@ define('xwiki-realtime-wysiwygEditor', [
           (info.diff.action === 'removeAttribute' && info.diff.name === 'style'))
       ];
 
-      var diffOptions = {
+      var DD = new DiffDom({
         preDiffApply: function(info) {
           // Apply our filters.
           if (preDiffFilters.some(filter => {
@@ -407,9 +412,15 @@ define('xwiki-realtime-wysiwygEditor', [
           var cursor = window.cursor;
           if (info.frame) {
             if (info.node) {
-              if (info.frame & 1) { cursor.fixStart(info.node); }
-              if (info.frame & 2) { cursor.fixEnd(info.node); }
-            } else { console.error("info.node did not exist"); }
+              if (info.frame & 1) {
+                cursor.fixStart(info.node);
+              }
+              if (info.frame & 2) {
+                cursor.fixEnd(info.node);
+              }
+            } else {
+              console.error("info.node did not exist");
+            }
 
             var sel = cursor.makeSelection();
             var range = cursor.makeRange();
@@ -417,7 +428,7 @@ define('xwiki-realtime-wysiwygEditor', [
             cursor.fixSelection(sel, range);
           }
         }
-      };
+      });
 
       // List of pretty name of all users (mapped with their server ID).
       var userData = {};
@@ -425,60 +436,37 @@ define('xwiki-realtime-wysiwygEditor', [
       var userList;
       var myId;
 
-      var DD = new DiffDom(diffOptions);
-
-      var fixMacros = function () {
-        if ($(window.inner).find('.macro[data-cke-widget-data]')) {
-          var dataValues = {};
-          var $elements = $(window.innerDoc).find('[data-cke-widget-data]');
-          $elements.each(function (idx, el) {
-            dataValues[idx] = $(el).attr('data-cke-widget-data');
-          });
-          editor.widgets.instances = {};
-          editor.widgets.checkWidgets();
-          $elements.each(function (idx, el) {
-            $(el).attr('data-cke-widget-data', dataValues[idx]);
-          });
-        }
+      var fixMacros = function() {
+        var dataValues = {};
+        var $elements = $(window.innerDoc).find('[data-cke-widget-data]');
+        $elements.each(function(idx, element) {
+          dataValues[idx] = $(element).attr('data-cke-widget-data');
+        });
+        editor.widgets.instances = {};
+        editor.widgets.checkWidgets();
+        $elements.each(function(idx, element) {
+          $(element).attr('data-cke-widget-data', dataValues[idx]);
+        });
       };
 
-      // apply patches, and try not to lose the cursor in the process!
-      var applyHjson = function (shjson) {
+      // Apply patches and try not to lose the cursor in the process!
+      var applyHjson = function(shjson) {
         var userDocStateDom = Hyperjson.toDOM(JSON.parse(shjson));
-        userDocStateDom.setAttribute("contenteditable", "true"); // lol wtf
-        var patch = (DD).diff(window.inner, userDocStateDom);
-        (DD).apply(window.inner, patch);
-        try { fixMacros(); } catch (e) { console.log("Unable to fix the macros", e); }
-      };
-
-      var realtimeOptions = {
-        // provide initialstate...
-        initialState: stringifyDOM(inner) || '{}',
-
-        // the websocket URL
-        websocketURL: WebsocketURL,
-
-        // our username
-        userName: userName,
-
-        // the channel we will communicate over
-        channel: channel,
-
-        // Crypto object to avoid loading it twice in Cryptpad
-        crypto: Crypto,
-
-        // Network loaded in realtime-frontend
-        network: network,
-
-        // OT
-        //patchTransformer: Chainpad.NaiveJSONTransformer
+        userDocStateDom.setAttribute('contenteditable', 'true');
+        var patch = DD.diff(window.inner, userDocStateDom);
+        DD.apply(window.inner, patch);
+        try {
+          fixMacros();
+        } catch (e) {
+          console.log("Unable to fix the macros.", e);
+        }
       };
 
       var findMacroComments = function(el) {
         var arr = [];
-        for(var i = 0; i < el.childNodes.length; i++) {
+        for (var i = 0; i < el.childNodes.length; i++) {
           var node = el.childNodes[i];
-          if(node.nodeType === 8 && node.data && /startmacro/.test(node.data)) {
+          if (node.nodeType === 8 && node.data && /startmacro/.test(node.data)) {
             arr.push(node);
           } else {
             arr.push.apply(arr, findMacroComments(node));
@@ -487,138 +475,83 @@ define('xwiki-realtime-wysiwygEditor', [
         return arr;
       };
 
-      var createSaver = function (info) {
-        if(!DEMO_MODE) {
-          Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(toolbar.toolbar
-            .find('.rt-toolbar-rightside'),
-            saverConfig.messages);
-          Saver.setLastSavedContent(editor._.previousModeData);
-          var saverCreateConfig = {
-            formId: window.XWiki.editor === "wysiwyg" ? "edit" : "inline", // Id of the wiki page form
-            setTextValue: function(newText, toConvert, callback) {
-              var andThen = function (data) {
-                var doc = window.DOMDoc = (new DOMParser()).parseFromString(data,"text/html");
-                window.cursor.update();
-                doc.body.setAttribute("contenteditable", "true");
-                var patch = (DD).diff(window.inner, doc.body);
-                (DD).apply(window.inner, patch);
+      var createSaver = function(info) {
+        Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(
+          toolbar.toolbar.find('.rt-toolbar-rightside'));
+        Saver.setLastSavedContent(editor._.previousModeData);
+        var saverCreateConfig = {
+          // Id of the wiki page form.
+          formId: window.XWiki.editor === "wysiwyg" ? "edit" : "inline",
+          setTextValue: function(newText, toConvert, callback) {
+            var andThen = function(data) {
+              var doc = window.DOMDoc = (new DOMParser()).parseFromString(data,"text/html");
+              window.cursor.update();
+              doc.body.setAttribute("contenteditable", "true");
+              var patch = (DD).diff(window.inner, doc.body);
+              (DD).apply(window.inner, patch);
 
-                // If available, transform the HTML comments for XWiki macros into macros before saving
-                // (<!--startmacro:{...}-->). We can do that by using the "xwiki-refresh" command provided the by
-                // CKEditor Integration application.
-                if (editor.plugins['xwiki-macro'] && findMacroComments(window.inner).length > 0) {
-                  initializing = true;
-                  editor.execCommand('xwiki-refresh');
-                  afterRefresh.push(callback);
-                } else {
-                  callback();
-                  onLocal();
-                }
-              };
-              if (toConvert) {
-                var object = {
-                  wiki: XWiki.currentWiki,
-                  space: XWiki.currentSpace,
-                  page: XWiki.currentPage,
-                  convert: true,
-                  text: newText
-                };
-                $.post(htmlConverterUrl+'?xpage=plain&outputSyntax=plain', object).done(function(data) {
-                  andThen(data);
-                }).fail(function(err){
-                  var debugLog = {
-                    state: editorId + '/convertHTML',
-                    postData: object
-                  };
-                  module.onAbort(null, 'converthtml', JSON.stringify(debugLog));
-                });
+              // If available, transform the HTML comments for XWiki macros into macros before saving
+              // (<!--startmacro:{...}-->). We can do that by using the "xwiki-refresh" command provided the by
+              // CKEditor Integration application.
+              if (editor.plugins['xwiki-macro'] && findMacroComments(window.inner).length > 0) {
+                initializing = true;
+                editor.execCommand('xwiki-refresh');
+                afterRefresh.push(callback);
               } else {
-                andThen(newText);
+                callback();
+                realtimeOptions.onLocal();
               }
-            },
-            getSaveValue: function() {
-              return {
-                content: editor.getData(),
-                RequiresHTMLConversion: 'content',
-                'content_syntax': 'xwiki/2.1'
+            };
+            if (toConvert) {
+              var object = {
+                wiki: XWiki.currentWiki,
+                space: XWiki.currentSpace,
+                page: XWiki.currentPage,
+                convert: true,
+                text: newText
               };
-            },
-            getTextValue: function() {
-              try {
-                return editor.getData();
-              } catch (e) {
-                // ckError: "The content cannot be saved because of a CKEditor internal error. You should try to copy
-                //   your important changes and reload the editor.",
-                // ckError: "Le contenu n'a pas pu être sauvé à cause d'une erreur interne de CKEditor. Vous devriez
-                //   essayer de copier vos modifications importantes et de recharger la page.",
-                editor.showNotification(Messages.ckError, 'warning');
-                return null;
-              }
-            },
-            realtime: info.realtime,
-            userList: info.userList,
-            userName: userName,
-            network: info.network,
-            channel: eventsChannel,
-            demoMode: DEMO_MODE,
-            safeCrash: function(reason, debugLog) { module.onAbort(null, reason, debugLog); }
-          };
-          Saver.create(saverCreateConfig);
-        }
-      };
-
-      var onRemote = realtimeOptions.onRemote = function (info) {
-        if (initializing) { return; }
-
-        var shjson = info.realtime.getUserDoc();
-
-        // remember where the cursor is
-        window.cursor.update();
-
-        // build a dom from HJSON, diff, and patch the editor
-        applyHjson(shjson);
-
-        var shjson2 = stringifyDOM(window.inner);
-        if (shjson2 !== shjson) {
-          console.error("shjson2 !== shjson");
-          var diff = Chainpad.Diff.diff(shjson, shjson2);
-          console.log(shjson, diff);
-          module.chainpad.contentUpdate(shjson2);
-        }
-      };
-
-      var onInit = realtimeOptions.onInit = function (info) {
-        var $bar = $('#cke_1_toolbox');
-        userList = info.userList;
-        var config = {
-          userData: userData,
-          onUsernameClick: function (id) {
-            var basehref = iframe.contentWindow.location.href.split('#')[0] || "";
-            iframe.contentWindow.location.href = basehref + "#rt-user-" + id;
+              $.post(htmlConverterUrl + '?xpage=plain&outputSyntax=plain', object).done(function(data) {
+                andThen(data);
+              }).fail(function(err) {
+                var debugLog = {
+                  state: editorId + '/convertHTML',
+                  postData: object
+                };
+                module.onAbort(null, 'converthtml', JSON.stringify(debugLog));
+              });
+            } else {
+              andThen(newText);
+            }
+          },
+          getSaveValue: function() {
+            return {
+              content: editor.getData(),
+              RequiresHTMLConversion: 'content',
+              'content_syntax': 'xwiki/2.1'
+            };
+          },
+          getTextValue: function() {
+            try {
+              return editor.getData();
+            } catch (e) {
+              // ckError: "The content cannot be saved because of a CKEditor internal error. You should try to copy
+              //   your important changes and reload the editor.",
+              // ckError: "Le contenu n'a pas pu être sauvé à cause d'une erreur interne de CKEditor. Vous devriez
+              //   essayer de copier vos modifications importantes et de recharger la page.",
+              editor.showNotification(Messages.ckError, 'warning');
+              return null;
+            }
+          },
+          realtime: info.realtime,
+          userList: info.userList,
+          userName,
+          network: info.network,
+          channel: eventsChannel,
+          safeCrash: function(reason, debugLog) {
+            module.onAbort(null, reason, debugLog);
           }
         };
-        toolbar = Toolbar.create({
-          '$container': $bar,
-          myUserName: info.myID,
-          realtime: info.realtime,
-          getLag: info.getLag,
-          userList: info.userList,
-          config
-        });
-        // When someone leaves, if they used Save&View, it removes the locks from the document.
-        // We're going to add it again to be sure new users will see the lock page and be able to join.
-        var oldUsers = JSON.parse(JSON.stringify(userList.users || []));
-        userList.change.push(function () {
-          if (userList.length === 0) { return; }
-          // If someone has left, try to get the lock
-          if (oldUsers.some(function (u) {
-            return userList.users.indexOf(u) === -1;
-          })) {
-            XWiki.EditLock = new XWiki.DocumentLock();
-            XWiki.EditLock.lock();
-          }
-          oldUsers = JSON.parse(JSON.stringify(userList.users || []));
-        });
+        Saver.create(saverCreateConfig);
       };
 
       var getXPath = function(element) {
@@ -632,7 +565,7 @@ define('xwiki-realtime-wysiwygEditor', [
       };
 
       var getPrettyName = function(userName) {
-        return (userName) ? userName.replace(/^.*-([^-]*)%2d[0-9]*$/, function(all, one) { 
+        return userName ? userName.replace(/^.*-([^-]*)%2d[0-9]*$/, function(all, one) { 
           return decodeURIComponent(one);
         }) : userName;
       };
@@ -732,145 +665,227 @@ define('xwiki-realtime-wysiwygEditor', [
         $(window.inner).css('padding-left', requiredPadding === 0 ? '' : ((requiredPadding + 15) + 'px'));
       };
 
-      var first = true;
-      var onReady = realtimeOptions.onReady = function (info) {
-        if (!initializing) {
-          return;
-        }
+      var isFirstOnReadyCall = true;
 
-        $.extend(module, {
-          chainpad: info.realtime,
-          leaveChannel: info.leave,
-          realtimeOptions
-        });
-        var shjson = module.chainpad.getUserDoc();
+      var realtimeOptions = {
+        // provide initialstate...
+        initialState: stringifyDOM(inner) || '{}',
 
-        myId = info.myId;
+        // the websocket URL
+        websocketURL: WebsocketURL,
 
-        if (first === true) {
-          first = false;
-          // Update the user list to link the wiki name to the user id.
-          var userdataConfig = {
-            myId: info.myId,
-            userName,
-            userAvatar,
-            onChange: userList.onChange,
-            crypto: Crypto,
-            editor: editorId,
-            getCursor: function() {
-              var selection = editor.getSelection();
-              if (!selection) {
-                return '';
-              }
-              var ranges = selection.getRanges();
-              if (!ranges || !ranges[0] || !ranges[0].startContainer || !ranges[0].startContainer.$) {
-                return '';
-              }
-              var node = ranges[0].startContainer.$;
-              node = (node.nodeName === '#text') ? node.parentNode : node;
-              var xpath = getXPath(node);
-              return xpath;
+        // our username
+        userName: userName,
+
+        // the channel we will communicate over
+        channel: channel,
+
+        // Crypto object to avoid loading it twice in Cryptpad
+        crypto: Crypto,
+
+        // Network loaded in realtime-frontend
+        network: network,
+
+        // OT
+        //patchTransformer: Chainpad.NaiveJSONTransformer
+
+        onRemote: function(info) {
+          if (initializing) {
+            return;
+          }
+
+          var shjson = info.realtime.getUserDoc();
+
+          // Remember where the cursor is.
+          window.cursor.update();
+
+          // Build a DOM from HJSON, diff, and patch the editor.
+          applyHjson(shjson);
+
+          var shjson2 = stringifyDOM(window.inner);
+          if (shjson2 !== shjson) {
+            console.error('shjson2 !== shjson');
+            var diff = Chainpad.Diff.diff(shjson, shjson2);
+            console.log(shjson, diff);
+            module.chainpad.contentUpdate(shjson2);
+          }
+        },
+
+        onInit: function(info) {
+          var $bar = $('#cke_1_toolbox');
+          userList = info.userList;
+          var config = {
+            userData,
+            onUsernameClick: function(id) {
+              var basehref = iframe.contentWindow.location.href.split('#')[0] || '';
+              iframe.contentWindow.location.href = basehref + '#rt-user-' + id;
             }
           };
-          if (!realtimeConfig.marginAvatar) {
-            delete userdataConfig.getCursor;
+          toolbar = Toolbar.create({
+            '$container': $bar,
+            myUserName: info.myID,
+            realtime: info.realtime,
+            getLag: info.getLag,
+            userList: info.userList,
+            config
+          });
+          // When someone leaves, if they used Save&View, it removes the locks from the document. We're going to add it
+          // again to be sure new users will see the lock page and be able to join.
+          var oldUsers = JSON.parse(JSON.stringify(userList.users || []));
+          userList.change.push(function() {
+            if (userList.length) {
+              // If someone has left, try to get the lock.
+              if (oldUsers.some(user => userList.users.indexOf(user) === -1)) {
+                XWiki.EditLock = new XWiki.DocumentLock();
+                XWiki.EditLock.lock();
+              }
+              oldUsers = JSON.parse(JSON.stringify(userList.users || []));
+            }
+          });
+        },
+
+        onReady: function(info) {
+          if (!initializing) {
+            return;
           }
 
-          userData = UserData.start(info.network, userdataChannel, userdataConfig);
-          userList.change.push(changeUserIcons);
-        }
+          $.extend(module, {
+            chainpad: info.realtime,
+            leaveChannel: info.leave,
+            realtimeOptions
+          });
+          var shjson = module.chainpad.getUserDoc();
 
-        applyHjson(shjson);
+          myId = info.myId;
 
-        console.log('Unlocking editor');
-        initializing = false;
-        setEditable(true);
-        module.chainpad.start();
+          if (isFirstOnReadyCall) {
+            isFirstOnReadyCall = false;
+            // Update the user list to link the wiki name to the user id.
+            var userdataConfig = {
+              myId: info.myId,
+              userName,
+              userAvatar,
+              onChange: userList.onChange,
+              crypto: Crypto,
+              editor: editorId,
+              getCursor: function() {
+                var selection = editor.getSelection();
+                if (!selection) {
+                  return '';
+                }
+                var ranges = selection.getRanges();
+                if (!ranges || !ranges[0] || !ranges[0].startContainer || !ranges[0].startContainer.$) {
+                  return '';
+                }
+                var node = ranges[0].startContainer.$;
+                node = (node.nodeName === '#text') ? node.parentNode : node;
+                var xpath = getXPath(node);
+                return xpath;
+              }
+            };
+            if (!realtimeConfig.marginAvatar) {
+              delete userdataConfig.getCursor;
+            }
 
-        onLocal();
-        createSaver(info);
-      };
+            userData = UserData.start(info.network, userdataChannel, userdataConfig);
+            userList.change.push(changeUserIcons);
+          }
 
-      var onAbort = module.onAbort = realtimeOptions.onAbort = function (info, reason, debug) {
-        console.log("Aborting the session!");
-        var msg = reason || 'disconnected';
-        module.chainpad.abort();
-        try {
-          // Don't break if the channel doesn't exist anymore
-          module.leaveChannel();
-        } catch (e) {}
-        module.aborted = true;
-        editorConfig.abort();
-        Saver.stop();
-        toolbar.failed();
-        toolbar.toolbar.remove();
-        if (userData.leave && typeof userData.leave === "function") { userData.leave(); }
-        changeUserIcons({});
-        if($disallowButton[0].checked && !module.aborted) {
-          ErrorBox.show(msg, debug);
-        }
-      };
+          applyHjson(shjson);
 
-      var onConnectionChange = realtimeOptions.onConnectionChange = function (info) {
-        if (module.aborted) { return; }
-        console.log("Connection status : "+info.state);
-        toolbar.failed();
-        if (info.state) {
-          //ErrorBox.hide();
-          initializing = true;
-          toolbar.reconnecting(info.myId);
-        } else {
+          console.log('Unlocking editor');
+          initializing = false;
+          setEditable(true);
+          module.chainpad.start();
+
+          realtimeOptions.onLocal();
+          createSaver(info);
+        },
+
+        onAbort: function(info, reason, debug) {
+          console.log("Aborting the session!");
+          var msg = reason || 'disconnected';
           module.chainpad.abort();
-          setEditable(false);
-          //ErrorBox.show('disconnected');
-        }
-      };
-
-      var beforeReconnecting = realtimeOptions.beforeReconnecting = function (callback) {
-        var oldChannel = channel;
-        updateKeys().done(function() {
-          if (channel !== oldChannel) {
-            editorConfig.onKeysChanged();
-            setEditable(false);
-            $disallowButton.prop('checked', false);
-            onAbort();
-          } else {
-            callback(channel, stringifyDOM(window.inner));
+          try {
+            // Don't break if the channel doesn't exist anymore.
+            module.leaveChannel();
+          } catch (e) {}
+          module.aborted = true;
+          editorConfig.abort();
+          Saver.stop();
+          toolbar.failed();
+          toolbar.toolbar.remove();
+          if (typeof userData.leave === 'function') {
+            userData.leave();
           }
-        });
-      };
+          changeUserIcons({});
+          if ($disallowButton[0].checked && !module.aborted) {
+            ErrorBox.show(msg, debug);
+          }
+        },
 
-      // This function resets the realtime fields after coming back from source mode.
-      var onLocalFromSource = realtimeOptions.onLocalFromSource = function () {
-        var iframe = jQuery('iframe')[0]; 
-        window.inner = iframe.contentWindow.body;
-        window.innerDoc = iframe.contentWindow.document;
-        window.cursor = Cursor(window.inner);
-        iframe.onload = addStyle;
-        addStyle();
-        onLocal();
-      };
+        onConnectionChange: function(info) {
+          if (module.aborted) {
+            return;
+          }
+          console.log('Connection status: ' + info.state);
+          toolbar.failed();
+          if (info.state) {
+            initializing = true;
+            toolbar.reconnecting(info.myId);
+          } else {
+            module.chainpad.abort();
+            setEditable(false);
+          }
+        },
 
-      var onLocal = realtimeOptions.onLocal = function () {
-        if (initializing) { return; }
-        // stringify the json and send it into chainpad
-        var shjson = stringifyDOM(window.inner);
-        module.chainpad.contentUpdate(shjson);
+        beforeReconnecting: function(callback) {
+          var oldChannel = channel;
+          updateKeys().done(function() {
+            if (channel !== oldChannel) {
+              editorConfig.onKeysChanged();
+              setEditable(false);
+              $disallowButton.prop('checked', false);
+              module.onAbort();
+            } else {
+              callback(channel, stringifyDOM(window.inner));
+            }
+          });
+        },
 
-        if (module.chainpad.getUserDoc() !== shjson) {
-          console.error("realtime.getUserDoc() !== shjson");
+        // This function resets the realtime fields after coming back from source mode.
+        onLocalFromSource: function() {
+          var iframe = jQuery('iframe')[0]; 
+          window.inner = iframe.contentWindow.body;
+          window.innerDoc = iframe.contentWindow.document;
+          window.cursor = Cursor(window.inner);
+          iframe.onload = addStyle;
+          addStyle();
+          this.onLocal();
+        },
+
+        onLocal: function() {
+          if (initializing) {
+            return;
+          }
+          // Stringify the JSON and send it into ChainPad.
+          var shjson = stringifyDOM(window.inner);
+          module.chainpad.contentUpdate(shjson);
+
+          if (module.chainpad.getUserDoc() !== shjson) {
+            console.error("realtime.getUserDoc() !== shjson");
+          }
         }
       };
+
+      module.onAbort = realtimeOptions.onAbort;
 
       module.realtimeInput = ChainPadNetflux.start(realtimeOptions);
 
-      /* hitting enter makes a new line, but places the cursor inside
-        of the <br> instead of the <p>. This makes it such that you
-        cannot type until you click, which is rather unnacceptable.
-        If the cursor is ever inside such a <br>, you probably want
-        to push it out to the parent element, which ought to be a
-        paragraph tag. This needs to be done on keydown, otherwise
-        the first such keypress will not be inserted into the P. */
+      // Hitting enter makes a new line, but places the cursor inside of the <br> instead of the <p>. This makes it such
+      // that you cannot type until you click, which is rather unnacceptable. If the cursor is ever inside such a <br>,
+      // you probably want to push it out to the parent element, which ought to be a paragraph tag. This needs to be
+      // done on keydown, otherwise the first such keypress will not be inserted into the P.
       window.inner.addEventListener('keydown', window.cursor.brFix);
 
       editor.on('change', function() {
@@ -878,42 +893,25 @@ define('xwiki-realtime-wysiwygEditor', [
         if (!initializing) {
           Saver.setLocalEditFlag(true);
         }
-        onLocal();
+        realtimeOptions.onLocal();
       });
 
-      // export the typing tests to the window.
+      // Export the typing tests to the window.
       // call like `test = easyTest()`
       // terminate the test like `test.cancel()`
-      var easyTest = window.easyTest = function () {
+      window.easyTest = function () {
         window.cursor.update();
         var start = window.cursor.Range.start;
-        var test = TypingTest.testInput(inner, start.el, start.offset, onLocal);
-        onLocal();
+        var test = TypingTest.testInput(inner, start.el, start.offset, realtimeOptions.onLocal);
+        realtimeOptions.onLocal();
         return test;
       };
     };
 
-    var untilThen = function () {
-      var $iframe = $('iframe');
-      if (window.CKEDITOR &&
-        window.CKEDITOR.instances &&
-        window.CKEDITOR.instances.content &&
-        $iframe.length &&
-        $iframe[0].contentWindow &&
-        $iframe[0].contentWindow.body) {
-        var editor = window.CKEDITOR.instances.content;
-        if (editor.status === "ready") {
-          whenReady(editor, $iframe[0]);
-        } else {
-          editor.on('instanceReady', function() { whenReady(editor, $iframe[0]); });
-        }
-        return;
-        //return whenReady(window.CKEDITOR.instances.content, $iframe[0]);
-      }
-      setTimeout(untilThen, 100);
-    };
-    /* wait for the existence of CKEDITOR before doing things...  */
-    untilThen();
+    return ckeditorPromise.then($.proxy(waitForEditorInstance, null, 'content')).done(function(editor) {
+      // FIXME: This works only with the stand-alone (classic) editor.
+      whenReady(editor, $(editor.container.$).find('iframe')[0]);
+    });
   };
 
   return module;

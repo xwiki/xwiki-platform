@@ -19,9 +19,8 @@
  */
 define('xwiki-realtime-wysiwygEditor-loader', [
   'jquery',
-  'xwiki-realtime-loader',
-  'deferred!ckeditor'
-], function($, Loader, ckeditorPromise) {
+  'xwiki-realtime-loader'
+], function($, Loader) {
   'use strict';
 
   // TODO: Check if this is really needed.
@@ -42,33 +41,13 @@ define('xwiki-realtime-wysiwygEditor-loader', [
     compatible: ['wysiwyg', 'wiki']
   };
 
-  var waitForEditorInstance = function(name, ckeditor) {
-    var deferred = $.Deferred();
-    var editor = ckeditor.instances[name];
-    if (editor) {
-      if (editor.status === 'ready') {
-        deferred.resolve(editor);
-      } else {
-        editor.on('instanceReady', $.proxy(deferred, 'resolve', editor));
-      }
-    } else {
-      ckeditor.on('instanceReady', function(event) {
-        if (event.editor.name === name) {
-          deferred.resolve(editor);
-        }
-      });
-    }
-    return deferred.promise();
-  };
-
   Loader.bootstrap(info).done(function(keys) {
     require(['xwiki-realtime-wysiwygEditor'], function(RealtimeWysiwygEditor) {
       if (RealtimeWysiwygEditor && RealtimeWysiwygEditor.main) {
         keys._update = $.proxy(Loader, 'updateKeys', editorId);
         var config = Loader.getConfig();
         config.rtURL = Loader.getEditorURL(window.location.href, info);
-        RealtimeWysiwygEditor.main(config, keys, Loader.isRt);
-        ckeditorPromise.then($.proxy(waitForEditorInstance, null, 'content')).done(function(editor) {
+        RealtimeWysiwygEditor.main(config, keys, Loader.isRt).done(function(editor) {
           RealtimeWysiwygEditor.currentMode = editor.mode;
           if (Loader.isRt) {
             $('.cke_button__source').remove();

@@ -260,7 +260,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private String getDockerImageTag(TestConfiguration testConfiguration)
     {
-        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag() : LATEST;
+        // TODO: We currently cannot use Tomcat 10.x as it corresponds to a package change for JakartaEE and we'll need
+        // XWiki to move to the new packages first. This is why we force an older version for Tomcat.
+        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag()
+            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9" : LATEST);
     }
 
     private GenericContainer createServletContainer() throws Exception

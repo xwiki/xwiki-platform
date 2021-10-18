@@ -25,15 +25,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.content.AlteredContent;
 import org.xwiki.annotation.content.ContentAlterer;
+import org.xwiki.annotation.content.TextExtractor;
 import org.xwiki.annotation.renderer.AnnotationEvent;
 import org.xwiki.annotation.renderer.AnnotationEvent.AnnotationEventType;
 import org.xwiki.rendering.listener.Listener;
@@ -42,7 +41,6 @@ import org.xwiki.rendering.listener.QueueListener;
 import org.xwiki.rendering.listener.chaining.ChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
  * Chaining listener that maps the annotations on the events that it receives, holds the state of annotations on these
@@ -61,12 +59,6 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
      * Version number of this class.
      */
     private static final long serialVersionUID = -2790330640900288463L;
-
-    /**
-     * Syntaxes that are from the HTML family.
-     */
-    private static final Set<SyntaxType> HTML_FAMILY_TYPES =
-        SetUtils.hashSet(SyntaxType.XHTML, SyntaxType.HTML, SyntaxType.ANNOTATED_XHTML, SyntaxType.ANNOTATED_HTML);
 
     /**
      * The chain listener from which this listener is part of.
@@ -107,21 +99,21 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     private Map<Event, SortedMap<Integer, List<AnnotationEvent>>> bookmarks =
         new HashMap<Event, SortedMap<Integer, List<AnnotationEvent>>>();
 
-    private HTMLTextExtracter htmlTextExtracter;
+    private TextExtractor textExtractor;
 
     /**
      * Builds an annotation generator listener from the passed link generator in the passed chain.
      *
      * @param selectionAlterer cleaner for the annotation selection text, so that it can be mapped on the content
      * @param listenerChain the chain in which this listener is part of
-     * @param htmlTextExtracter text content extracter from HTML
+     * @param textExtractor plain text extractor, depending on a given syntax
      */
     public AnnotationGeneratorChainingListener(ContentAlterer selectionAlterer, ListenerChain listenerChain,
-        HTMLTextExtracter htmlTextExtracter)
+        TextExtractor textExtractor)
     {
         this.chain = listenerChain;
         this.selectionAlterer = selectionAlterer;
-        this.htmlTextExtracter = htmlTextExtracter;
+        this.textExtractor = textExtractor;
     }
 
     @Override
@@ -170,18 +162,11 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     @Override
     public void onRawText(String text, Syntax syntax)
     {
-        String textContent = text;
-        if (HTML_FAMILY_TYPES.contains(syntax.getType())) {
-            // Since text could come from within an HTML macro, it's content should be parsed, cleaned and transformed
-            // into plain text, as the users see it when they add the annotation.
-            textContent = htmlTextExtracter.getTextContent(text);
-        }
-
         // Store the raw text as it is ftm. Should handle syntax in the future
         super.onRawText(text, syntax);
-        // Similar approach to verbatim FTM. In the future, syntax specific cleaner could be used for various syntaxes
-        // (which would do the great job for HTML, for example)
-        handleRawText(textContent);
+        // Handle text depending on the syntax and, if possible, extract the plain text content, as the users see it
+        // when they add the annotation.
+        handleRawText(textExtractor.extractText(text, syntax));
     }
 
     /**

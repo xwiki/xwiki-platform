@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.annotation.internal.renderer;
+package org.xwiki.annotation.internal.content;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -35,9 +35,11 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSInput;
+import org.xwiki.annotation.content.TextExtractor;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
@@ -49,13 +51,13 @@ import org.xwiki.xml.html.HTMLUtils;
  * @version $Id$
  * @since 13.9RC1
  */
-@Component(roles = HTMLTextExtracter.class)
+@Component(hints = {"html", "xhtml", "annotatedhtml", "annotatedxhtml"})
 @Singleton
-public class HTMLTextExtracter implements Initializable
+public class HTMLTextExtractor implements TextExtractor, Initializable
 {
     /**
      * Helper object for manipulating DOM Level 3 Load and Save APIs.
-     **/
+     */
     private DOMImplementationLS lsImpl;
 
     private Map<String, String> htmlCleanerParametersMap;
@@ -79,13 +81,15 @@ public class HTMLTextExtracter implements Initializable
     /**
      * Parse and clean a HTML given as string and compute it's text content.
      *
-     * @param html an HTML as string
+     * @param content an HTML as string
+     * @param syntax the handled syntax
      * @return text content of the HTML document
      */
-    public String getTextContent(String html)
+    @Override
+    public String extractText(String content, Syntax syntax)
     {
         StringBuilder fullContent = new StringBuilder();
-        Document htmlDoc = parseHTML(html);
+        Document htmlDoc = parseHTML(content);
         XPath xPath = XPathFactory.newInstance().newXPath();
         try {
             NodeList textNodes = (NodeList) xPath.compile("//text()").evaluate(htmlDoc, XPathConstants.NODESET);

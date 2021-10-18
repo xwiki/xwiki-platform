@@ -487,17 +487,22 @@ define('xwiki-realtime-saver', [
             debug('A remote client saved and incremented the latest common ancestor.');
           }
 
-          // update lastSaved attributes
+          // Update lastSaved attributes.
           lastSaved.wasEditedLocally = false;
 
-          // update the local latest Common Ancestor version string
+          // Update the local latest common ancestor version string.
           lastSaved.version = msgVersion;
 
-          // remember the state of the textArea when last saved
-          // so that we can avoid additional minor versions
-          // there's a *tiny* race condition here
-          // but it's probably not an issue
+          // Remember the state of the textArea when last saved so that we can avoid additional minor versions. There's
+          // a *tiny* race condition here but it's probably not an issue.
           lastSaved.content = mainConfig.getTextValue();
+
+          // Update the document meta in order to ensure proper merge on save (when using the form action buttons).
+          doc.update({
+            version: lastSaved.version,
+            modified: now(),
+            isNew: false
+          });
         } else if (typeof lastSaved.onReceiveOwnIsave === 'function') {
           lastSaved.onReceiveOwnIsave();
         }

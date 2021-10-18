@@ -66,7 +66,17 @@ define('xwiki-realtime-document', [
           // Reload failed. Continue using the current data.
           return this;
         }
-      });
+      }).done($.proxy(this, 'update'));
+    },
+
+    update: function(data) {
+      $.extend(this, data);
+      if (this.documentReference === meta.documentReference && this.version !== meta.version) {
+        // Update the meta and the hidden fields used by the edit form in order to ensure proper merge on save.
+        meta.setVersion(this.version);
+        $('#editingVersionDate').val(this.modified);
+        $('#isNew').val(this.isNew);
+      }
     },
 
     save: function(data) {

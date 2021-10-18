@@ -743,7 +743,7 @@ define('xwiki-realtime-loader', [
       deferred.resolve(keys);
     }
     return deferred.promise();
-  };
+  },
 
   parseKeyData = function(editorId, channels) {
     var keys = {};

@@ -81,7 +81,7 @@ define('xwiki-realtime-toolbar', [
     }).map(function(user) {
       // Display the users.
       var userDisplay = $('<span/>').attr({
-        'class': Config.marginAvatar === '1' ? 'rt-user-link' : '',
+        'class': Config.marginAvatar === 1 ? 'rt-user-link' : '',
         'data-id': user.id
       });
       if (displayConfig === undefined || displayConfig === 'name' || displayConfig === 'both') {

@@ -19,6 +19,7 @@
  */
 define('xwiki-realtime-wysiwygEditor', [
   'jquery',
+  'xwiki-realtime-config',
   'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
@@ -34,8 +35,8 @@ define('xwiki-realtime-wysiwygEditor', [
   'diff-dom'
 ], function (
   /* jshint maxparams:false */
-  $, ErrorBox, Toolbar, ChainPadNetflux, Hyperjson, Cursor, UserData, TypingTest, JSONSortify, Interface, Saver,
-  Chainpad, Crypto, DiffDom
+  $, realtimeConfig, ErrorBox, Toolbar, ChainPadNetflux, Hyperjson, Cursor, UserData, TypingTest, JSONSortify,
+  Interface, Saver, Chainpad, Crypto, DiffDom
 ) {
   'use strict';
 
@@ -43,9 +44,11 @@ define('xwiki-realtime-wysiwygEditor', [
     Hyperjson
   };
 
-  var hasClass = function(actual, expected, some) {
+  var hasClass = function(actual, expectedList, some) {
     var actualList = (actual || '').split(/\s+/);
-    var expectedList = (expected || '').split(/\s+/);
+    if (typeof expectedList === 'string') {
+      expectedList = [expectedList];
+    }
     return expectedList[some ? 'some' : 'every'](expectedClass => actualList.indexOf(expectedClass) >= 0);
   };
 
@@ -69,16 +72,16 @@ define('xwiki-realtime-wysiwygEditor', [
   var macroFilter = function(hj) {
     // Send a widget ID == 0 to avoid a fight between broswers about it and prevent the container from having the
     // "selected" class (blue border).
-    if (hasClass(hj[1].class, 'cke_widget_wrapper cke_widget_block')) {
+    if (hasClass(hj[1].class, ['cke_widget_wrapper', 'cke_widget_block'])) {
       hj[1].class = 'cke_widget_wrapper cke_widget_block';
       hj[1]['data-cke-widget-id'] = '0';
-    } else if (hasClass(hj[1].class, 'cke_widget_wrapper cke_widget_inline')) {
+    } else if (hasClass(hj[1].class, ['cke_widget_wrapper', 'cke_widget_inline'])) {
       hj[1].class = 'cke_widget_wrapper cke_widget_inline';
       hj[1]['data-cke-widget-id'] = '0';
     } else if (hj[1]['data-macro'] && hasClass(hj[1].class, 'macro')) {
       // Don't send the "upcasted" attribute which can be removed, generating a shjson != shjson2 error.
       delete hj[1]['data-cke-widget-upcasted'];
-    } else if (hasClass(hj[1].class, 'cke_widget_drag_handler cke_image_resizer', /* some */ true)) {
+    } else if (hasClass(hj[1].class, ['cke_widget_drag_handler', 'cke_image_resizer'], /* some */ true)) {
       // Remove the title attribute of the drag&drop icons since they are localized and create fights over the language
       // to use.
       delete hj[1].title;
@@ -128,17 +131,7 @@ define('xwiki-realtime-wysiwygEditor', [
     saverConfig.mergeContent = true;
     var Messages = saverConfig.messages || {};
 
-    var $configField = $('#realtime-frontend-getconfig');
-    var parsedConfig;
-    if ($configField.length) {
-      try {
-        parsedConfig = JSON.parse($configField.html());
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    var displayAvatarInMargin = typeof parsedConfig !== "undefined" ? parseInt(parsedConfig.marginAvatar) : 0;
-    saverConfig.mergeContent = typeof parsedConfig !== "undefined" ? parseInt(parsedConfig.enableMerge) !== 0 : true;
+    saverConfig.mergeContent = realtimeConfig.enableMerge !== 0;
 
     /** Key in the localStore which indicates realtime activity should be disallowed. */
     var LOCALSTORAGE_DISALLOW = editorConfig.LOCALSTORAGE_DISALLOW;
@@ -312,7 +305,7 @@ define('xwiki-realtime-wysiwygEditor', [
         }
       };
 
-      // don't let the user edit until the pad is ready
+      // Don't let the user edit until the real-time framework is ready.
       setEditable(false);
 
       var forbiddenTags = [
@@ -324,107 +317,93 @@ define('xwiki-realtime-wysiwygEditor', [
         'AUDIO'
       ];
 
-      var diffOptions = {
-        preDiffApply: function(info) {
-          /*
-            Don't accept attributes that begin with 'on'
-            these are probably listeners, and we don't want to
-            send scripts over the wire.
-          */
-          if (['addAttribute', 'modifyAttribute'].indexOf(info.diff.action) !== -1) {
-            if (/^on/.test(info.diff.name)) {
-              console.log("Rejecting forbidden element attribute with name (%s)", info.diff.name);
-              return true;
-            }
+      var preDiffFilters = [
+        // Don't accept attributes that begin with 'on' these are probably listeners, and we don't want to send scripts
+        // over the wire.
+        info => {
+          if (['addAttribute', 'modifyAttribute'].indexOf(info.diff.action) !== -1 && /^on/.test(info.diff.name)) {
+            return `Rejecting forbidden element attribute with name (${info.diff.name})`;
           }
-          /*
-            Also reject any elements which would insert any one of
-            our forbidden tag types: script, iframe, object,
-              applet, video, or audio
-          */
+        },
+
+        // Reject any elements which would insert any one of our forbidden tag types: script, iframe, object, applet,
+        // video or audio.
+        info => {
           if (['addElement', 'replaceElement'].indexOf(info.diff.action) !== -1) {
             if (info.diff.element && forbiddenTags.indexOf(info.diff.element.nodeName) !== -1) {
-              console.log("Rejecting forbidden tag of type (%s)", info.diff.element.nodeName);
-              return true;
+              return `Rejecting forbidden tag of type (${info.diff.element.nodeName})`;
             } else if (info.diff.newValue && forbiddenTags.indexOf(info.diff.newValue.nodeType) !== -1) {
-              console.log("Rejecting forbidden tag of type (%s)", info.diff.newValue.nodeName);
-              return true;
+              return `Rejecting forbidden tag of type (${info.diff.newValue.nodeName})`;
             }
           }
+        },
 
-          /*
-            Reject the rt-non-realtime class (magicline)
-          */
-          if (info.node && isNonRealtime(info.node)) {
-            if (info.diff.action === "removeElement") {
-              return true;
+        // Reject the rt-non-realtime class (magic line).
+        info => 'removeElement' === info.diff.action && isNonRealtime(info.node),
+
+        // Reject the CKEditor drag and resize handlers.
+        info => hasClass(info.node?.getAttribute?.('class'),
+          ['cke_widget_drag_handler_container', 'cke_widget_drag_handler', 'cke_image_resizer'], true),
+
+        // Don't change the aria-label properties because they depend on the browser locale and they can create fights.
+        info => info.diff.name === "aria-label" &&
+          ['modifyAttribute', 'removeAttribute', 'addAttribute'].indexOf(info.diff.action) !== -1,
+
+        // The "style" attribute in the "body" contains the padding used to display the user position indicators. It's
+        // not related to the content channel, but to the userdata channel.
+        info => info.node?.tagName === 'BODY' && (info.diff.action === 'modifyAttribute' ||
+          (info.diff.action === 'removeAttribute' && info.diff.name === 'style'))
+      ];
+
+      var diffOptions = {
+        preDiffApply: function(info) {
+          // Apply our filters.
+          if (preDiffFilters.some(filter => {
+            var result = filter(info);
+            if (typeof result === 'string') {
+              console.log(result);
             }
-          }
-
-          /*
-            XWiki Macros filter
-          */
-          // CKEditor drag&drop icon container.
-          if (info.node?.tagName === 'SPAN' &&
-              hasClass(info.node.getAttribute('class'), 'cke_widget_drag_handler_container')) {
+            return result;
+          })) {
+            // Reject the change.
             return true;
           }
-          // CKEditor drag&drop title (language fight).
-          if (hasClass(info.node?.getAttribute?.('class'), 'cke_widget_drag_handler cke_image_resizer', true)) {
-            return true;
-          }
 
-          // Don't change the aria-label properties because they depend on the browser language and they can create
-          // fights.
-          if (info.diff && info.diff.name === "aria-label") {
-            if (info.diff.action === "modifyAttribute" || info.diff.action === "removeAttribute" ||
-                info.diff.action === "addAttribute") {
-              return true;
-            }
-          }
-
-
-          /*
-            Cursor indicators
-          */
-          // The "style" attribute in the "body" contains the padding used to display the user position indicators.
-          // It is not related to the content channel, but to the userdata channel.
-          if (info.node && info.node.tagName === "BODY") {
-            if (info.diff.action === "modifyAttribute" || (info.diff.action === "removeAttribute" &&
-                info.diff.name === "style")) {
-              return true;
-            }
-          }
+          //
+          // Cursor indicators
+          //
 
           var cursor = window.cursor;
-          // no use trying to recover the cursor if it doesn't exist
-          if (!cursor.exists()) { return; }
+          // No use trying to recover the cursor if it doesn't exist.
+          if (!cursor.exists()) {
+            return;
+          }
 
-          /*  frame is either 0, 1, 2, or 3, depending on which
-            cursor frames were affected: none, first, last, or both
-          */
+          // Frame is either 0, 1, 2, or 3, depending on which cursor frames were affected: none, first, last, or both.
           var frame = info.frame = cursor.inNode(info.node);
 
-          if (!frame) { return; }
+          if (!frame) {
+            return;
+          }
 
           if (typeof info.diff.oldValue === 'string' && typeof info.diff.newValue === 'string') {
             var pushes = cursor.pushDelta(info.diff.oldValue, info.diff.newValue);
-
             if (frame & 1) {
-              // push cursor start if necessary
+              // Push cursor start if necessary.
               if (pushes.commonStart < cursor.Range.start.offset) {
                 cursor.Range.start.offset += pushes.delta;
               }
             }
             if (frame & 2) {
-              // push cursor end if necessary
+              // Push cursor end if necessary.
               if (pushes.commonStart < cursor.Range.end.offset) {
                 cursor.Range.end.offset += pushes.delta;
               }
             }
           }
         },
-        postDiffApply: function (info) {
+
+        postDiffApply: function(info) {
           var cursor = window.cursor;
           if (info.frame) {
             if (info.node) {
@@ -440,8 +419,10 @@ define('xwiki-realtime-wysiwygEditor', [
         }
       };
 
-      var userData = {}; // List of pretty name of all users (mapped with their server ID)
-      var userList; // List of users still connected to the channel (server IDs)
+      // List of pretty name of all users (mapped with their server ID).
+      var userData = {};
+      // List of users still connected to the channel (server IDs).
+      var userList;
       var myId;
 
       var DD = new DiffDom(diffOptions);
@@ -640,7 +621,7 @@ define('xwiki-realtime-wysiwygEditor', [
         });
       };
 
-      var getXPath = function (element) {
+      var getXPath = function(element) {
         var xpath = '';
         for ( ; element && element.nodeType == 1; element = element.parentNode ) {
           var id = $(element.parentNode).children(element.tagName).index(element) + 1;
@@ -650,13 +631,13 @@ define('xwiki-realtime-wysiwygEditor', [
         return xpath;
       };
 
-      var getPrettyName = function (userName) {
+      var getPrettyName = function(userName) {
         return (userName) ? userName.replace(/^.*-([^-]*)%2d[0-9]*$/, function(all, one) { 
           return decodeURIComponent(one);
         }) : userName;
       };
 
-      editor.on( 'toDataFormat', function( evt) {
+      editor.on('toDataFormat', function(evt) {
         var root = evt.data.dataValue;
         var toRemove = [];
         var toReplaceMacro = [];
@@ -666,9 +647,9 @@ define('xwiki-realtime-wysiwygEditor', [
             toRemove.push(node);
           }
           if (typeof node.hasClass === "function") {
-            if (node.hasClass("rt-non-realtime")) {
+            if (node.hasClass('rt-non-realtime')) {
               toRemove.push(node);
-            } else if (node.hasClass("macro") &&
+            } else if (node.hasClass('macro') &&
                 node.attributes &&
                 node.attributes['data-macro'] &&
                 node.parent &&
@@ -701,74 +682,67 @@ define('xwiki-realtime-wysiwygEditor', [
         }
       }, null, null, 12 );
 
-      var changeUserIcons = function (newdata) {
-        if (!displayAvatarInMargin || displayAvatarInMargin == 0) { return; }
+      var changeUserIcons = function(newdata) {
+        if (!realtimeConfig.marginAvatar) {
+          return;
+        }
 
-        // If no new data (someone has just joined or left the channel), get the latest known values
+        // If no new data (someone has just joined or left the channel), get the latest known values.
         var updatedData = newdata || userData;
-
-        var activeUsers = userList.users.slice(0);
 
         $(window.innerDoc).find('.rt-user-position').remove();
         var positions = {};
         var requiredPadding = 0;
-        for (var i=0; i<activeUsers.length; i++) {
-          var id = activeUsers[i];
+        userList.users.filter(id => updatedData[id]?.['cursor_' + editorId]).forEach(id => {
           var data = updatedData[id];
-          if (data) {
-            var name = getPrettyName (data.name);
-
-            // Set the user position
-            var element = undefined; // If not declared as undefined, it keeps the previous value from the loop
-            if (data['cursor_' + editorId]) {
-              element = window.innerDoc.evaluate(data['cursor_' + editorId], window.innerDoc, null,
-                XPathResult.FIRST_ORDERED_NODE_TYPE, null ).singleNodeValue;
-            }
-            if (element) {
-              var pos = $(element).offset();
-              if (!positions[pos.top]) {
-                positions[pos.top] = [id];
-              } else {
-                positions[pos.top].push(id);
-              }
-              var index = positions[pos.top].length - 1;
-              var posTop = pos.top + 3;
-              var posLeft = index * 16;
-              requiredPadding = Math.max(requiredPadding, (posLeft+10));
-              var $indicator;
-              if (data.avatar) {
-                $indicator = $('<img src="' + data.avatar + '?width=15" alt="" />');
-              } else {
-                $indicator = $('<div>' + name.substr(0,1) + '</div>');
-              }
-              $indicator.addClass("rt-non-realtime rt-user-position");
-              $indicator.attr("contenteditable", "false");
-              $indicator.attr("id", "rt-user-" + id);
-              $indicator.attr("title", name);
-              $indicator.css({
-                "left" : posLeft + "px",
-                "top" : posTop + "px"
-              });
-              $('html', window.innerDoc).append($indicator);
-            }
+          var name = getPrettyName(data.name);
+          // Set the user position.
+          var element = window.innerDoc.evaluate(data['cursor_' + editorId], window.innerDoc, null,
+            XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+          if (!element) {
+            return;
           }
-        }
+          var pos = $(element).offset();
+          if (!positions[pos.top]) {
+            positions[pos.top] = [id];
+          } else {
+            positions[pos.top].push(id);
+          }
+          var index = positions[pos.top].length - 1;
+          var posTop = pos.top + 3;
+          var posLeft = index * 16;
+          requiredPadding = Math.max(requiredPadding, (posLeft + 10));
+          var $indicator;
+          if (data.avatar) {
+            $indicator = $('<img alt=""/>').attr('src', data.avatar);
+          } else {
+            $indicator = $('<div/>').text(name.substring(0, 1));
+          }
+          $indicator.addClass('rt-non-realtime rt-user-position').attr({
+            id: 'rt-user-' + id,
+            title: name,
+            contenteditable: 'false'
+          }).css({
+            'left': posLeft + 'px',
+            'top': posTop + 'px'
+          });
+          $('html', window.innerDoc).append($indicator);
+        });
 
-        if (requiredPadding === 0) {
-          $(window.inner).css("padding-left", '');
-          return;
-        }
-        requiredPadding += 15;
-        $(window.inner).css("padding-left", requiredPadding+'px');
+        $(window.inner).css('padding-left', requiredPadding === 0 ? '' : ((requiredPadding + 15) + 'px'));
       };
 
       var first = true;
       var onReady = realtimeOptions.onReady = function (info) {
-        if (!initializing) { return; }
+        if (!initializing) {
+          return;
+        }
 
-        module.chainpad = window.chainpad = info.realtime;
-        module.leaveChannel = info.leave;
-        module.realtimeOptions = realtimeOptions;
+        $.extend(module, {
+          chainpad: info.realtime,
+          leaveChannel: info.leave,
+          realtimeOptions
+        });
         var shjson = module.chainpad.getUserDoc();
 
         myId = info.myId;
@@ -777,24 +751,30 @@ define('xwiki-realtime-wysiwygEditor', [
           first = false;
           // Update the user list to link the wiki name to the user id.
           var userdataConfig = {
-            myId : info.myId,
-            userName : userName,
-            userAvatar : userAvatar,
-            onChange : userList.onChange,
-            crypto : Crypto,
-            editor : editorId,
-            getCursor : function() {
+            myId: info.myId,
+            userName,
+            userAvatar,
+            onChange: userList.onChange,
+            crypto: Crypto,
+            editor: editorId,
+            getCursor: function() {
               var selection = editor.getSelection();
-              if (!selection) { return ""; }
+              if (!selection) {
+                return '';
+              }
               var ranges = selection.getRanges();
-              if (!ranges || !ranges[0] || !ranges[0].startContainer || !ranges[0].startContainer.$) { return ""; }
+              if (!ranges || !ranges[0] || !ranges[0].startContainer || !ranges[0].startContainer.$) {
+                return '';
+              }
               var node = ranges[0].startContainer.$;
-              node = (node.nodeName === "#text") ? node.parentNode : node;
+              node = (node.nodeName === '#text') ? node.parentNode : node;
               var xpath = getXPath(node);
               return xpath;
             }
           };
-          if (!displayAvatarInMargin || displayAvatarInMargin == 0) { delete userdataConfig.getCursor; }
+          if (!realtimeConfig.marginAvatar) {
+            delete userdataConfig.getCursor;
+          }
 
           userData = UserData.start(info.network, userdataChannel, userdataConfig);
           userList.change.push(changeUserIcons);
@@ -802,7 +782,7 @@ define('xwiki-realtime-wysiwygEditor', [
 
         applyHjson(shjson);
 
-        console.log("Unlocking editor");
+        console.log('Unlocking editor');
         initializing = false;
         setEditable(true);
         module.chainpad.start();

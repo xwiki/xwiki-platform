@@ -109,19 +109,9 @@ define('xwiki-livedata', [
       // Calling Object.freeze(undefined) on IE11 triggers an exception. 
       this.data.entries = Object.freeze(this.data.entries);
     }
-    // Fetch the data if we don't have any. This call must be made as soon as possible to display the data to the user
-    // early.
-    // We use a dedicated field for the first load as the fetch start/end events can be triggered before the loader 
-    // components is loaded (and in this case the loader is never hidden even once the entries are displayed).
+
+    // Reactive properties must be initialized before Vue is instantiated.
     this.firstEntriesLoading = true;
-    if (!this.data.data.entries.length) {
-      this.updateEntries()
-        // Marks the loaded as finish, even if it fails as the loader should stop and an message be displayed to the 
-        // user in this case.
-        .finally(() => this.firstEntriesLoading = false);
-    } else {
-      this.firstEntriesLoading = false;
-    }
     this.currentLayoutId = "";
     this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = {
@@ -154,6 +144,21 @@ define('xwiki-livedata', [
         logic: this
       },
     });
+
+    // Fetch the data if we don't have any. This call must be made just after the main Vue component is initialized as 
+    // LivedataPersistentConfiguration must be mounted for the persisted filters to be loaded and applied when fetching 
+    // the entries.
+    // We use a dedicated field (firstEntriesLoading) for the first load as the fetch start/end events can be triggered 
+    // before the loader components is loaded (and in this case the loader is never hidden even once the entries are
+    // displayed).
+    if (!this.data.data.entries.length) {
+      this.updateEntries()
+        // Mark the loader as finished, even if it fails as the loader should stop and a message be displayed to the 
+        // user in this case.
+        .finally(() => this.firstEntriesLoading = false);
+    } else {
+      this.firstEntriesLoading = false;
+    }
 
     editBus.init(this);
 

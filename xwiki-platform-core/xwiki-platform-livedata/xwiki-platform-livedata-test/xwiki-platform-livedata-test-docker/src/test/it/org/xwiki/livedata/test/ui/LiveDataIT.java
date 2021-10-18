@@ -172,6 +172,12 @@ class LiveDataIT
         tableLayout
             .assertCellWithLink(USER_COLUMN, "U1", testUtils.getURL(new DocumentReference("xwiki", "XWiki", "U1")));
 
+        // Reload the page to verify that the persisted filters are taken into account after reload.
+        testUtils.getDriver().navigate().refresh();
+        tableLayout.waitUntilReady();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
         // Become guest because the tests does not need specific rights. 
         testUtils.forceGuestUser();
 

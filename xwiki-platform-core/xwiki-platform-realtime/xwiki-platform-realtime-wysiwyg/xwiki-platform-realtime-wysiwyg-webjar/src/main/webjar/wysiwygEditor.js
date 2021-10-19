@@ -140,7 +140,7 @@ define('xwiki-realtime-wysiwygEditor', [
       } else {
         ckeditor.on('instanceReady', function(event) {
           if (event.editor.name === name) {
-            deferred.resolve(editor);
+            deferred.resolve(event.editor);
           }
         });
       }

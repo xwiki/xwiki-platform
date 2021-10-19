@@ -120,7 +120,7 @@
   #end
 #end
 
-#macro (displayXPropertyDiff $diff $propertyPrettyName)
+#macro (displayXPropertyDiff $diff $propertyPrettyName $fieldName)
   #if (!$propertyPrettyName)
     #set ($xclass = $xwiki.getDocument($diff.className).getxWikiClass())
     #set ($propertyPrettyName = "$!xclass.get($diff.propName).translatedPrettyName")
@@ -132,7 +132,12 @@
   #if ($diff.propType == 'Password' || ($diff.propType == 'Email' && $diff.className == 'XWiki.XWikiUsers'))
     #set ($obfuscate = 'web.history.changes.privateInformation')
   #end
-  #displayPropertyDiff($propertyPrettyName $diff.prevValue $diff.newValue $obfuscate $diff.propName)
+  #if (!$fieldName)
+    #set ($realName = $diff.propName)
+  #else
+    #set ($realName = $fieldName)
+  #end
+  #displayPropertyDiff($propertyPrettyName $diff.prevValue $diff.newValue $obfuscate $NULL $realName)
   #set ($propertyPrettyName = $NULL)
 #end
 
@@ -150,7 +155,7 @@
       <dl>
         #foreach ($fieldDiff in $metaDataDiff)
           #set ($fieldPrettyName = $services.localization.render("core.viewers.diff.metadata.$fieldDiff.field"))
-          #displayXPropertyDiff($fieldDiff $fieldPrettyName)
+          #displayXPropertyDiff($fieldDiff $fieldPrettyName $fieldDiff.field)
         #end
         #if ($tagsDiff)
           #foreach ($propertyDiff in $tagsDiff)

@@ -183,7 +183,9 @@
               <excludes>
                 **/DefaultWikiMacroInitializer.java,
                 **/DefaultWikiMacroRenderer.java,
-                **/WikiMacroConstants.java
+                **/WikiMacroConstants.java,
+                org/xwiki/rendering/wikimacro/internal/DefaultWikiMacro.java,
+                org/xwiki/rendering/wikimacro/internal/DefaultWikiMacroFactory.java
               </excludes>
             </configuration>
           </execution>

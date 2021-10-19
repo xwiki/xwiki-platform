@@ -100,7 +100,8 @@
             <configuration>
               <excludes>
                 org/xwiki/extension/index/internal/ExtensionIndexStore.java,
-                org/xwiki/extension/index/internal/job/ExtensionIndexJob.java
+                org/xwiki/extension/index/internal/job/ExtensionIndexJob.java,
+                org/xwiki/extension/index/internal/DefaultExtensionIndex.java
               </excludes>
             </configuration>
           </execution>

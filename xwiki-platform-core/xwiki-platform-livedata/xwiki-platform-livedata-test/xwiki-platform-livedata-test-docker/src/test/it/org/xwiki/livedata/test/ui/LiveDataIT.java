@@ -76,6 +76,8 @@ class LiveDataIT
 
     private static final String CHOICE_D = "value4";
 
+    private static final String CHOICE_EMPTY = "(empty)";
+
     private static final String BIRTHDAY_COLUMN = "birthday";
 
     private static final String USER_COLUMN = "user";
@@ -146,7 +148,7 @@ class LiveDataIT
         tableLayout.editCell(CHOICE_COLUMN, 2, CHOICE_COLUMN, CHOICE_C);
         tableLayout.editCell(BIRTHDAY_COLUMN, 1, BIRTHDAY_COLUMN, BIRTHDAY_DATETIME);
         tableLayout.editAndCancel(BIRTHDAY_COLUMN, 2, BIRTHDAY_COLUMN, CANCELED_BIRTHDAY_DATETIME);
-        // Edits the choice column of Nikolay, to assert that an cell with an empty content can be edited. 
+        // Edits the choice column of Nikolay, to assert that a cell with an empty content can be edited. 
         tableLayout.editCell(CHOICE_COLUMN, 3, CHOICE_COLUMN, CHOICE_D);
         assertEquals(3, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_CHARLY);
@@ -177,6 +179,11 @@ class LiveDataIT
         tableLayout.waitUntilReady();
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_EMPTY);
+        // Reload to test if the empty filter is displayed again.
+        testUtils.getDriver().navigate().refresh();
+        tableLayout.waitUntilReady();
+        assertEquals(CHOICE_EMPTY, tableLayout.getFilterValues(CHOICE_COLUMN).get(0));
 
         // Become guest because the tests does not need specific rights. 
         testUtils.forceGuestUser();

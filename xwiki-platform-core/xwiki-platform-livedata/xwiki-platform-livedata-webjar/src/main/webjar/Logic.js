@@ -239,10 +239,16 @@ define('xwiki-livedata', [
       ],
     });
 
+    // Return a translation only once the translations have been loaded from the server.
     this.translate = async (key, ...args) => {
       // Make sure that the translations are loaded from the server before translating.
       await translationsPromise;
       return vue.$t(key, args);
+    }
+    
+    // Waits for the translations to be loaded before continuing.
+    this.translationsLoaded = async() => {
+      await translationsPromise;
     }
   };
 

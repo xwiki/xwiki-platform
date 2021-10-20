@@ -201,9 +201,9 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Waits until the table has content displayed and loaded. Use {@link #waitUntilReady()} for the default behavior.
+     * Waits until the table is loaded. Use {@link #waitUntilReady()} for the default behavior.
      *
-     * @param expectRows when {@code true} waits for rows to be displayed and loaded, when {@code false} continue
+     * @param expectRows when {@code true} waits for rows to be loaded, when {@code false} continue
      *     without waiting for the content
      * @see #waitUntilReady()
      * @since 12.10.9
@@ -212,15 +212,16 @@ public class TableLayoutElement extends BaseElement
     {
         // Waits for all the live data to be loaded and the cells to be finished loading.
         getDriver().waitUntilCondition(webDriver -> {
-            boolean isWaiting =
-                Arrays.asList(getClasses(getRoot().findElement(By.cssSelector(".layout-loader")))).contains("waiting");
+            List<String> layoutLoaderClasses =
+                Arrays.asList(getClasses(getRoot().findElement(By.cssSelector(".layout-loader"))));
+            boolean isWaiting = layoutLoaderClasses.contains("waiting");
             if (isWaiting) {
                 return false;
             }
             if (!noFiltering()) {
                 return false;
             }
-            return !expectRows || hasLines() && areCellsLoaded();
+            return !expectRows || !layoutLoaderClasses.contains("loading") && areCellsLoaded();
         }, 20);
     }
 
@@ -245,7 +246,7 @@ public class TableLayoutElement extends BaseElement
     {
         getDriver().waitUntilCondition(webDriver -> {
             // Cells are displayed and they are loaded.
-            if (!hasLines() || !areCellsLoaded()) {
+            if (isEmpty() || !areCellsLoaded()) {
                 return false;
             }
             // And the count of row is greater than the expected count.
@@ -276,7 +277,7 @@ public class TableLayoutElement extends BaseElement
     {
         getDriver().waitUntilCondition(webDriver -> {
             // Cells are displayed. And they are loaded.
-            if (!hasLines() || !areCellsLoaded()) {
+            if (isEmpty() || !areCellsLoaded()) {
                 return false;
             }
             // And the count of row is greater than the expected count.
@@ -381,10 +382,7 @@ public class TableLayoutElement extends BaseElement
      */
     public void editCell(String columnLabel, int rowNumber, String fieldName, String newValue)
     {
-        internalEdit(columnLabel, rowNumber, fieldName, newValue, () -> {
-            // Clicks somewhere outside the edited cell. We use the h1 tag because it is present on all pages.
-            new Actions(getDriver().getWrappedDriver()).click(getDriver().findElement(By.tagName("h1"))).perform();
-        });
+        internalEdit(columnLabel, rowNumber, fieldName, newValue, true);
     }
 
     /**
@@ -399,10 +397,7 @@ public class TableLayoutElement extends BaseElement
      */
     public void editAndCancel(String columnLabel, int rowNumber, String fieldName, String newValue)
     {
-        internalEdit(columnLabel, rowNumber, fieldName, newValue, () -> {
-            // Press escape to cancel the edition.
-            new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
-        });
+        internalEdit(columnLabel, rowNumber, fieldName, newValue, false);
     }
 
     /**
@@ -485,11 +480,11 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * @return {@code true} if the live data contains some result lines, {@code false} otherwise
+     * @return {@code false} if the live data contains some result lines, {@code true} otherwise
      */
-    private boolean hasLines()
+    private boolean isEmpty()
     {
-        return !getRoot().findElements(By.cssSelector("tbody tr td.cell .livedata-displayer")).isEmpty();
+        return getRoot().findElements(By.cssSelector("tbody tr td.cell .livedata-displayer")).isEmpty();
     }
 
     /**
@@ -536,19 +531,16 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Does the steps for the edition of a cell, until the {@code newValue} is set on the requested field. Then call an
-     * {@code userAction} (for instance a click outside of the cell, or pressing escape). The {@code userAction} is
-     * expected to switch the Live Data back to the view mode (i.e., not cells are edited). Finally, waits for the
-     * result of the user action to be completed before continuing.
+     * Does the steps for the edition of a cell and then returning the cell to view mode either by clicking on a h1
+     * tag or by pressing escape if {@code save} is false.
      *
      * @param columnLabel the label of the column
      * @param rowNumber the number of the row to update (the first line is number 1)
      * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
      * @param newValue the new value set of the field, but never saved because we cancel the edition
-     * @param userAction an user action to perform after the field values has been set. This action is expected to
-     *     bring the Live Data back to the view mode
+     * @param save if the edit shall be saved (if false, the edit is cancelled)
      */
-    private void internalEdit(String columnLabel, int rowNumber, String fieldName, String newValue, Runnable userAction)
+    private void internalEdit(String columnLabel, int rowNumber, String fieldName, String newValue, boolean save)
     {
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
@@ -567,16 +559,24 @@ public class TableLayoutElement extends BaseElement
         new FormContainerElement(By.cssSelector(".livedata-displayer.edit"))
             .setFieldValue(element.findElement(selector), newValue);
 
-        userAction.run();
+        if (save) {
+            // Clicks somewhere outside the edited cell. We use the h1 tag because it is present on all pages.
+            new Actions(getDriver().getWrappedDriver()).click(getDriver().findElement(By.tagName("h1"))).perform();
+        } else {
+            // Press escape to cancel the edition.
+            new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
+        }
 
-        // Waits for the field to be reload before continuing.
+        // Waits for the field to disappear.
         getDriver().waitUntilCondition(input -> {
-            // Nothing is loading.
-            boolean noLoader = element.findElements(By.cssSelector(".xwiki-loader")).isEmpty();
-            // And the edited field is not displayed anymore.
-            boolean noInput = element.findElements(selector).isEmpty();
-            return noLoader && noInput;
+            // The edited field is not displayed anymore.
+            return element.findElements(selector).isEmpty();
         });
+
+        // Wait for reload after saving.
+        if (save) {
+            waitUntilReady();
+        }
     }
 
     private String[] getClasses(WebElement element)

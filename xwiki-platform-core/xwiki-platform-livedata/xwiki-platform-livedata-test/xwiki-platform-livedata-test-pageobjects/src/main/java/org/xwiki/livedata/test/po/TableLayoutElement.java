@@ -707,7 +707,7 @@ public class TableLayoutElement extends BaseElement
             new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
         }
 
-        // Waits for the field to disappear
+        // Waits for the field to disappear.
         getDriver().waitUntilCondition(input -> {
             // The edited field is not displayed anymore.
             return element.findElements(selector).isEmpty();

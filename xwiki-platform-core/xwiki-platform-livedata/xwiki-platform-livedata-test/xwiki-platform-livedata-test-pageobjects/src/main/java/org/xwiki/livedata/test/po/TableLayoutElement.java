@@ -20,6 +20,7 @@
 package org.xwiki.livedata.test.po;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -38,6 +39,7 @@ import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -332,6 +334,46 @@ public class TableLayoutElement extends BaseElement
         if (wait) {
             waitUntilReady();
         }
+    }
+
+    /**
+     * Return the current values of the filter of a given column. We return a list of values because some filters can
+     * have several values (e.g., a selectized field).
+     *
+     * @param columnLabel the label of the column (for instance, {@code Name})
+     * @return the current values of the filter
+     * @since 13.9
+     * @since 13.10RC1
+     * @since 13.4.4
+     */
+    public List<String> getFilterValues(String columnLabel)
+    {
+        int columnIndex = findColumnIndex(columnLabel);
+        WebElement element = getRoot()
+            .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
+        List<String> classes = Arrays.asList(getClasses(element));
+        List<String> ret;
+        if (classes.contains("filter-list")) {
+            if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
+                ret = new SuggestInputElement(element)
+                    .getSelectedSuggestions()
+                    .stream()
+                    .map(SuggestInputElement.SuggestionElement::getLabel)
+                    .collect(Collectors.toList());
+            } else {
+                ret = new Select(element)
+                    .getAllSelectedOptions()
+                    .stream()
+                    .map(WebElement::getText)
+                    .collect(Collectors.toList());
+            }
+        } else if (classes.contains("filter-text")) {
+            ret = singletonList(element.getText());
+        } else {
+            ret = Collections.emptyList();
+        }
+
+        return ret;
     }
 
     /**

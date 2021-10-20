@@ -713,7 +713,7 @@ public class TableLayoutElement extends BaseElement
             return element.findElements(selector).isEmpty();
         });
 
-        // Wait for reload after saving
+        // Wait for reload after saving.
         if (save) {
             waitUntilReady();
         }

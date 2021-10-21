@@ -2938,8 +2938,7 @@ Recursive title display detected!##
   </div>
 #end
 
-        
-## 
+##
 ## Parse the provided filterValue according to its match type and assign the resulting start/end dates to the dateRange
 ## map.
 ## First, if a after or before matchType is provided, a '/' is added respectivelly at the end or at the beguinning of  
@@ -2948,8 +2947,8 @@ Recursive title display detected!##
 ## If none of the substring conforms to the ISO 8601 date format, a second try is done by splitting using '-', and 
 ## the two substrings are parsed as timestamps.
 ##
-## @since 13.9RC1
-## @since 13.4.4
+## @since 13.10RC1
+## @since 13.4.5
 ##
 #macro (parseDateRange $matchType $filterValue $dateRange)
   ## Transform the filter value into a date range if needed.

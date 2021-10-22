@@ -65,16 +65,8 @@ public class StaticListClassPropertyValuesProviderTest
     @Test
     void getAllowedValues()
     {
-        // Needed to build localization string
-        when(this.baseClass.getName()).thenReturn("XWiki.TestClass");
-        // Needed to actually consider the localization in the display code
-        when(this.context.getWiki()).thenReturn(mock(XWiki.class));
-
         StaticListClass staticListClass = new StaticListClass();
-        staticListClass.setName("Test");
-        staticListClass.setObject(this.baseClass);
-
-        staticListClass.setValues("Foo|Bar|Toto|Tata|Foobar|Id=Display Value");
+        staticListClass.setValues("Foo|Bar|Toto|Tata|Foobar");
         PropertyValues allowedValues = this.staticListClassPropertyValuesProvider.getAllowedValues(staticListClass, 1,
             "f");
         assertEquals(Collections.singletonList(new PropertyValue("Foo")), allowedValues.getPropertyValues());
@@ -89,7 +81,7 @@ public class StaticListClassPropertyValuesProviderTest
 
         allowedValues = this.staticListClassPropertyValuesProvider.getAllowedValues(staticListClass, 5, "");
         assertEquals(Arrays.asList(new PropertyValue("Foo"), new PropertyValue("Bar"), new PropertyValue("Toto"),
-            new PropertyValue("Tata"), new PropertyValue("Foobar")),
+                new PropertyValue("Tata"), new PropertyValue("Foobar")),
             allowedValues.getPropertyValues());
 
         allowedValues = this.staticListClassPropertyValuesProvider.getAllowedValues(staticListClass, 2, "foobar");
@@ -103,8 +95,24 @@ public class StaticListClassPropertyValuesProviderTest
         allowedValues = this.staticListClassPropertyValuesProvider.getAllowedValues(staticListClass, 3, "o");
         assertEquals(Arrays.asList(new PropertyValue("Foo"), new PropertyValue("Toto"), new PropertyValue("Foobar")),
             allowedValues.getPropertyValues());
+    }
 
-        allowedValues = this.staticListClassPropertyValuesProvider.getAllowedValues(staticListClass, 3, "iD");
+    @Test
+    void getAllowedValuesWithLabel()
+    {
+        // Needed to build localization string
+        when(this.baseClass.getName()).thenReturn("XWiki.TestClass");
+        // Needed to actually consider the localization in the display code
+        when(this.context.getWiki()).thenReturn(mock(XWiki.class));
+
+        StaticListClass staticListClass = new StaticListClass();
+        staticListClass.setName("Test");
+        staticListClass.setObject(this.baseClass);
+
+        staticListClass.setValues("Foo|Bar|Toto|Tata|Foobar|Id=Display Value");
+
+        PropertyValues allowedValues =
+            this.staticListClassPropertyValuesProvider.getAllowedValues(staticListClass, 3, "iD");
         PropertyValue expected = new PropertyValue("Id");
         expected.getMetaData().put(META_DATA_LABEL, "Display Value");
         assertEquals(Collections.singletonList(expected), allowedValues.getPropertyValues());
@@ -113,11 +121,10 @@ public class StaticListClassPropertyValuesProviderTest
         allowedValues = this.staticListClassPropertyValuesProvider.getAllowedValues(staticListClass, 3, "Display");
         assertEquals(Collections.singletonList(expected), allowedValues.getPropertyValues());
 
-        String translatedLabel = "Translated";
-        expected.getMetaData().put(META_DATA_LABEL, translatedLabel);
-        when(this.localization.getTranslationPlain("XWiki.TestClass_Test_Id")).thenReturn(translatedLabel);
-
         // Test filter by translated label
+        String translatedLabel = "Translated";
+        when(this.localization.getTranslationPlain("XWiki.TestClass_Test_Id")).thenReturn(translatedLabel);
+        expected.getMetaData().put(META_DATA_LABEL, translatedLabel);
         allowedValues = this.staticListClassPropertyValuesProvider.getAllowedValues(staticListClass, 3, "ansl");
         assertEquals(Collections.singletonList(expected), allowedValues.getPropertyValues());
     }
@@ -133,7 +140,6 @@ public class StaticListClassPropertyValuesProviderTest
         StaticListClass staticListClass = new StaticListClass();
         staticListClass.setName("Query");
         staticListClass.setObject(this.baseClass);
-
         staticListClass.setValues("Foo|Bar|Toto|Tata|Foobar|Id=Display Value");
 
         PropertyValue actual = this.staticListClassPropertyValuesProvider.getValueFromQueryResult("Foo",

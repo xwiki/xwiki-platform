@@ -134,7 +134,7 @@ $services.localization.render('platform.xclass.classes.createClass.description',
   id="classes"
   properties="doc.title,doc.location,doc.date,doc.author,pageCount,_actions"
   source="liveTable"
-  sourceParameters="resultPage=XWiki.XWikiClassesLiveTableResults&amp;translationPrefix=platform.xclass.classes.livetable.&amp;queryFilters=currentlanguage"
+  sourceParameters="resultPage=XWiki.XWikiClassesLiveTableResults&amp;translationPrefix=platform.xclass.classes.livetable.&amp;queryFilters="
   }}
 {
   "meta": {

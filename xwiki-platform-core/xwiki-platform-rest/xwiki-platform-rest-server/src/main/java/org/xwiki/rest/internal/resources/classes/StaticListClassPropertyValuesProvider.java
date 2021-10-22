@@ -20,17 +20,16 @@
 package org.xwiki.rest.internal.resources.classes;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
@@ -55,10 +54,11 @@ public class StaticListClassPropertyValuesProvider extends AbstractListClassProp
     {
         final PropertyValues result = new PropertyValues();
         List<String> allValues = StaticListClass.getListFromString(propertyDefinition.getValues());
+        Map<String, ListItem> valueMap = StaticListClass.getMapFromString(propertyDefinition.getValues());
 
         String lowerFilter = filter.toLowerCase();
 
-        allValues.stream().map(id -> constructPropertyValueForId(id, propertyDefinition))
+        allValues.stream().map(id -> constructPropertyValueForId(id, propertyDefinition, valueMap))
             // Filter both by key and by (translated) label (that's why we construct a PropertyValue first)
             .filter(val -> val.getValue().toString().toLowerCase().contains(lowerFilter)
                 || (val.getMetaData().containsKey(META_DATA_LABEL)
@@ -81,7 +81,8 @@ public class StaticListClassPropertyValuesProvider extends AbstractListClassProp
         if (value != null && value.getValue() instanceof String) {
             String stringKey = (String) value.getValue();
 
-            return constructPropertyValueForId(stringKey, propertyDefinition);
+            Map<String, ListItem> valueMap = StaticListClass.getMapFromString(propertyDefinition.getValues());
+            return constructPropertyValueForId(stringKey, propertyDefinition, valueMap);
         }
 
         return value;
@@ -92,23 +93,17 @@ public class StaticListClassPropertyValuesProvider extends AbstractListClassProp
      *
      * @param id The id/value of the item
      * @param propertyDefinition The definition of the property
+     * @param map The map from value to list item with value and label
      * @return The result, may contain a label if it is different from the id
      * @since 13.10RC1
      */
-    private PropertyValue constructPropertyValueForId(String id, StaticListClass propertyDefinition)
+    private PropertyValue constructPropertyValueForId(String id, StaticListClass propertyDefinition,
+        Map<String, ListItem> map)
     {
+        String displayValue = propertyDefinition.getDisplayValue(id, propertyDefinition.getName(), map,
+            this.xcontextProvider.get());
+
         PropertyValue val = new PropertyValue(id);
-
-        BaseObject xObject = new BaseObject();
-        String propertyName = propertyDefinition.getName();
-        StringProperty stringProperty = new StringProperty();
-        stringProperty.setValue(id);
-        xObject.addField(propertyName, stringProperty);
-
-        String displayValue = propertyDefinition.displayView(propertyName, xObject, this.xcontextProvider.get());
-
-        // displayView uses XML escaping, but the label should not be escaped
-        displayValue = StringEscapeUtils.unescapeXml(displayValue);
 
         if (!id.equals(displayValue)) {
             val.getMetaData().put(META_DATA_LABEL, displayValue);

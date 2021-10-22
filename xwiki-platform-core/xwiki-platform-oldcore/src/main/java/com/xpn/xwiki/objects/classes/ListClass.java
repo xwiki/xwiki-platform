@@ -640,7 +640,7 @@ public abstract class ListClass extends PropertyClass
      * @param context The request context.
      * @return The text that should be displayed, representing a human-understandable name for the internal value.
      */
-    protected String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
+    public String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
     {
         return getDisplayValue(value, name, map, value, context);
     }

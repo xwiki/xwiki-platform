@@ -100,9 +100,9 @@ public class StaticListClassPropertyValuesProviderTest
     @Test
     void getAllowedValuesWithLabel()
     {
-        // Needed to build localization string
+        // Needed to build localization string.
         when(this.baseClass.getName()).thenReturn("XWiki.TestClass");
-        // Needed to actually consider the localization in the display code
+        // Needed to actually consider the localization in the display code.
         when(this.context.getWiki()).thenReturn(mock(XWiki.class));
 
         StaticListClass staticListClass = new StaticListClass();
@@ -117,11 +117,11 @@ public class StaticListClassPropertyValuesProviderTest
         expected.getMetaData().put(META_DATA_LABEL, "Display Value");
         assertEquals(Collections.singletonList(expected), allowedValues.getPropertyValues());
 
-        // Test filter by label
+        // Test filter by label.
         allowedValues = this.staticListClassPropertyValuesProvider.getAllowedValues(staticListClass, 3, "Display");
         assertEquals(Collections.singletonList(expected), allowedValues.getPropertyValues());
 
-        // Test filter by translated label
+        // Test filter by translated label.
         String translatedLabel = "Translated";
         when(this.localization.getTranslationPlain("XWiki.TestClass_Test_Id")).thenReturn(translatedLabel);
         expected.getMetaData().put(META_DATA_LABEL, translatedLabel);
@@ -132,9 +132,9 @@ public class StaticListClassPropertyValuesProviderTest
     @Test
     void getValueFromQueryResult()
     {
-        // Needed to build localization string
+        // Needed to build localization string.
         when(this.baseClass.getName()).thenReturn("XWiki.TestQueryResult");
-        // Needed to actually consider the localization in the display code
+        // Needed to actually consider the localization in the display code.
         when(this.context.getWiki()).thenReturn(mock(XWiki.class));
 
         StaticListClass staticListClass = new StaticListClass();
@@ -146,7 +146,7 @@ public class StaticListClassPropertyValuesProviderTest
             staticListClass);
         assertEquals(new PropertyValue("Foo"), actual);
 
-        // For values without definition, the given id should be returned
+        // For values without definition, the given id should be returned.
         actual = this.staticListClassPropertyValuesProvider.getValueFromQueryResult("Baz", staticListClass);
         assertEquals(new PropertyValue("Baz"), actual);
 
@@ -159,7 +159,7 @@ public class StaticListClassPropertyValuesProviderTest
         expected.getMetaData().put(META_DATA_LABEL, translatedLabel);
         when(this.localization.getTranslationPlain("XWiki.TestQueryResult_Query_Id")).thenReturn(translatedLabel);
 
-        // Test filter by translated label
+        // Test filter by translated label.
         actual = this.staticListClassPropertyValuesProvider.getValueFromQueryResult("Id", staticListClass);
         assertEquals(expected, actual);
     }
@@ -167,9 +167,9 @@ public class StaticListClassPropertyValuesProviderTest
     @Test
     void getValueFromQueryResultWithSpecialCharacter()
     {
-        // Needed to build localization string
+        // Needed to build localization string.
         when(this.baseClass.getName()).thenReturn("XWiki.TestQueryResultSpecial");
-        // Needed to actually consider the localization in the display code
+        // Needed to actually consider the localization in the display code.
         when(this.context.getWiki()).thenReturn(mock(XWiki.class));
 
         StaticListClass staticListClass = new StaticListClass();
@@ -194,7 +194,7 @@ public class StaticListClassPropertyValuesProviderTest
         expected.getMetaData().put(META_DATA_LABEL, translatedLabel);
         when(this.localization.getTranslationPlain("XWiki.TestQueryResultSpecial_Query_Id")).thenReturn(translatedLabel);
 
-        // Test filter by translated label
+        // Test filter by translated label.
         actual = this.staticListClassPropertyValuesProvider.getValueFromQueryResult("Id", staticListClass);
         assertEquals(expected, actual);
     }

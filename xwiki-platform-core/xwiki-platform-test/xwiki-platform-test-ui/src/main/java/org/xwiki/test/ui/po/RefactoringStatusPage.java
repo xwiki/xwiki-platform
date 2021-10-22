@@ -19,41 +19,40 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Represents the page that displays the status of a copy operation. This page is normally loaded after the user clicks
- * on the Copy button (i.e. after the copy parameters have been submitted).
- * 
+ * Represents the status page of a refactoring job.
+ *
  * @version $Id$
- * @since 7.4.1
- * @since 8.0M1
+ * @since 13.10RC1
  */
-public class CopyOrRenameOrDeleteStatusPage extends RefactoringStatusPage
+public class RefactoringStatusPage extends BasePage
 {
-    @FindBy(css = ".job-status .col-lg-6:first-child .breadcrumb > li:last-child a")
-    private WebElement oldPage;
+    private static final String MESSAGE_CSS_SELECTOR =
+        ".xcontent.job-status .box.successmessage, .xcontent.job-status .box.errormessage";
 
-    @FindBy(css = ".job-status .col-lg-6:last-child .breadcrumb > li:last-child a")
-    private WebElement newPage;
+    @FindBy(css = MESSAGE_CSS_SELECTOR)
+    private WebElement message;
 
-    public ViewPage gotoOriginalPage()
+    /**
+     * Waits until the operation finishes.
+     *
+     * @return this page
+     */
+    public RefactoringStatusPage waitUntilFinished()
     {
-        this.oldPage.click();
-        return new ViewPage();
-    }
-
-    public ViewPage gotoNewPage()
-    {
-        this.newPage.click();
-        return new ViewPage();
-    }
-
-    @Override
-    public CopyOrRenameOrDeleteStatusPage waitUntilFinished()
-    {
-        super.waitUntilFinished();
+        // Waits for a success or error message to be displayed before continuing. Previously, this method was waiting
+        // for the job progress bar to be "missing" before continuing, which could happen too early, before the bar was
+        // even displayed once.
+        getDriver().waitUntilElementIsVisible(By.cssSelector(MESSAGE_CSS_SELECTOR));
         return this;
+    }
+
+    public String getInfoMessage()
+    {
+        return this.message.getText();
     }
 }

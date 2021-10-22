@@ -17,41 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.po;
+package org.xwiki.flamingo.skin.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.RefactoringStatusPage;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * Represents the page that displays the status of a copy operation. This page is normally loaded after the user clicks
- * on the Copy button (i.e. after the copy parameters have been submitted).
- * 
+ * Represents the status page of the restore refactoring action.
+ *
  * @version $Id$
- * @since 7.4.1
- * @since 8.0M1
+ * @since 13.10RC1
  */
-public class CopyOrRenameOrDeleteStatusPage extends RefactoringStatusPage
+public class RestoreStatusPage extends RefactoringStatusPage
 {
-    @FindBy(css = ".job-status .col-lg-6:first-child .breadcrumb > li:last-child a")
-    private WebElement oldPage;
+    @FindBy(xpath = "//div[@id='document-title']/h1/a")
+    private WebElement viewLink;
 
-    @FindBy(css = ".job-status .col-lg-6:last-child .breadcrumb > li:last-child a")
-    private WebElement newPage;
-
-    public ViewPage gotoOriginalPage()
+    /**
+     * @return The restored page.
+     */
+    public ViewPage gotoRestoredPage()
     {
-        this.oldPage.click();
-        return new ViewPage();
-    }
-
-    public ViewPage gotoNewPage()
-    {
-        this.newPage.click();
+        this.viewLink.click();
         return new ViewPage();
     }
 
     @Override
-    public CopyOrRenameOrDeleteStatusPage waitUntilFinished()
+    public RestoreStatusPage waitUntilFinished()
     {
         super.waitUntilFinished();
         return this;

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,9 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
+import org.xwiki.flamingo.skin.test.po.RestoreStatusPage;
+import org.xwiki.flamingo.skin.test.po.UndeletePage;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rest.model.jaxb.Page;
@@ -53,6 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests the Delete Page feature.
@@ -232,25 +237,26 @@ class DeletePageIT
 
     /**
      * Test that when you delete a page and you select "affect children", it delete children properly. It also test the
-     * opposite.
+     * opposite. Further, this tests the batch restore.
      *
      * @since 7.2RC1
      */
     @Test
     @Order(7)
-    void deleteChildren(TestUtils setup, TestReference reference, TestInfo info)
+    void deleteChildren(TestUtils setup, TestReference parentReference, TestInfo info)
     {
         // Initialize the parent
-        DocumentReference parentReference = reference;
         ViewPage parentPage = setup.createPage(parentReference, "Content", "Parent");
 
         // Test 1: Try to delete it to make sure we don't have the "affect children" option yet
-        ConfirmationPage confirmationPage = parentPage.deletePage();
+        DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
         assertFalse(confirmationPage.hasAffectChildrenOption());
 
         // Initialize the children pages
         final int NB_CHILDREN = 3;
         DocumentReference[] childrenReferences = new DocumentReference[NB_CHILDREN];
+        assertTrue(info.getTestClass().isPresent());
+        assertTrue(info.getTestMethod().isPresent());
         for (int i = 0; i < NB_CHILDREN; ++i) {
             childrenReferences[i] = new DocumentReference("xwiki",
                 Arrays.asList(info.getTestClass().get().getSimpleName(), info.getTestMethod().get().getName(),
@@ -290,6 +296,56 @@ class DeletePageIT
             page = setup.gotoPage(childrenReferences[i]);
             assertFalse(page.exists());
         }
+
+        // Test 4: test batch restore
+        setup.gotoPage(parentReference);
+        DeletePageOutcomePage outcomePage = new DeletePageOutcomePage();
+        outcomePage.waitUntilPageIsLoaded();
+        outcomePage.clickBatchLink();
+        UndeletePage undeletePage = new UndeletePage();
+        undeletePage.waitUntilPageIsLoaded();
+
+        // Go back and forward again to test clicking the cancel link.
+        outcomePage = undeletePage.clickCancel();
+        outcomePage.waitUntilPageIsLoaded();
+        outcomePage.clickBatchLink();
+        undeletePage.waitUntilPageIsLoaded();
+
+        assertTrue(undeletePage.hasBatch());
+        undeletePage.setBatchIncluded(true);
+        undeletePage.toggleBatchPanel();
+
+        assertEquals("superadmin", undeletePage.getPageDeleter());
+        String deletedBatchId = undeletePage.getDeletedBatchId();
+        try {
+            UUID deletedBatchUUID = UUID.fromString(deletedBatchId);
+        } catch (IllegalArgumentException e) {
+            fail("Batch id is not a valid UUID: " + deletedBatchId);
+        }
+        TableLayoutElement liveDataTable = undeletePage.getDeletedBatchLiveData().getTableLayout();
+        assertEquals(NB_CHILDREN + 1, liveDataTable.countRows());
+        liveDataTable.assertRow(UndeletePage.LIVE_DATA_PAGE, "Parent");
+        for (int i = 0; i < NB_CHILDREN; ++i) {
+            liveDataTable.assertRow(UndeletePage.LIVE_DATA_PAGE, "Child " + (i + 1));
+        }
+        // Assert that we have at least some actions. Testing individual items is not so easy because the action URLs
+        // are not what the LD page object expects.
+        liveDataTable.assertRow(UndeletePage.LIVE_DATA_ACTIONS, "RestoreDelete");
+
+        // Trigger the actual restore.
+        RestoreStatusPage restoreStatusPage = undeletePage.clickRestore();
+        restoreStatusPage.waitUntilFinished();
+        assertEquals("Done.", restoreStatusPage.getInfoMessage());
+        page = restoreStatusPage.gotoRestoredPage();
+
+        // Check the page have been effectively restored.
+        assertTrue(page.exists());
+        // And also the children have been restored.
+        for (int i = 0; i < NB_CHILDREN; ++i) {
+            page = setup.gotoPage(childrenReferences[i]);
+            assertTrue(page.exists());
+        }
+
     }
 
     /**

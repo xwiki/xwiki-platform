@@ -35,6 +35,7 @@ import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 import org.xwiki.xml.XMLUtils;
 
@@ -639,7 +640,9 @@ public abstract class ListClass extends PropertyClass
      * @param map The value=name mapping specified in the "values" parameter of the property.
      * @param context The request context.
      * @return The text that should be displayed, representing a human-understandable name for the internal value.
+     * @since 13.10RC1
      */
+    @Unstable
     public String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
     {
         return getDisplayValue(value, name, map, value, context);

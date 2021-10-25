@@ -108,7 +108,8 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
 
         String rendererHint = this.configuration.getRenderer();
         FontSize size = parameters.getFontSize();
-        Type type = parameters.getImageType();
+        Type type = (parameters.getImageType() != null) ? parameters.getImageType()
+            : this.configuration.getDefaultType();
         Block result;
         try {
             result = render(content, context.isInline(), size, type, rendererHint);

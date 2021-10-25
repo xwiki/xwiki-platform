@@ -35,7 +35,7 @@ public class FormulaMacroParameters
     private FontSize size = FontSize.DEFAULT;
 
     /** The type of image to generate. */
-    private Type type = Type.DEFAULT;
+    private Type type;
 
     /**
      * @param size indicate which font size to use

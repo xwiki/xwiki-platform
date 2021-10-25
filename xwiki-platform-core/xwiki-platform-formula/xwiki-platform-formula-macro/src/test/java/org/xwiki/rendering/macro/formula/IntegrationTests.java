@@ -19,17 +19,18 @@
  */
 package org.xwiki.rendering.macro.formula;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.formula.ImageData;
+import org.xwiki.formula.FormulaRenderer;
 import org.xwiki.formula.ImageStorage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
-import org.xwiki.test.jmock.MockingComponentManager;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -39,45 +40,33 @@ import org.xwiki.test.jmock.MockingComponentManager;
  * @since 3.0RC1
  */
 @RunWith(RenderingTestSuite.class)
+@AllComponents
 public class IntegrationTests
 {
     @RenderingTestSuite.Initialized
-    public void initialize(MockingComponentManager componentManager) throws Exception
+    public void initialize(MockitoComponentManager componentManager) throws Exception
     {
-        Mockery mockery = new JUnit4Mockery();
-
         // Document Access Bridge Mock
         final DocumentAccessBridge mockDocumentAccessBridge =
-            componentManager.registerMockComponent(mockery, DocumentAccessBridge.class);
+            componentManager.registerMockComponent(DocumentAccessBridge.class);
 
         // Image Storage Mock
-        final ImageStorage mockImageStorage = componentManager.registerMockComponent(mockery, ImageStorage.class);
+        final ImageStorage mockImageStorage = componentManager.registerMockComponent(ImageStorage.class);
 
         // Configuration Mock
         final FormulaMacroConfiguration mockConfiguration =
-            componentManager.registerMockComponent(mockery, FormulaMacroConfiguration.class);
+            componentManager.registerMockComponent(FormulaMacroConfiguration.class);
 
-        mockery.checking(new Expectations()
-        {
-            {
-                atLeast(1).of(mockDocumentAccessBridge).getCurrentDocumentReference();
-                DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-                will(returnValue(documentReference));
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        when(mockDocumentAccessBridge.getCurrentDocumentReference()).thenReturn(documentReference);
 
-                AttachmentReference attachmentReference = new AttachmentReference(
-                    "06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966", documentReference);
-                atLeast(2).of(mockDocumentAccessBridge).getAttachmentURL(attachmentReference, false);
-                will(returnValue(
-                    "/xwiki/bin/view/space/page/06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966"));
+        AttachmentReference attachmentReference = new AttachmentReference(
+            "06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966", documentReference);
+        when(mockDocumentAccessBridge.getAttachmentURL(attachmentReference, false)).thenReturn(
+            "/xwiki/bin/view/space/page/06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966");
 
-                atLeast(2).of(mockConfiguration).getRenderer();
-                will(returnValue("snuggletex"));
-
-                atLeast(2).of(mockImageStorage).get(with(any(String.class)));
-                will(returnValue(null));
-
-                atLeast(2).of(mockImageStorage).put(with(any(String.class)), with(any(ImageData.class)));
-            }
-        });
+        when(mockConfiguration.getRenderer()).thenReturn("snuggletex");
+        when(mockConfiguration.getDefaultType()).thenReturn(FormulaRenderer.Type.DEFAULT);
+        when(mockImageStorage.get(any(String.class))).thenReturn(null);
     }
 }

@@ -169,38 +169,39 @@ XWIKI_OPTS="$XWIKI_OPTS -Djetty.http.port=$JETTY_PORT"
 # Specify port and key to stop a running Jetty instance
 JETTY_OPTS="$JETTY_OPTS STOP.KEY=xwiki STOP.PORT=$JETTY_STOP_PORT"
 
+# Returns the Java version.
+# 8 for 1.8.0_nn, 9 for 9-ea etc, and "no_java" for undetected
+java_version() {
+  local result
+  local java_cmd
+  if [[ -n $(type -p java) ]]; then
+    java_cmd=java
+  elif [[ (-n "$JAVA_HOME") && (-x "$JAVA_HOME/bin/java") ]]; then
+    java_cmd="$JAVA_HOME/bin/java"
+  fi
+  local IFS=$'\n'
+  # remove \r for Cygwin
+  local lines=$("$java_cmd" -Xms32M -Xmx32M -version 2>&1 | tr '\r' '\n')
+  if [[ -z $java_cmd ]]; then
+    result=no_java
+  else
+    for line in $lines; do
+      if [[ (-z $result) && ($line = *"version \""*) ]]; then
+        local ver=$(echo $line | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
+        # on macOS, sed doesn't support '?'
+        if [[ $ver = "1."* ]]; then
+          result=$(echo $ver | sed -e 's/1\.\([0-9]*\)\(.*\)/\1/; 1q')
+        else
+          result=$(echo $ver | sed -e 's/\([0-9]*\)\(.*\)/\1/; 1q')
+        fi
+      fi
+    done
+  fi
+  echo "$result"
+}
+
 # Check version of Java (when in non-interactive mode)
 if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
-  # Returns the Java version.
-  # 8 for 1.8.0_nn, 9 for 9-ea etc, and "no_java" for undetected
-  java_version() {
-    local result
-    local java_cmd
-    if [[ -n $(type -p java) ]]; then
-      java_cmd=java
-    elif [[ (-n "$JAVA_HOME") && (-x "$JAVA_HOME/bin/java") ]]; then
-      java_cmd="$JAVA_HOME/bin/java"
-    fi
-    local IFS=$'\n'
-    # remove \r for Cygwin
-    local lines=$("$java_cmd" -Xms32M -Xmx32M -version 2>&1 | tr '\r' '\n')
-    if [[ -z $java_cmd ]]; then
-      result=no_java
-    else
-      for line in $lines; do
-        if [[ (-z $result) && ($line = *"version \""*) ]]; then
-          local ver=$(echo $line | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
-          # on macOS, sed doesn't support '?'
-          if [[ $ver = "1."* ]]; then
-            result=$(echo $ver | sed -e 's/1\.\([0-9]*\)\(.*\)/\1/; 1q')
-          else
-            result=$(echo $ver | sed -e 's/\([0-9]*\)\(.*\)/\1/; 1q')
-          fi
-        fi
-      done
-    fi
-    echo "$result"
-  }
   JAVA_VERSION="$(java_version)"
   if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
     echo "No Java found. You need Java installed for XWiki to work."
@@ -216,6 +217,16 @@ if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
       exit 0
     fi
   fi
+fi
+
+# TODO: Remove once https://jira.xwiki.org/browse/XRENDERING-616 and https://jira.xwiki.org/browse/XWIKI-19034 are
+# fixed. In summary we need this to allow the XWiki code or 3rd party code to use reflection to access private
+# variables (setAccessible() calls). See https://tinyurl.com/tdhkn6mp
+if [ "$JAVA_VERSION" -gt 11 ]; then
+  XWIKI_OPENS_LANG="--add-opens java.base/java.lang=ALL-UNNAMED"
+  XWIKI_OPENS_UTIL="--add-opens java.base/java.util=ALL-UNNAMED"
+  XWIKI_OPENS_CONCURRENT="--add-opens java.base/java.concurrent=ALL-UNNAMED"
+  XWIKI_OPTS="$XWIKI_OPENS_LANG $XWIKI_OPENS_UTIL $XWIKI_OPENS_CONCURRENTi $XWIKI_OPTS"
 fi
 
 # We save the shell PID here because we do an exec below and exec will replace the shell with the executed command

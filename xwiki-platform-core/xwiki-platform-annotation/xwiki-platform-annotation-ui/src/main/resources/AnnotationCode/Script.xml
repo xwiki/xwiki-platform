@@ -1023,7 +1023,7 @@ XWiki.Annotation = Class.create({
     // a new range is created to recalculate the new ends.
     var strictRange = this.fixRangeEndPoints(annDOMRange);
 
-    // All the nodes inside this range are extracted. Each node is wrapped inside the annotation markup span.
+    // Wrap each text node from this range inside an annotation markup SPAN.
     this.getTextNodesInRange(strictRange).forEach(textNode =&gt; this.markAnnotation(textNode, ann));
 
     // Add the marker span after the last span of this annotation.
@@ -1044,7 +1044,7 @@ XWiki.Annotation = Class.create({
    *
    * @param markedNode the node that corresponds to the current annotation
    * @param ann object holding information about the annotation
-  */
+   */
   markAnnotation: function(markedNode, ann) {
     var wrapper = document.createElement('span');
     wrapper.addClassName('annotation');
@@ -1060,7 +1060,7 @@ XWiki.Annotation = Class.create({
    * with these new nodes.
    *
    * @param range the DOM range of the annotated text
-  */
+   */
   fixRangeEndPoints: function(range) {
     var strictRange = new Range();
 
@@ -1094,7 +1094,7 @@ XWiki.Annotation = Class.create({
    * @param annotatedElement the element from where the range is constructed
    * @param startIndex start offset where the range begins
    * @param endIndex end offset where the range ends
-  */
+   */
   getDOMRange: function(annotatedElement, startIndex, endIndex) {
     var startPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, startIndex);
     var endPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, endIndex);
@@ -1112,14 +1112,14 @@ XWiki.Annotation = Class.create({
    *
    * @param parentNode the node where the search is done
    * @param plainTextOffset the offset relative to the full plain content
-  */
+   */
   getTextNodeAtPlainTextOffset: function(parentNode, plainTextOffset) {
     var childNodes = parentNode.childNodes;
     var child;
     var parentNodePlainTextLength = 0;
     for (let i = 0; i &lt; childNodes.length; i++) {
       child = childNodes[i];
-      if (child &amp;&amp; child.nodeType == 3) {
+      if (child.nodeType == 3) {
         var previousSiblingsLength = parentNodePlainTextLength;
         // The spaces are ignored since they were removed as well on the server when the offset was computed.
         parentNodePlainTextLength += child.textContent.replace(/\s/g, '').length;
@@ -1128,10 +1128,9 @@ XWiki.Annotation = Class.create({
           // they are included.
           return {'node': child, 'offset': this.getNodeSpecificOffset(child, plainTextOffset - previousSiblingsLength)};
         }
-      }
-      if (child.childNodes.length &gt; 0) {
+      } else if (child.childNodes.length &gt; 0) {
         var maybeFoundNode = this.getTextNodeAtPlainTextOffset(child, plainTextOffset - parentNodePlainTextLength);
-        if (maybeFoundNode &amp;&amp; maybeFoundNode.node) {
+        if (maybeFoundNode.node) {
           return maybeFoundNode;
         } else {
           parentNodePlainTextLength += maybeFoundNode.offset;
@@ -1147,7 +1146,7 @@ XWiki.Annotation = Class.create({
    *
    * @param node a DOM node
    * @param offset the offset relative to the text without whitespaces
-  */
+   */
   getNodeSpecificOffset: function(node, offset) {
     var nonSpaceCharsLength = 0;
     var chars = Array.from(node.textContent);
@@ -1167,7 +1166,7 @@ XWiki.Annotation = Class.create({
    * Filter only the text nodes inside a DOM Range.
    *
    * @param range a DOM Range
-  */
+   */
   getTextNodesInRange: function(range) {
     var rangeIterator = document.createNodeIterator(
       range.commonAncestorContainer,
@@ -1186,12 +1185,12 @@ XWiki.Annotation = Class.create({
     while (rangeIterator.nextNode()) {
       nodeRange.selectNode(rangeIterator.referenceNode);
       // Don't consider nodes before the start of the range.
-      if (nodeRange.compareBoundaryPoints(Range.START_TO_START , range) == -1) {
+      if (nodeRange.compareBoundaryPoints(Range.START_TO_START, range) === -1) {
         continue;
       }
       nodes.push(rangeIterator.referenceNode);
       // Stop if the current node is the end of the range.
-      if (nodeRange.compareBoundaryPoints(Range.END_TO_END , range) == 0) {
+      if (nodeRange.compareBoundaryPoints(Range.END_TO_END, range) === 0) {
         break;
       }
     }
@@ -1201,7 +1200,7 @@ XWiki.Annotation = Class.create({
   /**
    * Remove the wrapper and marker of annotations. The selection highlight is also removed in case the new annotation
    * was deleted.
-  */
+   */
   removeAnnotationsAndSelectionMarkups: function() {
     document.querySelectorAll("span.annotation, span.selection-highlight")
       .forEach(annotationNode =&gt; annotationNode.replaceWith(...annotationNode.childNodes));

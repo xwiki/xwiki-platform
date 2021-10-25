@@ -20,8 +20,11 @@
 package org.xwiki.annotation.internal.content;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.annotation.content.TextExtractor;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -33,24 +36,30 @@ import org.xwiki.rendering.syntax.Syntax;
  * text, if possible.
  * 
  * @version $Id$
- * @since 13.9
+ * @since 13.10RC1
  */
 @Component
 @Singleton
 public class DefaultTextExtractor implements TextExtractor
 {
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public String extractText(String content, Syntax syntax)
     {
         try {
             HTMLTextExtractor syntaxSpecificTextExtractor =
-                componentManager.getInstance(TextExtractor.class, syntax.getType().getId());
+                componentManagerProvider.get().getInstance(TextExtractor.class, syntax.getType().getId());
             return syntaxSpecificTextExtractor.extractText(content, syntax);
         } catch (ComponentLookupException e) {
             // In case this happens, the content will not be altered.
+            logger.warn("Could not find an implementation for TextExtractor named [{}]", syntax.getType().getId());
+
         }
         return content;
     }

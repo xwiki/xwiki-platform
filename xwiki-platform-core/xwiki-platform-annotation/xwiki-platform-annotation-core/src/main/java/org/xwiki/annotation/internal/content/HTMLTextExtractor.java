@@ -49,7 +49,7 @@ import org.xwiki.xml.html.HTMLUtils;
  * Helper for transforming an HTML content into valid XHTML and getting it's text content.
  * 
  * @version $Id$
- * @since 13.9RC1
+ * @since 13.10RC1
  */
 @Component(hints = {"html", "xhtml", "annotatedhtml", "annotatedxhtml"})
 @Singleton

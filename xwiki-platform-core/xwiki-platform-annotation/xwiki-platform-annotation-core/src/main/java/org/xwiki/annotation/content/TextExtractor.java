@@ -21,15 +21,17 @@ package org.xwiki.annotation.content;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * Component responsible for extracting plain text from inside a given {@code String} depending on the syntax associated
  * with it. For example, the plain text could be extracted from inside an HTML content.
  * 
  * @version $Id$
- * @since 13.9
+ * @since 13.10RC1
  */
 @Role
+@Unstable
 public interface TextExtractor
 {
     /**

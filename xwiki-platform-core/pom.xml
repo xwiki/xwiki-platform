@@ -133,40 +133,7 @@
                    </differences>
                  </revapi.differences>
             -->
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.noLongerInheritsFromClass</code>
-                  <old>class org.xwiki.crypto.script.ScriptingCertificateStore</old>
-                  <new>class org.xwiki.crypto.script.ScriptingCertificateStore</new>
-                  <justification>Not a breakage</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class org.xwiki.crypto.script.ScriptingCertificateStore</old>
-                  <new>class org.xwiki.crypto.script.ScriptingCertificateStore</new>
-                  <superClass>org.xwiki.crypto.script.AbstractScriptingStore</superClass>
-                  <justification>Not a breakage</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.noLongerInheritsFromClass</code>
-                  <old>class org.xwiki.crypto.script.ScriptingKeyStore</old>
-                  <new>class org.xwiki.crypto.script.ScriptingKeyStore</new>
-                  <justification>Not a breakage</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class org.xwiki.crypto.script.ScriptingKeyStore</old>
-                  <new>class org.xwiki.crypto.script.ScriptingKeyStore</new>
-                  <superClass>org.xwiki.crypto.script.AbstractScriptingStore</superClass>
-                  <justification>Not a breakage</justification>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

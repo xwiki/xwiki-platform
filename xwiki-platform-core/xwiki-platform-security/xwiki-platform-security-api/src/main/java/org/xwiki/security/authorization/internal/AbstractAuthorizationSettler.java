@@ -56,10 +56,10 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
     /**
      * Private implementation of the {@link SecurityAccessEntry}.
      */
-    private final class InternalSecurityAccessEntry extends AbstractSecurityAccessEntry
+    private final class InternalSecurityAccessEntry extends AbstractSecurityAccessEntry implements GroupSecurityEntry
     {
         /** User reference. */
-        private final UserSecurityReference userReference;
+        private UserSecurityReference userReference;
 
         /** Entity reference. */
         private final SecurityReference reference;
@@ -86,6 +86,12 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
             return this.userReference;
         }
 
+        @Override
+        public void setGroupReference(GroupSecurityReference reference)
+        {
+            this.userReference = reference;
+        }
+        
         @Override
         public SecurityAccess getAccess()
         {

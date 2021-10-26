@@ -22,9 +22,11 @@ package org.xwiki.security.authorization.cache.internal;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.cache.SecurityShadowEntry;
+import org.xwiki.security.authorization.internal.GroupSecurityEntry;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -32,7 +34,7 @@ import org.xwiki.text.XWikiToStringBuilder;
  *
  * @version $Id$
  */
-public class DefaultSecurityShadowEntry implements SecurityShadowEntry
+public class DefaultSecurityShadowEntry implements SecurityShadowEntry, GroupSecurityEntry
 {
     /** The wiki where the user is shadowed. */
     private SecurityReference wikiReference;
@@ -61,6 +63,12 @@ public class DefaultSecurityShadowEntry implements SecurityShadowEntry
     public SecurityReference getReference()
     {
         return user;
+    }
+
+    @Override
+    public void setGroupReference(GroupSecurityReference reference)
+    {
+        this.user = reference;
     }
 
     @Override

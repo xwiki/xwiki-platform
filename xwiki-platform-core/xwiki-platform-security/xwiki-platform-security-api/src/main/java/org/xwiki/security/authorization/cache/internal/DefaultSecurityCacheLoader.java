@@ -49,6 +49,7 @@ import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 import org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry;
+import org.xwiki.security.authorization.internal.GroupSecurityEntry;
 import org.xwiki.security.internal.UserBridge;
 
 /**
@@ -93,10 +94,10 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     /**
      * Implementation of the SecurityRuleEntry.
      */
-    private final class EmptySecurityRuleEntry extends AbstractSecurityRuleEntry
+    private final class EmptySecurityRuleEntry extends AbstractSecurityRuleEntry implements GroupSecurityEntry
     {
         /** Reference of the related entity. */
-        private final SecurityReference reference;
+        private SecurityReference reference;
 
         /**
          * @param reference reference of the related entity
@@ -113,6 +114,12 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         public SecurityReference getReference()
         {
             return reference;
+        }
+
+        @Override
+        public void setGroupReference(GroupSecurityReference reference)
+        {
+            this.reference = reference;
         }
 
         /**

@@ -37,6 +37,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.EntityTypeNotSupportedException;
@@ -100,10 +101,10 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
     /**
      * Internal implementation of the SecurityRuleEntry.
      */
-    private final class InternalSecurityRuleEntry extends AbstractSecurityRuleEntry
+    private final class InternalSecurityRuleEntry extends AbstractSecurityRuleEntry implements GroupSecurityEntry
     {
         /** Reference of the related entity. */
-        private final SecurityReference reference;
+        private SecurityReference reference;
 
         /** The list of objects. */
         private final Collection<SecurityRule> rules;
@@ -125,6 +126,12 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         public SecurityReference getReference()
         {
             return reference;
+        }
+
+        @Override
+        public void setGroupReference(GroupSecurityReference reference)
+        {
+            this.reference = reference;
         }
 
         /**

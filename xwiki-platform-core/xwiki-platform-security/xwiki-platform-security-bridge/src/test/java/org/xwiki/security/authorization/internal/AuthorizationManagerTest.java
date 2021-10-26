@@ -24,6 +24,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.AbstractWikiTestCase;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -264,7 +266,7 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
     }
 
     @Test
-    public void testGroupAccess() throws Exception
+    public void testGroupAccessThenUserAccess() throws Exception
     {
         LegacyTestWiki testWiki =
             new LegacyTestWiki(getMockery(), getComponentManager(), "userAndGroupAdmin.xml", false);
@@ -274,7 +276,32 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setWikiId("wiki");
 
-        assertAccessTrue("User should have admin right", Right.ADMIN, user, ctx.getWikiReference(), ctx);
-        assertAccessTrue("Group should have admin right", Right.ADMIN, group, ctx.getWikiReference(), ctx);
+        WikiReference wiki = ctx.getWikiReference();
+        SpaceReference space = new SpaceReference("space", ctx.getWikiReference());
+
+        assertAccessTrue("Group should have admin right", Right.ADMIN, group, wiki, ctx);
+        assertAccessTrue("Group should have admin right", Right.ADMIN, group, space, ctx);
+        assertAccessTrue("User should have admin right", Right.ADMIN, user, wiki, ctx);
+        assertAccessTrue("User should have admin right", Right.ADMIN, user, space, ctx);
+    }
+
+    @Test
+    public void testUserAccessThenGroupAccess() throws Exception
+    {
+        LegacyTestWiki testWiki =
+            new LegacyTestWiki(getMockery(), getComponentManager(), "userAndGroupAdmin.xml", false);
+
+        DocumentReference user = new DocumentReference("wiki", "XWiki", "user");
+        DocumentReference group = new DocumentReference("wiki", "XWiki", "group");
+        XWikiContext ctx = testWiki.getXWikiContext();
+        ctx.setWikiId("wiki");
+
+        WikiReference wiki = ctx.getWikiReference();
+        SpaceReference space = new SpaceReference("space", ctx.getWikiReference());
+
+        assertAccessTrue("User should have admin right", Right.ADMIN, user, wiki, ctx);
+        assertAccessTrue("User should have admin right", Right.ADMIN, user, space, ctx);
+        assertAccessTrue("Group should have admin right", Right.ADMIN, group, wiki, ctx);
+        assertAccessTrue("Group should have admin right", Right.ADMIN, group, space, ctx);
     }
 }

@@ -19,17 +19,19 @@
  */
 package org.xwiki.rendering.macro.formula;
 
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.formula.FormulaRenderer;
 import org.xwiki.formula.ImageStorage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.rendering.test.integration.junit5.RenderingTests;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -39,28 +41,33 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
 @AllComponents
-public class IntegrationTests
+public class IntegrationTests implements RenderingTests
 {
-    @RenderingTestSuite.Initialized
+    private DocumentAccessBridge mockDocumentAccessBridge;
+
+    private ImageStorage mockImageStorage;
+
+    private FormulaMacroConfiguration mockConfiguration;
+
+    private AttachmentReference attachmentReference;
+
+    @RenderingTests.Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
         // Document Access Bridge Mock
-        final DocumentAccessBridge mockDocumentAccessBridge =
-            componentManager.registerMockComponent(DocumentAccessBridge.class);
+        mockDocumentAccessBridge = componentManager.registerMockComponent(DocumentAccessBridge.class);
 
         // Image Storage Mock
-        final ImageStorage mockImageStorage = componentManager.registerMockComponent(ImageStorage.class);
+        mockImageStorage = componentManager.registerMockComponent(ImageStorage.class);
 
         // Configuration Mock
-        final FormulaMacroConfiguration mockConfiguration =
-            componentManager.registerMockComponent(FormulaMacroConfiguration.class);
+        mockConfiguration = componentManager.registerMockComponent(FormulaMacroConfiguration.class);
 
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         when(mockDocumentAccessBridge.getCurrentDocumentReference()).thenReturn(documentReference);
 
-        AttachmentReference attachmentReference = new AttachmentReference(
+        attachmentReference = new AttachmentReference(
             "06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966", documentReference);
         when(mockDocumentAccessBridge.getAttachmentURL(attachmentReference, false)).thenReturn(
             "/xwiki/bin/view/space/page/06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966");
@@ -68,5 +75,17 @@ public class IntegrationTests
         when(mockConfiguration.getRenderer()).thenReturn("snuggletex");
         when(mockConfiguration.getDefaultType()).thenReturn(FormulaRenderer.Type.DEFAULT);
         when(mockImageStorage.get(any(String.class))).thenReturn(null);
+    }
+
+    @AfterEach
+    public void after()
+    {
+        verify(mockDocumentAccessBridge, times(1)).getCurrentDocumentReference();
+        verify(mockDocumentAccessBridge, times(1)).getAttachmentURL(attachmentReference, false);
+
+        verify(mockConfiguration, times(1)).getRenderer();
+        verify(mockConfiguration, times(1)).getDefaultType();
+
+        verify(mockImageStorage, times(1)).get(any(String.class));
     }
 }

@@ -87,7 +87,7 @@ class GetdocumentsPageTest extends PageTest
     }
 
     @Test
-    void removeObuscatedResultsWhenTotalrowsLowerThanLimit() throws Exception
+    void removeObfuscatedResultsWhenTotalrowsLowerThanLimit() throws Exception
     {
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("view"), any(), any(), any()))
             .thenReturn(false, true);

@@ -1064,32 +1064,27 @@ XWiki.Annotation = Class.create({
   fixRangeEndPoints: function(range) {
     var strictRange = new Range();
 
-    // In case the range starts and ends in the same text node, the first split could alter the length of the node and
-    // break the second split.
-    var endOffset = range.endOffset;
-    if (range.startContainer == range.endContainer) {
-      endOffset -= range.startOffset;
+    // Because the range could start and end in the same text node, the end point is fixed first, since this will not
+    // alter the startOffset.
+    // The split is done only if the offset is not before first or after last character for not creating empty text nodes.
+    if (range.endOffset &gt; 0 &amp;&amp; range.endOffset &lt; range.endContainer.length) {
+      range.endContainer.splitText(range.endOffset);
+    }
+    if (range.endOffset &gt; 0) {
+      strictRange.setEndAfter(range.endContainer);
+    } else {
+      strictRange.setEndBefore(range.endContainer);
     }
 
-    var originalStartContainerLength = range.startContainer.length;
-    var newStartNode = range.startContainer;
     // The split is done only if the offset is not before first or after last character for not creating empty text nodes.
     if (range.startOffset &gt; 0 &amp;&amp; range.startOffset &lt; range.startContainer.length) {
-      newStartNode = range.startContainer.splitText(range.startOffset);
+      range.startContainer.splitText(range.startOffset);
     }
-    // This means that the annotation starts after this node.
-    if (range.startOffset == originalStartContainerLength) {
-      strictRange.setStartAfter(newStartNode);
+    if (range.startOffset &gt; 0) {
+      strictRange.setStartAfter(range.startContainer);
     } else {
-      strictRange.setStartBefore(newStartNode);
+      strictRange.setStartBefore(range.startContainer);
     }
-
-    var newEndNode = range.endContainer;
-    // The split is done only if the offset is not before first or after last character for not creating empty text nodes.
-    if (endOffset &gt; 0 &amp;&amp; endOffset &lt; range.endContainer.length) {
-      newEndNode = range.endContainer.splitText(endOffset);
-    }
-    strictRange.setEndAfter(range.endContainer);
 
     return strictRange;
   },

@@ -53,6 +53,7 @@ import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
 import org.xwiki.security.authorization.cache.SecurityShadowEntry;
+import org.xwiki.security.authorization.internal.GroupSecurityEntry;
 
 /**
  * Default implementation of the security cache.
@@ -323,6 +324,14 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     throw new ParentEntryEvictedException(String
                         .format("The parent with reference [%s] is no longer available in the cache", parentReference));
                 }
+
+                // Make sure the group really is stored as such (can happen if that the right of the group was checked
+                // directly)
+                if (!(parent.getEntry().getReference() instanceof GroupSecurityReference)
+                    && parent.getEntry() instanceof GroupSecurityEntry) {
+                    ((GroupSecurityEntry) parent.getEntry()).setGroupReference(group);
+                }
+
                 this.parents.add(parent);
                 parent.addChild(this);
             }

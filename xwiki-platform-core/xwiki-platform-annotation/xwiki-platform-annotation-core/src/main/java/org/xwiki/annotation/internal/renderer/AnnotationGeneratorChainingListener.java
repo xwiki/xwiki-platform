@@ -228,7 +228,8 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
                 Object[] startEvt = getEventAndOffset(contextIndex + alteredSelectionStartIndex, false);
                 Object[] endEvt = getEventAndOffset(contextIndex + alteredSelectionEndIndex, true);
                 ann.set(Annotation.PLAIN_TEXT_START_OFFSET_FIELD, contextIndex + alteredSelectionStartIndex);
-                ann.set(Annotation.PLAIN_TEXT_END_OFFSET_FIELD, contextIndex + alteredSelectionEndIndex);
+                // The end offset should be just after the last annotated character.
+                ann.set(Annotation.PLAIN_TEXT_END_OFFSET_FIELD, contextIndex + alteredSelectionEndIndex + 1);
                 if (startEvt != null & endEvt != null) {
                     // store the bookmarks
                     addBookmark((Event) startEvt[0], new AnnotationEvent(AnnotationEventType.START, ann),

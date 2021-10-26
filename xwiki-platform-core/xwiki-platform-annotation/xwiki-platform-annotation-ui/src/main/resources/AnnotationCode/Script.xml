@@ -1071,12 +1071,18 @@ XWiki.Annotation = Class.create({
       endOffset -= range.startOffset;
     }
 
+    var originalStartContainerLength = range.startContainer.length;
     var newStartNode = range.startContainer;
     // The split is done only if the offset is not before first or after last character for not creating empty text nodes.
     if (range.startOffset &gt; 0 &amp;&amp; range.startOffset &lt; range.startContainer.length) {
       newStartNode = range.startContainer.splitText(range.startOffset);
     }
-    strictRange.setStartBefore(newStartNode);
+    // This means that the annotation starts after this node.
+    if (range.startOffset == originalStartContainerLength) {
+      strictRange.setStartAfter(newStartNode);
+    } else {
+      strictRange.setStartBefore(newStartNode);
+    }
 
     var newEndNode = range.endContainer;
     // The split is done only if the offset is not before first or after last character for not creating empty text nodes.
@@ -1100,8 +1106,7 @@ XWiki.Annotation = Class.create({
     var endPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, endIndex);
     var range = new Range();
     range.setStart(startPosition.node, startPosition.offset);
-    // The end offset should be the number of characters from the start of the range.endContainer to the boundary point.
-    range.setEnd(endPosition.node, endPosition.offset + 1);
+    range.setEnd(endPosition.node, endPosition.offset);
     return range;
   },
 
@@ -1123,7 +1128,7 @@ XWiki.Annotation = Class.create({
         var previousSiblingsLength = parentNodePlainTextLength;
         // The spaces are ignored since they were removed as well on the server when the offset was computed.
         parentNodePlainTextLength += child.textContent.replace(/\s/g, '').length;
-        if (plainTextOffset &lt; parentNodePlainTextLength) {
+        if (plainTextOffset &lt;= parentNodePlainTextLength) {
           // Because plainTextOffset doesn't consider spaces, the real offset of the node needs to be recomputed so that
           // they are included.
           return {'node': child, 'offset': this.getNodeSpecificOffset(child, plainTextOffset - previousSiblingsLength)};
@@ -1160,6 +1165,7 @@ XWiki.Annotation = Class.create({
         nonSpaceCharsLength++;
       }
     }
+    return chars.length;
   },
 
   /**

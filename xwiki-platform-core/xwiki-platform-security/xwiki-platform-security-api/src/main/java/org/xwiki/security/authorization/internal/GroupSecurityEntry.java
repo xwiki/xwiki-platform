@@ -26,7 +26,7 @@ import org.xwiki.security.authorization.SecurityEntry;
  * Allow modifying the reference of an existing SecurityEntry.
  * 
  * @version $Id$
- * @since 13.9RC1
+ * @since 13.10RC1
  * @since 13.4.5
  * @since 12.10.11
  */

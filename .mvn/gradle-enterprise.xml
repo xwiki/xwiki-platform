@@ -35,8 +35,13 @@
     <backgroundBuildScanUpload>#{env['CI'] == null}</backgroundBuildScanUpload>
   </buildScan>
   <buildCache>
+    <!-- Notes:
+     * To disable the local build cache on the command line, pass: -Dgradle.cache.local.enabled=false
+     * We disable the local build cache on CI since our agents are transients and isolated, and thus it would cost
+       more to save the goal outputs since they're not going to be re-used.
+    -->
     <local>
-      <enabled>true</enabled>
+      <enabled>#{env['CI'] == null}</enabled>
     </local>
     <remote>
       <enabled>false</enabled>

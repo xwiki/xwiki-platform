@@ -28,7 +28,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -123,15 +122,15 @@ public class ComputedFieldClass extends PropertyClass
     @Override
     public BaseProperty fromString(String value)
     {
+        // There is no content in a computed field
         return null;
     }
 
     @Override
     public BaseProperty newProperty()
     {
-        BaseProperty property = new StringProperty();
-        property.setName(getName());
-        return property;
+        // There is no content in a computed field
+        return null;
     }
 
     @Override

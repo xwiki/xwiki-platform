@@ -490,6 +490,18 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Return the {@link WebElement} of the dropdown button.
+     *
+     * @return the {@link WebElement} of the dropdown button
+     * @since 13.10RC1
+     * @since 13.4.5
+     */
+    public WebElement getDropDownButton()
+    {
+        return getRoot().findElement(By.cssSelector("a.dropdown-toggle"));
+    }
+
+    /**
      * Returns the column index of the given column. The indexes start at {@code 1}, corresponding to the leftest
      * column.
      *

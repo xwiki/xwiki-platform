@@ -160,7 +160,9 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         // XObjects properties
         for (List<BaseObject> xobjects : document.getXObjects().values()) {
             for (BaseObject xobject : xobjects) {
-                modified |= renameLinks(xobject, document, oldTarget, newTarget, renderer, xcontext, relative);
+                if (xobject != null) {
+                    modified |= renameLinks(xobject, document, oldTarget, newTarget, renderer, xcontext, relative);
+                }
             }
         }
 

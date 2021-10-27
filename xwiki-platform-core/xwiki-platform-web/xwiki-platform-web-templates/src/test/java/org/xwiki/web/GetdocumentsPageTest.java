@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import static org.mockito.Mockito.spy;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
@@ -47,7 +48,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -74,13 +74,16 @@ class GetdocumentsPageTest extends PageTest
 
     private TemplateManager templateManager;
 
+    private JSONTool jsonTool;
+
     @BeforeEach
     void setUp() throws Exception
     {
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         this.oldcore.getMocker().registerComponent(ScriptService.class, "query", this.queryService);
 
-        registerVelocityTool("jsontool", new JSONTool());
+        this.jsonTool = spy(new JSONTool());
+        registerVelocityTool("jsontool", this.jsonTool);
         registerVelocityTool("mathtool", new MathTool());
         registerVelocityTool("escapetool", new EscapeTool());
         registerVelocityTool("numbertool", new NumberTool());
@@ -141,13 +144,10 @@ class GetdocumentsPageTest extends PageTest
 
     private Map<String, Object> getJsonResultMap() throws Exception
     {
-        JSONTool jsonTool = mock(JSONTool.class);
-        registerVelocityTool("jsontool", jsonTool);
-
         this.templateManager.render(GETDOCUMENTS);
 
         ArgumentCaptor<Object> argument = ArgumentCaptor.forClass(Object.class);
-        verify(jsonTool).serialize(argument.capture());
+        verify(this.jsonTool).serialize(argument.capture());
 
         return (Map<String, Object>) argument.getValue();
     }

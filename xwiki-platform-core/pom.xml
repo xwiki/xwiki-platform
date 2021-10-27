@@ -119,6 +119,9 @@
                      </item>
                    </differences>
                  </revapi.differences>
+                 <revapi.differences>
+                   ... other difference group here...
+                 </revapi.differences>
 
                  Single justification example:
 
@@ -133,7 +136,150 @@
                    </differences>
                  </revapi.differences>
             -->
-            
+            <!-- Difference related to the Security refactoring. Start a new <revapi.differences> entry for other
+                 differences -->
+            <revapi.differences>
+              <justification>Code has been moved to another Maven module without any breakage</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.DefaultSecurityReferenceFactory</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.GroupSecurityReference</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.SecurityReference</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.SecurityReferenceFactory</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.UserSecurityReference</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.AccessDeniedException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorExecutor</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.AuthorizationException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorizationManager</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorizationManagerConfiguration</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorizationSettler</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.ContextualAuthorizationManager</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.DefaultAuthorizationManager</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.EntityTypeNotSupportedException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.Right</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.RightDescription</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.RightMap&lt;V&gt;</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.RightSet</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>enum org.xwiki.security.authorization.RuleState</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityAccess</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityAccessEntry</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityEntry</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityEntryReader</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityEntryReaderExtra</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityRule</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityRuleEntry</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.UnableToRegisterRightException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.cache.ConflictingInsertionException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.cache.ParentEntryEvictedException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityCache</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityCacheLoader</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityShadowEntry</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.event.RightUpdatedEvent</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

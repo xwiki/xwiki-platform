@@ -172,7 +172,7 @@
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-security-script</artifactId>
+        <artifactId>xwiki-platform-security-authorization-script</artifactId>
         <version>13.10-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->

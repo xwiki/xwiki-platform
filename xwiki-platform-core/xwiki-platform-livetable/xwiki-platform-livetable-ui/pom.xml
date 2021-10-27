@@ -58,7 +58,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-script</artifactId>
+      <artifactId>xwiki-platform-security-authorization-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -83,7 +83,7 @@
     <!-- Security Script Component List for the Page Tests -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-script</artifactId>
+      <artifactId>xwiki-platform-security-authorization-script</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>

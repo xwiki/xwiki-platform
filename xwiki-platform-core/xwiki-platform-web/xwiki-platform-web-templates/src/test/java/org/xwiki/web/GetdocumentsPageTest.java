@@ -34,6 +34,9 @@ import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.SecurityConfiguration;
+import org.xwiki.security.internal.DefaultSecurityConfiguration;
+import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -61,6 +64,8 @@ import static org.mockito.Mockito.when;
 @ComponentList({
     XWikiDateTool.class,
     ModelScriptService.class,
+    SecurityScriptService.class,
+    DefaultSecurityConfiguration.class
 })
 class GetdocumentsPageTest extends PageTest
 {
@@ -142,6 +147,37 @@ class GetdocumentsPageTest extends PageTest
         assertEquals("xwiki:XWiki.Viewable", viewable.get("doc_fullName"));
     }
 
+    @Test
+    void preventDOSAttackOnQueryItemsReturned() throws Exception
+    {
+        // Simulating the fact that when getdocuments.vm executes, the xwikivars.vm template has already been loaded by
+        // the page rendering.
+        this.templateManager.render("xwikivars.vm");
+
+        this.request.put("limit", "101");
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.bindValues(any(List.class))).thenReturn(this.query);
+
+        // Simulate the query limit
+        SecurityConfiguration securityConfiguration =
+            this.oldcore.getMocker().registerMockComponent(SecurityConfiguration.class);
+        when(securityConfiguration.getQueryItemsLimit()).thenReturn(100);
+
+        this.templateManager.render(GETDOCUMENTS);
+
+        ArgumentCaptor<Integer> argument = ArgumentCaptor.forClass(Integer.class);
+        verify(this.query).setLimit(argument.capture());
+
+        // Verify that even though the guest user is asking for 101 items, we only return 100.
+        assertEquals(100, argument.getValue());
+    }
+
+    /**
+     * @return the captured JSON map before serialization, to make it easier for each test to assert the map content.
+     */
     private Map<String, Object> getJsonResultMap() throws Exception
     {
         this.templateManager.render(GETDOCUMENTS);

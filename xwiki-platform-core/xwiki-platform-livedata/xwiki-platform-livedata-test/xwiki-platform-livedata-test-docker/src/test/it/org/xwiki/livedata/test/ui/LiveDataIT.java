@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ArrayNode;
@@ -46,6 +47,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests of the Live Data macro, in view and edit modes.
@@ -100,6 +102,9 @@ class LiveDataIT
     @Order(1)
     void livedataLivetableTableLayout(TestUtils testUtils, TestReference testReference) throws Exception
     {
+        // Make sure an icon theme is configured.
+        testUtils.setWikiPreference("iconTheme", "IconThemes.Silk");
+
         // Login as super admin because guest user cannot remove pages.
         testUtils.loginAsSuperAdmin();
         testUtils.createUser("U1", "U1", null);
@@ -136,6 +141,12 @@ class LiveDataIT
 
         LiveDataElement liveDataElement = new LiveDataElement("test");
         TableLayoutElement tableLayout = liveDataElement.getTableLayout();
+
+        // Verify that at least one Live Data icon is displayed to prevent XWIKI-19086 to happen again.
+        assertTrue(tableLayout.getDropDownButton().findElement(By.tagName("img")).getAttribute("src")
+            .contains("bullet_arrow_down.png"));
+
+        // Test the Live Data content.
         assertEquals(3, tableLayout.countRows());
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O1");
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O2 1");

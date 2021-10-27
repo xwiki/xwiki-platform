@@ -156,8 +156,80 @@
                    </differences>
                  </revapi.differences>
             -->
-            
-            
+            <!-- Note: Until https://github .com/revapi/revapi/issues/221#issuecomment-832626011 is fixed, the
+                 revapi.differences node below must not be cleaned between releases. -->
+            <revapi.differences>
+              <!-- Start of Revapi possible bug: -->
+              <justification>Possibly a bug in Revapi, see https://github.com/revapi/revapi/issues/221#issuecomment-832626011</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.missing.oldClass</code>
+                  <old>missing-class javax.servlet.http.Cookie</old>
+                  <new>missing-class javax.servlet.http.Cookie</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.missing.newClass</code>
+                  <old>missing-class javax.servlet.http.Cookie</old>
+                  <new>missing-class javax.servlet.http.Cookie</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.missing.oldClass</code>
+                  <old>missing-class javax.servlet.http.HttpServletRequest</old>
+                  <new>missing-class javax.servlet.http.HttpServletRequest</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.missing.newClass</code>
+                  <old>missing-class javax.servlet.http.HttpServletRequest</old>
+                  <new>missing-class javax.servlet.http.HttpServletRequest</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.missing.oldClass</code>
+                  <old>missing-class javax.servlet.http.HttpServletResponse</old>
+                  <new>missing-class javax.servlet.http.HttpServletResponse</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.missing.newClass</code>
+                  <old>missing-class javax.servlet.http.HttpServletResponse</old>
+                  <new>missing-class javax.servlet.http.HttpServletResponse</new>
+                </item>
+                <!-- End of Revapi possible bug -->
+                <item>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</old>
+                  <new>class org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</new>
+                  <justification>Not a breakage, the old XWikiContextInitializationFilter content has been moved to a new class of the same name in a new package and old class now inherits from the new one</justification>
+                </item>
+                <item>
+                  <code>java.method.removed</code>
+                  <old>method java.util.List&lt;java.lang.String&gt; com.xpn.xwiki.XWiki::getConfiguredSyntaxes()</old>
+                  <justification>Not a runtime breakage since that method has been moved to the oldcore legacy module</justification>
+                </item>
+                <item>
+                  <code>java.method.removed</code>
+                  <old>method java.util.List&lt;java.lang.String&gt; com.xpn.xwiki.api.XWiki::getConfiguredSyntaxes()</old>
+                  <justification>Not a runtime breakage since that method has been moved to the oldcore legacy module</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.like.script.LikeScriptService::cleanCacheUIX()</old>
+                  <justification>Unstable API: this method should not have been made public in first place, the cache clean is handled by listening on the events automatically.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.removed</code>
+                  <old>field org.xwiki.rest.XWikiResource.logger</old>
+                  <justification>Has been deprecated for a long time.</justification>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

@@ -1097,8 +1097,8 @@ XWiki.Annotation = Class.create({
    * @param endIndex end offset where the range ends
    */
   getDOMRange: function(annotatedElement, startIndex, endIndex) {
-    var startPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, startIndex);
-    var endPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, endIndex);
+    var startPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, startIndex, true);
+    var endPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, endIndex, false);
     var range = new Range();
     range.setStart(startPosition.node, startPosition.offset);
     range.setEnd(endPosition.node, endPosition.offset);
@@ -1112,8 +1112,9 @@ XWiki.Annotation = Class.create({
    *
    * @param parentNode the node where the search is done
    * @param plainTextOffset the offset relative to the full plain content
+   * @param isStart boolean specifying if a start or end offset is targeted
    */
-  getTextNodeAtPlainTextOffset: function(parentNode, plainTextOffset) {
+  getTextNodeAtPlainTextOffset: function(parentNode, plainTextOffset, isStart) {
     var childNodes = parentNode.childNodes;
     var child;
     var parentNodePlainTextLength = 0;
@@ -1123,13 +1124,18 @@ XWiki.Annotation = Class.create({
         var previousSiblingsLength = parentNodePlainTextLength;
         // The spaces are ignored since they were removed as well on the server when the offset was computed.
         parentNodePlainTextLength += child.textContent.replace(/\s/g, '').length;
-        if (plainTextOffset &lt;= parentNodePlainTextLength) {
+        // Consider that an end offset is exclusive.
+        if ((isStart &amp;&amp; plainTextOffset &lt; parentNodePlainTextLength) ||
+            (!isStart &amp;&amp; plainTextOffset &lt;= parentNodePlainTextLength)) {
           // Because plainTextOffset doesn't consider spaces, the real offset of the node needs to be recomputed so that
           // they are included.
-          return {'node': child, 'offset': this.getNodeSpecificOffset(child, plainTextOffset - previousSiblingsLength)};
+          return {
+            'node': child,
+            'offset': this.getNodeSpecificOffset(child, plainTextOffset - previousSiblingsLength, isStart)
+          };
         }
       } else if (child.childNodes.length &gt; 0) {
-        var maybeFoundNode = this.getTextNodeAtPlainTextOffset(child, plainTextOffset - parentNodePlainTextLength);
+        var maybeFoundNode = this.getTextNodeAtPlainTextOffset(child, plainTextOffset - parentNodePlainTextLength, isStart);
         if (maybeFoundNode.node) {
           return maybeFoundNode;
         } else {
@@ -1146,18 +1152,18 @@ XWiki.Annotation = Class.create({
    *
    * @param node a DOM node
    * @param offset the offset relative to the text without whitespaces
+   * @param isStart boolean specifying if a start or end offset is targeted
    */
-  getNodeSpecificOffset: function(node, offset) {
+  getNodeSpecificOffset: function(node, offset, isStart) {
     var nonSpaceCharsLength = 0;
     var chars = Array.from(node.textContent);
     for (let i = 0; i &lt; chars.length; i++) {
-      if (/\s/.test(chars[i])) {
-        continue;
-      } else {
-        if (nonSpaceCharsLength === offset) {
-          return i;
-        }
-        nonSpaceCharsLength++;
+      // Because the end offset is exclusive, it can be a whitespace.
+      if (offset == 0 &amp;&amp; (!isStart || (isStart &amp;&amp; !/\s/.test(chars[i])))) {
+        return i;
+      }
+      if (!/\s/.test(chars[i])) {
+        offset--;
       }
     }
     return chars.length;

@@ -1399,7 +1399,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     for (String key : xclass.getPropertyList()) {
                         if (object.safeget(key) == null) {
                             PropertyClass classProperty = (PropertyClass) xclass.getField(key);
-                            object.safeput(key, classProperty.newProperty());
+                            BaseProperty property = classProperty.newProperty();
+                            if (property != null) {
+                                object.safeput(key, property);
+                            }
                         }
                     }
                 }

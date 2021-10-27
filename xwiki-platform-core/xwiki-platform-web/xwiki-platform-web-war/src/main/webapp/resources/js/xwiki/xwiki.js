@@ -1937,6 +1937,7 @@ require(['jquery'], function($) {
       window.fetch = function() {
         return originalFetch.apply(this, arguments).then(function(response) {
           handleResponseHeaders($.proxy(response.headers, 'get'));
+          return response;
         });
       };
     }

@@ -157,7 +157,7 @@
                  </revapi.differences>
             -->
             <!-- Note: Until https://github .com/revapi/revapi/issues/221#issuecomment-832626011 is fixed, the
-                 revapi.differences node below must not be cleaned between releases. -->
+                 revapi.differences node below must not be cleaned between releases. -->p
             <revapi.differences>
               <!-- Start of Revapi possible bug: -->
               <justification>Possibly a bug in Revapi, see https://github.com/revapi/revapi/issues/221#issuecomment-832626011</justification>

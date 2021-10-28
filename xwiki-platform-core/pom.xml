@@ -280,6 +280,47 @@
                 </item>
               </differences>
             </revapi.differences>
+            <!-- Added generics to NumberProperty. Start a new <revapi.differences> entry for other differences -->
+            <revapi.differences>
+              <justification>Not a breakage thanks to type erasure</justification>
+              <criticality>allowed</criticality>
+              <ignore>true</ignore>
+              <differences>
+                <item>
+                  <code>java.class.superTypeTypeParametersChanged</code>
+                  <old>class com.xpn.xwiki.objects.DoubleProperty</old>
+                  <new>class com.xpn.xwiki.objects.DoubleProperty</new>
+                  <oldSuperType>com.xpn.xwiki.objects.NumberProperty</oldSuperType>
+                  <newSuperType>com.xpn.xwiki.objects.NumberProperty&lt;java.lang.Double&gt;</newSuperType>
+                </item>
+                <item>
+                  <code>java.class.superTypeTypeParametersChanged</code>
+                  <old>class com.xpn.xwiki.objects.FloatProperty</old>
+                  <new>class com.xpn.xwiki.objects.FloatProperty</new>
+                  <oldSuperType>com.xpn.xwiki.objects.NumberProperty</oldSuperType>
+                  <newSuperType>com.xpn.xwiki.objects.NumberProperty&lt;java.lang.Float&gt;</newSuperType>
+                </item>
+                <item>
+                  <code>java.class.superTypeTypeParametersChanged</code>
+                  <old>class com.xpn.xwiki.objects.IntegerProperty</old>
+                  <new>class com.xpn.xwiki.objects.IntegerProperty</new>
+                  <oldSuperType>com.xpn.xwiki.objects.NumberProperty</oldSuperType>
+                  <newSuperType>com.xpn.xwiki.objects.NumberProperty&lt;java.lang.Integer&gt;</newSuperType>
+                </item>
+                <item>
+                  <code>java.class.superTypeTypeParametersChanged</code>
+                  <old>class com.xpn.xwiki.objects.LongProperty</old>
+                  <new>class com.xpn.xwiki.objects.LongProperty</new>
+                  <oldSuperType>com.xpn.xwiki.objects.NumberProperty</oldSuperType>
+                  <newSuperType>com.xpn.xwiki.objects.NumberProperty&lt;java.lang.Long&gt;</newSuperType>
+                </item>
+                <item>
+                  <code>java.generics.elementNowParameterized</code>
+                  <old>class com.xpn.xwiki.objects.NumberProperty</old>
+                  <new>class com.xpn.xwiki.objects.NumberProperty&lt;N extends java.lang.Number&gt;</new>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

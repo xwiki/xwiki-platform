@@ -27,11 +27,14 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -84,20 +87,15 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
     @Named("user")
     private DocumentReferenceResolver<String> resolver;
 
-    /** Execution object. */
     @Inject
-    private Execution execution;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
-    private List<SecurityEntryReaderExtra> extras;
+    private Provider<XWikiContext> xcontextProvider;
 
-    /**
-     * @return the current {@code XWikiContext}
-     */
-    private XWikiContext getXWikiContext()
-    {
-        return ((XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY));
-    }
+    @Inject
+    private Logger logger;
 
     /**
      * Internal implementation of the SecurityRuleEntry.
@@ -206,12 +204,25 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         // Get standard rules
         Collection<SecurityRule> rules = getSecurityRules(documentReference, classReference, wikiReference);
 
-        // Add extras
-        for (SecurityEntryReaderExtra extra : this.extras) {
-            Collection<SecurityRule> extraRules = extra.read(entity);
-            if (extraRules != null) {
-                rules.addAll(extraRules);
+        // Add extras rules
+        XWikiContext xcontext = this.xcontextProvider.get();
+        WikiReference currentWikiReference = xcontext.getWikiReference();
+        try {
+            // Switch to checked entity's wiki to get the right components
+            xcontext.setWikiReference(wikiReference);
+
+            List<SecurityEntryReaderExtra> extras =
+                this.componentManagerProvider.get().getInstanceList(SecurityEntryReaderExtra.class);
+            for (SecurityEntryReaderExtra extra : extras) {
+                Collection<SecurityRule> extraRules = extra.read(entity);
+                if (extraRules != null) {
+                    rules.addAll(extraRules);
+                }
             }
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to lookup extra security entry readers", e);
+        } finally {
+            xcontext.setWikiReference(currentWikiReference);
         }
 
         return new InternalSecurityRuleEntry(entity, rules);
@@ -226,7 +237,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
      */
     private XWikiDocument getDocument(DocumentReference documentReference) throws AuthorizationException
     {
-        XWikiContext context = getXWikiContext();
+        XWikiContext context = this.xcontextProvider.get();
 
         try {
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
@@ -247,7 +258,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
      */
     private DocumentReference getWikiOwner(WikiReference wikiReference) throws AuthorizationException
     {
-        XWikiContext context = getXWikiContext();
+        XWikiContext context = this.xcontextProvider.get();
         String wikiOwner;
         try {
             wikiOwner = context.getWiki().getWikiOwner(wikiReference.getName(), context);
@@ -351,7 +362,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         WikiReference documentWiki = documentReference.getWikiReference();
         DocumentReference owner = getWikiOwner(documentWiki);
         if (owner != null) {
-            XWikiContext context = getXWikiContext();
+            XWikiContext context = this.xcontextProvider.get();
 
             // Allow global rights to wiki owner
             if (context.isMainWiki(documentWiki.getName())) {

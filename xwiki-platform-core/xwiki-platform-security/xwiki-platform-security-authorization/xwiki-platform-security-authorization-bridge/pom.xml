@@ -36,6 +36,10 @@
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Authorization Bridge</xwiki.extension.name>
+    <xwiki.extension.features>
+      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+      org.xwiki.platform:xwiki-platform-security-bridge
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

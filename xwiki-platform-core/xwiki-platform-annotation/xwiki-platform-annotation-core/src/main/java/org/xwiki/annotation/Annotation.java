@@ -85,6 +85,20 @@ public class Annotation
     public static final String TARGET_FIELD = "target";
 
     /**
+     * The name of the field of this annotation start offset relative to the plain text.
+     *
+     * @since 13.10RC1
+     */
+    public static final String PLAIN_TEXT_START_OFFSET_FIELD = "plainTextStartOffset";
+
+    /**
+     * The name of the field of this annotation end offset relative to the plain text.
+     *
+     * @since 13.10RC1
+     */
+    public static final String PLAIN_TEXT_END_OFFSET_FIELD = "plainTextEndOffset";
+
+    /**
      * The unique identifier of this annotation, which should be unique among all the annotations on the same target.
      */
     protected final String id;

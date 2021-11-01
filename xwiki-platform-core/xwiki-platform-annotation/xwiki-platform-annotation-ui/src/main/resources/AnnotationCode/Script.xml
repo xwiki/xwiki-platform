@@ -1120,6 +1120,10 @@ XWiki.Annotation = Class.create({
     var parentNodePlainTextLength = 0;
     for (let i = 0; i &lt; childNodes.length; i++) {
       child = childNodes[i];
+      // Skip content which is only needed for editing sections.
+      if (child.className &amp;&amp; child.className.indexOf("edit_section") != -1) {
+        continue;
+      }
       if (child.nodeType == 3) {
         var previousSiblingsLength = parentNodePlainTextLength;
         // The spaces are ignored since they were removed as well on the server when the offset was computed.

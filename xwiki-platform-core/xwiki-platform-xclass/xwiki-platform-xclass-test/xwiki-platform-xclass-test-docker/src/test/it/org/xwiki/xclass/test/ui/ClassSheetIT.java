@@ -68,11 +68,15 @@ class ClassSheetIT
             // Make sure the document doesn't exist.
             setup.deletePage(spaceName, pageName);
 
-            // Create the class document.
-            DataTypesPage dataTypesPage = DataTypesPage.gotoPage().waitUntilPageIsLoaded();
+            // Ensure that class listing also works as guest user.
+            setup.forceGuestUser();
+            DataTypesPage dataTypesPage = DataTypesPage.gotoPage();
             String dataTypesPageTitle = dataTypesPage.getDocumentTitle();
             assertTrue(dataTypesPage.isClassListed("XWiki", "XWikiRights"));
             assertFalse(dataTypesPage.isClassListed(spaceName, classDocName));
+            setup.loginAsSuperAdmin();
+            dataTypesPage = DataTypesPage.gotoPage();
+            // Create the class document.
             ClassSheetPage classSheetPage = dataTypesPage.createClass(spaceName, className).waitUntilPageIsLoaded();
             assertEquals(classTitle, classSheetPage.getDocumentTitle());
             assertTrue(classSheetPage.hasBreadcrumbContent(dataTypesPageTitle, false));

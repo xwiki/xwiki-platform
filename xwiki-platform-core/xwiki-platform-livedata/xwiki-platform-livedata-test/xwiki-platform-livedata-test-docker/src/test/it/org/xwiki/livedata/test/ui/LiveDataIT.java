@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ArrayNode;
@@ -46,6 +47,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests of the Live Data macro, in view and edit modes.
@@ -76,6 +78,8 @@ class LiveDataIT
 
     private static final String CHOICE_D = "value4";
 
+    private static final String CHOICE_EMPTY = "(empty)";
+
     private static final String BIRTHDAY_COLUMN = "birthday";
 
     private static final String USER_COLUMN = "user";
@@ -90,10 +94,6 @@ class LiveDataIT
         "(1) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
             + "pages.";
 
-    private static final String FOOTNOTES_PROPERTY_NOT_VIEWABLE =
-        "(*) Displayed when some entries require special rights"
-            + " to be viewed and thus fields cannot be extracted from them.";
-
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
      * and two XObjects, then edit the XObjects properties from the live data.
@@ -102,6 +102,9 @@ class LiveDataIT
     @Order(1)
     void livedataLivetableTableLayout(TestUtils testUtils, TestReference testReference) throws Exception
     {
+        // Make sure an icon theme is configured.
+        testUtils.setWikiPreference("iconTheme", "IconThemes.Silk");
+
         // Login as super admin because guest user cannot remove pages.
         testUtils.loginAsSuperAdmin();
         testUtils.createUser("U1", "U1", null);
@@ -138,6 +141,12 @@ class LiveDataIT
 
         LiveDataElement liveDataElement = new LiveDataElement("test");
         TableLayoutElement tableLayout = liveDataElement.getTableLayout();
+
+        // Verify that at least one Live Data icon is displayed to prevent XWIKI-19086 to happen again.
+        assertTrue(tableLayout.getDropDownButton().findElement(By.tagName("img")).getAttribute("src")
+            .contains("bullet_arrow_down.png"));
+
+        // Test the Live Data content.
         assertEquals(3, tableLayout.countRows());
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O1");
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O2 1");
@@ -150,7 +159,7 @@ class LiveDataIT
         tableLayout.editCell(CHOICE_COLUMN, 2, CHOICE_COLUMN, CHOICE_C);
         tableLayout.editCell(BIRTHDAY_COLUMN, 1, BIRTHDAY_COLUMN, BIRTHDAY_DATETIME);
         tableLayout.editAndCancel(BIRTHDAY_COLUMN, 2, BIRTHDAY_COLUMN, CANCELED_BIRTHDAY_DATETIME);
-        // Edits the choice column of Nikolay, to assert that an cell with an empty content can be edited. 
+        // Edits the choice column of Nikolay, to assert that a cell with an empty content can be edited. 
         tableLayout.editCell(CHOICE_COLUMN, 3, CHOICE_COLUMN, CHOICE_D);
         assertEquals(3, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_CHARLY);
@@ -176,6 +185,17 @@ class LiveDataIT
         tableLayout
             .assertCellWithLink(USER_COLUMN, "U1", testUtils.getURL(new DocumentReference("xwiki", "XWiki", "U1")));
 
+        // Reload the page to verify that the persisted filters are taken into account after reload.
+        testUtils.getDriver().navigate().refresh();
+        tableLayout.waitUntilReady();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+        tableLayout.filterColumn(CHOICE_COLUMN, CHOICE_EMPTY);
+        // Reload to test if the empty filter is displayed again.
+        testUtils.getDriver().navigate().refresh();
+        tableLayout.waitUntilReady();
+        assertEquals(CHOICE_EMPTY, tableLayout.getFilterValues(CHOICE_COLUMN).get(0));
+
         // Become guest because the tests does not need specific rights. 
         testUtils.forceGuestUser();
 
@@ -183,12 +203,11 @@ class LiveDataIT
 
         liveDataElement = new LiveDataElement("test");
         tableLayout = liveDataElement.getTableLayout();
+        assertEquals(2, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
-        tableLayout.assertRow(NAME_COLUMN, "N/A*");
         tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
-        assertEquals(2, liveDataElement.countFootnotes());
-        assertThat(liveDataElement.getFootnotesText(),
-            containsInAnyOrder(FOOTNOTES_PROPERTY_NOT_VIEWABLE, FOOTNOTE_COMPUTED_TITLE));
+        assertEquals(1, liveDataElement.countFootnotes());
+        assertThat(liveDataElement.getFootnotesText(), containsInAnyOrder(FOOTNOTE_COMPUTED_TITLE));
     }
 
     /**

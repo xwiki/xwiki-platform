@@ -1,0 +1,22 @@
+.rt-toolbar {
+  width: 100%;
+  color: #666;
+  font-weight: bold;
+  height: 30px;
+  margin-bottom: -3px;
+  display: inline-block;
+}
+
+.rt-toolbar div {
+  padding: 0 10px;
+  height: 1.5em;
+  line-height: 25px;
+  height: 22px;
+}
+
+.rt-toolbar div.rt-back {
+  padding: 0;
+  font-weight: bold;
+  cursor: pointer;
+  color: #000;
+}

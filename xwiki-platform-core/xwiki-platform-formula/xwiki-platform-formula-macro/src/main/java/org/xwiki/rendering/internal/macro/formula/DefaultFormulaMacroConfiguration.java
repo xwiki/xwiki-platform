@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.formula.FormulaRenderer;
 import org.xwiki.rendering.macro.formula.FormulaMacroConfiguration;
 
 /**
@@ -57,6 +58,13 @@ public class DefaultFormulaMacroConfiguration implements FormulaMacroConfigurati
     private static final String SAFE_RENDERER = "snuggletex";
 
     /**
+     * Default value for the default type.
+     *
+     * @see #getDefaultType()
+     */
+    private static final String DEFAULT_TYPE = FormulaRenderer.Type.DEFAULT.toString();
+
+    /**
      * Defines from where to read the rendering configuration data.
      */
     @Inject
@@ -72,5 +80,11 @@ public class DefaultFormulaMacroConfiguration implements FormulaMacroConfigurati
     public String getSafeRenderer()
     {
         return SAFE_RENDERER;
+    }
+
+    @Override
+    public FormulaRenderer.Type getDefaultType()
+    {
+        return FormulaRenderer.Type.valueOf(this.configuration.getProperty(PREFIX + "defaultType", DEFAULT_TYPE));
     }
 }

@@ -57,7 +57,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -205,7 +205,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -220,7 +220,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -232,7 +232,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertTrue(mocker.getComponentUnderTest().getLastError() instanceof IllegalArgumentException);
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -300,7 +300,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -315,7 +315,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expectedExtension, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);    
+        verifyNoInteractions(wikiUserManager);    
     }
 
     @Test
@@ -327,7 +327,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertEquals(false, result);
         assertTrue(mocker.getComponentUnderTest().getLastError() instanceof IllegalArgumentException);
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -428,7 +428,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertEquals(false, result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -443,7 +443,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -471,7 +471,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expectedExtension, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -487,7 +487,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -513,7 +513,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -528,7 +528,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertEquals(false, result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -754,7 +754,7 @@ public class WikiUserManagerScriptServiceTest
         assertFalse(result);
         assertEquals("User [mainWiki:XWiki.User] cannot call $services.wiki.user.join() with an other userId.",
                 this.mocker.getComponentUnderTest().getLastError().getMessage());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -802,7 +802,7 @@ public class WikiUserManagerScriptServiceTest
         assertFalse(result);
         assertEquals("User [mainWiki:XWiki.User] cannot call $services.wiki.user.leave() with an other userId.",
                 this.mocker.getComponentUnderTest().getLastError().getMessage());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -870,7 +870,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertNull(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -921,7 +921,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertNull(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
     
     @Test
@@ -954,7 +954,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expecyedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -1002,7 +1002,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertNull(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -1018,7 +1018,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertNull(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -1068,7 +1068,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -1120,7 +1120,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -1166,7 +1166,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertNull(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -1199,7 +1199,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test
@@ -1251,7 +1251,7 @@ public class WikiUserManagerScriptServiceTest
         // Asserts
         assertFalse(result);
         assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
-        verifyZeroInteractions(wikiUserManager);
+        verifyNoInteractions(wikiUserManager);
     }
 
     @Test

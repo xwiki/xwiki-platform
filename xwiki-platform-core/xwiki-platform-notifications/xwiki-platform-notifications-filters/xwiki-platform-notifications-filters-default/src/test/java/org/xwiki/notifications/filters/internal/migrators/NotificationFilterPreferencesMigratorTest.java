@@ -26,6 +26,7 @@ import java.util.Set;
 
 import javax.inject.Provider;
 
+import org.apache.commons.collections4.SetUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,7 +44,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.text.StringUtils;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import com.google.common.collect.Sets;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -134,32 +134,32 @@ public class NotificationFilterPreferencesMigratorTest
                 xwikicontext);
 
         verify(modelBridge).saveFilterPreferences(userA, Arrays.asList(
-                createExpectedPreference(Sets.newHashSet("update", "create"),
-                        Sets.newHashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
+                createExpectedPreference(SetUtils.hashSet("update", "create"),
+                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
                         "filter1", true, new Date(100L), "", "", "page1", ""),
-                createExpectedPreference(Sets.newHashSet("update", "create"),
-                        Sets.newHashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
+                createExpectedPreference(SetUtils.hashSet("update", "create"),
+                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
                         "filter1", true, new Date(100L), "", "", "page2", ""),
-                createExpectedPreference(Sets.newHashSet("update", "create"),
-                        Sets.newHashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
+                createExpectedPreference(SetUtils.hashSet("update", "create"),
+                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
                         "filter1", true, new Date(100L), "", "space1", "", ""),
-                createExpectedPreference(Sets.newHashSet("update", "create"),
-                        Sets.newHashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
+                createExpectedPreference(SetUtils.hashSet("update", "create"),
+                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
                         "filter1", true, new Date(100L), "", "space2", "", ""),
-                createExpectedPreference(Sets.newHashSet("update", "create"),
-                        Sets.newHashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
+                createExpectedPreference(SetUtils.hashSet("update", "create"),
+                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
                         "filter1", true, new Date(100L), "wiki1", "", "", ""),
-                createExpectedPreference(Sets.newHashSet("update", "create"),
-                        Sets.newHashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
+                createExpectedPreference(SetUtils.hashSet("update", "create"),
+                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
                         "filter1", true, new Date(100L), "wiki2", "", "", ""),
-                createExpectedPreference(Sets.newHashSet("update", "create"),
-                        Sets.newHashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
+                createExpectedPreference(SetUtils.hashSet("update", "create"),
+                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
                         "filter1", true, new Date(100L), "", "", "", "user1"),
-                createExpectedPreference(Sets.newHashSet("update", "create"),
-                        Sets.newHashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
+                createExpectedPreference(SetUtils.hashSet("update", "create"),
+                        SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
                         "filter1", true, new Date(100L), "", "", "", "user2"),
-                createExpectedPreference(Sets.newHashSet("comment"),
-                        Sets.newHashSet(NotificationFormat.ALERT, NotificationFormat.EMAIL), NotificationFilterType.EXCLUSIVE,
+                createExpectedPreference(SetUtils.hashSet("comment"),
+                        SetUtils.hashSet(NotificationFormat.ALERT, NotificationFormat.EMAIL), NotificationFilterType.EXCLUSIVE,
                         "filter2", false, new Date(90L), "", "", "page3", "")
         ));
     }

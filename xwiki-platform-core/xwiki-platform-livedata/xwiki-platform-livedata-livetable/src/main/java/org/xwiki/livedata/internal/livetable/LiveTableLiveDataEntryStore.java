@@ -31,6 +31,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -58,6 +59,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+
 /**
  * {@link LiveDataEntryStore} implementation that reuses existing live table data.
  * 
@@ -80,6 +83,9 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
 
     private static final String UNDEFINED_CLASS_ERROR_MESSAGE =
         "Can't update object properties if the object type (class name) is undefined.";
+
+    @Inject
+    private Logger logger;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -179,9 +185,15 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
             try {
                 // The live table results page may use "global" variables.
                 this.templateManager.render("xwikivars.vm");
+            } catch (Exception e) {
+                this.logger.warn(
+                    "Failed to evaluate [xwikivars.vm] when getting the Livetable results from page [{}]. Cause: [{}].",
+                    page, getRootCauseMessage(e));
+            }
+            try {
                 XWikiContext xcontext = this.xcontextProvider.get();
-                return xcontext.getWiki().getDocument(documentReference, xcontext).getRenderedContent(Syntax.PLAIN_1_0,
-                    xcontext);
+                return xcontext.getWiki().getDocument(documentReference, xcontext)
+                    .getRenderedContent(Syntax.PLAIN_1_0, xcontext);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

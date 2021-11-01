@@ -38,7 +38,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -69,7 +69,7 @@ class PermissionCheckerListenerTest
 
         this.listener.check(event, context, parameters);
 
-        verifyZeroInteractions(event);
+        verifyNoInteractions(event);
     }
 
     @Test

@@ -45,7 +45,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -134,7 +134,7 @@ public class DocumentMovedListenerTest
         verify(query2).setString("newPage", "xwiki:PageB.WebHome");
         verify(query2).setString("oldPage", "xwiki:PageA.WebHome");
         verify(query2).executeUpdate();
-        verifyZeroInteractions(namespaceContextExecutor);
+        verifyNoInteractions(namespaceContextExecutor);
     }
 
     @Test
@@ -217,6 +217,6 @@ public class DocumentMovedListenerTest
         verify(query).setString("newPage", "xwiki:PageB.Terminal");
         verify(query).setString("oldPage", "xwiki:PageA.Terminal");
         verify(query).executeUpdate();
-        verifyZeroInteractions(namespaceContextExecutor);
+        verifyNoInteractions(namespaceContextExecutor);
     }
 }

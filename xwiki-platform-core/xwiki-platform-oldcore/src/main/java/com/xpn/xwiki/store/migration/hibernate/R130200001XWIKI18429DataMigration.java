@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -308,11 +309,18 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         }
     }
 
-    private void updateColumns(DatabaseMetaData databaseMetaData, StringBuilder builder) throws SQLException
+    private void updateColumns(DatabaseMetaData databaseMetaData, StringBuilder builder)
+        throws SQLException, DataMigrationException
     {
         for (PersistentClass entity : this.hibernateStore.getConfigurationMetadata().getEntityBindings()) {
             // Check if the table exist
             if (exists(entity, databaseMetaData)) {
+                if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
+                    // Make sure all MySQL/MariaDB tables use a DYNAMIC row format (required to support key prefix
+                    // length limit up to 3072 bytes)
+                    setTableDYNAMIC(entity, builder);
+                }
+
                 // Find properties to update
                 for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
                     updateProperty(it.next(), databaseMetaData, builder);
@@ -321,6 +329,41 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
                 // Check the key
                 updateValue(entity.getKey(), databaseMetaData, builder);
             }
+        }
+    }
+
+    private void setTableDYNAMIC(PersistentClass entity, StringBuilder builder) throws DataMigrationException
+    {
+        String tableName = this.hibernateStore.getConfiguredTableName(entity);
+
+        if (!StringUtils.equalsIgnoreCase(getRowFormat(tableName), "Dynamic")) {
+            builder.append("<sql>");
+            builder.append("ALTER TABLE ");
+            builder.append(tableName);
+            builder.append(" ROW_FORMAT=DYNAMIC");
+            builder.append("</sql>");
+        }
+    }
+
+    private String getRowFormat(String tableName) throws DataMigrationException
+    {
+        try {
+            return getStore().executeRead(getXWikiContext(), new HibernateCallback<String>()
+            {
+                @Override
+                public String doInHibernate(Session session) throws HibernateException, XWikiException
+                {
+                    NativeQuery<String> query = session
+                        .createNativeQuery("SELECT DISTINCT ROW_FORMAT FROM INFORMATION_SCHEMA.TABLES "
+                            + "WHERE TABLE_SCHEMA = :schema AND TABLE_NAME = :table");
+                    query.setParameter("schema", hibernateStore.getDatabaseFromWikiName());
+                    query.setParameter("table", tableName);
+
+                    return query.uniqueResult();
+                }
+            });
+        } catch (XWikiException e) {
+            throw new DataMigrationException("Failed to get unique keys", e);
         }
     }
 

@@ -775,97 +775,97 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementById(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementById(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsById(String using)
     {
-        return this.wrappedDriver.findElementsById(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByLinkText(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByLinkText(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByLinkText(String using)
     {
-        return this.wrappedDriver.findElementsByLinkText(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByPartialLinkText(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByPartialLinkText(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByPartialLinkText(String using)
     {
-        return this.wrappedDriver.findElementsByPartialLinkText(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByTagName(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByTagName(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByTagName(String using)
     {
-        return this.wrappedDriver.findElementsByTagName(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByName(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByName(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByName(String using)
     {
-        return this.wrappedDriver.findElementsByName(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByClassName(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByClassName(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByClassName(String using)
     {
-        return this.wrappedDriver.findElementsByClassName(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByCssSelector(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByCssSelector(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByCssSelector(String using)
     {
-        return this.wrappedDriver.findElementsByCssSelector(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByXPath(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByXPath(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByXPath(String using)
     {
-        return this.wrappedDriver.findElementsByXPath(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override

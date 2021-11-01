@@ -539,7 +539,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return pc == null ? null : pc.newProperty().getClass().getName();
+        if (pc != null) {
+            BaseProperty property = pc.newProperty();
+            if (property != null) {
+                return property.getClass().getName();
+            }
+        }
+
+        return null;
     }
 
     @Override

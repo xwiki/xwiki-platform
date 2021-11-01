@@ -343,7 +343,7 @@ class DefaultOfficeResourceViewerTest
         assertNotNull(this.officeResourceViewer.createView(ATTACHMENT_RESOURCE_REFERENCE, DEFAULT_VIEW_PARAMETERS));
 
         verify(attachmentCache).remove(CACHE_KEY);
-        verify(attachmentCache).set(eq(CACHE_KEY), notNull(AttachmentOfficeDocumentView.class));
+        verify(attachmentCache).set(eq(CACHE_KEY), notNull());
     }
 
     @Test

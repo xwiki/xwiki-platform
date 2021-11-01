@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.Select;
@@ -61,6 +62,6 @@ public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectio
      */
     public WebElement getConfigurationTab(String editorId)
     {
-        return getDriver().findElementByCssSelector("a[role='tab'][data-editorid='" + editorId + "']");
+        return getDriver().findElement(By.cssSelector("a[role='tab'][data-editorid='" + editorId + "']"));
     }
 }

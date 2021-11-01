@@ -47,7 +47,8 @@ public class EditablePropertyPane extends BaseElement
 
     public EditablePropertyPane(String property)
     {
-        this.element = getDriver().findElementByCssSelector("dt.editableProperty[data-property=\"" + property + "\"]");
+        this.element = getDriver().findElement(
+            By.cssSelector("dt.editableProperty[data-property=\"" + property + "\"]"));
         this.viewer =
             this.element.findElement(By.xpath("./following-sibling::dd[contains(@class, 'editableProperty-viewer')]"));
         this.editor =

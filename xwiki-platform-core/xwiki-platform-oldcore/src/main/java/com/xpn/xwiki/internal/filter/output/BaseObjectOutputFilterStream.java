@@ -214,7 +214,10 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
         for (String key : xclass.getPropertyList()) {
             if (this.entity.safeget(key) == null) {
                 PropertyClass classProperty = (PropertyClass) xclass.getField(key);
-                this.entity.safeput(key, classProperty.newProperty());
+                BaseProperty property = classProperty.newProperty();
+                if (property != null) {
+                    this.entity.safeput(key, property);
+                }
             }
         }
     }

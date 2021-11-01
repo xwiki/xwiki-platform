@@ -190,7 +190,7 @@ export default {
       if (this.operator === "between") {
         // Serialize the date range as a ISO 8601 time interval, without fractional seconds.
         // See https://en.wikipedia.org/wiki/ISO_8601#Time_intervals
-        return `${daterangepicker.startDate.format()}/${daterangepicker.endDate.format()}`
+        return `${daterangepicker.startDate.format()}/${daterangepicker.endDate.add(59, 'seconds').format()}`
       } else if (this.operator === 'before' || this.operator === 'after') {
         // Use the ISO 8601 representation, without fractional seconds.
         return daterangepicker.startDate.format();

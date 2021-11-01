@@ -64,7 +64,7 @@ import static org.mockito.Mockito.when;
  * @since 11.9RC1
  */
 @OldcoreTest
-public class UpdateRightsOnDocumentRenameListenerTest
+class UpdateRightsOnDocumentRenameListenerTest
 {
     @InjectMockComponents
     private UpdateRightsOnDocumentRenameListener listener;
@@ -127,7 +127,7 @@ public class UpdateRightsOnDocumentRenameListenerTest
     }
 
     @Test
-    public void processOnRenameWithUserOnly() throws XWikiException
+    void processOnRenameWithUserOnly() throws XWikiException
     {
         when(targetUserDocument.getXObject((EntityReference) userClassDocumentReference)).thenReturn(new BaseObject());
         DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(sourceUserDocumentReference,
@@ -149,7 +149,7 @@ public class UpdateRightsOnDocumentRenameListenerTest
     }
 
     @Test
-    public void processOnRenameWithGroupOnly() throws XWikiException
+    void processOnRenameWithGroupOnly() throws XWikiException
     {
         when(targetUserDocument.getXObject((EntityReference) groupClassDocumentReference)).thenReturn(new BaseObject());
         DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(sourceUserDocumentReference,
@@ -171,7 +171,7 @@ public class UpdateRightsOnDocumentRenameListenerTest
     }
 
     @Test
-    public void processOnRenameWithUserAndGroup() throws XWikiException
+    void processOnRenameWithUserAndGroup() throws XWikiException
     {
         when(targetUserDocument.getXObject((EntityReference) userClassDocumentReference)).thenReturn(new BaseObject());
         when(targetUserDocument.getXObject((EntityReference) groupClassDocumentReference)).thenReturn(new BaseObject());

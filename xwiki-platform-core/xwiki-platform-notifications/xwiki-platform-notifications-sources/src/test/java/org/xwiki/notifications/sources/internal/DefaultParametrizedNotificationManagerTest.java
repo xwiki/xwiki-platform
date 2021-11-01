@@ -64,7 +64,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -244,7 +244,7 @@ public class DefaultParametrizedNotificationManagerTest
 
         // Verify
         assertEquals(5, result);
-        verifyZeroInteractions(event3);
+        verifyNoInteractions(event3);
     }
 
     @Test

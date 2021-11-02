@@ -28,7 +28,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
@@ -38,7 +40,6 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
-import org.xwiki.test.docker.internal.junit5.VersionUtils;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
@@ -156,7 +157,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
         // have been fixed.
-        if (VersionUtils.getJavaMajorVersion() >= 17) {
+        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
+            LOGGER.info("XXX Java 17 found!");
             List<String> javaOpts = new ArrayList<>();
             addJava17AddOpens(javaOpts);
             this.servletContainer.withEnv("JAVA_OPTS", StringUtils.join(javaOpts, ' '));

@@ -2689,6 +2689,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * Retrieve and returns all objects corresponding to the given class reference, or an empty list if there's none.
+     * Be aware that some elements of this list might be null since all objects are in the list at their real index.
+     *
+     * @param classReference the reference of the xclass for which to retrieve the xobjects
+     * @return a list of xobjects and null elements (for deleted xobjects) corresponding to the given xclass
+     *          or an empty list.
      * @since 2.2M1
      */
     public List<BaseObject> getXObjects(DocumentReference classReference)
@@ -2703,6 +2709,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * Retrieve and returns all objects corresponding to the class reference corresponding to the resolution of the
+     * given entity reference, or an empty list if there's none.
+     * Be aware that some elements of this list might be null since all objects are in the list at their real index.
+     *
+     * @param reference the reference that is resolved to an xclass for retrieving the corresponding xobjects
+     * @return a list of xobjects and null elements (for deleted xobjects) corresponding to the given xclass
+     *           or an empty list.
      * @since 3.3M1
      */
     public List<BaseObject> getXObjects(EntityReference reference)

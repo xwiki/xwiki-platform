@@ -38,6 +38,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.VersionUtils;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
@@ -153,6 +154,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
             "/var/lib/jetty/webapps/xwiki");
 
+        // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
+        // have been fixed.
+        if (VersionUtils.getJavaMajorVersion() >= 17) {
+            List<String> javaOpts = new ArrayList<>();
+            addJava17AddOpens(javaOpts);
+            this.servletContainer.withEnv("JAVA_OPTS", StringUtils.join(javaOpts, ' '));
+        }
+
         // When executing on the Oracle database, we get the following timezone error unless we pass a system
         // property to the Oracle JDBC driver:
         //   java.sql.SQLException: Cannot create PoolableConnectionFactory (ORA-00604: error occurred at
@@ -188,6 +197,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         catalinaOpts.add("-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true");
         catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
         catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");
+
+        // Note: Tomcat 9.x automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
+        // need to add them as we do for Jetty.
+        // see https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
 
         // If we're on debug mode, start XWiki in debug mode too so that we can attach a remote debugger to it
         // in order to debug.
@@ -350,5 +363,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         {
             this.servletContainer.copyFileFromContainer(CLOVER_DATABASE, CLOVER_DATABASE);
         }
+    }
+
+    private void addJava17AddOpens(List<String> list)
+    {
+        list.add("--add-opens java.base/java.lang=ALL-UNNAMED");
+        list.add("--add-opens java.base/java.util=ALL-UNNAMED");
+        list.add("--add-opens java.base/java.concurrent=ALL-UNNAMED");
     }
 }

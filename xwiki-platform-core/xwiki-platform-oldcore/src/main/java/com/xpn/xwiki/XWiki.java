@@ -113,6 +113,7 @@ import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
 import org.xwiki.extension.job.internal.InstallJob;
+import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
@@ -7891,9 +7892,9 @@ public class XWiki implements EventListener
         // Skip it if:
         // * the authenticator was not yet initialized
         // * we are using the standard authenticator
-        // * the event is not related to an install job
+        // * the event is not related to an install or uninstall job
         if (this.authService == null || this.authService.getClass() == XWikiAuthServiceImpl.class
-            || !event.getJobType().equals(InstallJob.JOBTYPE)) {
+            || (!event.getJobType().equals(InstallJob.JOBTYPE) && !event.getJobType().equals(UninstallJob.JOBTYPE))) {
             return;
         }
 
@@ -7910,7 +7911,8 @@ public class XWiki implements EventListener
                 setAuthService(authClass);
             }
         } catch (ClassNotFoundException e) {
-            LOGGER.error("Failed to get the class of the configured authenticator, setting standard authenticator.", e);
+            LOGGER.warn("Failed to get the class of the configured authenticator ({}), keeping current authenticator.",
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

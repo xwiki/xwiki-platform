@@ -128,8 +128,9 @@ def builds = [
       // Java 17+. Remove that when we support it. See for example https://tinyurl.com/vc5brrtd
       properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec -Djvm=/home/hudsonagent/java8/bin/java',
       sonar: true,
-      // Build with Java 16 since Sonar requires Java 11+.
-      javaTool: 'java16'
+      // Build with Java 14 since Sonar requires Java 11+ (and currently we can't use Java 16 or 17 because of
+      // Spoon).
+      javaTool: 'java14'
     )
   }
 ]

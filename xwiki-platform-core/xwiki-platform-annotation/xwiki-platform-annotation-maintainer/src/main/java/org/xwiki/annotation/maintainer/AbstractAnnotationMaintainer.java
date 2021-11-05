@@ -90,7 +90,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
             }
 
             // store the annotations to save after update
-            List<Annotation> toUpdate = new ArrayList<Annotation>();
+            List<Annotation> toUpdate = new ArrayList<>();
 
             // produce the ptr of the previous and current, wrt to syntax
             String syntaxId = ioContentService.getSourceSyntax(target);
@@ -402,7 +402,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
      */
     private List<Integer> getOccurrences(String subject, String pattern, int exclude)
     {
-        List<Integer> indexes = new ArrayList<Integer>();
+        List<Integer> indexes = new ArrayList<>();
         int lastIndex = subject.indexOf(pattern);
         while (lastIndex != -1) {
             if (lastIndex != exclude) {

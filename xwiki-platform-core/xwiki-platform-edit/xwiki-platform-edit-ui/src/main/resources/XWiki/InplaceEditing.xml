@@ -735,13 +735,19 @@ define('editInPlace', [
     if (actionButtonsWrapper.length === 0) {
       actionButtonsWrapper = $('&lt;div class="sticky-buttons-wrapper col-xs-12"&gt;' +
         '&lt;div class="inplace-editing-buttons sticky-buttons"/&gt;&lt;/div&gt;').insertAfter(editContent).toggle(!!xwikiDocument);
-      var actionButtons = actionButtonsWrapper.children('.sticky-buttons').data('xwikiDocument', xwikiDocument);
+      var actionButtons = actionButtonsWrapper.children('.sticky-buttons')
+        .data('xwikiDocument', xwikiDocument)
+        // expose the fakeform if an extension needs to manipulate it
+        .data('fakeForm', fakeForm);
       return loadActionButtons(actionButtons);
     } else {
       // If we're editing a page..
       if (xwikiDocument) {
         // ..then make sure the action buttons are displayed right away (don't wait for the user to scroll).
-        actionButtonsWrapper.show().children('.sticky-buttons').data('xwikiDocument', xwikiDocument)
+        actionButtonsWrapper.show().children('.sticky-buttons')
+          .data('xwikiDocument', xwikiDocument)
+          // expose the fakeform if an extension needs to manipulate it
+          .data('fakeForm', fakeForm)
           // but make sure the position of the action buttons is updated.
           .trigger('xwiki:dom:refresh');
         // The action buttons are disabled on Save &amp; View. We don't reload the page on Save &amp; View and we reuse the
@@ -768,6 +774,7 @@ define('editInPlace', [
 
   var initTranslateButton = function(xwikiDocument) {
     // Initialize the translate button only if it's visible.
+    // FIXME: this should probably use the translateButtonSelector
     const translateButton = $('#tmTranslate [data-toggle="popover"]').filter(':visible');
     translateButton.off('click.translate').on('click.translate', function(event) {
       event.preventDefault();
@@ -861,6 +868,9 @@ define('editInPlace', [
     },
     insert: function(element) {
       this._getActionButtons().find('.hidden.extra').append(element);
+    },
+    append: function(element) {
+      this.insert(element);
     },
     down: function(selector) {
       return this._getActionButtons().find(selector)[0];
@@ -1071,7 +1081,7 @@ require(['jquery'], function($) {
     $(this).click();
   };
 
-  var editButton = $('#tmEdit &gt; a');
+  var editButton = $(config.editButtonSelector);
   editButton.on('click.inPlaceEditing', {
     beforeEdit: function() {
       history.replaceState(null, null, '#edit');
@@ -1081,7 +1091,7 @@ require(['jquery'], function($) {
     }
   }, onInPlaceEditing).attr('data-editor', 'inplace');
 
-  var translateButton = $('#tmTranslate &gt; a');
+  var translateButton = $(config.translateButtonSelector);
   translateButton.on('click.inPlaceEditing', {
     beforeEdit: function() {
       history.replaceState(null, null, '#translate');
@@ -1578,6 +1588,8 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
       'contentType': 'org.xwiki.rendering.syntax.SyntaxContent',
       'editMode': $defaultEditMode,
       'wysiwygEditor': $services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id,
+      'editButtonSelector': '#tmEdit &gt; a',
+      'translateButtonSelector': '#tmTranslate &gt; a',
       'enableSourceMode': true,
       'enableOfficeImport': $services.officemanager.isConnected(),
       'paths': {

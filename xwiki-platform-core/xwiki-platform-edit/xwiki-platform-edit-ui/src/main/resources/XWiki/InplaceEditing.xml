@@ -746,7 +746,7 @@ define('editInPlace', [
         // ..then make sure the action buttons are displayed right away (don't wait for the user to scroll).
         actionButtonsWrapper.show().children('.sticky-buttons')
           .data('xwikiDocument', xwikiDocument)
-          // expose the fakeform if an extension needs to manipulate it
+          // Expose the fake form if an extension needs to manipulate it.
           .data('fakeForm', fakeForm)
           // but make sure the position of the action buttons is updated.
           .trigger('xwiki:dom:refresh');

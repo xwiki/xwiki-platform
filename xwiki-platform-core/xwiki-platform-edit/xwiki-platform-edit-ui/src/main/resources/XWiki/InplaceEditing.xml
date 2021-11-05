@@ -737,7 +737,7 @@ define('editInPlace', [
         '&lt;div class="inplace-editing-buttons sticky-buttons"/&gt;&lt;/div&gt;').insertAfter(editContent).toggle(!!xwikiDocument);
       var actionButtons = actionButtonsWrapper.children('.sticky-buttons')
         .data('xwikiDocument', xwikiDocument)
-        // expose the fakeform if an extension needs to manipulate it
+        // Expose the fake form if an extension needs to manipulate it.
         .data('fakeForm', fakeForm);
       return loadActionButtons(actionButtons);
     } else {

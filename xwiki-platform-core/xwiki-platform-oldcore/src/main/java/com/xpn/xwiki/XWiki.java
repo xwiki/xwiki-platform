@@ -113,6 +113,7 @@ import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
 import org.xwiki.extension.job.internal.InstallJob;
+import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
@@ -7891,9 +7892,9 @@ public class XWiki implements EventListener
         // Skip it if:
         // * the authenticator was not yet initialized
         // * we are using the standard authenticator
-        // * the event is not related to an install job
+        // * the event is not related to an install or uninstall job
         if (this.authService == null || this.authService.getClass() == XWikiAuthServiceImpl.class
-            || !event.getJobType().equals(InstallJob.JOBTYPE)) {
+            || (!event.getJobType().equals(InstallJob.JOBTYPE) && !event.getJobType().equals(UninstallJob.JOBTYPE))) {
             return;
         }
 
@@ -7903,11 +7904,15 @@ public class XWiki implements EventListener
 
             // If the class does not have the same reference anymore it means it's coming from a different classloader
             // which generally imply that it's coming from an extension which has been reloaded or upgraded
-            if (this.authService.getClass() != authClass) {
+            // Both still need to have the same class name as otherwise it means the current class did not had anything
+            // to with with the standard configuration (some authenticators register themself)
+            if (this.authService.getClass() != authClass
+                && this.authService.getClass().getName().equals(authClass.getName())) {
                 setAuthService(authClass);
             }
         } catch (ClassNotFoundException e) {
-            LOGGER.error("Failed to get the class of the configured authenticator, setting standard authenticator.", e);
+            LOGGER.warn("Failed to get the class of the configured authenticator ({}), keeping current authenticator.",
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

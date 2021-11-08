@@ -21,6 +21,7 @@ package org.xwiki.annotation;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.hamcrest.Description;
 import org.jmock.Expectations;
@@ -34,6 +35,8 @@ import org.xwiki.annotation.io.IOTargetService;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxRegistry;
 
 /**
  * Mock setup for the annotations tests, mocking the {@link IOService} and {@link IOTargetService} to provide documents
@@ -60,6 +63,8 @@ public class AnnotationsMockSetup
      */
     protected IOService ioService;
 
+    protected SyntaxRegistry syntaxRegistry;
+
     /**
      * The document factory used to load documents from the test files.
      */
@@ -78,15 +83,21 @@ public class AnnotationsMockSetup
     {
         // IOTargetService mockup
         ioTargetService = mockery.mock(IOTargetService.class);
-        DefaultComponentDescriptor<IOTargetService> iotsDesc = new DefaultComponentDescriptor<IOTargetService>();
+        DefaultComponentDescriptor<IOTargetService> iotsDesc = new DefaultComponentDescriptor<>();
         iotsDesc.setRoleType(IOTargetService.class);
         componentManager.registerComponent(iotsDesc, ioTargetService);
 
         // IOService mockup
         ioService = mockery.mock(IOService.class);
-        DefaultComponentDescriptor<IOService> ioDesc = new DefaultComponentDescriptor<IOService>();
+        DefaultComponentDescriptor<IOService> ioDesc = new DefaultComponentDescriptor<>();
         ioDesc.setRoleType(IOService.class);
         componentManager.registerComponent(ioDesc, ioService);
+
+        // Syntax Registry mock
+        syntaxRegistry = mockery.mock(SyntaxRegistry.class);
+        DefaultComponentDescriptor<SyntaxRegistry> syntaxRegistryDesc = new DefaultComponentDescriptor<>();
+        syntaxRegistryDesc.setRoleType(SyntaxRegistry.class);
+        componentManager.registerComponent(syntaxRegistryDesc, syntaxRegistry);
 
         this.docFactory = docFactory;
     }
@@ -154,6 +165,9 @@ public class AnnotationsMockSetup
 
                 allowing(ioTargetService).getSourceSyntax(with(docName));
                 will(returnValue(mDoc.getSyntax()));
+
+                allowing(syntaxRegistry).getSyntax("xwiki/2.0");
+                will(returnValue(Optional.of(Syntax.XWIKI_2_0)));
             }
         });
     }

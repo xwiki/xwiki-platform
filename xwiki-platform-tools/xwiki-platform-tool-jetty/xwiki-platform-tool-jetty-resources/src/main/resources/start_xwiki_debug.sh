@@ -237,8 +237,8 @@ java_version() {
 }
 
 # Check version of Java (when in non-interactive mode)
+JAVA_VERSION="$(java_version)"
 if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
-  JAVA_VERSION="$(java_version)"
   if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
     echo "No Java found. You need Java installed for XWiki to work."
     exit 0

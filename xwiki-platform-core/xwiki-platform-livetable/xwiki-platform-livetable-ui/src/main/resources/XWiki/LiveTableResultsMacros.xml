@@ -936,7 +936,7 @@
       #set ($paramPrefix = $NULL)
     #end
   #end
-  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size() $paramPrefix)")
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size() $paramPrefix $NULL)")
   #set ($whereSql = "$whereSql and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
     #livetable_addFilterParam($filterValue $matchType $whereParams "${paramPrefix}${foreach.count}")
@@ -960,7 +960,7 @@
   #end
   ## As noted above, we have to use the like operator because the list of values is saved concatenated, so from the
   ## point of view of the query the match type is always partial.
-  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget 'partial' false $filterValues.size() $paramPrefix)")
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget 'partial' false $filterValues.size() $paramPrefix $NULL)")
   #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
     #if ($matchTypes.get($foreach.index) == 'empty')

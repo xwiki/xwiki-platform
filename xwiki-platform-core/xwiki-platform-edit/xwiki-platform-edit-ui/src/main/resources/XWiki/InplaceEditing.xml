@@ -774,8 +774,7 @@ define('editInPlace', [
 
   var initTranslateButton = function(xwikiDocument) {
     // Initialize the translate button only if it's visible.
-    // FIXME: this should probably use the translateButtonSelector
-    const translateButton = $('#tmTranslate [data-toggle="popover"]').filter(':visible');
+    const translateButton = $(config.translateButtonSelector).filter('[data-toggle="popover"]').filter(':visible');
     translateButton.off('click.translate').on('click.translate', function(event) {
       event.preventDefault();
       translateButton.parent().addClass('hidden');

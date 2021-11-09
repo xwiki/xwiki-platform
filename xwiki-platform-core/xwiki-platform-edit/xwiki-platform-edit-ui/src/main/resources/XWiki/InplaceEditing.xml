@@ -806,7 +806,7 @@ define('editInPlace', [
       var xwikiDocumentLocale = data.document.getRealLocale();
       var uiLocale = $('html').attr('lang');
       if (xwikiDocumentLocale &amp;&amp; xwikiDocumentLocale !== uiLocale) {
-        const translateButton = $('#tmTranslate [data-toggle="popover"]');
+        const translateButton = $(config.translateButtonSelector).filter('[data-toggle="popover"]');
         // Restore the translation button behavior for view action.
         translateButton.off('click.translate')
           // Restore the popover text for view action.
@@ -868,6 +868,7 @@ define('editInPlace', [
     insert: function(element) {
       this._getActionButtons().find('.hidden.extra').append(element);
     },
+    // Note that this method only works with single argument.
     append: function(element) {
       this.insert(element);
     },

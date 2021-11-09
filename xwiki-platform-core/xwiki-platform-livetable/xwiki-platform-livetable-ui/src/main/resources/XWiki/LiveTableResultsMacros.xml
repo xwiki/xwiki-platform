@@ -892,7 +892,7 @@
     #end
   #end
   #set ($filterValues = $request.getParameterValues($colname))
-  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size() $paramPrefix)")
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size() $paramPrefix $NULL)")
   #set ($whereSql = "$whereSql and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
     #livetable_addFilterParam($filterValue $matchType $whereParams "${paramPrefix}${foreach.count}")
@@ -911,7 +911,7 @@
   #else
     #set ($paramPrefix = $NULL)
   #end
-  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget 'partial' false $filterValues.size() $paramPrefix)")
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget 'partial' false $filterValues.size() $paramPrefix $NULL)")
   #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
     #if ($whereParams.entrySet())

@@ -358,7 +358,7 @@ var XWiki = (function(XWiki) {
           this.savingBox.replace(this.savedBox);
         }
         if (!state.isContinue || $('body').hasClassName('previewbody')) {
-          state.saveButton.fire("xwiki:document:saved");
+          state.saveButton.fire("xwiki:document:saved", response.responseJSON);
           if (this.maybeRedirect(state.isContinue)) {
             return;
           }
@@ -378,8 +378,7 @@ var XWiki = (function(XWiki) {
       }
 
       // Announce that the document has been saved
-      // TODO: We should send the new version as a memo field
-      state.saveButton.fire("xwiki:document:saved");
+      state.saveButton.fire("xwiki:document:saved", response.responseJSON);
 
       // If documents have been merged we need to reload to get latest saved version.
       if (response.responseJSON && response.responseJSON.mergedDocument) {

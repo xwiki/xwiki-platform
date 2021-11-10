@@ -23,8 +23,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.text.StringUtils;
 
-import java.io.Serializable;
-
 /**
  * A Legacy Event Status is the equivalent of {@link EventStatus} for {@link LegacyEvent}.
  *
@@ -33,7 +31,7 @@ import java.io.Serializable;
  * @since 11.1RC1
  * @version $Id$
  */
-public class LegacyEventStatus implements Serializable
+public class LegacyEventStatus
 {
     private LegacyEvent activityEvent;
 

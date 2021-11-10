@@ -37,10 +37,7 @@ import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
-import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
-import org.xwiki.eventstream.internal.events.EventStatusDeletedEvent;
 import org.xwiki.model.namespace.WikiNamespace;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -73,9 +70,6 @@ public class LegacyEventStatusManager implements EventStatusManager
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
-    private ObservationManager observation;
 
     @Inject
     private NamespaceContextExecutor namespaceContextExecutor;
@@ -200,7 +194,6 @@ public class LegacyEventStatusManager implements EventStatusManager
                 throw new EventStreamException(e);
             }
 
-            this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
             return null;
         });
     }
@@ -221,7 +214,6 @@ public class LegacyEventStatusManager implements EventStatusManager
                 throw new EventStreamException(e);
             }
 
-            this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
             return null;
         });
     }
@@ -257,7 +249,6 @@ public class LegacyEventStatusManager implements EventStatusManager
                 throw new EventStreamException(e);
             }
 
-            this.observation.notify(new EventStatusDeletedEvent(), null);
             return null;
         });
     }

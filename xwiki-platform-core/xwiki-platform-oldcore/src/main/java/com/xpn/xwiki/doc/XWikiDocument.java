@@ -99,6 +99,8 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
@@ -149,6 +151,8 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
@@ -636,6 +640,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private RenderingContext renderingContext;
 
     /**
+     * @see #getAuthors()
+     */
+    private DocumentAuthors authors;
+
+    /**
      * Create a document for the given reference, with the {@link Locale#ROOT} even if the reference contains a locale.
      * If you want to create a document for another locale, use {@link #XWikiDocument(DocumentReference, Locale)}.
      * @since 2.2M1
@@ -826,6 +835,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private String localizePlainOrKey(String key, Object... parameters)
     {
         return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+    }
+
+    private DocumentReferenceResolver<UserReference> getDocumentReferenceUserReferenceResolver()
+    {
+        return Utils.getComponent(
+            new DefaultParameterizedType(DocumentReferenceResolver.class, null, UserReference.class), "bridge");
+    }
+
+    private UserReferenceResolver<DocumentReference> getUserReferenceDocumentReferenceResolver()
+    {
+        return Utils.getComponent(
+            new DefaultParameterizedType(UserReferenceResolver.class, null, DocumentReference.class), "document");
     }
 
     public XWikiStoreInterface getStore(XWikiContext context)
@@ -1866,28 +1887,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
+     * @deprecated Since 13.10RC1 rely on {@link #getAuthors}.
      */
+    @Deprecated
     public DocumentReference getAuthorReference()
     {
-        return this.authorReference;
+        return this.getDocumentReferenceUserReferenceResolver().resolve(getAuthors().getMetadataAuthor());
     }
 
     /**
      * @since 3.0M3
+     * @deprecated Since 13.10RC1 rely on {@link #setAuthors(DocumentAuthors)}
      */
+    @Deprecated
     public void setAuthorReference(DocumentReference authorReference)
     {
-        if (ObjectUtils.notEqual(authorReference, getAuthorReference())) {
-            setMetaDataDirty(true);
-        }
-
-        this.authorReference = intern(authorReference);
-
-        // Log this since it's probably a mistake so that we find who is doing bad things
-        if (this.authorReference != null && this.authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                new Exception("See stack trace"));
-        }
+        UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(authorReference);
+        this.setAuthors(new DefaultDocumentAuthors(this.getAuthors()).setMetadataAuthor(user));
     }
 
     /**
@@ -1914,30 +1930,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
+     * @deprecated Since 13.10RC1 rely on {@link #getAuthors()}.
      */
     @Override
     public DocumentReference getContentAuthorReference()
     {
-        return this.contentAuthorReference;
+        return this.getDocumentReferenceUserReferenceResolver().resolve(this.getAuthors().getContentAuthor());
     }
 
     /**
      * @since 3.0M3
+     * @deprecated Since 13.10RC1 rely on {@link #setAuthors(DocumentAuthors)}
      */
+    @Deprecated
     public void setContentAuthorReference(DocumentReference contentAuthorReference)
     {
-        if (ObjectUtils.notEqual(contentAuthorReference, getContentAuthorReference())) {
-            setMetaDataDirty(true);
-        }
-
-        this.contentAuthorReference = intern(contentAuthorReference);
-
-        // Log this since it's probably a mistake so that we find who is doing bad things
-        if (this.contentAuthorReference != null
-            && this.contentAuthorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                new Exception("See stack trace"));
-        }
+        UserReference contentUser = this.getUserReferenceDocumentReferenceResolver().resolve(contentAuthorReference);
+        this.setAuthors(new DefaultDocumentAuthors(this.getAuthors()).setContentAuthor(contentUser));
     }
 
     /**
@@ -9125,5 +9134,31 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public int getLocalReferenceMaxLength()
     {
         return getStore().getLimitSize(this.getXWikiContext(), this.getClass(), "fullName");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DocumentAuthors getAuthors()
+    {
+        return this.authors;
+    }
+
+    /**
+     * Allow to set the different authors of the document.
+     * Note that if one of the author changed as part of this call, the {@link #setMetaDataDirty(boolean)} flag is set
+     * to {@code true}.
+     *
+     * @param authors the authors information.
+     * @since 13.10RC1
+     */
+    @Unstable
+    public void setAuthors(DocumentAuthors authors)
+    {
+        if (!Objects.equals(getAuthors(), authors)) {
+            this.setMetaDataDirty(true);
+        }
+        this.authors = authors;
     }
 }

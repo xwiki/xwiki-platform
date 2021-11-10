@@ -21,6 +21,7 @@ package org.xwiki.bridge;
 
 import java.util.Date;
 
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
@@ -133,8 +134,20 @@ public interface DocumentModelBridge
     /**
      * @return the document's content author user reference
      * @since 7.2M1
+     * @deprecated since 13.10RC1 rely on {@link #getAuthors()}.
      */
+    @Deprecated
     DocumentReference getContentAuthorReference();
+
+    /**
+     * @return the various authors information of a document.
+     * @since 13.10RC1
+     */
+    @Unstable
+    default DocumentAuthors getAuthors()
+    {
+        return null;
+    }
 
     /**
      * @return the creation date of the current document.

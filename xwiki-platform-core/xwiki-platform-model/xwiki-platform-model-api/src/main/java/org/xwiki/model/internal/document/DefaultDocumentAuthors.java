@@ -50,9 +50,11 @@ public class DefaultDocumentAuthors implements DocumentAuthors
      */
     public DefaultDocumentAuthors(DocumentAuthors documentAuthors)
     {
-        this.contentAuthor = documentAuthors.getContentAuthor();
-        this.metadataAuthor = documentAuthors.getMetadataAuthor();
-        this.displayedAuthor = documentAuthors.getDisplayedAuthor();
+        if (documentAuthors != null) {
+            this.contentAuthor = documentAuthors.getContentAuthor();
+            this.metadataAuthor = documentAuthors.getMetadataAuthor();
+            this.displayedAuthor = documentAuthors.getDisplayedAuthor();
+        }
     }
 
     /**

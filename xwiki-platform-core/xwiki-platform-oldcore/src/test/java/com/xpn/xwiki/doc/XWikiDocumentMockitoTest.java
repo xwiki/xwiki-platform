@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
@@ -49,7 +50,10 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
@@ -104,6 +108,14 @@ public class XWikiDocumentMockitoTest
     private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
 
     private static final DocumentReference CLASS_REFERENCE = DOCUMENT_REFERENCE;
+
+    @MockComponent
+    @Named("bridge")
+    private DocumentReferenceResolver<UserReference> documentReferenceUserReferenceResolver;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceDocumentReferenceResolver;
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -851,6 +863,9 @@ public class XWikiDocumentMockitoTest
     {
         // Make sure we set the metadata dirty flag to false to verify it's not changed thereafter
         DocumentReference author = new DocumentReference("Wiki", "XWiki", "Author");
+        UserReference userReference = mock(UserReference.class);
+        when(this.documentReferenceUserReferenceResolver.resolve(userReference)).thenReturn(author);
+        when(this.userReferenceDocumentReferenceResolver.resolve(author)).thenReturn(userReference);
         this.document.setAuthorReference(author);
         this.document.setMetaDataDirty(false);
 
@@ -1309,6 +1324,9 @@ public class XWikiDocumentMockitoTest
     void testAuthorAfterDocumentCopy() throws XWikiException
     {
         DocumentReference author = new DocumentReference("Wiki", "XWiki", "Albatross");
+        UserReference userReference = mock(UserReference.class);
+        when(this.documentReferenceUserReferenceResolver.resolve(userReference)).thenReturn(author);
+        when(this.userReferenceDocumentReferenceResolver.resolve(author)).thenReturn(userReference);
         this.document.setAuthorReference(author);
         XWikiDocument copy =
             this.document.copyDocument(this.document.getName() + " Copy", this.oldcore.getXWikiContext());

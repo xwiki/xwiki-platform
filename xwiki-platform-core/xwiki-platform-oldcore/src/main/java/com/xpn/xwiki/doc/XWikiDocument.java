@@ -642,7 +642,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * @see #getAuthors()
      */
-    private DocumentAuthors authors;
+    private DefaultDocumentAuthors authors;
 
     /**
      * Create a document for the given reference, with the {@link Locale#ROOT} even if the reference contains a locale.
@@ -840,13 +840,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private DocumentReferenceResolver<UserReference> getDocumentReferenceUserReferenceResolver()
     {
         return Utils.getComponent(
-            new DefaultParameterizedType(DocumentReferenceResolver.class, null, UserReference.class), "bridge");
+            new DefaultParameterizedType(null, DocumentReferenceResolver.class, UserReference.class), "bridge");
     }
 
     private UserReferenceResolver<DocumentReference> getUserReferenceDocumentReferenceResolver()
     {
         return Utils.getComponent(
-            new DefaultParameterizedType(UserReferenceResolver.class, null, DocumentReference.class), "document");
+            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
     }
 
     public XWikiStoreInterface getStore(XWikiContext context)
@@ -1892,7 +1892,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public DocumentReference getAuthorReference()
     {
-        return this.getDocumentReferenceUserReferenceResolver().resolve(getAuthors().getMetadataAuthor());
+        if (getAuthors() != null) {
+            return this.getDocumentReferenceUserReferenceResolver().resolve(getAuthors().getMetadataAuthor());
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -1902,8 +1906,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public void setAuthorReference(DocumentReference authorReference)
     {
-        UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(authorReference);
-        this.setAuthors(new DefaultDocumentAuthors(this.getAuthors()).setMetadataAuthor(user));
+        if (authorReference != null) {
+            UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(authorReference);
+            if (this.authors != null && !Objects.equals(this.authors.getMetadataAuthor(), user)) {
+                this.authors.setMetadataAuthor(user);
+                this.setMetaDataDirty(true);
+            } else {
+                this.setAuthors(new DefaultDocumentAuthors().setMetadataAuthor(user));
+            }
+        }
     }
 
     /**
@@ -1935,7 +1946,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Override
     public DocumentReference getContentAuthorReference()
     {
-        return this.getDocumentReferenceUserReferenceResolver().resolve(this.getAuthors().getContentAuthor());
+        if (getAuthors() != null) {
+            return this.getDocumentReferenceUserReferenceResolver().resolve(this.getAuthors().getContentAuthor());
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -1945,8 +1960,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public void setContentAuthorReference(DocumentReference contentAuthorReference)
     {
-        UserReference contentUser = this.getUserReferenceDocumentReferenceResolver().resolve(contentAuthorReference);
-        this.setAuthors(new DefaultDocumentAuthors(this.getAuthors()).setContentAuthor(contentUser));
+        if (contentAuthorReference != null) {
+            UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(contentAuthorReference);
+            if (this.authors != null && !Objects.equals(this.authors.getContentAuthor(), user)) {
+                this.authors.setContentAuthor(user);
+                this.setMetaDataDirty(true);
+            } else {
+                this.setAuthors(new DefaultDocumentAuthors().setContentAuthor(user));
+            }
+        }
     }
 
     /**
@@ -9159,6 +9181,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (!Objects.equals(getAuthors(), authors)) {
             this.setMetaDataDirty(true);
         }
-        this.authors = authors;
+        this.authors = new DefaultDocumentAuthors(authors);
     }
 }

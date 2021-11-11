@@ -610,7 +610,6 @@ return XWiki;
 #set($annotationsActivated = $configObj.getProperty('activated').value)
 #set($exceptionSpaces = $configObj.getProperty('exceptionSpaces').value)
 #set($annotationClass = $configObj.getProperty('annotationClass').value)
-#set ($fastDiffPath = $services.webjars.url('org.webjars.npm:fast-diff', 'diff'))
 
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
@@ -973,35 +972,6 @@ XWiki.Annotation = Class.create({
       }
       response.request.options.onFailure(response);
       return true;
-    }
-  },
-
-  /**
-   * Mark the given annotations inside the content by using the start and end offset computed on the server.
-   * With these, a DOM Range will be created and each node inside it will be marked.
-   *
-   * @param annotations object with information about all the annotations on the page
-   * @param andShow whether the annotations should also be shown (highlighted) on the content
-   * @param navigateToPane if the document should be repositioned to the annotations tab in the document extra section.
-   *        Useful when the changes on annotations are done from the tab, when the document position should still stay
-   *        in the tab
-   * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful
-   *        for deleting annotations, which should be reflected in the annotated element even if no annotations are
-   *        still left to display)
-   */
-  loadAnnotations: function(annotatedContent, andShow, navigateToPane, force) {
-    if (annotatedContent.annotations.size() == 0 &amp;&amp; !force) {
-      return;
-    }
-    // For avoiding adding the same annotation twice, all the annotations markups are removed before adding them again.
-    this.removeAnnotationsAndSelectionMarkups();
-    this.addAnnotationsMarkup(annotatedContent.annotations);
-    // Notify the content change.
-    document.fire('xwiki:dom:updated', {elements: [this.annotatedElement]});
-    // Also handle the tab 'downstairs' when the annotations list changes.
-    this.reloadTab(navigateToPane);
-    if (andShow) {
-      this.toggleAnnotations(true);
     }
   },
 
@@ -1863,7 +1833,7 @@ return XWiki;
 
 require.config({
   paths: {
-    'fast-diff': '$!fastDiffPath'
+    'fast-diff': $jsontool.serialize($services.webjars.url('org.webjars.npm:fast-diff', 'diff'))
   }
 })
 
@@ -1913,9 +1883,9 @@ define('xwiki-text-offset-updater', ['jquery', 'node-module!fast-diff'], functio
   };
 
   return {
-    'getChanges': getChanges,
-    'findOffsetAfterChanges': findOffsetAfterChanges
-  }
+    getChanges,
+    findOffsetAfterChanges
+  };
 });
 
 require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function($, offsetUpdater) {
@@ -1943,6 +1913,20 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
     #end
 
     $.extend(XWiki.Annotation.prototype, {
+      /**
+       * Mark the given annotations inside the content by using the start and end offset computed on the server.
+       * With these, a DOM Range will be created and each node inside it will be marked.
+       *
+       * @param annotatedContent object with information about the page annotations and the content already marked by
+       *        the server
+       * @param andShow whether the annotations should also be shown (highlighted) on the content
+       * @param navigateToPane if the document should be repositioned to the annotations tab in the document extra section.
+       *        Useful when the changes on annotations are done from the tab, when the document position should still stay
+       *        in the tab
+       * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful
+       *        for deleting annotations, which should be reflected in the annotated element even if no annotations are
+       *        still left to display)
+       */
       loadAnnotations: function(annotatedContent, andShow, navigateToPane, force) {
         if (annotatedContent.annotations.size() == 0 &amp;&amp; !force) {
           return;
@@ -1984,6 +1968,7 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
         plainTextEndOffset.value = offsetUpdater.findOffsetAfterChanges(changes, parseInt(plainTextEndOffset.value));
       }
     });
+
     // parse the exception spaces and check where is the current space in that list
     var exceptions = [];
     #foreach($space in $exceptionSpaces)

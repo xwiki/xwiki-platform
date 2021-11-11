@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
+import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.StaticListClass;
@@ -56,20 +57,22 @@ public class StaticListClassPropertyValuesProvider extends AbstractListClassProp
         List<String> allValues = StaticListClass.getListFromString(propertyDefinition.getValues());
         Map<String, ListItem> valueMap = StaticListClass.getMapFromString(propertyDefinition.getValues());
 
-        String lowerFilter = filter.toLowerCase();
-
-        allValues.stream().map(id -> constructPropertyValueForId(id, propertyDefinition, valueMap))
+        allValues.stream().map(id -> addLabelIfDifferent(new PropertyValue(id), propertyDefinition, valueMap))
             // Filter both by key and by (translated) label (that's why we construct a PropertyValue first)
-            .filter(val -> val.getValue().toString().toLowerCase().contains(lowerFilter)
+            .filter(val -> StringUtils.containsIgnoreCase(val.getValue().toString(), filter)
                 || (val.getMetaData().containsKey(META_DATA_LABEL)
-                && val.getMetaData().get(META_DATA_LABEL).toString().toLowerCase().contains(lowerFilter)))
+                && StringUtils.containsIgnoreCase(val.getMetaData().get(META_DATA_LABEL).toString(), filter)))
             .limit(limit).forEach((result::withPropertyValues));
 
         return result;
     }
 
     /**
-     * {@inheritDoc}
+     * Constructs a property value from the given result of the given static list class.
+     *
+     * @param result The result of a database query or the value from a REST query
+     * @param propertyDefinition The definition of the static list class
+     * @return The property value, possibly including a label from either the definition or l10n
      *
      * @since 13.10RC1
      */
@@ -79,36 +82,33 @@ public class StaticListClassPropertyValuesProvider extends AbstractListClassProp
         PropertyValue value = super.getValueFromQueryResult(result, propertyDefinition);
 
         if (value != null && value.getValue() instanceof String) {
-            String stringKey = (String) value.getValue();
-
             Map<String, ListItem> valueMap = StaticListClass.getMapFromString(propertyDefinition.getValues());
-            return constructPropertyValueForId(stringKey, propertyDefinition, valueMap);
+            addLabelIfDifferent(value, propertyDefinition, valueMap);
         }
 
         return value;
     }
 
     /**
-     * Constructs a {@code PropertyValue} for the given id of the given {@code StaticListClass}.
+     * Adds a label to the given {@code PropertyValue} from the given {@code StaticListClass}.
      *
-     * @param id The id/value of the item
-     * @param propertyDefinition The definition of the property
+     * @param value The property value
+     * @param propertyDefinition The definition of the static list class property
      * @param map The map from value to list item with value and label
-     * @return The result, may contain a label if it is different from the id
+     * @return The property value with the label
      * @since 13.10RC1
      */
-    private PropertyValue constructPropertyValueForId(String id, StaticListClass propertyDefinition,
+    private PropertyValue addLabelIfDifferent(PropertyValue value, StaticListClass propertyDefinition,
         Map<String, ListItem> map)
     {
+        String id = (String) value.getValue();
         String displayValue = propertyDefinition.getDisplayValue(id, propertyDefinition.getName(), map,
             this.xcontextProvider.get());
 
-        PropertyValue val = new PropertyValue(id);
-
         if (!id.equals(displayValue)) {
-            val.getMetaData().put(META_DATA_LABEL, displayValue);
+            value.getMetaData().put(META_DATA_LABEL, displayValue);
         }
 
-        return val;
+        return value;
     }
 }

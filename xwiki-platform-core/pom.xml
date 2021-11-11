@@ -321,6 +321,19 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>Not a breakage, new annotation on existing protected and now public method.</justification>
+              <criticality>allowed</criticality>
+              <ignore>true</ignore>
+              <differences>
+                <item>
+                  <code>java.annotation.added</code>
+                  <old>method java.lang.String com.xpn.xwiki.objects.classes.ListClass::getDisplayValue(java.lang.String, java.lang.String, java.util.Map&lt;java.lang.String, com.xpn.xwiki.objects.classes.ListItem&gt;, com.xpn.xwiki.XWikiContext) @ com.xpn.xwiki.objects.classes.StaticListClass</old>
+                  <new>method java.lang.String com.xpn.xwiki.objects.classes.ListClass::getDisplayValue(java.lang.String, java.lang.String, java.util.Map&lt;java.lang.String, com.xpn.xwiki.objects.classes.ListItem&gt;, com.xpn.xwiki.XWikiContext) @ com.xpn.xwiki.objects.classes.StaticListClass</new>
+                  <annotation>@org.xwiki.stability.Unstable</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

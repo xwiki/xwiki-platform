@@ -26,7 +26,7 @@ package org.xwiki.test.ui.po;
  * @since 12.6.3
  * @since 12.9RC1
  */
-public class DocumentSyntaxPropertyPane extends EditablePropertyPane
+public class DocumentSyntaxPropertyPane extends EditablePropertyPane<String>
 {
     public DocumentSyntaxPropertyPane()
     {

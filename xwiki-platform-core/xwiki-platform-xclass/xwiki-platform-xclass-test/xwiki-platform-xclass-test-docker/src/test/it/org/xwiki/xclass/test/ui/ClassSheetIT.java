@@ -19,12 +19,14 @@
  */
 package org.xwiki.xclass.test.ui;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.EditablePropertyPane;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
@@ -55,7 +57,7 @@ class ClassSheetIT
      */
     @Test
     @Order(1)
-    void createClass(TestUtils setup, TestReference reference)
+    void createClass(TestUtils setup, TestReference reference) throws Exception
     {
         //TODO: rewrite the test to not rely on the breadcrumb based on parent/child mechanism.
         setup.setHierarchyMode("parentchild");
@@ -89,6 +91,12 @@ class ClassSheetIT
             // Add a new property.
             classEditor = classSheetPage.waitUntilPageIsLoaded().clickEditClassLink();
             classEditor.addProperty("age", "Number").setPrettyName("Your current age");
+
+            // Add a computed property.
+            String titleDisplayer =
+                IOUtils.toString(this.getClass().getResourceAsStream("/contentDisplayer.wiki"), "UTF-8");
+            classEditor.addProperty("description", "ComputedField").setPrettyName("Description")
+                .setMetaProperty("customDisplay", titleDisplayer);
             classEditor.clickSaveAndView();
 
             // We have to wait for the page to load because Selenium doesn't do it all the time when we click on Save & View
@@ -99,6 +107,7 @@ class ClassSheetIT
             // Assert that the properties are listed.
             assertTrue(classSheetPage.hasProperty("color", "Your favorite color", "String"));
             assertTrue(classSheetPage.hasProperty("age", "Your current age", "Number"));
+            assertTrue(classSheetPage.hasProperty("description", "Description", "Computed Field"));
 
             // Create and bind a sheet.
             classSheetPage = classSheetPage.clickCreateSheetButton().waitUntilPageIsLoaded()
@@ -134,8 +143,21 @@ class ClassSheetIT
             editPage.setValue("age", "27");
             ViewPage viewPage = editPage.clickSaveAndView();
 
+            // Verify that the properties can be edited in-place.
+            EditablePropertyPane<String> colorProperty =
+                new EditablePropertyPane<>(String.format("%s.%s[0].color", spaceName, classDocName));
+            assertEquals("blue", colorProperty.clickEdit().getValue());
+            colorProperty.setValue("pink").clickSave();
+            assertEquals("pink", colorProperty.getDisplayValue());
+
+            EditablePropertyPane<String> descriptionProperty =
+                new EditablePropertyPane<>(String.format("%s.%s[0].description", spaceName, classDocName));
+            assertEquals("", descriptionProperty.clickEdit().getValue());
+            descriptionProperty.setValue("Tester").clickSave();
+            assertEquals("Tester", descriptionProperty.getDisplayValue());
+
             assertEquals(pageName, viewPage.getDocumentTitle());
-            assertEquals("YOUR FAVORITE COLOR\nblue\nYOUR CURRENT AGE\n27", viewPage.getContent());
+            assertEquals("YOUR FAVORITE COLOR\npink\nYOUR CURRENT AGE\n27\nDESCRIPTION\nTester", viewPage.getContent());
             viewPage.clickBreadcrumbLink(classTitle);
             classSheetPage.waitUntilPageIsLoaded();
 

@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.api;
 
+import org.xwiki.model.reference.ObjectPropertyReference;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -125,5 +127,24 @@ public class Object extends Collection
     public BaseObjectReference getReference()
     {
         return getBaseObject().getReference();
+    }
+
+    /**
+     * Helper method used to obtain the reference of an object property even when the object might not have the property
+     * (e.g. because it's a computed property which doesn't have a stored value so it's not saved on the object). This
+     * is a safe alternative to {@code getProperty(propertyName).getReference()} when you're not sure whether the object
+     * has the specified property or not.
+     * 
+     * @param propertyName the property name
+     * @return the object property reference
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-19031">XWIKI-19031: Computed fields are stored as empty string
+     *      properties in the database</a>
+     * @since 12.10.11
+     * @since 13.4.6
+     * @since 13.10RC1
+     */
+    public ObjectPropertyReference getPropertyReference(String propertyName)
+    {
+        return new ObjectPropertyReference(propertyName, getReference());
     }
 }

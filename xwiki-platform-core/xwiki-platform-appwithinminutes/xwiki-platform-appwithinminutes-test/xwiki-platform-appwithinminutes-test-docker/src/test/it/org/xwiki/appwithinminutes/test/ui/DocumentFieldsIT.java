@@ -17,14 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.appwithinminutes;
+package org.xwiki.appwithinminutes.test.ui;
 
 import java.util.Arrays;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
 import org.xwiki.appwithinminutes.test.po.ApplicationCreatePage;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomeEditPage;
@@ -33,26 +32,45 @@ import org.xwiki.appwithinminutes.test.po.ClassFieldEditPane;
 import org.xwiki.appwithinminutes.test.po.EntryEditPage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.AdminAuthenticationRule;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.EditablePropertyPane;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the special document fields available in the class editor, such as Title and Content.
  * 
  * @version $Id$
- * @since 4.5RC1
+ * @since 12.10.11
+ * @since 13.4.6
+ * @since 13.10RC1
  */
-public class DocumentFieldsTest extends AbstractTest
+@UITest
+class DocumentFieldsIT
 {
-    @Rule
-    public AdminAuthenticationRule adminAuthenticationRule = new AdminAuthenticationRule(true, getUtil());
+    @BeforeAll
+    static void beforeAll(TestUtils setup)
+    {
+        // By default the minimal distribution used for the tests doesn't have any rights setup. Let's create an Admin
+        // user part of the Admin Group and make sure that this Admin Group has admin rights in the wiki. We could also
+        // have given that Admin user the admin right directly but the solution we chose is closer to the XS
+        // distribution.
+        setup.loginAsSuperAdmin();
+        setup.setGlobalRights("XWiki.XWikiAdminGroup", "", "admin", true);
+        setup.createAdminUser();
+        setup.loginAsAdmin();
+    }
 
     @Test
-    public void titleAndContent()
+    void titleAndContent(TestUtils setup)
     {
+        setup.loginAsAdmin();
+
         // Create a new application.
         String appName = RandomStringUtils.randomAlphabetic(6);
         ApplicationCreatePage appCreatePage = ApplicationCreatePage.gotoPage();
@@ -88,37 +106,44 @@ public class DocumentFieldsTest extends AbstractTest
         EntryNamePane entryNamePane = homeEditPage.clickFinish().clickAddNewEntry();
         entryNamePane.setName("Test");
         EntryEditPage entryEditPage = entryNamePane.clickAdd();
-        Assert.assertEquals("13", entryEditPage.getValue("number1"));
+        assertEquals("13", entryEditPage.getValue("number1"));
         // The page name is used as the default value for the title field.
-        Assert.assertEquals("Test", entryEditPage.getDocumentTitle());
-        Assert.assertEquals("Test", entryEditPage.getTitle());
+        assertEquals("Test", entryEditPage.getDocumentTitle());
+        assertEquals("Test", entryEditPage.getTitle());
         entryEditPage.setTitle("Foo");
-        Assert.assertEquals(defaultContent, entryEditPage.getContent());
+        assertEquals(defaultContent, entryEditPage.getContent());
         entryEditPage.setContent("Bar");
 
         // Check that the title and the content of the entry have been updated.
         ViewPage entryViewPage = entryEditPage.clickSaveAndView();
-        Assert.assertEquals("Foo", entryViewPage.getDocumentTitle());
-        Assert.assertTrue(entryViewPage.getContent().contains("Bar"));
-        entryViewPage.clickBreadcrumbLink(appName);
+        assertEquals("Foo", entryViewPage.getDocumentTitle());
+        assertTrue(entryViewPage.getContent().contains("Bar"));
+
+        // Verify that we can edit the document fields in-place.
+        String propertyReference = String.format("%s.Code.%1$sClass[0].title1", appName);
+        EditablePropertyPane<String> titleProperty = new EditablePropertyPane<>(propertyReference);
+        assertEquals("Foo", titleProperty.clickEdit().getValue());
+        titleProperty.setValue("Book").clickSave();
+        assertEquals("Book", titleProperty.getDisplayValue());
 
         // Check the entries live table.
+        entryViewPage.clickBreadcrumbLink(appName);
         LiveTableElement liveTable = new ApplicationHomePage().getEntriesLiveTable();
         liveTable.waitUntilReady();
-        Assert.assertEquals(1, liveTable.getRowCount());
-        Assert.assertTrue(liveTable.hasRow("My Title", "Foo"));
-        Assert.assertTrue(liveTable.hasRow("My Content", "Bar"));
+        assertEquals(1, liveTable.getRowCount());
+        assertTrue(liveTable.hasRow("My Title", "Book"));
+        assertTrue(liveTable.hasRow("My Content", "Bar"));
 
         // Check that the title and the content of the class have not been changed.
-        getUtil().gotoPage(new LocalDocumentReference(Arrays.asList(appName, "Code"), appName + "Class"), "edit",
+        setup.gotoPage(new LocalDocumentReference(Arrays.asList(appName, "Code"), appName + "Class"), "edit",
             "editor=wiki");
         WikiEditPage editPage = new WikiEditPage();
-        Assert.assertEquals(appName + " Class", editPage.getTitle());
-        Assert.assertEquals("", editPage.getContent());
+        assertEquals(appName + " Class", editPage.getTitle());
+        assertEquals("", editPage.getContent());
 
         // Now edit the class and check if the default values for title and content are taken from the template.
-        editPage.editInline();
-        Assert.assertEquals(defaultTitle, new ClassFieldEditPane("title1").getDefaultValue());
-        Assert.assertEquals(defaultContent, new ClassFieldEditPane("content1").getDefaultValue());
+        editPage.edit();
+        assertEquals(defaultTitle, new ClassFieldEditPane("title1").getDefaultValue());
+        assertEquals(defaultContent, new ClassFieldEditPane("content1").getDefaultValue());
     }
 }

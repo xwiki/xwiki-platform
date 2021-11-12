@@ -925,7 +925,7 @@ XWiki.Annotation = Class.create({
           // hide message at page bottom
           this._x_notification.hide();
           // Load the received annotations, along with annotations markers.
-          this.loadAnnotations(response.responseJSON.annotatedContent.annotations, andShow, false, force);
+          this.loadAnnotations(response.responseJSON.annotatedContent, andShow, false, force);
           // store the state of the annotations
           this.fetchedAnnotations = true;
           this.setAnnotationVisibility(andShow);
@@ -972,35 +972,6 @@ XWiki.Annotation = Class.create({
       }
       response.request.options.onFailure(response);
       return true;
-    }
-  },
-
-  /**
-   * Mark the given annotations inside the content by using the start and end offset computed on the server.
-   * With these, a DOM Range will be created and each node inside it will be marked.
-   *
-   * @param annotations object with information about all the annotations on the page
-   * @param andShow whether the annotations should also be shown (highlighted) on the content
-   * @param navigateToPane if the document should be repositioned to the annotations tab in the document extra section.
-   *        Useful when the changes on annotations are done from the tab, when the document position should still stay
-   *        in the tab
-   * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful
-   *        for deleting annotations, which should be reflected in the annotated element even if no annotations are
-   *        still left to display)
-   */
-  loadAnnotations: function(annotations, andShow, navigateToPane, force) {
-    if (annotations.size() == 0 &amp;&amp; !force) {
-      return;
-    }
-    // For avoiding adding the same annotation twice, all the annotations markups are removed before adding them again.
-    this.removeAnnotationsAndSelectionMarkups();
-    this.addAnnotationsMarkup(annotations);
-    // Notify the content change.
-    document.fire('xwiki:dom:updated', {elements: [this.annotatedElement]});
-    // Also handle the tab 'downstairs' when the annotations list changes.
-    this.reloadTab(navigateToPane);
-    if (andShow) {
-      this.toggleAnnotations(true);
     }
   },
 
@@ -1285,7 +1256,7 @@ XWiki.Annotation = Class.create({
               this.fetchedAnnotations = true;
               // Reload the received annotations forcing update so that deleting last annotation is reflected in the
               // list of annotations, with scroll to tab if not in bubble.
-              this.loadAnnotations(response.responseJSON.annotatedContent.annotations, this.displayingAnnotations, !inBubble, true);
+              this.loadAnnotations(response.responseJSON.annotatedContent, this.displayingAnnotations, !inBubble, true);
             }.bind(this),
             onComplete : function() {
               // In the end: re-enable the button
@@ -1541,7 +1512,7 @@ XWiki.Annotation = Class.create({
         }
         this.fetchedAnnotations = true;
         // Reload the received annotations, with scroll to tab.
-        this.loadAnnotations(response.responseJSON.annotatedContent.annotations, this.displayingAnnotations, !inBubble);
+        this.loadAnnotations(response.responseJSON.annotatedContent, this.displayingAnnotations, !inBubble);
       }.bind(this),
       onFailure : function(response) {
         var failureReason = response.statusText;
@@ -1821,7 +1792,7 @@ XWiki.Annotation = Class.create({
           return;
         }
         this.setAnnotationVisibility(true);
-        this.loadAnnotations(response.responseJSON.annotatedContent.annotations, true);
+        this.loadAnnotations(response.responseJSON.annotatedContent, true);
         this.fetchedAnnotations = true;
         form._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.success')", 'done');
         // and hide the create bubble, skipping selection highlight clear
@@ -1860,42 +1831,157 @@ XWiki.Annotation = Class.create({
 return XWiki;
 }(XWiki || {}));
 
-document.observe('xwiki:dom:loaded', function() {
-  // Load the annotations only in view mode, if the document content is displayed
-  // (the document content is not displayed when viewer=history for instance).
-  if (XWiki.contextaction != 'view' || !$('xwikicontent')) {
-    return;
+require.config({
+  paths: {
+    'fast-diff': $jsontool.serialize($services.webjars.url('org.webjars.npm:fast-diff', 'diff'))
   }
+})
 
-  #if ($annotationHighlightByDefault &amp;&amp; $annotationHighlightByDefault != 0)
-    var displayHighlight = true;
-  #else
-    var displayHighlight = false;
-  #end
-  #if ($annotationsDisplayedByDefault &amp;&amp; $annotationsDisplayedByDefault != 0)
-    var displayed = true;
-  #else
-    var displayed = false;
-  #end
-  #if ($annotationsActivated &amp;&amp; $annotationsActivated != 0)
-    var activated = true;
-  #else
-    var activated = false;
-  #end
-
-  // parse the exception spaces and check where is the current space in that list
-  var exceptions = [];
-  #foreach($space in $exceptionSpaces)
-    exceptions.push('$space');
-  #end
-  var currentSpaceInExceptions = exceptions.indexOf(XWiki.currentSpace);
-  // if the annotations are activated and the current space is not an exception or the annotations are not activated but the current space is an exception
-  if ((activated &amp;&amp; currentSpaceInExceptions &lt; 0) || (!activated &amp;&amp; currentSpaceInExceptions &gt;= 0)) {
-    // initialize the annotations on the xwikicontent element which is the document content by default
-    new XWiki.Annotation(displayHighlight, $('xwikicontent'), displayed);
+define('node-module', {
+  load: function(name, req, onLoad, config) {
+    window.module = window.module || {};
+    req([name], function () {
+      onLoad(window.module.exports);
+    });
   }
 });
-</code>
+
+define('xwiki-text-offset-updater', ['jquery', 'node-module!fast-diff'], function($, diff) {
+  /**
+   * Compute the changes between different versions of a text.
+   */
+  var getChanges = function(previousText, currentText) {
+    return diff(previousText, currentText);
+  };
+
+  /**
+   * Recompute the offset considering the changes of the text.
+   */
+  var findOffsetAfterChanges = function(changes, oldOffset) {
+    var count = 0, newOffset = oldOffset;
+    for (var i = 0; i &lt; changes.length &amp;&amp; count &lt; oldOffset; i++) {
+      var change = changes[i];
+      if (change[0] &lt; 0) {
+        // Delete: shift the offset to the left.
+        if (count + change[1].length &gt; oldOffset) {
+          // Shift the offset to the left with the number of deleted characters before the original offset.
+          newOffset -= oldOffset - count;
+        } else {
+          // Shift the offset to the left with the number of deleted characters.
+          newOffset -= change[1].length;
+        }
+        count += change[1].length;
+      } else if (change[0] &gt; 0) {
+        // Insert: shift the offset to the right with the number of inserted characters.
+        newOffset += change[1].length;
+      } else {
+        // Keep: don't change the offset.
+        count += change[1].length;
+      }
+    }
+    return newOffset;
+  };
+
+  return {
+    getChanges,
+    findOffsetAfterChanges
+  };
+});
+
+require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function($, offsetUpdater) {
+  $(function() {
+    // Load the annotations only in view mode, if the document content is displayed
+    // (the document content is not displayed when viewer=history for instance).
+    if (XWiki.contextaction != 'view' || !$('xwikicontent')) {
+      return;
+    }
+
+    #if ($annotationHighlightByDefault &amp;&amp; $annotationHighlightByDefault != 0)
+      var displayHighlight = true;
+    #else
+      var displayHighlight = false;
+    #end
+    #if ($annotationsDisplayedByDefault &amp;&amp; $annotationsDisplayedByDefault != 0)
+      var displayed = true;
+    #else
+      var displayed = false;
+    #end
+    #if ($annotationsActivated &amp;&amp; $annotationsActivated != 0)
+      var activated = true;
+    #else
+      var activated = false;
+    #end
+
+    $.extend(XWiki.Annotation.prototype, {
+      /**
+       * Mark the given annotations inside the content by using the start and end offset computed on the server.
+       * With these, a DOM Range will be created and each node inside it will be marked.
+       *
+       * @param annotatedContent object with information about the page annotations and the content already marked by
+       *        the server
+       * @param andShow whether the annotations should also be shown (highlighted) on the content
+       * @param navigateToPane if the document should be repositioned to the annotations tab in the document extra section.
+       *        Useful when the changes on annotations are done from the tab, when the document position should still stay
+       *        in the tab
+       * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful
+       *        for deleting annotations, which should be reflected in the annotated element even if no annotations are
+       *        still left to display)
+       */
+      loadAnnotations: function(annotatedContent, andShow, navigateToPane, force) {
+        if (annotatedContent.annotations.size() == 0 &amp;&amp; !force) {
+          return;
+        }
+        // For avoiding adding the same annotation twice, all the annotations markups are removed before adding them
+        // again.
+        this.removeAnnotationsAndSelectionMarkups();
+        this.updateAnnotationsOffsets(annotatedContent);
+        this.addAnnotationsMarkup(annotatedContent.annotations);
+        // Notify the content change.
+        $(document).trigger('xwiki:dom:updated', {'elements': [this.annotatedElement]});
+        // Also handle the tab 'downstairs' when the annotations list changes.
+        this.reloadTab(navigateToPane);
+        if (andShow) {
+          this.toggleAnnotations(true);
+        }
+      },
+
+      /**
+       * Since the offsets were computed based on the plain text before the JavaScript execution, these need to be
+       * updated to consider possible changes.
+       */
+      updateAnnotationsOffsets: function(annotatedContent) {
+        // Ignore spaces since they were not considered when the offsets were computed.
+        var contentBefore = $('&lt;div&gt;&lt;/div&gt;').html(annotatedContent.content).text().replace(/\s/g, '');
+        var contentAfter = $('#xwikicontent').text().replace(/\s/g, '');
+        var changes = offsetUpdater.getChanges(contentBefore, contentAfter);
+        annotatedContent.annotations.forEach(ann =&gt; this.updateAnnotationOffsets(ann, changes));
+      },
+
+      updateAnnotationOffsets: function(ann, changes) {
+        var plainTextStartOffset = ann.fields.find(field =&gt; field.name == 'plainTextStartOffset');
+        var plainTextEndOffset = ann.fields.find(field =&gt; field.name == 'plainTextEndOffset');
+        // Check if the annotation was found.
+        if (!plainTextStartOffset.value || !plainTextEndOffset.value) {
+          return;
+        }
+        plainTextStartOffset.value = offsetUpdater.findOffsetAfterChanges(changes, parseInt(plainTextStartOffset.value));
+        plainTextEndOffset.value = offsetUpdater.findOffsetAfterChanges(changes, parseInt(plainTextEndOffset.value));
+      }
+    });
+
+    // parse the exception spaces and check where is the current space in that list
+    var exceptions = [];
+    #foreach($space in $exceptionSpaces)
+    exceptions.push('$space');
+    #end
+    var currentSpaceInExceptions = exceptions.indexOf(XWiki.currentSpace);
+    // if the annotations are activated and the current space is not an exception or the annotations are not activated but the current space is an exception
+    if ((activated &amp;&amp; currentSpaceInExceptions &lt; 0) || (!activated &amp;&amp; currentSpaceInExceptions &gt;= 0)) {
+      // initialize the annotations on the xwikicontent element which is the document content by default
+      new XWiki.Annotation(displayHighlight, $('#xwikicontent')[0], displayed);
+    }
+  });
+});</code>
     </property>
     <property>
       <name>Annotation Javascript -- Annotation application</name>

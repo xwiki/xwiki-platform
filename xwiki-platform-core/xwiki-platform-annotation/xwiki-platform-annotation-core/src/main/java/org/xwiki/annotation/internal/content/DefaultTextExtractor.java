@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.annotation.content.TextExtractor;
 import org.xwiki.component.annotation.Component;
@@ -32,8 +33,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
- * Component responsible for finding the specific implementation depending on the given syntax and extracting the plain
- * text, if possible.
+ * Find the specific implementation depending on the given syntax and extract the plain text, if possible.
  * 
  * @version $Id$
  * @since 13.10RC1
@@ -58,7 +58,8 @@ public class DefaultTextExtractor implements TextExtractor
             return syntaxSpecificTextExtractor.extractText(content, syntax);
         } catch (ComponentLookupException e) {
             // In case this happens, the content will not be altered.
-            logger.warn("Could not find an implementation for TextExtractor named [{}]", syntax.getType().getId());
+            logger.warn("Could not find an implementation for TextExtractor named [{}]. Root cause: [{}]",
+                syntax.getType().getId(), ExceptionUtils.getRootCauseMessage(e));
 
         }
         return content;

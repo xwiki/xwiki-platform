@@ -30,6 +30,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
@@ -65,6 +67,9 @@ public class HTMLTextExtractor implements TextExtractor, Initializable
     @Inject
     private HTMLCleaner htmlCleaner;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -99,6 +104,8 @@ public class HTMLTextExtractor implements TextExtractor, Initializable
             }
         } catch (XPathExpressionException e) {
             // This should not happen. In case it does, the content will remain empty.
+            logger.warn("Failed to extract the text content of an HTML document. Root cause: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
         }
         return fullContent.toString();
     }

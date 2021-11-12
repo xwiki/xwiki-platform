@@ -44,7 +44,7 @@ Get the actual notifications.
 #if ('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'getNotifications' == $request.action)
   #set ($requestedDocumentReference = $services.model.resolveDocument($request.document))
   #macro (generateNotificationInput $id $reference $label)
-    &lt;label class="hidden" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
+    &lt;label class="sr-only" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
     &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
   #end
   {{html clean="false"}} ## we need clean="false" because we want to display the raw content

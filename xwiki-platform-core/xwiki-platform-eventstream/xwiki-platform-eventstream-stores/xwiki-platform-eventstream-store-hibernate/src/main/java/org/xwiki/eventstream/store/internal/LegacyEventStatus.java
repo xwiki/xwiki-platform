@@ -23,6 +23,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.text.StringUtils;
 
+import java.io.Serializable;
+
 /**
  * A Legacy Event Status is the equivalent of {@link EventStatus} for {@link LegacyEvent}.
  *
@@ -31,7 +33,8 @@ import org.xwiki.text.StringUtils;
  * @since 11.1RC1
  * @version $Id$
  */
-public class LegacyEventStatus
+// The class must be Serializable or Hibernate won't accept it
+public class LegacyEventStatus implements Serializable
 {
     private LegacyEvent activityEvent;
 

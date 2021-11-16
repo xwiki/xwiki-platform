@@ -148,6 +148,9 @@ public final class RightsManager
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
+    private EntityReferenceSerializer<String> absoluteEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "default");
+
     private EntityReferenceSerializer<String> localEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
 
@@ -1086,9 +1089,12 @@ public final class RightsManager
             ListClass.getListFromString(right.getLargeStringValue(userOrGroupField), USERGROUPLISTFIELD_SEP, false);
 
         String userOrGroupSource = this.compactWikiEntityReferenceSerializer.serialize(userOrGroupSourceReference);
+        String aboluteUserOrGroupSource = this.absoluteEntityReferenceSerializer.serialize(userOrGroupSourceReference);
         String userOrGroupTarget = this.compactWikiEntityReferenceSerializer.serialize(userOrGroupTargetReference);
 
-        if (usersOrGroups.remove(userOrGroupSource)) {
+        boolean isRelativeReferencePresent = usersOrGroups.remove(userOrGroupSource);
+        boolean isAbsoluteReferencePresent = usersOrGroups.remove(aboluteUserOrGroupSource);
+        if (isRelativeReferencePresent || isAbsoluteReferencePresent) {
             usersOrGroups.add(userOrGroupTarget);
             needUpdate = true;
         }

@@ -23,10 +23,12 @@ package com.xpn.xwiki.plugin.rightsmanager;
 import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -84,6 +86,50 @@ class RightsManagerTest
         DocumentReference newGroupName = new DocumentReference("xwiki", "XWiki", "GroupAfter");
         String oldValue = "XWiki.GroupBefore,XWiki.Some\\,OtherGroup";
         String expectedValue = "XWiki.Some\\,OtherGroup,XWiki.GroupAfter";
+
+        XWikiDocument rightsDocument = loadTestDocumentFromStore();
+        BaseObject rightsObject = rightsDocument.getXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
+        rightsObject.setLargeStringValue("groups", oldValue);
+        oldcore.getSpyXWiki().saveDocument(rightsDocument, oldcore.getXWikiContext());
+
+        rights.replaceUserOrGroupFromAllRights(oldGroupName, newGroupName, false, oldcore.getXWikiContext());
+
+        BaseObject updatedRightsObject = loadTestDocumentFromStore().getXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
+        assertEquals(expectedValue, updatedRightsObject.getLargeStringValue("groups"));
+    }
+
+
+    @Test
+    void replaceUserOrGroupFromAllRightsWithAbsoluteReferences() throws Exception
+    {
+        DocumentReference oldGroupName = new DocumentReference("xwiki", "XWiki", "GroupBefore");
+        DocumentReference newGroupName = new DocumentReference("xwiki", "XWiki", "GroupAfter");
+        String oldValue = "xwiki:XWiki.GroupBefore,subwiki:XWiki.Some\\,OtherGroup,XWiki.GroupBefore";
+        String expectedValue = "subwiki:XWiki.Some\\,OtherGroup,XWiki.GroupAfter";
+
+        XWikiDocument rightsDocument = loadTestDocumentFromStore();
+        BaseObject rightsObject = rightsDocument.getXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
+        rightsObject.setLargeStringValue("groups", oldValue);
+        oldcore.getSpyXWiki().saveDocument(rightsDocument, oldcore.getXWikiContext());
+
+        rights.replaceUserOrGroupFromAllRights(oldGroupName, newGroupName, false, oldcore.getXWikiContext());
+
+        BaseObject updatedRightsObject = loadTestDocumentFromStore().getXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS);
+        assertEquals(expectedValue, updatedRightsObject.getLargeStringValue("groups"));
+    }
+
+
+    @Test
+    @Disabled("this does not work yet; the code renames the local group with the same name as the global group, too")
+    void replaceUserOrGroupFromAllRightsInSubWiki() throws Exception
+    {
+        DocumentReference oldGroupName = new DocumentReference("xwiki", "XWiki", "GroupBefore");
+        DocumentReference newGroupName = new DocumentReference("subwiki", "XWiki", "GroupAfter");
+        String oldValue = "xwiki:XWiki.GroupBefore,subwiki:XWiki.Some\\,OtherGroup,XWiki.GroupBefore";
+        String expectedValue = "subwiki:XWiki.Some\\,OtherGroup,subwiki:XWiki.GroupAfter,XWiki.GroupBefore";
+
+        XWikiContext context = oldcore.getXWikiContext();
+        context.setWikiId("subwiki");
 
         XWikiDocument rightsDocument = loadTestDocumentFromStore();
         BaseObject rightsObject = rightsDocument.getXObject(MockitoOldcore.GLOBAL_RIGHTS_CLASS);

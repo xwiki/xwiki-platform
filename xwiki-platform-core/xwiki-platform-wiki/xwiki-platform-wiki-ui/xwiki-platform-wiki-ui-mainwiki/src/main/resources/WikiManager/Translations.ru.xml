@@ -226,7 +226,6 @@ platform.wiki.create.wizard.step.dw=После нажатия на кнопку 
 platform.wiki.create.wizard.step.previous=Предыдущий шаг
 platform.wiki.create.wizard.step.next=Следующий шаг
 platform.wiki.create.wizard.step.create=Создать
-
 platform.wiki.create.wizard.step.creation=Создание вики
 platform.wiki.create.wizard.step.creation.wait=Пожалуйста, подождите, пока создается вики.
 platform.wiki.create.wizard.step.creation.complete=Вики {0} успешно создана. Теперь вы можете войти.
@@ -279,7 +278,7 @@ platform.wiki.sheet.aliases=Псевдоним - это другое назва�
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+platform.wiki.dependencies.applicationmanager.missing=Подключаемый модуль {0}Application Manager Plugin{1} не установлен. Пожалуйста, установите его и попробуйте еще раз.
 
 #######################################
 ## until 6.4RC1
@@ -303,5 +302,6 @@ platform.wiki.delete.confirmation.yes=Да, пожалуйста, удалите
 ### Missing: platform.wiki.delete.confirmation.no=No, take me back!
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This enables the simple binding mode in JAXB.
+  See http://weblogs.java.net/blog/kohsuke/archive/2006/03/simple_and_bett.html
+-->
+<jaxb:bindings
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+  xmlns:xjc= "http://java.sun.com/xml/ns/jaxb/xjc" jaxb:extensionBindingPrefixes="xjc"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <jaxb:globalBindings>
+    <xjc:simple/>
+    <jaxb:javaType name="java.util.Calendar" xmlType="xs:dateTime"
+        parseMethod="javax.xml.bind.DatatypeConverter.parseDate"
+        printMethod="javax.xml.bind.DatatypeConverter.printDate"
+        />
+  </jaxb:globalBindings>
+
+  <!-- Use singular rather than plural for the channel path property. -->
+  <jaxb:bindings schemaLocation="xwiki.rest.netflux.model.xsd">
+    <jaxb:bindings node="//xs:element[@name = 'path']">
+      <jaxb:property name="path"/>
+    </jaxb:bindings>
+  </jaxb:bindings>
+
+</jaxb:bindings>

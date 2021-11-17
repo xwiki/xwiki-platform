@@ -33,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -124,8 +123,6 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.HeaderBlock;
-import org.xwiki.rendering.block.ImageBlock;
-import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -133,7 +130,6 @@ import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.internal.parser.LinkParser;
 import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
@@ -2693,6 +2689,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * Retrieve and returns all objects corresponding to the given class reference, or an empty list if there's none.
+     * Be aware that some elements of this list might be null since all objects are in the list at their real index.
+     *
+     * @param classReference the reference of the xclass for which to retrieve the xobjects
+     * @return a list of xobjects and null elements (for deleted xobjects) corresponding to the given xclass
+     *          or an empty list.
      * @since 2.2M1
      */
     public List<BaseObject> getXObjects(DocumentReference classReference)
@@ -2707,6 +2709,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * Retrieve and returns all objects corresponding to the class reference corresponding to the resolution of the
+     * given entity reference, or an empty list if there's none.
+     * Be aware that some elements of this list might be null since all objects are in the list at their real index.
+     *
+     * @param reference the reference that is resolved to an xclass for retrieving the corresponding xobjects
+     * @return a list of xobjects and null elements (for deleted xobjects) corresponding to the given xclass
+     *           or an empty list.
      * @since 3.3M1
      */
     public List<BaseObject> getXObjects(EntityReference reference)
@@ -4925,13 +4934,28 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         xarProperties.setPreserveVersion(bWithVersions);
         xarProperties.setEncoding(encoding);
         xarProperties.setFormat(format);
+        xarProperties.setTarget(out);
 
+        toXML(documentProperties, xarProperties);
+    }
+
+    /**
+     * Serialize the document to an OutputStream.
+     *
+     * @param xarProperties the configuration of the output filter
+     * @param documentProperties the configuration of the input filter
+     * @throws XWikiException when an errors occurs during wiki operations
+     * @since 13.8RC1
+     */
+    public void toXML(DocumentInstanceInputProperties documentProperties, XAROutputProperties xarProperties)
+        throws XWikiException
+    {
         try {
-            Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this, out, xarProperties,
-                documentProperties);
+            Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this, xarProperties.getTarget(),
+                xarProperties, documentProperties);
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
-                "Error parsing xml", e, null);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_DOC_EXPORT,
+                "Error serializing XML", e, null);
         }
     }
 

@@ -44,7 +44,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -61,7 +60,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -337,7 +336,7 @@ public class DefaultIconSetManagerTest
         assertEquals(iconSet, mocker.getComponentUnderTest().getIconSet("default"));
 
         // Verify
-        verifyZeroInteractions(queryManager);
+        verifyNoInteractions(queryManager);
     }
 
     @Test

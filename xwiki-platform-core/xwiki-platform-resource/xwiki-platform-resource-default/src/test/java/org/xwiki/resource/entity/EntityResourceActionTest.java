@@ -19,10 +19,9 @@
  */
 package org.xwiki.resource.entity;
 
-import org.junit.*;
-import org.xwiki.resource.entity.EntityResourceAction;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.resource.entity.EntityResourceAction}.
@@ -30,10 +29,10 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 6.1M2
  */
-public class EntityResourceActionTest
+class EntityResourceActionTest
 {
     @Test
-    public void equalsAndHashCode()
+    void equalsAndHashCode()
     {
         EntityResourceAction id1 = new EntityResourceAction("action");
         EntityResourceAction id2 = new EntityResourceAction("action");
@@ -43,7 +42,7 @@ public class EntityResourceActionTest
     }
 
     @Test
-    public void fromString()
+    void fromString()
     {
         EntityResourceAction id = EntityResourceAction.fromString("view");
         assertEquals(EntityResourceAction.VIEW, id);

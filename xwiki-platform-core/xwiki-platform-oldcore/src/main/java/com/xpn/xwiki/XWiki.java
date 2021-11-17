@@ -91,6 +91,8 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
+import org.xwiki.bridge.event.DocumentRestoredEvent;
+import org.xwiki.bridge.event.DocumentRestoringEvent;
 import org.xwiki.bridge.event.DocumentRolledBackEvent;
 import org.xwiki.bridge.event.DocumentRollingBackEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -111,6 +113,7 @@ import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
 import org.xwiki.extension.job.internal.InstallJob;
+import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
@@ -2030,8 +2033,10 @@ public class XWiki implements EventListener
                 // Put attachments to remove in recycle bin
                 if (hasAttachmentRecycleBin(context)) {
                     for (XWikiAttachmentToRemove attachment : document.getAttachmentsToRemove()) {
-                        if (attachment.isToRecycleBin()) {
-                            // Make sure the attachment will be deleted with its history
+                        if (attachment.isToRecycleBin()
+                            // Only store the attachment to the trash bin if it's not broken
+                            && attachment.getAttachment().contentExists(context)) {
+                            // Make sure the attachment will be stored with its history
                             attachment.getAttachment().loadArchive(context);
                             getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(),
                                 context.getUser(), new Date(), context, true);
@@ -7520,8 +7525,21 @@ public class XWiki implements EventListener
     public void restoreFromRecycleBin(long index, String comment, XWikiContext context) throws XWikiException
     {
         XWikiDocument newdoc = getRecycleBinStore().restoreFromRecycleBin(index, context, true);
+
+        ObservationManager observation = getObservationManager();
+
+        if (observation != null) {
+            observation.notify(new DocumentRestoringEvent(newdoc.getDocumentReferenceWithLocale(), index), newdoc,
+                context);
+        }
+
         saveDocument(newdoc, comment, context);
         getRecycleBinStore().deleteFromRecycleBin(index, context, true);
+
+        if (observation != null) {
+            observation.notify(new DocumentRestoredEvent(newdoc.getDocumentReferenceWithLocale(), index), newdoc,
+                context);
+        }        
     }
 
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException
@@ -7874,9 +7892,9 @@ public class XWiki implements EventListener
         // Skip it if:
         // * the authenticator was not yet initialized
         // * we are using the standard authenticator
-        // * the event is not related to an install job
+        // * the event is not related to an install or uninstall job
         if (this.authService == null || this.authService.getClass() == XWikiAuthServiceImpl.class
-            || !event.getJobType().equals(InstallJob.JOBTYPE)) {
+            || (!event.getJobType().equals(InstallJob.JOBTYPE) && !event.getJobType().equals(UninstallJob.JOBTYPE))) {
             return;
         }
 
@@ -7886,11 +7904,15 @@ public class XWiki implements EventListener
 
             // If the class does not have the same reference anymore it means it's coming from a different classloader
             // which generally imply that it's coming from an extension which has been reloaded or upgraded
-            if (this.authService.getClass() != authClass) {
+            // Both still need to have the same class name as otherwise it means the current class did not had anything
+            // to with with the standard configuration (some authenticators register themself)
+            if (this.authService.getClass() != authClass
+                && this.authService.getClass().getName().equals(authClass.getName())) {
                 setAuthService(authClass);
             }
         } catch (ClassNotFoundException e) {
-            LOGGER.error("Failed to get the class of the configured authenticator, setting standard authenticator.", e);
+            LOGGER.warn("Failed to get the class of the configured authenticator ({}), keeping current authenticator.",
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

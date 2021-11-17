@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class SimpleEventQueryTest
+class SimpleEventQueryTest
 {
     @Test
     void less()
@@ -80,6 +80,7 @@ public class SimpleEventQueryTest
 
         assertEquals(1, query.getConditions().size());
         assertEquals("property", ((CompareQueryCondition) query.getConditions().get(0)).getProperty());
+        assertFalse(((CompareQueryCondition) query.getConditions().get(0)).isParameter());
         assertEquals("value", ((CompareQueryCondition) query.getConditions().get(0)).getValue());
         assertEquals(CompareType.GREATER, ((CompareQueryCondition) query.getConditions().get(0)).getType());
     }
@@ -376,5 +377,19 @@ public class SimpleEventQueryTest
         assertFalse(query1.equals(query3));
         assertFalse(query1.equals(query4));
         assertFalse(query1.equals(null));
+    }
+
+    @Test
+    void parameter()
+    {
+        SimpleEventQuery query = new SimpleEventQuery();
+
+        query.parameter().greater("property", "value");
+
+        assertEquals(1, query.getConditions().size());
+        assertEquals("property", ((CompareQueryCondition) query.getConditions().get(0)).getProperty());
+        assertTrue(((CompareQueryCondition) query.getConditions().get(0)).isParameter());
+        assertEquals("value", ((CompareQueryCondition) query.getConditions().get(0)).getValue());
+        assertEquals(CompareType.GREATER, ((CompareQueryCondition) query.getConditions().get(0)).getType());
     }
 }

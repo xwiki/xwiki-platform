@@ -609,10 +609,10 @@ blockquote.mention-quote {
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory/>
+      <defaultCategory>Notifications</defaultCategory>
     </property>
     <property>
-      <description>Insert a user mention.</description>
+      <description>Inserts a user mention.</description>
     </property>
     <property>
       <id>mention</id>

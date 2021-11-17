@@ -73,7 +73,7 @@ public abstract class AbstractLegacyEventStore extends AbstractAsynchronousEvent
     }
 
     @Override
-    public Optional<Event> syncDeleteEvent(Event event) throws EventStreamException
+    protected Optional<Event> syncDeleteEvent(Event event) throws EventStreamException
     {
         Optional<Event> existingEvent = getEvent(event.getId());
 
@@ -85,7 +85,7 @@ public abstract class AbstractLegacyEventStore extends AbstractAsynchronousEvent
     }
 
     @Override
-    public EventStatus syncSaveEventStatus(EventStatus status) throws EventStreamException
+    protected EventStatus syncSaveEventStatus(EventStatus status) throws EventStreamException
     {
         try {
             this.eventStatusManager.saveEventStatus(status);
@@ -97,14 +97,14 @@ public abstract class AbstractLegacyEventStore extends AbstractAsynchronousEvent
     }
 
     @Override
-    public EntityEvent syncSaveMailEntityEvent(EntityEvent event) throws EventStreamException
+    protected EntityEvent syncSaveMailEntityEvent(EntityEvent event) throws EventStreamException
     {
         // Unsupported
         return event;
     }
 
     @Override
-    public Optional<EventStatus> syncDeleteEventStatus(EventStatus status) throws EventStreamException
+    protected Optional<EventStatus> syncDeleteEventStatus(EventStatus status) throws EventStreamException
     {
         try {
             this.eventStatusManager.deleteEventStatus(status);

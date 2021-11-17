@@ -23,11 +23,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -345,7 +343,7 @@ class DefaultOfficeResourceViewerTest
         assertNotNull(this.officeResourceViewer.createView(ATTACHMENT_RESOURCE_REFERENCE, DEFAULT_VIEW_PARAMETERS));
 
         verify(attachmentCache).remove(CACHE_KEY);
-        verify(attachmentCache).set(eq(CACHE_KEY), notNull(AttachmentOfficeDocumentView.class));
+        verify(attachmentCache).set(eq(CACHE_KEY), notNull());
     }
 
     @Test

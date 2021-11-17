@@ -19,13 +19,19 @@
  */
 package com.xpn.xwiki.internal.filter.input;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.filter.output.DocumentInstanceOutputFilterStream;
 
 /**
@@ -38,7 +44,7 @@ class DocumentInstanceInputFilterStreamTest extends AbstractInstanceInputFilterS
     // Tests
 
     @Test
-    void testImportDocumentsPreserveVersion() throws FilterException, IOException
+    void importDocumentsPreserveVersion() throws FilterException, IOException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
         outputProperties.setVerbose(false);
@@ -49,5 +55,36 @@ class DocumentInstanceInputFilterStreamTest extends AbstractInstanceInputFilterS
         inputProperties.setVerbose(false);
 
         assertXML("document1", outputProperties, inputProperties);
+    }
+
+    @Test
+    void withAttachmentContent() throws IOException, XWikiException, FilterException
+    {
+        DocumentReference reference = new DocumentReference("wiki", "space", "document");
+        XWikiDocument document = new XWikiDocument(reference);
+        document.setDate(new Date(0));
+        document.setContentUpdateDate(document.getDate());
+        document.setCreationDate(document.getDate());
+        document.setAttachment("attachment1", new ByteArrayInputStream("content1".getBytes()),
+            this.oldcore.getXWikiContext());
+        document.getAttachment("attachment1").setDate(document.getDate());
+        document.setAttachment("attachment2", new ByteArrayInputStream("content2".getBytes()),
+            this.oldcore.getXWikiContext());
+        document.getAttachment("attachment2").setDate(document.getDate());
+        document.setMetaDataDirty(false);
+        document.setContentDirty(false);
+        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
+
+        DocumentInstanceInputProperties inputProperties = new DocumentInstanceInputProperties();
+        inputProperties.setAttachmentsContent(Collections.singleton("attachment1"));
+        inputProperties.setWithRevisions(false);
+        inputProperties.setWithJRCSRevisions(false);
+        inputProperties.setVerbose(false);
+
+        assertXML("documentwithattachment1content", inputProperties);
+
+        inputProperties.setAttachmentsContent(Collections.singleton("attachment2"));
+
+        assertXML("documentwithattachment2content", inputProperties);
     }
 }

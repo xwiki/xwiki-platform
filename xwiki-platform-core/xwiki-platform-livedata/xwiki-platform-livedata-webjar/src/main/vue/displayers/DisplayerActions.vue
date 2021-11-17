@@ -34,7 +34,7 @@
     view-only
     :property-id="propertyId"
     :entry="entry"
-    :is-empty="actions.length === 0"
+    :is-empty="false"
     :intercept-touch="false"
   >
 

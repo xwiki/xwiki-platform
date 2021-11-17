@@ -63,15 +63,29 @@ public interface SortableEventQuery extends EventQuery
 
         private final String property;
 
+        private final boolean parameter;
+
         private final Order order;
 
         /**
-         * @param property see {@link #getProperty}
-         * @param order see {@link #getOrder}
+         * @param property see {@link #getProperty()}
+         * @param order see {@link #getOrder()}
          */
         public SortClause(String property, Order order)
         {
+            this(property, false, order);
+        }
+
+        /**
+         * @param property see {@link #getProperty()}
+         * @param parameter see {@link #isParameter()}
+         * @param order see {@link #getOrder()}
+         * @since 13.9RC1
+         */
+        public SortClause(String property, boolean parameter, Order order)
+        {
             this.property = property;
+            this.parameter = parameter;
             this.order = order;
         }
 
@@ -81,6 +95,14 @@ public interface SortableEventQuery extends EventQuery
         public String getProperty()
         {
             return this.property;
+        }
+
+        /**
+         * @return true if it's a custom event parameter
+         */
+        public boolean isParameter()
+        {
+            return this.parameter;
         }
 
         /**
@@ -97,6 +119,7 @@ public interface SortableEventQuery extends EventQuery
             HashCodeBuilder builder = new HashCodeBuilder();
 
             builder.append(getProperty());
+            builder.append(isParameter());
             builder.append(getOrder());
 
             return builder.build();
@@ -110,7 +133,7 @@ public interface SortableEventQuery extends EventQuery
             }
 
             return obj instanceof SortClause && ((SortClause) obj).getProperty().equals(getProperty())
-                && ((SortClause) obj).getOrder() == getOrder();
+                && ((SortClause) obj).isParameter() == isParameter() && ((SortClause) obj).getOrder() == getOrder();
         }
 
         @Override
@@ -118,8 +141,10 @@ public interface SortableEventQuery extends EventQuery
         {
             ToStringBuilder builder = new XWikiToStringBuilder(this);
 
-            builder.append("property", this.property);
-            builder.append("order", this.order);
+            builder.append("property", getProperty());
+            builder.append("parameter", isParameter());
+            builder.append("order", getOrder());
+
             return builder.build();
         }
     }

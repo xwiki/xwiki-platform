@@ -21,8 +21,7 @@
 import XWikiIcon from "../../../utilities/XWikiIcon";
 import {mount} from '@vue/test-utils'
 import _ from "lodash";
-import Vue from "vue";
-
+import flushPromises from 'flush-promises'
 
 function initWrapper(params = {}) {
   return mount(XWikiIcon, _.merge({
@@ -32,7 +31,47 @@ function initWrapper(params = {}) {
   }, params));
 }
 
+/**
+ * Initialize the mocks for the icon queries.
+ */
+function mockIconsFetch() {
+  function initPromise(cssClass) {
+    return Promise.resolve({
+      json: () => {
+        return Promise.resolve({
+          icons: [{
+            cssClass: cssClass
+          }]
+        });
+      },
+    });
+  }
+
+  const cssClassesMap = {
+    'add': 'fa fa-plus',
+    'remove': 'fa fa-minus'
+  }
+  window.fetch = jest.fn((query) => {
+    // Extract the name parameter from the query and return the corresponding css classes.
+    const nameParameter = query.match(/.+name=(.+)$/)[1];
+    const cssClasses = cssClassesMap[nameParameter];
+    return initPromise(cssClasses);
+  });
+}
+
 describe('XWikiIcon.vue', () => {
+
+  beforeEach(() => {
+    // Defines the name of the current wiki in the XWiki global object. Needed to resolve the REST URI to call to
+    // retrieve the metadata of the icon.
+    global.XWiki = {
+      currentWiki: 'xwiki'
+    }
+
+    // Mock the ajax query to get the metadata of the request icon.
+    mockIconsFetch();
+  })
+
   it('Displays an icon using a font', () => {
     const wrapper = initWrapper({
       propsData: {
@@ -58,23 +97,6 @@ describe('XWikiIcon.vue', () => {
   })
 
   it('Displays an icon retrieved from the REST API', async () => {
-    // Mock the ajax query to get the metadata of the request icon.
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve({
-          icons: [{
-            cssClass: "fa fa-plus"
-          }]
-        }),
-      })
-    );
-
-    // Defines the name of the current wiki in the XWiki global object. Needed to resolve the REST URI to call to 
-    // retrieve the metadata of the icon.
-    global.XWiki = {
-      currentWiki: 'xwiki'
-    }
-    
     const wrapper = initWrapper({
       propsData: {
         iconDescriptor: {
@@ -83,12 +105,26 @@ describe('XWikiIcon.vue', () => {
       }
     });
 
-    // Wait for the next rendering after the ajax query is resolved (several ticks are needed to account for the
-    // resolution of the ajax requests resolution).
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await flushPromises()
 
     expect(wrapper.attributes('class')).toBe('fa fa-plus');
+  })
+
+  it('Refresh the icon after a property change', async () => {
+    const wrapper = initWrapper({
+      propsData: {
+        iconDescriptor: {name: 'add'}
+      }
+    })
+
+    await flushPromises()
+
+    expect(wrapper.attributes('class')).toBe('fa fa-plus');
+
+    wrapper.setProps({iconDescriptor: {name: 'remove'}});
+
+    await flushPromises();
+
+    expect(wrapper.attributes('class')).toBe('fa fa-minus');
   })
 })

@@ -59,6 +59,8 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
 
     private boolean nextOpen;
 
+    private boolean nextParameter;
+
     private Deque<GroupQueryCondition> groupStack = new LinkedList<>();
 
     /**
@@ -162,6 +164,19 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
         return this;
     }
 
+    /**
+     * Next call will be about custom event parameters.
+     * 
+     * @return this {@link SimpleEventQuery}
+     * @since 13.9RC1
+     */
+    public SimpleEventQuery parameter()
+    {
+        this.nextParameter = true;
+
+        return this;
+    }
+
     private void nextOr(boolean or)
     {
         if (!this.nextOpen && !this.currentConditions.isEmpty()) {
@@ -231,7 +246,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
 
     private void addCompareCondition(String property, Object value, CompareType type)
     {
-        addCondition(new CompareQueryCondition(property, value, type, this.nextReversed));
+        addCondition(new CompareQueryCondition(property, this.nextParameter, value, type, this.nextReversed));
     }
 
     private void addCondition(QueryCondition newCondition)
@@ -261,6 +276,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
         // Reset flags
         this.nextReversed = false;
         this.nextOr = false;
+        this.nextParameter = false;
     }
 
     /**
@@ -359,7 +375,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery in(String property, List<?> values)
     {
-        addCondition(new InQueryCondition(this.nextReversed, property, (List) values));
+        addCondition(new InQueryCondition(this.nextReversed, property, this.nextParameter, (List) values));
 
         return this;
     }
@@ -448,7 +464,10 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery addSort(String property, Order order)
     {
-        this.sorts.add(new SortClause(property, order));
+        this.sorts.add(new SortClause(property, this.nextParameter, order));
+
+        // Reset flag
+        this.nextParameter = false;
 
         return this;
     }

@@ -59,6 +59,7 @@ import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.AbstractAsynchronousEventStore;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.StreamEventSearchResult;
+import org.xwiki.eventstream.query.AbstractPropertyQueryCondition;
 import org.xwiki.eventstream.query.CompareQueryCondition;
 import org.xwiki.eventstream.query.CompareQueryCondition.CompareType;
 import org.xwiki.eventstream.query.GroupQueryCondition;
@@ -463,7 +464,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         if (query instanceof SortableEventQuery) {
             for (SortClause sort : ((SortableEventQuery) query).getSorts()) {
-                solrQuery.addSort(sort.getProperty(), sort.getOrder() == Order.ASC ? ORDER.asc : ORDER.desc);
+                solrQuery.addSort(toSolrFieldName(sort), sort.getOrder() == Order.ASC ? ORDER.asc : ORDER.desc);
             }
         }
 
@@ -571,7 +572,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(condition.getProperty());
+        builder.append(toSolrFieldName(condition));
 
         builder.append(':');
 
@@ -616,10 +617,35 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         return builder.toString();
     }
 
+    private String getMapFieldName(String key)
+    {
+        return this.utils.getMapFieldName(key, EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES, String.class);
+    }
+
+    private String toSolrFieldName(AbstractPropertyQueryCondition condition)
+    {
+        if (condition.isParameter()) {
+            // It's a custom parameter
+            return getMapFieldName(condition.getProperty());
+        } else {
+            return condition.getProperty();
+        }
+    }
+
+    private String toSolrFieldName(SortClause sort)
+    {
+        if (sort.isParameter()) {
+            // It's a custom parameter
+            return getMapFieldName(sort.getProperty());
+        } else {
+            return sort.getProperty();
+        }
+    }
+
     private String serializeCompareCondition(CompareQueryCondition condition)
     {
         StringBuilder builder = new StringBuilder();
-        builder.append(toSearchFieldName(condition.getProperty()));
+        builder.append(toSearchFieldName(toSolrFieldName(condition)));
         builder.append(':');
 
         switch (condition.getType()) {

@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.objects;
 
-public class FloatProperty extends NumberProperty
+public class FloatProperty extends NumberProperty<Float>
 {
     private static final long serialVersionUID = 1L;
 }

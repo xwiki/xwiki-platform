@@ -20,21 +20,11 @@
 package com.xpn.xwiki.internal.skin;
 
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.inject.Provider;
 
-import org.apache.commons.configuration2.BaseConfiguration;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.environment.Environment;
-import org.xwiki.skin.Resource;
-import org.xwiki.skin.Skin;
 import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
@@ -45,18 +35,26 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 6.4M1
  */
-public class EnvironmentSkin extends AbstractSkin
+public class EnvironmentSkin extends AbstractResourceSkin
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EnvironmentSkin.class);
+    private final Environment environment;
 
-    private Environment environment;
+    private final Provider<XWikiContext> xcontextProvider;
 
-    private Configuration properties;
+    private final URLConfiguration urlConfiguration;
 
-    private Provider<XWikiContext> xcontextProvider;
-
-    private URLConfiguration urlConfiguration;
-
+    /**
+     * Default constructor.
+     *
+     * @param id the skin id (for instance, {@code "flamingo"})
+     * @param skinManager the skin manager that instantiates this skin
+     * @param configuration the skin internal configuration, used to access the default parent skin id
+     * @param logger a logger used to log warning in case of error when parsing a skin's syntax
+     * @param environment the wiki environment, this is where this skin load its resources from
+     * @param xcontextProvider a wiki context provide, used to give access to the context when resolving the skin's
+     *     rsources.
+     * @param urlConfiguration the url configuration used to resolve the url of the skin's resources
+     */
     public EnvironmentSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
         Logger logger, Environment environment, Provider<XWikiContext> xcontextProvider,
         URLConfiguration urlConfiguration)
@@ -69,91 +67,32 @@ public class EnvironmentSkin extends AbstractSkin
     }
 
     @Override
-    protected Skin createParent()
+    protected URL getResourceURL(String propertiesPath)
     {
-        Skin skin;
-
-        String parentId = getProperties().getString("parent");
-
-        if (parentId != null) {
-            if (parentId.isEmpty()) {
-                // There is explicitly no parent (make sure to not fallback on default parent skin)
-                skin = VOID;
-            } else {
-                skin = this.skinManager.getSkin(parentId);
-            }
-        } else {
-            skin = null;
-        }
-
-        return skin;
-    }
-
-    public Configuration getProperties()
-    {
-        if (this.properties == null) {
-            URL url = this.environment.getResource(getSkinFolder() + "skin.properties");
-            if (url != null) {
-                try {
-                    this.properties = new Configurations().properties(url);
-                } catch (ConfigurationException e) {
-                    LOGGER.error("Failed to load skin [{}] properties file ([])", this.id, url,
-                        ExceptionUtils.getRootCauseMessage(e));
-
-                    this.properties = new BaseConfiguration();
-                }
-            } else {
-                LOGGER.debug("No properties found for skin [{}]", this.id);
-
-                this.properties = new BaseConfiguration();
-            }
-        }
-
-        return this.properties;
-    }
-
-    public String getSkinFolder()
-    {
-        return "/skins/" + this.id + '/';
+        return this.environment.getResource(propertiesPath);
     }
 
     @Override
-    public Resource<?> getLocalResource(String resourceName)
+    protected EnvironmentSkinResource createResource(String resourcePath, String resourceName)
     {
-        String resourcePath = getSkinResourcePath(resourceName);
-
-        if (this.environment.getResource(resourcePath) != null) {
-            return createResource(resourcePath, resourceName);
-        }
-
-        return null;
-    }
-
-    protected AbstractEnvironmentResource createResource(String resourcePath, String resourceName)
-    {
-        return new SkinEnvironmentResource(resourcePath, resourceName, this, this.environment, this.xcontextProvider,
+        return new EnvironmentSkinResource(resourcePath, resourceName, this, this.environment, this.xcontextProvider,
             this.urlConfiguration);
     }
 
-    private String getSkinResourcePath(String resource)
+    @Override
+    protected String getSkinFolder()
     {
-        String skinFolder = getSkinFolder();
-        String resourcePath = skinFolder + resource;
-
-        // Prevent inclusion of templates from other directories
-        Path normalizedResource = Paths.get(resourcePath).normalize();
-        if (!normalizedResource.startsWith(skinFolder)) {
-            LOGGER.warn("Direct access to skin file [{}] refused. Possible break-in attempt!", normalizedResource);
-
-            return null;
-        }
-
-        return resourcePath;
+        return '/' + super.getSkinFolder();
     }
 
-    @Override
-    public String getOutputSyntaxString()
+    /**
+     * Check if the skin exists by checking if a directory exists and contains a {@code skin.properties} file.
+     *
+     * @return {@code true} if the skin exists, {@code false} otherwise
+     * @since 13.8RC1
+     */
+    public boolean exists()
     {
-        return getProperties().getString("outputSyntax");
+        return getResourceURL(getPropertiesPath()) != null;
     }
 }

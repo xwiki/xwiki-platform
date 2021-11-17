@@ -40,6 +40,8 @@ import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxRegistry;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 /**
@@ -76,6 +78,9 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
     @Inject
     protected ComponentManager componentManager;
 
+    @Inject
+    private SyntaxRegistry syntaxRegistry;
+
     @Override
     public void updateAnnotations(String target, String previousContent, String currentContent)
         throws MaintainerServiceException
@@ -90,12 +95,12 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
             }
 
             // store the annotations to save after update
-            List<Annotation> toUpdate = new ArrayList<Annotation>();
+            List<Annotation> toUpdate = new ArrayList<>();
 
             // produce the ptr of the previous and current, wrt to syntax
             String syntaxId = ioContentService.getSourceSyntax(target);
-            String renderedPreviousContent = renderPlainText(previousContent, syntaxId);
-            String renderedCurrentContent = renderPlainText(currentContent, syntaxId);
+            String renderedPreviousContent = renderPlainText(target, previousContent, syntaxId);
+            String renderedCurrentContent = renderPlainText(target, currentContent, syntaxId);
 
             // create the diffs
             Collection<XDelta> differences =
@@ -134,21 +139,26 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
      * @throws Exception if anything goes wrong while rendering the content
      * @return the normalized plain text rendered content
      */
-    private String renderPlainText(String content, String syntaxId) throws Exception
+    private String renderPlainText(String target, String content, String syntaxId) throws Exception
     {
         PrintRenderer renderer = componentManager.getInstance(PrintRenderer.class, "normalizer-plain/1.0");
 
-        // parse
+        // Parse
         Parser parser = componentManager.getInstance(Parser.class, syntaxId);
         XDOM xdom = parser.parse(new StringReader(content));
 
-        // run transformations -> although it's going to be at least strange to handle rendered content since there
+        // Run transformations -> although it's going to be at least strange to handle rendered content since there
         // is no context
-        Syntax sourceSyntax = Syntax.valueOf(syntaxId);
+        Syntax sourceSyntax = this.syntaxRegistry.getSyntax(syntaxId).orElseThrow(() ->
+            new MaintainerServiceException(String.format(
+                "Failed to render content for target [%s] since Syntax [%s] is not available in the Syntax Registry",
+                target, syntaxId)));
         TransformationManager transformationManager = componentManager.getInstance(TransformationManager.class);
-        transformationManager.performTransformations(xdom, sourceSyntax);
+        TransformationContext txContext = new TransformationContext(xdom, sourceSyntax);
+        txContext.setId(target);
+        transformationManager.performTransformations(xdom, txContext);
 
-        // render
+        // Render
         WikiPrinter printer = new DefaultWikiPrinter();
         renderer.setPrinter(printer);
 
@@ -402,7 +412,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
      */
     private List<Integer> getOccurrences(String subject, String pattern, int exclude)
     {
-        List<Integer> indexes = new ArrayList<Integer>();
+        List<Integer> indexes = new ArrayList<>();
         int lastIndex = subject.indexOf(pattern);
         while (lastIndex != -1) {
             if (lastIndex != exclude) {

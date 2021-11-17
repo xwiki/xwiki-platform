@@ -154,7 +154,7 @@ public class XWikiAttachmentEventGenerator
         InputSource source;
         Long size;
         String alias = null;
-        if (properties.isWithWikiAttachmentsContent()) {
+        if (isWithWikiAttachmentContent(attachmentRevision, properties)) {
             try {
                 source = new XWikiAttachmentContentInputSource(attachmentRevision.getAttachmentContent(xcontext));
                 size = attachmentRevision.getLongSize();
@@ -236,13 +236,24 @@ public class XWikiAttachmentEventGenerator
         return false;
     }
 
+    private boolean isWithWikiAttachmentContent(XWikiAttachment attachmentRevision,
+        DocumentInstanceInputProperties properties)
+    {
+        if (properties.isWithWikiAttachmentsContent()) {
+            return properties.getAttachmentsContent().isEmpty()
+                || properties.getAttachmentsContent().contains(attachmentRevision.getFilename());
+        }
+
+        return false;
+    }
+
     private void onAttachment(XWikiAttachment attachment, XWikiAttachmentFilter attachmentFilter,
         DocumentInstanceInputProperties properties, FilterEventParameters attachmentParameters, XWikiContext xcontext)
         throws FilterException
     {
         InputStream content;
         Long size;
-        if (properties.isWithWikiAttachmentsContent()) {
+        if (isWithWikiAttachmentContent(attachment, properties)) {
             try {
                 content = attachment.getContentInputStream(xcontext);
                 size = attachment.getLongSize();

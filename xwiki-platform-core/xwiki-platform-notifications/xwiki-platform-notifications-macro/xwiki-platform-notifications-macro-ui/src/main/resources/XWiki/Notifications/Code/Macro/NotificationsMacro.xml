@@ -422,8 +422,11 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       if (!entry.read) {
         // Style the read button
         readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
-        // Insert the cross icon
-        readButton.html('$services.icon.renderHTML("check")');
+        // Insert the cross icon and an accessible label
+        var readButtonIcon = $("$escapetool.javascript($services.icon.renderHTML('check'))");
+        var readButtonLabel= $('&lt;span class="sr-only"/&gt;');
+        readButtonLabel.text("$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
+        readButton.append(readButtonIcon).append(readButtonLabel);
         // On click
         readButton.click(function() {
           var notif = $(this).parents('div.notification-event');
@@ -599,8 +602,11 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
           entry.find('.notification-content').prepend(readButton);
           // Style the read button
           readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
-          // Insert the cross icon
-          readButton.html('$services.icon.renderHTML("check")');
+          // Insert the cross icon and an accessible label
+          var readButtonIcon = $("$escapetool.javascript($services.icon.renderHTML('check'))");
+          var readButtonLabel= $('&lt;span class="sr-only"/&gt;');
+          readButtonLabel.text("$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
+          readButton.append(readButtonIcon).append(readButtonLabel);
           // On click
           readButton.click(function() {
             var notif = $(this).parents('div.notification-event');

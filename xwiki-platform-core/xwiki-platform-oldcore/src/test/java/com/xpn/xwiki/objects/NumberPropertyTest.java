@@ -19,51 +19,39 @@
  */
 package com.xpn.xwiki.objects;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
-import org.xwiki.test.ComponentManagerRule;
-import org.xwiki.test.annotation.ComponentList;
+import org.junit.jupiter.api.Test;
 
-import com.xpn.xwiki.web.Utils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link NumberProperty}.
  *
  * @version $Id$
- * @since 5.2M1
  */
-@ComponentList({LocalStringEntityReferenceSerializer.class})
-public class NumberPropertyTest
+class NumberPropertyTest
 {
-    @Rule
-    public ComponentManagerRule componentManager = new ComponentManagerRule();
-
-    @Before
-    public void setup()
-    {
-        Utils.setComponentManager(this.componentManager);
-    }
-
     /**
      * Verify that we can compare a null valued number property with a non-null valued number property without having a
      * NPE (<a href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
-    public void nullValueEqualsWithOtherNumberProperty()
+    void nullValueEqualsWithOtherNumberProperty()
     {
-        NumberProperty nullValueProperty = new IntegerProperty();
+        IntegerProperty nullValueProperty = new IntegerProperty();
         nullValueProperty.setValue(null);
-        Assert.assertNull(nullValueProperty.getValue());
+        assertNull(nullValueProperty.getValue());
 
-        NumberProperty notNullValueProperty = new IntegerProperty();
+        IntegerProperty notNullValueProperty = new IntegerProperty();
         notNullValueProperty.setValue(1);
-        Assert.assertNotNull(notNullValueProperty.getValue());
+        assertNotNull(notNullValueProperty.getValue());
 
         // Should not throw a NPE.
-        Assert.assertFalse(nullValueProperty.equals(notNullValueProperty));
+        assertFalse(nullValueProperty.equals(notNullValueProperty));
     }
 
     /**
@@ -71,80 +59,116 @@ public class NumberPropertyTest
      * NPE (<a href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
-    public void notNullValueEqualsWithOtherNullNumberProperty()
+    void notNullValueEqualsWithOtherNullNumberProperty()
     {
-        NumberProperty nullValueProperty = new IntegerProperty();
+        IntegerProperty nullValueProperty = new IntegerProperty();
         nullValueProperty.setValue(1);
-        Assert.assertNotNull(nullValueProperty.getValue());
+        assertNotNull(nullValueProperty.getValue());
 
-        NumberProperty notNullValueProperty = new IntegerProperty();
+        IntegerProperty notNullValueProperty = new IntegerProperty();
         notNullValueProperty.setValue(null);
-        Assert.assertNull(notNullValueProperty.getValue());
+        assertNull(notNullValueProperty.getValue());
 
         // Should not throw a NPE.
-        Assert.assertFalse(nullValueProperty.equals(notNullValueProperty));
+        assertFalse(nullValueProperty.equals(notNullValueProperty));
     }
 
     /**
-     * Verify that we can compare two null valued number properties without having a NPE (<a
-     * href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
+     * Verify that we can compare two null valued number properties without having a NPE
+     * (<a href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
-    public void equalNullValueEquals()
+    void equalNullValueEquals()
     {
-        NumberProperty nullValueProperty1 = new IntegerProperty();
+        IntegerProperty nullValueProperty1 = new IntegerProperty();
         nullValueProperty1.setValue(null);
-        Assert.assertNull(nullValueProperty1.getValue());
+        assertNull(nullValueProperty1.getValue());
 
-        NumberProperty nullValueProperty2 = new IntegerProperty();
+        IntegerProperty nullValueProperty2 = new IntegerProperty();
         nullValueProperty2.setValue(null);
-        Assert.assertNull(nullValueProperty2.getValue());
+        assertNull(nullValueProperty2.getValue());
 
         // Should not throw a NPE.
-        Assert.assertTrue(nullValueProperty1.equals(nullValueProperty2));
+        assertTrue(nullValueProperty1.equals(nullValueProperty2));
     }
 
     /**
      * Two equal non-null values.
      */
     @Test
-    public void equalNotNullValues()
+    void equalNotNullValues()
     {
-        NumberProperty nullValueProperty = new IntegerProperty();
+        IntegerProperty nullValueProperty = new IntegerProperty();
         nullValueProperty.setValue(1);
 
-        NumberProperty notNullValueProperty = new IntegerProperty();
+        IntegerProperty notNullValueProperty = new IntegerProperty();
         notNullValueProperty.setValue(1);
 
-        Assert.assertTrue(nullValueProperty.equals(notNullValueProperty));
+        assertTrue(nullValueProperty.equals(notNullValueProperty));
     }
 
     /**
      * Two not equal non-null values.
      */
     @Test
-    public void notEqualNonNullValues()
+    void notEqualNonNullValues()
     {
-        NumberProperty nullValueProperty = new IntegerProperty();
+        IntegerProperty nullValueProperty = new IntegerProperty();
         nullValueProperty.setValue(0);
 
-        NumberProperty notNullValueProperty = new IntegerProperty();
+        IntegerProperty notNullValueProperty = new IntegerProperty();
         notNullValueProperty.setValue(1);
 
-        Assert.assertFalse(nullValueProperty.equals(notNullValueProperty));
+        assertFalse(nullValueProperty.equals(notNullValueProperty));
     }
 
     @Test
-    public void testHashCode()
+    void testHashCode()
     {
         final Number value = 101;
 
-        NumberProperty n1 = new IntegerProperty();
-        NumberProperty n2 = new IntegerProperty();
+        IntegerProperty n1 = new IntegerProperty();
+        IntegerProperty n2 = new IntegerProperty();
 
         n1.setValue(value);
         n2.setValue(value);
 
-        Assert.assertEquals(n1.hashCode(), n2.hashCode());
+        assertEquals(n1.hashCode(), n2.hashCode());
+    }
+
+    @Test
+    void convert()
+    {
+        DoubleProperty doubleProperty = new DoubleProperty();
+        doubleProperty.setValue(1);
+        assertInstanceOf(Double.class, doubleProperty.getValue());
+        assertEquals(1D, doubleProperty.getValue());
+        doubleProperty.setValue("2");
+        assertInstanceOf(Double.class, doubleProperty.getValue());
+        assertEquals(2D, doubleProperty.getValue());
+
+        FloatProperty floatProperty = new FloatProperty();
+        floatProperty.setValue(1);
+        assertInstanceOf(Float.class, floatProperty.getValue());
+        assertEquals(1F, floatProperty.getValue());
+        floatProperty.setValue("2");
+        assertInstanceOf(Float.class, floatProperty.getValue());
+        assertEquals(2F, floatProperty.getValue());
+
+        IntegerProperty integerProperty = new IntegerProperty();
+        integerProperty.setValue(1D);
+        assertInstanceOf(Integer.class, integerProperty.getValue());
+        assertEquals(1, integerProperty.getValue());
+        integerProperty.setValue("2");
+        assertInstanceOf(Integer.class, integerProperty.getValue());
+        assertEquals(2, integerProperty.getValue());
+
+        LongProperty longProperty = new LongProperty();
+        longProperty.setValue(1D);
+        assertInstanceOf(Long.class, longProperty.getValue());
+        assertEquals(1L, longProperty.getValue());
+        longProperty.setValue("2");
+        assertInstanceOf(Long.class, longProperty.getValue());
+        assertEquals(2L, longProperty.getValue());
     }
 }

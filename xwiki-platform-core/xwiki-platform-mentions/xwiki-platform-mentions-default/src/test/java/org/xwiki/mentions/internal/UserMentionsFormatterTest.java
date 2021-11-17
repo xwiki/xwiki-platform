@@ -19,8 +19,6 @@
  */
 package org.xwiki.mentions.internal;
 
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;

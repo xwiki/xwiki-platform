@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -43,7 +45,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -210,9 +211,8 @@ public class NotificationFilterPreferenceStore
      * Delete a filter preference.
      *
      * @param preference the preference to delete.
-     * @throws NotificationException if an error happens
      */
-    private void deleteFilterPreference(NotificationFilterPreference preference) throws NotificationException
+    private void deleteFilterPreference(NotificationFilterPreference preference)
     {
         if (preference == null) {
             return;
@@ -242,7 +242,8 @@ public class NotificationFilterPreferenceStore
             }
         }
 
-        this.observation.notify(new NotificationFilterPreferenceDeletedEvent(), null);
+        // Notify listeners about the delete
+        this.observation.notify(new NotificationFilterPreferenceDeletedEvent(), preference);
     }
 
     /**
@@ -305,6 +306,7 @@ public class NotificationFilterPreferenceStore
             hibernateStore.beginTransaction(context);
             Session session = hibernateStore.getSession(context);
 
+            List<DefaultNotificationFilterPreference> preferencesToSend = new ArrayList<>(filterPreferences.size());
             for (NotificationFilterPreference preference : filterPreferences) {
                 // Hibernate mapping only describes how to save NotificationFilterPreference objects and does not
                 // handle extended objects (like ScopeNotificationFilterPreference).
@@ -312,12 +314,15 @@ public class NotificationFilterPreferenceStore
                 DefaultNotificationFilterPreference copy = new DefaultNotificationFilterPreference(preference);
                 copy.setOwner(serializedEntity);
                 session.saveOrUpdate(copy);
+                preferencesToSend.add(copy);
             }
 
             hibernateStore.endTransaction(context, true);
 
-            for (int i = 0; i < filterPreferences.size(); ++i) {
-                this.observation.notify(new NotificationFilterPreferenceAddOrUpdatedEvent(), null);
+            // Notify listeners about the update
+            for (DefaultNotificationFilterPreference filterPreference : preferencesToSend) {
+                this.observation.notify(new NotificationFilterPreferenceAddOrUpdatedEvent(), filterPreference,
+                    entityReference);
             }
         } catch (Exception e) {
             if (hibernateStore != null) {

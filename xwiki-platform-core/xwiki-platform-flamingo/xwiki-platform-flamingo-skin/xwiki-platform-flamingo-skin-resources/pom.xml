@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin</artifactId>
-    <version>13.8-SNAPSHOT</version>
+    <version>13.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Resources</name>
@@ -153,7 +153,7 @@
     <plugins>
       <!-- Verify the JavaScript code. -->
       <plugin>
-        <groupId>com.cj.jshintmojo</groupId>
+        <groupId>org.xwiki.contrib</groupId>
         <artifactId>jshint-maven-plugin</artifactId>
         <executions>
           <execution>

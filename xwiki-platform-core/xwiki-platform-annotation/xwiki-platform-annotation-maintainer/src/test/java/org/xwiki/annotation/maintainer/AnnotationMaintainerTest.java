@@ -48,7 +48,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
     /**
      * Document description files to run this test for.
      */
-    private static Collection<String[]> files = new ArrayList<String[]>();
+    private static Collection<String[]> files = new ArrayList<>();
 
     /**
      * Mock document to run tests for.

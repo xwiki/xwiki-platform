@@ -361,11 +361,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (safeget(property.getName()) == null) {
                 deprecatedObjectProperties.add(property);
             } else {
-                String propertyClass = ((PropertyClass) safeget(property.getName())).newProperty().getClassType();
-                String objectPropertyClass = property.getClassType();
+                BaseProperty emptyProperty = ((PropertyClass) safeget(property.getName())).newProperty();
+                if (emptyProperty != null) {
+                    String propertyClass = emptyProperty.getClassType();
+                    String objectPropertyClass = property.getClassType();
 
-                if (!propertyClass.equals(objectPropertyClass)) {
-                    deprecatedObjectProperties.add(property);
+                    if (!propertyClass.equals(objectPropertyClass)) {
+                        deprecatedObjectProperties.add(property);
+                    }
                 }
             }
         }

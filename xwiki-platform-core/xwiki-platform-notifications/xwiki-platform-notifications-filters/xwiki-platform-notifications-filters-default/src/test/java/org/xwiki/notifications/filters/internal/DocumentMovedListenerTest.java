@@ -32,10 +32,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.notifications.filters.internal.CachedModelBridge;
-import org.xwiki.notifications.filters.internal.DocumentMovedListener;
-import org.xwiki.notifications.filters.internal.ModelBridge;
-import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -49,7 +45,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -138,7 +134,7 @@ public class DocumentMovedListenerTest
         verify(query2).setString("newPage", "xwiki:PageB.WebHome");
         verify(query2).setString("oldPage", "xwiki:PageA.WebHome");
         verify(query2).executeUpdate();
-        verifyZeroInteractions(namespaceContextExecutor);
+        verifyNoInteractions(namespaceContextExecutor);
     }
 
     @Test
@@ -221,6 +217,6 @@ public class DocumentMovedListenerTest
         verify(query).setString("newPage", "xwiki:PageB.Terminal");
         verify(query).setString("oldPage", "xwiki:PageA.Terminal");
         verify(query).executeUpdate();
-        verifyZeroInteractions(namespaceContextExecutor);
+        verifyNoInteractions(namespaceContextExecutor);
     }
 }

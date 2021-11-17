@@ -35,6 +35,7 @@ import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Users related script API.
@@ -68,6 +69,9 @@ public class UserScriptService implements ScriptService
 
     @Inject
     private UserReferenceResolver<String> userReferenceResolver;
+
+    @Inject
+    private UserReferenceSerializer<String> userReferenceSerializer;
 
     /**
      * @param <S> the type of the {@link ScriptService}
@@ -204,5 +208,18 @@ public class UserScriptService implements ScriptService
     public boolean exists(UserReference userReference)
     {
         return this.userManager.exists(userReference);
+    }
+
+    /**
+     * Serialize the given user reference by using the default serializer.
+     *
+     * @param userReference the user reference to serialize.
+     * @return a serialization of the user reference.
+     * @since 13.8RC1
+     */
+    @Unstable
+    public String serialize(UserReference userReference)
+    {
+        return this.userReferenceSerializer.serialize(userReference);
     }
 }

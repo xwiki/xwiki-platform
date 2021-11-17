@@ -36,7 +36,6 @@ import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.security.authentication.AuthenticationAction;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.security.authentication.ResetPasswordException;
-import org.xwiki.security.authentication.ResetPasswordManager;
 import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;

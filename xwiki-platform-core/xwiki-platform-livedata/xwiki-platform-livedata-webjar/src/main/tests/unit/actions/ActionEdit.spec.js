@@ -22,7 +22,7 @@ import {mount} from "@vue/test-utils";
 import ActionEdit from "../../../displayers/actions/ActionEdit";
 import _ from "lodash";
 
-function initWrapper({isEditable = true, setEdit = undefined}) {
+function initWrapper({setEdit = undefined}) {
   global.XWiki = _.merge(global.XWiki, {
     currentWiki: 'xwiki'
   })
@@ -34,7 +34,7 @@ function initWrapper({isEditable = true, setEdit = undefined}) {
 
   return mount(ActionEdit, {
     propsData: {
-      displayer: {isEditable, setEdit},
+      displayer: {setEdit},
       closePopover: () => {}
     },
     mocks: {
@@ -58,10 +58,5 @@ describe('ActionEdit.vue', () => {
 
     expect(setEdit.mock.calls.length).toBe(1)
     expect(stopPropagation.mock.calls.length).toBe(1)
-  })
-
-  it('Renders when not editable', async () => {
-    const wrapper = initWrapper({isEditable: false});
-    expect(wrapper.html()).toBe('');
   })
 })

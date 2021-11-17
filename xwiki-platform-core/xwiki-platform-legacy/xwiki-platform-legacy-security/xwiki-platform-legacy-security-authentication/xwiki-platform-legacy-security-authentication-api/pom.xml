@@ -25,15 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-security-authentication</artifactId>
-    <version>13.8-SNAPSHOT</version>
+    <version>13.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-security-authentication-api</artifactId>
-  <name>XWiki Platform - Legacy - Security Authentication API</name>
+  <name>XWiki Platform - Legacy - Security - Authentication - API</name>
   <packaging>jar</packaging>
   <description>Repackages xwiki-platform-security-authentication-api including the legacy code/APIs</description>
   <properties>
     <!-- The features provided by this module so that it's found when resolving extension -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-security-authentication-api</xwiki.extension.features>
+    <!-- We check the coverage in this module instead of xwiki-platform-security-authentication-api since we wrap it -->
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

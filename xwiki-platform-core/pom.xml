@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>13.8-SNAPSHOT</version>
+    <version>13.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -50,16 +50,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <systemProperties combine.children="append">
-              <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
-              <!-- TODO: Remove this property once all functional tests have been moved to use the failsafe plugin -->
-              <property>
-                <name>screenshotDirectory</name>
-                <value>${basedir}/target/screenshots</value>
-              </property>
-            </systemProperties>
-          </configuration>
           <dependencies>
             <dependency>
               <groupId>org.xwiki.commons</groupId>
@@ -67,19 +57,6 @@
               <version>${commons.version}</version>
             </dependency>
           </dependencies>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <configuration>
-            <systemProperties combine.children="append">
-              <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
-              <property>
-                <name>screenshotDirectory</name>
-                <value>${basedir}/target/screenshots</value>
-              </property>
-            </systemProperties>
-          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -142,6 +119,9 @@
                      </item>
                    </differences>
                  </revapi.differences>
+                 <revapi.differences>
+                   ... other difference group here...
+                 </revapi.differences>
 
                  Single justification example:
 
@@ -156,33 +136,188 @@
                    </differences>
                  </revapi.differences>
             -->
+            <!-- Difference related to the Security refactoring. Start a new <revapi.differences> entry for other
+                 differences -->
             <revapi.differences>
-              <criticality>highlight</criticality>
+              <justification>Code has been moved to another Maven module without any breakage</justification>
+              <criticality>allowed</criticality>
               <differences>
                 <item>
-                  <ignore>true</ignore>
-                  <code>java.method.returnTypeChanged</code>
-                  <old>method javax.mail.internet.InternetAddress org.xwiki.security.authentication.script.AuthenticationScriptService::requestResetPassword(org.xwiki.user.UserReference) throws org.xwiki.security.authentication.ResetPasswordException</old>
-                  <new>method void org.xwiki.security.authentication.script.AuthenticationScriptService::requestResetPassword(org.xwiki.user.UserReference) throws org.xwiki.security.authentication.ResetPasswordException</new>
-                  <justification>Unstable API: this API was not properly designed and shouldn't have returned that in first place.</justification>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.DefaultSecurityReferenceFactory</old>
                 </item>
                 <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method javax.mail.internet.InternetAddress org.xwiki.security.authentication.ResetPasswordRequestResponse::getUserEmail()</old>
-                  <justification>Unstable API: this API was not properly designed and shouldn't have returned that in first place.</justification>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.GroupSecurityReference</old>
                 </item>
                 <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.XWiki::invokeServletAndReturnAsString(java.lang.String, com.xpn.xwiki.XWikiContext)</old>
-                  <justification>Not a breackage. Moved to legacy.</justification>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.SecurityReference</old>
                 </item>
                 <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::invokeServletAndReturnAsString(java.lang.String)</old>
-                  <justification>Not a breackage. Moved to legacy.</justification>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.SecurityReferenceFactory</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.UserSecurityReference</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.AccessDeniedException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorExecutor</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.AuthorizationException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorizationManager</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorizationManagerConfiguration</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.AuthorizationSettler</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.ContextualAuthorizationManager</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.DefaultAuthorizationManager</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.EntityTypeNotSupportedException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.Right</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.RightDescription</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.RightMap&lt;V&gt;</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.RightSet</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>enum org.xwiki.security.authorization.RuleState</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityAccess</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityAccessEntry</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityEntry</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityEntryReader</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityEntryReaderExtra</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityRule</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.SecurityRuleEntry</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.UnableToRegisterRightException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.cache.ConflictingInsertionException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.cache.ParentEntryEvictedException</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityCache</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityCacheLoader</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.security.authorization.cache.SecurityShadowEntry</old>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.event.RightUpdatedEvent</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <!-- Added generics to NumberProperty. Start a new <revapi.differences> entry for other differences -->
+            <revapi.differences>
+              <justification>Not a breakage thanks to type erasure</justification>
+              <criticality>allowed</criticality>
+              <ignore>true</ignore>
+              <differences>
+                <item>
+                  <code>java.class.superTypeTypeParametersChanged</code>
+                  <old>class com.xpn.xwiki.objects.DoubleProperty</old>
+                  <new>class com.xpn.xwiki.objects.DoubleProperty</new>
+                  <oldSuperType>com.xpn.xwiki.objects.NumberProperty</oldSuperType>
+                  <newSuperType>com.xpn.xwiki.objects.NumberProperty&lt;java.lang.Double&gt;</newSuperType>
+                </item>
+                <item>
+                  <code>java.class.superTypeTypeParametersChanged</code>
+                  <old>class com.xpn.xwiki.objects.FloatProperty</old>
+                  <new>class com.xpn.xwiki.objects.FloatProperty</new>
+                  <oldSuperType>com.xpn.xwiki.objects.NumberProperty</oldSuperType>
+                  <newSuperType>com.xpn.xwiki.objects.NumberProperty&lt;java.lang.Float&gt;</newSuperType>
+                </item>
+                <item>
+                  <code>java.class.superTypeTypeParametersChanged</code>
+                  <old>class com.xpn.xwiki.objects.IntegerProperty</old>
+                  <new>class com.xpn.xwiki.objects.IntegerProperty</new>
+                  <oldSuperType>com.xpn.xwiki.objects.NumberProperty</oldSuperType>
+                  <newSuperType>com.xpn.xwiki.objects.NumberProperty&lt;java.lang.Integer&gt;</newSuperType>
+                </item>
+                <item>
+                  <code>java.class.superTypeTypeParametersChanged</code>
+                  <old>class com.xpn.xwiki.objects.LongProperty</old>
+                  <new>class com.xpn.xwiki.objects.LongProperty</new>
+                  <oldSuperType>com.xpn.xwiki.objects.NumberProperty</oldSuperType>
+                  <newSuperType>com.xpn.xwiki.objects.NumberProperty&lt;java.lang.Long&gt;</newSuperType>
+                </item>
+                <item>
+                  <code>java.generics.elementNowParameterized</code>
+                  <old>class com.xpn.xwiki.objects.NumberProperty</old>
+                  <new>class com.xpn.xwiki.objects.NumberProperty&lt;N extends java.lang.Number&gt;</new>
                 </item>
               </differences>
             </revapi.differences>
@@ -247,6 +382,7 @@
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>
     <module>xwiki-platform-model</module>
+    <module>xwiki-platform-netflux</module>
     <module>xwiki-platform-notifications</module>
     <module>xwiki-platform-observation</module>
     <module>xwiki-platform-office</module>
@@ -254,6 +390,7 @@
     <module>xwiki-platform-panels</module>
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-ratings</module>
+    <module>xwiki-platform-realtime</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>
@@ -318,6 +455,52 @@
                   <property>
                     <name>oracle.jdbc.timezoneAsRegion</name>
                     <value>false</value>
+                  </property>
+                </systemProperties>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <!-- Executed when the docker profile is not specified. This is because we want to define the
+           "screenshotDirectory" system property for Surefire/Failsafe plugins only when not executing docker-based
+           tests since it's not used for them (the screenshot directory is computed based on the "maven.build.dir"
+            system property for them). -->
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <systemProperties combine.children="append">
+                  <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is
+                       failing.
+                       TODO: Remove this property once all functional tests have been moved to use the failsafe plugin
+                  -->
+                  <property>
+                    <name>screenshotDirectory</name>
+                    <value>${project.build.directory}/screenshots</value>
+                  </property>
+                </systemProperties>
+              </configuration>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemProperties combine.children="append">
+                  <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is
+                       failing (only used by non-docker UI tests) -->
+                  <property>
+                    <name>screenshotDirectory</name>
+                    <value>${project.build.directory}/screenshots</value>
                   </property>
                 </systemProperties>
               </configuration>

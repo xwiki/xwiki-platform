@@ -68,7 +68,10 @@ rendering.macro.notifications.parameter.tags.name=Étiquettes
 rendering.macro.notifications.parameter.tags.description=Liste des tags à prendre en compte (séparés par des virgules). Ne fonctionne que pour le wiki courant. Ignoré si "useUserPreferences" vaut "true".
 notifications.macro.noWatchedUsers=Vous ne suivez personne.
 notifications.macro.whenNotView=Macro de notification. Peut être vu en mode 'view'.
+notifications.macro.markEventAsRead=Marquer l'événement comme lu
+notifications.macro.showEventDetails=Afficher les détails de l'événement
 notifications.menu.nothing=Aucune notification !
 notifications.menu.more=Charger les notifications plus anciennes
-notifications.menu.details=Détails ({0})</content>
+notifications.menu.details=Détails ({0})
+</content>
 </xwikidoc>

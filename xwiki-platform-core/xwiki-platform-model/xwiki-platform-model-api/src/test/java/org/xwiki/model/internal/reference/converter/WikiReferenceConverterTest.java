@@ -33,20 +33,20 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @version $Id$
  */
 @ComponentTest
-public class WikiReferenceConverterTest
+class WikiReferenceConverterTest
 {
     @InjectMockComponents
     private WikiReferenceConverter converter;
 
     @Test
-    public void convertWikitoString()
+    void convertWikitoString()
     {
         assertNull(this.converter.convert(String.class, null));
         assertEquals("name", this.converter.convert(String.class, new WikiReference("name")));
     }
 
     @Test
-    public void convertWikiFromString()
+    void convertWikiFromString()
     {
         assertNull(this.converter.convert(WikiReference.class, null));
         assertEquals(new WikiReference("name"), this.converter.convert(WikiReference.class, "name"));

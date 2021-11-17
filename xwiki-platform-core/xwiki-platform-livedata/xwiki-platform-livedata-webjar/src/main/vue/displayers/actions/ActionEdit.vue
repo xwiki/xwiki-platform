@@ -17,7 +17,6 @@
 
 <template>
   <BaseAction
-    v-if="displayer.isEditable"
     title-translation-key="livedata.displayer.actions.edit"
     :icon-descriptor="{ name: 'edit' }"
     :handler="handler"

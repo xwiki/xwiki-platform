@@ -87,7 +87,8 @@ export default {
   methods: {
     async fetchRemoteIconDescriptor(iconName) {
       try {
-        const iconURL = `/xwiki/rest/wikis/${XWiki.currentWiki}/iconThemes/icons?name=${encodeURIComponent(iconName)}`;
+        const parameters = `name=${encodeURIComponent(iconName)}`;
+        const iconURL = `${XWiki.contextPath}/rest/wikis/${XWiki.currentWiki}/iconThemes/icons?${parameters}`;
         const response = await window.fetch(iconURL, {
           headers: {
             'Accept': 'application/json'
@@ -105,11 +106,17 @@ export default {
   watch: {
     iconDescriptor: {
       async handler(iconDescriptor) {
-        if (this.isImage || this.isFont) {
+        // If the new icon descriptor already has an icon type, we consider it is not needed to fetch its metadata
+        // remotely. The remote icon descriptor is set to undefined and the iconDescriptor prop value are directly used
+        // to render the icon.
+        const iconSetType = iconDescriptor?.iconSetType
+        if (iconSetType === 'IMAGE' || iconSetType === 'FONT') {
+          this.remoteIconDescriptor = undefined
           return;
         }
         const iconName = iconDescriptor?.name;
         if (!iconName) {
+          this.remoteIconDescriptor = undefined
           return;
         }
         // If the icon was not already fetched, fetch it!

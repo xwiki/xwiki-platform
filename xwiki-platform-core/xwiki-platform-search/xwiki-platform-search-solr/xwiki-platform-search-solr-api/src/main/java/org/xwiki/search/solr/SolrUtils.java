@@ -117,6 +117,18 @@ public interface SolrUtils
     void setMap(String fieldName, Map<String, ?> fieldValue, SolrInputDocument document);
 
     /**
+     * @param key the key in the map
+     * @param mapFieldName the name of the virtual map field
+     * @param type the type of the value
+     * @return the name of the Solr field
+     * @since 13.9RC1
+     */
+    default String getMapFieldName(String key, String mapFieldName, Type type)
+    {
+        return mapFieldName;
+    }
+
+    /**
      * Extract the identifier of the document.
      * 
      * @param document the Solr document

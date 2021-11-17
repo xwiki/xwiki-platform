@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org/netflux"
+    xmlns:netflux="http://www.xwiki.org/netflux" elementFormDefault="qualified">
+
+  <!--
+  *
+  * Types
+  *
+  -->
+
+  <complexType name="EntityReference">
+    <simpleContent>
+      <extension base="string">
+        <attribute name="type" type="string"></attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <complexType name="EntityChannel">
+    <sequence>
+      <element name="entityReference" type="netflux:EntityReference"></element>
+      <element name="path" type="string" minOccurs="0" maxOccurs="unbounded"></element>
+      <element name="key" type="string" minOccurs="0" maxOccurs="1"></element>
+      <element name="userCount" type="int" minOccurs="0" maxOccurs="1"></element>
+    </sequence>
+  </complexType>
+
+  <!--
+  *
+  * Elements
+  *
+  -->
+
+  <element name="entityChannel" type="netflux:EntityChannel"></element>
+</schema>

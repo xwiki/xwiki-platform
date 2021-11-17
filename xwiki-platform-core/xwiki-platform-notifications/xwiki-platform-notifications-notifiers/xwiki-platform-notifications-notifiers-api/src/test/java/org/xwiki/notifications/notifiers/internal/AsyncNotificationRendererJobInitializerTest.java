@@ -19,11 +19,8 @@
  */
 package org.xwiki.notifications.notifiers.internal;
 
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.Test;
 import org.xwiki.notifications.NotificationConfiguration;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -32,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
-public class AsyncNotificationRendererJobInitializerTest
+class AsyncNotificationRendererJobInitializerTest
 {
     @InjectMockComponents
     private AsyncNotificationRendererJobInitializer jobInitializer;
@@ -41,14 +38,14 @@ public class AsyncNotificationRendererJobInitializerTest
     private NotificationConfiguration configuration;
 
     @Test
-    public void getPoolSize()
+    void getPoolSize()
     {
         when(this.configuration.getAsyncPoolSize()).thenReturn(42);
         assertEquals(42, this.jobInitializer.getPoolSize());
     }
 
     @Test
-    public void getDefaultThreadPriority()
+    void getDefaultThreadPriority()
     {
         assertEquals(Thread.NORM_PRIORITY - 1, this.jobInitializer.getDefaultPriority());
     }

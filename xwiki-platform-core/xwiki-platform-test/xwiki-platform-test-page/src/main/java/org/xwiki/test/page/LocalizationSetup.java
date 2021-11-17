@@ -19,12 +19,15 @@
  */
 package org.xwiki.test.page;
 
-import org.mockito.invocation.InvocationOnMock;
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 import org.mockito.stubbing.Answer;
 import org.xwiki.localization.script.LocalizationScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.TestComponentManager;
 
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -43,7 +46,12 @@ public final class LocalizationSetup
     }
 
     /**
-     * Sets up localization so that all translation return their key as translation values.
+     * Sets up localization so that all translation return their key as translation values. When the translation has
+     * parameters, the parameter are appended comma separated and  between square brackets after the key.
+     * <p>
+     * For instance, calling {@code $services.localization.render('my.key')} returns {@code "my.key"}, and calling
+     * {@code $services.localization.render('my.key2', 'a', 1)} returns {@code "my.key2 [a, 1]"}.
+     * 
      *
      * @param tcm the stubbed Component Manager for the test
      * @throws Exception when a setup error occurs
@@ -52,15 +60,26 @@ public final class LocalizationSetup
     {
         LocalizationScriptService lss = mock(LocalizationScriptService.class);
         tcm.registerComponent(ScriptService.class, "localization", lss);
+        
+        // The translations are mocked by returning the translation, suffixed with the list of the String.valueOf
+        // values of the translation parameters if they exist.
+        // We mock the translations instead of using their actual values because they are subject to change from
+        // Weblate, possibly making the build fail unexpectedly.
         when(lss.render(anyString())).thenAnswer(
-            new Answer<String>() {
-                @Override
-                public String answer(InvocationOnMock invocationOnMock) throws Throwable
-                {
-                    // Return the translation key as the value
-                    return invocationOnMock.getArgument(0);
-                }
+            (Answer<String>) invocationOnMock -> {
+                // Return the translation key as the value
+                return invocationOnMock.getArgument(0);
             }
         );
+        when(lss.render(anyString(), anyCollection())).thenAnswer((Answer<String>) invocationOnMock -> {
+            // Displays the comma-separated list of parameters between squared brackets after the translation key as
+            // the value, so that they can be verified in tests.
+            // For instance: my.key [paramA, paramB]
+            Object key = invocationOnMock.getArgument(0);
+            Collection<?> parameters = invocationOnMock.getArgument(1);
+            return parameters.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", ", key + " [", "]"));
+        });
     }
 }

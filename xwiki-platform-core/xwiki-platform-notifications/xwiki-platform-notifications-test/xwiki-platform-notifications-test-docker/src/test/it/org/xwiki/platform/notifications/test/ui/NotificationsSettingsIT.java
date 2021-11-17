@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,7 +71,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }
 )
-public class NotificationsSettingsIT
+class NotificationsSettingsIT
 {
     private static final String FIRST_USER_NAME = NotificationsSettingsIT.class.getSimpleName() + "user1";
     private static final String FIRST_USER_PASSWORD = "notificationsUser1";
@@ -87,20 +86,20 @@ public class NotificationsSettingsIT
     private static final String ALERT_FORMAT = "alert";
 
     @BeforeEach
-    public void setup(TestUtils testUtils)
+    void setup(TestUtils testUtils)
     {
         testUtils.createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
     }
 
     @AfterEach
-    public void tearDown(TestUtils testUtils)
+    void tearDown(TestUtils testUtils)
     {
         testUtils.deletePage("XWiki", FIRST_USER_NAME);
     }
 
     @Test
     @Order(1)
-    public void notificationsSwitches(TestUtils testUtils) throws Exception
+    void notificationsSwitches(TestUtils testUtils) throws Exception
     {
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
@@ -201,7 +200,7 @@ public class NotificationsSettingsIT
 
     @Test
     @Order(2)
-    public void notificationFiltersDefaultValues(TestUtils testUtils) throws Exception
+    void notificationFiltersDefaultValues(TestUtils testUtils) throws Exception
     {
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
 
@@ -249,7 +248,7 @@ public class NotificationsSettingsIT
 
     @Test
     @Order(3)
-    public void filterAndWatchedPage(TestUtils testUtils, TestReference testReference) throws Exception
+    void filterAndWatchedPage(TestUtils testUtils, TestReference testReference) throws Exception
     {
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
 

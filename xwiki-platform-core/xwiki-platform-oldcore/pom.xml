@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>13.8-SNAPSHOT</version>
+    <version>13.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -41,10 +41,13 @@
     </xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.35</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.36</xwiki.jacoco.instructionRatio>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+
+    <!-- Workaround a limitation in Eclipse M2E which prevent using classes from OldCore test-jar in other module's main classes -->
+    <m2e.disableTestClasspathFlag>true</m2e.disableTestClasspathFlag>
   </properties>
   <dependencies>
     <dependency>
@@ -67,11 +70,15 @@
     <!-- CSS4J (used for PDF export) -->
     <dependency>
       <groupId>io.sf.carte</groupId>
-      <artifactId>xml-dtd</artifactId>
+      <artifactId>css4j</artifactId>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.sf.carte</groupId>
+      <artifactId>xml-dtd</artifactId>
     </dependency>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
@@ -429,7 +436,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-api</artifactId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

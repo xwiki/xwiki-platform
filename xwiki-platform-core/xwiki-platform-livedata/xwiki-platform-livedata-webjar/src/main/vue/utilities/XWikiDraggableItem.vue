@@ -22,7 +22,7 @@
   <div class="draggable-item">
     <div class="handle">
       <slot name="handle">
-        <span class="fa fa-bars"></span>
+        <XWikiIcon :icon-descriptor="{name: 'menu'}" />
       </slot>
     </div>
 
@@ -32,10 +32,13 @@
 
 
 <script>
+import XWikiIcon from "./XWikiIcon";
+
 export default {
 
   name: "XWikiDraggableItem",
 
+  components: {XWikiIcon}
 };
 </script>
 

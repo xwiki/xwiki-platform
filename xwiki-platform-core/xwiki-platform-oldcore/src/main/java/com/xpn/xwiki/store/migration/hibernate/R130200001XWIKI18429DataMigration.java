@@ -23,13 +23,16 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -162,8 +165,8 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         stringBuilder.append("\" ");
     }
 
-    private void updateColumn(Column column, DatabaseMetaData databaseMetaData, StringBuilder builder)
-        throws SQLException
+    private void updateColumn(Column column, DatabaseMetaData databaseMetaData, Set<String> dynamicTables,
+        StringBuilder builder) throws SQLException, DataMigrationException
     {
         int expectedLenght = column.getLength();
 
@@ -172,7 +175,7 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
 
             // Skip the update if the column does not exist of if its size if greater or equals already
             if (databaseSize != null && databaseSize.intValue() < expectedLenght) {
-                update(column, builder);
+                update(column, dynamicTables, builder);
             }
         }
     }
@@ -197,27 +200,28 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         return null;
     }
 
-    private void updateProperty(Property property, DatabaseMetaData databaseMetaData, StringBuilder builder)
-        throws SQLException
+    private void updateProperty(Property property, DatabaseMetaData databaseMetaData, Set<String> dynamicTables,
+        StringBuilder builder) throws SQLException, DataMigrationException
     {
         if (property != null) {
-            updateValue(property.getValue(), databaseMetaData, builder);
+            updateValue(property.getValue(), databaseMetaData, dynamicTables, builder);
         }
     }
 
-    private void updateValue(Value value, DatabaseMetaData databaseMetaData, StringBuilder builder) throws SQLException
+    private void updateValue(Value value, DatabaseMetaData databaseMetaData, Set<String> dynamicTables,
+        StringBuilder builder) throws SQLException, DataMigrationException
     {
         if (value instanceof Collection) {
             Table collectionTable = ((Collection) value).getCollectionTable();
 
             for (Iterator<Column> it = collectionTable.getColumnIterator(); it.hasNext();) {
-                updateColumn(it.next(), databaseMetaData, builder);
+                updateColumn(it.next(), databaseMetaData, dynamicTables, builder);
             }
         } else if (value != null) {
             for (Iterator<Selectable> it = value.getColumnIterator(); it.hasNext();) {
                 Selectable selectable = it.next();
                 if (selectable instanceof Column) {
-                    updateColumn((Column) selectable, databaseMetaData, builder);
+                    updateColumn((Column) selectable, databaseMetaData, dynamicTables, builder);
                 }
             }
         }
@@ -308,19 +312,70 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         }
     }
 
-    private void updateColumns(DatabaseMetaData databaseMetaData, StringBuilder builder) throws SQLException
+    private void updateColumns(DatabaseMetaData databaseMetaData, StringBuilder builder)
+        throws SQLException, DataMigrationException
     {
+        Set<String> dynamicTables = new HashSet<>();
+
         for (PersistentClass entity : this.hibernateStore.getConfigurationMetadata().getEntityBindings()) {
             // Check if the table exist
             if (exists(entity, databaseMetaData)) {
+                if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
+                    // Make sure all MySQL/MariaDB tables use a DYNAMIC row format (required to support key prefix
+                    // length limit up to 3072 bytes)
+                    setTableDYNAMIC(entity, builder, dynamicTables);
+                }
+
                 // Find properties to update
                 for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
-                    updateProperty(it.next(), databaseMetaData, builder);
+                    updateProperty(it.next(), databaseMetaData, dynamicTables, builder);
                 }
 
                 // Check the key
-                updateValue(entity.getKey(), databaseMetaData, builder);
+                updateValue(entity.getKey(), databaseMetaData, dynamicTables, builder);
             }
+        }
+    }
+
+    private void setTableDYNAMIC(PersistentClass entity, StringBuilder builder, Set<String> dynamicTables)
+        throws DataMigrationException
+    {
+        String tableName = this.hibernateStore.getConfiguredTableName(entity);
+
+        setTableDYNAMIC(tableName, builder, dynamicTables);
+    }
+
+    private void setTableDYNAMIC(String tableName, StringBuilder builder, Set<String> dynamicTables)
+        throws DataMigrationException
+    {
+        if (!dynamicTables.contains(tableName) && !StringUtils.equalsIgnoreCase(getRowFormat(tableName), "Dynamic")) {
+            builder.append("<sql>");
+            builder.append("ALTER TABLE ");
+            builder.append(tableName);
+            builder.append(" ROW_FORMAT=DYNAMIC");
+            builder.append("</sql>");
+        }
+    }
+
+    private String getRowFormat(String tableName) throws DataMigrationException
+    {
+        try {
+            return getStore().executeRead(getXWikiContext(), new HibernateCallback<String>()
+            {
+                @Override
+                public String doInHibernate(Session session) throws HibernateException, XWikiException
+                {
+                    NativeQuery<String> query =
+                        session.createNativeQuery("SELECT DISTINCT ROW_FORMAT FROM INFORMATION_SCHEMA.TABLES "
+                            + "WHERE TABLE_SCHEMA = :schema AND TABLE_NAME = :table");
+                    query.setParameter("schema", hibernateStore.getDatabaseFromWikiName());
+                    query.setParameter("table", tableName);
+
+                    return query.uniqueResult();
+                }
+            });
+        } catch (XWikiException e) {
+            throw new DataMigrationException("Failed to get unique keys", e);
         }
     }
 
@@ -339,30 +394,20 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         return resultSet.next();
     }
 
-    private ResultSet getTables(PersistentClass entity, DatabaseMetaData databaseMetaData) throws SQLException
-    {
-        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
-        String tableName = this.hibernateStore.getConfiguredTableName(entity);
-
-        ResultSet resultSet;
-        if (this.hibernateStore.isCatalog()) {
-            resultSet = databaseMetaData.getTables(databaseName, null, tableName, null);
-        } else {
-            resultSet = databaseMetaData.getTables(null, databaseName, tableName, null);
-        }
-
-        return resultSet;
-    }
-
-    private void update(Column column, StringBuilder builder)
+    private void update(Column column, Set<String> dynamicTables, StringBuilder builder) throws DataMigrationException
     {
         if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
-            // Not using <modifyDataType> here because Liquibase ignores attributes likes "NOT NULL"
-            builder.append("<sql>");
             JdbcEnvironment jdbcEnvironment =
                 this.hibernateStore.getConfigurationMetadata().getDatabase().getJdbcEnvironment();
             String tableName = jdbcEnvironment.getQualifiedObjectNameFormatter()
                 .format(column.getValue().getTable().getQualifiedTableName(), this.hibernateStore.getDialect());
+
+            // Make sure all MySQL/MariaDB tables use a DYNAMIC row format (required to support key prefix
+            // length limit up to 3072 bytes)
+            setTableDYNAMIC(tableName, builder, dynamicTables);
+
+            // Not using <modifyDataType> here because Liquibase ignores attributes likes "NOT NULL"
+            builder.append("<sql>");
             builder.append(this.hibernateStore.getDialect().getAlterTableString(tableName));
             builder.append(" MODIFY ");
             builder.append(column.getQuotedName(this.hibernateStore.getDialect()));

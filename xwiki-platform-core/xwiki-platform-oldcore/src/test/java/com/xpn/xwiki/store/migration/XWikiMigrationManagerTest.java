@@ -33,7 +33,6 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**

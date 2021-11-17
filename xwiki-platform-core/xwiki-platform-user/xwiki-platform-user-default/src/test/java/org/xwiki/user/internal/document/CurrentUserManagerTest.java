@@ -19,7 +19,6 @@
  */
 package org.xwiki.user.internal.document;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -47,7 +46,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class CurrentUserManagerTest
+class CurrentUserManagerTest
 {
     @InjectMockComponents
     private CurrentUserManager manager;

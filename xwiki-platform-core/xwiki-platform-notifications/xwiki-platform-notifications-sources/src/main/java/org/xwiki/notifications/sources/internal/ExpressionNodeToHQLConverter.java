@@ -28,7 +28,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.BooleanValueNode;

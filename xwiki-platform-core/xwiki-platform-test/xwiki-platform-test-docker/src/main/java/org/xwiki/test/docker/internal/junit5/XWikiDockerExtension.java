@@ -59,7 +59,6 @@ import ch.qos.logback.classic.Level;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.followOutput;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getAgentName;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getResultFileLocation;
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isLocal;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.setLogbackLoggerLevel;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreenshot;
@@ -251,12 +250,6 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     {
         LOGGER.info("(*) Stopping test [{}]", extensionContext.getTestMethod().get().getName());
 
-        // If running locally then save the screenshot and the video by default for easier debugging. For the moment
-        // we consider we're running locally if we're not running inside a Docker container. To be improved.
-        if (isLocal()) {
-            saveScreenshotAndVideo(extensionContext);
-        }
-
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc() && this.isVncStarted) {
             VncRecordingContainer vnc = loadVNC(extensionContext);
@@ -272,10 +265,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        // Only take screenshot & save video if not executing locally as otherwise they're always taken and saved!
-        if (!isLocal()) {
-            saveScreenshotAndVideo(extensionContext);
-        }
+        saveScreenshotAndVideo(extensionContext);
 
         // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
         displayAgentName();

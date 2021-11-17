@@ -228,7 +228,7 @@ public class EventStoreTest
         return result;
     }
 
-    private void assertEqualsResult(Collection<Event> expected, EventSearchResult result) throws EventStreamException
+    private void assertEqualsResult(Collection<Event> expected, EventSearchResult result)
     {
         assertEquals(new HashSet<>(expected), result.stream().collect(Collectors.toSet()));
     }
@@ -236,7 +236,7 @@ public class EventStoreTest
     // Tests
 
     @Test
-    public void saveGetDeleteEvent() throws Exception
+    void saveGetDeleteEvent() throws Exception
     {
         assertFalse(this.eventStore.getEvent("id").isPresent());
 
@@ -290,7 +290,7 @@ public class EventStoreTest
     }
 
     @Test
-    public void saveDeleteEventStatuses() throws Exception
+    void saveDeleteEventStatuses() throws Exception
     {
         Date date0 = new Date(0);
         Date date10 = new Date(10);
@@ -387,7 +387,7 @@ public class EventStoreTest
     }
 
     @Test
-    public void allSearch()
+    void allSearch()
         throws EventStreamException, InterruptedException, ExecutionException, SolrServerException, IOException
     {
         // Misc
@@ -411,7 +411,7 @@ public class EventStoreTest
         searchFields();
     }
 
-    public void searchMisc() throws EventStreamException, InterruptedException, ExecutionException
+    private void searchMisc() throws EventStreamException, InterruptedException, ExecutionException
     {
         EVENT1.setHidden(true);
         EVENT2.setHidden(true);
@@ -473,7 +473,21 @@ public class EventStoreTest
     }
 
     @Test
-    public void searchDate() throws EventStreamException, InterruptedException, ExecutionException
+    void searchParameter() throws EventStreamException, InterruptedException, ExecutionException
+    {
+        EVENT1.setParameters(Collections.singletonMap("param", "value1"));
+        EVENT2.setParameters(Collections.singletonMap("param", "value2"));
+
+        this.eventStore.saveEvent(EVENT1);
+        this.eventStore.saveEvent(EVENT2).get();
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery());
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().parameter().eq("param", "value1"));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().parameter().eq("param", "value2"));
+    }
+
+    @Test
+    void searchDate() throws EventStreamException, InterruptedException, ExecutionException
     {
         Date date0 = new Date(0);
         Date date10 = new Date(10);
@@ -560,7 +574,7 @@ public class EventStoreTest
         assertEquals(2, result.getTotalHits());
     }
 
-    public void searchReference() throws EventStreamException, InterruptedException, ExecutionException
+    private void searchReference() throws EventStreamException, InterruptedException, ExecutionException
     {
         DocumentReference document1 = new DocumentReference("document1", SPACE_REFERENCE);
         DocumentReference document2 = new DocumentReference("document2", SPACE_REFERENCE);
@@ -598,7 +612,7 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, SPACE2_REFERENCE));
     }
 
-    public void searchStatus()
+    private void searchStatus()
         throws EventStreamException, InterruptedException, ExecutionException, SolrServerException, IOException
     {
         DefaultEventStatus status11 = eventstatus(EVENT1, "entity1", true);
@@ -634,7 +648,7 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().withStatus("entity1", false));
     }
 
-    public void searchMail()
+    private void searchMail()
         throws EventStreamException, InterruptedException, ExecutionException, SolrServerException, IOException
     {
         DefaultEntityEvent mail11 = entityevent(EVENT1, "entity1");
@@ -683,8 +697,7 @@ public class EventStoreTest
     }
 
     @Test
-    public void deleteWiki()
-        throws EventStreamException, InterruptedException, ExecutionException, ComponentLookupException
+    void deleteWiki() throws EventStreamException, InterruptedException, ExecutionException, ComponentLookupException
     {
         EVENT1.setWiki(new WikiReference("wikia"));
         EVENT2.setWiki(new WikiReference("wikia"));

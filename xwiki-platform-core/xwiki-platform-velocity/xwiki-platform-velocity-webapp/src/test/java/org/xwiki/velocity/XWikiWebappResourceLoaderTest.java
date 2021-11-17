@@ -28,7 +28,6 @@ import javax.servlet.ServletContext;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;

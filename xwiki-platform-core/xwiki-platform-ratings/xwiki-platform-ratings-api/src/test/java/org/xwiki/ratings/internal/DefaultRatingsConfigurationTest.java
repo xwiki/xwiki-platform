@@ -25,7 +25,6 @@ import java.util.Set;
 
 import javax.inject.Named;
 
-import org.apache.ecs.storage.Hash;
 import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
@@ -39,9 +38,8 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link DefaultRatingsConfiguration}.
@@ -50,7 +48,7 @@ import static org.mockito.ArgumentMatchers.any;
  * @since 12.9RC1
  */
 @ComponentTest
-public class DefaultRatingsConfigurationTest
+class DefaultRatingsConfigurationTest
 {
     @InjectMockComponents
     private DefaultRatingsConfiguration configuration;

@@ -28,6 +28,7 @@ import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.context.Execution;
@@ -79,8 +80,6 @@ import static org.mockito.Mockito.when;
 @PageComponentList
 public class PageTest
 {
-    private static final String SKIN_PROPERTIES_PATH = "/skins/flamingo/skin.properties";
-
     @InjectMockitoOldcore
     protected MockitoOldcore oldcore;
 
@@ -133,6 +132,9 @@ public class PageTest
 
         CacheManager cacheManager = componentManager.registerMockComponent(CacheManager.class);
         when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(mock(Cache.class));
+        CacheFactory cacheFactory = mock(CacheFactory.class);
+        when(cacheManager.getCacheFactory()).thenReturn(cacheFactory);
+        when(cacheFactory.newCache(any(CacheConfiguration.class))).thenReturn(mock(Cache.class));
     }
 
     /**

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-panels</artifactId>
-    <version>13.8-SNAPSHOT</version>
+    <version>13.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-panels-ui</artifactId>
   <name>XWiki Platform - Panels - UI</name>
@@ -120,7 +120,7 @@
     <!-- Used to check access rights (e.g. in the Applications panel). -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-script</artifactId>
+      <artifactId>xwiki-platform-security-authorization-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

@@ -13,7 +13,7 @@ export default {
   mixins: [displayerMixin, displayerLinkMixin],
   computed: {
     html() {
-        if (this.entry['doc.title_raw']) {
+        if (this.entry['doc.title_raw'] !== undefined) {
         this.logic.footnotes.put('1', 'livedata.footnotes.computedTitle');
         return `${this.htmlValue} <sup>1</sup>`;
       } else {

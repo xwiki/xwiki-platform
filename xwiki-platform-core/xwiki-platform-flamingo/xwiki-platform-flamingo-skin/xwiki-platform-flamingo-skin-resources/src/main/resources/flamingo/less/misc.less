@@ -200,7 +200,7 @@
 // FIX: login
 #loginForm {
   .panel {
-    max-width: 450px;
+    max-width: @loginFormMaxWidth;
     margin: auto;
     text-align: left;
   }
@@ -209,6 +209,16 @@
     font-weight: normal;
     float: right;
     margin-top: .3em;
+  }
+}
+
+.resetpasswordpanel, .forgotusernamepanel {
+  max-width: @loginFormMaxWidth;
+  margin: auto;
+  text-align: left;
+
+  .resetpasswordlinks, .forgotusernamelinks {
+    margin-top: 1em;
   }
 }
 

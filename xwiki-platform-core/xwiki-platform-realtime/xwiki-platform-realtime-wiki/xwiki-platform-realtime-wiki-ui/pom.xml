@@ -29,7 +29,12 @@
   </parent>
   <artifactId>xwiki-platform-realtime-wiki-ui</artifactId>
   <name>XWiki Platform - Realtime - Wiki - UI</name>
+  <description>Adds support for real-time wiki syntax (text) editing in XWiki.</description>
   <packaging>xar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Realtime Wiki Editor</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

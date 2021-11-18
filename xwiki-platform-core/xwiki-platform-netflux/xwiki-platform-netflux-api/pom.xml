@@ -29,8 +29,11 @@
   </parent>
   <artifactId>xwiki-platform-netflux-api</artifactId>
   <name>XWiki Platform - Netflux - API</name>
+  <description>The API to associate one or more real-time communication channels to an XWiki entity, and the corresponding script service.</description>
   <packaging>jar</packaging>
   <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Netflux API</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

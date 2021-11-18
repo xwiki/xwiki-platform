@@ -512,6 +512,9 @@ public class XWikiContext extends Hashtable<Object, Object>
         return StringUtils.equalsIgnoreCase(wikiName, getMainXWiki());
     }
 
+    /**
+     * @return the current document handled in the context or {@code null}.
+     */
     public XWikiDocument getDoc()
     {
         return (XWikiDocument) get("doc");

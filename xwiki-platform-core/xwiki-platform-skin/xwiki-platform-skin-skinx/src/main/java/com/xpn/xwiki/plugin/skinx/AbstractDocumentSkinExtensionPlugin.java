@@ -236,14 +236,16 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     public boolean hasPageExtensions(XWikiContext context)
     {
         XWikiDocument doc = context.getDoc();
-        List<BaseObject> objects = doc.getObjects(getExtensionClassName());
-        if (objects != null) {
-            for (BaseObject obj : objects) {
-                if (obj == null) {
-                    continue;
-                }
-                if (obj.getStringValue(USE_FIELDNAME).equals("currentPage")) {
-                    return true;
+        if (doc != null) {
+            List<BaseObject> objects = doc.getObjects(getExtensionClassName());
+            if (objects != null) {
+                for (BaseObject obj : objects) {
+                    if (obj == null) {
+                        continue;
+                    }
+                    if (obj.getStringValue(USE_FIELDNAME).equals("currentPage")) {
+                        return true;
+                    }
                 }
             }
         }

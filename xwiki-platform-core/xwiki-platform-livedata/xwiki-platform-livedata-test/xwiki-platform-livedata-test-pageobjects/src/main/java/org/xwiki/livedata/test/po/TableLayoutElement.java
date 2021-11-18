@@ -435,9 +435,7 @@ public class TableLayoutElement extends BaseElement
      */
     public void filterColumn(String columnLabel, String content, boolean wait)
     {
-        int columnIndex = findColumnIndex(columnLabel);
-        WebElement element = getRoot()
-            .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
+        WebElement element = getFilter(columnLabel);
 
         List<String> classes = Arrays.asList(getClasses(element));
         if (classes.contains("filter-list")) {
@@ -519,6 +517,20 @@ public class TableLayoutElement extends BaseElement
         int columnNumber = findColumnIndex(columnLabel);
         return getRoot().findElement(
             By.cssSelector(String.format("tbody tr:nth-child(%d) td:nth-child(%d)", rowNumber, columnNumber)));
+    }
+
+    /**
+     * Get the filter for the given column.
+     *
+     * @param columnLabel the label of the column to get the filter element for, for instance {@code "Title"}
+     * @return The {@link WebElement} for the given column filter.
+     * @since 13.10RC1
+     */
+    public WebElement getFilter(String columnLabel)
+    {
+        int columnIndex = findColumnIndex(columnLabel);
+        return getRoot()
+            .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
     }
 
     /**

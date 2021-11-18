@@ -20,7 +20,10 @@
 package org.xwiki.livedata.test.ui;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -37,6 +40,7 @@ import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
 import org.xwiki.text.StringUtils;
@@ -80,6 +84,14 @@ class LiveDataIT
 
     private static final String CHOICE_EMPTY = "(empty)";
 
+    private static final String CHOICE_L = "value_l";
+
+    private static final String CHOICE_L_LABEL = "Display & Label";
+
+    private static final String CHOICE_T = "value_t";
+
+    private static final String CHOICE_T_TRANSLATION = "Translated & Label";
+
     private static final String BIRTHDAY_COLUMN = "birthday";
 
     private static final String USER_COLUMN = "user";
@@ -117,7 +129,7 @@ class LiveDataIT
         String className = testUtils.serializeReference(testReference);
 
         // Initializes the page content.
-        createClassNameLiveDataPage(testUtils, testReference, className);
+        createClassNameLiveDataPage(testUtils, testReference);
 
         // Creates the XClass.
         createXClass(testUtils, testReference);
@@ -159,7 +171,7 @@ class LiveDataIT
         tableLayout.editCell(CHOICE_COLUMN, 2, CHOICE_COLUMN, CHOICE_C);
         tableLayout.editCell(BIRTHDAY_COLUMN, 1, BIRTHDAY_COLUMN, BIRTHDAY_DATETIME);
         tableLayout.editAndCancel(BIRTHDAY_COLUMN, 2, BIRTHDAY_COLUMN, CANCELED_BIRTHDAY_DATETIME);
-        // Edits the choice column of Nikolay, to assert that a cell with an empty content can be edited. 
+        // Edits the choice column of Nikolay, to assert that a cell with an empty content can be edited.
         tableLayout.editCell(CHOICE_COLUMN, 3, CHOICE_COLUMN, CHOICE_D);
         assertEquals(3, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_CHARLY);
@@ -196,7 +208,7 @@ class LiveDataIT
         tableLayout.waitUntilReady();
         assertEquals(CHOICE_EMPTY, tableLayout.getFilterValues(CHOICE_COLUMN).get(0));
 
-        // Become guest because the tests does not need specific rights. 
+        // Become guest because the tests does not need specific rights.
         testUtils.forceGuestUser();
 
         testUtils.gotoPage(testReference);
@@ -208,6 +220,29 @@ class LiveDataIT
         tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
         assertEquals(1, liveDataElement.countFootnotes());
         assertThat(liveDataElement.getFootnotesText(), containsInAnyOrder(FOOTNOTE_COMPUTED_TITLE));
+
+        // Testing the selectize filters
+        SuggestInputElement suggestInputElement = new SuggestInputElement(tableLayout.getFilter(CHOICE_COLUMN));
+
+        // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
+        suggestInputElement.click().waitForSuggestions();
+
+        // Test filtering by label
+        suggestInputElement.sendKeys(CHOICE_L_LABEL);
+        suggestInputElement.waitForSuggestions();
+        List<SuggestInputElement.SuggestionElement> suggestionElements = suggestInputElement.getSuggestions();
+        assertEquals(1, suggestionElements.size());
+        assertEquals(CHOICE_L, suggestionElements.get(0).getValue());
+        assertEquals(CHOICE_L_LABEL, suggestionElements.get(0).getLabel());
+
+        // Test filtering by translation
+        suggestInputElement.clear();
+        suggestInputElement.sendKeys(CHOICE_T_TRANSLATION);
+        suggestInputElement.waitForSuggestions();
+        suggestionElements = suggestInputElement.getSuggestions();
+        assertEquals(1, suggestionElements.size());
+        assertEquals(CHOICE_T, suggestionElements.get(0).getValue());
+        assertEquals(CHOICE_T_TRANSLATION, suggestionElements.get(0).getLabel());
     }
 
     /**
@@ -244,7 +279,12 @@ class LiveDataIT
             new DocumentReference("Translation", testReference.getLastSpaceReference());
         testUtils.addObject(translationDocumentReference, "XWiki.TranslationDocumentClass",
             singletonMap("scope", "WIKI"));
-        testUtils.rest().savePage(translationDocumentReference, "emptyvalue=\ncomputedTitle=O3", "translation");
+        String choiceTTranslationKey =
+            StringUtils.joinWith("_", testUtils.serializeReference(testReference.getLocalDocumentReference()),
+                CHOICE_COLUMN, CHOICE_T);
+        testUtils.rest().savePage(translationDocumentReference,
+            "emptyvalue=\ncomputedTitle=O3\n" + choiceTTranslationKey + "=" + CHOICE_T_TRANSLATION,
+            "translation");
     }
 
     /**
@@ -275,13 +315,22 @@ class LiveDataIT
         testUtils.addClassProperty(testReference, CHOICE_COLUMN, "StaticList");
         ClassEditPage classEditPage = new ClassEditPage();
         StaticListClassEditElement propertyList = classEditPage.getStaticListClassEditElement(CHOICE_COLUMN);
-        propertyList.setValues(StringUtils.joinWith("|", CHOICE_A, CHOICE_B, CHOICE_C, CHOICE_D));
+        StringJoiner choices = new StringJoiner("|");
+        choices.add(CHOICE_A);
+        choices.add(CHOICE_B);
+        choices.add(CHOICE_C);
+        choices.add(CHOICE_D);
+        // Add padding values to ensure that the last values are not initially loaded
+        IntStream.range(10, 20).mapToObj(i -> "padding" + i).forEach(choices::add);
+        choices.add(StringUtils.joinWith("=", CHOICE_L, CHOICE_L_LABEL));
+        choices.add(CHOICE_T);
+        propertyList.setValues(choices.toString());
         classEditPage.clickSaveAndView();
         testUtils.addClassProperty(testReference, BIRTHDAY_COLUMN, "Date");
         testUtils.addClassProperty(testReference, USER_COLUMN, "Users");
     }
 
-    private void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference, String className)
+    private void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference)
         throws Exception
     {
         TestUtils.RestTestUtils rest = testUtils.rest();
@@ -293,7 +342,8 @@ class LiveDataIT
             + "  id=\"test\"\n"
             + "  properties=\"" + properties + "\"\n"
             + "  source=\"liveTable\"\n"
-            + "  sourceParameters=\"translationPrefix=&className=" + className.replace("xwiki:", "") + "\"\n"
+            + "  sourceParameters=\"translationPrefix=&className=" + testUtils.serializeReference(
+            testReference.getLocalDocumentReference()) + "\"\n"
             + "}}{{/liveData}}\n"
             + "{{/velocity}}");
         rest.save(page);

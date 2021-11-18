@@ -29,12 +29,13 @@
   </parent>
   <artifactId>xwiki-platform-netflux-rest</artifactId>
   <name>XWiki Platform - Netflux - REST</name>
+  <description>Provides the REST resources needed to create and retrieve the entity channels that are used for real-time synchronization in XWiki.</description>
   <packaging>jar</packaging>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Netflux REST Services</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.82</xwiki.jacoco.instructionRatio>
-    </properties>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

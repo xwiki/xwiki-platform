@@ -215,7 +215,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                         // Only add the extension as being "always used" if the page holding it has been saved with
                         // programming rights.
                         if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
-                            doc.getContentAuthorReference(), doc.getDocumentReference())) {
+                            doc.getAuthorReference(), doc.getDocumentReference())) {
                             extensions.add(extension);
                         }
                     } catch (XWikiException e1) {
@@ -333,7 +333,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             // new or already existing object
             if (document.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
                 if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
-                    document.getContentAuthorReference(), document.getDocumentReference())) {
+                    document.getAuthorReference(), document.getDocumentReference())) {
                     getAlwaysUsedExtensions().add(document.getDocumentReference());
 
                     return;

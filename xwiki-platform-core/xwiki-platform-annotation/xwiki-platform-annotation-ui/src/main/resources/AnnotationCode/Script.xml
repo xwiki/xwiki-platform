@@ -985,7 +985,8 @@ XWiki.Annotation = Class.create({
     // Check if the annotation was found.
     var plainTextStartOffset = ann.fields.find(field =&gt; field.name == 'plainTextStartOffset');
     var plainTextEndOffset = ann.fields.find(field =&gt; field.name == 'plainTextEndOffset');
-    if (!plainTextStartOffset.value || !plainTextEndOffset.value) {
+    if ((!plainTextStartOffset.value &amp;&amp; plainTextStartOffset.value !== 0) ||
+        (!plainTextEndOffset.value &amp;&amp; plainTextEndOffset.value !== 0)) {
       return false;
     }
 
@@ -1961,7 +1962,8 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
         var plainTextStartOffset = ann.fields.find(field =&gt; field.name == 'plainTextStartOffset');
         var plainTextEndOffset = ann.fields.find(field =&gt; field.name == 'plainTextEndOffset');
         // Check if the annotation was found.
-        if (!plainTextStartOffset.value || !plainTextEndOffset.value) {
+        if ((!plainTextStartOffset.value &amp;&amp; plainTextStartOffset.value !== 0) ||
+            (!plainTextEndOffset.value &amp;&amp; plainTextEndOffset.value !== 0)) {
           return;
         }
         plainTextStartOffset.value = offsetUpdater.findOffsetAfterChanges(changes, parseInt(plainTextStartOffset.value));

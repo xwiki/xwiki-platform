@@ -50,10 +50,10 @@
                   <span class="input-group-addon">$services.icon.renderHTML('envelope')</span>
                   <input type="text" id="e" name="e" class="form-control" size="60" />
                 </dd>
-                <dt>
-                  <input type="submit" value="$services.localization.render('xe.admin.forgotUsername.submit')" class="btn btn-primary col-xs-12"/>
-                </dt>
             </dl>
+            <div class="forgotusernamelinks">
+              <input type="submit" value="$services.localization.render('xe.admin.forgotUsername.submit')" class="btn btn-primary col-xs-12"/>
+            </div>
             <input type="hidden" name="form_token" value="$services.csrf.getToken()" />
         </form>
         #forgotUsernameBoxEnd()

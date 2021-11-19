@@ -31,7 +31,7 @@
   <name>XWiki Platform - Skin - Skin Extensions</name>
   <description>XWiki Platform - Skin - Skin Extensions</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.18</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Build tools -->
@@ -85,6 +85,15 @@
       <groupId>com.google.javascript</groupId>
       <artifactId>closure-compiler</artifactId>
       <version>${closure-compiler.version}</version>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

@@ -158,7 +158,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
         // have been fixed.
         if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
-            LOGGER.info("XXX Java 17 found!");
             List<String> javaOpts = new ArrayList<>();
             addJava17AddOpens(javaOpts);
             this.servletContainer.withEnv("JAVA_OPTS", StringUtils.join(javaOpts, ' '));

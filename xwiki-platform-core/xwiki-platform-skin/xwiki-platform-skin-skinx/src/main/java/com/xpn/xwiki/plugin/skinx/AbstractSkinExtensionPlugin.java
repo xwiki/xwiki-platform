@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -350,7 +351,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
             query.append("&amp;");
             query.append(sanitize(parameter.getKey()));
             query.append("=");
-            query.append(sanitize(parameter.getValue().toString()));
+            query.append(sanitize(Objects.toString(parameter.getValue(), "")));
         }
         // If the main page is requested unminified, also send unminified extensions
         if ("false".equals(context.getRequest().getParameter("minify"))) {

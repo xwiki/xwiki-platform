@@ -845,7 +845,7 @@ define('xwiki-realtime-loader', [
         deferred.reject();
       } else if (window.XWiki.editor === info.type) {
         // No lock and we are using the right editor. Start realtime.
-        this.updateKeys(info.type).done(function(keys) {
+        this.updateKeys(info.type).done(keys => {
           if (!keys[info.type] || !keys.events || !keys.userdata) {
             ErrorBox.show('unavailable');
             console.error('You are not allowed to create a new realtime session for that document.');

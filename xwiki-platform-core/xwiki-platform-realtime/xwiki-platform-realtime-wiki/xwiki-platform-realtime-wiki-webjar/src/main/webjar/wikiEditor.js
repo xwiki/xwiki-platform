@@ -211,6 +211,9 @@ define('xwiki-realtime-wikiEditor', [
       // List of pretty name of all users (mapped with their server ID).
       var userData;
 
+      // The real-time toolbar, showing the list of connected users and the lag.
+      var toolbar;
+
       var setValueWithCursor = function(newValue) {
         var oldValue = canonicalize(editor.getValue());
         var ops = ChainPad.Diff.diff(oldValue, newValue);

@@ -98,6 +98,10 @@ define('xwiki-realtime-document', [
 
     getChannels: function(params) {
       var url = new XWiki.Document(this.documentReference).getRestURL('channels');
+      params = $.extend({
+        // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
+        timestamp: new Date().getTime()
+      }, params);
       return $.getJSON(url, $.param(params, true)).then(function(data) {
         if (!Array.isArray(data)) {
           console.error('Failed to retrieve the list of document channels.');

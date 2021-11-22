@@ -34,11 +34,13 @@ define('xwiki-realtime-wysiwygEditor', [
   'chainpad',
   'xwiki-realtime-crypto',
   'diff-dom',
-  'deferred!ckeditor'
+  'deferred!ckeditor',
+  // Adds support for XPath API to IE11.
+  'wgxpath'
 ], function (
   /* jshint maxparams:false */
   $, realtimeConfig, Messages, ErrorBox, Toolbar, ChainPadNetflux, Hyperjson, Cursor, UserData, TypingTest, JSONSortify,
-  Interface, Saver, Chainpad, Crypto, DiffDom, ckeditorPromise
+  Interface, Saver, Chainpad, Crypto, diffDOM, ckeditorPromise, wgxpath
 ) {
   'use strict';
 
@@ -335,7 +337,7 @@ define('xwiki-realtime-wysiwygEditor', [
           (info.diff.action === 'removeAttribute' && info.diff.name === 'style'))
       ],
 
-      DD = new DiffDom({
+      DD = new diffDOM.DiffDOM({
         preDiffApply: function(info) {
           // Apply our filters.
           if (preDiffFilters.some(filter => {
@@ -409,6 +411,8 @@ define('xwiki-realtime-wysiwygEditor', [
       userData = {},
       // List of users still connected to the channel (server IDs).
       userList,
+      // The real-time toolbar, showing the list of connected users and the lag.
+      toolbar,
 
       fixMacros = function() {
         var dataValues = {};
@@ -427,7 +431,8 @@ define('xwiki-realtime-wysiwygEditor', [
       applyHjson = function(shjson) {
         var userDocStateDom = Hyperjson.toDOM(JSON.parse(shjson));
         userDocStateDom.setAttribute('contenteditable', 'true');
-        var patch = DD.diff(window.inner, userDocStateDom);
+        // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
+        var patch = DD.diff(diffDOM.nodeToObj(window.inner), diffDOM.nodeToObj(userDocStateDom));
         DD.apply(window.inner, patch);
         try {
           fixMacros();
@@ -455,14 +460,15 @@ define('xwiki-realtime-wysiwygEditor', [
         Saver.setLastSavedContent(editor._.previousModeData);
         var saverCreateConfig = {
           // Id of the wiki page form.
-          formId: window.XWiki.editor === "wysiwyg" ? "edit" : "inline",
+          formId: window.XWiki.editor === 'wysiwyg' ? 'edit' : 'inline',
           setTextValue: function(newText, toConvert, callback) {
             var andThen = function(data) {
-              var doc = window.DOMDoc = (new DOMParser()).parseFromString(data,"text/html");
+              var doc = new DOMParser().parseFromString(data, 'text/html');
               window.cursor.update();
-              doc.body.setAttribute("contenteditable", "true");
-              var patch = (DD).diff(window.inner, doc.body);
-              (DD).apply(window.inner, patch);
+              doc.body.setAttribute('contenteditable', 'true');
+              // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
+              var patch = DD.diff(diffDOM.nodeToObj(window.inner), diffDOM.nodeToObj(doc.body));
+              DD.apply(window.inner, patch);
 
               // If available, transform the HTML comments for XWiki macros into macros before saving
               // (<!--startmacro:{...}-->). We can do that by using the "xwiki-refresh" command provided the by
@@ -600,6 +606,8 @@ define('xwiki-realtime-wysiwygEditor', [
           var data = updatedData[id];
           var name = getPrettyName(data.name);
           // Set the user position.
+          // Make sure we have XPath API support in the editor iframe (missing in IE11).
+          wgxpath.install(window.innerDoc.defaultView);
           var element = window.innerDoc.evaluate(data['cursor_' + editorId], window.innerDoc, null,
             XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
           if (!element) {

@@ -22,7 +22,6 @@ package org.xwiki.ratings.events;
 import org.xwiki.observation.event.BeginEvent;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.RatingsManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event sent whenever an {@link AverageRating} is updated. The event is sent with the following information:
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public class UpdatingAverageRatingEvent extends AbstractAverageRatingEvent implements BeginEvent
 {
     /**

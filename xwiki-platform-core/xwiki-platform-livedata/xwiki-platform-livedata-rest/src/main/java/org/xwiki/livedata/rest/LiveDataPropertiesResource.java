@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.model.jaxb.Properties;
 import org.xwiki.livedata.rest.model.jaxb.PropertyDescriptor;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides the list of known properties from an existing {@link LiveDataSource}.
@@ -39,7 +38,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Path("/liveData/sources/{sourceId}/properties")
-@Unstable
 public interface LiveDataPropertiesResource
 {
     /**

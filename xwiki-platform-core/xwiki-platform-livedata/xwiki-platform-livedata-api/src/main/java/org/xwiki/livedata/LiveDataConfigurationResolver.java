@@ -20,7 +20,6 @@
 package org.xwiki.livedata;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Resolves {@link LiveDataConfiguration} from some input.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Role
-@Unstable
 public interface LiveDataConfigurationResolver<T>
 {
     /**

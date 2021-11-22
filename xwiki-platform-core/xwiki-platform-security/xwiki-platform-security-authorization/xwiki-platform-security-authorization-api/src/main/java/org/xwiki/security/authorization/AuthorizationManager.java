@@ -96,7 +96,6 @@ public interface AuthorizationManager
      * the same right does not cause an exception and return the existing right.
      * @since 12.6
      */
-    @Unstable
     default Right register(RightDescription rightDescription, Set<Right> impliedByRights)
         throws UnableToRegisterRightException
     {

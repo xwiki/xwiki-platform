@@ -21,8 +21,6 @@ package org.xwiki.user;
 
 import java.io.Serializable;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Abstracts the concept of User reference. This allows to support several store implementations for users.
  * For example for an implementation storing the users in wiki pages, the internal reference would be a
@@ -32,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 public interface UserReference extends Serializable
 {
     /**

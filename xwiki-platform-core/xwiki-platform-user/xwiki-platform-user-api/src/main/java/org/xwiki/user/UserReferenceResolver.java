@@ -20,7 +20,6 @@
 package org.xwiki.user;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Convert a raw representation of a user reference into a {@link UserReference} object (for example converts
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 @Role
 public interface UserReferenceResolver<T>
 {

@@ -20,7 +20,6 @@
 package org.xwiki.user;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Converts a {@link UserReference} into a serialized form (e.g. into a String representation).
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 @Role
 public interface UserReferenceSerializer<T>
 {

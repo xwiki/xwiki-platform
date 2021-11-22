@@ -22,7 +22,6 @@ package org.xwiki.user;
 import java.util.Properties;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the User module.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 @Role
 public interface UserConfiguration
 {

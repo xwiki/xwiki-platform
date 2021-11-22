@@ -33,7 +33,6 @@ import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationC
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service for name strategies.
@@ -44,7 +43,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named("modelvalidation")
 @Singleton
-@Unstable
 public class ModelValidationScriptService implements ScriptService
 {
     @Inject

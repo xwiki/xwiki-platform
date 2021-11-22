@@ -25,7 +25,6 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
 import org.xwiki.filter.input.InputSource;
-import org.xwiki.stability.Unstable;
 
 /**
  * Attachment related events.
@@ -91,13 +90,11 @@ public interface WikiAttachmentFilter
      * @type {@link String}
      * @since 12.0RC1
      */
-    @Unstable
     String PARAMETER_REVISION_CONTENT_ALIAS = "revision_content_alias";
 
     /**
      * @since 12.0RC1
      */
-    @Unstable
     String VALUE_REVISION_CONTENT_ALIAS_CURRENT = "";
 
     /**
@@ -118,7 +115,6 @@ public interface WikiAttachmentFilter
      * @throws FilterException when failing to send event
      * @since 12.0RC1
      */
-    @Unstable
     default void beginWikiDocumentAttachment(String name, InputSource content, Long size,
         @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException
     {
@@ -132,7 +128,6 @@ public interface WikiAttachmentFilter
      * @throws FilterException when failing to send event
      * @since 12.0RC1
      */
-    @Unstable
     default void endWikiDocumentAttachment(String name, InputSource content, Long size,
         @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException
     {
@@ -143,7 +138,6 @@ public interface WikiAttachmentFilter
      * @throws FilterException when failing to send event
      * @since 12.0RC1
      */
-    @Unstable
     default void beginWikiAttachmentRevisions(@Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException
     {
@@ -154,7 +148,6 @@ public interface WikiAttachmentFilter
      * @throws FilterException when failing to send event
      * @since 12.0RC1
      */
-    @Unstable
     default void endWikiAttachmentRevisions(@Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException
     {
@@ -168,7 +161,6 @@ public interface WikiAttachmentFilter
      * @throws FilterException when failing to send event
      * @since 12.0RC1
      */
-    @Unstable
     default void beginWikiAttachmentRevision(String version, InputSource content, Long size,
         @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException
     {
@@ -182,7 +174,6 @@ public interface WikiAttachmentFilter
      * @throws FilterException when failing to send event
      * @since 12.0RC1
      */
-    @Unstable
     default void endWikiAttachmentRevision(String version, InputSource content, Long size,
         @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException
     {

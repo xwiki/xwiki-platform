@@ -46,7 +46,6 @@ import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.query.QueryException;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script services for the Event Stream Module.
@@ -112,7 +111,6 @@ public class EventStreamScriptService implements ScriptService
      * @return the status of the process
      * @since 12.6
      */
-    @Unstable
     public JobStatus getLegacyMigrationStatus()
     {
         Job job = this.jobs.getJob(LEGACY_MIGRATOR_ID);
@@ -130,7 +128,6 @@ public class EventStreamScriptService implements ScriptService
      * @throws JobException when failing to start the job
      * @since 12.6
      */
-    @Unstable
     public JobStatus startLegacyMigration(Date since) throws JobException
     {
         return this.jobs

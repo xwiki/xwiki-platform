@@ -21,7 +21,6 @@ package org.xwiki.model.validation;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define a strategy to validate or transform an entity reference.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.0RC1
  */
 @Role
-@Unstable
 public interface EntityNameValidation
 {
     /**

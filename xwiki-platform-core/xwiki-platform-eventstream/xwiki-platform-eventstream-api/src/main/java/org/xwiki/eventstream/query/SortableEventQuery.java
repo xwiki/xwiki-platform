@@ -24,7 +24,6 @@ import java.util.List;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.eventstream.EventQuery;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -33,7 +32,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 12.5RC1
  */
-@Unstable
 public interface SortableEventQuery extends EventQuery
 {
     /**

@@ -29,7 +29,6 @@ import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Various helpers around the Solr API.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.3RC1
  */
-@Unstable
 @Role
 public interface SolrUtils
 {
@@ -184,7 +182,6 @@ public interface SolrUtils
      * @param document the Solr document
      * @since 12.10
      */
-    @Unstable
     default void setAtomic(String modifier, String fieldName, Object fieldValue, Type valueType,
         SolrInputDocument document)
     {

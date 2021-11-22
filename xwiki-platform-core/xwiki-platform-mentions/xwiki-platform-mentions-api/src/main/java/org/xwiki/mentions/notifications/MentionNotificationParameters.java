@@ -30,7 +30,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -44,7 +43,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 12.6
  */
-@Unstable
 public class MentionNotificationParameters implements Serializable
 {
     private final Map<String, Set<MentionNotificationParameter>> newMentions;

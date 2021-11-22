@@ -28,7 +28,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.EmailAddressObfuscator;
 import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Access general mail APIs from scripts.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.4RC1
  */
-@Unstable
 @Component
 @Named("mail.general")
 @Singleton

@@ -44,7 +44,6 @@ import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.internal.DefaultMailResult;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -151,7 +150,6 @@ public class MailStorageScriptService extends AbstractMailScriptService
      *         from the store
      * @since 12.10
      */
-    @Unstable
     public List<ScriptMailResult> resend(Map<String, Object> filterMap, int offset, int count)
     {
         return resendGeneric(filterMap, offset, count,

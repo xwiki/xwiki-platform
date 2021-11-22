@@ -40,7 +40,6 @@ import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -54,7 +53,6 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public abstract class AbstractScriptRatingsManager implements RatingsScriptServiceAPI
 {
     private RatingsManager ratingsManager;

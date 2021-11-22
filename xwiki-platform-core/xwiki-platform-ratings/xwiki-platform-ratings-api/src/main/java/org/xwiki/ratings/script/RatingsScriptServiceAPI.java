@@ -41,7 +41,6 @@ import com.xpn.xwiki.util.Programming;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public interface RatingsScriptServiceAPI
 {
     /**

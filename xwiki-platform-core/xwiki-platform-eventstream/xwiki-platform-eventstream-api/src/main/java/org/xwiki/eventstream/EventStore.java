@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Save and access store events.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.4RC1
  */
 @Role
-@Unstable
 public interface EventStore
 {
     /**

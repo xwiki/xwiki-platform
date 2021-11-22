@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Resends mails.
@@ -59,7 +58,6 @@ public interface MailResender
      *         message failed to be loaded from the store, in which case no entry will be returned in the returned list
      * @since 12.10
      */
-    @Unstable
     default List<Pair<MailStatus, MailStatusResult>> resend(Map<String, Object> filterMap, int offset, int count)
         throws MailStoreException
     {

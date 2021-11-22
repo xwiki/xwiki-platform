@@ -20,7 +20,6 @@
 package org.xwiki.officeimporter.server;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration properties for the {@link OfficeServer}. They are defined in XWiki's global configuration file using
@@ -70,7 +69,6 @@ public interface OfficeServerConfiguration
      * @return all ports that can be used for connecting to the office server instance.
      * @since 12.1RC1
      */
-    @Unstable
     default int[] getServerPorts()
     {
         return new int[0];

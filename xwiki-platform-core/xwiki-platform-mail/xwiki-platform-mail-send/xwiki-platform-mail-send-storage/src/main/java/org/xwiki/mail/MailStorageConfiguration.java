@@ -20,7 +20,6 @@
 package org.xwiki.mail;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration for the storage part of the Mail Sender.
@@ -41,7 +40,6 @@ public interface MailStorageConfiguration
      * @return true if XWiki should resend automatically mails in the prepare + error states at restart
      * @since 12.9RC1
      */
-    @Unstable
     default boolean resendAutomaticallyAtStartup()
     {
         return true;

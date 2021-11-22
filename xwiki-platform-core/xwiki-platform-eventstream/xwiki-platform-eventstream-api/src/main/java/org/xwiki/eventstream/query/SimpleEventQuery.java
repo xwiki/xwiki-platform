@@ -33,7 +33,6 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.query.CompareQueryCondition.CompareType;
 import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -42,7 +41,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 12.4RC1
  */
-@Unstable
 public class SimpleEventQuery extends GroupQueryCondition implements PageableEventQuery, SortableEventQuery
 {
     private List<QueryCondition> currentConditions = conditions;

@@ -22,15 +22,12 @@ package org.xwiki.livedata.livetable;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents the configuration passed when creating a live table instance.
  * 
  * @version $Id$
  * @since 12.10
  */
-@Unstable
 public class LiveTableConfiguration
 {
     private String id;

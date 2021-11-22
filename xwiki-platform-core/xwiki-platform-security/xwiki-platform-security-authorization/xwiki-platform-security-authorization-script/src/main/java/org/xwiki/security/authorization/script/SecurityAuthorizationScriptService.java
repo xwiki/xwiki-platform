@@ -156,7 +156,6 @@ public class SecurityAuthorizationScriptService implements ScriptService
      * @return {@code true} only if the right name can be find.
      * @since 12.7RC1
      */
-    @Unstable
     public boolean isRightRegistered(String rightName)
     {
         return Right.toRight(rightName) != Right.ILLEGAL;

@@ -141,7 +141,6 @@ public interface DocumentModelBridge
      * @since 12.8RC1
      * @since 12.6.3
      */
-    @Unstable
     default Date getCreationDate()
     {
         return null;

@@ -23,7 +23,6 @@ import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.mentions.events.MentionEventParams;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides the operations to serialize and unserializa objects that holds mentions notifications datas.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.5RC1
  */
 @Role
-@Unstable
 public interface MentionsNotificationsObjectMapper
 {
     /**

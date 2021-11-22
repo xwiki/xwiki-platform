@@ -21,7 +21,6 @@ package org.xwiki.mentions;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.mentions.internal.MentionFormatterProvider;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides services to format the user mentions.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface MentionsFormatter
 {
     /**

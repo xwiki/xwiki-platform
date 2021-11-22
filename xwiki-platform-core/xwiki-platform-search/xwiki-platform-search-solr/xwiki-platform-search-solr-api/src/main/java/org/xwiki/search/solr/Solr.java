@@ -21,7 +21,6 @@ package org.xwiki.search.solr;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * The central entry point to access a Solr core.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.2
  */
 @Role
-@Unstable
 public interface Solr
 {
     /**

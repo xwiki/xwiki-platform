@@ -27,7 +27,6 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.model.jaxb.Types;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides the list of known property types from an existing {@link LiveDataSource}.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Path("/liveData/sources/{sourceId}/types")
-@Unstable
 public interface LiveDataPropertyTypesResource
 {
     /**

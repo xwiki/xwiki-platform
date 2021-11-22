@@ -31,7 +31,6 @@ import org.xwiki.mentions.MentionsFormatter;
 import org.xwiki.mentions.internal.MentionFormatterProvider;
 import org.xwiki.mentions.internal.MentionsEventExecutor;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service for the Mentions application.
@@ -41,7 +40,6 @@ import org.xwiki.stability.Unstable;
  */
 @Component
 @Singleton
-@Unstable
 @Named("mentions")
 public class MentionsScriptService implements ScriptService
 {
@@ -79,7 +77,6 @@ public class MentionsScriptService implements ScriptService
      * @return the current size of the queue of elements (page, comments...) with mentions to analyze
      * @since 12.6
      */
-    @Unstable
     public long getQueueSize()
     {
         return this.eventExecutor.getQueueSize();
@@ -106,7 +103,6 @@ public class MentionsScriptService implements ScriptService
      * @see MentionsFormatter#formatMention(String, DisplayStyle)
      * @since 12.10
      */
-    @Unstable
     public String format(String actorReference, DisplayStyle style, String type)
     {
         // Uses the "user" type when the mention has an undefined type.

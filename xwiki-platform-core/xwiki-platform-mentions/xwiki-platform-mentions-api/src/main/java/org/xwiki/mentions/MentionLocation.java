@@ -19,15 +19,12 @@
  */
 package org.xwiki.mentions;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * List the location where mentions can occur.
  *
  * @version $Id$
  * @since 12.5RC1
  */
-@Unstable
 public enum MentionLocation
 {
     /**

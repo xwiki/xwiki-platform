@@ -31,7 +31,6 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Enable or disable notifications from the event stream (for customization purpose).
@@ -77,7 +76,6 @@ public interface NotificationFilter extends Comparable
      * @since 12.9RC1
      * @since 12.6.3
      */
-    @Unstable
     enum FilteringPhase
     {
         /**
@@ -221,7 +219,6 @@ public interface NotificationFilter extends Comparable
      * @since 12.9RC1
      * @since 12.6.3
      */
-    @Unstable
     default Set<FilteringPhase> getFilteringPhases()
     {
         return SUPPORT_BOTH_FILTERING_PHASE;

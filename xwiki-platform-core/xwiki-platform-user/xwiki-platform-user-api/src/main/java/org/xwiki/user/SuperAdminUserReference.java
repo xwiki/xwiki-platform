@@ -19,8 +19,6 @@
  */
 package org.xwiki.user;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents the Super Admin user reference, i.e. a virtual user that has all permissions. If you need to verify
  * if a given UserReference is the Super Admin user, you should use
@@ -29,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 public final class SuperAdminUserReference implements UserReference
 {
     /**

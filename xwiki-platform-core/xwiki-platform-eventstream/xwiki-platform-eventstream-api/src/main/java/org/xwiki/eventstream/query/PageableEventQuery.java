@@ -20,7 +20,6 @@
 package org.xwiki.eventstream.query;
 
 import org.xwiki.eventstream.EventQuery;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allow paging events.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.4RC1
  */
-@Unstable
 public interface PageableEventQuery extends EventQuery
 {
     /**

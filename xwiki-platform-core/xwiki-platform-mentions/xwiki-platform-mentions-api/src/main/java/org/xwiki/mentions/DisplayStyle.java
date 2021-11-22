@@ -19,15 +19,12 @@
  */
 package org.xwiki.mentions;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * List of the different display style of the user mentions.
  *
  * @version $Id$
  * @since 12.5RC1
  */
-@Unstable
 public enum DisplayStyle
 {
     /**

@@ -47,7 +47,6 @@ import org.apache.solr.schema.StrField;
 import org.apache.solr.schema.TextField;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base helper class to implement {@link SolrCoreInitializer}.
@@ -55,7 +54,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.3RC1
  */
-@Unstable
 public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 {
     /**
@@ -622,7 +620,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * @throws SolrException when failing to delete the field.
      * @since 12.9RC1
      */
-    @Unstable
     protected void deleteField(String fieldName, boolean dynamic) throws SolrException
     {
         try {
@@ -671,7 +668,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * @throws SolrException when failing to set the field
      * @since 12.10
      */
-    @Unstable
     protected void setTextGeneralField(String name, boolean multiValued, boolean dynamic, Object... attributes)
         throws SolrException
     {
@@ -998,7 +994,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * @throws SolrException when failing to add the field
      * @since 12.10
      */
-    @Unstable
     protected void setFieldType(FieldTypeDefinition definition, boolean add) throws SolrException
     {
         try {

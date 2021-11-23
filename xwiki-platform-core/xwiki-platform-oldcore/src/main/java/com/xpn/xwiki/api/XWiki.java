@@ -1395,7 +1395,6 @@ public class XWiki extends Api
      * @return the list of available locales
      * @since 12.4RC1
      */
-    @Unstable
     public List<Locale> getAvailableLocales()
     {
         return this.xwiki.getAvailableLocales(getXWikiContext());
@@ -1620,7 +1619,6 @@ public class XWiki extends Api
      * @throws XWikiException if the document cannot be renamed properly.
      * @since 12.5RC1
      */
-    @Unstable
     public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
         List<DocumentReference> childDocumentReferences) throws XWikiException

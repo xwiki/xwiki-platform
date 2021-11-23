@@ -43,8 +43,6 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * A wrapper around {@link XWikiRequest}.
  * 
@@ -52,7 +50,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.4RC1
  * @since 11.10.5
  */
-@Unstable
 public class WrappingXWikiRequest implements XWikiRequest
 {
     protected final XWikiRequest request;

@@ -4767,7 +4767,6 @@ public class XWiki implements EventListener
      * @throws XWikiException if the document cannot be renamed properly.
      * @since 12.5RC1
      */
-    @Unstable
     public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
         List<DocumentReference> childDocumentReferences, XWikiContext context)
@@ -4919,7 +4918,6 @@ public class XWiki implements EventListener
      * {@link XWikiStoreInterface#renameXWikiDoc(XWikiDocument, DocumentReference, XWikiContext)} should be preferred.
      */
     @Deprecated
-    @Unstable
     public void renameByCopyAndDelete(XWikiDocument sourceDoc, DocumentReference newDocumentReference,
         List<DocumentReference> backlinkDocumentReferences, List<DocumentReference> childDocumentReferences,
         XWikiContext context) throws XWikiException

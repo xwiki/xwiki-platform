@@ -146,7 +146,6 @@ import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.velocity.VelocityContextFactory;
@@ -6993,7 +6992,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException in case of problem during the clone operation.
      * @since 12.5RC1
      */
-    @Unstable
     public XWikiDocument cloneRename(DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
     {
         loadAttachments(context);

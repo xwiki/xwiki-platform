@@ -39,7 +39,6 @@ import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -265,7 +264,6 @@ public class DeleteAction extends XWikiAction
      * @throws XWikiException if anything goes wrong during the document deletion
      * @since 12.8RC1
      */
-    @Unstable
     protected boolean deleteDocument(EntityReference entityReference, XWikiContext context,
         boolean shouldSkipRecycleBin)
         throws XWikiException

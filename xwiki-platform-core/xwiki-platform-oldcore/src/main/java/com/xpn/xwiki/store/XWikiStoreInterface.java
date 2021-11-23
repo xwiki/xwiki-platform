@@ -24,7 +24,6 @@ import java.util.List;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -48,7 +47,6 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of problem during the rename.
      * @since 12.5RC1
      */
-    @Unstable
     default void renameXWikiDoc(XWikiDocument doc, DocumentReference newReference, XWikiContext context)
         throws XWikiException
     {

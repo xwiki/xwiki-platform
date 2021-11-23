@@ -50,7 +50,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -712,7 +711,6 @@ public class Document extends Api
      * @throws XWikiException if retrieving the document translations from the database fails
      * @since 12.4RC1
      */
-    @Unstable
     public List<Locale> getTranslationLocales() throws XWikiException
     {
         return this.doc.getTranslationLocales(getXWikiContext());
@@ -2304,7 +2302,6 @@ public class Document extends Api
      * @throws XWikiException in case of problem to perform the query.
      * @since 12.5RC1
      */
-    @Unstable
     public List<DocumentReference> getBackLinkedReferences() throws XWikiException
     {
         return this.doc.getBackLinkedReferences(getXWikiContext());
@@ -2345,7 +2342,6 @@ public class Document extends Api
      * @throws XWikiException in case of problem to query the children.
      * @since 12.5RC1
      */
-    @Unstable
     public List<DocumentReference> getChildrenReferences() throws XWikiException
     {
         return this.doc.getChildrenReferences(getXWikiContext());

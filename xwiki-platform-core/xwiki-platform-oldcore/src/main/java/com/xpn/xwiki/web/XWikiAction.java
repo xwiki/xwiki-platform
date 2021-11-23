@@ -302,7 +302,6 @@ public abstract class XWikiAction implements LegacyAction
      * @return {@code true} if the entity reference name is valid according to the name strategy.
      * @since 12.0RC1
      */
-    @Unstable
     protected boolean isEntityReferenceNameValid(EntityReference entityReference)
     {
         if (this.getEntityNameValidationManager().getEntityReferenceNameStrategy() != null

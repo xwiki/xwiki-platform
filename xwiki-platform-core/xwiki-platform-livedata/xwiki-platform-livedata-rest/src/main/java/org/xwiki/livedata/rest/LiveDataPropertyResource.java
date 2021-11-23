@@ -29,7 +29,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.livedata.LiveDataSource;
-import org.xwiki.livedata.rest.model.jaxb.PropertyDescriptor;rty.
+import org.xwiki.livedata.rest.model.jaxb.PropertyDescriptor;
+
+/**
+ * Represents a live data property.
  * 
  * @version $Id$
  * @since 12.10

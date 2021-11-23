@@ -19,8 +19,6 @@
  */
 package org.xwiki.like;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Generic exception for Like module.
  *

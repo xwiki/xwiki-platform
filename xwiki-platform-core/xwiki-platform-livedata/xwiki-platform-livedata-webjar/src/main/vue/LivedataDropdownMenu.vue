@@ -69,10 +69,10 @@
         v-for="layout in data.meta.layouts"
         :key="layout.id"
         :class="{
-          'disabled': logic.currentLayoutId === layout.id,
+          'disabled': isCurrentLayout(layout.id),
         }"
       >
-        <a href="#" @click.prevent="logic.changeLayout(layout.id)">
+        <a href="#" @click.prevent="changeLayout(layout.id)">
           <XWikiIcon :icon-descriptor="layout.icon"></XWikiIcon>
           {{ layout.name }}
         </a>
@@ -126,6 +126,17 @@ export default {
   computed: {
     data () { return this.logic.data; },
   },
+
+  methods: {
+    isCurrentLayout(layoutId) {
+      return this.logic.currentLayoutId === layoutId
+    },
+    changeLayout(layoutId) {
+      if (!this.isCurrentLayout(layoutId)) {
+        this.logic.changeLayout(layoutId)
+      }
+    }
+  }
 
 };
 </script>

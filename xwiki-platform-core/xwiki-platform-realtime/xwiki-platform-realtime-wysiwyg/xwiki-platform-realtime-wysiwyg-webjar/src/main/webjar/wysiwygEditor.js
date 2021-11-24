@@ -283,9 +283,9 @@ define('xwiki-realtime-wysiwygEditor', [
       // Add the style again when modifying a macro (which reloads the iframe).
       iframe.onload = addStyle;
 
-      var setEditable = module.setEditable = function(bool) {
-        window.inner.setAttribute('contenteditable', bool);
-        $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').prop('disabled', bool);
+      var setEditable = module.setEditable = function(editable) {
+        window.inner.setAttribute('contenteditable', editable);
+        $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').prop('disabled', !editable);
       };
 
       // Don't let the user edit until the real-time framework is ready.

@@ -22,6 +22,9 @@ package org.xwiki.store.merge;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.diff.Conflict;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
@@ -125,5 +128,50 @@ public class MergeManagerResult<R, C>
         // TODO: only the list of conflicts should be considered here: the various merge operation should
         // create proper conflicts, and not log errors.
         return !(this.getConflicts().isEmpty() && this.log.getLogs(LogLevel.ERROR).isEmpty());
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        MergeManagerResult<?, ?> that = (MergeManagerResult<?, ?>) o;
+
+        return new EqualsBuilder()
+            .append(modified, that.modified)
+            .append(conflicts, that.conflicts)
+            .append(mergeResult, that.mergeResult)
+            // we cannot compare logs for equality, but we compare hasConflicts since it's using log error emptyness
+            .append(this.hasConflicts(), that.hasConflicts())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(69, 33)
+            .append(conflicts)
+            .append(mergeResult)
+            // we cannot compare logs for equality, but we compare hasConflicts since it's using log error emptyness
+            .append(this.hasConflicts())
+            .append(modified)
+            .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+            .append("conflicts", conflicts)
+            .append("mergeResult", mergeResult)
+            .append("log", log)
+            .append("modified", modified)
+            .toString();
     }
 }

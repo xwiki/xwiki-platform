@@ -41,15 +41,11 @@ define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-message
 
   var createAllowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox = function(checked) {
     var checkbox = $(
-      '<div class="realtime-allow-outerdiv">' +
-        '<label class="realtime-allow-label" for="">' +
-          '<input type="checkbox" class="realtime-allow" id=""/>' +
-        '</label>' +
-      '</div>'
+      '<label class="realtime-allow-label text-nowrap">' +
+        '<input type="checkbox" class="realtime-allow"/>' +
+      '</label>'
     ).appendTo('.buttons');
-    var id = uid();
-    return checkbox.find('label').attr('for', id).append(document.createTextNode(Messages.allowRealtime))
-      .find('input').attr('id', id).prop('checked', !!checked);
+    return checkbox.append(document.createTextNode(Messages.allowRealtime)).find('input').prop('checked', !!checked);
   };
 
   var createMergeMessageElement = Interface.createMergeMessageElement = function(container) {

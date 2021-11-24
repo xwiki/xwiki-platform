@@ -21,9 +21,7 @@ define('xwiki-realtime-messages', {
   prefix: 'realtime.',
   keys: [
     'editingAlone',
-    'editingWithOneOtherPerson',
     'editingWith',
-    'otherPeople',
     'disconnected',
     'synchronizing',
     'reconnecting',

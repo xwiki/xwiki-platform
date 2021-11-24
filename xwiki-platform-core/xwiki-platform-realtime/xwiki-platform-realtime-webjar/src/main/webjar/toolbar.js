@@ -64,15 +64,21 @@ define('xwiki-realtime-toolbar', [
       // Collect the user data.
       if (userId !== myUserId) {
         var userData = (usersData || {})[userId] || {};
-        var userName = (userData.name || '').replace(/^.*-([^-]*)%2d[0-9]*$/, function(all, one) {
-         return decodeURIComponent(one);
-        });
-        if (userName) {
-          return {
+        var user = JSON.parse((userData.name || '').replace(
+          // <userReference>-encoded(<userName>)%2d<randomNumber>
+          /^(.*)-([^-]*)%2d[0-9]*$/,
+          function(all, userReference, userName) {
+            return JSON.stringify({
+              reference: userReference,
+              name: decodeURIComponent(userName)
+            });
+          }
+        ));
+        if (user.name) {
+          return $.extend(user, {
             id: userId,
-            name: userName,
             avatar: userData.avatar
-          };
+          });
         }
       }
     }).filter(function(user) {
@@ -80,9 +86,11 @@ define('xwiki-realtime-toolbar', [
       return user;
     }).map(function(user) {
       // Display the users.
-      var userDisplay = $('<span/>').attr({
+      var userDisplay = $('<a/>').attr({
         'class': Config.marginAvatar === 1 ? 'rt-user-link' : '',
-        'data-id': user.id
+        'href': new XWiki.Document(XWiki.Model.resolve(user.reference, XWiki.EntityType.DOCUMENT)).getURL(),
+        'data-id': user.id,
+        'data-reference': user.reference
       });
       if (displayConfig === undefined || displayConfig === 'name' || displayConfig === 'both') {
         userDisplay.text(user.name);
@@ -98,26 +106,25 @@ define('xwiki-realtime-toolbar', [
             .prependTo(userDisplay);
         }
       }
-      return userDisplay.html();
-    }).join(displayConfig === 'avatar' ? ' ' : ', ');
+      return userDisplay.prop('outerHTML');
+    // We don't need to separate the users with comma if the avatars are displayed.
+    }).join((displayConfig === 'avatar' || displayConfig === 'both') ? '' : ', ');
   };
 
-  var updateUserList = function(myUserName, listElement, userList, userData, onUsernameClick) {
+  var updateUserList = function(myUserName, listElement, userList, userData, onUserNameClick) {
     if (userList.indexOf(myUserName) < 0) {
       listElement.textContent = Messages.synchronizing;
       return;
     }
     if (userList.length === 1) {
       listElement.innerHTML = Messages.editingAlone;
-    } else if (userList.length === 2) {
-      listElement.innerHTML = Messages.editingWithOneOtherPerson + getOtherUsers(myUserName, userList, userData);
     } else {
-      listElement.innerHTML = Messages.editingWith + ' ' + (userList.length - 1) + ' ' + Messages.otherPeople +
-        getOtherUsers(myUserName, userList, userData);
+      listElement.innerHTML = Messages.editingWith + ' ' + getOtherUsers(myUserName, userList, userData);
     }
-    $('.rt-user-link').off('click').on('click', function() {
-      if (typeof onUsernameClick === 'function') {
-        onUsernameClick($(this).attr('data-id'));
+    $('.rt-user-link').off('click').on('click', function(event) {
+      event.preventDefault();
+      if (typeof onUserNameClick === 'function') {
+        onUserNameClick($(this).attr('data-id'));
       } else if ($('iframe').length) {
         var baseHref = $('iframe')[0].contentWindow.location.href.split('#')[0] || '';
         $('iframe')[0].contentWindow.location.href = baseHref + '#rt-user-' + $(this).attr('data-id');
@@ -144,7 +151,6 @@ define('xwiki-realtime-toolbar', [
     var lagElement = createLagElement(toolbar.find('.rt-toolbar-rightside'));
     var userData = config.userData;
     var changeNameID = config.changeNameID;
-    var onUsernameClick = config.onUsernameClick;
 
     // Check if the user is allowed to change their name.
     if (changeNameID) {
@@ -165,7 +171,7 @@ define('xwiki-realtime-toolbar', [
         // Someone has changed their name or color.
         userData = newUserData;
       }
-      updateUserList(myUserName, userListElement, users, userData, onUsernameClick);
+      updateUserList(myUserName, userListElement, users, userData, config.onUsernameClick);
     });
 
     var ks = function() {

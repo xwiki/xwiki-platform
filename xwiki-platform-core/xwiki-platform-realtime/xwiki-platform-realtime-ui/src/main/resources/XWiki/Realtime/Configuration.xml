@@ -272,7 +272,7 @@
       <displayBeforeCategory/>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>edit</displayInCategory>
     </property>
     <property>
       <displayInSection>Realtime Editors</displayInSection>

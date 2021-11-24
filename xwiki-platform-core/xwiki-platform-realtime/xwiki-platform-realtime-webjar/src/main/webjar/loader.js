@@ -72,7 +72,7 @@ define('xwiki-realtime-loader', [
     return {
       WebsocketURL: realtimeConfig.webSocketURL,
       htmlConverterUrl: new XWiki.Document('ConvertHTML', 'RTFrontend').getURL('get', 'xpage=plain&outputSyntax=plain'),
-      // userId === <userReference>-encoded(<userName>)%2d<random number>
+      // userId === <userReference>-encoded(<userName>)%2d<randomNumber>
       userName: userReference + '-' + encodeURIComponent(realtimeConfig.user.name + '-').replace(/-/g, '%2d') +
         String(Math.random()).substring(2),
       userAvatarURL: realtimeConfig.user.avatarURL,

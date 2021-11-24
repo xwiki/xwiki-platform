@@ -411,7 +411,7 @@ define('xwiki-realtime-wysiwygEditor', [
       userData = {},
       // List of users still connected to the channel (server IDs).
       userList,
-      // The real-time toolbar, showing the list of connected users and the lag.
+      // The real-time toolbar, showing the list of connected users, the merge message, the spinner and the lag.
       toolbar,
 
       fixMacros = function() {
@@ -679,7 +679,6 @@ define('xwiki-realtime-wysiwygEditor', [
         },
 
         onInit: function(info) {
-          var $bar = $('#cke_1_toolbox');
           userList = info.userList;
           var config = {
             userData,
@@ -689,8 +688,8 @@ define('xwiki-realtime-wysiwygEditor', [
             }
           };
           toolbar = Toolbar.create({
-            '$container': $bar,
-            myUserName: info.myId,
+            '$container': $('#cke_1_toolbox'),
+            myUserName: info.myID,
             realtime: info.realtime,
             getLag: info.getLag,
             userList: info.userList,

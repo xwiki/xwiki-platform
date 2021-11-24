@@ -1,51 +1,35 @@
-.rt-toolbar-leftside div {
-  float: left;
+/* Note that we made the CSS selectors a bit more specific in order to overcome the CSS reset from CKEditor. */
+div.rt-toolbar {
+  /* The toolbar has 2 sides: left and right. */
+  display: flex;
+  justify-content: space-between;
+  /* Matches the height of the user avatar plus the vertical spacing. */
+  line-height: 24px;
 }
-.rt-toolbar-leftside {
-  float: left;
+
+.rt-toolbar .rt-toolbar-rightside {
+  /* The right side shows: merge message, spinner and lag. */
+  display: flex;
 }
-.rt-toolbar-rightside {
-  float: right;
+.rt-toolbar .rt-toolbar-rightside > div {
+  /* Leave some space between the merge message, spinner and lag. */
+  margin-left: 1em;
 }
-.rt-lag {
-  float: right;
-}
-.rt-spinner {
-  float: left;
-}
-.rt-user-link {
-  cursor: pointer;
-  color: #0088CC;
-}
-.rt-user-link:hover {
-  text-decoration: underline;
-  color: #005580;
-}
-.rt-user-avatar, .rt-user-fake-avatar {
-  border: 1px solid #AAA;
+
+.rt-toolbar .rt-user-avatar, .rt-toolbar .rt-user-fake-avatar {
   border-radius: 4px;
-  cursor: pointer;
   margin: 2px 3px 2px 6px;
   vertical-align: top;
 }
-.rt-user-avatar {
+.rt-toolbar .rt-user-avatar {
   max-width: 20px;
   max-height: 20px;
 }
-.rt-user-fake-avatar {
+.rt-toolbar .rt-user-fake-avatar {
   width: 20px;
   height: 20px;
   line-height: 20px;
+  font-size: 18px;
   display: inline-block;
   text-align: center;
-  background: #CCCCFF;
-  color: #3333FF;
-  font-size: 20px;
-  font-weight: bold;
-}
-#secret-merge {
-  opacity: 0;
-}
-#secret-merge:hover {
-  opacity: 1;
 }

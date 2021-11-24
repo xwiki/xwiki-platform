@@ -211,7 +211,7 @@ define('xwiki-realtime-wikiEditor', [
       // List of pretty name of all users (mapped with their server ID).
       var userData;
 
-      // The real-time toolbar, showing the list of connected users and the lag.
+      // The real-time toolbar, showing the list of connected users, the merge message, the spinner and the lag.
       var toolbar;
 
       var setValueWithCursor = function(newValue) {
@@ -272,7 +272,8 @@ define('xwiki-realtime-wikiEditor', [
         onInit: function(info) {
           // Create the toolbar.
           toolbar = Toolbar.create({
-            '$container': $('#xwikieditcontentinner'),
+            // Prepend the real-time toolbar to the existing Wiki Editor toolbar.
+            '$container': $('.leftmenu2'),
             myUserName: info.myID,
             realtime: info.realtime,
             getLag: info.getLag,

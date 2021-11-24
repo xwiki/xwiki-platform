@@ -165,7 +165,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             this.servletContainer.setCommandParts(commandPartList.toArray(new String[0]));
         }
 
-        // Jetty 10.0.3+/9.4.x+ has now added a protection in URLs so that encoded characters such as % are
+        // Jetty 10.0.3+ has now added a protection in URLs so that encoded characters such as % are
         // prohibited by default. Since XWiki uses them, we need to configure Jetty to allow for it. See
         // https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance
         this.servletContainer.setCommand("jetty.httpConfig.uriCompliance=RFC3986");

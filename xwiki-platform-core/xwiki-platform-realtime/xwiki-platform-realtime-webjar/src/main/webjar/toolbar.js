@@ -62,9 +62,9 @@ define('xwiki-realtime-toolbar', [
     var displayConfig = Config.toolbarUserlist;
     return userList.map(function(userId) {
       // Collect the user data.
-      if (userId !== myUserId) {
-        var userData = (usersData || {})[userId] || {};
-        var user = JSON.parse((userData.name || '').replace(
+      var userData = usersData?.[userId];
+      if (userData && userId !== myUserId) {
+        var userJSON = userData.name?.replace(
           // <userReference>-encoded(<userName>)%2d<randomNumber>
           /^(.*)-([^-]*)%2d[0-9]*$/,
           function(all, userReference, userName) {
@@ -73,9 +73,9 @@ define('xwiki-realtime-toolbar', [
               name: decodeURIComponent(userName)
             });
           }
-        ));
-        if (user.name) {
-          return $.extend(user, {
+        );
+        if (userJSON !== userData.name) {
+          return $.extend(JSON.parse(userJSON), {
             id: userId,
             avatar: userData.avatar
           });

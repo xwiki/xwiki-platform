@@ -19,6 +19,11 @@
  */
 package org.xwiki.sharepage.test.po;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.apache.commons.lang.StringUtils;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
@@ -43,7 +48,23 @@ public class ShareDialog extends BaseElement
 
     public void setEmailField(String email)
     {
-        new SuggestInputElement(this.emailField).sendKeys(email).waitForSuggestions().selectTypedText();
+        // TODO: Debugging for the https://jira.xwiki.org/browse/XWIKI-17872 flicker
+        // Try to understand what can make the suggest fail to be loaded by doing the following:
+        //   On timeout, go to ?input=joh&limit=10&wiki=global&xpage=uorgsuggest&media=json&uorg=user (the URL
+        //   called by the suggest) and display the result on screen in the hope to see a stack trace.
+        try {
+            new SuggestInputElement(this.emailField).sendKeys(email).waitForSuggestions().selectTypedText();
+        } catch (TimeoutException e) {
+            try {
+                getDriver().get(StringUtils.substringBefore(getDriver().getCurrentUrl(), "?")
+                    + "?input=" + URLEncoder.encode(email, "UTF-8")
+                    + "&limit=10&wiki=global&xpage=uorgsuggest&media=json&uorg=user");
+            } catch (UnsupportedEncodingException ee) {
+                // Shouldn't happen
+                throw e;
+            }
+            throw e;
+        }
     }
 
     public void setMessage(String message)

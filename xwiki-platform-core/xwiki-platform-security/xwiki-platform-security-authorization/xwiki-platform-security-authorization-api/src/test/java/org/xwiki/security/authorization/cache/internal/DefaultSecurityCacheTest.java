@@ -62,6 +62,8 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -861,5 +863,33 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
                 return entry.getReference() != docRef || entry.getUserReference() != userRef;
             }
         });
+    }
+
+    @Test
+    public void testKeyCollisions() throws Exception
+    {
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new WikiReference("wiki"))));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "page1"))));
+
+        SecurityReference spaceReference = newEntityReference(new SpaceReference("wiki", "page1", "page2"));
+        SecurityRuleEntry page1Space = mockSecurityRuleEntry(spaceReference);
+
+        // Add a cache entry associated to SPACE wiki:page1.page2
+        this.securityCache.add(page1Space);
+
+        assertSame(page1Space, this.securityCache.get(spaceReference));
+
+        SecurityReference documentReference = newEntityReference(new DocumentReference("wiki", "page1", "page2"));
+
+        assertNull(this.securityCache.get(documentReference));
+
+        SecurityRuleEntry page1Document = mockSecurityRuleEntry(documentReference);
+
+        // Add a cache entry associated to DOCUMENT wiki:page1.page2
+        this.securityCache.add(page1Document);
+
+        assertSame(page1Space, this.securityCache.get(spaceReference));
+        assertSame(page1Document, this.securityCache.get(documentReference));
     }
 }

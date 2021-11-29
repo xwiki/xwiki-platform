@@ -43,6 +43,7 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
@@ -70,6 +71,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
     /** Separator used for composing key for the cache. */
     private static final String KEY_CACHE_SEPARATOR = "@@";
+
+    /** Escaped separator used for composing key for the cache. */
+    private static final String KEY_CACHE_SEPARATOR_ESCAPED = KEY_CACHE_SEPARATOR + KEY_CACHE_SEPARATOR;
 
     /** Logger. **/
     @Inject
@@ -506,13 +510,34 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         }
     }
 
+    private String escapeEntryKey(String value)
+    {
+        return value.replace(KEY_CACHE_SEPARATOR, KEY_CACHE_SEPARATOR_ESCAPED);
+    }
+
+    private String getEntryKey(boolean shadow, EntityReference userReference, EntityReference reference)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(shadow ? 's' : 'n');
+        if (userReference != null) {
+            builder.append(escapeEntryKey(this.keySerializer.serialize(userReference)));
+        }
+        builder.append(KEY_CACHE_SEPARATOR);
+        builder.append(reference.getType());
+        builder.append(':');
+        builder.append(escapeEntryKey(this.keySerializer.serialize(reference)));
+
+        return builder.toString();
+    }
+
     /**
      * @param reference the reference to build the key.
      * @return a unique key for this reference.
      */
     private String getEntryKey(SecurityReference reference)
     {
-        return keySerializer.serialize(reference);
+        return getEntryKey(null, reference);
     }
 
     /**
@@ -522,7 +547,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private String getEntryKey(UserSecurityReference userReference, SecurityReference reference)
     {
-        return keySerializer.serialize(userReference) + KEY_CACHE_SEPARATOR + keySerializer.serialize(reference);
+        return getEntryKey(false, userReference, reference);
     }
 
     /**
@@ -532,7 +557,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private String getShadowEntryKey(SecurityReference userReference, SecurityReference root)
     {
-        return keySerializer.serialize(root) + KEY_CACHE_SEPARATOR + keySerializer.serialize(userReference);
+        return getEntryKey(true, userReference, root);
     }
 
     /**

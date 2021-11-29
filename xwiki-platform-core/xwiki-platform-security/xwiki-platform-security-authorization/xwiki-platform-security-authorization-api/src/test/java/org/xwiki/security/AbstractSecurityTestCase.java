@@ -110,17 +110,17 @@ public abstract class AbstractSecurityTestCase
         return mainWikiReference;
     }
 
-    private SecurityReference newEntityReference(EntityReference reference)
+    protected SecurityReference newEntityReference(EntityReference reference)
     {
         return new SecurityReference(reference, getMainWikiReference());
     }
 
-    private UserSecurityReference newUserReference(DocumentReference reference)
+    protected UserSecurityReference newUserReference(DocumentReference reference)
     {
         return new UserSecurityReference(reference, getMainWikiReference());
     }
 
-    private GroupSecurityReference newGroupReference(DocumentReference reference)
+    protected GroupSecurityReference newGroupReference(DocumentReference reference)
     {
         return new GroupSecurityReference(reference, getMainWikiReference());
     }

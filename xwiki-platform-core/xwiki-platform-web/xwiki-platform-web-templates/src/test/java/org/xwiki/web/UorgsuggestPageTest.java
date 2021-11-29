@@ -31,6 +31,7 @@ import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.icon.internal.DefaultIconManagerComponentList;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.query.QueryParameter;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
@@ -49,6 +50,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xmlunit.builder.Input.fromStream;
@@ -90,7 +92,11 @@ class UorgsuggestPageTest extends PageTest
         when(this.queryManagerScriptService.xwql(anyString())).thenReturn(this.query);
         when(this.query.setWiki(any())).thenReturn(this.query);
         when(this.query.addFilter(anyString())).thenReturn(this.query);
-        when(this.query.bindValue(anyString(), any())).thenReturn(this.query);
+        QueryParameter qp = mock(QueryParameter.class);
+        when(this.query.bindValue(anyString())).thenReturn(qp);
+        when(qp.anyChars()).thenReturn(qp);
+        when(qp.literal(anyString())).thenReturn(qp);
+        when(qp.query()).thenReturn(this.query);
 
         registerVelocityTool("escapetool", new EscapeTool());
         registerVelocityTool("jsontool", new JSONTool());

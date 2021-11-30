@@ -30,6 +30,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
@@ -214,8 +215,15 @@ public class TableLayoutElement extends BaseElement
     {
         // Waits for all the live data to be loaded and the cells to be finished loading.
         getDriver().waitUntilCondition(webDriver -> {
+            WebElement root;
+            try {
+                root = getRoot();
+            } catch (StaleElementReferenceException e) {
+                // If the root element is stale, this means Vue is mounting itself and the table is not ready yet.
+                return false;
+            }
             List<String> layoutLoaderClasses =
-                Arrays.asList(getClasses(getRoot().findElement(By.cssSelector(".layout-loader"))));
+                Arrays.asList(getClasses(root.findElement(By.cssSelector(".layout-loader"))));
             boolean isWaiting = layoutLoaderClasses.contains("waiting");
             if (isWaiting) {
                 return false;

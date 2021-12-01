@@ -54,7 +54,7 @@ public interface LocalizationManager
      * 
      * @param bundleType a hint identifying the bundle type.
      * @param bundleId the identifier of the bundle, for example a wiki document name, or the URL to a
-     *            <tt>.properties</tt> file.
+     *            {@code .properties} file.
      * @return the {@link TranslationBundle} or null if none could be found
      * @throws TranslationBundleDoesNotExistsException when no bundle could be found for the passed identifier
      * @throws TranslationBundleFactoryDoesNotExistsException when no bundle factory could be found for the passed type
@@ -71,7 +71,7 @@ public interface LocalizationManager
      * 
      * @param bundleType a hint identifying the bundle type.
      * @param bundleId the identifier of the bindle, for example a wiki document name, or the URL to a
-     *            <tt>.properties</tt> file.
+     *            {@code .properties} file.
      * @throws TranslationBundleDoesNotExistsException when no bundle could be found for the passed identifier
      * @throws TranslationBundleFactoryDoesNotExistsException when no bundle factory could be found for the passed type
      */

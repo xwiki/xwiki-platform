@@ -40,7 +40,7 @@ public interface AuthorExecutor
      * @param authorReference the user to check rights on
      * @return computed result
      * @throws Exception if unable to compute a result
-     * @param <V> the result type of method <tt>call</tt>
+     * @param <V> the result type of method {@code call}
      * @deprecated since 10.11RC1, use {@link #call(Callable, DocumentReference, DocumentReference)} instead
      */
     @Deprecated
@@ -55,7 +55,7 @@ public interface AuthorExecutor
      *            test the author right)
      * @return computed result
      * @throws Exception if unable to compute a result
-     * @param <V> the result type of method <tt>call</tt>
+     * @param <V> the result type of method {@code call}
      * @since 10.11RC1
      */
     default <V> V call(Callable<V> callable, DocumentReference authorReference, DocumentReference sourceReference)

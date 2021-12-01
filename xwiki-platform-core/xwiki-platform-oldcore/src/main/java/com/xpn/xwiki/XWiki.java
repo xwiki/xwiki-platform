@@ -2813,7 +2813,7 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @param skin the name of the skin for which to return the base skin. For example : <tt>XWiki.DefaultSkin</tt>
+     * @param skin the name of the skin for which to return the base skin. For example : {@code XWiki.DefaultSkin}
      * @param context see {@link XWikiContext}
      * @return if found, the name of the base skin the asked skin inherits from. If not found, returns an empty string.
      * @since 2.0.2

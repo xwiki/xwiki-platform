@@ -585,7 +585,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      *
      * @param request The servlet request.
      * @param response The servlet response.
-     * @return The username value, or <tt>null</tt> if not found or the cookie isn't valid.
+     * @return The username value, or {@code null} if not found or the cookie isn't valid.
      */
     @Override
     // TODO: Also use the URL, in case cookies are disabled [XWIKI-1071]
@@ -609,7 +609,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      *
      * @param request The servlet request.
      * @param response The servlet response.
-     * @return The password value, or <tt>null</tt> if not found or the cookie isn't valid.
+     * @return The password value, or {@code null} if not found or the cookie isn't valid.
      */
     @Override
     // TODO: Also use the URL, in case cookies are disabled [XWIKI-1071]

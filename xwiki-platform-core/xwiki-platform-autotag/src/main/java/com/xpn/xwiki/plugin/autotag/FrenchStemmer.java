@@ -74,10 +74,10 @@ public class FrenchStemmer
     private boolean modified;
 
     /**
-     * Stemms the given term to a unique <tt>discriminator</tt>.
+     * Stemms the given term to a unique {@code discriminator}.
      * 
      * @param term java.langString The term that should be stemmed
-     * @return java.lang.String Discriminator for <tt>term</tt>
+     * @return java.lang.String Discriminator for {@code term}
      */
     public String stem(String term)
     {

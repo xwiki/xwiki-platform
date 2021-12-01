@@ -206,7 +206,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     /**
-     * Returns the part of the URL identifying the web application. In a normal install, that is <tt>xwiki/</tt>.
+     * Returns the part of the URL identifying the web application. In a normal install, that is {@code xwiki/}.
      *
      * @return The configured context path.
      */

@@ -32,11 +32,11 @@ import com.xpn.xwiki.objects.BaseProperty;
  * The rules are as follows:
  * <ul>
  * <li>if an object of the specified class is added or deleted a notification is sent</li>
- * <li>if the objects list is the same then the values of the specified property in <tt>newdoc</tt> 
- * and <tt>olddoc</tt> are checked on corresponding objects - the correspondence is done based on 
- * the index of the objects in the list of objects of type <tt>classname</tt>.</li>
- * <li>if <tt>classname</tt> or <tt>propertyName</tt> are not specified upon instantiation 
- * (<tt>null</tt> or empty string), this <tt>PropertyChangedRule</tt> will never notify.</li>
+ * <li>if the objects list is the same then the values of the specified property in {@code newdoc} 
+ * and {@code olddoc} are checked on corresponding objects - the correspondence is done based on 
+ * the index of the objects in the list of objects of type {@code classname}.</li>
+ * <li>if {@code classname} or {@code propertyName} are not specified upon instantiation 
+ * ({@code null} or empty string), this {@code PropertyChangedRule} will never notify.</li>
  * </ul>
  */
 @Deprecated

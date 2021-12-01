@@ -52,9 +52,9 @@ import com.xpn.xwiki.web.Utils;
  * <p>
  * The API provides a method {@link SkinExtensionPluginApi#use(String)}, which, when called, marks an extension as used
  * in the current result. Later on, all the used extensions are inserted in the content, by replacing the first
- * occurrence of the following string: <tt>&lt;!-- canonical.plugin.classname --&gt;</tt>, where the actual extension
+ * occurrence of the following string: {@code <!-- canonical.plugin.classname -->}, where the actual extension
  * type classname is used. For example, JS extensions are inserted in place of
- * <tt>&lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin --&gt;</tt>.
+ * {@code <!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->}.
  * </p>
  *
  * @see SkinExtensionPluginApi
@@ -140,8 +140,8 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
 
     /**
      * Returns the list of always used extensions of this type. Which resources are always used depends on the type of
-     * resource, for example document based StyleSheet extensions have a property in the object, <tt>use</tt>, which can
-     * have the value <tt>always</tt> to declare that an extension should always be used.
+     * resource, for example document based StyleSheet extensions have a property in the object, {@code use}, which can
+     * have the value {@code always} to declare that an extension should always be used.
      *
      * @param context The current request context.
      * @return A set of resource names that should be pulled in the current response. Note that this method is called
@@ -151,7 +151,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
 
     /**
      * Determines if the requested document contains on page skin extension objects of this type. True if at least one
-     * of the extension objects has the <tt>currentPage</tt> value for the <tt>use</tt> property.
+     * of the extension objects has the {@code currentPage} value for the {@code use} property.
      *
      * @param context the current request context
      * @return a boolean specifying if the current document contains on page skin extensions
@@ -383,7 +383,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * {@inheritDoc}
      * <p>
      * At the end of the request, insert the links to the pulled resources in the response, in the place marked by an
-     * XML comment of the format <tt>&lt;!-- canonical.plugin.classname --&gt;</tt>.
+     * XML comment of the format {@code <!-- canonical.plugin.classname -->}.
      * </p>
      *
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#endParsing(String, XWikiContext)

@@ -37,7 +37,7 @@ import org.xwiki.stability.Unstable;
 public interface DocumentModelBridge
 {    
     /**
-     * Retrieve the full name of the document, in the <code>Space.Name</code> format, for example <tt>Main.WebHome</tt>.
+     * Retrieve the full name of the document, in the <code>Space.Name</code> format, for example {@code Main.WebHome}.
      * 
      * @return A <code>String</code> representation of the document's full name.
      * @deprecated use {@link #getDocumentReference} instead

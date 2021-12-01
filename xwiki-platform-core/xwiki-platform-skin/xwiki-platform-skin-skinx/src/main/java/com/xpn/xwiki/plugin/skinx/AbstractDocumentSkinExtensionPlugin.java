@@ -163,7 +163,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     /**
      * {@inheritDoc}
      * <p>
-     * For this kind of resources, an XObject property (<tt>use</tt>) with the value <tt>always</tt> indicates always
+     * For this kind of resources, an XObject property ({@code use}) with the value {@code always} indicates always
      * used extensions. The list of extensions for each wiki is lazily placed in a cache: if the extension set for the
      * context wiki is null, then they will be looked up in the database and added to it. The cache is invalidated using
      * the notification mechanism.
@@ -185,7 +185,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
     /**
      * Returns the list of always used extensions of this type as a set of document references. For this kind of
-     * resources, an XObject property (<tt>use</tt>) with the value <tt>always</tt> indicates always used extensions.
+     * resources, an XObject property ({@code use}) with the value {@code always} indicates always used extensions.
      * The list of extensions for each wiki is lazily placed in a cache: if the extension set for the context wiki is
      * null, then they will be looked up in the database and added to it. The cache is invalidated using the
      * notification mechanism. Note that this method is called for each request, as the list might change in time, and

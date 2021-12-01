@@ -179,10 +179,6 @@ public class WARBuilder
             // Step: Unzip the Flamingo skin
             unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
 
-            // In order to work around issue https://jira.xwiki.org/browse/XWIKI-18335 with Jetty 10+, we replace
-            // jetty-web.xml with an overridden version when we're deploying on Jetty 10+
-            handleJetty10(webInfDirectory);
-
             // Mark it as having been built successfully
             touchMarkerFile();
         }
@@ -190,46 +186,6 @@ public class WARBuilder
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
         this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
-    }
-
-    private void handleJetty10(File webInfDirectory) throws Exception
-    {
-        ServletEngine engine = this.testConfiguration.getServletEngine();
-        String tag = this.testConfiguration.getServletEngineTag();
-        if (engine == ServletEngine.JETTY && extractJettyVersionFromDockerTag(tag) >= 10) {
-            // Override the jetty-web.xml
-            copyJettyWebFile(webInfDirectory);
-        }
-    }
-
-    private void copyJettyWebFile(File webInfDirectory) throws Exception
-    {
-        File outputFile = new File(webInfDirectory, "jetty-web.xml");
-        if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... Override jetty-web.xml since Jetty version is >= 10");
-        }
-        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-            InputStream is = getClass().getClassLoader().getResourceAsStream("jetty10-web.xml");
-            IOUtils.copy(is, fos);
-        }
-    }
-
-    private int extractJettyVersionFromDockerTag(String tag)
-    {
-        int result;
-        // TODO: Latest is currently 9.4.x for Jetty. Change this when it's no longer the case.
-        if (this.testConfiguration.getServletEngineTag() == null) {
-            result = 9;
-        } else {
-            try {
-                result = Integer.valueOf(this.testConfiguration.getServletEngineTag().substring(0, 2));
-            } catch (Exception e) {
-                // This can happen for example if we have "9-jre11" since "9-" will raise a NumberFormatException.
-                // In this case consider we're on 9.
-                result = 9;
-            }
-        }
-        return result;
     }
 
     private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception

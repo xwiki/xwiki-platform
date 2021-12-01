@@ -27,21 +27,24 @@ Configures the ByteBufferPool used by ServerConnectors.
 etc/jetty-bytebufferpool.xml
 
 [ini-template]
-### Server ByteBufferPool Configuration
-## Minimum capacity to pool ByteBuffers
+## Minimum capacity of a single ByteBuffer.
 #jetty.byteBufferPool.minCapacity=0
 
-## Maximum capacity to pool ByteBuffers
+## Maximum capacity of a single ByteBuffer.
+## Requests for ByteBuffers larger than this value results
+## in the ByteBuffer being allocated but not pooled.
 #jetty.byteBufferPool.maxCapacity=65536
 
-## Capacity factor
+## Bucket capacity factor.
+## ByteBuffers are allocated out of buckets that have
+## a capacity that is multiple of this factor.
 #jetty.byteBufferPool.factor=1024
 
-## Maximum queue length for each bucket (-1 for unbounded)
+## Maximum queue length for each bucket (-1 for unbounded).
 #jetty.byteBufferPool.maxQueueLength=-1
 
-## Maximum heap memory retainable by the pool (-1 for unlimited)
+## Maximum heap memory retainable by the pool (-1 for unlimited).
 #jetty.byteBufferPool.maxHeapMemory=-1
 
-## Maximum direct memory retainable by the pool (-1 for unlimited)
+## Maximum direct memory retainable by the pool (-1 for unlimited).
 #jetty.byteBufferPool.maxDirectMemory=-1

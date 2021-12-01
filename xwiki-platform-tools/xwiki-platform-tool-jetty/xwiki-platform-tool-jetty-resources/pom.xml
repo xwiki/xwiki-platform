@@ -34,8 +34,19 @@
   <properties>
     <!-- Jetty does not work with the Jakarta Annotation API version for some reason (it does not seems to load it without much explanation in the log) -->
     <xwiki.enforcer.enforce-jakarta.annotation-api.skip>true</xwiki.enforcer.enforce-jakarta.annotation-api.skip>
+    <!-- Use a possibly different version than the one used for the Jetty JARs packaged inside the XWiki WAR. The
+         reason is because the JARs requiring Jetty may not work work with the Jetty version we use for the standalone
+         packaging (which tends to use a newer version of Jetty). -->
+    <jetty.version>10.0.7</jetty.version>
   </properties>
   <dependencies>
+    <!-- Note: we're using the slf4j version used by Jetty since the slf4j JAR will be bundled in the jetty zip
+         generated. Without this, the slf4j version used by XWiki could cause conflicts. -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>2.0.0-alpha5</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-jetty-listener</artifactId>
@@ -61,7 +72,7 @@
       <artifactId>javax.servlet-api</artifactId>
       <!-- In addition we need to specify the version so that it's the one that is required by the version of Jetty
            used. -->
-      <version>3.1.0</version>
+      <version>4.0.1</version>
       <optional>true</optional>
       <scope>compile</scope>
     </dependency>
@@ -109,23 +120,29 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>javax-websocket-server-impl</artifactId>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-slf4j-impl</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
     </dependency>
-    <!-- We need to bundle the WebSocket API in the Jetty JARs. This is normally drawn transitively by the
-      javax-websocket-server-impl artifact above. However, since we declare the WebSocket API dependency
-      (javax.websocket:javax.websocket-api) with a "provided" scope in our top level POM, the Assembly plugin
-      doesn't include it by default. -->
     <dependency>
-      <groupId>javax.websocket</groupId>
-      <artifactId>javax.websocket-api</artifactId>
-      <!-- In addition we need to specify the version so that it's the one that is required by the version of Jetty used.
-        Jetty 9 supports WebSocket 1.0, Jetty 10 supports WebSocket 1.1 and Jetty 11 supports WebSocket 2.0. -->
-      <version>1.0</version>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-client</artifactId>
+      <version>${jetty.version}</version>
       <optional>true</optional>
-      <scope>compile</scope>
+    </dependency>
+    <!-- Note: We don't provide Jetty Websocket API only JSR356 -->
+    <dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>websocket-javax-server</artifactId>
+      <version>${jetty.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>websocket-javax-client</artifactId>
+      <version>${jetty.version}</version>
+      <optional>true</optional>
     </dependency>
   </dependencies>
   <build>

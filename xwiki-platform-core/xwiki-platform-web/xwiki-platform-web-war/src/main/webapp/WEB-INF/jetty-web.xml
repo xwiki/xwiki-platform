@@ -34,26 +34,4 @@
   The import should be fixed at a point to allow importing everything without creating a form with a field by page.
   Once done this configuration can be removed. See https://jira.xwiki.org/browse/XWIKI-11597 for a follow up. -->
   <Set name="maxFormKeys">2000</Set>
-
-  <!-- Tell jetty that javax.mail should be something that is invisible to the user, but if it's provided inside the
-       webapp use that instead (this is the case for XWiki). This is needed for work around issue
-       https://github.com/appropriate/docker-jetty/issues/108. Note that we don't have this problem in the XWiki
-       Standalone packaging since we create a custom distribution of Jetty and we don't include the Jetty "mail"
-       module. However we have the problem in our functional Docker-based tests where we use the official Jetty
-       image. -->
-  <!-- Note: This works for Jetty 9.4.x. If you're deploying on Jetty 10+ you must remove the 2 calls to
-       getSystemClasspathPattern and getServerClasspathPattern, as otherwise XWiki will fail to deploy. In Jetty 10+
-       it's no longer necessary to have this hack. Right now we provide a jetty10-web.xml file in the docker test
-       maven module to make it work on Jetty 10+. Once all the Jetty version we use are >= 10.0 then we'll be able
-       to remove these calls below and the jetty10-web.xml file. -->
-  <Call name="getSystemClasspathPattern">
-    <Call name="add">
-      <Arg>-javax.mail.</Arg>
-    </Call>
-  </Call>
-  <Call name="getServerClasspathPattern">
-    <Call name="add">
-      <Arg>javax.mail.</Arg>
-    </Call>
-  </Call>
 </Configure>

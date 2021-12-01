@@ -123,14 +123,8 @@ def builds = [
       name: 'Quality',
       goals: 'clean install jacoco:report sonar:sonar',
       profiles: 'quality,legacy,coverage',
-      // Note: We specify the "jvm" system property to execute the tests with Java 8 in order to limit problems
-      // with more recent versions of Java. In the future, we'll need to be able to also execute the tests with
-      // Java 17+. Remove that when we support it. See for example https://tinyurl.com/vc5brrtd
-      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec -Djvm=/home/hudsonagent/java8/bin/java',
+      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec',
       sonar: true,
-      // Build with Java 14 since Sonar requires Java 11+ (and currently we can't use Java 16 or 17 because of
-      // Spoon).
-      javaTool: 'java14'
     )
   }
 ]

@@ -58,6 +58,14 @@
       <version>${project.version}</version>
       <type>zip</type>
       <optional>true</optional>
+      <exclusions>
+        <!-- Make sure we don't bundle the SLF4J version from jetty resources (which uses a version that works with
+             Jetty -->
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- Add the database JAR so that it's included in the expanded WAR since it's not included
          by default in the Platform WAR. -->

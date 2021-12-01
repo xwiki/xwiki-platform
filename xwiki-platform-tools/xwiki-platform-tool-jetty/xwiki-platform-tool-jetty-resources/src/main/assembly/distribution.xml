@@ -47,9 +47,14 @@
         <!-- lib/annotations -->
         <exclude>org.ow2.asm:*</exclude>
         <exclude>javax.annotation:*</exclude>
+        <exclude>jakarta.annotation:jakarta.annotation-api</exclude>
+        <!-- lib/logging -->
+        <exclude>org.slf4j:slf4j-api</exclude>
+        <exclude>org.eclipse.jetty:jetty-slf4j-impl</exclude>
         <!-- lib/websocket -->
         <exclude>org.eclipse.jetty.websocket:*</exclude>
         <exclude>javax.websocket:*</exclude>
+        <exclude>*:jetty-javax-websocket-api</exclude>
       </excludes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
       <useProjectArtifact>false</useProjectArtifact>
@@ -68,6 +73,7 @@
       <includes>
         <include>org.ow2.asm:*</include>
         <include>javax.annotation:*</include>
+        <include>jakarta.annotation:jakarta.annotation-api</include>
       </includes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
       <useProjectArtifact>false</useProjectArtifact>
@@ -76,7 +82,17 @@
       <outputDirectory>/jetty/lib/websocket</outputDirectory>
       <includes>
         <include>org.eclipse.jetty.websocket:*</include>
-        <include>javax.websocket:*</include>
+        <include>*:jetty-javax-websocket-api</include>
+      </includes>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <!-- Logging -->
+    <dependencySet>
+      <outputDirectory>/jetty/lib/logging</outputDirectory>
+      <includes>
+        <include>org.slf4j:slf4j-api</include>
+        <include>org.eclipse.jetty:jetty-slf4j-impl</include>
       </includes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
       <useProjectArtifact>false</useProjectArtifact>
@@ -99,6 +115,11 @@
       <excludes>
         <exclude>**/*.sh</exclude>
       </excludes>
+    </fileSet>
+    <!-- Jetty cannot output logs in a non-existent directory so we need to have it created -->
+    <fileSet>
+      <directory>${basedir}/src/main/resources/logs</directory>
+      <outputDirectory>/logs</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>

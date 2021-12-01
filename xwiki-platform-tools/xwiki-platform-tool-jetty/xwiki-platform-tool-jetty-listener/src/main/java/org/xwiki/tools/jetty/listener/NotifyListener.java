@@ -24,8 +24,8 @@ import java.net.UnknownHostException;
 
 import org.eclipse.jetty.util.component.AbstractLifeCycle.AbstractLifeCycleListener;
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.log.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Jetty lifecycle listener that prints a message to open a browser when the server is started. This is to provide
@@ -37,7 +37,7 @@ import org.eclipse.jetty.util.log.Logger;
 public class NotifyListener extends AbstractLifeCycleListener
 {
     /** Logging helper object. */
-    private static final Logger LOGGER = Log.getLogger(NotifyListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotifyListener.class);
 
     /**
      * Delimiter to print to make the message stand out in the console/logs.
@@ -54,7 +54,7 @@ public class NotifyListener extends AbstractLifeCycleListener
             LOGGER.info(Messages.getString("jetty.startup.notification"), serverUrl);
         } catch (UnknownHostException ex) {
             // Shouldn't happen, localhost should be available
-            LOGGER.ignore(ex);
+            LOGGER.error("Failed to find hostname for localhost", ex);
         }
         LOGGER.info(DELIMITER);
     }

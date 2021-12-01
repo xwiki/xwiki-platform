@@ -17,9 +17,16 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#macro (displayObjectProperty $propertyReference $displayMode)
+#macro (displayObjectProperty $propertyReference $displayMode $createIfMissing)
   #set ($propertyReference = $services.model.resolveObjectProperty($propertyReference))
   #set ($object = $doc.getObject($propertyReference.parent))
+  #if (!$object && $createIfMissing)
+    #set ($object = $doc.newObject($propertyReference.parent.name))
+  #end
+  ## Properties are only initialized when the document is saved, try initializing the property if it is missing
+  #if ($createIfMissing && !$object.getProperty($propertyReference.name))
+    #set ($discard = $object.set($propertyReference.name, $object.getValue($propertyReference.name)))
+  #end
   $!object.display($propertyReference.name, $displayMode)
 #end
 

@@ -39,7 +39,8 @@
     #if ($knownPropertyTypes.contains($propertyType))
       #initRequiredSkinExtensions()
       #if ($propertyType == 'object')
-        #displayObjectProperty($propertyReference $displayMode)
+        #set($createIfMissing = ($request.getParameter('objectPolicy') == 'updateOrCreate'))
+        #displayObjectProperty($propertyReference $displayMode $createIfMissing)
       #else
         #displayDocumentProperty($propertyReference $displayMode)
       #end

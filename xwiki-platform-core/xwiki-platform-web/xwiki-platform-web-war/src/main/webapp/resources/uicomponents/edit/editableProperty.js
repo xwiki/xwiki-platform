@@ -118,6 +118,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       mode: 'edit',
       property: editableProperty.data('property'),
       type: editableProperty.data('propertyType'),
+      objectPolicy: editableProperty.data('objectPolicy'),
       language: xcontext.locale
     }).done(function(html) {
       // Replace the edit action with the save and cancel actions.
@@ -164,6 +165,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
     data.push({name: 'minorEdit', value: true});
     data.push({name: 'form_token', value: xcontext.form_token});
     data.push({name: 'ajax', value: true});
+    data.push({name: 'objectPolicy', value: editableProperty.data('objectPolicy')});
     // Make the request to save the property.
     return $.post(XWiki.currentDocument.getURL('save'), data).done(function() {
       editor.trigger('xwiki:document:saved');
@@ -185,6 +187,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       xpage: 'display',
       property: editableProperty.data('property'),
       type: editableProperty.data('propertyType'),
+      objectPolicy: editableProperty.data('objectPolicy'),
       language: xcontext.locale
     }).done(function(html) {
       // Update the viewer.

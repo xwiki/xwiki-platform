@@ -2006,6 +2006,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         setCreatorReference(userStringToReference(creator));
     }
 
+    @Override
     public Date getDate()
     {
         if (this.updateDate == null) {
@@ -2027,6 +2028,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         this.updateDate = date;
     }
 
+    @Override
     public Date getCreationDate()
     {
         if (this.creationDate == null) {

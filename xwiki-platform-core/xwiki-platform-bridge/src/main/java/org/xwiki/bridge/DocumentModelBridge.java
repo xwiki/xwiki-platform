@@ -157,4 +157,14 @@ public interface DocumentModelBridge
     {
         return false;
     }
+
+    /**
+     * @return the last save date of the current document.
+     * @since 14.0RC1
+     */
+    @Unstable
+    default Date getDate()
+    {
+        return null;
+    }
 }

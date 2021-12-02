@@ -39,20 +39,26 @@
          packaging (which tends to use a newer version of Jetty). -->
     <jetty.version>10.0.7</jetty.version>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <!-- Jetty 10.0.x is using SLF4J 2.x so we override the dep mgmt of the XWiki top level POM so that the
+             SLF4J version coming from the Jetty deps below is used. When we wrote this we were depending on Jetty
+             10.0.7 which was depending on SLF4J 2.0.0-alpha5, hence the reason we put that as the lower limit. -->
+        <version>[2.0.0-alpha5,)</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
-    <!-- Note: we're using the slf4j version used by Jetty since the slf4j JAR will be bundled in the jetty zip
-         generated. Without this, the slf4j version used by XWiki could cause conflicts. -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>2.0.0-alpha5</version>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-jetty-listener</artifactId>
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
+    <!-- Needed for the org.apache.commons.io.output.TeeOutputStream class used to split the Jetty logs -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>

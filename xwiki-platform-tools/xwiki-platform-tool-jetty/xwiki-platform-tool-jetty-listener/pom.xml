@@ -32,6 +32,11 @@
   <description>Includes a lifecycle listener that notifies users that they should open the wiki in a browser after the server started.</description>
   <dependencies>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
       <scope>provided</scope>

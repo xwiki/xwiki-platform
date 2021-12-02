@@ -691,7 +691,7 @@ diff$id.hashCode()##
 
 #macro (diffDataReference $entityReference)
   #set ($id = "$!entityReference.type:$!services.model.serialize($entityReference, 'default')")
-  #if ($entityReference.type == 'DOCUMENT')
+  #if ($entityReference.type == 'DOCUMENT' && "$!entityReference.locale" != '')
     ## We need different anchors for different document translations.
     #set ($id = "${id}_$!entityReference.locale")
   #end

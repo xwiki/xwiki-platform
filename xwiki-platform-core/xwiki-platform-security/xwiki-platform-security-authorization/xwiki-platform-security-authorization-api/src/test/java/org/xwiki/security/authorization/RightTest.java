@@ -22,7 +22,7 @@ package org.xwiki.security.authorization;
 import java.util.Collections;
 import java.util.Set;
 
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 
@@ -38,19 +38,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class RightTest
 {
-    class CustomRight implements RightDescription
+    static class FooRight implements RightDescription
     {
-        private String name;
-
-        CustomRight(String name)
-        {
-            this.name = name;
-        }
+        final static String NAME = "foo";
 
         @Override
         public String getName()
         {
-            return this.name;
+            return NAME;
         }
 
         @Override
@@ -88,6 +83,20 @@ class RightTest
         {
             return true;
         }
+
+        static void unregister()
+        {
+            Right fooRight = Right.toRight("foo");
+            if (fooRight != Right.ILLEGAL) {
+                fooRight.unregister();
+            }
+        }
+    }
+
+    @AfterEach
+    void afterEach()
+    {
+        FooRight.unregister();
     }
 
     @Test
@@ -98,22 +107,20 @@ class RightTest
         assertSame(Right.ILLEGAL, Right.toRight("notexist"));
     }
 
-    @Disabled("Disabled because it breaks the DefaultAuthorizationManagerIntegrationTest since Rights are static.")
     @Test
     void constructorWithImpliedByRight()
     {
         assertNull(Right.VIEW.getImpliedRights());
 
-        Right myRight = new Right(new CustomRight("foo"), Collections.singleton(Right.VIEW));
+        Right myRight = new Right(new FooRight(), Collections.singleton(Right.VIEW));
         assertSame(Right.toRight("foo"), myRight);
         assertEquals(Collections.singleton(myRight), Right.VIEW.getImpliedRights());
     }
 
-    @Disabled("Disabled because it breaks the DefaultAuthorizationManagerIntegrationTest since Rights are static.")
     @Test
     void like()
     {
-        Right myRight = new Right(new CustomRight("foo"));
-        assertTrue(myRight.like(new CustomRight("foo")));
+        Right myRight = new Right(new FooRight());
+        assertTrue(myRight.like(new FooRight()));
     }
 }

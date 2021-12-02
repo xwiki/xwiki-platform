@@ -24,11 +24,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 import org.xwiki.model.EntityType;
 import org.xwiki.security.AbstractSecurityTestCase;
-import org.xwiki.test.isolation.IsolatedTestRunner;
-import org.xwiki.test.isolation.IsolatedClassPrefix;
 
 import static org.xwiki.security.authorization.RuleState.ALLOW;
 import static org.xwiki.security.authorization.RuleState.DENY;
@@ -39,8 +36,6 @@ import static org.xwiki.security.authorization.RuleState.DENY;
  * @version $Id$
  * @since 4.0M2
  */
-@RunWith(IsolatedTestRunner.class)
-@IsolatedClassPrefix("org.xwiki.security")
 public abstract class AbstractAdditionalRightsTestCase extends AbstractSecurityTestCase
 {
     private static class TestRightDescription implements RightDescription

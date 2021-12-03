@@ -1892,7 +1892,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public DocumentReference getAuthorReference()
     {
-        if (getAuthors() != null) {
+        if (getAuthors() != null && this.getAuthors().getMetadataAuthor() != null) {
             return this.getDocumentReferenceUserReferenceResolver().resolve(getAuthors().getMetadataAuthor());
         } else {
             return null;
@@ -1946,7 +1946,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Override
     public DocumentReference getContentAuthorReference()
     {
-        if (getAuthors() != null) {
+        if (getAuthors() != null && this.getAuthors().getContentAuthor() != null) {
             return this.getDocumentReferenceUserReferenceResolver().resolve(this.getAuthors().getContentAuthor());
         } else {
             return null;
@@ -1995,27 +1995,33 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
+     * @deprecated since 13.10RC1 use {@link #getAuthors()}.
      */
+    @Deprecated
     public DocumentReference getCreatorReference()
     {
-        return this.creatorReference;
+        if (getAuthors() != null && this.getAuthors().getCreator() != null) {
+            return this.getDocumentReferenceUserReferenceResolver().resolve(this.getAuthors().getCreator());
+        } else {
+            return null;
+        }
     }
 
     /**
      * @since 3.0M3
+     * @deprecated since 13.10RC1 use {@link #setAuthors(DocumentAuthors)}
      */
+    @Deprecated
     public void setCreatorReference(DocumentReference creatorReference)
     {
-        if (ObjectUtils.notEqual(creatorReference, getCreatorReference())) {
-            setMetaDataDirty(true);
-        }
-
-        this.creatorReference = intern(creatorReference);
-
-        // Log this since it's probably a mistake so that we find who is doing bad things
-        if (this.creatorReference != null && this.creatorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                new Exception("See stack trace"));
+        if (creatorReference != null) {
+            UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(creatorReference);
+            if (this.authors != null && !Objects.equals(this.authors.getCreator(), user)) {
+                this.authors.setCreator(user);
+                this.setMetaDataDirty(true);
+            } else {
+                this.setAuthors(new DefaultDocumentAuthors().setCreator(user));
+            }
         }
     }
 
@@ -9164,7 +9170,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Override
     public DocumentAuthors getAuthors()
     {
-        return this.authors;
+        if (this.authors == null) {
+            return new DefaultDocumentAuthors();
+        } else {
+            return this.authors;
+        }
     }
 
     /**

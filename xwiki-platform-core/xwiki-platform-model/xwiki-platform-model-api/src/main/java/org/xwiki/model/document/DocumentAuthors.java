@@ -57,4 +57,11 @@ public interface DocumentAuthors
      *          in the APIs for saving the changes.
      */
     UserReference getDisplayedAuthor();
+
+    /**
+     * The creator of the document is the first author of the document when it has been created.
+     *
+     * @return the reference of the user who authored the first version of the document.
+     */
+    UserReference getCreator();
 }

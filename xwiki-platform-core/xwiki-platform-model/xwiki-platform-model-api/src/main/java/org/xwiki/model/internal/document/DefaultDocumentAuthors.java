@@ -35,6 +35,7 @@ public class DefaultDocumentAuthors implements DocumentAuthors
     private UserReference contentAuthor;
     private UserReference metadataAuthor;
     private UserReference displayedAuthor;
+    private UserReference creator;
 
     /**
      * Default empty constructor.
@@ -54,6 +55,7 @@ public class DefaultDocumentAuthors implements DocumentAuthors
             this.contentAuthor = documentAuthors.getContentAuthor();
             this.metadataAuthor = documentAuthors.getMetadataAuthor();
             this.displayedAuthor = documentAuthors.getDisplayedAuthor();
+            this.creator = documentAuthors.getCreator();
         }
     }
 
@@ -96,6 +98,18 @@ public class DefaultDocumentAuthors implements DocumentAuthors
         return this;
     }
 
+    /**
+     * Specify the original creator of the document.
+     *
+     * @param creator the creator of the document.
+     * @return the current instance for builder pattern.
+     */
+    public DefaultDocumentAuthors setCreator(UserReference creator)
+    {
+        this.creator = creator;
+        return this;
+    }
+
     @Override
     public UserReference getContentAuthor()
     {
@@ -111,7 +125,17 @@ public class DefaultDocumentAuthors implements DocumentAuthors
     @Override
     public UserReference getDisplayedAuthor()
     {
-        return this.displayedAuthor;
+        if (this.displayedAuthor == null) {
+            return this.getMetadataAuthor();
+        } else {
+            return this.displayedAuthor;
+        }
+    }
+
+    @Override
+    public UserReference getCreator()
+    {
+        return creator;
     }
 
     @Override
@@ -131,6 +155,7 @@ public class DefaultDocumentAuthors implements DocumentAuthors
             .append(contentAuthor, that.contentAuthor)
             .append(metadataAuthor, that.metadataAuthor)
             .append(displayedAuthor, that.displayedAuthor)
+            .append(creator, this.creator)
             .isEquals();
     }
 
@@ -141,6 +166,7 @@ public class DefaultDocumentAuthors implements DocumentAuthors
             .append(contentAuthor)
             .append(metadataAuthor)
             .append(displayedAuthor)
+            .append(creator)
             .toHashCode();
     }
 }

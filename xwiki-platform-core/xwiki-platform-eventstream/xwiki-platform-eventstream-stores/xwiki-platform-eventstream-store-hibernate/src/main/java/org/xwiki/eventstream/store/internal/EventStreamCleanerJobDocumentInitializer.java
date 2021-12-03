@@ -29,11 +29,15 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserReference;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -114,14 +118,14 @@ public class EventStreamCleanerJobDocumentInitializer extends AbstractEventListe
     {
         boolean needsUpdate = false;
 
-        if (doc.getAuthorReference() == null) {
+        DefaultDocumentAuthors authors = new DefaultDocumentAuthors(doc.getAuthors());
+        if (authors.getMetadataAuthor() == null) {
             needsUpdate = true;
-            doc.setAuthorReference(SUPER_ADMIN);
+            authors.setMetadataAuthor(SuperAdminUserReference.INSTANCE);
         }
-
-        if (doc.getCreatorReference() == null) {
+        if (authors.getCreator() == null) {
             needsUpdate = true;
-            doc.setCreatorReference(SUPER_ADMIN);
+            authors.setCreator(SuperAdminUserReference.INSTANCE);
         }
 
         if (doc.getParentReference() == null) {

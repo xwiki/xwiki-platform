@@ -4096,12 +4096,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             DocumentReference classReference = resolveClassReference(className);
             List<Integer> classIds = objectsToAdd.get(className);
             for (Integer classId : classIds) {
-                BaseObject xObject = getXObject(classReference, classId);
-
                 // we ensure that the object has not been added yet, for example because of the update or create.
-                if (xObject == null) {
-                    newXObject(classReference, context);
-                }
+                getXObject(classReference, classId, true, context);
             }
         }
 

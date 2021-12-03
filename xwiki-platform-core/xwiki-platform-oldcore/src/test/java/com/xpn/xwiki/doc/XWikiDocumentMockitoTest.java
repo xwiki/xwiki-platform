@@ -376,6 +376,7 @@ public class XWikiDocumentMockitoTest
         assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 3));
         assertEquals("blabla", this.document.getXObject(baseClass.getDocumentReference(), 3).getStringValue("string"));
         assertEquals(13, this.document.getXObject(baseClass.getDocumentReference(), 3).getIntValue("int"));
+        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 4));
         assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
         assertEquals("bloublou",
             this.document.getXObject(baseClass.getDocumentReference(), 42).getStringValue("string"));

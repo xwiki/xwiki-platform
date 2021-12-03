@@ -727,7 +727,9 @@ XWiki.Annotation = Class.create({
   hookMenuButton : function() {
     // Since 7.4M1, the annotations trigger is inserted via an UIX.
     var annotationsTrigger = $('tmAnnotationsTrigger');
-    annotationsTrigger.observe('click', this.toggleSettingsPanel.bind(this));
+    if (annotationsTrigger) {
+      annotationsTrigger.observe('click', this.toggleSettingsPanel.bind(this));
+    }
  },
 
   setAnnotationVisibility : function (visibility) {

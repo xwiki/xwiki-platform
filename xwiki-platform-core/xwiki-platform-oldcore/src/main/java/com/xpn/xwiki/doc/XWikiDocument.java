@@ -146,6 +146,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.velocity.VelocityContextFactory;
@@ -4093,6 +4094,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         readDocMetaFromForm(eform, context);
         readTranslationMetaFromForm(eform, context);
 
+        readAddedUpdatedAndRemovedObjectsFromForm(eform, context);
+    }
+
+    /**
+     * Adds objects, applies property updates and removes objects as specified in the form.
+     *
+     * @param eform The form from which the values shall be read.
+     * @param context The XWiki context.
+     * @throws XWikiException If an error occurs.
+     * @since 14.0RC1
+     */
+    @Unstable
+    public void readAddedUpdatedAndRemovedObjectsFromForm(EditForm eform, XWikiContext context) throws XWikiException
+    {
         // We add the new objects that have been submitted in the form, before filling them with their values.
         Map<String, List<Integer>> objectsToAdd = eform.getObjectsToAdd();
         for (String className : objectsToAdd.keySet()) {

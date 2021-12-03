@@ -384,7 +384,7 @@ public class XWikiDocumentMockitoTest
     }
 
     /**
-     * Unit test for {@link XWikiDocument#readFromForm(EditForm, XWikiContext)} .
+     * Unit test for {@link XWikiDocument#readAddedUpdatedAndRemovedObjectsFromForm(EditForm, XWikiContext)}.
      */
     @Test
     void readAddedUpdatedAndRemovedObjectsFromForm() throws Exception
@@ -421,7 +421,7 @@ public class XWikiDocumentMockitoTest
 
         eform.setRequest(request);
         eform.readRequest();
-        this.document.readFromForm(eform, context);
+        this.document.readAddedUpdatedAndRemovedObjectsFromForm(eform, context);
 
         assertEquals(43, this.document.getXObjectSize(baseClass.getDocumentReference()));
         assertEquals("bloublou",

@@ -2890,7 +2890,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         DocumentReference absoluteClassReference = resolveClassReference(classReference);
 
-        BaseObject xobject = getXObject(absoluteClassReference);
+        BaseObject xobject = getXObject(absoluteClassReference, number);
 
         if (xobject == null && create) {
             xobject = BaseClass.newCustomClassInstance(absoluteClassReference, xcontext);

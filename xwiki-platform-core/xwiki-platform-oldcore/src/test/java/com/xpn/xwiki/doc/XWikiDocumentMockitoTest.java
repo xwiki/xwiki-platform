@@ -615,6 +615,25 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
+    void testGetXObjectCreateWithNumber() throws XWikiException
+    {
+        assertSame(this.baseObject, this.document.getXObject(CLASS_REFERENCE, this.baseObject.getNumber(), true,
+            this.oldcore.getXWikiContext()));
+        assertSame(this.baseObject2, this.document.getXObject(CLASS_REFERENCE, this.baseObject2.getNumber(), true,
+            this.oldcore.getXWikiContext()));
+        assertSame(this.baseObject, this.document.getXObject((EntityReference) CLASS_REFERENCE,
+            this.baseObject.getNumber(), true, this.oldcore.getXWikiContext()));
+        assertSame(this.baseObject2, this.document.getXObject((EntityReference) CLASS_REFERENCE,
+            this.baseObject2.getNumber(), true, this.oldcore.getXWikiContext()));
+
+        BaseObject newObject = this.document.getXObject(CLASS_REFERENCE, 42, true, this.oldcore.getXWikiContext());
+        assertNotSame(this.baseObject, newObject);
+        assertNotSame(this.baseObject2, newObject);
+        assertEquals(42, newObject.getNumber());
+        assertSame(newObject, this.document.getXObject(CLASS_REFERENCE, newObject.getNumber()));
+    }
+
+    @Test
     void testGetXObjectsWhenClassDoesNotExist()
     {
         assertEquals(Collections.emptyList(),

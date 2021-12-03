@@ -21,6 +21,8 @@ package org.xwiki.security.authentication.internal;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +33,7 @@ import javax.mail.internet.InternetAddress;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -85,6 +88,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
         new LocalDocumentReference(XWIKI_SPACE, "XWikiUsers");
 
     protected static final String VERIFICATION_PROPERTY = "verification";
+    protected static final String TOKEN_LIFETIME = "security.authentication.resetPasswordTokenLifetime";
 
     @Inject
     private UserManager userManager;
@@ -110,6 +114,10 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
 
     @Inject
     private Provider<ResetPasswordMailSender> resetPasswordMailSenderProvider;
+
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource configurationSource;
 
     @Inject
     private Logger logger;
@@ -218,6 +226,26 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
         }
     }
 
+    /**
+     * Check if the reset password token should be reset.
+     * To determine if the token should be reset, we check: 1. the token lifetime property, 2. the save date of the
+     * document.
+     *
+     * @param userDocument
+     * @return
+     */
+    private boolean shouldTokenBeReset(XWikiDocument userDocument)
+    {
+        Integer tokenLifeTime = this.configurationSource.getProperty(TOKEN_LIFETIME, 0);
+        boolean result = true;
+        if (tokenLifeTime != 0) {
+            Instant saveInstant = userDocument.getDate().toInstant();
+            Instant now = Instant.now();
+            return (saveInstant.plus(tokenLifeTime, ChronoUnit.MINUTES).isBefore(now));
+        }
+        return result;
+    }
+
     @Override
     public ResetPasswordRequestResponse checkVerificationCode(UserReference userReference, String verificationCode)
         throws ResetPasswordException
@@ -248,13 +276,16 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                 String equivalentPassword =
                     passwordClass.getEquivalentPassword(storedVerificationCode, verificationCode);
 
-                // We ensure to reset the verification code before checking if it's correct to avoid
-                // any bruteforce attack.
-                String newVerificationCode = context.getWiki().generateRandomString(30);
-                xObject.set(VERIFICATION_PROPERTY, newVerificationCode, context);
-                String saveComment = this.localizationManager
-                    .getTranslationPlain("xe.admin.passwordReset.step2.versionComment.changeValidationKey");
-                context.getWiki().saveDocument(userDocument, saveComment, true, context);
+                String newVerificationCode = verificationCode;
+                if (this.shouldTokenBeReset(userDocument)) {
+                    // We ensure to reset the verification code before checking if it's correct to avoid
+                    // any bruteforce attack.
+                    newVerificationCode = context.getWiki().generateRandomString(30);
+                    xObject.set(VERIFICATION_PROPERTY, newVerificationCode, context);
+                    String saveComment = this.localizationManager
+                        .getTranslationPlain("xe.admin.passwordReset.step2.versionComment.changeValidationKey");
+                    context.getWiki().saveDocument(userDocument, saveComment, true, context);
+                }
 
                 if (!storedVerificationCode.equals(equivalentPassword)) {
                     throw new ResetPasswordException(exceptionMessage);

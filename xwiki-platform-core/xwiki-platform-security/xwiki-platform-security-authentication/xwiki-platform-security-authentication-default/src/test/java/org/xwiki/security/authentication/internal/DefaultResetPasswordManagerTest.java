@@ -20,7 +20,10 @@
 package org.xwiki.security.authentication.internal;
 
 import java.net.URL;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Date;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -29,6 +32,7 @@ import javax.mail.internet.InternetAddress;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReference;
@@ -106,6 +110,10 @@ class DefaultResetPasswordManagerTest
     @MockComponent
     private Provider<ResetPasswordMailSender> resetPasswordMailSenderProvider;
 
+    @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource configurationSource;
+
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
@@ -136,6 +144,7 @@ class DefaultResetPasswordManagerTest
         when(this.xWiki.getDocument(this.userDocumentReference, this.context)).thenReturn(this.userDocument);
         this.resetPasswordMailSender = mock(ResetPasswordMailSender.class);
         when(this.resetPasswordMailSenderProvider.get()).thenReturn(this.resetPasswordMailSender);
+        when(this.configurationSource.getProperty(DefaultResetPasswordManager.TOKEN_LIFETIME, 0)).thenReturn(0);
     }
 
     @Test
@@ -278,6 +287,36 @@ class DefaultResetPasswordManagerTest
     }
 
     @Test
+    void checkVerificationCodeTokenLifetimeNotExpired() throws Exception
+    {
+        when(this.userManager.exists(this.userReference)).thenReturn(true);
+        InternetAddress email = new InternetAddress("foobar@xwiki.org");
+        when(this.userProperties.getEmail()).thenReturn(email);
+        String verificationCode = "abcd1245";
+        BaseObject xObject = mock(BaseObject.class);
+        when(this.userDocument
+            .getXObject(DefaultResetPasswordManager.RESET_PASSWORD_REQUEST_CLASS_REFERENCE))
+            .thenReturn(xObject);
+        String encodedVerificationCode = "encodedVerificationCode";
+        when(xObject.getStringValue(DefaultResetPasswordManager.VERIFICATION_PROPERTY))
+            .thenReturn(encodedVerificationCode);
+        BaseClass baseClass = mock(BaseClass.class);
+        when(xObject.getXClass(context)).thenReturn(baseClass);
+        PasswordClass passwordClass = mock(PasswordClass.class);
+        when(baseClass.get(DefaultResetPasswordManager.VERIFICATION_PROPERTY)).thenReturn(passwordClass);
+        when(passwordClass.getEquivalentPassword(encodedVerificationCode, verificationCode))
+            .thenReturn(encodedVerificationCode);
+        when(this.configurationSource.getProperty(DefaultResetPasswordManager.TOKEN_LIFETIME, 0)).thenReturn(15);
+        when(this.userDocument.getDate()).thenReturn(Date.from(Instant.now().minus(10, ChronoUnit.MINUTES)));
+
+        DefaultResetPasswordRequestResponse expected =
+            new DefaultResetPasswordRequestResponse(this.userReference, verificationCode);
+
+        assertEquals(expected, this.resetPasswordManager.checkVerificationCode(this.userReference, verificationCode));
+        verify(this.xWiki, never()).saveDocument(any(), any(), anyBoolean(), any());
+    }
+
+    @Test
     void checkVerificationCodeUnexistingUser() throws ResetPasswordException
     {
         when(this.userReference.toString()).thenReturn("user:Foobar");
@@ -318,6 +357,46 @@ class DefaultResetPasswordManagerTest
         when(this.localizationManager
             .getTranslationPlain("xe.admin.passwordReset.step2.error.wrongParameters", "user:Foobar"))
             .thenReturn(exceptionMessage);
+
+        ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
+            () -> this.resetPasswordManager.checkVerificationCode(this.userReference, verificationCode));
+        assertEquals(exceptionMessage, resetPasswordException.getMessage());
+        verify(this.xWiki).saveDocument(this.userDocument, saveComment, true, context);
+    }
+
+    @Test
+    void checkVerificationCodeTokenLifetimeExpired() throws Exception
+    {
+        when(this.userReference.toString()).thenReturn("user:Foobar");
+        when(this.userManager.exists(this.userReference)).thenReturn(true);
+        InternetAddress email = new InternetAddress("foobar@xwiki.org");
+        when(this.userProperties.getEmail()).thenReturn(email);
+        String verificationCode = "abcd1245";
+        BaseObject xObject = mock(BaseObject.class);
+        when(this.userDocument
+            .getXObject(DefaultResetPasswordManager.RESET_PASSWORD_REQUEST_CLASS_REFERENCE))
+            .thenReturn(xObject);
+        String encodedVerificationCode = "encodedVerificationCode";
+        when(xObject.getStringValue(DefaultResetPasswordManager.VERIFICATION_PROPERTY))
+            .thenReturn(encodedVerificationCode);
+        BaseClass baseClass = mock(BaseClass.class);
+        when(xObject.getXClass(context)).thenReturn(baseClass);
+        PasswordClass passwordClass = mock(PasswordClass.class);
+        when(baseClass.get(DefaultResetPasswordManager.VERIFICATION_PROPERTY)).thenReturn(passwordClass);
+        when(passwordClass.getEquivalentPassword(encodedVerificationCode, verificationCode))
+            .thenReturn("anotherCode");
+        String newVerificationCode = "foobartest";
+        when(xWiki.generateRandomString(30)).thenReturn(newVerificationCode);
+        String saveComment = "Save new verification code";
+        when(this.localizationManager
+            .getTranslationPlain("xe.admin.passwordReset.step2.versionComment.changeValidationKey"))
+            .thenReturn(saveComment);
+        String exceptionMessage = "Wrong verification code";
+        when(this.localizationManager
+            .getTranslationPlain("xe.admin.passwordReset.step2.error.wrongParameters", "user:Foobar"))
+            .thenReturn(exceptionMessage);
+        when(this.configurationSource.getProperty(DefaultResetPasswordManager.TOKEN_LIFETIME, 0)).thenReturn(15);
+        when(this.userDocument.getDate()).thenReturn(Date.from(Instant.now().minus(16, ChronoUnit.MINUTES)));
 
         ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
             () -> this.resetPasswordManager.checkVerificationCode(this.userReference, verificationCode));

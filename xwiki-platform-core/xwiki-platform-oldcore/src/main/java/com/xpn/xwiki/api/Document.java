@@ -41,6 +41,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -50,6 +51,8 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -3246,5 +3249,24 @@ public class Document extends Api
     public int getLocalReferenceMaxLength()
     {
         return this.doc.getLocalReferenceMaxLength();
+    }
+
+    /**
+     * Define the author of the document to be displayed, without changing the metadata and content authors.
+     * @param displayedAuthor the author to be displayed.
+     * @since 14.0RC1
+     */
+    @Unstable
+    public void setDisplayedAuthor(UserReference displayedAuthor)
+    {
+        DefaultDocumentAuthors documentAuthors;
+        if (this.doc.getAuthors() != null) {
+            documentAuthors = new DefaultDocumentAuthors(this.doc.getAuthors());
+        } else {
+            documentAuthors = new DefaultDocumentAuthors();
+        }
+        documentAuthors.setDisplayedAuthor(displayedAuthor);
+        this.doc.setAuthors(documentAuthors);
+        this.doc.setMetaDataDirty(true);
     }
 }

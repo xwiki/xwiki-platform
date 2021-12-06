@@ -112,6 +112,8 @@ public class XarExtensionPlan implements Closeable
                                 pages = new HashMap<>();
                                 this.previousXAREntries.put(wiki, pages);
                             }
+                            // We want to replace the key too because the type might be different but HashMap keep the old one
+                            pages.remove(entry);
                             pages.put(entry, xarPlanEntry);
                         }
                     }
@@ -138,6 +140,8 @@ public class XarExtensionPlan implements Closeable
                                 pages = new HashMap<>();
                                 this.nextXAREntries.put(wiki, pages);
                             }
+                            // We want to replace the key too because the type might be different but HashMap keep the old one
+                            pages.remove(entry);
                             pages.put(entry, nextExtension);
                         }
                     } catch (Exception e) {

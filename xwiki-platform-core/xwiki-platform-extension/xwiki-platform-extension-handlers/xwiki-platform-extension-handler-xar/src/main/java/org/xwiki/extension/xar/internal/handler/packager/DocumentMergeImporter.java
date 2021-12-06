@@ -87,19 +87,15 @@ public class DocumentMergeImporter
             String reference = "document:" + this.referenceSerializer.serialize(xarEntry);
 
             // Resolve the type
-            XarEntryType configuredType = this.typeResolver.resolve(xarEntry, false);
+            type = this.typeResolver.resolve(xarEntry, false);
 
             // Try a merger specific to the type name
             if (type != null && componentManager.hasComponent(XWikiDocumentMerger.class, type.getName())) {
-                // Try a merger specific to the document reference
+                // Try a merger specific to the entry type
                 merger = componentManager.getInstance(XWikiDocumentMerger.class, type.getName());
             } else if (componentManager.hasComponent(XWikiDocumentMerger.class, reference)) {
                 // Try a merger specific to the document reference
                 merger = componentManager.getInstance(XWikiDocumentMerger.class, reference);
-            }
-
-            if (configuredType != null) {
-                type = configuredType;
             }
         }
 

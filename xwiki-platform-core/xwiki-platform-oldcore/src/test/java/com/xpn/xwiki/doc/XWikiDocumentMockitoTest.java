@@ -54,6 +54,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
@@ -110,8 +111,8 @@ public class XWikiDocumentMockitoTest
     private static final DocumentReference CLASS_REFERENCE = DOCUMENT_REFERENCE;
 
     @MockComponent
-    @Named("bridge")
-    private DocumentReferenceResolver<UserReference> documentReferenceUserReferenceResolver;
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
 
     @MockComponent
     @Named("document")
@@ -864,7 +865,7 @@ public class XWikiDocumentMockitoTest
         // Make sure we set the metadata dirty flag to false to verify it's not changed thereafter
         DocumentReference author = new DocumentReference("Wiki", "XWiki", "Author");
         UserReference userReference = mock(UserReference.class);
-        when(this.documentReferenceUserReferenceResolver.resolve(userReference)).thenReturn(author);
+        when(this.documentReferenceUserReferenceSerializer.serialize(userReference)).thenReturn(author);
         when(this.userReferenceDocumentReferenceResolver.resolve(author)).thenReturn(userReference);
         this.document.setAuthorReference(author);
         this.document.setMetaDataDirty(false);
@@ -1325,7 +1326,7 @@ public class XWikiDocumentMockitoTest
     {
         DocumentReference author = new DocumentReference("Wiki", "XWiki", "Albatross");
         UserReference userReference = mock(UserReference.class);
-        when(this.documentReferenceUserReferenceResolver.resolve(userReference)).thenReturn(author);
+        when(this.documentReferenceUserReferenceSerializer.serialize(userReference)).thenReturn(author);
         when(this.userReferenceDocumentReferenceResolver.resolve(author)).thenReturn(userReference);
         this.document.setAuthorReference(author);
         XWikiDocument copy =
@@ -1337,7 +1338,10 @@ public class XWikiDocumentMockitoTest
     @Test
     void testCreatorAfterDocumentCopy() throws XWikiException
     {
+        UserReference userReference = mock(UserReference.class);
         DocumentReference creator = new DocumentReference("Wiki", "XWiki", "Condor");
+        when(this.userReferenceDocumentReferenceResolver.resolve(creator)).thenReturn(userReference);
+        when(this.documentReferenceUserReferenceSerializer.serialize(userReference)).thenReturn(creator);
         this.document.setCreatorReference(creator);
         XWikiDocument copy =
             this.document.copyDocument(this.document.getName() + " Copy", this.oldcore.getXWikiContext());

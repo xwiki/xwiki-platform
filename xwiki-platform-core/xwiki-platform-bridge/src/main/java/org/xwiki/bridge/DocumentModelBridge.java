@@ -134,14 +134,14 @@ public interface DocumentModelBridge
     /**
      * @return the document's content author user reference
      * @since 7.2M1
-     * @deprecated since 13.10RC1 rely on {@link #getAuthors()}.
+     * @deprecated since 14.0RC1 rely on {@link #getAuthors()}.
      */
     @Deprecated
     DocumentReference getContentAuthorReference();
 
     /**
      * @return the various authors information of a document.
-     * @since 13.10RC1
+     * @since 14.0RC1
      */
     @Unstable
     default DocumentAuthors getAuthors()

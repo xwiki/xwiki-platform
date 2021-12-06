@@ -149,10 +149,12 @@ import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
@@ -837,10 +839,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
-    private DocumentReferenceResolver<UserReference> getDocumentReferenceUserReferenceResolver()
+    private UserReferenceSerializer<DocumentReference> getUserReferenceDocumentReferenceSerializer()
     {
         return Utils.getComponent(
-            new DefaultParameterizedType(null, DocumentReferenceResolver.class, UserReference.class), "bridge");
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
     }
 
     private UserReferenceResolver<DocumentReference> getUserReferenceDocumentReferenceResolver()
@@ -1887,13 +1889,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated Since 13.10RC1 rely on {@link #getAuthors}.
+     * @deprecated Since 14.0RC1 rely on {@link #getAuthors}.
      */
     @Deprecated
     public DocumentReference getAuthorReference()
     {
         if (getAuthors() != null && this.getAuthors().getMetadataAuthor() != null) {
-            return this.getDocumentReferenceUserReferenceResolver().resolve(getAuthors().getMetadataAuthor());
+            return this.getUserReferenceDocumentReferenceSerializer().serialize(getAuthors().getMetadataAuthor());
         } else {
             return null;
         }
@@ -1901,18 +1903,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated Since 13.10RC1 rely on {@link #setAuthors(DocumentAuthors)}
+     * @deprecated Since 14.0RC1 rely on {@link #setAuthors(DocumentAuthors)}
      */
     @Deprecated
     public void setAuthorReference(DocumentReference authorReference)
     {
         if (authorReference != null) {
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(authorReference);
-            if (this.authors != null && !Objects.equals(this.authors.getMetadataAuthor(), user)) {
+            if (this.authors == null) {
+                this.setAuthors(new DefaultDocumentAuthors().setMetadataAuthor(user));
+                this.setMetaDataDirty(true);
+            } else if (!Objects.equals(this.authors.getMetadataAuthor(), user)) {
                 this.authors.setMetadataAuthor(user);
                 this.setMetaDataDirty(true);
-            } else {
-                this.setAuthors(new DefaultDocumentAuthors().setMetadataAuthor(user));
             }
         }
     }
@@ -1941,13 +1944,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated Since 13.10RC1 rely on {@link #getAuthors()}.
+     * @deprecated Since 14.0RC1 rely on {@link #getAuthors()}.
      */
     @Override
     public DocumentReference getContentAuthorReference()
     {
         if (getAuthors() != null && this.getAuthors().getContentAuthor() != null) {
-            return this.getDocumentReferenceUserReferenceResolver().resolve(this.getAuthors().getContentAuthor());
+            return this.getUserReferenceDocumentReferenceSerializer().serialize(this.getAuthors().getContentAuthor());
         } else {
             return null;
         }
@@ -1955,18 +1958,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated Since 13.10RC1 rely on {@link #setAuthors(DocumentAuthors)}
+     * @deprecated Since 14.0RC1 rely on {@link #setAuthors(DocumentAuthors)}
      */
     @Deprecated
     public void setContentAuthorReference(DocumentReference contentAuthorReference)
     {
         if (contentAuthorReference != null) {
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(contentAuthorReference);
-            if (this.authors != null && !Objects.equals(this.authors.getContentAuthor(), user)) {
+            if (this.authors == null) {
+                this.setAuthors(new DefaultDocumentAuthors().setContentAuthor(user));
+                this.setMetaDataDirty(true);
+            } else if (!Objects.equals(this.authors.getContentAuthor(), user)) {
                 this.authors.setContentAuthor(user);
                 this.setMetaDataDirty(true);
-            } else {
-                this.setAuthors(new DefaultDocumentAuthors().setContentAuthor(user));
             }
         }
     }
@@ -1995,13 +1999,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated since 13.10RC1 use {@link #getAuthors()}.
+     * @deprecated since 14.0RC1 use {@link #getAuthors()}.
      */
     @Deprecated
     public DocumentReference getCreatorReference()
     {
         if (getAuthors() != null && this.getAuthors().getCreator() != null) {
-            return this.getDocumentReferenceUserReferenceResolver().resolve(this.getAuthors().getCreator());
+            return this.getUserReferenceDocumentReferenceSerializer().serialize(this.getAuthors().getCreator());
         } else {
             return null;
         }
@@ -2009,18 +2013,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated since 13.10RC1 use {@link #setAuthors(DocumentAuthors)}
+     * @deprecated since 14.0RC1 use {@link #setAuthors(DocumentAuthors)}
      */
     @Deprecated
     public void setCreatorReference(DocumentReference creatorReference)
     {
         if (creatorReference != null) {
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(creatorReference);
-            if (this.authors != null && !Objects.equals(this.authors.getCreator(), user)) {
+            if (this.authors == null) {
+                this.setAuthors(new DefaultDocumentAuthors().setCreator(user));
+                this.setMetaDataDirty(true);
+            } else if (!Objects.equals(this.authors.getCreator(), user)) {
                 this.authors.setCreator(user);
                 this.setMetaDataDirty(true);
-            } else {
-                this.setAuthors(new DefaultDocumentAuthors().setCreator(user));
             }
         }
     }
@@ -4329,8 +4334,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             } else {
                 doc.setDocumentArchive(getDocumentArchive());
             }
-            doc.setAuthorReference(getAuthorReference());
-            doc.setContentAuthorReference(getContentAuthorReference());
+            doc.setAuthors(getAuthors());
             doc.setContent(getContent());
             doc.setCreationDate(getCreationDate());
             doc.setDate(getDate());
@@ -4346,7 +4350,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             doc.setStore(getStore());
             doc.setTemplateDocumentReference(getTemplateDocumentReference());
             doc.setParentReference(getRelativeParentReference());
-            doc.setCreatorReference(getCreatorReference());
             doc.setDefaultLocale(getDefaultLocale());
             doc.setDefaultTemplate(getDefaultTemplate());
             doc.setValidationScript(getValidationScript());
@@ -9183,7 +9186,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * to {@code true}.
      *
      * @param authors the authors information.
-     * @since 13.10RC1
+     * @since 14.0RC1
      */
     @Unstable
     public void setAuthors(DocumentAuthors authors)

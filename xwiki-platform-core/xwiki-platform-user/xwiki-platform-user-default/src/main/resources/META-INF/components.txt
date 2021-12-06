@@ -34,4 +34,3 @@ org.xwiki.user.internal.group.GroupsCache
 org.xwiki.user.internal.group.MembersCache
 org.xwiki.user.internal.group.UsersCache
 org.xwiki.user.internal.group.UsersCacheInvalidationListener
-org.xwiki.user.internal.bridge.DocumentReferenceUserReferenceResolver

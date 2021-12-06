@@ -26,7 +26,7 @@ import org.xwiki.user.UserReference;
  * Define the different authors information that are related to an XWiki Document.
  *
  * @version $Id$
- * @since 13.10RC1
+ * @since 14.0RC1
  */
 @Unstable
 public interface DocumentAuthors

@@ -28,7 +28,7 @@ import org.xwiki.user.UserReference;
  * Default implementation of {@link DocumentAuthors}.
  *
  * @version $Id$
- * @since 13.10RC1
+ * @since 14.0RC1
  */
 public class DefaultDocumentAuthors implements DocumentAuthors
 {

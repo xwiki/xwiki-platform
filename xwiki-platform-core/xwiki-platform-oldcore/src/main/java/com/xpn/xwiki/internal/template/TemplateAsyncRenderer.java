@@ -37,8 +37,9 @@ import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.ContentParser;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.template.Template;
@@ -54,7 +55,7 @@ import org.xwiki.template.TemplateContent;
 public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
 {
     @Inject
-    private ContentParser parser;
+    private MacroContentParser parser;
 
     @Inject
     private VelocityTemplateEvaluator evaluator;
@@ -74,13 +75,13 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
 
     private TemplateContent content;
 
-    private boolean xdomMode;
+    private boolean blockMode;
 
-    Set<String> initialize(Template template, boolean inline, boolean xdomMode) throws Exception
+    Set<String> initialize(Template template, boolean inline, boolean blockMode) throws Exception
     {
         this.template = template;
         this.content = template.getContent();
-        this.xdomMode = xdomMode;
+        this.blockMode = blockMode;
 
         this.inline = inline;
         this.transformationId = this.renderingContext.getTransformationId();
@@ -145,19 +146,15 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
 
         Block xdom;
         try {
-            xdom = this.parser.parse(this.content.getContent(), this.content.getSourceSyntax());
+            // Parse the content
+            MacroTransformationContext mtc = new MacroTransformationContext();
+            mtc.setSyntax(this.content.getSourceSyntax());
+            xdom = this.parser.parse(this.content.getContent(), mtc, false, isInline());
 
+            // Execute transformations
             transform(xdom);
         } catch (Exception e) {
             throw new RenderingException("Failed to execute template", e);
-        }
-
-        ///////////////////////////////////////
-        // Inline
-
-        // If in inline mode remove any top level paragraph.
-        if (isInline()) {
-            xdom = removeTopLevelParagraph(xdom);
         }
 
         ///////////////////////////////////////
@@ -165,7 +162,7 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
 
         String resultString = null;
 
-        if (async || !this.xdomMode) {
+        if (async || !this.blockMode) {
             resultString = render(xdom);
         }
 
@@ -183,7 +180,7 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         // XDOM
 
         XDOM xdom;
-        if (cached || this.xdomMode) {
+        if (cached || this.blockMode) {
             if (StringUtils.isEmpty(result)) {
                 xdom = new XDOM(Collections.emptyList());
             } else {

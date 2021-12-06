@@ -311,7 +311,7 @@ Object.extend(XWiki, {
             error.style.cursor="pointer";
             error.title = "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))";
             Event.observe(error, "click", function(event){
-                   event.element().next().toggleClassName("hidden");
+                   event.element().closest(".xwikirenderingerror").next().toggleClassName("hidden");
             });
         }
     });

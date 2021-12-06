@@ -6,5 +6,6 @@ org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceRes
 org.xwiki.rendering.internal.resolver.DocumentResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.internal.resolver.PageResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.internal.resolver.SpaceResourceReferenceEntityReferenceResolver
+org.xwiki.rendering.internal.util.XWikiErrorBlockGenerator
 org.xwiki.rendering.script.RenderingScriptService
 org.xwiki.rendering.internal.parser.LinkParser

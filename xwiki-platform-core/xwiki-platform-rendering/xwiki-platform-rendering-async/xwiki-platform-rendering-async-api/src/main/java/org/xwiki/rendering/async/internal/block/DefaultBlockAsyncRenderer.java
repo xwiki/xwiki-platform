@@ -46,6 +46,8 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 @Component(roles = DefaultBlockAsyncRenderer.class)
 public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
 {
+    private static final String TM_FAILEDASYNC = "rendering.async.error.failed";
+
     @Inject
     private AsyncContext asyncContext;
 
@@ -126,8 +128,8 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
             resultBlock = tranform(xdom, block);
         } catch (Exception e) {
             // Display the error in the result
-            resultBlock = new CompositeBlock(this.errorBlockGenerator
-                .generateErrorBlocks("Failed to execute asynchronous content", e, this.configuration.isInline()));
+            resultBlock = new CompositeBlock(this.errorBlockGenerator.generateErrorBlocks(this.configuration.isInline(),
+                TM_FAILEDASYNC, "Failed to execute asynchronous content", null, e));
         }
 
         return resultBlock;

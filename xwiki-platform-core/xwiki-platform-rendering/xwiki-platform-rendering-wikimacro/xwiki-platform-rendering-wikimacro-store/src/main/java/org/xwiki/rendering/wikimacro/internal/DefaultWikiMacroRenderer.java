@@ -94,6 +94,12 @@ import com.xpn.xwiki.api.Document;
 @Component(roles = DefaultWikiMacroRenderer.class)
 public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 {
+    private static final String TM_FAILEDRESOLVECONTENTPLACEHOLDER =
+        "rendering.wikimacro.error.failedResolveContentPlaceholder";
+
+    private static final String TM_FAILEDRESOLVEPARAMETERPLACEHOLDER =
+        "rendering.wikimacro.error.failedResolveParameterPlaceholder";
+
     /**
      * The key under which macro context will be available in the XWikiContext for scripts.
      * 
@@ -713,8 +719,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             try {
                 blocks = parseContent(this.macroContent, macroBlock.isInline()).getChildren();
             } catch (RenderingException e) {
-                blocks = this.errorBlockGenerator.generateErrorBlocks("Failed to resolve macro content placeholder", e,
-                    macroBlock.isInline());
+                blocks = this.errorBlockGenerator.generateErrorBlocks(macroBlock.isInline(),
+                    TM_FAILEDRESOLVECONTENTPLACEHOLDER, "Failed to resolve macro content placeholder", null, e);
             }
 
             // We don't execute the content to make sure it's execute later in the right context (where it was passed to
@@ -763,8 +769,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
                 blocks =
                     parseParameterValue((String) parameterValue, parameterName, macroBlock.isInline()).getChildren();
             } catch (Exception e) {
-                blocks = this.errorBlockGenerator.generateErrorBlocks("Failed to resolve macro content placeholder", e,
-                    macroBlock.isInline());
+                blocks = this.errorBlockGenerator.generateErrorBlocks(macroBlock.isInline(),
+                    TM_FAILEDRESOLVEPARAMETERPLACEHOLDER, "Failed to resolve macro parameter placeholder", null, e);
             }
 
             return new MetaDataBlock(blocks, nonGeneratedContentMetaData);

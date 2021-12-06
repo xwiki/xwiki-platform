@@ -49,6 +49,8 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseObjectWikiComponent implements UIExtension
 {
+    private static final String TM_FAILEDUIX = "uiextension.error.failed";
+
     protected final JobProgressManager progress;
 
     protected final ErrorBlockGenerator errorBlockGenerator;
@@ -111,8 +113,8 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
 
             result = this.executor.execute(executorConfiguration);
         } catch (Exception e) {
-            result = new CompositeBlock(this.errorBlockGenerator
-                .generateErrorBlocks(String.format("Failed to execute UIX with id [%s]", getId()), e, false));
+            result = new CompositeBlock(this.errorBlockGenerator.generateErrorBlocks(false, TM_FAILEDUIX,
+                "Failed to execute UIX with id [{}]", null, getId(), e));
         } finally {
             this.progress.endStep(this);
         }

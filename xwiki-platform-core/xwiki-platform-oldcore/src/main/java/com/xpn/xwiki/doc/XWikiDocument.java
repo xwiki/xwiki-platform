@@ -204,6 +204,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
 
+    private static final String TM_FAILEDDOCUMENTPARSE = "core.document.error.failedParse";
+
     /**
      * An attachment waiting to be deleted at next document save.
      *
@@ -8657,7 +8659,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 this.xdomCache = parseContent(getContent());
             } catch (XWikiException e) {
                 ErrorBlockGenerator errorBlockGenerator = Utils.getComponent(ErrorBlockGenerator.class);
-                return new XDOM(errorBlockGenerator.generateErrorBlocks("Failed to render content", e, false));
+                return new XDOM(errorBlockGenerator.generateErrorBlocks(false, TM_FAILEDDOCUMENTPARSE,
+                    "Failed to parse document content", null, e));
             }
         }
 

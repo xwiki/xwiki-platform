@@ -48,10 +48,11 @@ public interface DocumentAuthors
     UserReference getMetadataAuthor();
 
     /**
-     * The displayed author is the "real" author of a document as "the one who impulses the changes". However this
-     * author is only there for display purpose: it should never be used for security reasons. This author is different
-     * from metadata or content author when the document is saved through a script or a mechanism which delegates the
-     * save of the document.
+     * The displayed author is the author of a document that we want to display in the UI. This author should never be
+     * used for security reasons as it does not reflect who is responsible of the save performed.
+     * For example, this author is different from metadata author when the document is saved through a script
+     * wrote by a user without PR rights. Note that this author is optional: whenever it's not specified, it will
+     * fallback on the {@link #getMetadataAuthor()}.
      *
      * @return the reference of the user who impulses the creation of the document, without being the real user used
      *          in the APIs for saving the changes.

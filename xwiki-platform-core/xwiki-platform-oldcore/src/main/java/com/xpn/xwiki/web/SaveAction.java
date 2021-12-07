@@ -44,9 +44,11 @@ import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.job.Job;
+import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
@@ -55,6 +57,8 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -220,12 +224,20 @@ public class SaveAction extends EditAction
             tdoc.readFromForm(form, context);
         }
 
-        // TODO: handle Author
-        String username = context.getUser();
-        tdoc.setAuthor(username);
+        // TODO: entirely rely on UserReference from the context
+        DocumentReference docUserReference = context.getUserReference();
+        UserReferenceResolver<DocumentReference> userReferenceResolver =
+            Utils.getComponent(
+                new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
+        UserReference userReference = userReferenceResolver.resolve(docUserReference);
+        DefaultDocumentAuthors authors = new DefaultDocumentAuthors(tdoc.getAuthors());
+        authors.setMetadataAuthor(userReference);
+        authors.setDisplayedAuthor(userReference);
+
         if (tdoc.isNew()) {
-            tdoc.setCreator(username);
+            authors.setCreator(userReference);
         }
+        tdoc.setAuthors(authors);
 
         // Make sure we have at least the meta data dirty status
         tdoc.setMetaDataDirty(true);

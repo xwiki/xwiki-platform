@@ -30,6 +30,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
+import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.validation.EntityNameValidation;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
@@ -45,6 +46,8 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -104,6 +107,10 @@ class SaveActionTest
     @MockComponent
     private DocumentRevisionProvider documentRevisionProvider;
 
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
     private XWikiContext context;
 
     @InjectMockComponents
@@ -120,6 +127,8 @@ class SaveActionTest
     private EditForm mockForm;
 
     private XWiki xWiki;
+
+    private UserReference fooUserReference;
 
     @BeforeEach
     void setup()
@@ -146,6 +155,8 @@ class SaveActionTest
         when(this.entityNameValidationConfiguration.useValidation()).thenReturn(false);
 
         this.context.setUserReference(USER_REFERENCE);
+        this.fooUserReference = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(USER_REFERENCE)).thenReturn(this.fooUserReference);
     }
 
     @Test
@@ -174,7 +185,9 @@ class SaveActionTest
         assertFalse(saveAction.save(this.context));
         assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
 
-        verify(mockClonedDocument).setAuthor("XWiki.FooBar");
+        verify(mockClonedDocument).setAuthors(new DefaultDocumentAuthors()
+            .setDisplayedAuthor(this.fooUserReference)
+            .setMetadataAuthor(this.fooUserReference));
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
@@ -251,7 +264,9 @@ class SaveActionTest
         assertFalse(saveAction.save(this.context));
         assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
 
-        verify(mockClonedDocument).setAuthor("XWiki.FooBar");
+        verify(mockClonedDocument).setAuthors(new DefaultDocumentAuthors()
+            .setDisplayedAuthor(this.fooUserReference)
+            .setMetadataAuthor(this.fooUserReference));
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);

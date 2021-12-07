@@ -9196,4 +9196,42 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
         this.authors = new DefaultDocumentAuthors(authors);
     }
+
+    /**
+     * This getter has been created for hibernate in order to properly fill the DB field, it's not meant to be used
+     * for other purpose. For getting the displayed author, rely on {@link #getAuthors()}.
+     *
+     * @return the serialization of the displayed author reference.
+     */
+    private String getDisplayedAuthorReference()
+    {
+        if (this.getAuthors() == null || this.getAuthors().getDisplayedAuthor() == null) {
+            return "";
+        } else {
+            UserReferenceSerializer<String> userReferenceSerializer =
+                Utils.getComponent(new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
+            return userReferenceSerializer.serialize(this.getAuthors().getDisplayedAuthor());
+        }
+    }
+
+    /**
+     * This setter has been created for hibernate in order to properly create the XWikiDocument instance with the
+     * displayed author set, it's not meant to be used for other purpose.
+     * For setting the displayed author, rely on {@link #setAuthors(DocumentAuthors)} and
+     * {@link DefaultDocumentAuthors}.
+     *
+     * @param serializedUserReference the serialization of the displayed author reference.
+     */
+    private void setDisplayedAuthorReference(String serializedUserReference)
+    {
+        if (!StringUtils.isEmpty(serializedUserReference)) {
+            UserReferenceResolver<String> userReferenceResolver =
+                Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class, String.class));
+            UserReference userReference = userReferenceResolver.resolve(serializedUserReference);
+            if (this.authors == null) {
+                this.authors = new DefaultDocumentAuthors();
+            }
+            this.authors.setDisplayedAuthor(userReference);
+        }
+    }
 }

@@ -37,10 +37,12 @@ import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -52,7 +54,9 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -2546,6 +2550,10 @@ public class Document extends Api
     public void save(String comment, boolean minorEdit) throws XWikiException
     {
         if (hasAccessLevel("edit")) {
+            UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver =
+                Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class,
+                    CurrentUserReference.class));
+            this.setDisplayedAuthor(currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE));
             // If the current author does not have PR don't let it set current user as author of the saved document
             // since it can lead to right escalation
             if (hasProgrammingRights() || !getConfiguration().getProperty("security.script.save.checkAuthor", true)) {
@@ -3268,5 +3276,15 @@ public class Document extends Api
         documentAuthors.setDisplayedAuthor(displayedAuthor);
         this.doc.setAuthors(documentAuthors);
         this.doc.setMetaDataDirty(true);
+    }
+
+    /**
+     * @return the authors of the document.
+     * @since 14.0RC1
+     */
+    @Unstable
+    public DocumentAuthors getAuthors()
+    {
+        return doc.getAuthors();
     }
 }

@@ -21,12 +21,20 @@ package com.xpn.xwiki;
 
 import java.lang.reflect.InvocationTargetException;
 
+import javax.inject.Provider;
+
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
@@ -115,6 +123,18 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         mockRights.stubs().method("hasAccessLevel").will(returnValue(true));
         mockRights.stubs().method("hasProgrammingRights").will(returnValue(true));
         this.xwiki.setRightService((XWikiRightService) mockRights.proxy());
+
+        Mock mockUserReferenceResolver = mock(UserReferenceResolver.class);
+        Mock userReference = mock(UserReference.class);
+        mockUserReferenceResolver.stubs().method("resolve").will(returnValue(userReference.proxy()));
+
+        DefaultComponentDescriptor<UserReferenceResolver<CurrentUserReference>> userReferenceResolverDescriptor =
+            new DefaultComponentDescriptor<>();
+        userReferenceResolverDescriptor.setRoleType(
+            new DefaultParameterizedType(null, UserReferenceResolver.class, CurrentUserReference.class));
+        userReferenceResolverDescriptor.setRoleHint("default");
+        getComponentManager().registerComponent(userReferenceResolverDescriptor,
+            (UserReferenceResolver<CurrentUserReference>) mockUserReferenceResolver.proxy());
 
         TestListener listener = new TestListener();
         listener.expectedNewStatus = false;

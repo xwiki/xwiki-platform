@@ -60,6 +60,11 @@
       #if ($xwiki.getDocument('CKEditor.Config').getValue('loadJavaScriptSkinExtensions') == 1)
         #template("javascript.vm")
       #end
+      ## Add HTML tags inside the page's head element, provided by UI Extensions implementing the 
+      ## "org.xwiki.platform.html.head" Extension Point. This extension point is also used in XWiki.XWikiPreferences
+      #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.html.head', {'sortByParameter' : 'order'}))
+        $services.rendering.render($uix.execute(), 'xhtml/1.0')
+      #end
     &lt;/head&gt;
     #if (!$source)
       #set ($source = $tdoc)

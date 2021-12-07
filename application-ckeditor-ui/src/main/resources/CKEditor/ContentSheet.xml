@@ -51,6 +51,11 @@
   &lt;html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale" xml:lang="$xcontext.locale"&gt;
     &lt;head&gt;
       &lt;meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" /&gt;
+      ## Add HTML tags inside the page's head element, provided by UI Extensions implementing the 
+      ## "org.xwiki.platform.html.head" Extension Point. This extension point is also used in XWiki.XWikiPreferences
+      #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.html.head', {'sortByParameter' : 'order'}))
+        $services.rendering.render($uix.execute(), 'xhtml/1.0')
+      #end
       ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
       &lt;!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin --&gt;
       ## Fix some issues caused by the fact that we put the content directly under the BODY element.
@@ -59,11 +64,6 @@
       #template("stylesheets.vm")
       #if ($xwiki.getDocument('CKEditor.Config').getValue('loadJavaScriptSkinExtensions') == 1)
         #template("javascript.vm")
-      #end
-      ## Add HTML tags inside the page's head element, provided by UI Extensions implementing the 
-      ## "org.xwiki.platform.html.head" Extension Point. This extension point is also used in XWiki.XWikiPreferences
-      #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.html.head', {'sortByParameter' : 'order'}))
-        $services.rendering.render($uix.execute(), 'xhtml/1.0')
       #end
     &lt;/head&gt;
     #if (!$source)

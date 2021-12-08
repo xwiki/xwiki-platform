@@ -41,6 +41,17 @@
   <hidden>true</hidden>
   <content>{{include reference="CKEditor.VelocityMacros" /}}
 
+{{velocity output="false"}}
+#**
+ * Includes the specified template without empty or blank lines. This is useful when the empty/blank lines have no value
+ * for the WYSIWYG editor as it reduces the size of the edited content and thus speeds up the editing.
+ *#
+#macro (ckeditor_templateWithoutEmptyLines $templateName)
+  #set ($macro.templateOutput = "#template($templateName)")
+  $macro.templateOutput.replaceAll('(?m)^\s*\n', '')##
+#end
+{{/velocity}}
+
 {{velocity}}
 #if ($doc.fullName == 'CKEditor.ContentSheet')
   This is the sheet used to obtain the content that is passed to the [[CKEditor&gt;&gt;http://ckeditor.com/]].
@@ -61,9 +72,9 @@
       ## Fix some issues caused by the fact that we put the content directly under the BODY element.
       #set ($discard = $xwiki.ssx.use('CKEditor.ContentSheet'))
       ## Include the stylesheets that affect the content in view mode.
-      #template("stylesheets.vm")
+      #ckeditor_templateWithoutEmptyLines("stylesheets.vm")
       #if ($xwiki.getDocument('CKEditor.Config').getValue('loadJavaScriptSkinExtensions') == 1)
-        #template("javascript.vm")
+        #ckeditor_templateWithoutEmptyLines("javascript.vm")
       #end
     &lt;/head&gt;
     #if (!$source)

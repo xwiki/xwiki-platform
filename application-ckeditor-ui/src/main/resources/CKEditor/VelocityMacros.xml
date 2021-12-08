@@ -109,6 +109,8 @@
 #end
 
 #macro (ckeditor_getRenderedContent $source)
+  ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
+  #set ($discard = $xcontext.setDisplayMode('view'))
   #if ($source.html)
     #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference))
     #if ("$!html" == '' &amp;&amp; $html != '')
@@ -127,6 +129,9 @@
     ## CKEDITOR-185: Whitespace is generated in Firefox when creating a page without typing the content
     #set ($html = '&lt;p&gt;&lt;/p&gt;')
   #end
+  ## Unfortunately there's no API to get the current display mode... so we can't restore the display mode properly. We
+  ## assume the display mode was 'edit' because the WYSIWYG editor is used.
+  #set ($discard = $xcontext.setDisplayMode('edit'))
 #end
 
 #macro (ckeditor_importCSS $groupId $artifactId $path $evaluate)

@@ -105,11 +105,17 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
     @Override
     public Block execute()
     {
+        return execute(false);
+    }
+
+    @Override
+    public Block execute(boolean inline)
+    {
         this.progress.startStep(this, "uix.progress.execute", "Execute UIX with id [{}]", getId());
 
         Block result;
         try {
-            BlockAsyncRendererConfiguration executorConfiguration = configure();
+            BlockAsyncRendererConfiguration executorConfiguration = configure(inline);
 
             result = this.executor.execute(executorConfiguration);
         } catch (Exception e) {
@@ -122,7 +128,7 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
         return result;
     }
 
-    protected BlockAsyncRendererConfiguration configure()
+    protected BlockAsyncRendererConfiguration configure(boolean inline)
     {
         // We need to clone the block to avoid transforming the original and make it useless after the first
         // transformation
@@ -136,6 +142,9 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
 
         // Indicate the source syntax
         executorConfiguration.setDefaultSyntax(this.syntax);
+
+        // Inline
+        executorConfiguration.setInline(inline);
 
         // The author of the source
         executorConfiguration.setSecureReference(getDocumentReference(), getAuthorReference());

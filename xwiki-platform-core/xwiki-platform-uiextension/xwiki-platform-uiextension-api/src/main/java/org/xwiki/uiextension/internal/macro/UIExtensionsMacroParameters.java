@@ -17,27 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.async.internal.block;
+package org.xwiki.uiextension.internal.macro;
 
-import org.xwiki.rendering.RenderingException;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.uiextension.UIExtension;
 
 /**
- * Give a chance to prepare and cleanup before and after the actual renderer execution.
- * 
+ * Parameters for the {@link UIExtensionsMacro} Macro.
+ *
  * @version $Id$
- * @since 10.10RC1
+ * @since 14.0RC1
  */
-@FunctionalInterface
-public interface BlockAsyncRendererDecorator
+public class UIExtensionsMacroParameters
 {
+    private String extensionPoint;
+
     /**
-     * @param async true if the renderer is executed asynchronously
-     * @param cached true of the result of the renderer will be cached
-     * @param renderer the renderer to execute
-     * @return the result of the renderer execution
-     * @throws RenderingException when failing to execute the renderer
-     * @since 14.10RC1
+     * @param extensionPoint the ID of the Extension Point to retrieve the {@link UIExtension}s for
      */
-    BlockAsyncRendererResult render(BlockAsyncRenderer renderer, boolean async, boolean cached)
-        throws RenderingException;
+    @PropertyDescription("The ID of the Extension Point to retrieve the {@link UIExtension}s for.")
+    @PropertyMandatory
+    public void setExtensionPoint(String extensionPoint)
+    {
+        this.extensionPoint = extensionPoint;
+    }
+
+    /**
+     * @return the ID of the Extension Point to retrieve the {@link UIExtension}s for
+     */
+    public String getExtensionPoint()
+    {
+        return this.extensionPoint;
+    }
 }

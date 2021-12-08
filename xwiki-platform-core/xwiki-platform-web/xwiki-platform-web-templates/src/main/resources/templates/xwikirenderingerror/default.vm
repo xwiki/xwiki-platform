@@ -19,6 +19,15 @@
 ## ---------------------------------------------------------------------------
 ##!source.syntax=xwiki/2.1
 {{velocity}}
+  #macro(uiExtensions $extensionPoint)
+    #if (!$services.uix.getExtensions($extensionPoint).isEmpty())
+      #if (!$renderingerror.inline)
+        ## Make sure the UI extensions are standalone
+
+      #end
+      {{uiextensions extensionPoint="$extensionPoint"/}}
+    #end
+  #end
   {{box cssClass="xwikirenderingerror"}}
     #set($translatedMessage = $services.logging.translate($renderingerror.message))
     $services.rendering.escape($translatedMessage.formattedMessage, 'xwiki/2.1')##
@@ -26,9 +35,9 @@
       ~ $services.localization.render('rendering.error.causedBy', 'xwiki/2.1', [$renderingerror.rootCause.message.replaceAll('\n', ' ')])##
     #end
     ~ {{translation key="rendering.error.click"/}}
-  {{/box}}#if (!$renderingerror.inline)
-  ## Make sure the boxes are standalone
-
+  {{/box}}
+  #if (!$renderingerror.inline)
+    ## Make sure the boxes are standalone
 
   #end
   {{box cssClass="xwikirenderingerrordescription hidden"}}
@@ -39,5 +48,7 @@
     #if ($renderingerror.stackTrace)
       $services.rendering.escape($renderingerror.stackTrace, 'xwiki/2.1')
     #end
+    #uiExtensions('org.xwiki.plaftorm.rendering.error.afterDescription')
+    #uiExtensions("org.xwiki.plaftorm.rendering.error.afterDescription.${renderingerror.messageId}")
   {{/box}}
 {{/velocity}}

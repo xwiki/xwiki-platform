@@ -62,7 +62,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class WikiUIExtensionTest
+class WikiUIExtensionTest
 {
     private static final DocumentReference CLASS_REF = new DocumentReference("xwiki", "XWiki", "UIExtensionClass");
 
@@ -108,7 +108,7 @@ public class WikiUIExtensionTest
     }
 
     @Test
-    public void createWikiUIExtension()
+    void createWikiUIExtension()
         throws ComponentLookupException, WikiComponentException, JobException, RenderingException
     {
         when(this.contentParser.parse("", Syntax.XWIKI_2_1, DOC_REF)).thenReturn(XDOM.EMPTY);

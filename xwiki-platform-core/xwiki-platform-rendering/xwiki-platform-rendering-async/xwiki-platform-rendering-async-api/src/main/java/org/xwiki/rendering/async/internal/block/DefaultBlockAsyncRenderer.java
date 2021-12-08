@@ -36,6 +36,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
+import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * Helper to execute Block based asynchronous renderer.
@@ -47,6 +48,8 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
 {
     private static final String TM_FAILEDASYNC = "rendering.async.error.failed";
+
+    private static final ParserUtils PARSERUTILS = new ParserUtils();
 
     @Inject
     private AsyncContext asyncContext;
@@ -108,7 +111,15 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
                 this.asyncContext.useComponent(role.getRoleType(), role.getRoleHint());
             }
 
+            // Get the block to transform
             Block block = this.configuration.getBlock();
+
+            // Make sure the source is inline if needed
+            if (this.configuration.isInline()) {
+                block = PARSERUTILS.convertToInline(block, true);
+            }
+
+            // Create a XDOM instance for the transformation context
             XDOM xdom;
             if (block instanceof XDOM) {
                 xdom = (XDOM) block;

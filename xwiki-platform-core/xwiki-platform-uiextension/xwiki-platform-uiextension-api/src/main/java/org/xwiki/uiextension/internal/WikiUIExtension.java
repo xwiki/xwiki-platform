@@ -30,7 +30,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.rendering.RenderingException;
-import org.xwiki.rendering.async.internal.AsyncRenderer;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRenderer;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererDecorator;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
 import org.xwiki.uiextension.UIExtension;
@@ -58,6 +58,13 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
      * The key used for the UIX document in the UIX context.
      */
     public static final String CONTEXT_UIX_DOC_KEY = "doc";
+
+    /**
+     * The key used to indicate of the UIX is executed in an inline context.
+     * 
+     * @since 14.0RC1
+     */
+    public static final String CONTEXT_UIX_INLINE_KEY = "inline";
 
     /**
      * @see #WikiUIExtension
@@ -140,7 +147,7 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
         }
     }
 
-    private Object before() throws RenderingException
+    private Object before(boolean inline) throws RenderingException
     {
         // Get the document holding the UIX and put it in the UIX context
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -152,6 +159,7 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
         }
         Map<String, Object> uixContext = new HashMap<>();
         uixContext.put(WikiUIExtension.CONTEXT_UIX_DOC_KEY, document.newDocument(xcontext));
+        uixContext.put(WikiUIExtension.CONTEXT_UIX_INLINE_KEY, inline);
 
         // Remember the previous uix context to restore it
         Map<String, Object> previousUIXContext = (Map<String, Object>) xcontext.get(WikiUIExtension.CONTEXT_UIX_KEY);
@@ -170,13 +178,13 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
     }
 
     @Override
-    public BlockAsyncRendererResult render(AsyncRenderer renderer, boolean async, boolean cached)
+    public BlockAsyncRendererResult render(BlockAsyncRenderer renderer, boolean async, boolean cached)
         throws RenderingException
     {
-        Object obj = before();
+        Object obj = before(renderer.isInline());
 
         try {
-            return (BlockAsyncRendererResult) renderer.render(async, cached);
+            return renderer.render(async, cached);
         } finally {
             after(obj);
         }

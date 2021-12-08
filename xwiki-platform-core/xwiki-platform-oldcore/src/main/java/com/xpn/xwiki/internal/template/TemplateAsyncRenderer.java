@@ -144,7 +144,7 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         ///////////////////////////////////////
         // Parsing and execution
 
-        Block xdom;
+        XDOM xdom;
         try {
             // Parse the content
             MacroTransformationContext mtc = new MacroTransformationContext();

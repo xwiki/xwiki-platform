@@ -30,7 +30,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.rendering.RenderingException;
-import org.xwiki.rendering.async.internal.AsyncRenderer;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRenderer;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererDecorator;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
@@ -90,9 +90,9 @@ public class PanelWikiUIExtension extends AbstractWikiUIExtension implements Blo
     }
 
     @Override
-    protected BlockAsyncRendererConfiguration configure()
+    protected BlockAsyncRendererConfiguration configure(boolean inline)
     {
-        BlockAsyncRendererConfiguration configuration = super.configure();
+        BlockAsyncRendererConfiguration configuration = super.configure(inline);
 
         configuration.setDefaultSyntax(this.syntax);
 
@@ -122,13 +122,13 @@ public class PanelWikiUIExtension extends AbstractWikiUIExtension implements Blo
     }
 
     @Override
-    public BlockAsyncRendererResult render(AsyncRenderer renderer, boolean async, boolean cached)
+    public BlockAsyncRendererResult render(BlockAsyncRenderer renderer, boolean async, boolean cached)
         throws RenderingException
     {
         Object obj = before();
 
         try {
-            return (BlockAsyncRendererResult) renderer.render(async, cached);
+            return renderer.render(async, cached);
         } finally {
             after(obj);
         }

@@ -307,11 +307,12 @@ Object.extend(XWiki, {
    */
   makeRenderingErrorsExpandable: function(content) {
     $(content || 'body').select(".xwikirenderingerror").each(function(error) {
-        if(error.next().innerHTML !== "" && error.next().hasClassName("xwikirenderingerrordescription")) {
+        var description = error.next(".xwikirenderingerrordescription");
+        if(description.innerHTML !== "" && description.hasClassName("xwikirenderingerrordescription")) {
             error.style.cursor="pointer";
             error.title = "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))";
             Event.observe(error, "click", function(event){
-                   event.element().closest(".xwikirenderingerror").next().toggleClassName("hidden");
+                   event.element().closest(".xwikirenderingerror").next(".xwikirenderingerrordescription").toggleClassName("hidden");
             });
         }
     });

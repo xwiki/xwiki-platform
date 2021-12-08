@@ -30,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractSignableMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -222,14 +221,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
 
         // 3) If in inline mode remove any top level paragraph
         if (context.isInline()) {
-            this.parserUtils.removeTopLevelParagraph(result);
-
-            // Make sure included macro is inline when script macro itself is inline
-            // TODO: use inline parser instead
-            if (!result.isEmpty() && result.get(0) instanceof MacroBlock && !((MacroBlock) result.get(0)).isInline()) {
-                MacroBlock macro = (MacroBlock) result.get(0);
-                result.set(0, new MacroBlock(macro.getId(), macro.getParameters(), macro.getContent(), true));
-            }
+            this.parserUtils.convertToInline(result);
         }
 
         return result;

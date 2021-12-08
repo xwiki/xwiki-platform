@@ -165,13 +165,14 @@
   };
 })();
 
-define('node-module', {
-  load: function(name, req, onLoad, config) {
-    window.module = window.module || {};
-    req([name], function () {
-      onLoad(window.module.exports);
-    });
-  }
+define('node-module', ['jquery'], function($) {
+  return {
+    load: function(name, req, onLoad, config) {
+      $.get(req.toUrl(name + '.js'), function(text) {
+        onLoad.fromText('define(function(require, exports, module) {' + text + '});');
+      }, 'text');
+    }
+  };
 });
 
 define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], function($, diff, scrollUtils) {

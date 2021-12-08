@@ -30,6 +30,8 @@ import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.logging.event.LogEvent;
@@ -56,7 +58,7 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
     private static final String ECONTEXT_MARKER = "rendering.error.xwiki.template";
 
     @Inject
-    private TemplateManager templateManager;
+    private ComponentManager componentManager;
 
     @Inject
     private ScriptContextManager scriptContextManager;
@@ -69,55 +71,73 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
         ExecutionContext econtext = this.execution.getContext();
 
         // Protect against infinite loop
-        if (econtext.hasProperty(ECONTEXT_MARKER)) {
+        if (econtext.hasProperty(ECONTEXT_MARKER) || !this.componentManager.hasComponent(TemplateManager.class)) {
+            return null;
+        }
+
+        TemplateManager templateManager;
+        try {
+            templateManager = this.componentManager.getInstance(TemplateManager.class);
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to lookup TemplateManger component", e);
+
             return null;
         }
 
         // Try to find a template associated to the specific message id
         Template template = messageId != null
-            ? this.templateManager.getTemplate(CLASS_ATTRIBUTE_MESSAGE_VALUE + '/' + messageId + ".vm") : null;
+            ? templateManager.getTemplate(CLASS_ATTRIBUTE_MESSAGE_VALUE + '/' + messageId + ".vm") : null;
 
         // Fallback on the default template
         if (template == null) {
-            template = this.templateManager.getTemplate(CLASS_ATTRIBUTE_MESSAGE_VALUE + "/default.vm");
+            template = templateManager.getTemplate(CLASS_ATTRIBUTE_MESSAGE_VALUE + "/default.vm");
         }
 
         if (template != null) {
-            ScriptContext scriptContext = this.scriptContextManager.getCurrentScriptContext();
+            return executeTemplate(template, templateManager, messageId, message, description, inline, econtext);
+        }
 
-            // Remember the current value in the context
-            Object currentRenderingerror = scriptContext.getAttribute(CONTEXT_ATTRIBUTE, ScriptContext.GLOBAL_SCOPE);
+        return null;
+    }
 
-            try {
-                // Indicate that we are executing a rendering error template
-                econtext.newProperty(ECONTEXT_MARKER).initial(true).declare();
+    private List<Block> executeTemplate(Template template, TemplateManager templateManager, String messageId,
+        LogEvent message, LogEvent description, boolean inline, ExecutionContext econtext)
+    {
+        ScriptContext scriptContext = this.scriptContextManager.getCurrentScriptContext();
 
-                // Expose error information to the scripts through a $renderingerror variable
-                Map<String, Object> renderingerror = new HashMap<>();
-                renderingerror.put("message", message);
-                renderingerror.put("description", description);
-                renderingerror.put("inline", inline);
-                if (message.getThrowable() != null) {
-                    Throwable rootCause = ExceptionUtils.getRootCause(message.getThrowable());
-                    renderingerror.put("rootCause", rootCause != null ? rootCause : message.getThrowable());
-                    renderingerror.put("stackTrace", ExceptionUtils.getStackTrace(message.getThrowable()));
-                }
-                scriptContext.setAttribute(CONTEXT_ATTRIBUTE, renderingerror, ScriptContext.GLOBAL_SCOPE);
+        // Remember the current value in the context
+        Object currentRenderingerror = scriptContext.getAttribute(CONTEXT_ATTRIBUTE, ScriptContext.GLOBAL_SCOPE);
 
-                // Execute the template
-                Block block = this.templateManager.execute(template, inline);
+        try {
+            // Indicate that we are executing a rendering error template
+            econtext.newProperty(ECONTEXT_MARKER).initial(true).declare();
 
-                return block instanceof XDOM || block instanceof CompositeBlock ? block.getChildren()
-                    : Collections.singletonList(block);
-            } catch (Exception e) {
-                this.logger.error("Failed to generate error rendering message", e);
-            } finally {
-                // Restore the previous context value
-                scriptContext.setAttribute(CONTEXT_ATTRIBUTE, currentRenderingerror, ScriptContext.GLOBAL_SCOPE);
-
-                // We don't execute a renderingerror template anymore
-                econtext.removeProperty(ECONTEXT_MARKER);
+            // Expose error information to the scripts through a $renderingerror variable
+            Map<String, Object> renderingerror = new HashMap<>();
+            renderingerror.put("messageId", messageId);
+            renderingerror.put("message", message);
+            renderingerror.put("description", description);
+            renderingerror.put("inline", inline);
+            if (message.getThrowable() != null) {
+                Throwable rootCause = ExceptionUtils.getRootCause(message.getThrowable());
+                renderingerror.put("rootCause", rootCause != null ? rootCause : message.getThrowable());
+                renderingerror.put("stackTrace", ExceptionUtils.getStackTrace(message.getThrowable()));
             }
+            scriptContext.setAttribute(CONTEXT_ATTRIBUTE, renderingerror, ScriptContext.GLOBAL_SCOPE);
+
+            // Execute the template
+            Block block = templateManager.execute(template, inline);
+
+            return block instanceof XDOM || block instanceof CompositeBlock ? block.getChildren()
+                : Collections.singletonList(block);
+        } catch (Exception e) {
+            this.logger.error("Failed to generate error rendering message", e);
+        } finally {
+            // Restore the previous context value
+            scriptContext.setAttribute(CONTEXT_ATTRIBUTE, currentRenderingerror, ScriptContext.GLOBAL_SCOPE);
+
+            // We don't execute a renderingerror template anymore
+            econtext.removeProperty(ECONTEXT_MARKER);
         }
 
         return null;

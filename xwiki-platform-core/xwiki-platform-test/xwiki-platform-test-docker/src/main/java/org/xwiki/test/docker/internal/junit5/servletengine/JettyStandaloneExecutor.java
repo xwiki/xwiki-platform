@@ -139,7 +139,6 @@ public class JettyStandaloneExecutor
             System.setProperty("debug", "true");
         }
 
-        LOGGER.info("Current directory: [{}]", Paths.get("").toAbsolutePath());
         getExecutor().start();
     }
 

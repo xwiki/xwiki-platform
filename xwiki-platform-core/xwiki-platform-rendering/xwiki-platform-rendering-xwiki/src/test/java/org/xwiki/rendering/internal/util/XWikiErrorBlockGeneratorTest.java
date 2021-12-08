@@ -126,7 +126,8 @@ class XWikiErrorBlockGeneratorTest
         blocks = this.errorGenerator.generateErrorBlocks(false, null, "message {}.", "description {}.", "value");
 
         assertEquals(2, blocks.size());
-        assertEquals("message value.", ((WordBlock) blocks.get(0).getChildren().get(0)).getWord());
+        assertEquals("message value. Click on this message for details.",
+            ((WordBlock) blocks.get(0).getChildren().get(0)).getWord());
         assertEquals("description value.", ((VerbatimBlock) blocks.get(1).getChildren().get(0)).getProtectedString());
     }
 
@@ -136,7 +137,8 @@ class XWikiErrorBlockGeneratorTest
         List<Block> blocks = this.errorGenerator.generateErrorBlocks("message.", "description.", false);
 
         assertEquals(2, blocks.size());
-        assertEquals("message.", ((WordBlock) blocks.get(0).getChildren().get(0)).getWord());
+        assertEquals("message. Click on this message for details.",
+            ((WordBlock) blocks.get(0).getChildren().get(0)).getWord());
         assertEquals("description.", ((VerbatimBlock) blocks.get(1).getChildren().get(0)).getProtectedString());
     }
 

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
@@ -61,7 +62,7 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
     private ComponentManager componentManager;
 
     @Inject
-    private ScriptContextManager scriptContextManager;
+    private Provider<ScriptContextManager> scriptContextManagerProvider;
 
     @Inject
     private Execution execution;
@@ -104,7 +105,7 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
     private List<Block> executeTemplate(Template template, TemplateManager templateManager, String messageId,
         LogEvent message, LogEvent description, boolean inline, ExecutionContext econtext)
     {
-        ScriptContext scriptContext = this.scriptContextManager.getCurrentScriptContext();
+        ScriptContext scriptContext = this.scriptContextManagerProvider.get().getCurrentScriptContext();
 
         // Remember the current value in the context
         Object currentRenderingerror = scriptContext.getAttribute(CONTEXT_ATTRIBUTE, ScriptContext.GLOBAL_SCOPE);

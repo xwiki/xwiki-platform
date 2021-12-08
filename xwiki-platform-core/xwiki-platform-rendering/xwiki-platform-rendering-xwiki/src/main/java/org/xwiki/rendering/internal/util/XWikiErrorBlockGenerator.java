@@ -71,6 +71,7 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
         ExecutionContext econtext = this.execution.getContext();
 
         // Protect against infinite loop
+        // Support use case where no TemplateManager implementation is available
         if (econtext.hasProperty(ECONTEXT_MARKER) || !this.componentManager.hasComponent(TemplateManager.class)) {
             return null;
         }

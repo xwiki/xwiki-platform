@@ -46,14 +46,12 @@
         <exclude>commons-io:commons-io</exclude>
         <!-- lib/annotations -->
         <exclude>org.ow2.asm:*</exclude>
-        <exclude>javax.annotation:*</exclude>
         <exclude>jakarta.annotation:jakarta.annotation-api</exclude>
         <!-- lib/logging -->
         <exclude>org.slf4j:slf4j-api</exclude>
         <exclude>org.eclipse.jetty:jetty-slf4j-impl</exclude>
         <!-- lib/websocket -->
         <exclude>org.eclipse.jetty.websocket:*</exclude>
-        <exclude>javax.websocket:*</exclude>
         <exclude>*:jetty-javax-websocket-api</exclude>
       </excludes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
@@ -72,7 +70,6 @@
       <outputDirectory>/jetty/lib/annotations</outputDirectory>
       <includes>
         <include>org.ow2.asm:*</include>
-        <include>javax.annotation:*</include>
         <include>jakarta.annotation:jakarta.annotation-api</include>
       </includes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->

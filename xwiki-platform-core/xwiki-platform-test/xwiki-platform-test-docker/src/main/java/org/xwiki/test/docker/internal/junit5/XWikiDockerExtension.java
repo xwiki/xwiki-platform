@@ -22,16 +22,9 @@ package org.xwiki.test.docker.internal.junit5;
 import java.io.File;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
-import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
@@ -95,8 +88,7 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreensh
  * @version $Id$
  * @since 10.6RC1
  */
-public class XWikiDockerExtension extends AbstractExtension implements BeforeAllCallback, AfterAllCallback,
-    BeforeEachCallback, AfterEachCallback, ParameterResolver, TestExecutionExceptionHandler, ExecutionCondition
+public class XWikiDockerExtension extends AbstractExtension
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
 
@@ -173,7 +165,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
             // Build the XWiki WAR
             LOGGER.info("(*) Building custom XWiki WAR...");
-            File targetWARDirectory = new File(String.format("%s/xwiki", testConfiguration.getOutputDirectory()));
+            File targetWARDirectory = getServletContainerExecutor(testConfiguration, artifactResolver, mavenResolver,
+                repositoryResolver, extensionContext).getWARDirectory();
             WARBuilder builder = new WARBuilder(testConfiguration, targetWARDirectory, artifactResolver, mavenResolver,
                 repositoryResolver);
             builder.build();
@@ -409,15 +402,26 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         executor.stop(testConfiguration);
     }
 
+    private ServletContainerExecutor getServletContainerExecutor(TestConfiguration testConfiguration,
+        ArtifactResolver artifactResolver, MavenResolver mavenResolver, RepositoryResolver repositoryResolver,
+        ExtensionContext extensionContext)
+    {
+        ServletContainerExecutor executor = loadServletContainerExecutor(extensionContext);
+        if (executor == null) {
+            executor = new ServletContainerExecutor(testConfiguration, artifactResolver, mavenResolver,
+                repositoryResolver);
+            saveServletContainerExecutor(extensionContext, executor);
+        }
+        return executor;
+    }
+
     private void startServletEngine(File sourceWARDirectory, TestConfiguration testConfiguration,
         ArtifactResolver artifactResolver, MavenResolver mavenResolver, RepositoryResolver repositoryResolver,
         ExtensionContext extensionContext) throws Exception
     {
-        ServletContainerExecutor executor =
-            new ServletContainerExecutor(testConfiguration, artifactResolver, mavenResolver, repositoryResolver);
-        saveServletContainerExecutor(extensionContext, executor);
+        ServletContainerExecutor executor = getServletContainerExecutor(testConfiguration, artifactResolver,
+            mavenResolver, repositoryResolver, extensionContext);
         executor.start(sourceWARDirectory);
-
         setXWikiURL(testConfiguration, extensionContext);
     }
 

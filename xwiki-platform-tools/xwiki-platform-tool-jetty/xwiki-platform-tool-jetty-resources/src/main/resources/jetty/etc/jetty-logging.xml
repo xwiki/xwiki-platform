@@ -33,7 +33,7 @@
         <Arg>
           <New class="org.eclipse.jetty.util.RolloverFileOutputStream">
             <Arg>
-              <Property name="jetty.console-capture.dir" default="./jetty/logs" />/yyyy_mm_dd.jetty.log
+              <Property name="jetty.console-capture.dir" default="logs" />/yyyy_mm_dd.jetty.log
             </Arg>
             <Arg type="boolean">
               <Property name="jetty.console-capture.append" default="false" />

@@ -40,7 +40,7 @@ set XWIKI_DATA_DIR=${xwikiDataDir}
 
 REM Specify Jetty's home and base directories
 set JETTY_HOME=jetty
-set JETTY_BASE=%XWIKI_DATA_DIR%\jetty
+set JETTY_BASE=.
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home="%JETTY_HOME%" -Djetty.base="%JETTY_BASE%"
 
 REM Specify port and key to stop a running Jetty instance

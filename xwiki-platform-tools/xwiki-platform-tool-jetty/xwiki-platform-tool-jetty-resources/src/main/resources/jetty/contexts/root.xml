@@ -24,5 +24,5 @@
 
 <Configure class="org.eclipse.jetty.webapp.WebAppContext">
   <Set name="contextPath">/</Set>
-  <Set name="war"><SystemProperty name="jetty.home" default="."/>/../webapps/root</Set>
+  <Set name="war"><SystemProperty name="jetty.base" default="."/>/webapps/root</Set>
 </Configure>

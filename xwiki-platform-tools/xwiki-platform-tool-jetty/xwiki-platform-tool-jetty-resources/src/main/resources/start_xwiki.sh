@@ -144,16 +144,13 @@ mkdir -p $XWIKI_DATA_DIR 2>/dev/null
 # Ensure the logs directory exists as otherwise Jetty reports an error
 mkdir -p $XWIKI_DATA_DIR/logs 2>/dev/null
 
-# Set up the Jetty Base directory (used for custom Jetty configuration) to point to the Data Directory
-# Also created some Jetty directorie that Jetty would otherwise create at first startup. We do this to avoid
-# cryptic messages in the logs such as: "MKDIR: ${jetty.base}/lib"
-JETTY_BASE=$XWIKI_DATA_DIR/jetty
-mkdir -p $JETTY_BASE/lib/ext 2>/dev/null
+# Set up the Jetty Base directory (used for custom Jetty configuration) to be the current directory where this file is.
+# Also make sure the log directory exists since Jetty won't create it.
+JETTY_BASE=.
 mkdir -p $JETTY_BASE/logs 2>/dev/null
-mkdir -p $JETTY_BASE/resources 2>/dev/null
-mkdir -p $JETTY_BASE/webapps 2>/dev/null
 
-# Specify Jetty's home and base directories
+# Specify Jetty's home directory to be the directory named jetty inside the jetty base directory.
+# Thus JETTY_HOME/data and JETTY_HOME/webapps are inside the jetty base directory.
 JETTY_HOME=jetty
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 

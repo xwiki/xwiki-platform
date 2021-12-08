@@ -126,7 +126,7 @@ XWIKI_DATA_DIR=${xwikiDataDir}
 
 # Specify Jetty's home and base directories
 JETTY_HOME=jetty
-JETTY_BASE=$XWIKI_DATA_DIR/jetty
+JETTY_BASE=.
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 
 # Specify port and key to stop a running Jetty instance

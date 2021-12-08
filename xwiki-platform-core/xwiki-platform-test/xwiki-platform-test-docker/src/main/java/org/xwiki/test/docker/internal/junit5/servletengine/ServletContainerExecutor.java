@@ -97,6 +97,24 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     }
 
     /**
+     * @return the directory where the exploded XWiki WAR will be created
+     */
+    public File getWARDirectory()
+    {
+        File warDirectory;
+        if (ServletEngine.JETTY_STANDALONE.equals(this.testConfiguration.getServletEngine())) {
+            warDirectory = this.jettyStandaloneExecutor.getWARDirectory();
+        } else {
+            warDirectory =
+                new File(String.format("%s/xwiki", this.testConfiguration.getOutputDirectory())).getAbsoluteFile();
+        }
+        // Note: We compute the absolute file because otherwise there can be ".." elements in the file path and
+        // some containers (such as Jetty) have a protection against directory attacks and would refuse to load
+        // resources located in a path having ".." in it.
+        return warDirectory.getAbsoluteFile();
+    }
+
+    /**
      * @param sourceWARDirectory the location where the built WAR is located
      * @throws Exception if an error occurred during the build or start
      */

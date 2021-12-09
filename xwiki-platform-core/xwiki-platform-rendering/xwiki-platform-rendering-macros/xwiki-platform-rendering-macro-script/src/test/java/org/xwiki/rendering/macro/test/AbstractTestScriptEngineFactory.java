@@ -52,7 +52,7 @@ public abstract class AbstractTestScriptEngineFactory implements ScriptEngineFac
     @Override
     public String getEngineName()
     {
-        return "Test Scripting Engine";
+        return this.shortName;
     }
 
     @Override

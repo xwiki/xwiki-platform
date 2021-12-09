@@ -402,14 +402,11 @@ public class XWikiDocumentMockitoTest
             mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
         Map<String, String[]> parameters = generateFakeRequestMap();
-        parameters.put("space.page_32_string", new String[] {"thirty two"});
-        parameters.put("space.page_32_int", new String[] {"32"});
         BaseClass baseClass = generateFakeClass();
         generateFakeObjects();
         EditForm eform = new EditForm();
 
-        when(request.getParameter("objectPolicy")).thenReturn("updateOrCreate");
-        when(request.getParameterValues("addedObjects")).thenReturn(new String[] {"space.page_1", "space.page_32"});
+        when(request.getParameterValues("addedObjects")).thenReturn(new String[] {"space.page_1", "space.page_42"});
         when(request.getParameterValues("deletedObjects")).thenReturn(new String[] {"space.page_2"});
         when(request.getParameterMap()).thenReturn(parameters);
         when(documentReferenceResolverString.resolve("space.page")).thenReturn(this.document.getDocumentReference());
@@ -433,14 +430,8 @@ public class XWikiDocumentMockitoTest
         assertEquals("string2", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
         assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 1).getIntValue("int"));
         assertNull(this.document.getXObject(baseClass.getDocumentReference(), 2));
-        assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 3));
-        assertEquals("blabla", this.document.getXObject(baseClass.getDocumentReference(), 3).getStringValue("string"));
-        assertEquals(13, this.document.getXObject(baseClass.getDocumentReference(), 3).getIntValue("int"));
+        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 3));
         assertNull(this.document.getXObject(baseClass.getDocumentReference(), 4));
-        assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 32));
-        assertEquals("thirty two",
-            this.document.getXObject(baseClass.getDocumentReference(), 32).getStringValue("string"));
-        assertEquals(32, this.document.getXObject(baseClass.getDocumentReference(), 32).getIntValue("int"));
         assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
         assertEquals("bloublou",
             this.document.getXObject(baseClass.getDocumentReference(), 42).getStringValue("string"));

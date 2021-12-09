@@ -383,6 +383,61 @@ public class XWikiDocumentMockitoTest
         assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 42).getIntValue("int"));
     }
 
+    /**
+     * Unit test for {@link XWikiDocument#readFromForm(EditForm, XWikiContext)} .
+     */
+    @Test
+    void readAddedUpdatedAndRemovedObjectsFromForm() throws Exception
+    {
+        this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
+        this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        MockitoComponentManager mocker = this.oldcore.getMocker();
+        XWikiContext context = this.oldcore.getXWikiContext();
+        DocumentReferenceResolver<String> documentReferenceResolverString =
+            mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        // Entity Reference resolver is used in <BaseObject>.getXClass()
+        DocumentReferenceResolver<EntityReference> documentReferenceResolverEntity =
+            mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+
+        Map<String, String[]> parameters = generateFakeRequestMap();
+        BaseClass baseClass = generateFakeClass();
+        generateFakeObjects();
+        EditForm eform = new EditForm();
+
+        when(request.getParameterValues("addedObjects")).thenReturn(new String[] {"space.page_1", "space.page_42"});
+        when(request.getParameterValues("deletedObjects")).thenReturn(new String[] {"space.page_2"});
+        when(request.getParameterMap()).thenReturn(parameters);
+        when(documentReferenceResolverString.resolve("space.page")).thenReturn(this.document.getDocumentReference());
+        when(documentReferenceResolverString.resolve("InvalidSpace.InvalidPage"))
+            .thenReturn(new DocumentReference("wiki", "InvalidSpace", "InvalidPage"));
+        // This entity resolver with this 'resolve' method is used in
+        // <BaseCollection>.getXClassReference()
+        when(documentReferenceResolverEntity.resolve(any(EntityReference.class), any(DocumentReference.class)))
+            .thenReturn(this.document.getDocumentReference());
+        doReturn(this.document).when(this.oldcore.getSpyXWiki()).getDocument(this.document.getDocumentReference(),
+            context);
+
+        eform.setRequest(request);
+        eform.readRequest();
+        this.document.readFromForm(eform, context);
+
+        assertEquals(43, this.document.getXObjectSize(baseClass.getDocumentReference()));
+        assertEquals("bloublou",
+            this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
+        assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 0).getIntValue("int"));
+        assertEquals("string2", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
+        assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 1).getIntValue("int"));
+        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 2));
+        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 3));
+        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 4));
+        assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
+        assertEquals("bloublou",
+            this.document.getXObject(baseClass.getDocumentReference(), 42).getStringValue("string"));
+        assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 42).getIntValue("int"));
+    }
+
     @Test
     void testDeprecatedConstructors()
     {

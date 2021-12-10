@@ -176,9 +176,11 @@
 #largepanelheader($services.localization.render('panels.documentInformation.title'))
 
 {{html}}
+&lt;dl&gt;
 #foreach ($extension in $services.uix.getExtensions('org.xwiki.platform.panels.documentInformation', {'sortByParameter': 'order'}))
   $services.rendering.render($extension.execute(), 'xhtml/1.0')
 #end
+&lt;/dl&gt;
 {{/html}}
 
 #panelfooter()
@@ -322,8 +324,10 @@
 
 {{velocity}}
 #if ("$tdoc.locale" == '' &amp;&amp; $xwiki.isMultiLingual())
-; {{html}}&lt;label for="xwikidoclanguageinput2"&gt;$services.localization.render('panels.documentInformation.defaultLanguage')&lt;/label&gt;{{/html}}
-: {{html clean="false"}}#displayDocumentProperty_defaultLocale('edit'){{/html}}
+{{html clean="false"}}
+&lt;dt&gt;&lt;label for="xwikidoclanguageinput2"&gt;$services.localization.render('panels.documentInformation.defaultLanguage')&lt;/label&gt;&lt;/dt&gt;
+&lt;dd&gt;#displayDocumentProperty_defaultLocale('edit')&lt;/dd&gt;
+{{/html}}
 #end
 {{/velocity}}</content>
     </property>
@@ -470,8 +474,10 @@
 ##----------------------------------
 ## Display the wiki syntax combo box
 ##----------------------------------
-; {{html}}&lt;label for="xwikidocsyntaxinput2"&gt;$services.localization.render('panels.documentInformation.syntax')&lt;/label&gt;{{/html}}
-: {{html clean="false"}}#displayDocumentProperty_syntax('edit'){{/html}}
+{{html clean="false"}}
+&lt;dt&gt;&lt;label for="xwikidocsyntaxinput2"&gt;$services.localization.render('panels.documentInformation.syntax')&lt;/label&gt;&lt;/dt&gt;
+&lt;dd&gt;#displayDocumentProperty_syntax('edit')&lt;/dd&gt;
+{{/html}}
 {{/velocity}}</content>
     </property>
     <property>
@@ -615,11 +621,12 @@
 
 {{velocity}}
 ##--------------------------------------------------------------------------
-; {{html}}
+{{html clean="false"}}
+&lt;dt&gt;
 &lt;label for="xhidden"&gt;&lt;input id="xhidden" type="checkbox" name="xhidden" #if($tdoc.isHidden()) checked="checked"#end value="1"/&gt;$services.localization.render('panels.documentInformation.hiddenDocument')&lt;/label&gt;
-&lt;input name="xhidden" type="hidden" value="0" /&gt;
+&lt;/dt&gt;
+&lt;dd&gt;&lt;input name="xhidden" type="hidden" value="0" /&gt;&lt;/dd&gt;
 {{/html}}
-: #* Keep empty for HTML validation. *#
 {{/velocity}}</content>
     </property>
     <property>
@@ -763,9 +770,9 @@
 ##--------------------------------------------------------------------------
 #set ($pages = $tdoc.includedPages)
 #if($pages.size() != 0)
-  ; $services.localization.render('panels.documentInformation.includesCount', [$pages.size()])
+  {{html clean="false"}}&lt;dt&gt;{{/html}}$services.localization.render('panels.documentInformation.includesCount', [$pages.size()]){{html clean="false"}}&lt;/dt&gt;{{/html}}
   #foreach ($page in $pages)
-  : [[$page&gt;&gt;$page]] [[[[image:icon:page_white_edit||alt="$services.localization.render('panels.documentInformation.editIncluded', [$page])"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]
+  {{html clean="false"}}&lt;dd&gt;{{/html}}[[$page&gt;&gt;$page]] [[[[image:icon:page_white_edit||alt="$services.localization.render('panels.documentInformation.editIncluded', [$page])"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]{{html clean="false"}}&lt;/dd&gt;{{/html}}
   #end
 #end
 ##--------------------------------------------------------------------------

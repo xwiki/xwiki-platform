@@ -157,7 +157,6 @@
                     <xwikiDbConnectionUrl>jdbc:hsqldb:hsql://localhost/xwiki_db</xwikiDbConnectionUrl>
                     <xwikiDbConnectionUsername>sa</xwikiDbConnectionUsername>
                     <xwikiDbConnectionDriverClass>org.hsqldb.jdbcDriver</xwikiDbConnectionDriverClass>
-                    <xwikiDbDialect>org.hibernate.dialect.HSQLDialect</xwikiDbDialect>
                     <xwikiDbHbmXwiki>xwiki.hbm.xml</xwikiDbHbmXwiki>
                     <xwikiDbHbmFeeds>feeds.hbm.xml</xwikiDbHbmFeeds>
                     <xwikiPropertiesStoreFileDirectory>${xwiki.store.file.directory}</xwikiPropertiesStoreFileDirectory>

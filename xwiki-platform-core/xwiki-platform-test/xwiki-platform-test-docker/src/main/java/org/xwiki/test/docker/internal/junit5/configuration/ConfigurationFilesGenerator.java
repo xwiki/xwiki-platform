@@ -269,7 +269,7 @@ public class ConfigurationFilesGenerator
                 "sa",
                 "",
                 "org.hsqldb.jdbcDriver",
-                "org.hibernate.dialect.HSQLDialect",
+                null,
                 null,
                 null,
                 null)));
@@ -280,7 +280,7 @@ public class ConfigurationFilesGenerator
                 DB_USERNAME,
                 DB_PASSWORD,
                 "oracle.jdbc.driver.OracleDriver",
-                "org.hibernate.dialect.Oracle10gDialect",
+                null,
                 null,
                 "xwiki.oracle.hbm.xml",
                 "feeds.oracle.hbm.xml")));

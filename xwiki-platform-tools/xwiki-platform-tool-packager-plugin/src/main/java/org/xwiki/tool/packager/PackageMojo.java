@@ -975,7 +975,6 @@ public class PackageMojo extends AbstractOldCoreMojo
         props.put("xwikiDbConnectionUsername", "sa");
         props.put("xwikiDbConnectionPassword", "");
         props.put("xwikiDbConnectionDriverClass", "org.hsqldb.jdbcDriver");
-        props.put("xwikiDbDialect", "org.hibernate.dialect.HSQLDialect");
         props.put("xwikiDbHbmXwiki", "xwiki.hbm.xml");
         props.put("xwikiDbHbmFeeds", "feeds.hbm.xml");
 

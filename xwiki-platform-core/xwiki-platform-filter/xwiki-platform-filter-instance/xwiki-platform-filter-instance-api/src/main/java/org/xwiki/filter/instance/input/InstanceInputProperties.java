@@ -67,7 +67,7 @@ public class InstanceInputProperties extends HashMap<String, Object> implements 
     {
         Boolean verbose = (Boolean) get(PROPNAME_VERBOSE);
 
-        return verbose == Boolean.FALSE ? false : true;
+        return verbose != Boolean.FALSE;
     }
 
     @Override

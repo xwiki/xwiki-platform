@@ -79,8 +79,6 @@ class GetdocumentsPageTest extends PageTest
 
     private VelocityManager velocityManager;
 
-    private JSONTool jsonTool;
-
     @BeforeEach
     void setUp() throws Exception
     {
@@ -189,35 +187,7 @@ class GetdocumentsPageTest extends PageTest
         assertEquals("Thu Sep 23 00:00:00 CEST 2021", queryParams.get(0).toString());
         assertEquals("Thu Sep 23 23:59:59 CEST 2021", queryParams.get(1).toString());
     }
-
-    @Test
-    void preventDOSAttackOnQueryItemsReturned() throws Exception
-    {
-        // Simulating the fact that when getdocuments.vm executes, the xwikivars.vm template has already been loaded by
-        // the page rendering.
-        this.templateManager.render("xwikivars.vm");
-
-        this.request.put("limit", "101");
-        when(this.queryService.hql(anyString())).thenReturn(this.query);
-        when(this.query.setLimit(anyInt())).thenReturn(this.query);
-        when(this.query.setOffset(anyInt())).thenReturn(this.query);
-        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
-        when(this.query.bindValues(any(List.class))).thenReturn(this.query);
-
-        // Simulate the query limit
-        SecurityConfiguration securityConfiguration =
-            this.oldcore.getMocker().registerMockComponent(SecurityConfiguration.class);
-        when(securityConfiguration.getQueryItemsLimit()).thenReturn(100);
-
-        this.templateManager.render(GETDOCUMENTS);
-
-        ArgumentCaptor<Integer> argument = ArgumentCaptor.forClass(Integer.class);
-        verify(this.query).setLimit(argument.capture());
-
-        // Verify that even though the guest user is asking for 101 items, we only return 100.
-        assertEquals(100, argument.getValue());
-    }
-
+    
     /**
      * @return the captured JSON map before serialization, to make it easier for each test to assert the map content.
      */

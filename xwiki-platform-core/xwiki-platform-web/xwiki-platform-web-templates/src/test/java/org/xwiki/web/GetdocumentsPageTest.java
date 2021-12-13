@@ -20,6 +20,7 @@
 package org.xwiki.web;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -94,7 +95,7 @@ class GetdocumentsPageTest extends PageTest
     }
 
     @Test
-    void removeObuscatedResultsWhenTotalrowsLowerThanLimit() throws Exception
+    void removeObfuscatedResultsWhenTotalrowsLowerThanLimit() throws Exception
     {
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("view"), any(), any(), any()))
             .thenReturn(false, true);
@@ -157,8 +158,8 @@ class GetdocumentsPageTest extends PageTest
         List<Object> queryParams = (List<Object>) this.velocityManager.getVelocityContext().get("queryParams");
         assertNull(queryParams.get(0));
         assertEquals("Sandbox.WebHome", queryParams.get(1));
-        assertEquals("Wed Sep 22 00:00:00 CEST 2021", queryParams.get(2).toString());
-        assertEquals("Wed Sep 22 23:59:59 CEST 2021", queryParams.get(3).toString());
+        assertEquals(1632261600000L, ((Date) queryParams.get(2)).getTime());
+        assertEquals(1632347999000L, ((Date) queryParams.get(3)).getTime());
     }
 
     /**
@@ -167,6 +168,9 @@ class GetdocumentsPageTest extends PageTest
     @Test
     void dateFilterBetweenTimestamp() throws Exception
     {
+        long start = 1632348000000L;
+        long end = 1632434399999L;
+
         initDefaultQueryMocks(0);
 
         this.request.put("outputSyntax", "plain");
@@ -177,15 +181,16 @@ class GetdocumentsPageTest extends PageTest
         this.request.put("offset", "1");
         this.request.put("limit", "15");
         this.request.put("reqNo", "3");
-        this.request.put("doc.date", "1632348000000-1632434399999");
+
+        this.request.put("doc.date", String.format("%d-%d", start, end));
         this.request.put("sort", "doc.date");
         this.request.put("dir", "asc");
         this.templateManager.render(GETDOCUMENTS);
         verify(this.queryService).hql(
             "WHERE 1=1 and doc.date between ?1 and ?2 order by doc.date asc");
         List<Object> queryParams = (List<Object>) this.velocityManager.getVelocityContext().get("queryParams");
-        assertEquals("Thu Sep 23 00:00:00 CEST 2021", queryParams.get(0).toString());
-        assertEquals("Thu Sep 23 23:59:59 CEST 2021", queryParams.get(1).toString());
+        assertEquals(start, ((Date) queryParams.get(0)).getTime());
+        assertEquals(end, ((Date) queryParams.get(1)).getTime());
     }
     
     /**

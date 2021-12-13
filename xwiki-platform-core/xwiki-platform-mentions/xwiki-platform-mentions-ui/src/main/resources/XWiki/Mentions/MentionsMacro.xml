@@ -225,7 +225,7 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
     }
 
     function updateConf(config, name) {
-      const newConf = config;
+      const newConf = config || {};
       newConf.mentions = newConf.mentions || [];
       newConf.mentions.push(confMentions(name));
       return newConf;

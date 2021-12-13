@@ -881,33 +881,6 @@
 #end
 
 
-#macro (parseDateRange $matchType $filterValue $dateRange)
-  ## Transform the filter value into a date range if needed.
-  #if ($matchType == 'after')
-    #set ($dateRangeString = "$filterValue/")
-  #elseif ($matchType == 'before')
-    #set ($dateRangeString = "/$filterValue")
-  #else
-    ## Between start and end date.
-    #set ($dateRangeString = $filterValue)
-  #end
-  ## Try to parse as ISO 8601 time interval (see https://en.wikipedia.org/wiki/ISO_8601#Time_intervals)
-  #set ($parts = $dateRangeString.split('/', -1))
-  #if ($parts.size() == 2)
-    #set ($dateRange.start = $datetool.toDate('iso_tz', $parts[0]))
-    #set ($dateRange.end = $datetool.toDate('iso_tz', $parts[1]))
-  #end
-  #if (!$dateRange.start &amp;&amp; !$dateRange.end)
-    ## Try to parse as timestamp range. Note that this doesn't handle well negative timestamps.
-    #set ($parts = $dateRangeString.split('-', -1))
-    #if ($parts.size() == 2)
-      #set ($dateRange.start = $datetool.toDate($numbertool.toNumber($parts[0])))
-      #set ($dateRange.end = $datetool.toDate($numbertool.toNumber($parts[1])))
-    #end
-  #end
-#end
-
-
 #**
  * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
  *#

@@ -2947,8 +2947,8 @@ Recursive title display detected!##
 ## If none of the substring conforms to the ISO 8601 date format, a second try is done by splitting using '-', and 
 ## the two substrings are parsed as timestamps.
 ##
-## @since 13.10RC1
-## @since 13.4.5
+## @since 14.0RC1
+## @since 13.4.6
 ##
 #macro (parseDateRange $matchType $filterValue $dateRange)
   ## Transform the filter value into a date range if needed.

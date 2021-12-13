@@ -21,6 +21,7 @@ package org.xwiki.web;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,10 +152,8 @@ class MacrosTest extends PageTest
     @Test
     void parseDateRangeAfter() throws Exception
     {
-        String dateValue = "2021-09-22T00:00:00+02:00";
-
         this.velocityManager.getVelocityContext().put("dateRange", new HashMap<>());
-        this.velocityManager.getVelocityContext().put("dateValue", dateValue);
+        this.velocityManager.getVelocityContext().put("dateValue", "2021-09-22T00:00:00+02:00");
 
         String script = "#parseDateRange('after' $dateValue $dateRange)";
         StringWriter out = new StringWriter();
@@ -162,7 +161,7 @@ class MacrosTest extends PageTest
 
         Map<Object, Object> dateRange =
             (Map<Object, Object>) this.velocityManager.getVelocityContext().get("dateRange");
-        assertEquals("Wed Sep 22 00:00:00 CEST 2021", dateRange.get("start").toString());
+        assertEquals(1632261600000L, ((Date) dateRange.get("start")).getTime());
         assertNull(dateRange.get("end"));
     }
 
@@ -181,7 +180,7 @@ class MacrosTest extends PageTest
         Map<Object, Object> dateRange =
             (Map<Object, Object>) this.velocityManager.getVelocityContext().get("dateRange");
         assertNull(dateRange.get("start"));
-        assertEquals("Wed Sep 22 23:59:59 CEST 2021", dateRange.get("end").toString());
+        assertEquals(1632347999000L, ((Date) dateRange.get("end")).getTime());
     }
 
     @Test
@@ -198,17 +197,15 @@ class MacrosTest extends PageTest
 
         Map<Object, Object> dateRange =
             (Map<Object, Object>) this.velocityManager.getVelocityContext().get("dateRange");
-        assertEquals("Wed Sep 22 00:00:00 CEST 2021", dateRange.get("start").toString());
-        assertEquals("Wed Sep 22 23:59:59 CEST 2021", dateRange.get("end").toString());
+        assertEquals(1632261600000L, ((Date) dateRange.get("start")).getTime());
+        assertEquals(1632347999000L, ((Date) dateRange.get("end")).getTime());
     }
 
     @Test
     void parseDateRangeTimestampRange() throws Exception
     {
-        String dateValue = "1607295600000-1632347999999";
-
         this.velocityManager.getVelocityContext().put("dateRange", new HashMap<>());
-        this.velocityManager.getVelocityContext().put("dateValue", dateValue);
+        this.velocityManager.getVelocityContext().put("dateValue", "1607295600000-1632347999999");
 
         String script = "#parseDateRange('after' $dateValue $dateRange)";
         StringWriter out = new StringWriter();
@@ -216,7 +213,7 @@ class MacrosTest extends PageTest
 
         Map<Object, Object> dateRange =
             (Map<Object, Object>) this.velocityManager.getVelocityContext().get("dateRange");
-        assertEquals("Mon Dec 07 00:00:00 CET 2020", dateRange.get("start").toString());
-        assertEquals("Wed Sep 22 23:59:59 CEST 2021", dateRange.get("end").toString());
+        assertEquals(1607295600000L, ((Date) dateRange.get("start")).getTime());
+        assertEquals(1632347999999L, ((Date) dateRange.get("end")).getTime());
     }
 }

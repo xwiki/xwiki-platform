@@ -30,16 +30,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.icon.IconManagerScriptService;
+import org.xwiki.icon.internal.DefaultIconManagerComponentList;
 import org.xwiki.mentions.internal.MentionView;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.platform.date.script.DateScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
-import org.xwiki.test.page.IconManagerScriptServiceComponentList;
 import org.xwiki.test.page.XHTML10ComponentList;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.tools.EscapeTool;
@@ -61,8 +63,11 @@ import static org.mockito.Mockito.when;
  */
 @HTML50ComponentList
 @XHTML10ComponentList
-@IconManagerScriptServiceComponentList
-class MentionTest extends PageTest
+@DefaultIconManagerComponentList
+@ComponentList({
+    IconManagerScriptService.class,
+})
+class MentionPageTest extends PageTest
 {
     /**
      * Needs to be mocked because don't want the test result to be dependent of the current time.
@@ -74,7 +79,7 @@ class MentionTest extends PageTest
     void setUp() throws Exception
     {
         // Initializes then environment for the icon extension.
-        IconSetup.setUp(this.oldcore, this);
+        IconSetup.setUp(this, "/icons.properties");
     }
 
     /**
@@ -138,7 +143,7 @@ class MentionTest extends PageTest
         velocityContext.put("compositeEventParams", compositeEventParams);
 
         // Template rendering.
-        String actual = templateManager.render("templates/mentions/mention.vm");
+        String actual = templateManager.render("mentions/mention.vm");
         String expected = IOUtils.toString(getClass().getResourceAsStream("/templates/mentions/mention.html"),
             UTF_8);
 

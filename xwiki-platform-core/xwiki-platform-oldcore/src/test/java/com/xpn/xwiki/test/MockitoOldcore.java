@@ -1151,8 +1151,6 @@ public class MockitoOldcore
      */
     public void registerMockEnvironment() throws Exception
     {
-        
-        // TODO: initializer avec un if (...) comme les autres, si pas d'imple concrete existe.
         this.environment = getMocker().registerMockComponent(Environment.class);
 
         initEnvironmentDirectories();

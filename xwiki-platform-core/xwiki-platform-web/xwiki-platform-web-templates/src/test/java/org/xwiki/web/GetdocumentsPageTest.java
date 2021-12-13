@@ -20,6 +20,7 @@
 package org.xwiki.web;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +30,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import static org.mockito.Mockito.spy;
 import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.query.QueryException;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
@@ -40,17 +41,20 @@ import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.XWikiDateTool;
 import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.velocity.tools.JSONTool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -79,12 +83,15 @@ class GetdocumentsPageTest extends PageTest
 
     private TemplateManager templateManager;
 
+    private VelocityManager velocityManager;
+
     private JSONTool jsonTool;
 
     @BeforeEach
     void setUp() throws Exception
     {
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
+        this.velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
         this.oldcore.getMocker().registerComponent(ScriptService.class, "query", this.queryService);
 
         this.jsonTool = spy(new JSONTool());
@@ -92,6 +99,7 @@ class GetdocumentsPageTest extends PageTest
         registerVelocityTool("mathtool", new MathTool());
         registerVelocityTool("escapetool", new EscapeTool());
         registerVelocityTool("numbertool", new NumberTool());
+        registerVelocityTool("datetool", this.componentManager.getInstance(XWikiDateTool.class));
     }
 
     @Test
@@ -100,12 +108,7 @@ class GetdocumentsPageTest extends PageTest
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("view"), any(), any(), any()))
             .thenReturn(false, true);
         this.request.put("limit", "2");
-        when(this.queryService.hql(anyString())).thenReturn(this.query);
-        when(this.query.setLimit(anyInt())).thenReturn(this.query);
-        when(this.query.setOffset(anyInt())).thenReturn(this.query);
-        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
-        when(this.query.bindValues(any(List.class))).thenReturn(this.query);
-        when(this.query.count()).thenReturn(3L);
+        initDefaultQueryMocks(3);
         when(this.query.execute()).thenReturn(Arrays.asList("XWiki.NotViewable", "XWiki.Viewable"));
 
         Map<String, Object> result = getJsonResultMap();
@@ -128,12 +131,7 @@ class GetdocumentsPageTest extends PageTest
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("view"), any(), any(), any())).thenReturn(false,
             true);
         this.request.put("limit", "2");
-        when(this.queryService.hql(anyString())).thenReturn(this.query);
-        when(this.query.setLimit(anyInt())).thenReturn(this.query);
-        when(this.query.setOffset(anyInt())).thenReturn(this.query);
-        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
-        when(this.query.bindValues(any(List.class))).thenReturn(this.query);
-        when(this.query.count()).thenReturn(2L);
+        initDefaultQueryMocks(2);
         when(this.query.execute()).thenReturn(Arrays.asList("XWiki.NotViewable", "XWiki.Viewable"));
 
         Map<String, Object> result = getJsonResultMap();
@@ -145,6 +143,62 @@ class GetdocumentsPageTest extends PageTest
         Map<String, Object> viewable = rows.get(0);
         assertTrue((boolean) viewable.get("doc_viewable"));
         assertEquals("xwiki:XWiki.Viewable", viewable.get("doc_fullName"));
+    }
+
+    /**
+     * Request the {@code doc.date} field, filtered by a date range using ISO 8601 based time intervals.
+     */
+    @Test
+    void dateFilterBetweenISO8601() throws Exception
+    {
+        initDefaultQueryMocks(0);
+
+        this.request.put("offset", "1");
+        this.request.put("limit", "15");
+        this.request.put("collist", "doc.date");
+        this.request.put("doc.date_match", "between");
+        this.request.put("doc.date/join_mode", "OR");
+        this.request.put("childrenOf", "Sandbox");
+        this.request.put("doc.date", "2021-09-22T00:00:00+02:00/2021-09-22T23:59:59+02:00");
+        this.templateManager.render(GETDOCUMENTS);
+        verify(this.queryService).hql(
+            "WHERE 1=1 AND doc.fullName LIKE ?1 AND doc.fullName <> ?2 and doc.date between ?3 and ?4 ");
+        List<Object> queryParams = (List<Object>) this.velocityManager.getVelocityContext().get("queryParams");
+        assertNull(queryParams.get(0));
+        assertEquals("Sandbox.WebHome", queryParams.get(1));
+        assertEquals(1632261600000L, ((Date) queryParams.get(2)).getTime());
+        assertEquals(1632347999000L, ((Date) queryParams.get(3)).getTime());
+    }
+
+    /**
+     * Request the {@code doc.date} field, filtered by a date range using timestamp based time intervals.
+     */
+    @Test
+    void dateFilterBetweenTimestamp() throws Exception
+    {
+        long start = 1632348000000L;
+        long end = 1632434399999L;
+
+        initDefaultQueryMocks(0);
+
+        this.request.put("outputSyntax", "plain");
+        this.request.put("transprefix", "platform.index.");
+        this.request.put("classname", "");
+        this.request.put("collist", "doc.title,doc.location,doc.date,doc.author,_likes");
+        this.request.put("queryFilters", "currentlanguage,hidden");
+        this.request.put("offset", "1");
+        this.request.put("limit", "15");
+        this.request.put("reqNo", "3");
+
+        this.request.put("doc.date", String.format("%d-%d", start, end));
+        this.request.put("sort", "doc.date");
+        this.request.put("dir", "asc");
+        this.templateManager.render(GETDOCUMENTS);
+        verify(this.queryService).hql(
+            "WHERE 1=1 and doc.date between ?1 and ?2 order by doc.date asc");
+        List<Object> queryParams = (List<Object>) this.velocityManager.getVelocityContext().get("queryParams");
+        assertEquals(start, ((Date) queryParams.get(0)).getTime());
+        assertEquals(end, ((Date) queryParams.get(1)).getTime());
     }
 
     @Test
@@ -186,5 +240,15 @@ class GetdocumentsPageTest extends PageTest
         verify(this.jsonTool).serialize(argument.capture());
 
         return (Map<String, Object>) argument.getValue();
+    }
+
+    private void initDefaultQueryMocks(long count) throws QueryException
+    {
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.bindValues(any(List.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(count);
     }
 }

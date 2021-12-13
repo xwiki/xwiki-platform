@@ -2937,3 +2937,42 @@ Recursive title display detected!##
     <a href="$xwiki.getURL($docReference)">$escapetool.xml($docReference.name)</a>
   </div>
 #end
+
+##
+## Parse the provided filterValue according to its match type and assign the resulting start/end dates to the dateRange
+## map.
+## First, if a after or before matchType is provided, a '/' is added respectivelly at the end or at the beguinning of  
+## filterValue.
+## Then, we first start by trying to split filterValue using a '/', and parse the two substring as ISO 8601 dates.
+## If none of the substring conforms to the ISO 8601 date format, a second try is done by splitting using '-', and 
+## the two substrings are parsed as timestamps.
+##
+## @since 14.0RC1
+## @since 13.10.2
+## @since 13.4.6
+##
+#macro (parseDateRange $matchType $filterValue $dateRange)
+  ## Transform the filter value into a date range if needed.
+  #if ($matchType == 'after')
+    #set ($dateRangeString = "$filterValue/")
+  #elseif ($matchType == 'before')
+    #set ($dateRangeString = "/$filterValue")
+  #else
+    ## Between start and end date.
+    #set ($dateRangeString = $filterValue)
+  #end
+  ## Try to parse as ISO 8601 time interval (see https://en.wikipedia.org/wiki/ISO_8601#Time_intervals)
+  #set ($parts = $dateRangeString.split('/', -1))
+  #if ($parts.size() == 2)
+    #set ($dateRange.start = $datetool.toDate('iso_tz', $parts[0]))
+    #set ($dateRange.end = $datetool.toDate('iso_tz', $parts[1]))
+  #end
+  #if (!$dateRange.start && !$dateRange.end)
+    ## Try to parse as timestamp range. Note that this doesn't handle well negative timestamps.
+    #set ($parts = $dateRangeString.split('-', -1))
+    #if ($parts.size() == 2)
+      #set ($dateRange.start = $datetool.toDate($numbertool.toNumber($parts[0])))
+      #set ($dateRange.end = $datetool.toDate($numbertool.toNumber($parts[1])))
+    #end
+  #end
+#end

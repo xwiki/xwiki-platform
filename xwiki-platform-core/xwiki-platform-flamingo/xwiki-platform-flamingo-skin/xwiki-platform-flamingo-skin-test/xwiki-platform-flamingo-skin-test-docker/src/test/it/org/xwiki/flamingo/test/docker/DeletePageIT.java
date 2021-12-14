@@ -23,8 +23,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -87,6 +89,14 @@ class DeletePageIT
 
         // Create a new Page that will be deleted
         this.viewPage = setup.createPage(SPACE_VALUE, PAGE_VALUE, PAGE_CONTENT, PAGE_TITLE);
+    }
+
+    @AfterEach
+    void tearDown(TestUtils setup) throws Exception
+    {
+        // we play with multilingual in some tests, ensure to set it back to default values.
+        setup.setWikiPreference("multilingual", "false");
+        setup.setWikiPreference("default_language", "en");
     }
 
     @Test
@@ -311,7 +321,7 @@ class DeletePageIT
 
         // Try to delete the parent page
         ViewPage parentPage = setup.gotoPage(parentReference);
-        ConfirmationPage confirmationPage = parentPage.deletePage();
+        DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
         confirmationPage.setAffectChildren(true);
         confirmationPage.confirmDeletePage();
 
@@ -436,5 +446,206 @@ class DeletePageIT
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
         assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
+    }
+
+    /**
+     * This test is similar than {@link #deletePageWithUsedClass(TestUtils, TestInfo)} except that here we're checking
+     * the deletion when deleting only the xclass page alone: by default it should not be selected, and should not
+     * be deleted when confirming.
+     */
+    @Test
+    @Order(11)
+    void deletePageWithSingleUsedClass(TestUtils setup, TestInfo info)
+    {
+        // Create 2 pages in two locations:
+        // first page is an xclass that we'll try to delete
+        // second page will contain an xobject of the created xclass
+
+        String testClassName = info.getTestClass().get().getSimpleName();
+        String testMethodName = info.getTestMethod().get().getName();
+        String xclassSpace = "XClassSpace";
+        String xobjectSpace = "XObjectSpace";
+        List<String> xclassSpaceReference = Arrays.asList(testClassName, testMethodName, xclassSpace);
+        DocumentReference xclassReference = new DocumentReference("xwiki",
+            xclassSpaceReference,
+            "WebHome");
+        List<String> xobjectSpaceReference = Arrays.asList(testClassName, testMethodName, xobjectSpace);
+        DocumentReference xobjectReference = new DocumentReference("xwiki",
+            xobjectSpaceReference,
+            "WebHome");
+        String space = testClassName + "." + testMethodName;
+        String classPageName = "ClassPage";
+        String objectPageName = "ObjectPage";
+
+        DocumentReference classReference = new DocumentReference("xwiki", xclassSpaceReference, classPageName);
+        DocumentReference objectReference = new DocumentReference("xwiki", xobjectSpaceReference, objectPageName);
+
+        setup.createPage(classReference, "XClass page content", classPageName);
+        setup.createPage(objectReference, "XObject page content", objectPageName);
+
+        setup.addClassProperty(space, classPageName, "Foo", "String");
+        setup.addObject(objectReference, classReference.toString(), Collections.singletonMap("Foo", "Bar"));
+
+        // Try to delete the xclass page
+        ViewPage parentPage = setup.gotoPage(classReference);
+        DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
+        confirmationPage.confirmDeletePage();
+
+        // At this point we should have the question job UI
+        JobQuestionPane jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
+        assertFalse(jobQuestionPane.isEmpty());
+
+        assertEquals("You are about to delete pages that contain used XClass.", jobQuestionPane.getQuestionTitle());
+        TreeElement treeElement = jobQuestionPane.getQuestionTree();
+        List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
+
+        // there is a single node for the xclass:
+        //  1. to represent free pages
+        //  2. to represent classes with associated objects
+        assertEquals(1, topLevelNodes.size());
+
+        TreeNodeElement classPage = topLevelNodes.get(0);
+        assertEquals(classPageName, classPage.getLabel());
+        assertEquals(String.format("%s.%s.%s", space, xclassSpace, classPageName), classPage.getId());
+        assertFalse(classPage.isSelected());
+
+        classPage = classPage.open().waitForIt();
+        List<TreeNodeElement> children = classPage.getChildren();
+        assertEquals(1, children.size());
+
+        assertEquals(objectPageName, children.get(0).getLabel());
+
+        // here it's an object
+        assertEquals(String.format("object-%s.%s.%s", space, xobjectSpace, objectPageName), children.get(0).getId());
+        assertTrue(children.get(0).isLeaf());
+
+        CopyOrRenameOrDeleteStatusPage statusPage = jobQuestionPane.confirmQuestion();
+        statusPage.waitUntilFinished();
+
+        // check that the class page still exist
+        ViewPage viewPage = setup.gotoPage(classReference);
+        assertTrue(viewPage.exists());
+    }
+
+    /**
+     * This is basically the same scenario than before except that we create a translation of the xclass, and we try
+     * to delete that one: in theory it should only delete the translation.
+     */
+    @Test
+    @Order(12)
+    void deleteTranslationXClass(TestUtils setup, TestInfo info) throws Exception
+    {
+        // Create 2 pages in two locations:
+        // first page is an xclass that we'll translate
+        // second page will contain an xobject of the created xclass
+
+        String testClassName = info.getTestClass().get().getSimpleName();
+        String testMethodName = info.getTestMethod().get().getName();
+        String xclassSpace = "XClassSpace";
+        String xobjectSpace = "XObjectSpace";
+        List<String> xclassSpaceReference = Arrays.asList(testClassName, testMethodName, xclassSpace);
+        DocumentReference xclassReference = new DocumentReference("xwiki",
+            xclassSpaceReference,
+            "WebHome");
+        List<String> xobjectSpaceReference = Arrays.asList(testClassName, testMethodName, xobjectSpace);
+        DocumentReference xobjectReference = new DocumentReference("xwiki",
+            xobjectSpaceReference,
+            "WebHome");
+        String space = testClassName + "." + testMethodName;
+        String classPageName = "ClassPage";
+        String objectPageName = "ObjectPage";
+
+        DocumentReference classReference = new DocumentReference("xwiki", xclassSpaceReference, classPageName);
+        DocumentReference objectReference = new DocumentReference("xwiki", xobjectSpaceReference, objectPageName);
+
+        setup.createPage(classReference, "XClass page content", classPageName);
+        setup.createPage(objectReference, "XObject page content", objectPageName);
+
+        setup.addClassProperty(space, classPageName, "Foo", "String");
+        setup.addObject(objectReference, classReference.toString(), Collections.singletonMap("Foo", "Bar"));
+
+        // switch the wiki to multilingual
+        setup.setWikiPreference("multilingual", "true");
+        setup.setWikiPreference("languages", "en,fr");
+
+        DocumentReference frenchXClassTranslation = new DocumentReference(classReference, Locale.FRENCH);
+        setup.createPage(frenchXClassTranslation, "French XClass page content", classPageName);
+
+        DocumentReference rootLocaleXClassReference = new DocumentReference(classReference, Locale.ROOT);
+
+        // Check that accessing the page and its translation displays different content, since we'll use that
+        // for checking if translation exists.
+        ViewPage viewPage = setup.gotoPage(rootLocaleXClassReference);
+        assertEquals("XClass page content", viewPage.getContent());
+
+        viewPage = setup.gotoPage(frenchXClassTranslation);
+        assertEquals("French XClass page content", viewPage.getContent());
+
+        // Try to delete the xclass page
+        ViewPage parentPage = setup.gotoPage(frenchXClassTranslation);
+        DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
+        DeletingPage deletingPage = confirmationPage.confirmDeletePage();
+        deletingPage.waitUntilFinished();
+
+        // check that the translation does not exist, but the xclass does
+        viewPage = setup.gotoPage(rootLocaleXClassReference);
+        assertTrue(viewPage.exists());
+        assertEquals("XClass page content", viewPage.getContent());
+
+        viewPage = setup.gotoPage(frenchXClassTranslation);
+        // We cannot check the deletion of the translation with a viewPage.exists() because
+        // the original page is automatically displayed when the translation does not exist.
+        assertEquals("XClass page content", viewPage.getContent());
+
+        // We create back the translation
+        setup.createPage(frenchXClassTranslation, "French XClass page content", classPageName);
+
+        // This time we try to delete the class reference page (not the translation)
+        parentPage = setup.gotoPage(rootLocaleXClassReference);
+        confirmationPage = parentPage.deletePage();
+        confirmationPage.confirmDeletePage();
+
+        // At this point we should have the question job UI
+        JobQuestionPane jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
+        assertFalse(jobQuestionPane.isEmpty());
+
+        assertEquals("You are about to delete pages that contain used XClass.", jobQuestionPane.getQuestionTitle());
+        TreeElement treeElement = jobQuestionPane.getQuestionTree();
+        List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
+
+        // there is a single node for the xclass:
+        //  1. to represent free pages
+        //  2. to represent classes with associated objects
+        assertEquals(1, topLevelNodes.size());
+
+        TreeNodeElement classPage = topLevelNodes.get(0);
+        assertEquals(classPageName, classPage.getLabel());
+        assertEquals(String.format("%s.%s.%s", space, xclassSpace, classPageName), classPage.getId());
+        assertFalse(classPage.isSelected());
+
+        classPage = classPage.open().waitForIt();
+        List<TreeNodeElement> children = classPage.getChildren();
+        assertEquals(1, children.size());
+
+        assertEquals(objectPageName, children.get(0).getLabel());
+
+        // here it's an object
+        assertEquals(String.format("object-%s.%s.%s", space, xobjectSpace, objectPageName), children.get(0).getId());
+        assertTrue(children.get(0).isLeaf());
+
+        // select the class to be deleted
+        classPage.select();
+
+        CopyOrRenameOrDeleteStatusPage statusPage = jobQuestionPane.confirmQuestion();
+        statusPage.waitUntilFinished();
+
+        // Ensure the xclass has been deleted
+        DeletePageOutcomePage deletePageOutcomePage = deletingPage.getDeletePageOutcomePage();
+        assertTrue(deletePageOutcomePage.hasTerminalPagesInRecycleBin());
+
+        // Ensure the translation has also been deleted
+        setup.gotoPage(frenchXClassTranslation);
+        deletePageOutcomePage = new DeletePageOutcomePage();
+        assertEquals("Impossible de trouver ce document.", deletePageOutcomePage.getMessage());
     }
 }

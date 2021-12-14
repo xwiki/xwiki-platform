@@ -45,8 +45,9 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
 {
     /**
      * Map that will contain all entities that are concerned by the refactoring.
+     * Note that the EntityReference key locale is automatically set to null if it's the Locale.ROOT.
      */
-    protected Map<EntityReference, EntitySelection> concernedEntities = new HashMap<>();
+    private final Map<EntityReference, EntitySelection> concernedEntities = new HashMap<>();
 
     @Override
     protected void runInternal() throws Exception
@@ -103,27 +104,41 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
         }
     }
 
+    private DocumentReference cleanLocale(DocumentReference documentReference)
+    {
+        // We don't want to have locale information for root locale in the reference to not have problems with
+        // the questions.
+        // FIXME: Note that this should be probably improved in the future, to actually put the locale in the question
+        // along with the references, however it's difficult to support for now since we don't have a proper way to
+        // convert a value to a DocumentReference with locale through a Converter, which is currently the standard way
+        // for answering questions in QuestionJobResourceReferenceHandler.
+        // Moreover it's difficult to use a String value that we'd parse afterwards since the question is not a
+        // component.
+        if (Locale.ROOT.equals(documentReference.getLocale())) {
+            return new DocumentReference(documentReference, (Locale) null);
+        } else {
+            return documentReference;
+        }
+    }
+
+    private void putInConcernedEntities(DocumentReference documentReference)
+    {
+        DocumentReference cleanDocumentReference = cleanLocale(documentReference);
+        this.concernedEntities.put(cleanDocumentReference, new EntitySelection(cleanDocumentReference));
+    }
+
     private void getEntities(DocumentReference documentReference)
     {
         if (this.request.isDeep() && isSpaceHomeReference(documentReference)) {
             getEntities(documentReference.getLastSpaceReference());
         } else {
-            DocumentReference cleanDocumentReference;
-            // We don't want to have locale information for root locale in the reference to not have problems with
-            // the questions
-            if (Locale.ROOT.equals(documentReference.getLocale())) {
-                cleanDocumentReference = new DocumentReference(documentReference, (Locale) null);
-            } else {
-                cleanDocumentReference = documentReference;
-            }
-            this.concernedEntities.put(cleanDocumentReference, new EntitySelection(cleanDocumentReference));
+            this.putInConcernedEntities(documentReference);
         }
     }
 
     private void getEntities(SpaceReference spaceReference)
     {
-        visitDocuments(spaceReference,
-            documentReference -> concernedEntities.put(documentReference, new EntitySelection(documentReference)));
+        visitDocuments(spaceReference, this::putInConcernedEntities);
     }
 
     protected void notifyDocumentsDeleting()
@@ -136,5 +151,18 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
         if (event.isCanceled()) {
             getStatus().cancel();
         }
+    }
+
+    protected EntitySelection getConcernedEntitiesEntitySelection(EntityReference reference)
+    {
+        EntitySelection entitySelection = this.concernedEntities.get(reference);
+        if (entitySelection == null && reference instanceof DocumentReference) {
+            DocumentReference documentReference = (DocumentReference) reference;
+            if (Locale.ROOT.equals(documentReference.getLocale())) {
+                entitySelection = this.concernedEntities.get(
+                    new DocumentReference(documentReference.withoutLocale(), (Locale) null));
+            }
+        }
+        return entitySelection;
     }
 }

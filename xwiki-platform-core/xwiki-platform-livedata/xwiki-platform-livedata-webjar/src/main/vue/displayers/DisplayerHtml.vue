@@ -64,6 +64,4 @@ export default {
     color: @link-color;
   }
 }
-
-
 </style>

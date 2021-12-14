@@ -22,7 +22,9 @@ define('entityResourceDisplayer', ['jquery', 'resource'], function($, $resource)
 
   var displayFromBreadcrumb = function(resourceReference, breadcrumb) {
     breadcrumb.addClass('resource-hint');
-    var label = breadcrumb.find('.active').remove().find('a').addClass('resource-label');
+    var label = breadcrumb.find('.active').remove();
+    label = label.has('a').length ? label.find('a') : $('<span/>').text(label.text());
+    label.addClass('resource-label');
     var icon = $('<span class="resource-icon"></span>').addClass($resource.types[resourceReference.type].icon);
     var remove = $('<span class="glyphicon glyphicon-remove remove"></span>');
     // Remove the home icon from the breadcrumb because it distracts the user (from the resource icon) and because it

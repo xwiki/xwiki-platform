@@ -212,7 +212,7 @@
         <groupId>com.github.searls</groupId>
         <artifactId>jasmine-maven-plugin</artifactId>
         <!-- We want a more recent version of Jasmine because we want to use the (headless) Chrome driver. -->
-        <version>3.0-alpha-01</version>
+        <version>3.0-beta-02</version>
         <!-- Skip the execution of the Jasmine tests at this point. We run the tests in the integration-tests profile. -->
         <executions>
           <execution>

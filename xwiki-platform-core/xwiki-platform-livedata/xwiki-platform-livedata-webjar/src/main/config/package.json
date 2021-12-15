@@ -23,7 +23,7 @@
     "whatwg-fetch": "3.6.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.11",
+    "@vue/cli-plugin-babel": "4.5.15",
     "@vue/cli-plugin-eslint": "4.5.15",
     "@vue/cli-service": "~4.5.11",
     "@babel/eslint-parser": "7.15.0",

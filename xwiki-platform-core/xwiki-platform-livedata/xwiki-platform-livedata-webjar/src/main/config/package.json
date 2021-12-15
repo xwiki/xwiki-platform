@@ -25,7 +25,7 @@
     "@babel/eslint-parser": "7.15.0",
     "eslint": "7.32.0",
     "eslint-plugin-vue": "7.16.0",
-    "less": "^4.1.1",
+    "less": "4.1.2",
     "less-loader": "^8.0.0",
     "vue-template-compiler": "2.6.14",
     "@vue/cli-plugin-unit-jest": "~4.5.0",

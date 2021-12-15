@@ -470,7 +470,10 @@
       var macroPlugin = this;
       editor.addCommand(definition.commandId, {
         exec: function(editor) {
-          editor.execCommand('xwiki-macro', definition.macroCall);
+          // The macro can be inserted either direcly (using the parameter values specified in the macro call) or after
+          // filling the missing parameter values in the Macro Editor dialog (which is prefilled with the parameter
+          // values from the macro call).
+          editor.execCommand(definition.insertDirectly ? 'xwiki-macro-insert' : 'xwiki-macro', definition.macroCall);
         }
       });
       editor.ui.addButton(definition.commandId, {

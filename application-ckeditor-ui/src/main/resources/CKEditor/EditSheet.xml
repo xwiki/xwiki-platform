@@ -260,7 +260,10 @@ define('xwiki-ckeditor', [
   // This is a hack, increasing the technical debt since the CKEditor module should not know about the Markdown
   // syntax. Actually it should not know either about the xwiki/2.0 and xwiki/2.1 syntaxes ;)
   // This should be fixed by implementing https://jira.xwiki.org/browse/CKEDITOR-319
-  allowedContentBySyntax['markdown/1.2'] = allowedContentBySyntax['xwiki/2.1'];
+  allowedContentBySyntax['markdown/1.2'] = $.extend(true, allowedContentBySyntax['xwiki/2.1'], {});
+  // Markdown doesn't allow figures at the moment.
+  delete allowedContentBySyntax['markdown/1.2']['$1'].elements.figure;
+  delete allowedContentBySyntax['markdown/1.2']['$1'].elements.figcaption;
 
   var currentLocale = $('html').attr('lang') || '';
 
@@ -285,8 +288,26 @@ define('xwiki-ckeditor', [
       sourceDocument = new XWiki.Document(XWiki.Model.resolve(sourceDocumentReference, XWiki.EntityType.DOCUMENT));
     }
     sourceDocument.syntax = $(element).attr('data-sourceDocumentSyntax');
+
+    var allowedContent;
+    if (sourceDocument.syntax in allowedContentBySyntax) {
+      allowedContent = allowedContentBySyntax[sourceDocument.syntax];
+    } else {
+      // Fallback to content allowed by xwiki/2.1.
+      allowedContent = allowedContentBySyntax['xwiki/2.1'];
+    }
+    var allowedContentWithoutFigure = $.extend(true, allowedContent, {});
+    delete allowedContentWithoutFigure['$1'].elements.figure;
+    delete allowedContentWithoutFigure['$1'].elements.figcaption;
+
+    var isHTML5 = $(element).data('syntax') !== 'annotatedxhtml/1.0';
+    // Disable figure support if the syntax isn't HTML 5.
+    if (!isHTML5) {
+      allowedContent = allowedContentWithoutFigure;
+    }
+
     var config = {
-      allowedContent: allowedContentBySyntax[sourceDocument.syntax],
+      allowedContent: allowedContent,
       editorplaceholder: $jsontool.serialize($services.localization.render('ckeditor.content.placeholder')),
       filebrowserUploadUrl: getUploadURL(sourceDocument, 'filebrowser'),
       // This is used in CKEditor.FileUploader so we must keep them in sync.
@@ -295,7 +316,10 @@ define('xwiki-ckeditor', [
       // CKEditor uses '-' (dash) as locale separator (between the language code and the country code).
       language: currentLocale.toLowerCase().replace('_', '-'),
       uploadUrl: getUploadURL(sourceDocument, 'filetools'),
-      stylesSet: $(element).data('syntax') === 'annotatedxhtml/1.0' ? 'html4' : 'html5',
+      stylesSet: $(element).data('syntax') === isHTML5 ? 'html5' : 'html4',
+      'xwiki-image' : {
+        captionAllowedContent: allowedContentWithoutFigure
+      },
       'xwiki-link': {
         labelGenerator: sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.LinkLabelGenerator',

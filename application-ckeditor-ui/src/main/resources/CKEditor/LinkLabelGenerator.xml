@@ -47,7 +47,7 @@
 #set ($syntax = $services.rendering.resolveSyntax('xwiki/2.1'))
 #set ($linkReference = $services.rendering.escape("$prefix$!request.reference", $syntax))
 #set ($xdom = $services.rendering.parse("[[$linkReference]]", $syntax.toIdString()))
-## We don't use the plain text renderer because it is not consistent with the XHTML renderer used in view mode.
-$services.rendering.render($xdom, 'xhtml/1.0')
+## We don't use the plain text renderer because it is not consistent with the HTML renderer used in view mode.
+$services.rendering.render($xdom, ${services.wysiwyg.HTMLSyntax.toIdString()|'xhtml/1.0'})
 {{/velocity}}</content>
 </xwikidoc>

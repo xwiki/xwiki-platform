@@ -295,6 +295,7 @@ define('xwiki-ckeditor', [
       // CKEditor uses '-' (dash) as locale separator (between the language code and the country code).
       language: currentLocale.toLowerCase().replace('_', '-'),
       uploadUrl: getUploadURL(sourceDocument, 'filetools'),
+      stylesSet: #if ($services.wysiwyg.HTMLSyntax.version.startsWith("5")) 'html5' #else 'html4' #end,
       'xwiki-link': {
         labelGenerator: sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.LinkLabelGenerator',

@@ -59,7 +59,9 @@ import static org.mockito.Mockito.when;
  * This test suite assert the html rendered by the mention notification template.
  *
  * @version $Id$
- * @since 13.4RC1
+ * @since 14.0RC1
+ * @since 13.10.2
+ * @since 13.4.6
  */
 @HTML50ComponentList
 @XHTML10ComponentList

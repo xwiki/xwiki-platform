@@ -4009,6 +4009,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    /**
+     * Updates properties of existing objects with the values from the given form.
+     *
+     * @param eform The form to read the values from
+     * @param context The context used for getting the classes of objects
+     * @throws XWikiException On errors
+     */
     public void readObjectsFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {
         for (DocumentReference reference : getXObjects().keySet()) {

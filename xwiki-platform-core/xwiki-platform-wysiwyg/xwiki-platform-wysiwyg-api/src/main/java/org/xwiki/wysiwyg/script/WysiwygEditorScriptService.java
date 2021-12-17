@@ -122,6 +122,14 @@ public class WysiwygEditorScriptService implements ScriptService
     }
 
     /**
+     * @return The syntax identifier of the rendered HTML.
+     */
+    public Syntax getHTMLSyntax()
+    {
+        return Syntax.ANNOTATED_HTML_5_0;
+    }
+
+    /**
      * Parses the given HTML fragment and renders the result in annotated XHTML syntax.
      * <p>
      * This method is currently used in {@code wysiwyginput.vm} and its purpose is to refresh the content of the WYSIWYG

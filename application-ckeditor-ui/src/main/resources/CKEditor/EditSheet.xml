@@ -798,6 +798,13 @@ require(['jquery'], function($) {
     </property>
     <property>
       <code>require(['jquery', 'xwiki-ckeditor', 'xwiki-events-bridge'], function($, ckeditorPromise) {
+  // Make sure we don't create the editors twice because this file can be loaded twice (by RequireJS, for in-place
+  // editing, and as a JSX resource, for standalone editing).
+  if (ckeditorPromise.__editSheetLoaded) {
+    return;
+  }
+  ckeditorPromise.__editSheetLoaded = true;
+
   var createEditors = function(ckeditor, container) {
     container.find('.ckeditor-textarea').each(function() {
       // Wrap in try/catch so that a failure to load one editor doesn't affect the other editors.

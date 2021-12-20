@@ -185,11 +185,7 @@
 require.config({
   paths: {
     ckeditor: '$!ckeditorPath',
-    resource: '$!resourcePickerBundlePath',
-    resourcePicker: '$!resourcePickerBundlePath',
-    entityResourcePicker: '$!resourcePickerBundlePath',
-    entityResourceSuggester: '$!resourcePickerBundlePath',
-    entityResourceDisplayer: '$!resourcePickerBundlePath',
+    resourcePickerBundle: '$!resourcePickerBundlePath',
     modal: '$!modalPath',
     l10n: '$!l10nPath',
     macroWizard: '$!macroWizardBundlePath',
@@ -197,6 +193,9 @@ require.config({
     'bootstrap3-typeahead': '$!bootstrap3typeaheadPath',
     // This is used to preserve the selection when switching between WYSIWYG and Source modes.
     'fast-diff': '$!fastDiffPath'
+  },
+  bundles: {
+    'resourcePickerBundle': ['resource', 'resourcePicker', 'entityResourcePicker', 'entityResourceSuggester', 'entityResourceDisplayer']
   },
   shim: {
     ckeditor: {

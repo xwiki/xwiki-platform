@@ -190,16 +190,20 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public void addField(String name, PropertyInterface element)
     {
-        Set<String> properties = getPropertyList();
-        if (!properties.contains(name)) {
-            if (((BaseCollection) element).getNumber() == 0) {
-                ((BaseCollection) element).setNumber(properties.size() + 1);
+        if (element != null) {
+            Set<String> properties = getPropertyList();
+            if (!properties.contains(name)) {
+                if (((BaseCollection) element).getNumber() == 0) {
+                    ((BaseCollection) element).setNumber(properties.size() + 1);
+                }
             }
+
+            super.addField(name, element);
+
+            setDirty(true);
+        } else {
+            LOGGER.warn("Cannot add null field with name [{}] in [{}].", name, this);
         }
-
-        super.addField(name, element);
-
-        setDirty(true);
     }
 
     /**

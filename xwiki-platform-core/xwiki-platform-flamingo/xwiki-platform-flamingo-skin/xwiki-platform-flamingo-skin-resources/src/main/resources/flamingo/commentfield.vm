@@ -53,7 +53,12 @@
 ## To achieve this we add a new property to the comment class by copying the comment property and changing the name.
 #set ($commentObjClass = $commentObj.getxWikiClass())
 #set ($commentObjBaseClass = $commentObjClass.getXWikiClass())
-#set ($discard = $commentObjBaseClass.put($name, $commentClass.getXWikiClass().get('comment')))
+#set ($commentField = $commentClass.getXWikiClass().get('comment'))
+
+## In theory this should never occur, but apparently it happened in XWIKI-18717 in weird conditions,
+## so we're bullet-proofing
+#if ("$!commentField" != '')
+#set ($discard = $commentObjBaseClass.put($name, $commentField))
 #set ($discard = $commentObjBaseClass.get($name).setName($name))
 
 ## attribution of the value to the new field in the object.
@@ -76,3 +81,4 @@ $doc.displayEdit($fieldToDisplay, '', $commentObj)
 
 ## reset the temporary added field.
 #set ($discard = $commentObjBaseClass.removeField($name))
+#end

@@ -192,6 +192,28 @@ public class DefaultAuthenticationFailureManagerTest
         verify(this.sessionFailing, times(4)).get("customId");
     }
 
+    /**
+     * Ensure that the time window accepts big values (detect possible int/long problems)
+     */
+    @Test
+    void authenticationFailureLimitReachedBigTimeWindow()
+    {
+        when(this.configuration.getTimeWindow()).thenReturn(2160000); // 25 days
+        HttpServletRequest request = getRequest("customId");
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+
+        verify(this.observationManager, times(4)).notify(new AuthenticationFailureEvent(), this.failingLogin);
+        verify(this.observationManager, times(2)).notify(new AuthenticationFailureLimitReachedEvent(),
+            this.failingLogin);
+        verify(this.strategy1, times(2)).notify(failingLogin);
+        verify(this.strategy2, times(2)).notify(failingLogin);
+        verify(this.sessionFailing, times(2)).set(eq("customId"), any(Instant.class));
+        verify(this.sessionFailing, times(4)).get("customId");
+    }
+
     @Test
     void authenticationFailureEmptyLogin()
     {

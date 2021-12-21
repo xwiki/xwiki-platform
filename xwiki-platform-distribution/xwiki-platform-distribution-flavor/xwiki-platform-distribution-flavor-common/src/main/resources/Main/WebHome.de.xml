@@ -30,7 +30,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Hauptseite</title>
+  <title>Startseite</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -38,11 +38,11 @@
   <content>{{box cssClass="floatinginfobox"}}
 {{velocity}}
 {{html clean="false"}}
-## Chrome's XSS Auditor blocks the preview action if:
-## * the submitted content has an iframe with an external URL
-## * the preview action displays the submitted iframe
-## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
-## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
+## Chromes XSS Auditor blockiert die Vorschauaktion, wenn:
+## * der Inhalt ein iframe mit einer externen URL hat
+## * die Vorschau das übergebene iframe anzeigt
+## Der Workaround besteht darin, sicherzustellen, dass der gesendete Inhalt (die Makro-Marker) nicht mit dem HTML der Vorschau übereinstimmt.
+## Siehe XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
 #set ($iframe = 'iframe')
 &lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube video of XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
 {{/html}}
@@ -67,17 +67,23 @@ Verwenden Sie die {{velocity}}$services.icon.render('home'){{/velocity}} Breadcr
 
 Außerdem können Sie den [[Sandkasten&gt;&gt;Sandbox.WebHome]] verwenden, um weitere Demo-Inhalte anzusehen und die einzelnen Funktionen des Wikis auszuprobieren und besser kennenzulernen. 
 
- {{box}}Mit dem {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}} erfahren Sie mehr darüber, wie Sie XWiki verwenden.{{/box}}
+{{box}}
+Mit dem {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}} erfahren Sie mehr darüber, wie Sie XWiki verwenden.
+{{/box}}
 
-(%class="row"%)(((
-(%class="col-xs-12 col-sm-6"%)(((
+(%class="row"%)
+(((
+(%class="col-xs-12 col-sm-6"%)
+(((
 = Erweitern Sie Ihr Wiki =
 
 Um die Leistungsfähigkeit zu erhöhen und den Funktionsumfang Ihres Wikis zu erweitern, verwenden Sie den {{velocity}}[[Extension Manager&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}}, um Erweiterungen zu suchen und zu installieren.
 
 Benutzen Sie das [[Erweiterungsverzeichnis&gt;&gt;http://extensions.xwiki.org]], um durch die mehr als 900 für XWiki verfügbaren Community-Erweiterungen zu blättern.
 )))
-(%class="col-xs-12 col-sm-6"%)(((
+
+(%class="col-xs-12 col-sm-6"%)
+(((
 = Erstellen Sie Ihre Anwendung =
 
 Gehen Sie über die verfügbaren Erweiterungen hinaus und definieren Sie die //Struktur// Ihrer Daten basierend auf //Ihrem// Bedarf, indem Sie //Ihre// eigenen Anwendungen mit [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM) erstellen. 

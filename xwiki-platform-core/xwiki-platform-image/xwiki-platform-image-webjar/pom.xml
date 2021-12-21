@@ -24,17 +24,24 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-image</artifactId>
     <version>14.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-image</artifactId>
-  <name>XWiki Platform - Image - Parent POM</name>
-  <description>Code related to image processing</description>
-  <packaging>pom</packaging>
-  <modules>
-    <module>xwiki-platform-image-ui</module>
-    <module>xwiki-platform-image-webjar</module>
-    <module>xwiki-platform-image-api</module>
-    <module>xwiki-platform-image-plugin</module>
-  </modules>
+  <packaging>jar</packaging>
+  <artifactId>xwiki-platform-image-webjar</artifactId>
+  <name>XWiki Platform - Image - WebJar</name>
+  <description>JavaScript resources required by the image module.</description>
+  <properties>
+    <!-- Name to display in the Extension Manager -->
+    <xwiki.extension.name>Image WebJar</xwiki.extension.name>
+    <gallery.version>3.4.0</gallery.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>webjar-blueimp-gallery</artifactId>
+      <version>${gallery.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

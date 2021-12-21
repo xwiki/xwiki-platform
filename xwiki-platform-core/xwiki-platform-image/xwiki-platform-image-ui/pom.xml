@@ -24,17 +24,31 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-image</artifactId>
     <version>14.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-image</artifactId>
-  <name>XWiki Platform - Image - Parent POM</name>
-  <description>Code related to image processing</description>
-  <packaging>pom</packaging>
-  <modules>
-    <module>xwiki-platform-image-ui</module>
-    <module>xwiki-platform-image-webjar</module>
-    <module>xwiki-platform-image-api</module>
-    <module>xwiki-platform-image-plugin</module>
-  </modules>
+  <artifactId>xwiki-platform-image-ui</artifactId>
+  <name>XWiki Platform - Image - UI</name>
+  <packaging>xar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Image UI</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- JavaScript dependencies -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
+  </dependencies>
 </project>

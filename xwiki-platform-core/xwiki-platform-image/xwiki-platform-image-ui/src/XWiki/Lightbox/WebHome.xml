@@ -1,0 +1,528 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<xwikidoc version="1.4" reference="XWiki.Lightbox.WebHome" locale="">
+  <web>XWiki.Lightbox</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>XWiki.Admin</creator>
+  <creationDate>1639126877000</creationDate>
+  <parent>XWiki.WebHome</parent>
+  <author>XWiki.Admin</author>
+  <contentAuthor>XWiki.Admin</contentAuthor>
+  <date>1640072098000</date>
+  <contentUpdateDate>1639126877000</contentUpdateDate>
+  <version>1.649</version>
+  <title>Lightbox</title>
+  <comment/>
+  <minorEdit>true</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content/>
+  <object>
+    <name>XWiki.Lightbox.WebHome</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>7765dfcb-b2c3-4536-83bf-89cc7fb51cc5</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.lightboxDescription {&#xd;
+  background-color: white;&#xd;
+  display: grid;&#xd;
+  grid-template-columns: auto auto;&#xd;
+  justify-items: center;&#xd;
+  align-items: center;&#xd;
+  position: absolute;&#xd;
+  font-size: 2.5vw;&#xd;
+  width: 100%;&#xd;
+  height: 5%;&#xd;
+  bottom: 0;&#xd;
+  padding: 0;&#xd;
+}&#xd;
+.descriptionCol {&#xd;
+  padding-left: 3%;&#xd;
+}&#xd;
+#blueimp-gallery > div.slides img {&#xd;
+  bottom: 15%;&#xd;
+}&#xd;
+#blueimp-gallery > .indicator {&#xd;
+  bottom: 10%;&#xd;
+}&#xd;
+.controls {&#xd;
+  position: absolute;&#xd;
+  top: 3%;&#xd;
+  right: 3%;&#xd;
+  opacity: .8;&#xd;
+  cursor: pointer;&#xd;
+}&#xd;
+.blueimp-gallery .fullscreen:hover,&#xd;
+.blueimp-gallery .download:hover,&#xd;
+.blueimp-gallery .autoPlay:hover,&#xd;
+.blueimp-gallery .escape:hover {&#xd;
+  color: white;&#xd;
+  opacity: 1;&#xd;
+}&#xd;
+.blueimp-gallery .fullscreen,&#xd;
+.blueimp-gallery .download,&#xd;
+.blueimp-gallery .autoPlay,&#xd;
+.blueimp-gallery .escape {&#xd;
+  display: none;&#xd;
+}&#xd;
+.blueimp-gallery-controls .fullscreen,&#xd;
+.blueimp-gallery-controls .download,&#xd;
+.blueimp-gallery-controls .autoPlay,&#xd;
+.blueimp-gallery-controls .escape {&#xd;
+  display: block;&#xd;
+  /* Fix z-index issues (controls behind slide element) on Android: */&#xd;
+  -webkit-transform: translateZ(0);&#xd;
+  -moz-transform: translateZ(0);&#xd;
+  -ms-transform: translateZ(0);&#xd;
+  -o-transform: translateZ(0);&#xd;
+  transform: translateZ(0);&#xd;
+}</code>
+    </property>
+    <property>
+      <contentType></contentType>
+    </property>
+    <property>
+      <name>Lightbox Style Sheet</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Lightbox.WebHome</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>f936e4c9-b9ce-4e31-bb67-f987bde67053</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content></content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.requirejs.module.image.lightbox</name>
+    </property>
+    <property>
+      <parameters>id=xwiki-blueimp-gallery&#xd;
+path=$services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'js/blueimp-gallery-bundle.min')&#xd;
+bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-gallery-indicator,blueimp-gallery-video,blueimp-gallery-vimeo,blueimp-gallery-youtube</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Lightbox.WebHome</name>
+    <number>1</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>8626f6f7-1b24-45c3-9f6f-c7e40491fd9c</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}&#xd;
+#set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'css/blueimp-gallery.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))&#xd;
+#set ($discard = $xwiki.jsx.use('XWiki.Lightbox.WebHome'))&#xd;
+#set ($discard = $xwiki.ssx.use('XWiki.Lightbox.WebHome'))&#xd;
+{{html clean="false"}}&#xd;
+&lt;!-- The Gallery lightbox dialog. -->&#xd;
+&lt;div&#xd;
+  id="blueimp-gallery"&#xd;
+  class="blueimp-gallery"&#xd;
+  aria-label="image gallery"&#xd;
+  aria-modal="true"&#xd;
+  role="dialog"&#xd;
+>&#xd;
+  &lt;div class="slides" aria-live="polite">&lt;/div>&#xd;
+  &lt;h3 class="title">&lt;/h3>&#xd;
+  &lt;a&#xd;
+    class="prev" aria-controls="blueimp-gallery"&#xd;
+    aria-label="previous slide" aria-keyshortcuts="ArrowLeft"&#xd;
+  >&lt;/a>&#xd;
+  &lt;a&#xd;
+    class="next" aria-controls="blueimp-gallery"&#xd;
+    aria-label="next slide" aria-keyshortcuts="ArrowRight"&#xd;
+  >&lt;/a>&#xd;
+  &lt;div class="controls btn-group">&#xd;
+    &lt;a&#xd;
+      class="btn fullscreen" id="lightboxFullscreen" aria-controls="blueimp-gallery"&#xd;
+      aria-label="fullscreen" aria-keyshortcuts="Fullscreen"&#xd;
+    >$services.icon.renderHTML('arrows')&lt;/a>&#xd;
+    &lt;a&#xd;
+      class="btn download" id="lightboxDownload" aria-controls="blueimp-gallery"&#xd;
+      aria-label="download" aria-keyshortcuts="Download"&#xd;
+    >$services.icon.renderHTML('download')&lt;/a>&#xd;
+    &lt;a&#xd;
+      class="btn autoPlay" aria-controls="blueimp-gallery" aria-label="autoPlay slideshow"&#xd;
+      aria-keyshortcuts="Space" aria-pressed="false"&#xd;
+    >$services.icon.renderHTML('play')&lt;/a>&#xd;
+    &lt;a&#xd;
+      class="btn escape" aria-controls="blueimp-gallery"&#xd;
+      aria-label="escape" aria-keyshortcuts="Escape"&#xd;
+    >$services.icon.renderHTML('cross')&lt;/a>&#xd;
+  &lt;/div>&#xd;
+  &lt;div class="lightboxDescription">&#xd;
+    &lt;div class="descriptionCol">&#xd;
+      &lt;span class="title">&lt;/span>&#xd;
+    &lt;/div>&#xd;
+    &lt;div class="descriptionCol">&#xd;
+      &lt;span class="publisher">&lt;/span>&#xd;
+      &lt;span class="date">&lt;/span>&#xd;
+     &lt;/div>&#xd;
+  &lt;/div>&#xd;
+  &lt;ol class="indicator">&lt;/ol>&#xd;
+&lt;/div>&#xd;
+{{/html}}&#xd;
+{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.template.header.after</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.template.header.after.image.lightbox</name>
+    </property>
+    <property>
+      <parameters></parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

@@ -1,0 +1,56 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<xwikidoc version="1.4" reference="XWiki.Lightbox.LightboxConfiguration" locale="">
+  <web>XWiki.Lightbox</web>
+  <name>LightboxConfiguration</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>XWiki.Admin</creator>
+  <creationDate>1639138765000</creationDate>
+  <parent>WebHome</parent>
+  <author>XWiki.Admin</author>
+  <contentAuthor>XWiki.Admin</contentAuthor>
+  <date>1640076439000</date>
+  <contentUpdateDate>1639243017000</contentUpdateDate>
+  <version>12.9</version>
+  <title>LightboxConfiguration</title>
+  <comment/>
+  <minorEdit>true</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content/>
+  <object>
+    <name>XWiki.Lightbox.LightboxConfiguration</name>
+    <number>0</number>
+    <className>XWiki.Lightbox.LightboxConfigurationClass</className>
+    <guid>cbcc352e-94aa-4fdd-bf88-1bfc7bf008d1</guid>
+    <class>
+      <name>XWiki.Lightbox.LightboxConfigurationClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <isLightboxEnabled>
+        <customDisplay/>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>isLightboxEnabled</name>
+        <number>1</number>
+        <prettyName>Enable the lightbox</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </isLightboxEnabled>
+    </class>
+    <property>
+      <isLightboxEnabled>0</isLightboxEnabled>
+    </property>
+  </object>
+</xwikidoc>

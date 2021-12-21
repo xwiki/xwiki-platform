@@ -1,0 +1,332 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<xwikidoc version="1.4" reference="XWiki.Lightbox.LightboxAdministration" locale="">
+  <web>XWiki.Lightbox</web>
+  <name>LightboxAdministration</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>XWiki.Admin</creator>
+  <creationDate>1639138843000</creationDate>
+  <parent>WebHome</parent>
+  <author>XWiki.Admin</author>
+  <contentAuthor>XWiki.Admin</contentAuthor>
+  <date>1640076427000</date>
+  <contentUpdateDate>1639244117000</contentUpdateDate>
+  <version>5.6</version>
+  <title>LightboxAdministration</title>
+  <comment/>
+  <minorEdit>true</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity output="false"}}&#xd;
+#macro (stripHTMLMacro $displayOutput)&#xd;
+  $stringtool.removeEnd($stringtool.removeStart($displayOutput, '{{html clean="false" wiki="false"}}'), '{{/html}}')&#xd;
+#end&#xd;
+#macro (showProperty $propertyName)&#xd;
+  &lt;dl>&#xd;
+    &lt;dt>&#xd;
+      #set ($propertyClass = $xclass.get($propertyName))&#xd;
+      &lt;label#if ($editing) for="${lightboxConfigClassName}_0_${propertyName}"#end>&#xd;
+        $services.localization.render("lightbox.admin.${propertyName}.label")&#xd;
+      &lt;/label>&#xd;
+      #set ($hint = $propertyClass.hint)&#xd;
+      #if ("$!hint" == '')&#xd;
+        #set ($hint = $services.localization.render("lightbox.admin.${propertyName}.hint"))&#xd;
+      #end&#xd;
+      &lt;span class="xHint">$escapetool.xml($hint)&lt;/span>&#xd;
+    &lt;/dt>&#xd;
+    #set ($displayOutput = $lightboxConfigDoc.display($propertyName, $mode))&#xd;
+    &lt;dd>#stripHTMLMacro($displayOutput)&lt;/dd>&#xd;
+  &lt;/dl>&#xd;
+#end&#xd;
+{{/velocity}}&#xd;
+&#xd;
+{{velocity}}&#xd;
+#set ($lightboxConfigClassName = 'XWiki.Lightbox.LightboxConfigurationClass')&#xd;
+#set ($lightboxConfigDoc = $xwiki.getDocument('XWiki.Lightbox.LightboxConfiguration'))&#xd;
+#set ($discard = $lightboxConfigDoc.use($lightboxConfigClassName))&#xd;
+#set ($lightboxConfigClass = $xwiki.getDocument($lightboxConfigClassName))&#xd;
+#set ($xclass = $lightboxConfigClass.getxWikiClass())&#xd;
+#set ($editing = $xcontext.action == 'edit' || $xcontext.action == 'admin')&#xd;
+#set ($mode = "#if ($editing)edit#{else}view#end")&#xd;
+{{html clean="false"}}&#xd;
+#if ($xcontext.action == 'admin')&#xd;
+  &lt;form action="$lightboxConfigDoc.getURL('save')" class="xform">&#xd;
+    &lt;div class="hidden">&#xd;
+      &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.token)"/>&#xd;
+    &lt;/div>&#xd;
+#else&#xd;
+  &lt;div class="xform">&#xd;
+#end&#xd;
+  #showProperty('isLightboxEnabled')&#xd;
+#if ($xcontext.action == 'admin')&#xd;
+  &lt;p>&#xd;
+    &lt;input type="submit" class="btn btn-primary" name="action_saveandcontinue"&#xd;
+      value="$escapetool.xml($services.localization.render('save'))"/>&#xd;
+  &lt;/p>&#xd;
+&lt;/form>&#xd;
+#else&#xd;
+&lt;/div>&#xd;
+#end&#xd;
+{{/html}}&#xd;
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.Lightbox.LightboxAdministration</name>
+    <number>0</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>ba9edcd1-7940-485a-95ea-ad5aa5e684d3</guid>
+    <class>
+      <name>XWiki.ConfigurableClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <categoryIcon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>categoryIcon</name>
+        <number>11</number>
+        <picker>0</picker>
+        <prettyName>categoryIcon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </categoryIcon>
+      <codeToExecute>
+        <contenttype>VelocityWiki</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <hint/>
+        <name>codeToExecute</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>codeToExecute</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </codeToExecute>
+      <configurationClass>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText/>
+        <hint/>
+        <idField/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>configurationClass</name>
+        <number>3</number>
+        <picker>1</picker>
+        <prettyName>configurationClass</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </configurationClass>
+      <displayBeforeCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>displayBeforeCategory</name>
+        <number>10</number>
+        <picker>0</picker>
+        <prettyName>displayBeforeCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayBeforeCategory>
+      <displayInCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>displayInCategory</name>
+        <number>9</number>
+        <picker>0</picker>
+        <prettyName>displayInCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInCategory>
+      <displayInSection>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>displayInSection</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>displayInSection</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInSection>
+      <heading>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>heading</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>heading</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </heading>
+      <iconAttachment>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>iconAttachment</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>iconAttachment</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </iconAttachment>
+      <linkPrefix>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>linkPrefix</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>linkPrefix</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </linkPrefix>
+      <propertiesToShow>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>propertiesToShow</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>propertiesToShow</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </propertiesToShow>
+      <scope>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>12</number>
+        <picker>1</picker>
+        <prettyName>scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>WIKI|SPACE|ALL_SPACES|WIKI+ALL_SPACES</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+      <sectionOrder>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>sectionOrder</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>sectionOrder</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </sectionOrder>
+    </class>
+    <property>
+      <categoryIcon></categoryIcon>
+    </property>
+    <property>
+      <codeToExecute>{{display reference="XWiki.Lightbox.LightboxAdministration"/}}</codeToExecute>
+    </property>
+    <property>
+      <configurationClass></configurationClass>
+    </property>
+    <property>
+      <displayBeforeCategory></displayBeforeCategory>
+    </property>
+    <property>
+      <displayInCategory></displayInCategory>
+    </property>
+    <property>
+      <displayInSection>lightbox</displayInSection>
+    </property>
+    <property>
+      <heading></heading>
+    </property>
+    <property>
+      <iconAttachment></iconAttachment>
+    </property>
+    <property>
+      <linkPrefix></linkPrefix>
+    </property>
+    <property>
+      <propertiesToShow/>
+    </property>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+    <property>
+      <sectionOrder/>
+    </property>
+  </object>
+</xwikidoc>

@@ -84,8 +84,8 @@
   };
 
   var getWidgetToSelect = function(editor) {
-    var selection = editor.getSelection();
-    if (selection && !selection.isFake) {
+    var selection = editor.getSelection(/* forceRealSelection: */ true);
+    if (selection) {
       var nativeSelection = selection.getNative();
       for (var i = 0; i < nativeSelection.rangeCount; i++) {
         var widget = getWidgetInRange(nativeSelection.getRangeAt(i), editor);
@@ -141,6 +141,7 @@
         break;
       }
     }
+    var skippedBR = false;
     while (!range.collapsed) {
       if (typeof range.startContainer.nodeValue === 'string') {
         if (range.startOffset === range.startContainer.nodeValue.length) {
@@ -152,6 +153,13 @@
       } else if (range.startOffset === range.startContainer.childNodes.length) {
         // The range starts at the end of an element (inside). Move the start after that element.
         range.setStartAfter(range.startContainer);
+      } else if (!skippedBR && range.startOffset === range.startContainer.childNodes.length - 1 &&
+          range.startContainer.lastChild.nodeName.toLowerCase() === 'br') {
+        // The element ends with a BR and the range starts just before it. This BR is often used to make an empty line
+        // editable (can't place the caret on that empty line otherwise), so we can skip it, but only once (we don't
+        // want to skip multiple empty lines). Move the start after the element.
+        range.setStartAfter(range.startContainer);
+        skippedBR = true;
       } else {
         break;
       }

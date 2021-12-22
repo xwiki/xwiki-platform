@@ -413,7 +413,8 @@
       // * if the macro is updated then we need to wait for the macro output to be updated to match the new macro data
       editor.fire('lockSnapshot', {dontUpdate: true});
       var expectedElementName = data.inline ? 'span' : 'div';
-      if (widget && widget.element && widget.element.getName() === expectedElementName) {
+      var updatingWidget = widget && widget.element;
+      if (updatingWidget && widget.element.getName() === expectedElementName) {
         // We have edited a macro and the macro type (inline vs. block) didn't change.
         // We can safely update the existing macro widget.
         widget.setData(data);
@@ -422,12 +423,31 @@
         // the macro type may require changes to the HTML structure (e.g. split the parent paragraph) in order to
         // preserve the HTML validity, so we have to replace the existing macro widget.
         this.createMacroWidget(editor, data);
+        // When inserting an in-line macro we need to make sure that it stays inline after the edited content is
+        // refreshed (rendering round-trip). The problem is that the rendering doesn't support inline-only macros. When
+        // a macro is found alone inside a paragraph it is rendered as a block (when the content is refreshed), even if
+        // the macro supports inline mode. This prevents the user from typing in the same paragraph after the macro was
+        // inserted. We fix this by inserting an element after the macro which forces the inline rendering because the
+        // macro is not anymore alone inside the paragraph. We remove this element after the content is refreshed.
+        if (data.inline === 'enforce' && !updatingWidget && editor.widgets.focused) {
+          var inlineEnforcer = new CKEDITOR.dom.element('span');
+          inlineEnforcer.setAttribute('id', 'xwiki-macro-inline-enforcer');
+          inlineEnforcer.appendText('\u00A0');
+          inlineEnforcer.insertAfter(editor.widgets.focused.wrapper);
+        }
       }
       // Unlock the Undo/Redo history after the edited content is updated.
       var handler = editor.on('afterCommandExec', function(event) {
         var command = event.data.name;
         if (event.data.name === 'xwiki-refresh') {
           handler.removeListener();
+          // Remove the element we added after the macro to force the inline rendering.
+          var inlineEnforcer = editor.editable().findOne('span#xwiki-macro-inline-enforcer');
+          if (inlineEnforcer) {
+            // Place the caret after the inserted inline macro in order to allow the user to continue typing.
+            editor.getSelection().selectElement(inlineEnforcer);
+            inlineEnforcer.remove();
+          }
           editor.fire('unlockSnapshot');
         }
       });

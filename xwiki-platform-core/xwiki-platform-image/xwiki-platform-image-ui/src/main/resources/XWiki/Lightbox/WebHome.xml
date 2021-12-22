@@ -1,23 +1,41 @@
-<?xml version='1.1' encoding='UTF-8'?>
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc version="1.4" reference="XWiki.Lightbox.WebHome" locale="">
   <web>XWiki.Lightbox</web>
   <name>WebHome</name>
   <language/>
-  <defaultLanguage>en</defaultLanguage>
+  <defaultLanguage/>
   <translation>0</translation>
-  <creator>XWiki.Admin</creator>
-  <creationDate>1639126877000</creationDate>
+  <creator>xwiki:XWiki.Admin</creator>
   <parent>XWiki.WebHome</parent>
-  <author>XWiki.Admin</author>
-  <contentAuthor>XWiki.Admin</contentAuthor>
-  <date>1640072098000</date>
-  <contentUpdateDate>1639126877000</contentUpdateDate>
-  <version>1.649</version>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
   <title>Lightbox</title>
   <comment/>
-  <minorEdit>true</minorEdit>
+  <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content/>
   <object>
     <name>XWiki.Lightbox.WebHome</name>
@@ -141,10 +159,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
       image.popover({
         content: function() {
           return `
-            &lt;div class="btn-group imageToolbar">
-              &lt;a id="openLightbox">$services.icon.renderHTML("arrows")&lt;/a>
-              &lt;a id="imageDownload" href="${image[0].src}" target="_blank">$services.icon.renderHTML("download")&lt;/a>
-            &lt;/div>`;
+            &lt;div class="btn-group imageToolbar"&gt;
+              &lt;a id="openLightbox"&gt;$services.icon.renderHTML("arrows")&lt;/a&gt;
+              &lt;a id="imageDownload" href="${image[0].src}" target="_blank"&gt;$services.icon.renderHTML("download")&lt;/a&gt;
+            &lt;/div&gt;`;
         },
         html: true,
         placement: 'bottom',
@@ -246,7 +264,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
       method: 'GET',
       dataType: 'json'
     }).done(function (data, textStatus, jqXHR) {
-      var attachment = data.attachments.find(field => field.name == getImageName(imageLink));
+      var attachment = data.attachments.find(field =&gt; field.name == getImageName(imageLink));
       deferred.resolve(attachment);
     }).fail(function () {
       deferred.reject();
@@ -446,10 +464,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
 .descriptionCol {
   padding-left: 3%;
 }
-#blueimp-gallery > div.slides img {
+#blueimp-gallery &gt; div.slides img {
   bottom: 15%;
 }
-#blueimp-gallery > .indicator {
+#blueimp-gallery &gt; .indicator {
   bottom: 10%;
 }
 .controls {
@@ -486,7 +504,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
 }</code>
     </property>
     <property>
-      <contentType></contentType>
+      <contentType/>
     </property>
     <property>
       <name>Lightbox Style Sheet</name>
@@ -622,7 +640,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content></content>
+      <content/>
     </property>
     <property>
       <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
@@ -771,53 +789,53 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
   #set ($discard = $xwiki.jsx.use('XWiki.Lightbox.WebHome'))
   #set ($discard = $xwiki.ssx.use('XWiki.Lightbox.WebHome'))
   {{html clean="false"}}
-  &lt;!-- The Gallery lightbox dialog. -->
+  &lt;!-- The Gallery lightbox dialog. --&gt;
   &lt;div
     id="blueimp-gallery"
     class="blueimp-gallery"
     aria-label="image gallery"
     aria-modal="true"
     role="dialog"
-  >
-    &lt;div class="slides" aria-live="polite">&lt;/div>
-    &lt;h3 class="title">&lt;/h3>
+  &gt;
+    &lt;div class="slides" aria-live="polite"&gt;&lt;/div&gt;
+    &lt;h3 class="title"&gt;&lt;/h3&gt;
     &lt;a
       class="prev" aria-controls="blueimp-gallery"
       aria-label="previous slide" aria-keyshortcuts="ArrowLeft"
-    >&lt;/a>
+    &gt;&lt;/a&gt;
     &lt;a
       class="next" aria-controls="blueimp-gallery"
       aria-label="next slide" aria-keyshortcuts="ArrowRight"
-    >&lt;/a>
-    &lt;div class="controls btn-group">
+    &gt;&lt;/a&gt;
+    &lt;div class="controls btn-group"&gt;
       &lt;a
         class="btn fullscreen" id="lightboxFullscreen" aria-controls="blueimp-gallery"
         aria-label="fullscreen" aria-keyshortcuts="Fullscreen"
-      >$services.icon.renderHTML('arrows')&lt;/a>
+      &gt;$services.icon.renderHTML('arrows')&lt;/a&gt;
       &lt;a
         class="btn download" id="lightboxDownload" aria-controls="blueimp-gallery"
         aria-label="download" aria-keyshortcuts="Download"
-      >$services.icon.renderHTML('download')&lt;/a>
+      &gt;$services.icon.renderHTML('download')&lt;/a&gt;
       &lt;a
         class="btn autoPlay" aria-controls="blueimp-gallery" aria-label="autoPlay slideshow"
         aria-keyshortcuts="Space" aria-pressed="false"
-      >$services.icon.renderHTML('play')&lt;/a>
+      &gt;$services.icon.renderHTML('play')&lt;/a&gt;
       &lt;a
         class="btn escape" aria-controls="blueimp-gallery"
         aria-label="escape" aria-keyshortcuts="Escape"
-      >$services.icon.renderHTML('cross')&lt;/a>
-    &lt;/div>
-    &lt;div class="lightboxDescription">
-      &lt;div class="descriptionCol">
-        &lt;span class="title">&lt;/span>
-      &lt;/div>
-      &lt;div class="descriptionCol">
-        &lt;span class="publisher">&lt;/span>
-        &lt;span class="date">&lt;/span>
-       &lt;/div>
-    &lt;/div>
-    &lt;ol class="indicator">&lt;/ol>
-  &lt;/div>
+      &gt;$services.icon.renderHTML('cross')&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;div class="lightboxDescription"&gt;
+      &lt;div class="descriptionCol"&gt;
+        &lt;span class="title"&gt;&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="descriptionCol"&gt;
+        &lt;span class="publisher"&gt;&lt;/span&gt;
+        &lt;span class="date"&gt;&lt;/span&gt;
+       &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;ol class="indicator"&gt;&lt;/ol&gt;
+  &lt;/div&gt;
   {{/html}}
 #end
 {{/velocity}}</content>
@@ -829,7 +847,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
       <name>org.xwiki.platform.template.header.after.image.lightbox</name>
     </property>
     <property>
-      <parameters></parameters>
+      <parameters/>
     </property>
     <property>
       <scope>wiki</scope>

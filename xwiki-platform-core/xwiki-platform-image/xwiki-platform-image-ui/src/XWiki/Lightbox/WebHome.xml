@@ -124,59 +124,59 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>.lightboxDescription {&#xd;
-  background-color: white;&#xd;
-  display: grid;&#xd;
-  grid-template-columns: auto auto;&#xd;
-  justify-items: center;&#xd;
-  align-items: center;&#xd;
-  position: absolute;&#xd;
-  font-size: 2.5vw;&#xd;
-  width: 100%;&#xd;
-  height: 5%;&#xd;
-  bottom: 0;&#xd;
-  padding: 0;&#xd;
-}&#xd;
-.descriptionCol {&#xd;
-  padding-left: 3%;&#xd;
-}&#xd;
-#blueimp-gallery > div.slides img {&#xd;
-  bottom: 15%;&#xd;
-}&#xd;
-#blueimp-gallery > .indicator {&#xd;
-  bottom: 10%;&#xd;
-}&#xd;
-.controls {&#xd;
-  position: absolute;&#xd;
-  top: 3%;&#xd;
-  right: 3%;&#xd;
-  opacity: .8;&#xd;
-  cursor: pointer;&#xd;
-}&#xd;
-.blueimp-gallery .fullscreen:hover,&#xd;
-.blueimp-gallery .download:hover,&#xd;
-.blueimp-gallery .autoPlay:hover,&#xd;
-.blueimp-gallery .escape:hover {&#xd;
-  color: white;&#xd;
-  opacity: 1;&#xd;
-}&#xd;
-.blueimp-gallery .fullscreen,&#xd;
-.blueimp-gallery .download,&#xd;
-.blueimp-gallery .autoPlay,&#xd;
-.blueimp-gallery .escape {&#xd;
-  display: none;&#xd;
-}&#xd;
-.blueimp-gallery-controls .fullscreen,&#xd;
-.blueimp-gallery-controls .download,&#xd;
-.blueimp-gallery-controls .autoPlay,&#xd;
-.blueimp-gallery-controls .escape {&#xd;
-  display: block;&#xd;
-  /* Fix z-index issues (controls behind slide element) on Android: */&#xd;
-  -webkit-transform: translateZ(0);&#xd;
-  -moz-transform: translateZ(0);&#xd;
-  -ms-transform: translateZ(0);&#xd;
-  -o-transform: translateZ(0);&#xd;
-  transform: translateZ(0);&#xd;
+      <code>.lightboxDescription {
+  background-color: white;
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-items: center;
+  align-items: center;
+  position: absolute;
+  font-size: 2.5vw;
+  width: 100%;
+  height: 5%;
+  bottom: 0;
+  padding: 0;
+}
+.descriptionCol {
+  padding-left: 3%;
+}
+#blueimp-gallery > div.slides img {
+  bottom: 15%;
+}
+#blueimp-gallery > .indicator {
+  bottom: 10%;
+}
+.controls {
+  position: absolute;
+  top: 3%;
+  right: 3%;
+  opacity: .8;
+  cursor: pointer;
+}
+.blueimp-gallery .fullscreen:hover,
+.blueimp-gallery .download:hover,
+.blueimp-gallery .autoPlay:hover,
+.blueimp-gallery .escape:hover {
+  color: white;
+  opacity: 1;
+}
+.blueimp-gallery .fullscreen,
+.blueimp-gallery .download,
+.blueimp-gallery .autoPlay,
+.blueimp-gallery .escape {
+  display: none;
+}
+.blueimp-gallery-controls .fullscreen,
+.blueimp-gallery-controls .download,
+.blueimp-gallery-controls .autoPlay,
+.blueimp-gallery-controls .escape {
+  display: block;
+  /* Fix z-index issues (controls behind slide element) on Android: */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
 }</code>
     </property>
     <property>
@@ -325,8 +325,8 @@
       <name>org.xwiki.platform.requirejs.module.image.lightbox</name>
     </property>
     <property>
-      <parameters>id=xwiki-blueimp-gallery&#xd;
-path=$services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'js/blueimp-gallery-bundle.min')&#xd;
+      <parameters>id=xwiki-blueimp-gallery
+path=$services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'js/blueimp-gallery-bundle.min')
 bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-gallery-indicator,blueimp-gallery-video,blueimp-gallery-vimeo,blueimp-gallery-youtube</parameters>
     </property>
     <property>
@@ -457,63 +457,63 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content>{{velocity}}&#xd;
-#set ($lightboxConfigDoc = $xwiki.getDocument('XWiki.Lightbox.LightboxConfiguration'))&#xd;
-#set ($lightboxConfigObj = $lightboxConfigDoc.getObject('XWiki.Lightbox.LightboxConfigurationClass'))&#xd;
-#if ($lightboxConfigObj.getValue('isLightboxEnabled').equals(1))&#xd;
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'css/blueimp-gallery.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))&#xd;
-  #set ($discard = $xwiki.jsx.use('XWiki.Lightbox.WebHome'))&#xd;
-  #set ($discard = $xwiki.ssx.use('XWiki.Lightbox.WebHome'))&#xd;
-  {{html clean="false"}}&#xd;
-  &lt;!-- The Gallery lightbox dialog. -->&#xd;
-  &lt;div&#xd;
-    id="blueimp-gallery"&#xd;
-    class="blueimp-gallery"&#xd;
-    aria-label="image gallery"&#xd;
-    aria-modal="true"&#xd;
-    role="dialog"&#xd;
-  >&#xd;
-    &lt;div class="slides" aria-live="polite">&lt;/div>&#xd;
-    &lt;h3 class="title">&lt;/h3>&#xd;
-    &lt;a&#xd;
-      class="prev" aria-controls="blueimp-gallery"&#xd;
-      aria-label="previous slide" aria-keyshortcuts="ArrowLeft"&#xd;
-    >&lt;/a>&#xd;
-    &lt;a&#xd;
-      class="next" aria-controls="blueimp-gallery"&#xd;
-      aria-label="next slide" aria-keyshortcuts="ArrowRight"&#xd;
-    >&lt;/a>&#xd;
-    &lt;div class="controls btn-group">&#xd;
-      &lt;a&#xd;
-        class="btn fullscreen" id="lightboxFullscreen" aria-controls="blueimp-gallery"&#xd;
-        aria-label="fullscreen" aria-keyshortcuts="Fullscreen"&#xd;
-      >$services.icon.renderHTML('arrows')&lt;/a>&#xd;
-      &lt;a&#xd;
-        class="btn download" id="lightboxDownload" aria-controls="blueimp-gallery"&#xd;
-        aria-label="download" aria-keyshortcuts="Download"&#xd;
-      >$services.icon.renderHTML('download')&lt;/a>&#xd;
-      &lt;a&#xd;
-        class="btn autoPlay" aria-controls="blueimp-gallery" aria-label="autoPlay slideshow"&#xd;
-        aria-keyshortcuts="Space" aria-pressed="false"&#xd;
-      >$services.icon.renderHTML('play')&lt;/a>&#xd;
-      &lt;a&#xd;
-        class="btn escape" aria-controls="blueimp-gallery"&#xd;
-        aria-label="escape" aria-keyshortcuts="Escape"&#xd;
-      >$services.icon.renderHTML('cross')&lt;/a>&#xd;
-    &lt;/div>&#xd;
-    &lt;div class="lightboxDescription">&#xd;
-      &lt;div class="descriptionCol">&#xd;
-        &lt;span class="title">&lt;/span>&#xd;
-      &lt;/div>&#xd;
-      &lt;div class="descriptionCol">&#xd;
-        &lt;span class="publisher">&lt;/span>&#xd;
-        &lt;span class="date">&lt;/span>&#xd;
-       &lt;/div>&#xd;
-    &lt;/div>&#xd;
-    &lt;ol class="indicator">&lt;/ol>&#xd;
-  &lt;/div>&#xd;
-  {{/html}}&#xd;
-#end&#xd;
+      <content>{{velocity}}
+#set ($lightboxConfigDoc = $xwiki.getDocument('XWiki.Lightbox.LightboxConfiguration'))
+#set ($lightboxConfigObj = $lightboxConfigDoc.getObject('XWiki.Lightbox.LightboxConfigurationClass'))
+#if ($lightboxConfigObj.getValue('isLightboxEnabled').equals(1))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'css/blueimp-gallery.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.jsx.use('XWiki.Lightbox.WebHome'))
+  #set ($discard = $xwiki.ssx.use('XWiki.Lightbox.WebHome'))
+  {{html clean="false"}}
+  &lt;!-- The Gallery lightbox dialog. -->
+  &lt;div
+    id="blueimp-gallery"
+    class="blueimp-gallery"
+    aria-label="image gallery"
+    aria-modal="true"
+    role="dialog"
+  >
+    &lt;div class="slides" aria-live="polite">&lt;/div>
+    &lt;h3 class="title">&lt;/h3>
+    &lt;a
+      class="prev" aria-controls="blueimp-gallery"
+      aria-label="previous slide" aria-keyshortcuts="ArrowLeft"
+    >&lt;/a>
+    &lt;a
+      class="next" aria-controls="blueimp-gallery"
+      aria-label="next slide" aria-keyshortcuts="ArrowRight"
+    >&lt;/a>
+    &lt;div class="controls btn-group">
+      &lt;a
+        class="btn fullscreen" id="lightboxFullscreen" aria-controls="blueimp-gallery"
+        aria-label="fullscreen" aria-keyshortcuts="Fullscreen"
+      >$services.icon.renderHTML('arrows')&lt;/a>
+      &lt;a
+        class="btn download" id="lightboxDownload" aria-controls="blueimp-gallery"
+        aria-label="download" aria-keyshortcuts="Download"
+      >$services.icon.renderHTML('download')&lt;/a>
+      &lt;a
+        class="btn autoPlay" aria-controls="blueimp-gallery" aria-label="autoPlay slideshow"
+        aria-keyshortcuts="Space" aria-pressed="false"
+      >$services.icon.renderHTML('play')&lt;/a>
+      &lt;a
+        class="btn escape" aria-controls="blueimp-gallery"
+        aria-label="escape" aria-keyshortcuts="Escape"
+      >$services.icon.renderHTML('cross')&lt;/a>
+    &lt;/div>
+    &lt;div class="lightboxDescription">
+      &lt;div class="descriptionCol">
+        &lt;span class="title">&lt;/span>
+      &lt;/div>
+      &lt;div class="descriptionCol">
+        &lt;span class="publisher">&lt;/span>
+        &lt;span class="date">&lt;/span>
+       &lt;/div>
+    &lt;/div>
+    &lt;ol class="indicator">&lt;/ol>
+  &lt;/div>
+  {{/html}}
+#end
 {{/velocity}}</content>
     </property>
     <property>

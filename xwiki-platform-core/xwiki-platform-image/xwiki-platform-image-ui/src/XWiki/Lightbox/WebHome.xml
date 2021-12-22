@@ -22,6 +22,312 @@
   <object>
     <name>XWiki.Lightbox.WebHome</name>
     <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>d13a89fa-c549-4d9d-8f00-ac872a3ac192</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('lightboxTranslationKeys', {
+  prefix: 'core.viewers.attachments.',
+  keys: [
+    'date',
+    'author'
+  ]
+});
+
+require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-gallery', 'blueimp-gallery-fullscreen', 'blueimp-gallery-indicator'], function($, xm, l10n, gallery) {
+  var myOpenLightbox;
+
+  /*
+   * Make sure that the toolbar will remain open also while hovering it, not just the image.
+   */
+  var keepToolbarOpenOnHover = function(image) {
+    var timeout = setTimeout(function() {
+      image.popover('hide');
+    }, 3000);
+    $('.imageToolbar').on('mouseenter', function() {
+      clearTimeout(timeout);
+    });
+    $('.imageToolbar').parent().on('mouseleave', function() {
+      image.popover('hide');
+    });
+  }
+
+  /**
+   * Assign to each given image a toolbar popover with download and lightbox options.
+   */
+  var enableToolbarPopovers = function(images) {
+    images.each(function(index) {
+      var image = $(this);
+      image.popover({
+        content: function() {
+          return `
+            &lt;div class="btn-group imageToolbar">
+              &lt;a id="openLightbox">$services.icon.renderHTML("arrows")&lt;/a>
+              &lt;a id="imageDownload" href="${image[0].src}" target="_blank">$services.icon.renderHTML("download")&lt;/a>
+            &lt;/div>`;
+        },
+        html: true,
+        placement: 'bottom',
+        trigger: 'manual'
+      }).on('mouseenter', function() {
+        image.popover('show');
+        $('#openLightbox').data('index', index);
+        keepToolbarOpenOnHover(image);
+      }).on('show.bs.popover', function() {
+        // Set the attributes for the download button inside lightbox. Since IE11 does not have support for the download attribute,
+        // the image will be displayed in another tab.
+        $('#lightboxDownload').attr('href', image[0].src);
+        $('#lightboxDownload').attr('download', getImageName(image[0].src));
+        $('#lightboxDownload').attr('target', '_blank');
+      }).on('shown.bs.popover', function() {
+        // The popover content does not accept the download attribute, so we need to set this manually.
+        $('#imageDownload').attr('download', getImageName(image[0].src));
+      });
+    });
+  };
+
+  /**
+   * Remove the popover for the given elements.
+   */
+  var removePopovers = function(elements) {
+    elements.each(function(index) {
+      $(this).popover('destroy');
+    });
+  }
+
+  /*
+   * Extract the image name from the url. This may not be applied for external urls.
+   */
+  var getImageName = function(imageLink) {
+    return new URL(imageLink).pathname.split("/").pop();
+  };
+
+  /**
+   * Rescale image to original size.
+   */
+  var removeResizeParams = function(imageSrc) {
+    var url = new URL(imageSrc);
+    var searchParams = new URLSearchParams(url.search);
+    searchParams.delete('width');
+    searchParams.delete('height');
+    url.search = searchParams.toString();
+    return url.toString();
+  };
+
+  /**
+   * Scale image to thumbnail. This may not be applied for external urls.
+   */
+  var createThumbnailURL = function(imageSrc) {
+    var url = new URL(imageSrc);
+    var searchParams = new URLSearchParams(url.search);
+    searchParams.append('width', '150');
+    searchParams.append('height', '150');
+    url.search = searchParams.toString();
+    return url.toString();
+  };
+
+  /**
+   * Open lightbox in fullscreen mode, or close it if already open.
+   */
+  var toggleLightboxFullscreen = function() {
+    if (!$('#lightboxFullscreen').data('open')) {
+      myOpenLightbox.requestFullScreen($('#blueimp-gallery')[0]);
+      $('#lightboxFullscreen').data('open', true);
+    } else {
+      myOpenLightbox.exitFullScreen();
+      $('#lightboxFullscreen').data('open', false);
+    }
+  };
+
+  /**
+   * Update lightbox description using given information.
+   */
+  var updateLightboxDescription = function(data) {
+    if (data != undefined) {
+      $('.lightboxDescription').css("display", "grid");
+      $('.lightboxDescription').find('.title').text(data.name);
+      var translationPublisher = l10n.get('author', XWiki.Model.resolve(data.author, XWiki.EntityType.DOCUMENT).name);
+      $('.lightboxDescription').find('.publisher').text(translationPublisher);
+      var translationDate = l10n.get('date', new Date(data.date).toLocaleDateString());
+      $('.lightboxDescription').find('.date').text(translationDate);
+    } else {
+      $(".lightboxDescription").css("display", "none");
+    }
+  }
+
+  /**
+   * Get information for attachment, when this can be found inside the current page.
+   * TODO: consider the path of the attachment, not just the current page.
+   */
+  var getAttachmentInfo = function(imageLink) {
+    var deferred = $.Deferred();
+    var attachmentsURL = xm.restURL + `/attachments`;
+    $.ajax(attachmentsURL, {
+      method: 'GET',
+      dataType: 'json'
+    }).done(function (data, textStatus, jqXHR) {
+      var attachment = data.attachments.find(field => field.name == getImageName(imageLink));
+      deferred.resolve(attachment);
+    }).fail(function () {
+      deferred.reject();
+    });
+    return deferred.promise();
+  };
+
+  /**
+   * Open Gallery lightbox at the current index.
+   */
+  var openLightbox = function() {
+    var media = [];
+    $('#xwikicontent').find('img').each(function(index) {
+      var imageURL = removeResizeParams(this.src);
+      media.push({
+        href: imageURL,
+        thumbnail: createThumbnailURL(imageURL)
+      });
+    });
+
+    var options = {
+      container: '#blueimp-gallery',
+      index: parseInt($('#openLightbox').data('index')),
+      // The class names are overridden since we changed the styles.
+      closeClass: 'escape',
+      playPauseClass: 'autoPlay',
+      onslide: function(index, slide) {
+        getAttachmentInfo($(slide).find('img')[0].src).done(function(data) {
+          updateLightboxDescription(data);
+        });
+      }
+    };
+    myOpenLightbox = gallery(media, options);
+  };
+
+  /**
+   * Initialize the lightbox functionality for a set of images.
+   */
+  var initLightboxFunctionality = function() {
+    // Activate the lightbox for all images inside the xwikicontent. TODO: filter to consider only rendered images.
+    var contentImages = $('#xwikicontent').find('img');
+    enableToolbarPopovers(contentImages);
+  };
+
+  $(document).on('click', '#openLightbox', openLightbox);
+
+  $(document).on('click', '#lightboxFullscreen', toggleLightboxFullscreen);
+
+  $(window).on('load', function() {
+    initLightboxFunctionality();
+  });
+
+  $(document).on('xwiki:dom:updated', function() {
+    if ($('#blueimp-gallery').data('isViewMode')) {
+      initLightboxFunctionality();
+    }
+  });
+
+  $(document).on('xwiki:actions:edit', function() {
+    $('#blueimp-gallery').data('isViewMode', false);
+    removePopovers($('#xwikicontent').find('img'));
+  });
+
+  $(document).on('xwiki:actions:view', function() {
+    $('#blueimp-gallery').data('isViewMode', true);
+  });
+});</code>
+    </property>
+    <property>
+      <name>Lightbox JavaScript</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Lightbox.WebHome</name>
+    <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>7765dfcb-b2c3-4536-83bf-89cc7fb51cc5</guid>
     <class>

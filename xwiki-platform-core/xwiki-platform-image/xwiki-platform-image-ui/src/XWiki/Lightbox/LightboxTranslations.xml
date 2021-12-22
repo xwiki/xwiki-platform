@@ -20,7 +20,7 @@
   <hidden>true</hidden>
   <content>admin.lightbox=Lightbox
 lightbox.admin.isLightboxEnabled.label=Enable lightbox
-lightbox.admin.isLightboxEnabled.hint=If image lightbox is enabled.</content>
+lightbox.admin.isLightboxEnabled.hint=Enable the possibility to open content images in a lightbox.</content>
   <object>
     <name>XWiki.Lightbox.LightboxTranslations</name>
     <number>0</number>

@@ -18,57 +18,57 @@
   <minorEdit>true</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{velocity output="false"}}&#xd;
-#macro (stripHTMLMacro $displayOutput)&#xd;
-  $stringtool.removeEnd($stringtool.removeStart($displayOutput, '{{html clean="false" wiki="false"}}'), '{{/html}}')&#xd;
-#end&#xd;
-#macro (showProperty $propertyName)&#xd;
-  &lt;dl>&#xd;
-    &lt;dt>&#xd;
-      #set ($propertyClass = $xclass.get($propertyName))&#xd;
-      &lt;label#if ($editing) for="${lightboxConfigClassName}_0_${propertyName}"#end>&#xd;
-        $services.localization.render("lightbox.admin.${propertyName}.label")&#xd;
-      &lt;/label>&#xd;
-      #set ($hint = $propertyClass.hint)&#xd;
-      #if ("$!hint" == '')&#xd;
-        #set ($hint = $services.localization.render("lightbox.admin.${propertyName}.hint"))&#xd;
-      #end&#xd;
-      &lt;span class="xHint">$escapetool.xml($hint)&lt;/span>&#xd;
-    &lt;/dt>&#xd;
-    #set ($displayOutput = $lightboxConfigDoc.display($propertyName, $mode))&#xd;
-    &lt;dd>#stripHTMLMacro($displayOutput)&lt;/dd>&#xd;
-  &lt;/dl>&#xd;
-#end&#xd;
-{{/velocity}}&#xd;
-&#xd;
-{{velocity}}&#xd;
-#set ($lightboxConfigClassName = 'XWiki.Lightbox.LightboxConfigurationClass')&#xd;
-#set ($lightboxConfigDoc = $xwiki.getDocument('XWiki.Lightbox.LightboxConfiguration'))&#xd;
-#set ($discard = $lightboxConfigDoc.use($lightboxConfigClassName))&#xd;
-#set ($lightboxConfigClass = $xwiki.getDocument($lightboxConfigClassName))&#xd;
-#set ($xclass = $lightboxConfigClass.getxWikiClass())&#xd;
-#set ($editing = $xcontext.action == 'edit' || $xcontext.action == 'admin')&#xd;
-#set ($mode = "#if ($editing)edit#{else}view#end")&#xd;
-{{html clean="false"}}&#xd;
-#if ($xcontext.action == 'admin')&#xd;
-  &lt;form action="$lightboxConfigDoc.getURL('save')" class="xform">&#xd;
-    &lt;div class="hidden">&#xd;
-      &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.token)"/>&#xd;
-    &lt;/div>&#xd;
-#else&#xd;
-  &lt;div class="xform">&#xd;
-#end&#xd;
-  #showProperty('isLightboxEnabled')&#xd;
-#if ($xcontext.action == 'admin')&#xd;
-  &lt;p>&#xd;
-    &lt;input type="submit" class="btn btn-primary" name="action_saveandcontinue"&#xd;
-      value="$escapetool.xml($services.localization.render('save'))"/>&#xd;
-  &lt;/p>&#xd;
-&lt;/form>&#xd;
-#else&#xd;
-&lt;/div>&#xd;
-#end&#xd;
-{{/html}}&#xd;
+  <content>{{velocity output="false"}}
+#macro (stripHTMLMacro $displayOutput)
+  $stringtool.removeEnd($stringtool.removeStart($displayOutput, '{{html clean="false" wiki="false"}}'), '{{/html}}')
+#end
+#macro (showProperty $propertyName)
+  &lt;dl>
+    &lt;dt>
+      #set ($propertyClass = $xclass.get($propertyName))
+      &lt;label#if ($editing) for="${lightboxConfigClassName}_0_${propertyName}"#end>
+        $services.localization.render("lightbox.admin.${propertyName}.label")
+      &lt;/label>
+      #set ($hint = $propertyClass.hint)
+      #if ("$!hint" == '')
+        #set ($hint = $services.localization.render("lightbox.admin.${propertyName}.hint"))
+      #end
+      &lt;span class="xHint">$escapetool.xml($hint)&lt;/span>
+    &lt;/dt>
+    #set ($displayOutput = $lightboxConfigDoc.display($propertyName, $mode))
+    &lt;dd>#stripHTMLMacro($displayOutput)&lt;/dd>
+  &lt;/dl>
+#end
+{{/velocity}}
+
+{{velocity}}
+#set ($lightboxConfigClassName = 'XWiki.Lightbox.LightboxConfigurationClass')
+#set ($lightboxConfigDoc = $xwiki.getDocument('XWiki.Lightbox.LightboxConfiguration'))
+#set ($discard = $lightboxConfigDoc.use($lightboxConfigClassName))
+#set ($lightboxConfigClass = $xwiki.getDocument($lightboxConfigClassName))
+#set ($xclass = $lightboxConfigClass.getxWikiClass())
+#set ($editing = $xcontext.action == 'edit' || $xcontext.action == 'admin')
+#set ($mode = "#if ($editing)edit#{else}view#end")
+{{html clean="false"}}
+#if ($xcontext.action == 'admin')
+  &lt;form action="$lightboxConfigDoc.getURL('save')" class="xform">
+    &lt;div class="hidden">
+      &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.token)"/>
+    &lt;/div>
+#else
+  &lt;div class="xform">
+#end
+  #showProperty('isLightboxEnabled')
+#if ($xcontext.action == 'admin')
+  &lt;p>
+    &lt;input type="submit" class="btn btn-primary" name="action_saveandcontinue"
+      value="$escapetool.xml($services.localization.render('save'))"/>
+  &lt;/p>
+&lt;/form>
+#else
+&lt;/div>
+#end
+{{/html}}
 {{/velocity}}</content>
   <object>
     <name>XWiki.Lightbox.LightboxAdministration</name>

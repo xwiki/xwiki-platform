@@ -49,6 +49,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -167,6 +168,7 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
+import com.xpn.xwiki.internal.doc.BaseObjects;
 import com.xpn.xwiki.internal.doc.XWikiAttachmentList;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.internal.render.OldRendering;
@@ -504,10 +506,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * Map holding document objects indexed by XClass references (i.e. Document References since a XClass reference
-     * points to a document). The map is not synchronized, and uses a TreeMap implementation to preserve index ordering
-     * (consistent sorted order for output to XML, rendering in velocity, etc.)
+     * points to a document). The preserve index ordering (consistent sorted order for output to XML, rendering in
+     * velocity, etc.)
      */
-    private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
+    private Map<DocumentReference, BaseObjects> xObjects = new ConcurrentSkipListMap<>();
 
     private final XWikiAttachmentList attachmentList = new XWikiAttachmentList(XWikiDocument.this);
 
@@ -2544,7 +2546,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public Map<DocumentReference, List<BaseObject>> getXObjects()
     {
-        return this.xObjects;
+        return (Map) this.xObjects;
     }
 
     /**
@@ -2572,7 +2574,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         // Replace the current objects with the provided ones.
-        this.xObjects = objects;
+        Map<DocumentReference, BaseObjects> objectsCopy = new ConcurrentSkipListMap<>();
+        objects.forEach((k, v) -> objectsCopy.put(k, new BaseObjects(v)));
+        this.xObjects = objectsCopy;
     }
 
     /**
@@ -2636,9 +2640,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         BaseObject object = BaseClass.newCustomClassInstance(absoluteClassReference, context);
         object.setOwnerDocument(this);
         object.setXClassReference(classReference);
-        List<BaseObject> objects = this.xObjects.get(absoluteClassReference);
+        BaseObjects objects = this.xObjects.get(absoluteClassReference);
         if (objects == null) {
-            objects = new ArrayList<BaseObject>();
+            objects = new BaseObjects();
             this.xObjects.put(absoluteClassReference, objects);
         }
         objects.add(object);
@@ -2758,16 +2762,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         // Add new objects
-        if (objects.isEmpty()) {
-            // Pretty wrong but can't remove that for retro compatibility reasons...
-            // Note that it means that someone can put an unmodifiable list here make impossible to add any object of
-            // this class.
-            this.xObjects.put(classReference, objects);
-        } else {
-            for (BaseObject baseObject : objects) {
-                addXObject(classReference, baseObject);
-            }
-        }
+        this.xObjects.put(classReference, new BaseObjects(objects));
 
         setMetaDataDirty(true);
     }
@@ -3062,9 +3057,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             object.setNumber(nb);
         }
 
-        List<BaseObject> objects = this.xObjects.get(classReference);
+        BaseObjects objects = this.xObjects.get(classReference);
         if (objects == null) {
-            objects = new ArrayList<BaseObject>();
+            objects = new BaseObjects();
             this.xObjects.put(classReference, objects);
         }
         while (nb >= objects.size()) {
@@ -3088,9 +3083,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         object.setOwnerDocument(this);
         object.setNumber(nb);
 
-        List<BaseObject> objects = this.xObjects.get(object.getXClassReference());
+        BaseObjects objects = this.xObjects.get(object.getXClassReference());
         if (objects == null) {
-            objects = new ArrayList<BaseObject>();
+            objects = new BaseObjects();
             this.xObjects.put(object.getXClassReference(), objects);
         }
         while (nb >= objects.size()) {

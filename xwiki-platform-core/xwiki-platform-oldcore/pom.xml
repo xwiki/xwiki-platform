@@ -607,6 +607,10 @@
       <version>1.6</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava-testlib</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.xwiki.commons</groupId>

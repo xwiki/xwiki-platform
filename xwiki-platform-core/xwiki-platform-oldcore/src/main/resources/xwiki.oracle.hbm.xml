@@ -73,7 +73,7 @@
         <property name="content" type="materialized_clob" column="XWD_CONTENT" length="200000" not-null="false" />
         <property name="version" type="string" column="XWD_VERSION" length="255" not-null="true" />
         <property name="customClass" type="string" column="XWD_CUSTOM_CLASS" length="768" />
-        <property name="parent" type="string" column="XWD_PARENT" length="511" />
+        <property name="parent" type="string" column="XWD_PARENT" length="768" />
         <property name="xWikiClassXML" type="materialized_clob" column="XWD_CLASS_XML" length="60000" not-null="false" />
         <property name="elements" type="integer" not-null="true" column="XWD_ELEMENTS" />
         <property name="defaultTemplate" type="string" column="XWD_DEFAULT_TEMPLATE" length="768" />

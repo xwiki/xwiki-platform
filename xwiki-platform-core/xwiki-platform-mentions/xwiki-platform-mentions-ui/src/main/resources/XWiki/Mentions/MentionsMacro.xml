@@ -209,7 +209,7 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
           editor.once('afterInsertHtml', function () {
             editor.execCommand('xwiki-macro-insert', {
               name: 'mention',
-              inline: true,
+              inline: 'enforce',
               parameters: {
                 reference: param.id,
                 style: 'FULL_NAME',

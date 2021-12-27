@@ -65,6 +65,8 @@ ckeditor.plugin.link.queryString=Query String
 ckeditor.plugin.link.defaultLabel=type the link label
 ckeditor.plugin.link.openInNewTab=Open Link in New Tab
 
+ckeditor.plugin.list.listType.none=None
+
 ckeditor.plugin.macro.placeholder=macro:{0}
 ckeditor.plugin.macro.buttonHint=XWiki Macro
 ckeditor.plugin.macro.editButtonHint=Edit Macro

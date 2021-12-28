@@ -23,14 +23,13 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -50,7 +49,6 @@ import org.hibernate.mapping.Table;
 import org.hibernate.mapping.Value;
 import org.hibernate.query.NativeQuery;
 import org.slf4j.Logger;
-import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
 
@@ -64,16 +62,11 @@ import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * This migration increase the maximum size of all the columns potentially containing a document reference to the
- * maximum index supported by MySQL: 768.
+ * Extended by migrations which need to resize columns to the maximum index supported by MySQL: 768.
  *
  * @version $Id$
- * @since 13.2RC1
  */
-@Component
-@Named("R130200001XWIKI18429")
-@Singleton
-public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigration
+public abstract class AbstractResizeMigration extends AbstractHibernateDataMigration
 {
     private static final int MAXSIZE_MIN = 720;
 
@@ -238,23 +231,44 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
             try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
                 DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-                // Remove combined UNIQUE KEY affecting xwikiattrecyclebin#XDA_FILENAME column since those are not
-                // supposed to exist anymore and it can prevent the resize on MySQL/MariaDB
+                java.util.Collection<PersistentClass> bindings =
+                    this.hibernateStore.getConfigurationMetadata().getEntityBindings();
+
+                Set<String> dynamicTables = new HashSet<>();
+
+                List<PersistentClass> existingTables = new ArrayList<>(bindings.size());
+
                 if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
+                    // Make sure all MySQL/MariaDB tables use a DYNAMIC row format (required to support key prefix
+                    // length limit up to 3072 bytes)
+                    for (PersistentClass entity : this.hibernateStore.getConfigurationMetadata().getEntityBindings()) {
+                        if (exists(entity, databaseMetaData)) {
+                            existingTables.add(entity);
+
+                            setTableDYNAMIC(entity, builder, dynamicTables);
+                        }
+                    }
+
+                    // Remove combined UNIQUE KEY affecting xwikiattrecyclebin#XDA_FILENAME column since those are not
+                    // supposed to exist anymore and it can prevent the resize on MySQL/MariaDB
                     removeAttachmentRecycleFilenameMultiKey(builder);
                     removeRecycleFilenameMultiKey(builder);
                 }
 
-                // Update collumns for which the size changed
-                updateColumns(databaseMetaData, builder);
+                // Update columns for which the size changed
+                updateColumns(existingTables, databaseMetaData, builder, dynamicTables);
             }
         } catch (SQLException e) {
             throw new DataMigrationException("Error while extracting metadata", e);
         }
 
         if (builder.length() > 0) {
-            return String.format("<changeSet author=\"xwiki\" id=\"R%s\">%s</changeSet>", getVersion().getVersion(),
-                builder.toString());
+            String script = String.format("<changeSet author=\"xwiki\" id=\"R%s\">%s</changeSet>",
+                getVersion().getVersion(), builder.toString());
+
+            this.logger.debug("Liquibase script: {}", script);
+
+            return script;
         }
 
         return null;
@@ -312,28 +326,17 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         }
     }
 
-    private void updateColumns(DatabaseMetaData databaseMetaData, StringBuilder builder)
-        throws SQLException, DataMigrationException
+    private void updateColumns(List<PersistentClass> existingTables, DatabaseMetaData databaseMetaData,
+        StringBuilder builder, Set<String> dynamicTables) throws SQLException, DataMigrationException
     {
-        Set<String> dynamicTables = new HashSet<>();
-
-        for (PersistentClass entity : this.hibernateStore.getConfigurationMetadata().getEntityBindings()) {
-            // Check if the table exist
-            if (exists(entity, databaseMetaData)) {
-                if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
-                    // Make sure all MySQL/MariaDB tables use a DYNAMIC row format (required to support key prefix
-                    // length limit up to 3072 bytes)
-                    setTableDYNAMIC(entity, builder, dynamicTables);
-                }
-
-                // Find properties to update
-                for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
-                    updateProperty(it.next(), databaseMetaData, dynamicTables, builder);
-                }
-
-                // Check the key
-                updateValue(entity.getKey(), databaseMetaData, dynamicTables, builder);
+        for (PersistentClass entity : existingTables) {
+            // Find properties to update
+            for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
+                updateProperty(it.next(), databaseMetaData, dynamicTables, builder);
             }
+
+            // Check the key
+            updateValue(entity.getKey(), databaseMetaData, dynamicTables, builder);
         }
     }
 
@@ -354,6 +357,8 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
             builder.append(tableName);
             builder.append(" ROW_FORMAT=DYNAMIC");
             builder.append("</sql>");
+
+            dynamicTables.add(tableName);
         }
     }
 
@@ -404,6 +409,7 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
 
             // Make sure all MySQL/MariaDB tables use a DYNAMIC row format (required to support key prefix
             // length limit up to 3072 bytes)
+            // Check again in case it's a special table which was missed in the previous pass
             setTableDYNAMIC(tableName, builder, dynamicTables);
 
             // Not using <modifyDataType> here because Liquibase ignores attributes likes "NOT NULL"

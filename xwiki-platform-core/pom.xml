@@ -156,9 +156,16 @@
                    </differences>
                  </revapi.differences>
             -->
-            <!-- Note: Until https://github .com/revapi/revapi/issues/221#issuecomment-832626011 is fixed, the
-                 revapi.differences node below must not be cleaned between releases. -->p
-            
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.store.migration.hibernate.R130200001XWIKI18429DataMigration</old>
+                  <justification>Migration not needed anymore</justification>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

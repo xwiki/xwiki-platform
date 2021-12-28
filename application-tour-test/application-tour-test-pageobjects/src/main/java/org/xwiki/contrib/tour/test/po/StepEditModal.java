@@ -149,13 +149,13 @@ public class StepEditModal extends EditPage
     public void close()
     {
         closeButton.click();
-        waitUntilElementDisappears(By.id("stepForm"));
+        getDriver().waitUntilElementDisappears(By.id("stepForm"));
     }
 
     public void save()
     {
         saveButton.click();
-        waitUntilElementDisappears(By.id("stepForm"));
+        getDriver().waitUntilElementDisappears(By.id("stepForm"));
     }
 
 }

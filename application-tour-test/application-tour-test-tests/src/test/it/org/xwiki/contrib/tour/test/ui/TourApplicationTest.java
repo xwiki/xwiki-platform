@@ -43,8 +43,7 @@ import static org.junit.Assert.assertTrue;
 public class TourApplicationTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule superAdminAuthenticationRule =
-        new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     private void setUpTour(TourEditPage tourEditPage, String description, boolean isActive, String targetPage,
         String targetClass) throws Exception

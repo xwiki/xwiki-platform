@@ -28,7 +28,6 @@
     <version>1.3.4-SNAPSHOT</version>
   </parent>
   <artifactId>application-tour-test</artifactId>
-  <version>1.3.4-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>Integration tests for the Tour Application.</description>
   <name>Tour Application - Test - Parent POM</name>

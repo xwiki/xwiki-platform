@@ -42,7 +42,7 @@ public class PageWithTour extends ViewPage
     
     public boolean isTourDisplayed()
     {
-        return getUtil().hasElement(By.className("tour"));
+        return getDriver().hasElement(By.className("tour"));
     }
     
     public String getStepTitle()
@@ -57,17 +57,17 @@ public class PageWithTour extends ViewPage
     
     public boolean hasPreviousStep()
     {
-        return getUtil().hasElementWithoutWaiting(By.xpath("//a[@id='bootstrap_tour_prev']"));
+        return getDriver().hasElementWithoutWaiting(By.xpath("//a[@id='bootstrap_tour_prev']"));
     }
 
     public boolean hasNextStep()
     {
-        return getUtil().hasElementWithoutWaiting(By.xpath("//a[@id='bootstrap_tour_next']"));
+        return getDriver().hasElementWithoutWaiting(By.xpath("//a[@id='bootstrap_tour_next']"));
     }
 
     public boolean hasEndButton()
     {
-        return getUtil().hasElementWithoutWaiting(
+        return getDriver().hasElementWithoutWaiting(
                 By.xpath("//div[contains(@class, 'popover-navigation')]//a[@id='bootstrap_tour_end']"));
     }
     
@@ -83,10 +83,10 @@ public class PageWithTour extends ViewPage
         // Click
         getDriver().findElement(By.xpath("//a[@id='bootstrap_tour_prev']")).click();
         // Wait until current state disappears
-        getUtil().waitUntilCondition(
+        getDriver().waitUntilCondition(
                 ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.id(stepId))));
         // Wait until new step appears
-        getUtil().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(By.className("tour")));
+        getDriver().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(By.className("tour")));
     }
 
     public void nextStep()
@@ -96,17 +96,17 @@ public class PageWithTour extends ViewPage
         // Click
         getDriver().findElement(By.xpath("//a[@id='bootstrap_tour_next']")).click();
         // Wait until current state disappears
-        getUtil().waitUntilCondition(
+        getDriver().waitUntilCondition(
                 ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.id(stepId))));
         // Wait until new step appear
-        getUtil().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(By.className("tour")));
+        getDriver().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(By.className("tour")));
     }
 
     public void end()
     {
         getDriver().findElement(
                 By.xpath("//div[contains(@class, 'popover-navigation')]//a[@id='bootstrap_tour_end']")).click();
-        getUtil().waitUntilCondition(
+        getDriver().waitUntilCondition(
                 ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.className("tour"))));
     }
 
@@ -114,18 +114,18 @@ public class PageWithTour extends ViewPage
     {
         getDriver().findElement(
                 By.xpath("//a[@id='bootstrap_tour_close']")).click();
-        getUtil().waitUntilCondition(
+        getDriver().waitUntilCondition(
                 ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.className("tour"))));
     }
     
     public boolean hasResumeButton()
     {
-        return getUtil().hasElementWithoutWaiting(By.id("tourResume"));
+        return getDriver().hasElementWithoutWaiting(By.id("tourResume"));
     }
 
     public void resume()
     {
         getDriver().findElement(By.id("tourResume")).click();
-        getUtil().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(By.className("tour")));
+        getDriver().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(By.className("tour")));
     }
 }

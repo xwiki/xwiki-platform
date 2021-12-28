@@ -76,7 +76,7 @@ public class TourEditPage extends EditPage
     public StepEditModal newStep()
     {
         addStepButton.click();
-        waitUntilElementIsVisible(By.id("stepForm"));
+        getDriver().waitUntilElementIsVisible(By.id("stepForm"));
         return new StepEditModal();
     }
 
@@ -85,7 +85,7 @@ public class TourEditPage extends EditPage
         WebElement stepEditLink =
                 stepsContainer.findElement(By.xpath(String.format("(//a[contains(@class, 'editStep')])[%d]", number)));
         stepEditLink.click();
-        waitUntilElementIsVisible(By.id("stepForm"));
+        getDriver().waitUntilElementIsVisible(By.id("stepForm"));
         return new StepEditModal();
     }
 
@@ -94,14 +94,14 @@ public class TourEditPage extends EditPage
         WebElement deleteLink =
                 stepsContainer.findElement(By.xpath(String.format("(//a[contains(@class, 'deleteStep')])[%d]", number)));
         deleteLink.click();
-        waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
+        getDriver().waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
         WebElement confirmBox = getDriver().findElement(By.className("xdialog-content"));
         if (confirm) {
             confirmBox.findElement(By.xpath("//input[@value = 'Yes']")).click();
         } else {
             confirmBox.findElement(By.xpath("//input[@value = 'No']")).click();
         }
-        waitUntilElementDisappears(By.className("xdialog-box-confirmation"));
+        getDriver().waitUntilElementDisappears(By.className("xdialog-box-confirmation"));
         waitForNotificationSuccessMessage("Delete step done!");
 
     }

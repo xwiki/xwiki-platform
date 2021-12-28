@@ -29,7 +29,11 @@
   </parent>
   <artifactId>application-tour-test-pageobjects</artifactId>
   <name>Tour Application - Tests - Page Objects</name>
-  <description>Page Objects for Tour Application - Tests.</description>
+  <description>Page Objects for Tour Application - Tests</description>
+  <properties>
+    <!-- None of the classes is valid -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

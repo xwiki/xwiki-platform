@@ -349,6 +349,8 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         throws DataMigrationException
     {
         if (!dynamicTables.contains(tableName) && !StringUtils.equalsIgnoreCase(getRowFormat(tableName), "Dynamic")) {
+            this.logger.debug("Converting raw format for table [{}]", tableName);
+
             builder.append("<sql>");
             builder.append("ALTER TABLE ");
             builder.append(tableName);
@@ -371,7 +373,11 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
                     query.setParameter("schema", hibernateStore.getDatabaseFromWikiName());
                     query.setParameter("table", tableName);
 
-                    return query.uniqueResult();
+                    String rawFormat = query.uniqueResult();
+
+                    logger.debug("Row format for table [{}]: {}", tableName, rawFormat);
+
+                    return rawFormat;
                 }
             });
         } catch (XWikiException e) {
@@ -396,11 +402,19 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
 
     private void update(Column column, Set<String> dynamicTables, StringBuilder builder) throws DataMigrationException
     {
-        if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
+        DatabaseProduct productName = this.hibernateStore.getDatabaseProductName();
+
+        this.logger.debug("Database product name: {}", productName);
+
+        if (productName == DatabaseProduct.MYSQL) {
             JdbcEnvironment jdbcEnvironment =
                 this.hibernateStore.getConfigurationMetadata().getDatabase().getJdbcEnvironment();
             String tableName = jdbcEnvironment.getQualifiedObjectNameFormatter()
                 .format(column.getValue().getTable().getQualifiedTableName(), this.hibernateStore.getDialect());
+
+            String quotedColumn = column.getQuotedName(this.hibernateStore.getDialect());
+
+            this.logger.debug("Updating column [{}] in table [{}]", quotedColumn, tableName);
 
             // Make sure all MySQL/MariaDB tables use a DYNAMIC row format (required to support key prefix
             // length limit up to 3072 bytes)
@@ -410,7 +424,7 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
             builder.append("<sql>");
             builder.append(this.hibernateStore.getDialect().getAlterTableString(tableName));
             builder.append(" MODIFY ");
-            builder.append(column.getQuotedName(this.hibernateStore.getDialect()));
+            builder.append(quotedColumn);
             builder.append(' ');
             builder.append(getDataType(column, this.hibernateStore.getConfigurationMetadata()));
             builder.append("</sql>");

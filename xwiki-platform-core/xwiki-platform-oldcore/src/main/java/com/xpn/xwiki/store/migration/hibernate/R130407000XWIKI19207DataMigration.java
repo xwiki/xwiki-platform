@@ -39,8 +39,6 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 @Singleton
 public class R130407000XWIKI19207DataMigration extends R130200001XWIKI18429DataMigration
 {
-    private static final int MAXSIZE_MIN = 511;
-
     @Override
     public String getDescription()
     {

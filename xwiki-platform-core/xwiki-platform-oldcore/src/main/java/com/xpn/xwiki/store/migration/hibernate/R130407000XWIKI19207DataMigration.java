@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * This migration increase the maximum size of the parent column to the maximum index supported by MySQL: 768.
+ * This migration increase the maximum size of various columns to the maximum index supported by MySQL: 768.
  *
  * @version $Id$
  * @since 13.4.7
@@ -37,14 +37,14 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 @Component
 @Named("R130407000XWIKI19207")
 @Singleton
-public class R130407000XWIKI19207DataMigration extends R130200001XWIKI18429DataMigration
+public class R130407000XWIKI19207DataMigration extends AbstractResizeMigration
 {
     private static final int MAXSIZE_MIN = 511;
 
     @Override
     public String getDescription()
     {
-        return "Increase the maximum size of the parent column to the maximum index supported by MySQL";
+        return "Increase the maximum size of the columns to the maximum index supported by MySQL";
     }
 
     @Override

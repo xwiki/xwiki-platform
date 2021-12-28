@@ -54,7 +54,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * This migration aims at applying the fix done on https://jira.xwiki.org/browse/XWIKI-15215 (change the type of some
  * column so that they fit in the maximum allowed maximum row size for the used table type) instances older than
  * 11.3RC1. Without this it's difficult to migrate to utf8mb3. It's also a requirement for
- * {@link R130200001XWIKI18429DataMigration}.
+ * {@link AbstractResizeMigration}.
  * <p>
  * The columns are:
  * <ul>

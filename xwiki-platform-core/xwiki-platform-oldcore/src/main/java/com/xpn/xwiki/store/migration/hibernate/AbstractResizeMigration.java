@@ -65,6 +65,9 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * Extended by migrations which need to resize columns to the maximum index supported by MySQL: 768.
  *
  * @version $Id$
+ * @since 13.4.7
+ * @since 13.10.3
+ * @since 14.0RC1
  */
 public abstract class AbstractResizeMigration extends AbstractHibernateDataMigration
 {

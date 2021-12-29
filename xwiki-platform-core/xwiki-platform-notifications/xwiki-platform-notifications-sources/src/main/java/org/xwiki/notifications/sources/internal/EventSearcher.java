@@ -96,7 +96,6 @@ public class EventSearcher
      * @param limit the maximum number of events to return
      * @param parameters parameters to use
      * @return the found events
-     * @throws QueryException when to search the events
      * @throws EventStreamException when to search the events
      */
     public List<Event> searchStoreEvents(int offset, int limit, NotificationParameters parameters)

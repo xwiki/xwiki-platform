@@ -590,7 +590,8 @@ public abstract class XWikiAction implements LegacyAction
                 }
 
                 if (renderResult != null) {
-                    if (doc.isNew() && "view".equals(context.getAction())
+                    // We apply same logic for both view and get
+                    if (doc.isNew() && ("view".equals(context.getAction()) || "get".equals(context.getAction()))
                         && !"recyclebin".equals(context.getRequest().get("viewer"))
                         && !"children".equals(context.getRequest().get("viewer"))
                         && !"siblings".equals(context.getRequest().get("viewer"))) {

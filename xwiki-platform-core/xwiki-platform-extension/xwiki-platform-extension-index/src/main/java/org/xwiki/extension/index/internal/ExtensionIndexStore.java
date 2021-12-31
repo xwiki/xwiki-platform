@@ -353,7 +353,7 @@ public class ExtensionIndexStore implements Initializable
         // Update installed
         this.utils.setAtomic(
             installed ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
-            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INSTALLED_NAMESPACES, toStoredNamespace(namespace), document);
+            InstalledExtension.FIELD_INSTALLED_NAMESPACES, toStoredNamespace(namespace), document);
 
         // Update compatible
         if (installed) {
@@ -736,7 +736,7 @@ public class ExtensionIndexStore implements Initializable
                 if (!indexedQuery.getInstalled()) {
                     builder.append('-');
                 }
-                builder.append(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INSTALLED_NAMESPACES);
+                builder.append(InstalledExtension.FIELD_INSTALLED_NAMESPACES);
                 builder.append(':');
 
                 builder.append('(');

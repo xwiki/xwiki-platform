@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.DefaultExtensionComponent;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
@@ -84,13 +85,6 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
      * The name of the field indicating in which namespaces an extension is incompatible.
      */
     public static final String SOLR_FIELD_INCOMPATIBLE_NAMESPACES = "s_incompatibleNamespaces";
-
-    /**
-     * The name of the field indicating in which namespaces an extension is installed.
-     * 
-     * @since 14.0RC1
-     */
-    public static final String SOLR_FIELD_INSTALLED_NAMESPACES = "s_installedNamespaces";
 
     /**
      * The name of the field indicating if an entry is the last version of an extension.
@@ -175,7 +169,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         }
 
         if (cversion < SCHEMA_VERSION_14_0) {
-            setStringField(SOLR_FIELD_INSTALLED_NAMESPACES, true, false);
+            setStringField(InstalledExtension.FIELD_INSTALLED_NAMESPACES, true, false);
         }
     }
 

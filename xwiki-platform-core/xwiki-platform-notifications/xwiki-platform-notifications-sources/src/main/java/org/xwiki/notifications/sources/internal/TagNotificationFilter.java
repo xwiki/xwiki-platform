@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.sources.internal;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -117,6 +118,13 @@ public class TagNotificationFilter implements NotificationFilter
             query.bindValue("tagList", enabledTags);
             query.setWiki(currentWiki);
             List<String> pagesHoldingTags = query.execute();
+            if (pagesHoldingTags.isEmpty()) {
+                // here we should return an "always false" node
+                // but the event query generator cannot not handle this currently
+                // return new BooleanValueNode(true).eq(new BooleanValueNode(false));
+                // instead we return an empty list and hope the query optimizer reduces the query
+                pagesHoldingTags = Arrays.asList("");
+            }
             return value(EventProperty.PAGE).inStrings(pagesHoldingTags)
                     .and(value(EventProperty.WIKI).eq(value(currentWiki)));
         } catch (QueryException e) {

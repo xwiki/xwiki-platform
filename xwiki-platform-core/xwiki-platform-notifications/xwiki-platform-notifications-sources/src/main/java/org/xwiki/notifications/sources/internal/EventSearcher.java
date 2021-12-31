@@ -83,7 +83,7 @@ public class EventSearcher
             try {
                 return searchStoreEvents(offset, limit, parameters);
             } catch (EventStreamException e) {
-                this.logger.debug("Failed to get events from the EventStore. Trying on the legacy store", e);
+                this.logger.warn("Failed to get events from the EventStore. Trying on the legacy store", e);
             }
         }
 

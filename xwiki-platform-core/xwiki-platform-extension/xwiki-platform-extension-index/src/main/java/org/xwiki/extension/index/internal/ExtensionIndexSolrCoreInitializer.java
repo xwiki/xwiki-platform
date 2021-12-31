@@ -86,6 +86,13 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     public static final String SOLR_FIELD_INCOMPATIBLE_NAMESPACES = "s_incompatibleNamespaces";
 
     /**
+     * The name of the field indicating in which namespaces an extension is installed.
+     * 
+     * @since 14.0RC1
+     */
+    public static final String SOLR_FIELD_INSTALLED_NAMESPACES = "s_installedNamespaces";
+
+    /**
      * The name of the field indicating if an entry is the last version of an extension.
      */
     public static final String SOLR_FIELD_LAST = "s_last";
@@ -101,10 +108,12 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final long SCHEMA_VERSION_13_3 = 130300000;
 
+    private static final long SCHEMA_VERSION_14_0 = 140000000;
+
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_13_3;
+        return SCHEMA_VERSION_14_0;
     }
 
     @Override
@@ -163,6 +172,10 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
             // Store hints for each component type
             setStringField(toComponentFieldName("*"), true, true);
+        }
+
+        if (cversion < SCHEMA_VERSION_14_0) {
+            setStringField(SOLR_FIELD_INSTALLED_NAMESPACES, true, false);
         }
     }
 

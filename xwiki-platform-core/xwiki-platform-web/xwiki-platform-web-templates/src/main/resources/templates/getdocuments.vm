@@ -80,6 +80,9 @@ $response.setContentType("application/json")
 ## ORDER
 ##
 #set ($order = "$!request.sort")
+#if (!$regextool.compile('^(doc\.)?\w+$').matcher($order).matches())
+  #set($order = '')
+#end
 #set ($orderQueryPart = '')
 #if ($order != '')
   #set ($orderDirection = "$!{request.get('dir').toLowerCase()}")

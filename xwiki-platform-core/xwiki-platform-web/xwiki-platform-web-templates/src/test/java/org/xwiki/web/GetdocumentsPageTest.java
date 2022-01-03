@@ -204,10 +204,6 @@ class GetdocumentsPageTest extends PageTest
     @Test
     void preventDOSAttackOnQueryItemsReturned() throws Exception
     {
-        // Simulating the fact that when getdocuments.vm executes, the xwikivars.vm template has already been loaded by
-        // the page rendering.
-        this.templateManager.render("xwikivars.vm");
-
         this.request.put("limit", "101");
         when(this.queryService.hql(anyString())).thenReturn(this.query);
         when(this.query.setLimit(anyInt())).thenReturn(this.query);

@@ -110,7 +110,6 @@ $response.setContentType("application/json")
   ## Security protection for guest users: limit the number of items returned to avoid DOS attacks.
   #if ($isGuest)
     #set ($maxLimit = $services.security.getQueryItemsLimit())
-    zzz $services.security - $maxLimit
     #set ($limit = $mathtool.min($limit, $maxLimit))
   #end
 #end

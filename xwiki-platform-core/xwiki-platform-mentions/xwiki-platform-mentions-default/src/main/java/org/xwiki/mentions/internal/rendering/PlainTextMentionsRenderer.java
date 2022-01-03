@@ -36,7 +36,7 @@ import org.xwiki.mentions.internal.MentionFormatterProvider;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 
 /**
- * Plain text rendered with a specialization to display well formatted user mentions.
+ * Plain text rendered with a specialization to display well-formatted user mentions.
  *
  * @version $Id$
  * @since 12.6

@@ -19,27 +19,32 @@
  */
 package org.xwiki.mentions.internal.rendering;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.util.List;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.renderer.AbstractPrintRendererFactory;
+import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Mentions specific plain text renderer factory.
+ * Unit tests for {@link MentionsSyntaxProvider}.
  *
  * @version $Id$
- * @since 12.6
  */
-@Component
-@Named("plainmentions/1.0")
-@Singleton
-public class PlainTextMentionsRendererFactory extends AbstractPrintRendererFactory
+@ComponentTest
+class MentionsSyntaxProviderTest
 {
-    @Override
-    public Syntax getSyntax()
+    @InjectMockComponents
+    private MentionsSyntaxProvider provider;
+
+    @Test
+    void get()
     {
-        return MentionsSyntaxProvider.PLAINMENTIONS_1_0;
+        List<Syntax> syntaxes = this.provider.get();
+        assertEquals(1, syntaxes.size());
+        assertEquals("plainmentions/1.0", syntaxes.get(0).toIdString());
+        assertEquals("Plain Text Mentions 1.0", syntaxes.get(0).toString());
     }
 }

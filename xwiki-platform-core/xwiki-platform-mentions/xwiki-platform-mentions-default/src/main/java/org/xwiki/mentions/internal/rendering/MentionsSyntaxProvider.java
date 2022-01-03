@@ -19,27 +19,41 @@
  */
 package org.xwiki.mentions.internal.rendering;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.renderer.AbstractPrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
- * Mentions specific plain text renderer factory.
+ * Register the {@code plainmentions/1.0} Syntax supported by this module.
  *
  * @version $Id$
- * @since 12.6
+ * @since 14.0RC1
  */
 @Component
 @Named("plainmentions/1.0")
 @Singleton
-public class PlainTextMentionsRendererFactory extends AbstractPrintRendererFactory
+public class MentionsSyntaxProvider implements Provider<List<Syntax>>
 {
+    /**
+     * Plain Mentions syntax.
+     */
+    public static final SyntaxType PLAINMENTIONS = new SyntaxType("plainmentions", "Plain Text Mentions");
+
+    /**
+     * Plain Mentions 1.0 syntax.
+     */
+    public static final Syntax PLAINMENTIONS_1_0 = new Syntax(PLAINMENTIONS, "1.0");
+
     @Override
-    public Syntax getSyntax()
+    public List<Syntax> get()
     {
-        return MentionsSyntaxProvider.PLAINMENTIONS_1_0;
+        return Collections.singletonList(PLAINMENTIONS_1_0);
     }
 }

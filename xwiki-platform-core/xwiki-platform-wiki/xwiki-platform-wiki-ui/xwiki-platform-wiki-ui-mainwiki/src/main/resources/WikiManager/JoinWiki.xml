@@ -245,7 +245,7 @@
                   &lt;a href="$backUrl" class='button secondary'&gt;{{translation key="platform.wiki.users.join.request.cancel.label"/}}&lt;/a&gt;
                 &lt;/span&gt;
                 &lt;input type='hidden' name='wikiId' value="$!wikiId"/&gt;
-                &lt;input type='hidden' name='requestJoin' value="$!request.requestJoin"/&gt;
+                &lt;input type='hidden' name='requestJoin' value="$escapetool.xml($!request.requestJoin)"/&gt;
                 &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
               &lt;/dl&gt;
             &lt;/form&gt;

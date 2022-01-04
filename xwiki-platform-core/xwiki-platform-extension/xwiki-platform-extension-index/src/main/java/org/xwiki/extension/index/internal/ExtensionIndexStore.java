@@ -60,7 +60,6 @@ import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.repository.internal.installed.DefaultInstalledExtension;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.ExtensionQuery;
@@ -525,13 +524,12 @@ public class ExtensionIndexStore implements Initializable
 
         // Set installed state
         InstalledExtension installedExtension = this.installedExtensions.getInstalledExtension(extension.getId());
-        if (DefaultInstalledExtension.isInstalled(extension)) {
-            Collection<String> namespaces = DefaultInstalledExtension.getNamespaces(extension);
-            if (namespaces == null) {
+        if (installedExtension != null) {
+            if (installedExtension.getNamespaces() == null) {
                 this.utils.set(Extension.FIELD_ALLOWEDNAMESPACES, toStoredNamespace((String) null), document);
             } else {
-                this.utils.set(Extension.FIELD_ALLOWEDNAMESPACES,
-                    namespaces.stream().map(this::toStoredNamespace).collect(Collectors.toList()), document);
+                this.utils.set(Extension.FIELD_ALLOWEDNAMESPACES, installedExtension.getNamespaces().stream()
+                    .map(this::toStoredNamespace).collect(Collectors.toList()), document);
             }
         }
 
@@ -574,15 +572,20 @@ public class ExtensionIndexStore implements Initializable
         return this.extensionManager.getRepository(repositoryId);
     }
 
-    private SolrExtension toSolrExtension(SolrDocument document)
+    public ExtensionId getExtensionId(SolrDocument document)
+    {
+        return new ExtensionId(
+            this.utils.<String>get(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID, document),
+            this.factory.getVersion(this.utils.<String>get(Extension.FIELD_VERSION, document)));
+    }
+
+    public SolrExtension toSolrExtension(SolrDocument document)
     {
         if (document == null) {
             return null;
         }
 
-        ExtensionId extensionId =
-            new ExtensionId(this.utils.<String>get(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID, document),
-                this.factory.getVersion(this.utils.<String>get(Extension.FIELD_VERSION, document)));
+        ExtensionId extensionId = getExtensionId(document);
 
         return toSolrExtension(document, extensionId);
     }
@@ -595,6 +598,13 @@ public class ExtensionIndexStore implements Initializable
 
         SolrExtension extension = new SolrExtension(getRepository(document), extensionId);
 
+        toSolrExtension(document, extension);
+
+        return extension;
+    }
+
+    public void toSolrExtension(SolrDocument document, SolrExtension extension)
+    {
         extension.setType(this.utils.get(Extension.FIELD_TYPE, document));
 
         extension.setName(this.utils.get(Extension.FIELD_NAME, document));
@@ -623,8 +633,6 @@ public class ExtensionIndexStore implements Initializable
 
         // TODO: add dependencies
         // TODO: add managed dependencies
-
-        return extension;
     }
 
     private Collection<String> getNamespaces(String fieldName, SolrDocument document)
@@ -649,6 +657,25 @@ public class ExtensionIndexStore implements Initializable
     {
         SolrQuery solrQuery = new SolrQuery();
 
+        createSolrQuery(query, solrQuery);
+
+        // Execute the search
+        QueryResponse response;
+        try {
+            response = search(solrQuery);
+        } catch (Exception e) {
+            throw new SearchException("Failed to search extension for query [" + query + "]", e);
+        }
+
+        SolrDocumentList documents = response.getResults();
+
+        List<Extension> extensions = documents.stream().map(this::toSolrExtension).collect(Collectors.toList());
+
+        return new CollectionIterableResult<>((int) documents.getNumFound(), (int) documents.getStart(), extensions);
+    }
+
+    public void createSolrQuery(ExtensionQuery query, SolrQuery solrQuery)
+    {
         if (StringUtils.isNotBlank(query.getQuery())) {
             solrQuery.setQuery(query.getQuery());
 
@@ -755,20 +782,6 @@ public class ExtensionIndexStore implements Initializable
             // Only search for latest versions
             solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
         }
-
-        // Execute the search
-        QueryResponse response;
-        try {
-            response = search(solrQuery);
-        } catch (Exception e) {
-            throw new SearchException("Failed to search extension for query [" + query + "]", e);
-        }
-
-        SolrDocumentList documents = response.getResults();
-
-        List<Extension> extensions = documents.stream().map(this::toSolrExtension).collect(Collectors.toList());
-
-        return new CollectionIterableResult<>((int) documents.getNumFound(), (int) documents.getStart(), extensions);
     }
 
     private String serializeFilter(Filter filter)

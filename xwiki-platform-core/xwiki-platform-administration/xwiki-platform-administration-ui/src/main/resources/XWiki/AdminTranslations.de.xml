@@ -50,7 +50,7 @@ administration.menu.search.noResults=Keine Ergebnisse.
 # Registration Section
 XWiki.XWikiPreferences_use_email_verification.hint=Wenn "Ja" wird beim Ausfüllen des Anmeldeformulars eine E-Mail an die angegebene E-Mail Adresse gesendet.
 XWiki.XWikiPreferences_validation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, um ihre E-Mail-Adresse zu bestätigen.
-XWiki.XWikiPreferences_confirmation_email_content.hint=Die E-Mail-Vorlage für die erste Mail die der Benutzer erhält, nachdem das Konto durch Klicken auf den Validierungslink erstellt wurde.
+XWiki.XWikiPreferences_confirmation_email_content.hint=Die E-Mail-Vorlage, die der E-Mail entspricht, die gesendet wird, nachdem der Benutzer sein Konto bestätigt hat, indem er auf den Bestätigungslink in der ersten E-Mail klickt, die er erhält.
 XWiki.XWikiPreferences_invitation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, die zur Registrierung eingeladen werden.
 XWiki.Registration_heading.hint=Dies ist die Zeile oben auf der Seite, die den Personen angezeigt wird, die sich registrieren und die sich gerade registriert haben. Velocity und Wiki-Syntax können verwendet werden.
 XWiki.Registration_welcomeMessage.hint=Dies wird nur angezeigt, wenn Personen das Formular ausfüllen. Velocity und Wiki-Syntax können verwendet werden.

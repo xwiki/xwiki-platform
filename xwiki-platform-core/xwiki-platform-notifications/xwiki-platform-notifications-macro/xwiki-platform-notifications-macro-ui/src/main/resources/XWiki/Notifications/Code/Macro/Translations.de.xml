@@ -39,7 +39,7 @@
   <content>rendering.macro.notifications.name=Benachrichtigungen
 rendering.macro.notifications.description=Zeigt Benachrichtigungen über Ereignisse im Wiki an.
 rendering.macro.notifications.parameter.count.name=Anzahl
-rendering.macro.notifications.parameter.count.description=Maximale Anzahl von Ereignissen, die standardmäßig angezeigt werden.
+rendering.macro.notifications.parameter.count.description=Maximale Anzahl von Ereignissen, die standardmäßig angezeigt werden
 rendering.macro.notifications.parameter.useUserPreferences.name=Die Einstellungen des Benutzers verwenden
 rendering.macro.notifications.parameter.useUserPreferences.description=Wenn wahr, werden die Einstellungen des Benutzers für Benachrichtigungen verwendet
 rendering.macro.notifications.parameter.displayOwnEvents.name=Eigene Ereignisse anzeigen
@@ -68,7 +68,10 @@ rendering.macro.notifications.parameter.tags.name=Tags
 rendering.macro.notifications.parameter.tags.description=Liste der zu berücksichtigenden Tags (kommagetrennt). Es funktioniert nur im aktuellen Wiki. Wird ignoriert, wenn "useUserPreferences" auf "true" gesetzt ist.
 notifications.macro.noWatchedUsers=Sie folgen niemandem.
 notifications.macro.whenNotView=Makro für Benachrichtigungen. Zu sehen im Modus 'Ansicht'.
+notifications.macro.markEventAsRead=Ereignis als gelesen markieren
+notifications.macro.showEventDetails=Zeige Ereignis-Details
 notifications.menu.nothing=Keine Benachrichtigungen verfügbar!
 notifications.menu.more=Ältere Benachrichtigungen laden
-notifications.menu.details=Details ({0})</content>
+notifications.menu.details=Details ({0})
+</content>
 </xwikidoc>

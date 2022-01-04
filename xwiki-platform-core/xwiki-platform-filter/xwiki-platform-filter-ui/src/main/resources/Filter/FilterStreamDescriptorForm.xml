@@ -58,9 +58,9 @@
       &lt;dd&gt;
         ## TODO: design a real framework to generate form by type
         #if (($descriptor.defaultValue || "$!descriptor.defaultValue" != '') &amp;&amp; ($descriptor.type.getName() == 'boolean' || $descriptor.type.getName() == 'int' || $descriptor.type.getName() == 'java.lang.String'))
-          &lt;input type="text" id="$descriptorId" name="$descriptorId" value="#if($request.get($descriptorId))$request.get($descriptorId)#else$descriptor.defaultValue#end"/&gt;
+          &lt;input type="text" id="$descriptorId" name="$descriptorId" value="#if($request.get($descriptorId))$escapetool.xml($request.get($descriptorId))#else$descriptor.defaultValue#end"/&gt;
         #else
-          &lt;input type="text" id="$descriptorId" name="$descriptorId"#if($request.get($descriptorId))value="$request.get($descriptorId)"#end/&gt;
+          &lt;input type="text" id="$descriptorId" name="$descriptorId"#if($request.get($descriptorId))value="$escapetool.xml($request.get($descriptorId))"#end/&gt;
         #end
       &lt;/dd&gt;
     #end

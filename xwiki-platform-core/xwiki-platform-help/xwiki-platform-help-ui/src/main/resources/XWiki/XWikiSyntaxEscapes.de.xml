@@ -46,15 +46,17 @@
 Erlaubt es XWiki Syntax zu entgehen.
 
 |=Funktion|=XWiki Syntax 1.0|=Ergebnis
-|Entziehungszeichen für ein Zeichen|{{{Dies ist kein \[Link\]}}}|{{{Dies ist kein [Link]}}}
+|Entziehungszeichen für ein Zeichen|{{{Dies ist kein [Link]}}}|{{{Dies ist kein [Link]}}}
 
 === 2.0 Escapes ===
 
 Erlaubt es XWiki Syntax zu entgehen.
 
 |=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Ergebnis
-|Entziehungszeichen für ein Zeichen|(((
+|Escapezeichen für ein Zeichen|(((
 {{{Dies ist kein ~[~[Link~]~]}}}
 {{info}}Um ein ~~ Zeichen einzufügen ist dieses doppelt einzugeben: ~~~~{{/info}}
-)))|{{{Dies ist kein [[Link]]}}}</content>
+)))|{{{Dies ist kein [[Link]]}}}
+|Längeren Text escapen
+(beachte auch "Verbatim")|~{~{~{{{{ etwas **längerer** Text //ohne// Formatierung}}}~}~}~}|{{{ etwas **längerer** Text //ohne// Formatierung}}}</content>
 </xwikidoc>

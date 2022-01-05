@@ -58,7 +58,7 @@ xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platf
 xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/main/resources/xwiki-platform-search-solr-server-core-minimal.zip
 
 # XVNC
-?? .Xauthority-*
+.Xauthority-*
 
 # Misc
 *.log.*

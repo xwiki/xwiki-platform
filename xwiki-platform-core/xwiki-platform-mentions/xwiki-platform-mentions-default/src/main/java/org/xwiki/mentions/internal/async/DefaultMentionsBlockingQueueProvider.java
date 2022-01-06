@@ -29,9 +29,14 @@ import javax.inject.Singleton;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
+import org.h2.mvstore.MVStoreException;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
+import org.xwiki.mentions.MentionException;
 import org.xwiki.mentions.internal.MentionsBlockingQueueProvider;
+
+import static org.h2.mvstore.DataUtils.ERROR_UNSUPPORTED_FORMAT;
 
 /**
  * Default implementation of {@link MentionsBlockingQueueProvider}.
@@ -52,10 +57,13 @@ public class DefaultMentionsBlockingQueueProvider implements MentionsBlockingQue
     @Inject
     private Environment environment;
 
+    @Inject
+    private Logger logger;
+
     private MVStore mvStore;
 
     @Override
-    public BlockingQueue<MentionsData> initBlockingQueue()
+    public BlockingQueue<MentionsData> initBlockingQueue() throws MentionException
     {
         File parentDir = new File(this.environment.getPermanentDirectory(), "mentions");
         File queueFile = new File(parentDir, "mvqueue");
@@ -63,10 +71,29 @@ public class DefaultMentionsBlockingQueueProvider implements MentionsBlockingQue
             try {
                 Files.createDirectory(parentDir.toPath());
             } catch (IOException e) {
-                throw new RuntimeException("Error when initializing directory", e);
+                throw new MentionException("Error when initializing directory", e);
             }
         }
-        this.mvStore = MVStore.open(queueFile.getAbsolutePath());
+        try {
+            this.mvStore = MVStore.open(queueFile.getAbsolutePath());
+        } catch (MVStoreException e) {
+            // When migrating from h2mvstore v1.x to h2mvstore v2.x, the file format changes.
+            // In this case, the old file is removed and a new one is created.
+            // Note that if some unprocessed MentionsData are stored in the store during the intialization, they will be
+            // lost and the mentioned users will not be notified. 
+            if (e.getErrorCode() == ERROR_UNSUPPORTED_FORMAT) {
+                this.logger.info("Deleting deprecated v1 h2mvstore file [{}]", queueFile.getAbsolutePath());
+                try {
+                    Files.delete(queueFile.toPath());
+                } catch (IOException e1) {
+                    throw new MentionException(
+                        String.format("Error when deleting file [%s].", queueFile.getAbsolutePath()), e);
+                }
+                this.mvStore = MVStore.open(queueFile.getAbsolutePath());
+            } else {
+                throw e;
+            }
+        }
 
         return new MapBasedLinkedBlockingQueue<>(this.mvStore.openMap("mentionsData"));
     }

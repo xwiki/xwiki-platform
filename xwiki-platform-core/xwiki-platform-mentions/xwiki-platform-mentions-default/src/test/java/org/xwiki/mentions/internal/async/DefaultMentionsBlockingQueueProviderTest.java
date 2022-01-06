@@ -48,7 +48,7 @@ class DefaultMentionsBlockingQueueProviderTest
     private Environment environment;
 
     @Test
-    void initBlockingQueue(@XWikiTempDir File tmpDir)
+    void initBlockingQueue(@XWikiTempDir File tmpDir) throws Exception
     {
         when(this.environment.getPermanentDirectory()).thenReturn(tmpDir);
         BlockingQueue<MentionsData> actual = this.provider.initBlockingQueue();
@@ -56,7 +56,7 @@ class DefaultMentionsBlockingQueueProviderTest
     }
 
     @Test
-    void initBlockingQueueTwice(@XWikiTempDir File tmpDir)
+    void initBlockingQueueTwice(@XWikiTempDir File tmpDir) throws Exception
     {
         when(this.environment.getPermanentDirectory()).thenReturn(tmpDir);
         this.provider.initBlockingQueue();

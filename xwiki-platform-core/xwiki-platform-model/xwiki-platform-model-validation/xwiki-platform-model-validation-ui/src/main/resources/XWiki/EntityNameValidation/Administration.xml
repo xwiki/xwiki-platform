@@ -437,7 +437,7 @@
       <displayInCategory>edit</displayInCategory>
     </property>
     <property>
-      <displayInSection>Name Strategies</displayInSection>
+      <displayInSection>nameStrategies</displayInSection>
     </property>
     <property>
       <heading>$services.localization.render('entitynamevalidation.admin.heading')</heading>

@@ -20,6 +20,7 @@
 package org.xwiki.template;
 
 import java.io.Writer;
+import java.util.concurrent.Callable;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
@@ -414,12 +415,33 @@ public interface TemplateManager
      * @param content the template content
      * @param author the template author
      * @return the template
-     * @throws Exception if an error occurred during template instanciation
+     * @throws Exception if an error occurred during template instantiation
      * @since 9.6RC1
+     * @deprecated since 14.0CR1, use {@link #createStringTemplate(String, DocumentReference, DocumentReference)}
+     *             instead
      */
+    @Deprecated
     default Template createStringTemplate(String content, DocumentReference author) throws Exception
     {
-        throw new UnsupportedOperationException("org.xwiki.template.TemplateManager#createStringTemplate() "
-            + "has been called without being reimplemented.");
+        throw new UnsupportedOperationException(
+            "org.xwiki.template.TemplateManager#createStringTemplate(String, DocumentReference) "
+                + "has been called without being reimplemented.");
+    }
+
+    /**
+     * Create a new template using a given content and a specific author and source document.
+     *
+     * @param content the template content
+     * @param author the template author
+     * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
+     *            test the author right)
+     * @return the template
+     * @throws Exception if an error occurred during template instantiation
+     * @since 14.0RC1
+     */
+    default Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
+        throws Exception
+    {
+        return createStringTemplate(content, author);
     }
 }

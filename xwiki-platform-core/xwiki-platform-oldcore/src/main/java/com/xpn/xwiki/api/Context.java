@@ -600,7 +600,6 @@ public class Context extends Api
      * {@link Document#display(String, Object)}.
      *
      * @return the display mode, one of "view", "edit", "hidden", "search" or "rendered"
-     * @since 12.10.12
      * @since 13.4.7
      * @since 13.10.3
      * @since 14.0-rc-1

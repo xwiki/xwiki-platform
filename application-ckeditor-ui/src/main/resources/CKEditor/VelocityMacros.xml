@@ -110,7 +110,14 @@
 
 #macro (ckeditor_getRenderedContent $source)
   ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
+  #set ($macro.previousDisplayMode = $xcontext.displayMode)
   #set ($discard = $xcontext.setDisplayMode('view'))
+  #if ($xcontext.displayMode != 'view')
+    ## Before XWiki 14.0-rc-1, 13.4.7, 13.10.3 and 12.10.12 there's no API to get the current display mode so we can't
+    ## restore the previous display mode properly. We assume the previous display mode is 'edit' because the WYSIWYG
+    ## editor is used.
+    #set ($macro.previousDisplayMode = 'edit')
+  #end
   #if ($source.html)
     #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference))
     #if ("$!html" == '' &amp;&amp; $html != '')
@@ -129,9 +136,8 @@
     ## CKEDITOR-185: Whitespace is generated in Firefox when creating a page without typing the content
     #set ($html = '&lt;p&gt;&lt;/p&gt;')
   #end
-  ## Unfortunately there's no API to get the current display mode... so we can't restore the display mode properly. We
-  ## assume the display mode was 'edit' because the WYSIWYG editor is used.
-  #set ($discard = $xcontext.setDisplayMode('edit'))
+  ## Restore the previous display mode.
+  #set ($discard = $xcontext.setDisplayMode($macro.previousDisplayMode))
 #end
 
 #macro (ckeditor_importCSS $groupId $artifactId $path $evaluate)

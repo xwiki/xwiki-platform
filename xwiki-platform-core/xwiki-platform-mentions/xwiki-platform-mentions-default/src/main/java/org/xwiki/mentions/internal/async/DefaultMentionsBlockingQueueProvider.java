@@ -110,7 +110,8 @@ public class DefaultMentionsBlockingQueueProvider implements MentionsBlockingQue
     {
         long currentTimeMillis = System.currentTimeMillis();
         Path backupFile = queueFile.toPath().getParent().resolve(String.format("mvqueue.%d.old", currentTimeMillis));
-        this.logger.info("Backup deprecated v1 h2mvstore file [{}] to [{}].", queueFile.getAbsolutePath(),
+        this.logger.info("Unsupported file format for [{}]. It will be saved in [{}] and replaced by a new file.",
+            queueFile.getAbsolutePath(),
             backupFile.toFile().getAbsolutePath());
         Files.move(queueFile.toPath(), backupFile);
     }

@@ -102,8 +102,8 @@ class DefaultMentionsBlockingQueueProviderTest
         assertTrue(mentionsData.isEmpty());
         assertEquals(1, this.logCapture.size());
         assertTrue(this.logCapture.getMessage(0).matches(
-            "Backup deprecated v1 h2mvstore file \\[.+/v1/mentions/mvqueue] "
-                + "to \\[.+/v1/mentions/mvqueue\\.\\d+\\.old]\\."));
+            "^Unsupported file format for \\[.+/v1/mentions/mvqueue]. "
+                + "It will be saved in \\[.+/v1/mentions/mvqueue\\.\\d+\\.old] and replaced by a new file."));
         assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());
         this.provider.closeQueue();
     }

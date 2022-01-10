@@ -231,8 +231,8 @@ public class SaveAction extends EditAction
                 new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
         UserReference userReference = userReferenceResolver.resolve(docUserReference);
         DefaultDocumentAuthors authors = new DefaultDocumentAuthors(tdoc.getAuthors());
-        authors.setMetadataAuthor(userReference);
-        authors.setDisplayedAuthor(userReference);
+        authors.setEffectiveMetadataAuthor(userReference);
+        authors.setOriginalMetadataAuthor(userReference);
 
         if (tdoc.isNew()) {
             authors.setCreator(userReference);

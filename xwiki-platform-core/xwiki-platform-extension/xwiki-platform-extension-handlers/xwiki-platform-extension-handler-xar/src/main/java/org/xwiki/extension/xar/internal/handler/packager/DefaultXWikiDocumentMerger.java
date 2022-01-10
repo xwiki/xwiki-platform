@@ -39,6 +39,7 @@ import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.logging.LogLevel;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
@@ -287,24 +288,23 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         DocumentReference userDocumentReference = configuration != null ? configuration.getAuthorReference() : null;
         if (userDocumentReference != null) {
             UserReference userReference = this.documentReferenceUserReferenceResolver.resolve(userDocumentReference);
-            nextDocument.setAuthors(new DefaultDocumentAuthors()
-                .setCreator(currentDocument.getAuthors().getCreator())
-                .setContentAuthor(userReference)
-                .setMetadataAuthor(userReference)
-                .setDisplayedAuthor(userReference)
-            );
-            DefaultDocumentAuthors authors = new DefaultDocumentAuthors(nextDocument.getAuthors());
-            nextDocument.setAuthorReference(userDocumentReference);
-            nextDocument.setContentAuthorReference(userDocumentReference);
+            DocumentAuthors authors = currentDocument.getAuthors();
+            currentDocument.setMetaDataDirty(true);
+            authors.setContentAuthor(userReference);
+            authors.setEffectiveMetadataAuthor(userReference);
+
             for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
                 attachment.setAuthorReference(userDocumentReference);
             }
             if (mergedDocument != null) {
-                mergedDocument.setAuthorReference(userDocumentReference);
-                mergedDocument.setContentAuthorReference(userDocumentReference);
+                DocumentAuthors mergedDocumentAuthors = mergedDocument.getAuthors();
+                mergedDocument.setMetaDataDirty(true);
+                mergedDocumentAuthors.setEffectiveMetadataAuthor(userReference);
+                mergedDocumentAuthors.setContentAuthor(userReference);
+
                 for (XWikiAttachment attachment : mergedDocument.getAttachmentList()) {
                     if (attachment.isContentDirty()) {
-                        attachment.setAuthorReference(mergedDocument.getAuthorReference());
+                        attachment.setAuthorReference(userDocumentReference);
                     }
                 }
             }

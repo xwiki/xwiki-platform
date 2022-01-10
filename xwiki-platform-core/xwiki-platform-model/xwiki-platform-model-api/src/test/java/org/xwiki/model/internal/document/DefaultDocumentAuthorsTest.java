@@ -40,11 +40,11 @@ class DefaultDocumentAuthorsTest
         UserReference creatorRef = mock(UserReference.class);
         UserReference metadataAuthorRef = mock(UserReference.class);
         UserReference displayedAuthorRef = mock(UserReference.class);
-        DefaultDocumentAuthors documentAuthors = new DefaultDocumentAuthors()
-            .setCreator(creatorRef)
-            .setContentAuthor(contentAuthorRef)
-            .setMetadataAuthor(metadataAuthorRef)
-            .setDisplayedAuthor(displayedAuthorRef);
+        DefaultDocumentAuthors documentAuthors = new DefaultDocumentAuthors();
+        documentAuthors.setCreator(creatorRef);
+        documentAuthors.setContentAuthor(contentAuthorRef);
+        documentAuthors.setEffectiveMetadataAuthor(metadataAuthorRef);
+        documentAuthors.setOriginalMetadataAuthor(displayedAuthorRef);
 
         DefaultDocumentAuthors otherAuthors = new DefaultDocumentAuthors(documentAuthors);
         assertEquals(documentAuthors, otherAuthors);
@@ -57,17 +57,17 @@ class DefaultDocumentAuthorsTest
         UserReference creatorRef = mock(UserReference.class);
         UserReference metadataAuthorRef = mock(UserReference.class);
         UserReference displayedAuthorRef = mock(UserReference.class);
-        DefaultDocumentAuthors documentAuthors = new DefaultDocumentAuthors()
-            .setCreator(creatorRef)
-            .setContentAuthor(contentAuthorRef)
-            .setMetadataAuthor(metadataAuthorRef)
-            .setDisplayedAuthor(displayedAuthorRef);
-        assertSame(displayedAuthorRef, documentAuthors.getDisplayedAuthor());
+        DefaultDocumentAuthors documentAuthors = new DefaultDocumentAuthors();
+        documentAuthors.setCreator(creatorRef);
+        documentAuthors.setContentAuthor(contentAuthorRef);
+        documentAuthors.setEffectiveMetadataAuthor(metadataAuthorRef);
+        documentAuthors.setOriginalMetadataAuthor(displayedAuthorRef);
+        assertSame(displayedAuthorRef, documentAuthors.getOriginalMetadataAuthor());
 
-        documentAuthors = new DefaultDocumentAuthors()
-            .setCreator(creatorRef)
-            .setContentAuthor(contentAuthorRef)
-            .setMetadataAuthor(metadataAuthorRef);
-        assertSame(metadataAuthorRef, documentAuthors.getDisplayedAuthor());
+        documentAuthors = new DefaultDocumentAuthors();
+        documentAuthors.setCreator(creatorRef);
+        documentAuthors.setContentAuthor(contentAuthorRef);
+        documentAuthors.setEffectiveMetadataAuthor(metadataAuthorRef);
+        assertSame(metadataAuthorRef, documentAuthors.getOriginalMetadataAuthor());
     }
 }

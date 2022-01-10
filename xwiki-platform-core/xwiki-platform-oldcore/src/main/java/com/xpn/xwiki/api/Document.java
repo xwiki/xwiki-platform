@@ -2547,13 +2547,20 @@ public class Document extends Api
         save(comment, false);
     }
 
+    private UserReferenceResolver<CurrentUserReference> getCurrentUserReferenceResolver()
+    {
+        return Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class,
+                CurrentUserReference.class));
+    }
+
     public void save(String comment, boolean minorEdit) throws XWikiException
     {
         if (hasAccessLevel("edit")) {
-            UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver =
-                Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class,
-                    CurrentUserReference.class));
-            this.setDisplayedAuthor(currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE));
+
+            DocumentAuthors authors = this.getAuthors();
+            authors.setOriginalMetadataAuthor(
+                getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
+            this.doc.setMetaDataDirty(true);
             // If the current author does not have PR don't let it set current user as author of the saved document
             // since it can lead to right escalation
             if (hasProgrammingRights() || !getConfiguration().getProperty("security.script.save.checkAuthor", true)) {
@@ -2649,6 +2656,8 @@ public class Document extends Api
     {
         XWikiContext xcontext = getXWikiContext();
 
+        getAuthors().setOriginalMetadataAuthor(
+            getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
         DocumentReference author = getEffectiveAuthorReference();
         if (hasAccess(Right.EDIT, author)) {
             DocumentReference currentUser = xcontext.getUserReference();
@@ -3257,25 +3266,6 @@ public class Document extends Api
     public int getLocalReferenceMaxLength()
     {
         return this.doc.getLocalReferenceMaxLength();
-    }
-
-    /**
-     * Define the author of the document to be displayed, without changing the metadata and content authors.
-     * @param displayedAuthor the author to be displayed.
-     * @since 14.0RC1
-     */
-    @Unstable
-    public void setDisplayedAuthor(UserReference displayedAuthor)
-    {
-        DefaultDocumentAuthors documentAuthors;
-        if (this.doc.getAuthors() != null) {
-            documentAuthors = new DefaultDocumentAuthors(this.doc.getAuthors());
-        } else {
-            documentAuthors = new DefaultDocumentAuthors();
-        }
-        documentAuthors.setDisplayedAuthor(displayedAuthor);
-        this.doc.setAuthors(documentAuthors);
-        this.doc.setMetaDataDirty(true);
     }
 
     /**

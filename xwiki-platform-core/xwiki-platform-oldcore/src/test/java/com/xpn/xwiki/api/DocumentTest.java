@@ -311,7 +311,7 @@ class DocumentTest
             .thenReturn(userReference);
         document.save();
 
-        assertEquals(userReference, document.getAuthors().getDisplayedAuthor());
+        assertEquals(userReference, document.getAuthors().getOriginalMetadataAuthor());
         assertEquals(authorReference, document.getAuthorReference());
 
         when(this.oldcore.getMockRightService().hasProgrammingRights(this.oldcore.getXWikiContext())).thenReturn(true);

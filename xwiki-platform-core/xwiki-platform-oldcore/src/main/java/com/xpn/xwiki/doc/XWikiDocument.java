@@ -1894,8 +1894,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public DocumentReference getAuthorReference()
     {
-        if (getAuthors() != null && this.getAuthors().getMetadataAuthor() != null) {
-            return this.getUserReferenceDocumentReferenceSerializer().serialize(getAuthors().getMetadataAuthor());
+        if (getAuthors() != null && this.getAuthors().getEffectiveMetadataAuthor() != null) {
+            return this.getUserReferenceDocumentReferenceSerializer().serialize(getAuthors().getEffectiveMetadataAuthor());
         } else {
             return null;
         }
@@ -1911,10 +1911,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (authorReference != null) {
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(authorReference);
             if (this.authors == null) {
-                this.setAuthors(new DefaultDocumentAuthors().setMetadataAuthor(user));
-                this.setMetaDataDirty(true);
-            } else if (!Objects.equals(this.authors.getMetadataAuthor(), user)) {
-                this.authors.setMetadataAuthor(user);
+                this.setAuthors(new DefaultDocumentAuthors());
+            }
+
+            if (!Objects.equals(this.authors.getEffectiveMetadataAuthor(), user)) {
+                this.authors.setEffectiveMetadataAuthor(user);
                 this.setMetaDataDirty(true);
             }
         }
@@ -1966,9 +1967,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (contentAuthorReference != null) {
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(contentAuthorReference);
             if (this.authors == null) {
-                this.setAuthors(new DefaultDocumentAuthors().setContentAuthor(user));
-                this.setMetaDataDirty(true);
-            } else if (!Objects.equals(this.authors.getContentAuthor(), user)) {
+                this.setAuthors(new DefaultDocumentAuthors());
+            }
+
+            if (!Objects.equals(this.authors.getContentAuthor(), user)) {
                 this.authors.setContentAuthor(user);
                 this.setMetaDataDirty(true);
             }
@@ -2021,9 +2023,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (creatorReference != null) {
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(creatorReference);
             if (this.authors == null) {
-                this.setAuthors(new DefaultDocumentAuthors().setCreator(user));
-                this.setMetaDataDirty(true);
-            } else if (!Objects.equals(this.authors.getCreator(), user)) {
+                this.setAuthors(new DefaultDocumentAuthors());
+            }
+
+            if (!Objects.equals(this.authors.getCreator(), user)) {
                 this.authors.setCreator(user);
                 this.setMetaDataDirty(true);
             }
@@ -9174,10 +9177,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public DocumentAuthors getAuthors()
     {
         if (this.authors == null) {
-            return new DefaultDocumentAuthors();
-        } else {
-            return this.authors;
+            this.authors = new DefaultDocumentAuthors();
         }
+        return this.authors;
     }
 
     /**
@@ -9203,14 +9205,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      *
      * @return the serialization of the displayed author reference.
      */
-    private String getDisplayedAuthorReference()
+    private String getOriginalMetadataAuthorReference()
     {
-        if (this.getAuthors() == null || this.getAuthors().getDisplayedAuthor() == null) {
+        if (this.getAuthors() == null || this.getAuthors().getOriginalMetadataAuthor() == null) {
             return "";
         } else {
             UserReferenceSerializer<String> userReferenceSerializer =
                 Utils.getComponent(new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
-            return userReferenceSerializer.serialize(this.getAuthors().getDisplayedAuthor());
+            return userReferenceSerializer.serialize(this.getAuthors().getOriginalMetadataAuthor());
         }
     }
 
@@ -9222,7 +9224,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      *
      * @param serializedUserReference the serialization of the displayed author reference.
      */
-    private void setDisplayedAuthorReference(String serializedUserReference)
+    private void setOriginalMetadataAuthorReference(String serializedUserReference)
     {
         if (!StringUtils.isEmpty(serializedUserReference)) {
             UserReferenceResolver<String> userReferenceResolver =
@@ -9231,7 +9233,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             if (this.authors == null) {
                 this.authors = new DefaultDocumentAuthors();
             }
-            this.authors.setDisplayedAuthor(userReference);
+            this.authors.setOriginalMetadataAuthor(userReference);
         }
     }
 }

@@ -185,9 +185,10 @@ class SaveActionTest
         assertFalse(saveAction.save(this.context));
         assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
 
-        verify(mockClonedDocument).setAuthors(new DefaultDocumentAuthors()
-            .setDisplayedAuthor(this.fooUserReference)
-            .setMetadataAuthor(this.fooUserReference));
+        DefaultDocumentAuthors documentAuthors = new DefaultDocumentAuthors();
+        documentAuthors.setOriginalMetadataAuthor(this.fooUserReference);
+        documentAuthors.setEffectiveMetadataAuthor(this.fooUserReference);
+        verify(mockClonedDocument).setAuthors(documentAuthors);
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
@@ -264,9 +265,10 @@ class SaveActionTest
         assertFalse(saveAction.save(this.context));
         assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
 
-        verify(mockClonedDocument).setAuthors(new DefaultDocumentAuthors()
-            .setDisplayedAuthor(this.fooUserReference)
-            .setMetadataAuthor(this.fooUserReference));
+        DefaultDocumentAuthors documentAuthors = new DefaultDocumentAuthors();
+        documentAuthors.setOriginalMetadataAuthor(this.fooUserReference);
+        documentAuthors.setEffectiveMetadataAuthor(this.fooUserReference);
+        verify(mockClonedDocument).setAuthors(documentAuthors);
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);

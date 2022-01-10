@@ -271,7 +271,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, context);
             UserReferenceSerializer<String> userReferenceSerializer = Utils.getComponent(
                 new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
-            String author = userReferenceSerializer.serialize(doc.getAuthors().getDisplayedAuthor());
+            String author = userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());
             archiveDoc.updateArchive(doc, author, doc.getDate(), doc.getComment(), doc.getRCSVersion(),
                 context);
             doc.setRCSVersion(archiveDoc.getLatestVersion());

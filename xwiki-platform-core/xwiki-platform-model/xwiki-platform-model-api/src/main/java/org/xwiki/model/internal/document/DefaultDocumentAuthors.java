@@ -33,8 +33,8 @@ import org.xwiki.user.UserReference;
 public class DefaultDocumentAuthors implements DocumentAuthors
 {
     private UserReference contentAuthor;
-    private UserReference metadataAuthor;
-    private UserReference displayedAuthor;
+    private UserReference effectiveMetadataAuthor;
+    private UserReference originalMetadataAuthor;
     private UserReference creator;
 
     /**
@@ -53,61 +53,34 @@ public class DefaultDocumentAuthors implements DocumentAuthors
     {
         if (documentAuthors != null) {
             this.contentAuthor = documentAuthors.getContentAuthor();
-            this.metadataAuthor = documentAuthors.getMetadataAuthor();
-            this.displayedAuthor = documentAuthors.getDisplayedAuthor();
+            this.effectiveMetadataAuthor = documentAuthors.getEffectiveMetadataAuthor();
+            this.originalMetadataAuthor = documentAuthors.getOriginalMetadataAuthor();
             this.creator = documentAuthors.getCreator();
         }
     }
 
-    /**
-     * Specify the author of the content of the document: this author is only responsible to the content, and not to
-     * other information of the document such as xobjects.
-     *
-     * @param contentAuthor the author of the content of the document.
-     * @return the current instance for Builder pattern.
-     */
-    public DefaultDocumentAuthors setContentAuthor(UserReference contentAuthor)
+    @Override
+    public void setContentAuthor(UserReference contentAuthor)
     {
         this.contentAuthor = contentAuthor;
-        return this;
     }
 
-    /**
-     * Specify the metddata author of the document: this author is not responsible to the content, but responsible to
-     * the xobjects and other metadata.
-     *
-     * @param metdataAuthor the author of the metadata of the document.
-     * @return the current instance for builder pattern.
-     */
-    public DefaultDocumentAuthors setMetadataAuthor(UserReference metdataAuthor)
+    @Override
+    public void setEffectiveMetadataAuthor(UserReference metdataAuthor)
     {
-        this.metadataAuthor = metdataAuthor;
-        return this;
+        this.effectiveMetadataAuthor = metdataAuthor;
     }
 
-    /**
-     * Specify the displayed author of the document: this author is only there for display purpose, and might be
-     * different from other authors if the document has been saved through a script for example.
-     *
-     * @param displayedAuthor the author to display.
-     * @return the current instance for builder pattern.
-     */
-    public DefaultDocumentAuthors setDisplayedAuthor(UserReference displayedAuthor)
+    @Override
+    public void setOriginalMetadataAuthor(UserReference originalMetadataAuthor)
     {
-        this.displayedAuthor = displayedAuthor;
-        return this;
+        this.originalMetadataAuthor = originalMetadataAuthor;
     }
 
-    /**
-     * Specify the original creator of the document.
-     *
-     * @param creator the creator of the document.
-     * @return the current instance for builder pattern.
-     */
-    public DefaultDocumentAuthors setCreator(UserReference creator)
+    @Override
+    public void setCreator(UserReference creator)
     {
         this.creator = creator;
-        return this;
     }
 
     @Override
@@ -117,18 +90,18 @@ public class DefaultDocumentAuthors implements DocumentAuthors
     }
 
     @Override
-    public UserReference getMetadataAuthor()
+    public UserReference getEffectiveMetadataAuthor()
     {
-        return this.metadataAuthor;
+        return this.effectiveMetadataAuthor;
     }
 
     @Override
-    public UserReference getDisplayedAuthor()
+    public UserReference getOriginalMetadataAuthor()
     {
-        if (this.displayedAuthor == null) {
-            return this.getMetadataAuthor();
+        if (this.originalMetadataAuthor == null) {
+            return this.getEffectiveMetadataAuthor();
         } else {
-            return this.displayedAuthor;
+            return this.originalMetadataAuthor;
         }
     }
 
@@ -153,8 +126,8 @@ public class DefaultDocumentAuthors implements DocumentAuthors
 
         return new EqualsBuilder()
             .append(contentAuthor, that.contentAuthor)
-            .append(metadataAuthor, that.metadataAuthor)
-            .append(displayedAuthor, that.displayedAuthor)
+            .append(effectiveMetadataAuthor, that.effectiveMetadataAuthor)
+            .append(originalMetadataAuthor, that.originalMetadataAuthor)
             .append(creator, this.creator)
             .isEquals();
     }
@@ -164,8 +137,8 @@ public class DefaultDocumentAuthors implements DocumentAuthors
     {
         return new HashCodeBuilder(17, 67)
             .append(contentAuthor)
-            .append(metadataAuthor)
-            .append(displayedAuthor)
+            .append(effectiveMetadataAuthor)
+            .append(originalMetadataAuthor)
             .append(creator)
             .toHashCode();
     }

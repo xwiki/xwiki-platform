@@ -40,24 +40,51 @@ public interface DocumentAuthors
     UserReference getContentAuthor();
 
     /**
-     * The metadata author is the author responsible of any change but the content: saving a new xobject in a document
-     * update the metadata auhor but not the content author.
+     * Specify the author of the content of the document: this author is only responsible to the content, and not to
+     * other information of the document such as xobjects.
      *
-     * @return the reference of the user who authored metadata of the document.
+     * @param contentAuthor the author of the content of the document.
+     * @see #getContentAuthor()
      */
-    UserReference getMetadataAuthor();
+    void setContentAuthor(UserReference contentAuthor);
 
     /**
-     * The displayed author is the author of a document that we want to display in the UI. This author should never be
-     * used for security reasons as it does not reflect who is responsible of the save performed.
-     * For example, this author is different from metadata author when the document is saved through a script
-     * wrote by a user without PR rights. Note that this author is optional: whenever it's not specified, it will
-     * fallback on the {@link #getMetadataAuthor()}.
+     * The effective metadata author is the author responsible of any change but the content: e.g. saving a new xobject
+     * in a document update the metadata auhor but not the content author. It's effective, as it is the actual author
+     * who holds the responsibility of the changes in terms of rights.
      *
-     * @return the reference of the user who impulses the creation of the document, without being the real user used
-     *          in the APIs for saving the changes.
+     * @return the reference of the user who saved metadata of the document, or who was used to save it.
      */
-    UserReference getDisplayedAuthor();
+    UserReference getEffectiveMetadataAuthor();
+
+    /**
+     * Specify the metadata author of the document: this author is not responsible to the content, but responsible to
+     * the xobjects and other metadata.
+     *
+     * @param metadataAuthor the author of the metadata of the document.
+     * @see #getEffectiveMetadataAuthor()
+     */
+    void setEffectiveMetadataAuthor(UserReference metadataAuthor);
+
+    /**
+     * The original metadata author is the author who have triggered a save on the document, but who does not hold
+     * responsibility for those changes in terms of rights. It should be different from the
+     * {@link #getEffectiveMetadataAuthor()} when the save is performed through a mechanism which prevent users to need
+     * edit rights for saving the document (e.g. adding a new comment in a page). Note that if there is no original
+     * metadata author defined, it should always fallback to the {@link #getEffectiveMetadataAuthor()}.
+     *
+     * @return the reference of the user who originally triggers the save.
+     */
+    UserReference getOriginalMetadataAuthor();
+
+    /**
+     * Specify the original metadata author of the document: the author who have triggered a save on the document,
+     * but who does not hold responsibility for those changes in terms of rights.
+     *
+     * @param originalMetadataAuthor the author to display.
+     * @see #getOriginalMetadataAuthor()
+     */
+    void setOriginalMetadataAuthor(UserReference originalMetadataAuthor);
 
     /**
      * The creator of the document is the first author of the document when it has been created.
@@ -65,4 +92,11 @@ public interface DocumentAuthors
      * @return the reference of the user who authored the first version of the document.
      */
     UserReference getCreator();
+
+    /**
+     * Specify the original creator of the document.
+     *
+     * @param creator the creator of the document.
+     */
+    void setCreator(UserReference creator);
 }

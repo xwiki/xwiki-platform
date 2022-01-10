@@ -36,8 +36,7 @@
             $xwiki.formatDate($tdoc.date)
           ])
         #else
-          #set ($authorName = $services.user.serialize($tdoc.authors.displayedAuthor))
-          $services.localization.render('core.footer.modification', [$xwiki.getUserName($authorName), $xwiki.formatDate($tdoc.date)])
+          $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.authors.originalMetadataAuthor), $xwiki.formatDate($tdoc.date)])
         #end
       </div>
     #end

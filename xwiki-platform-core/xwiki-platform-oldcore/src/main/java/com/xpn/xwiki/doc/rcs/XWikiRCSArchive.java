@@ -242,7 +242,7 @@ public class XWikiRCSArchive extends Archive
                     // set this fields from old document
                     UserReferenceSerializer<String> userReferenceSerializer = Utils.getComponent(
                         new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
-                    nodeInfo.setAuthor(userReferenceSerializer.serialize(doc.getAuthors().getDisplayedAuthor()));
+                    nodeInfo.setAuthor(userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor()));
                     nodeInfo.setComment(doc.getComment());
                     nodeInfo.setDate(doc.getDate());
                 } catch (Exception e) {

@@ -153,12 +153,11 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
     private DataMigrationManager dataMigrationManager;
 
-    private final BootstrapServiceRegistry bootstrapServiceRegistry =
-        new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
+    private BootstrapServiceRegistry bootstrapServiceRegistry;
 
-    private final MetadataSources metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
+    private MetadataSources metadataSources;
 
-    private final Configuration configuration = new Configuration(this.metadataSources);
+    private HibernateStoreConfiguration configuration;
 
     private StandardServiceRegistry standardServiceRegistry;
 
@@ -217,9 +216,18 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         return url;
     }
 
+    private void createConfiguration()
+    {
+        this.bootstrapServiceRegistry = new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
+        this.metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
+        this.configuration = new HibernateStoreConfiguration(this.metadataSources, this.configuration);
+    }
+
     @Override
     public void initialize() throws InitializationException
     {
+        createConfiguration();
+
         URL url = getHibernateConfigurationURL();
         if (url != null) {
             this.configuration.configure(url);
@@ -295,8 +303,14 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public void build()
     {
-        // Get rid of existing session factory
-        disposeInternal();
+        // Check if it's a rebuild
+        if (this.sessionFactory != null) {
+            // Get rid of existing session factory
+            disposeInternal();
+
+            // Recreate the configuration
+            createConfiguration();
+        }
 
         this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
         this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();

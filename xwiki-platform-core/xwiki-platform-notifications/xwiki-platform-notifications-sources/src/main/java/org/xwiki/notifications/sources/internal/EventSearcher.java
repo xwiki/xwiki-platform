@@ -84,7 +84,7 @@ public class EventSearcher
             try {
                 return searchStoreEvents(offset, limit, parameters);
             } catch (EventStreamException e) {
-                this.logger.warn("Failed to get events from the EventStore. Reason: [{}]. Trying the legacy store.",
+                this.logger.debug("Failed to get events from the EventStore. Reason: [{}]. Trying the legacy store.",
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }

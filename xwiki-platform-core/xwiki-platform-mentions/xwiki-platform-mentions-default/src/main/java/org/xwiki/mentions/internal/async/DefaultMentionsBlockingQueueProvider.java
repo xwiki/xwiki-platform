@@ -22,6 +22,7 @@ package org.xwiki.mentions.internal.async;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.BlockingQueue;
 
 import javax.inject.Inject;
@@ -29,9 +30,14 @@ import javax.inject.Singleton;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
+import org.h2.mvstore.MVStoreException;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
+import org.xwiki.mentions.MentionException;
 import org.xwiki.mentions.internal.MentionsBlockingQueueProvider;
+
+import static org.h2.mvstore.DataUtils.ERROR_UNSUPPORTED_FORMAT;
 
 /**
  * Default implementation of {@link MentionsBlockingQueueProvider}.
@@ -52,10 +58,13 @@ public class DefaultMentionsBlockingQueueProvider implements MentionsBlockingQue
     @Inject
     private Environment environment;
 
+    @Inject
+    private Logger logger;
+
     private MVStore mvStore;
 
     @Override
-    public BlockingQueue<MentionsData> initBlockingQueue()
+    public BlockingQueue<MentionsData> initBlockingQueue() throws MentionException
     {
         File parentDir = new File(this.environment.getPermanentDirectory(), "mentions");
         File queueFile = new File(parentDir, "mvqueue");
@@ -63,10 +72,28 @@ public class DefaultMentionsBlockingQueueProvider implements MentionsBlockingQue
             try {
                 Files.createDirectory(parentDir.toPath());
             } catch (IOException e) {
-                throw new RuntimeException("Error when initializing directory", e);
+                throw new MentionException("Error when initializing directory", e);
             }
         }
-        this.mvStore = MVStore.open(queueFile.getAbsolutePath());
+        try {
+            this.mvStore = MVStore.open(queueFile.getAbsolutePath());
+        } catch (MVStoreException e) {
+            // When migrating from h2mvstore v1.x to h2mvstore v2.x, the file format changes. In this case, the old file
+            // is removed and a new one is created. Note that if some unprocessed MentionsData are still in the store
+            // during the initialization, they will be lost and the mentioned users will not be notified. 
+            if (e.getErrorCode() == ERROR_UNSUPPORTED_FORMAT) {
+                try {
+                    backupQueueFile(queueFile);
+                } catch (IOException moveException) {
+                    throw new MentionException(
+                        String.format("Failed to backup [%s] to [].", queueFile.getAbsolutePath()), e);
+                }
+                this.mvStore = MVStore.open(queueFile.getAbsolutePath());
+            } else {
+                // If the exception is not related to the file format, rethrow the exception.
+                throw e;
+            }
+        }
 
         return new MapBasedLinkedBlockingQueue<>(this.mvStore.openMap("mentionsData"));
     }
@@ -77,5 +104,15 @@ public class DefaultMentionsBlockingQueueProvider implements MentionsBlockingQue
         if (this.mvStore != null) {
             this.mvStore.close();
         }
+    }
+
+    private void backupQueueFile(File queueFile) throws IOException
+    {
+        long currentTimeMillis = System.currentTimeMillis();
+        Path backupFile = queueFile.toPath().getParent().resolve(String.format("mvqueue.%d.old", currentTimeMillis));
+        this.logger.info("Unsupported file format for [{}]. It will be saved in [{}] and replaced by a new file.",
+            queueFile.getAbsolutePath(),
+            backupFile.toFile().getAbsolutePath());
+        Files.move(queueFile.toPath(), backupFile);
     }
 }

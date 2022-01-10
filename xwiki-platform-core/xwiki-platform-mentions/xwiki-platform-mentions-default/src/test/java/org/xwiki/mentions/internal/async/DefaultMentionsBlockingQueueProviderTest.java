@@ -20,15 +20,27 @@
 package org.xwiki.mentions.internal.async;
 
 import java.io.File;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.BlockingQueue;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.environment.Environment;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import ch.qos.logback.classic.Level;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -47,21 +59,52 @@ class DefaultMentionsBlockingQueueProviderTest
     @MockComponent
     private Environment environment;
 
-    @Test
-    void initBlockingQueue(@XWikiTempDir File tmpDir)
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+
+    @XWikiTempDir
+    private File tmpDir;
+
+    @BeforeEach
+    void setUp()
     {
-        when(this.environment.getPermanentDirectory()).thenReturn(tmpDir);
+        when(this.environment.getPermanentDirectory()).thenReturn(this.tmpDir);
+    }
+
+    @Test
+    void initBlockingQueue() throws Exception
+    {
         BlockingQueue<MentionsData> actual = this.provider.initBlockingQueue();
         assertTrue(actual instanceof MapBasedLinkedBlockingQueue);
     }
 
     @Test
-    void initBlockingQueueTwice(@XWikiTempDir File tmpDir)
+    void initBlockingQueueTwice() throws Exception
     {
-        when(this.environment.getPermanentDirectory()).thenReturn(tmpDir);
         this.provider.initBlockingQueue();
         this.provider.closeQueue();
         BlockingQueue<MentionsData> actual = this.provider.initBlockingQueue();
         assertTrue(actual instanceof MapBasedLinkedBlockingQueue);
+    }
+
+    @Test
+    void initBlockingQueueCreateDirectoryFail() throws Exception
+    {
+        URL url = DefaultMentionsBlockingQueueProviderTest.class.getClassLoader().getResource("v1");
+        Path v1Dir = Paths.get(url.toURI());
+        Path mentionsDir = v1Dir.resolve("mentions");
+        // Recopy a reference ".test" file at the expected location to allow the test to be executed several times in a
+        // row.
+        Files.copy(mentionsDir.resolve("mvqueue.test"), mentionsDir.resolve("mvqueue"), REPLACE_EXISTING);
+
+        when(this.environment.getPermanentDirectory()).thenReturn(v1Dir.toFile());
+        BlockingQueue<MentionsData> mentionsData = this.provider.initBlockingQueue();
+        assertTrue(mentionsData.isEmpty());
+        assertEquals(1, this.logCapture.size());
+        assertTrue(this.logCapture.getMessage(0).matches(
+            "^Unsupported file format for \\[.+/v1/mentions/mvqueue]. "
+                + "It will be saved in \\[.+/v1/mentions/mvqueue\\.\\d+\\.old] and replaced by a new file."));
+        assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());
+        this.provider.closeQueue();
     }
 }

@@ -17,36 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions.internal;
-
-import java.util.concurrent.BlockingQueue;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.mentions.MentionException;
-import org.xwiki.mentions.internal.async.MentionsData;
+package org.xwiki.mentions;
 
 /**
- * Blocking queue provider.
+ * Generic exception for the Mention module.
  *
  * @version $Id$
- * @since 12.6
+ * @since 14.0RC1
  */
-@Role
-public interface MentionsBlockingQueueProvider
+public class MentionException extends Exception
 {
     /**
-     * Initialize a blocking queue.
+     * Construct a new {@code MentionsException} with the specified detail message.
      *
-     * @return the blocking queue
-     * @throws MentionException if an error occurs during the initialization of the queue
+     * @param message the detail message. The detail message is saved for later retrieval by the {@link
+     *     #getMessage()}
      */
-    BlockingQueue<MentionsData> initBlockingQueue() throws MentionException;
+    public MentionException(String message)
+    {
+        super(message);
+    }
 
     /**
-     * Close the queue.
+     * Constructs a new {@code MentionsException} with the specified detail message and cause.
      *
-     * @since 12.6.1
-     * @since 12.7RC1
+     * @param message the detail message. The detail message is saved for later retrieval by the {@link
+     *     #getMessage()}
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A null value
+     *     is permitted, and indicates that the cause is nonexistent or unknown.)
      */
-    void closeQueue();
+    public MentionException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

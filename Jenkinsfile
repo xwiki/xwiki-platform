@@ -36,18 +36,18 @@ node() {
   }
   // Run the functional (docker) tests (since we don't override the "profiles", the default profiles will run integration
   // and functional tests). Thus we specify the "pom" parameter to only build the test page objects and execute the
-  // functional tests from the "test" module.
+  // functional tests from the application-ckeditor-test module.
   xwikiBuild {
-    pom = 'test/pom.xml'
+    pom = 'application-ckeditor-test/pom.xml'
   }
   // Run the integration tests (since we don't override the "profiles", the default profiles will run integration and
-  // functional tests). Thus we specfify the "pom" parameter to only execute the integration tests from the "plugins"
-  // module.
+  // functional tests). Thus we specfify the "pom" parameter to only execute the integration tests from the
+  // application-ckeditor-plugins module.
   xwikiBuild {
     // Force the latest Java version in order to be able to use the latest version of the Jasmine Maven plugin to run the
     // JavaScript integration tests. We have to do this because we depend on an old XWiki parent POM version that is
     // using an old java version (1.7).
     javaTool = 'official'
-    pom = 'plugins/pom.xml'
+    pom = 'application-ckeditor-plugins/pom.xml'
   }
 }

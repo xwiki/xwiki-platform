@@ -319,6 +319,8 @@ Get the actual notifications.
       .addClass('notification-event-clean')
       .html('$services.icon.renderHTML("trash")&amp;nbsp;$escapetool.xml($escapetool.javascript($services.localization.render('notifications.menu.clear')))')
       .click(function (event) {
+        // Avoid navigating to href="#"
+        event.preventDefault();
         // Avoid the menu closing
         event.stopPropagation();
         // Ask confirmation

@@ -86,7 +86,7 @@
       <dd>
         <input type="text" id="$!{options.id}Title" name="targetAttachmentName" value="$escapetool.xml($attachment.name)"
                class="location-title-field" 
-               placeholder="$!services.localization.render('attachment.rename.newName.placeholder')" />
+               placeholder="$!services.localization.render('attachment.rename.newName.placeholder')" /> 
       </dd>
       ##------------
       ## Target Page

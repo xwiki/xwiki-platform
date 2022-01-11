@@ -19,8 +19,6 @@
  */
 package org.xwiki.attachment.script;
 
-import java.util.Collection;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,10 +28,11 @@ import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiException;
+
+import static java.util.Collections.singletonList;
 
 /**
  * TODO: document me.
@@ -49,29 +48,35 @@ public class AttachmentScriptService implements ScriptService
     @Inject
     private AttachmentsManager attachmentsManager;
 
-    // TODO: add parameters and document
-    // TODO: do we keep everything in this module?
-    public MoveAttachmentRequest createRenameRequest(Collection<EntityReference> sources, EntityReference destination)
+    /**
+     * Creates an attachment move request.
+     *
+     * @param sourceLocation the location of the document containing the source attachment
+     * @param sourceName the name of the source attachment
+     * @param targetLocation the target location of the document containing the attachment
+     * @param targetName the target name of the attachment
+     * @return the initialized move attachment request
+     */
+    public MoveAttachmentRequest createMoveRequest(DocumentReference sourceLocation, String sourceName,
+        DocumentReference targetLocation, String targetName)
     {
         MoveAttachmentRequest moveAttachmentRequest = new MoveAttachmentRequest();
-        moveAttachmentRequest.setEntityReferences(sources);
-        moveAttachmentRequest.setProperty("destination", destination);
+        moveAttachmentRequest.setEntityReferences(singletonList(new AttachmentReference(sourceName, sourceLocation)));
+        moveAttachmentRequest.setProperty("destination", new AttachmentReference(targetName, targetLocation));
         return moveAttachmentRequest;
     }
 
     /**
-     * @param wikiName the name of the wiki
-     * @param spaceName the name of the space(s) (e.g., "Main" or "Main.Sub")
-     * @param pageName the name of the page
+     * @param documentReference the document reference containing the attachment
      * @param attachmentName the name of the attachment
      * @return {@code true} if the attachment exists or has existed (but was moved with a redirection) at the requested
      *     location.
      */
-    public boolean attachmentExists(String wikiName, String spaceName, String pageName, String attachmentName)
+    public boolean locationAvailable(DocumentReference documentReference, String attachmentName)
     {
         try {
-            return this.attachmentsManager.exists(
-                new AttachmentReference(attachmentName, new DocumentReference(wikiName, spaceName, pageName)));
+            return this.attachmentsManager.available(
+                new AttachmentReference(attachmentName, documentReference));
         } catch (XWikiException e) {
             // TODO: check best practices for exception is SS.
             return false;

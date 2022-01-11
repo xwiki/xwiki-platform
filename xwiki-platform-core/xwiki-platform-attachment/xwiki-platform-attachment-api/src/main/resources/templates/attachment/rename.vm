@@ -23,6 +23,8 @@
 
 ## Update all the 
 
+## TODO: rename everything to use "move" instead of "rename" with is move generic.
+
 #set ($attachment = $request.attachment)
 #set ($attachment = $services.model.resolveAttachment($attachment))
 
@@ -60,27 +62,34 @@
         #error($services.localization.render('attachment.rename.emptyName'))
         #template("attachment/renameStep1.vm")
       #else
-        OK
         #template('attachment/refactoring_macros.vm')
 ##        ## Determine if the new document should be terminal.
 ##        #getNestedDocumentReference($request.newWikiName $request.newSpaceName $request.newPageName $NULL false
 ##          $newDocReference)
 ##        #set ($newDocReferenceAsString = $services.model.serialize($newDocReference))
         ## Allow users to overwrite existing documents if they are redirect placeholders.
+        #set ($sourceWikiName = $request.sourceWikiName)
+        #set ($sourceSpaceName = $request.sourceSpaceName)
+        #set ($sourcePageName = $request.sourcePageName)
+        #set ($sourceAttachmentName = $request.sourceAttachmentName)
+        #set ($targetLocation = $request.targetLocation)
+        #set ($targetAttachmentName = $request.targetAttachmentName)
         
-        
-        #if ($services.attachment.attachmentExists($newDocReference) && !$xwiki.getDocument($newDocReference).getObject('XWiki.RedirectClass'))
+        #if (!$services.attachment.locationAvailable($targetLocation, $targetAttachmentName)) 
           $response.setStatus(409)
+          ## TODO: check localization.
           #error($services.localization.render('attachment.rename.alreadyExists', 
-            [${escapetool.xml($newDocReferenceAsString)}, $xwiki.getURL($newDocReference)]))
+            [${escapetool.xml($targetLocation)}, $xwiki.getURL($targetLocation)]))
           #template("attachment/renameStep1.vm")
-        #elseif (!$xwiki.hasAccessLevel('edit', $xcontext.user, $newDocReferenceAsString))
+        #elseif (!$xwiki.hasAccessLevel('edit', $xcontext.user, $targetLocation))
           $response.setStatus(403)
-          #error($services.localization.render('core.rename.targetNotWritable',
-            [${escapetool.xml($newDocReferenceAsString)}]))
+          #error($services.localization.render('attachment.rename.targetNotWritable',
+            [${escapetool.xml($targetLocation)}]))
           #template('attachment/renameStep1.vm')
         #else
-          #set ($renameRequest = $services.attachment.createRenameRequest($attachment, $newDocReference))
+          ## TODO: replace the manual serialization with an actual serialization.
+          #set ($renameRequest = $services.attachment.createMoveRequest("$sourceWikiName:$sourcePageName.$sourcePageName", 
+            $sourceAttachmentName, $targetLocation, $targetAttachmentName))
           ## We can't rename the children if the new page is terminal.
           #set ($deep = $request.deep == 'true' && !$terminal)
           #set ($discard = $renameRequest.setDeep($deep))
@@ -90,7 +99,7 @@
           #set ($discard = $renameRequest.setAutoRedirect($autoRedirect))
           ## Rename operation relies on copy.
           ## TODO: check what this macro does
-          #maybeUpdateTitleAfterCopy($renameRequest $doc.documentReference 'newPageTitle')
+##          #maybeUpdateTitleAfterCopy($renameRequest $doc.documentReference 'newPageTitle')
           #if ($request.async == 'true')
             ## We may be asked a question (we assume that async also imply we want it interactive)
             #set ($discard = $renameRequest.setInteractive(true))

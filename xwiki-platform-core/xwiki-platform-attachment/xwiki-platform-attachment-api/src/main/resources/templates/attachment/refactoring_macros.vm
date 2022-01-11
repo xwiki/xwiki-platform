@@ -20,7 +20,7 @@
 ###
 ### Refactoring attachments macros.
 ###
-#macro (displaySourceAttachment)
+#macro (displaySourceAttachment) 
 <dt>
   <label>$services.localization.render('attachment.rename.source.label')</label>
   <span class="xHint">$services.localization.render('attachment.rename.source.hint')</span>

@@ -19,8 +19,6 @@
  */
 package org.xwiki.attachment.internal;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -31,13 +29,12 @@ import org.xwiki.model.reference.AttachmentReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * TODO: document me.
+ * Provide operations to inspect and manipulate attachments.
  *
  * @version $Id$
- * @since X.Y.X
+ * @since 14.0RC1
  */
 @Component(roles = AttachmentsManager.class)
 @Singleton
@@ -47,27 +44,21 @@ public class AttachmentsManager
     private Provider<XWikiContext> xcontextProvider;
 
     /**
-     * Check if an attachment exists or has existed at the request location
+     * Check if an attachment exists.
      *
      * @param attachmentLocation the reference of the attachment to check
-     * @return {@code true} if the attachment is found at the requested location, or if a redirection exist for the
-     *     requested location, {@code false} otherwise
+     * @return {@code true} if the attachment is found at the requested location, {@code false} otherwise
      * @throws XWikiException if the attachments couldn't be retrieved
      */
-    public boolean exists(AttachmentReference attachmentLocation) throws XWikiException
+    public boolean available(AttachmentReference attachmentLocation) throws XWikiException
     {
         XWikiDocument document = this.xcontextProvider.get().getWiki()
             .getDocument(attachmentLocation.getDocumentReference(), this.xcontextProvider.get());
         boolean exists;
         if (document == null) {
             exists = false;
-        } else if (document.getAttachment(attachmentLocation.getName()) != null) {
-            exists = true;
         } else {
-            List<BaseObject> xObjects = document.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE);
-            exists = xObjects.stream().anyMatch(
-                it -> it.getStringValue(RedirectAttachmentClassDocumentInitializer.SOURCE_NAME_FIELD)
-                    .equals(attachmentLocation.getName()));
+            exists = document.getAttachment(attachmentLocation.getName()) != null;
         }
         return exists;
     }

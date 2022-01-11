@@ -1,0 +1,2 @@
+org.xwiki.attachment.script.AttachmentScriptService
+org.xwiki.attachment.internal.AttachmentService

@@ -102,7 +102,7 @@ public class BaseObjects extends AbstractList<BaseObject>
         // Check if the index is valid
         rangeCheckForAdd(index);
 
-        // Move right values
+        // Shifts right values to the right
         if (index < this.size) {
             for (int i = this.size - 1; i >= index; --i) {
                 put(i + 1, get(i));
@@ -128,7 +128,26 @@ public class BaseObjects extends AbstractList<BaseObject>
     {
         rangeCheck(index);
 
-        return this.map.remove(index);
+        BaseObject previous = this.map.remove(index);
+
+        // Shifts right values to the left
+        if (index < this.size - 1) {
+            for (int i = index; i < this.size - 1; ++i) {
+                put(i, get(i + 1));
+            }
+        }
+
+        // The list is one element shorter
+        --this.size;
+
+        return previous;
+    }
+
+    @Override
+    public void clear()
+    {
+        this.map.clear();
+        this.size = 0;
     }
 
     private void rangeCheck(int index)

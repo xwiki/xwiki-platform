@@ -120,12 +120,26 @@ public class BaseObjectsTest
         assertEquals(3, objects.size());
 
         objects.remove(0);
-        objects.remove(2);
 
-        assertNull(objects.get(0));
-        assertSame(XOBJ2, objects.get(1));
-        assertNull(objects.get(2));
+        assertEquals(2, objects.size());
+        assertSame(XOBJ2, objects.get(0));
+        assertSame(XOBJ3, objects.get(1));
+
+        objects.remove(1);
+
+        assertEquals(1, objects.size());
+        assertSame(XOBJ2, objects.get(0));
+    }
+
+    @Test
+    void clear()
+    {
+        BaseObjects objects = new BaseObjects(Arrays.asList(XOBJ1, XOBJ2, XOBJ3));
 
         assertEquals(3, objects.size());
+
+        objects.clear();
+
+        assertEquals(0, objects.size());
     }
 }

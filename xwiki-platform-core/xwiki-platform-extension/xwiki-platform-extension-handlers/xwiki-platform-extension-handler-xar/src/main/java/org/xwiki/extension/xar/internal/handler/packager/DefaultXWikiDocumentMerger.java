@@ -289,7 +289,6 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         if (userDocumentReference != null) {
             UserReference userReference = this.documentReferenceUserReferenceResolver.resolve(userDocumentReference);
             DocumentAuthors authors = currentDocument.getAuthors();
-            currentDocument.setMetaDataDirty(true);
             authors.setContentAuthor(userReference);
             authors.setEffectiveMetadataAuthor(userReference);
 
@@ -298,7 +297,6 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
             }
             if (mergedDocument != null) {
                 DocumentAuthors mergedDocumentAuthors = mergedDocument.getAuthors();
-                mergedDocument.setMetaDataDirty(true);
                 mergedDocumentAuthors.setEffectiveMetadataAuthor(userReference);
                 mergedDocumentAuthors.setContentAuthor(userReference);
 

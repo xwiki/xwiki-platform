@@ -21,9 +21,13 @@ package org.xwiki.model.internal.document;/*
 import org.junit.jupiter.api.Test;
 import org.xwiki.user.UserReference;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link DefaultDocumentAuthors}.
@@ -36,38 +40,55 @@ class DefaultDocumentAuthorsTest
     @Test
     void constructorClone()
     {
+        XWikiDocument xWikiDocument = mock(XWikiDocument.class);
         UserReference contentAuthorRef = mock(UserReference.class);
         UserReference creatorRef = mock(UserReference.class);
         UserReference metadataAuthorRef = mock(UserReference.class);
         UserReference displayedAuthorRef = mock(UserReference.class);
-        DefaultDocumentAuthors documentAuthors = new DefaultDocumentAuthors();
+        DefaultDocumentAuthors documentAuthors = new DefaultDocumentAuthors(xWikiDocument);
         documentAuthors.setCreator(creatorRef);
         documentAuthors.setContentAuthor(contentAuthorRef);
         documentAuthors.setEffectiveMetadataAuthor(metadataAuthorRef);
         documentAuthors.setOriginalMetadataAuthor(displayedAuthorRef);
-
-        DefaultDocumentAuthors otherAuthors = new DefaultDocumentAuthors(documentAuthors);
-        assertEquals(documentAuthors, otherAuthors);
     }
 
     @Test
     void getDisplayedAuthor()
     {
+        XWikiDocument xWikiDocument = mock(XWikiDocument.class);
         UserReference contentAuthorRef = mock(UserReference.class);
         UserReference creatorRef = mock(UserReference.class);
         UserReference metadataAuthorRef = mock(UserReference.class);
         UserReference displayedAuthorRef = mock(UserReference.class);
-        DefaultDocumentAuthors documentAuthors = new DefaultDocumentAuthors();
+        DefaultDocumentAuthors documentAuthors = new DefaultDocumentAuthors(xWikiDocument);
         documentAuthors.setCreator(creatorRef);
         documentAuthors.setContentAuthor(contentAuthorRef);
         documentAuthors.setEffectiveMetadataAuthor(metadataAuthorRef);
         documentAuthors.setOriginalMetadataAuthor(displayedAuthorRef);
         assertSame(displayedAuthorRef, documentAuthors.getOriginalMetadataAuthor());
 
-        documentAuthors = new DefaultDocumentAuthors();
+        documentAuthors = new DefaultDocumentAuthors(xWikiDocument);
         documentAuthors.setCreator(creatorRef);
         documentAuthors.setContentAuthor(contentAuthorRef);
         documentAuthors.setEffectiveMetadataAuthor(metadataAuthorRef);
         assertSame(metadataAuthorRef, documentAuthors.getOriginalMetadataAuthor());
+    }
+
+    @Test
+    void setEffectiveMetadataAuthor()
+    {
+        XWikiDocument xWikiDocument = mock(XWikiDocument.class);
+        UserReference effectiveMetadataAuthor = mock(UserReference.class);
+        DefaultDocumentAuthors documentAuthors = new DefaultDocumentAuthors(xWikiDocument);
+        documentAuthors.setEffectiveMetadataAuthor(effectiveMetadataAuthor);
+        verify(xWikiDocument).setMetaDataDirty(true);
+
+        documentAuthors.setEffectiveMetadataAuthor(effectiveMetadataAuthor);
+        // should have been triggered only once since it's not modified again
+        verify(xWikiDocument).setMetaDataDirty(true);
+
+        documentAuthors.setEffectiveMetadataAuthor(mock(UserReference.class));
+        // not the same author, so should be triggered once more
+        verify(xWikiDocument, times(2)).setMetaDataDirty(true);
     }
 }

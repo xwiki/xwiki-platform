@@ -22,7 +22,6 @@ package org.xwiki.bridge;
 import java.util.Date;
 
 import org.xwiki.model.document.DocumentAuthors;
-import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
@@ -147,7 +146,7 @@ public interface DocumentModelBridge
     @Unstable
     default DocumentAuthors getAuthors()
     {
-        return new DefaultDocumentAuthors();
+        return null;
     }
 
     /**

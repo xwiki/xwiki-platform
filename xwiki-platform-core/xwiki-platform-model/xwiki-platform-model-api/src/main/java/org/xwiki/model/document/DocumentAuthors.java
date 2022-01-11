@@ -23,7 +23,9 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
- * Define the different authors information that are related to an XWiki Document.
+ * Define the different authors information that are related to an XWikiDocument.
+ * Note that since this API uses {@link UserReference} the getters should never returns {@code null} but should return
+ * {@link org.xwiki.user.GuestUserReference} instead when needed.
  *
  * @version $Id$
  * @since 14.0RC1
@@ -32,8 +34,11 @@ import org.xwiki.user.UserReference;
 public interface DocumentAuthors
 {
     /**
-     * The content author is the author of the content field only: this author is used for security reason when a script
-     * needs to be executed.
+     * The last user that has changed the document's content (ie not object, attachments). The Content author is only
+     * changed when the document content changes. Note that Content Author is used to check programming rights on a
+     * document and this is the reason we need to know the last author who's modified the content since programming
+     * rights depend on this.
+     * Note that this should never return {@code null}.
      *
      * @return the reference of the user who authored latest content of the document.
      */
@@ -42,6 +47,10 @@ public interface DocumentAuthors
     /**
      * Specify the author of the content of the document: this author is only responsible to the content, and not to
      * other information of the document such as xobjects.
+     * The last user that has changed the document's content (ie not object, attachments). The Content author is only
+     * changed when the document content changes. Note that Content Author is used to check programming rights on a
+     * document and this is the reason we need to know the last author who's modified the content since programming
+     * rights depend on this.
      *
      * @param contentAuthor the author of the content of the document.
      * @see #getContentAuthor()
@@ -52,6 +61,7 @@ public interface DocumentAuthors
      * The effective metadata author is the author responsible of any change but the content: e.g. saving a new xobject
      * in a document update the metadata auhor but not the content author. It's effective, as it is the actual author
      * who holds the responsibility of the changes in terms of rights.
+     * Note that this should never return {@code null}.
      *
      * @return the reference of the user who saved metadata of the document, or who was used to save it.
      */
@@ -72,6 +82,7 @@ public interface DocumentAuthors
      * {@link #getEffectiveMetadataAuthor()} when the save is performed through a mechanism which prevent users to need
      * edit rights for saving the document (e.g. adding a new comment in a page). Note that if there is no original
      * metadata author defined, it should always fallback to the {@link #getEffectiveMetadataAuthor()}.
+     * Note that this should never return {@code null}.
      *
      * @return the reference of the user who originally triggers the save.
      */
@@ -88,6 +99,7 @@ public interface DocumentAuthors
 
     /**
      * The creator of the document is the first author of the document when it has been created.
+     * Note that this should never return {@code null}.
      *
      * @return the reference of the user who authored the first version of the document.
      */
@@ -99,4 +111,11 @@ public interface DocumentAuthors
      * @param creator the creator of the document.
      */
     void setCreator(UserReference creator);
+
+    /**
+     * Copy all authors from the given document authors.
+     *
+     * @param documentAuthors the authors to copy value from.
+     */
+    void copyAuthors(DocumentAuthors documentAuthors);
 }

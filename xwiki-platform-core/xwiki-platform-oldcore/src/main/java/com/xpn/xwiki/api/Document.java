@@ -2560,7 +2560,6 @@ public class Document extends Api
             DocumentAuthors authors = this.getAuthors();
             authors.setOriginalMetadataAuthor(
                 getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
-            this.doc.setMetaDataDirty(true);
             // If the current author does not have PR don't let it set current user as author of the saved document
             // since it can lead to right escalation
             if (hasProgrammingRights() || !getConfiguration().getProperty("security.script.save.checkAuthor", true)) {

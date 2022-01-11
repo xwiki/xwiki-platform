@@ -19,10 +19,15 @@
  */
 package org.xwiki.model.internal.document;
 
+import java.util.Objects;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
+
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Default implementation of {@link DocumentAuthors}.
@@ -32,55 +37,74 @@ import org.xwiki.user.UserReference;
  */
 public class DefaultDocumentAuthors implements DocumentAuthors
 {
+    private final XWikiDocument documentHolder;
     private UserReference contentAuthor;
     private UserReference effectiveMetadataAuthor;
     private UserReference originalMetadataAuthor;
     private UserReference creator;
 
     /**
-     * Default empty constructor.
+     * Default constructor.
+     *
+     * @param documentHolder the document which holds those authors.
      */
-    public DefaultDocumentAuthors()
+    public DefaultDocumentAuthors(XWikiDocument documentHolder)
     {
+        this.documentHolder = documentHolder;
+        this.contentAuthor = GuestUserReference.INSTANCE;
+        this.effectiveMetadataAuthor = GuestUserReference.INSTANCE;
+        this.creator = GuestUserReference.INSTANCE;
     }
 
-    /**
-     * Default constructor cloning the given document authors.
-     *
-     * @param documentAuthors the authors information to be cloned.
-     */
-    public DefaultDocumentAuthors(DocumentAuthors documentAuthors)
+    @Override
+    public void copyAuthors(DocumentAuthors documentAuthors)
     {
-        if (documentAuthors != null) {
-            this.contentAuthor = documentAuthors.getContentAuthor();
-            this.effectiveMetadataAuthor = documentAuthors.getEffectiveMetadataAuthor();
-            this.originalMetadataAuthor = documentAuthors.getOriginalMetadataAuthor();
-            this.creator = documentAuthors.getCreator();
-        }
+        // Use setters those that metadata dirty are updated if needed
+        this.setContentAuthor(documentAuthors.getContentAuthor());
+        this.setEffectiveMetadataAuthor(documentAuthors.getEffectiveMetadataAuthor());
+        this.setOriginalMetadataAuthor(documentAuthors.getOriginalMetadataAuthor());
+        this.setCreator(documentAuthors.getCreator());
     }
 
     @Override
     public void setContentAuthor(UserReference contentAuthor)
     {
-        this.contentAuthor = contentAuthor;
+        if (!Objects.equals(this.contentAuthor, contentAuthor)) {
+            this.contentAuthor = contentAuthor;
+            this.flagMetadataDirty();
+        }
     }
 
     @Override
-    public void setEffectiveMetadataAuthor(UserReference metdataAuthor)
+    public void setEffectiveMetadataAuthor(UserReference metadataAuthor)
     {
-        this.effectiveMetadataAuthor = metdataAuthor;
+        if (!Objects.equals(this.effectiveMetadataAuthor, metadataAuthor)) {
+            this.effectiveMetadataAuthor = metadataAuthor;
+            this.flagMetadataDirty();
+        }
     }
 
     @Override
     public void setOriginalMetadataAuthor(UserReference originalMetadataAuthor)
     {
-        this.originalMetadataAuthor = originalMetadataAuthor;
+        if (!Objects.equals(this.originalMetadataAuthor, originalMetadataAuthor)) {
+            this.originalMetadataAuthor = originalMetadataAuthor;
+            this.flagMetadataDirty();
+        }
     }
 
     @Override
     public void setCreator(UserReference creator)
     {
-        this.creator = creator;
+        if (!Objects.equals(this.creator, creator)) {
+            this.creator = creator;
+            this.flagMetadataDirty();
+        }
+    }
+
+    private void flagMetadataDirty()
+    {
+        this.documentHolder.setMetaDataDirty(true);
     }
 
     @Override
@@ -111,6 +135,7 @@ public class DefaultDocumentAuthors implements DocumentAuthors
         return creator;
     }
 
+    // We don't check document holder in equals and hashcode to avoid recursive calls.
     @Override
     public boolean equals(Object o)
     {
@@ -128,7 +153,7 @@ public class DefaultDocumentAuthors implements DocumentAuthors
             .append(contentAuthor, that.contentAuthor)
             .append(effectiveMetadataAuthor, that.effectiveMetadataAuthor)
             .append(originalMetadataAuthor, that.originalMetadataAuthor)
-            .append(creator, this.creator)
+            .append(creator, that.creator)
             .isEquals();
     }
 

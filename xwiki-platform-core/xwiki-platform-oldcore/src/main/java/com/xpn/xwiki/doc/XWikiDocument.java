@@ -152,6 +152,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
@@ -425,24 +426,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private String format;
 
-    /**
-     * First author of the document.
-     */
-    private DocumentReference creatorReference;
-
-    /**
-     * The Author is changed when any part of the document changes (content, objects, attachments).
-     */
-    private DocumentReference authorReference;
-
-    /**
-     * The last user that has changed the document's content (ie not object, attachments). The Content author is only
-     * changed when the document content changes. Note that Content Author is used to check programming rights on a
-     * document and this is the reason we need to know the last author who's modified the content since programming
-     * rights depend on this.
-     */
-    private DocumentReference contentAuthorReference;
-
     private String customClass;
 
     private Date contentUpdateDate;
@@ -644,7 +627,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * @see #getAuthors()
      */
-    private DefaultDocumentAuthors authors;
+    private final DefaultDocumentAuthors authors = new DefaultDocumentAuthors(this);
 
     /**
      * Create a document for the given reference, with the {@link Locale#ROOT} even if the reference contains a locale.
@@ -1894,8 +1877,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public DocumentReference getAuthorReference()
     {
-        if (getAuthors() != null && this.getAuthors().getEffectiveMetadataAuthor() != null) {
-            return this.getUserReferenceDocumentReferenceSerializer().serialize(getAuthors().getEffectiveMetadataAuthor());
+        UserReference effectiveMetadataAuthor = getAuthors().getEffectiveMetadataAuthor();
+        if (this.getAuthors().getEffectiveMetadataAuthor() != null
+            && effectiveMetadataAuthor != GuestUserReference.INSTANCE) {
+            return this.getUserReferenceDocumentReferenceSerializer().serialize(effectiveMetadataAuthor);
         } else {
             return null;
         }
@@ -1903,21 +1888,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated Since 14.0RC1 rely on {@link #setAuthors(DocumentAuthors)}
+     * @deprecated Since 14.0RC1 rely on {@link DocumentAuthors#setEffectiveMetadataAuthor(UserReference)}
      */
     @Deprecated
     public void setAuthorReference(DocumentReference authorReference)
     {
-        if (authorReference != null) {
+        if (authorReference == null) {
+            this.authors.setEffectiveMetadataAuthor(GuestUserReference.INSTANCE);
+        } else {
+            if (authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
+                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
+                    new Exception("See stack trace"));
+            }
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(authorReference);
-            if (this.authors == null) {
-                this.setAuthors(new DefaultDocumentAuthors());
-            }
-
-            if (!Objects.equals(this.authors.getEffectiveMetadataAuthor(), user)) {
-                this.authors.setEffectiveMetadataAuthor(user);
-                this.setMetaDataDirty(true);
-            }
+            this.authors.setEffectiveMetadataAuthor(user);
         }
     }
 
@@ -1950,8 +1934,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Override
     public DocumentReference getContentAuthorReference()
     {
-        if (getAuthors() != null && this.getAuthors().getContentAuthor() != null) {
-            return this.getUserReferenceDocumentReferenceSerializer().serialize(this.getAuthors().getContentAuthor());
+        UserReference contentAuthor = this.getAuthors().getContentAuthor();
+        if (contentAuthor != null && contentAuthor != GuestUserReference.INSTANCE) {
+            return this.getUserReferenceDocumentReferenceSerializer().serialize(contentAuthor);
         } else {
             return null;
         }
@@ -1959,21 +1944,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated Since 14.0RC1 rely on {@link #setAuthors(DocumentAuthors)}
+     * @deprecated Since 14.0RC1 rely on {@link DocumentAuthors#setContentAuthor(UserReference)}
      */
     @Deprecated
     public void setContentAuthorReference(DocumentReference contentAuthorReference)
     {
-        if (contentAuthorReference != null) {
+        if (contentAuthorReference == null) {
+            this.authors.setContentAuthor(GuestUserReference.INSTANCE);
+        } else {
+            if (contentAuthorReference.getName().equals(XWikiRightService.GUEST_USER)) {
+                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
+                    new Exception("See stack trace"));
+            }
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(contentAuthorReference);
-            if (this.authors == null) {
-                this.setAuthors(new DefaultDocumentAuthors());
-            }
-
-            if (!Objects.equals(this.authors.getContentAuthor(), user)) {
-                this.authors.setContentAuthor(user);
-                this.setMetaDataDirty(true);
-            }
+            this.authors.setContentAuthor(user);
         }
     }
 
@@ -2006,8 +1990,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public DocumentReference getCreatorReference()
     {
-        if (getAuthors() != null && this.getAuthors().getCreator() != null) {
-            return this.getUserReferenceDocumentReferenceSerializer().serialize(this.getAuthors().getCreator());
+        UserReference creator = this.getAuthors().getCreator();
+        if (creator != null && creator != GuestUserReference.INSTANCE) {
+            return this.getUserReferenceDocumentReferenceSerializer().serialize(creator);
         } else {
             return null;
         }
@@ -2015,21 +2000,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated since 14.0RC1 use {@link #setAuthors(DocumentAuthors)}
+     * @deprecated since 14.0RC1 use {@link DocumentAuthors#setCreator(UserReference)}
      */
     @Deprecated
     public void setCreatorReference(DocumentReference creatorReference)
     {
-        if (creatorReference != null) {
+        if (creatorReference == null) {
+            this.authors.setCreator(GuestUserReference.INSTANCE);
+        } else {
+            if (creatorReference.getName().equals(XWikiRightService.GUEST_USER)) {
+                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
+                    new Exception("See stack trace"));
+            }
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(creatorReference);
-            if (this.authors == null) {
-                this.setAuthors(new DefaultDocumentAuthors());
-            }
-
-            if (!Objects.equals(this.authors.getCreator(), user)) {
-                this.authors.setCreator(user);
-                this.setMetaDataDirty(true);
-            }
+            this.authors.setCreator(user);
         }
     }
 
@@ -4337,7 +4321,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             } else {
                 doc.setDocumentArchive(getDocumentArchive());
             }
-            doc.setAuthors(getAuthors());
+            doc.getAuthors().copyAuthors(getAuthors());
             doc.setContent(getContent());
             doc.setCreationDate(getCreationDate());
             doc.setDate(getDate());
@@ -9170,33 +9154,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return getStore().getLimitSize(this.getXWikiContext(), this.getClass(), "fullName");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public DocumentAuthors getAuthors()
     {
-        if (this.authors == null) {
-            this.authors = new DefaultDocumentAuthors();
-        }
         return this.authors;
-    }
-
-    /**
-     * Allow to set the different authors of the document.
-     * Note that if one of the author changed as part of this call, the {@link #setMetaDataDirty(boolean)} flag is set
-     * to {@code true}.
-     *
-     * @param authors the authors information.
-     * @since 14.0RC1
-     */
-    @Unstable
-    public void setAuthors(DocumentAuthors authors)
-    {
-        if (!Objects.equals(getAuthors(), authors)) {
-            this.setMetaDataDirty(true);
-        }
-        this.authors = new DefaultDocumentAuthors(authors);
     }
 
     /**
@@ -9207,7 +9168,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private String getOriginalMetadataAuthorReference()
     {
-        if (this.getAuthors() == null || this.getAuthors().getOriginalMetadataAuthor() == null) {
+        if (this.getAuthors().getOriginalMetadataAuthor() == null
+            || this.getAuthors().getOriginalMetadataAuthor() == GuestUserReference.INSTANCE) {
             return "";
         } else {
             UserReferenceSerializer<String> userReferenceSerializer =
@@ -9219,8 +9181,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * This setter has been created for hibernate in order to properly create the XWikiDocument instance with the
      * displayed author set, it's not meant to be used for other purpose.
-     * For setting the displayed author, rely on {@link #setAuthors(DocumentAuthors)} and
-     * {@link DefaultDocumentAuthors}.
      *
      * @param serializedUserReference the serialization of the displayed author reference.
      */
@@ -9230,9 +9190,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             UserReferenceResolver<String> userReferenceResolver =
                 Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class, String.class));
             UserReference userReference = userReferenceResolver.resolve(serializedUserReference);
-            if (this.authors == null) {
-                this.authors = new DefaultDocumentAuthors();
-            }
             this.authors.setOriginalMetadataAuthor(userReference);
         }
     }

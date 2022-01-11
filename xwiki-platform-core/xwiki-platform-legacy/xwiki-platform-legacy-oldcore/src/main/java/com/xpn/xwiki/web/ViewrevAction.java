@@ -42,7 +42,6 @@ public class ViewrevAction extends XWikiAction
     public ViewrevAction()
     {
         this.waitForXWikiInitialization = false;
-        this.handleRedirectObject = true;
     }
 
     @Override
@@ -61,5 +60,11 @@ public class ViewrevAction extends XWikiAction
         }
 
         return "view";
+    }
+
+    @Override
+    protected boolean supportRedirections()
+    {
+        return true;
     }
 }

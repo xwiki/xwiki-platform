@@ -105,14 +105,6 @@ public class DownloadAction extends XWikiAction
     /** The format of a valid range header. */
     private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=([0-9]+)?-([0-9]+)?");
 
-    /**
-     * Default constructor.
-     */
-    public DownloadAction()
-    {
-        this.handleRedirectObject = true;
-    }
-
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -199,6 +191,12 @@ public class DownloadAction extends XWikiAction
                 popDocumentFromContext(backwardCompatibilityContextObjects);
             }
         }
+    }
+
+    @Override
+    protected boolean supportRedirections()
+    {
+        return true;
     }
 
     private void throwNotFoundException(String filename) throws XWikiException

@@ -46,14 +46,6 @@ public class GetAction extends XWikiAction
      */
     public static final String GET_ACTION = "get";
 
-    /**
-     * Default constructor.
-     */
-    public GetAction()
-    {
-        this.handleRedirectObject = true;
-    }
-
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -74,5 +66,11 @@ public class GetAction extends XWikiAction
         context.getResponse().setHeader("Content-Location", context.getDoc().getURL("view", context));
 
         return GET_ACTION;
+    }
+
+    @Override
+    protected boolean supportRedirections()
+    {
+        return true;
     }
 }

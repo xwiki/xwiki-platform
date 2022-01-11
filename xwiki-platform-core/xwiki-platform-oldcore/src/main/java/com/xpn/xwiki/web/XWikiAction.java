@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
@@ -154,15 +156,14 @@ public abstract class XWikiAction implements LegacyAction
     @Inject
     protected ObservationManager observation;
 
+    @Inject
+    @Named("context")
+    private ComponentManager componentManager;
+
     /**
      * Indicate if the action allow asynchronous display (among which the XWiki initialization).
      */
     protected boolean waitForXWikiInitialization = true;
-
-    /**
-     * Indicate if the XWiki.RedirectClass is handled by the action (see handleRedirectObject()).
-     */
-    protected boolean handleRedirectObject = false;
 
     @Inject
     @Named("currentmixed")
@@ -897,6 +898,18 @@ public abstract class XWikiAction implements LegacyAction
         return null;
     }
 
+    /**
+     * Indicate if the action support redirection. The default value is {@code false}.
+     *
+     * @return {@code true} if the action supports redirections, {@code false} otherwise
+     * @since 14.0RC1
+     */
+    @Unstable
+    protected boolean supportRedirections()
+    {
+        return false;
+    }
+
     protected void handleRevision(XWikiContext context) throws XWikiException
     {
         String rev = context.getRequest().getParameter("rev");
@@ -1209,13 +1222,16 @@ public abstract class XWikiAction implements LegacyAction
     private boolean handleRedirect(XWikiContext context) throws XWikiException
     {
         // If no redirection are expected, this step is skipped.
-        if (this.handleRedirectObject) {
-            List<RedirectionFilter> filters = Utils.getComponentList(RedirectionFilter.class);
-            for (RedirectionFilter filter : filters) {
-                boolean redirect = filter.redirect(context);
-                if (redirect) {
-                    return true;
+        if (this.supportRedirections()) {
+            try {
+                for (RedirectionFilter filter : this.componentManager.<RedirectionFilter>getInstanceList(
+                    RedirectionFilter.class)) {
+                    if (filter.redirect(context)) {
+                        return true;
+                    }
                 }
+            } catch (ComponentLookupException e) {
+                throw new XWikiException("Failed to resolve the redirection filters list", e);
             }
         }
         return false;

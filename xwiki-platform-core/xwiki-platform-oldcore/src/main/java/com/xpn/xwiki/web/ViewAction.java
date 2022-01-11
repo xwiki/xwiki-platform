@@ -51,7 +51,6 @@ public class ViewAction extends XWikiAction
     public ViewAction()
     {
         this.waitForXWikiInitialization = false;
-        this.handleRedirectObject = true;
     }
 
     @Override
@@ -77,5 +76,11 @@ public class ViewAction extends XWikiAction
         } else {
             return VIEW_ACTION;
         }
+    }
+
+    @Override
+    protected boolean supportRedirections()
+    {
+        return true;
     }
 }

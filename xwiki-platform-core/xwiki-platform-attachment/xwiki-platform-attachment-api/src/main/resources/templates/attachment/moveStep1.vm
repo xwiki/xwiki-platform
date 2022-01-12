@@ -97,7 +97,11 @@
           <span class="xHint">$!services.localization.render('attachment.move.newLocation.hint')</span>
         </dt>
         <dd>
-          #set ($documentReference = $services.model.serialize($doc.documentReference, 'local'))
+          #set ($targetRef = $doc.documentReference)
+          #if ($request.targetLocation)
+            #set ($targetRef = $request.targetLocation)
+          #end
+          #set ($documentReference = $services.model.serialize($targetRef, 'local'))
           #pagePicker({
             'id': 'targetLocation',
             'name': 'targetLocation',

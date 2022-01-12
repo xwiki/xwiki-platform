@@ -25,9 +25,10 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+
+import static java.util.Arrays.asList;
 
 /**
  * TODO: document me.
@@ -44,12 +45,21 @@ public class RedirectAttachmentClassDocumentInitializer extends AbstractMandator
      * The local reference of the redirect attachment class.
      */
     public static final LocalDocumentReference REFERENCE =
-        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "RedirectClass");
+        new LocalDocumentReference(asList("Attachment", "Code"), "RedirectClass");
 
+    /**
+     * The name of the field containing the name of the attachment before the move.
+     */
     public static final String SOURCE_NAME_FIELD = "sourceName";
 
+    /**
+     * The name of the field storing the location of the attachment after the move.
+     */
     public static final String TARGET_LOCATION_FIELD = "targetLocation";
 
+    /**
+     * The name of the field storing the name of the attachment after the move.
+     */
     public static final String TARGET_NAME_FIELD = "targetName";
 
     /**

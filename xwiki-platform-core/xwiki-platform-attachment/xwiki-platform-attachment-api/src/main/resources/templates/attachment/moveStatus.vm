@@ -26,26 +26,15 @@
     <div class="col-xs-12 col-lg-6">
       <dl>
         #displayLocations('attachment.move.source.label' 'attachment.move.source.hint' $moveJobRequest.entityReferences)
-        #displayBooleanConfigParam('attachment.move.children.label', 'attachment.move.children.hintWithoutParams'
-          $moveJobRequest.isDeep())
-        #if ($isAdvancedUser || $isSuperAdmin)
-          #displayBooleanConfigParam('attachment.move.links.label', 'attachment.move.links.hintWithoutParams'
-            $moveJobRequest.isUpdateLinks())
-        #end
         #displayBooleanConfigParam('attachment.move.autoRedirect.label', 'attachment.move.autoRedirect.hint'
           $moveJobRequest.isAutoRedirect())
       </dl>
     </div>
     <div class="col-xs-12 col-lg-6">
       <dl>
-        #displayLocations('attachment.move.target.location.label' 'attachment.move.target.location.hint'
+        >> $moveJobRequest.destination
+        #displayLocations('attachment.move.newLocation.label' 'attachment.move.newLocation.hint'
           [$moveJobRequest.destination])
-        #if ($isAdvancedUser || $isSuperAdmin)
-          #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
-          #set ($terminal = $moveJobRequest.destination.type == 'DOCUMENT'
-            && $moveJobRequest.destination.name != $defaultDocumentName)
-          #displayBooleanConfigParam('attachment.move.target.terminal.label', 'attachment.move.target.terminal.hint' $terminal)
-        #end
       </dl>
     </div>
   </div>
@@ -56,10 +45,7 @@
   ## TODO: allows question templates to inject the web resources they need
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 
     'tree.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
-##  #set ($discard = $xwiki.jsfx.use("uicomponents/job/question/ExtensionBreakingQuestion.js", true))
-##  #set ($discard = $xwiki.jsfx.use("uicomponents/job/question/XClassBreakingQuestion.js", true))
   #set ($moveJobState = $moveJobStatus.state)
-  STATE $moveJobState
   #set ($finished = $moveJobState == 'FINISHED')
   #set ($moveJobRequest = $moveJobStatus.request)
   #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
@@ -73,11 +59,9 @@
       [$xwiki.getUserName($moveJobRequest.userReference), $xwiki.formatDate($moveJobStatus.startDate)])</p>
     #displayMoveJobRequest($moveJobRequest)
     #if (!$finished)
-      NOT FINISHED
       #displayJobProgressBar($moveJobStatus)
       #displayJobQuestion($moveJobStatus)
     #else
-      FINISHED
       #displayJobFinishedMessage($moveJobStatus)
     #end
     #if ($isAdvancedUser || $isSuperAdmin)

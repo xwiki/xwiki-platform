@@ -48,7 +48,7 @@
   <input type="hidden" name="updateLinks" value="false"/>
 </dt>
 <dd#if ($hidden) class="hidden"#end>
-  ## TODO: update once a backling management mechanism is in place
+  ## TODO: update once a backlink management mechanism is in place
   #set ($backLinksCount = 0)
   #set ($backLinksURL = '')
   <span class="xHint">

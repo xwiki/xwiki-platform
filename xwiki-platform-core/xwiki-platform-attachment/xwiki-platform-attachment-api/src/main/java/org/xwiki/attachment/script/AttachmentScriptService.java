@@ -74,8 +74,8 @@ public class AttachmentScriptService implements ScriptService
     {
         MoveAttachmentRequest request = new MoveAttachmentRequest();
         request.setEntityReferences(singletonList(new AttachmentReference(sourceName, sourceLocation)));
-        request.setProperty("destination", new AttachmentReference(targetName, targetLocation));
-        request.setProperty("autoRedirect", autoRedirect);
+        request.setProperty(MoveAttachmentRequest.DESTINATION, new AttachmentReference(targetName, targetLocation));
+        request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, autoRedirect);
         request.setInteractive(isAsync);
         return request;
     }

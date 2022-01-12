@@ -19,11 +19,12 @@
  */
 package org.xwiki.attachment;
 
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.stability.Unstable;
 
 /**
- * TODO: document me.
+ * Job request for moving an attachment to a new location. A redirection can be persisted at the old location.
  *
  * @version $Id$
  * @since 14.0RC1
@@ -31,5 +32,30 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class MoveAttachmentRequest extends EntityRequest
 {
-    // TODO...
+    /**
+     * Destination property name.
+     */
+    public static final String DESTINATION = "destination";
+
+    /**
+     * Auto-redirection property name.
+     */
+    public static final String AUTO_REDIRECT = "autoRedirect";
+
+    /**
+     * @return the destination of the move
+     */
+    public AttachmentReference getDestination()
+    {
+        return getProperty(DESTINATION);
+    }
+
+    /**
+     * @return {@code true} if a redirection must be created from the old location to the new one, {@code false}
+     *     otherwise
+     */
+    public boolean isAutoRedirect()
+    {
+        return getProperty(AUTO_REDIRECT, true);
+    }
 }

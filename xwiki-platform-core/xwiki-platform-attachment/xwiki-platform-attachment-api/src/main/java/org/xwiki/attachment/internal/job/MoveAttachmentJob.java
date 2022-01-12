@@ -20,6 +20,7 @@
 package org.xwiki.attachment.internal.job;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -28,7 +29,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.xwiki.attachment.MoveAttachmentRequest;
+import org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -42,8 +45,8 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.REFERENCE;
 import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.SOURCE_NAME_FIELD;
+import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.TARGET_LOCATION_FIELD;
 import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.TARGET_NAME_FIELD;
 
 /**
@@ -68,6 +71,12 @@ public class MoveAttachmentJob
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private ContextualLocalizationManager contextualLocalizationManager;
+
+    @Inject
+    protected EntityReferenceSerializer<String> referenceSerializer;
+
     @Override
     public String getType()
     {
@@ -77,11 +86,12 @@ public class MoveAttachmentJob
     @Override
     protected void process(EntityReference source)
     {
+        this.progressManager.pushLevelProgress(this);
         this.request.setId("refactoring", "moveAttachment",
             String.format("%d-%d", System.currentTimeMillis(), ThreadLocalRandom.current().nextInt(100, 1000)));
 
-        AttachmentReference destination = this.request.getProperty("destination");
-        boolean autoRedirect = this.request.getProperty("autoRedirect");
+        AttachmentReference destination = this.request.getProperty(MoveAttachmentRequest.DESTINATION);
+        boolean autoRedirect = this.request.getProperty(MoveAttachmentRequest.AUTO_REDIRECT);
 
         XWiki wiki = this.xcontextProvider.get().getWiki();
         try {
@@ -95,34 +105,61 @@ public class MoveAttachmentJob
             targetDocument.setAttachment(destination.getName(),
                 sourceAttachment.getContentInputStream(this.xcontextProvider.get()), this.xcontextProvider.get());
 
-            // TODO: remove the redirection class if it exists with the name of the new attachment.
+            removeExistingRedirection(destination, targetDocument);
 
             if (autoRedirect) {
-                int idx = sourceDocument.createXObject(REFERENCE, this.xcontextProvider.get());
-                BaseObject xObject = sourceDocument.getXObject(REFERENCE, idx);
-                xObject.setStringValue(SOURCE_NAME_FIELD, source.getName());
-                xObject.setStringValue(TARGET_NAME_FIELD,
-                    this.entityReferenceSerializer.serialize(destination.getParent()));
-                xObject.setStringValue(TARGET_NAME_FIELD, destination.getName());
+                initializeAutoRedirection(source, destination, sourceDocument);
             }
-            // TODO: transaction
+
             // TODO: localize
             if (Objects.equals(source.getParent(), destination.getParent())) {
                 wiki.saveDocument(sourceDocument,
-                    "Attachment " + source.getName() + " renamed  to " + destination.getName(),
+                    this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.inPlace",
+                        source.getName(), destination.getName()),
                     this.xcontextProvider.get());
             } else {
-                wiki.saveDocument(sourceDocument, "Attachment moved to " + destination, this.xcontextProvider.get());
-                wiki.saveDocument(targetDocument, "Attachment moved from " + source, this.xcontextProvider.get());
+                // "Attachment moved to " + destination
+                String historyMessageSource =
+                    this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.source",
+                        this.referenceSerializer.serialize(destination));
+                String historyMessageTarget =
+                    this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.target",
+                        this.referenceSerializer.serialize(source));
+                wiki.saveDocument(sourceDocument, historyMessageSource, this.xcontextProvider.get());
+                wiki.saveDocument(targetDocument, historyMessageTarget, this.xcontextProvider.get());
             }
         } catch (XWikiException e) {
-            // TODO: handle exception
+            // TODO: handle exception 
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            this.progressManager.popLevelProgress(this);
         }
+    }
 
-        this.progressManager.pushLevelProgress(5, this);
-        this.progressManager.startStep(this);
+    private void initializeAutoRedirection(EntityReference source, AttachmentReference destination,
+        XWikiDocument sourceDocument)
+        throws XWikiException
+    {
+        int idx = sourceDocument.createXObject(RedirectAttachmentClassDocumentInitializer.REFERENCE,
+            this.xcontextProvider.get());
+        BaseObject xObject =
+            sourceDocument.getXObject(RedirectAttachmentClassDocumentInitializer.REFERENCE, idx);
+        xObject.setStringValue(SOURCE_NAME_FIELD, source.getName());
+        xObject.setStringValue(TARGET_LOCATION_FIELD,
+            this.entityReferenceSerializer.serialize(destination.getParent()));
+        xObject.setStringValue(TARGET_NAME_FIELD, destination.getName());
+    }
+
+    private void removeExistingRedirection(AttachmentReference destination, XWikiDocument targetDocument)
+    {
+        List<BaseObject> targetRedirections =
+            targetDocument.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE);
+        for (BaseObject targetRedirection : targetRedirections) {
+            if (targetRedirection.getStringValue(SOURCE_NAME_FIELD).equals(destination.getName())) {
+                targetDocument.removeXObject(targetRedirection);
+            }
+        }
     }
 }

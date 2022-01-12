@@ -21,6 +21,9 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -35,6 +38,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.redirection.RedirectionFilter;
 
 /**
  * Add a backward compatibility layer to {@link XWikiAction}.
@@ -43,6 +47,10 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public privileged aspect XWikiActionCompatibilityAspect
 {
+    @Inject
+    @Named("XWiki.RedirectClass")
+    private RedirectionFilter XWikiAction.redirectionClassFilter;
+    
     // handleRedirectObject and handleRedirectObject while previously {@code protected} are now {@code public} due of 
     // technical limitations of AspectJ.
     // See https://doanduyhai.wordpress.com/2011/12/12/advanced-aspectj-part-ii-inter-type-declaration/
@@ -72,49 +80,6 @@ public privileged aspect XWikiActionCompatibilityAspect
     @Deprecated
     public boolean XWikiAction.handleRedirectObject(XWikiContext context) throws XWikiException
     {
-        WikiReference wikiReference = context.getWikiReference();
-
-        // Look if the document has a redirect object
-        XWikiDocument doc = context.getDoc();
-        BaseObject redirectObj = doc.getXObject(RedirectClassDocumentInitializer.REFERENCE);
-        if (redirectObj == null) {
-            return false;
-        }
-
-        // Get the location
-        String location = redirectObj.getStringValue("location");
-        if (StringUtils.isBlank(location)) {
-            return false;
-        }
-
-        // Resolve the location to get a reference
-        DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
-        EntityReference locationReference = resolver.resolve(location, wikiReference);
-
-        // Get the type of the current target
-        ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
-        EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
-        EntityReference entityReference = entityResource.getEntityReference();
-
-        // If the entity is inside a document, compute the new entity with the new document part.
-        if (entityReference.getType().ordinal() > EntityType.DOCUMENT.ordinal()) {
-            EntityReference parentDocument = entityReference.extractReference(EntityType.DOCUMENT);
-            locationReference = entityReference.replaceParent(parentDocument, locationReference);
-        }
-
-        // Get the URL corresponding to the location
-        // Note: the anchor part is lost in the process, because it is not sent to the server
-        // (see: http://stackoverflow.com/a/4276491)
-        String url = context.getWiki().getURL(locationReference, context.getAction(),
-            context.getRequest().getQueryString(), null, context);
-
-        // Send the redirection
-        try {
-            context.getResponse().sendRedirect(url);
-        } catch (IOException e) {
-            throw new XWikiException("Failed to redirect.", e);
-        }
-
-        return true;
+       return this.redirectionClassFilter.redirect(context);
     }
 }

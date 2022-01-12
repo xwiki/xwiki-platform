@@ -1596,14 +1596,16 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        super.setOwnerDocument(ownerDocument);
+        if (this.ownerDocument != ownerDocument) {
+            super.setOwnerDocument(ownerDocument);
 
-        if (this.ownerDocument != null) {
-            setDocumentReference(this.ownerDocument.getDocumentReference());
-        }
+            if (this.ownerDocument != null) {
+                setDocumentReference(this.ownerDocument.getDocumentReference());
+            }
 
-        if (ownerDocument != null && this.isDirty) {
-            ownerDocument.setMetaDataDirty(true);
+            if (ownerDocument != null && this.isDirty) {
+                ownerDocument.setMetaDataDirty(true);
+            }
         }
     }
 

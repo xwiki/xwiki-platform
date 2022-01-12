@@ -22,8 +22,8 @@
 ###
 #macro (displaySourceAttachment) 
 <dt>
-  <label>$services.localization.render('attachment.rename.source.label')</label>
-  <span class="xHint">$services.localization.render('attachment.rename.source.hint')</span>
+  <label>$services.localization.render('attachment.move.source.label')</label>
+  <span class="xHint">$services.localization.render('attachment.move.source.hint')</span>
 </dt>
 <dd>
   #hierarchy($attachment)
@@ -42,7 +42,7 @@
   <label>
     #set ($checked = !$request.updateLinks || $request.updateLinks == 'true')
     <input type="checkbox" name="updateLinks" value="true" #if ($checked)checked="checked"#end />
-    $services.localization.render('attachment.rename.links.label')
+    $services.localization.render('attachment.move.links.label')
   </label>
   ## The value submitted when the checkbox is not checked, used to preserve the form state.
   <input type="hidden" name="updateLinks" value="false"/>
@@ -52,7 +52,7 @@
   #set ($backLinksCount = 0)
   #set ($backLinksURL = '')
   <span class="xHint">
-    $services.localization.render('attachment.rename.links.hint', ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])
+    $services.localization.render('attachment.move.links.hint', ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])
   </span>
 </dd>
 #end

@@ -19,13 +19,32 @@
  */
 package org.xwiki.attachment.internal.job;
 
+import java.io.IOException;
+import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
+
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.attachment.MoveAttachmentRequest;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.refactoring.internal.job.AbstractEntityJobWithChecks;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.refactoring.internal.job.AbstractEntityJob;
 import org.xwiki.refactoring.job.EntityJobStatus;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+
+import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.REFERENCE;
+import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.SOURCE_NAME_FIELD;
+import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.TARGET_NAME_FIELD;
 
 /**
  * TODO: document me.
@@ -36,12 +55,18 @@ import org.xwiki.refactoring.job.EntityJobStatus;
 @Component
 @Named(MoveAttachmentJob.HINT)
 public class MoveAttachmentJob
-    extends AbstractEntityJobWithChecks<MoveAttachmentRequest, EntityJobStatus<MoveAttachmentRequest>>
+    extends AbstractEntityJob<MoveAttachmentRequest, EntityJobStatus<MoveAttachmentRequest>>
 {
     /**
      * The hint for this job.
      */
     public static final String HINT = "refactoring/attachment/move";
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Override
     public String getType()
@@ -50,8 +75,54 @@ public class MoveAttachmentJob
     }
 
     @Override
-    protected void process(EntityReference entityReference)
+    protected void process(EntityReference source)
     {
-        // TODO: implement me
+        this.request.setId("refactoring", "moveAttachment",
+            String.format("%d-%d", System.currentTimeMillis(), ThreadLocalRandom.current().nextInt(100, 1000)));
+
+        AttachmentReference destination = this.request.getProperty("destination");
+        boolean autoRedirect = this.request.getProperty("autoRedirect");
+
+        XWiki wiki = this.xcontextProvider.get().getWiki();
+        try {
+            XWikiDocument sourceDocument = wiki.getDocument(source.getParent(), this.xcontextProvider.get());
+            XWikiDocument targetDocument = wiki.getDocument(destination.getParent(), this.xcontextProvider.get());
+            XWikiAttachment sourceAttachment = sourceDocument.getAttachment(source.getName());
+
+            // Remove the original attachment and create a new one with the same name.
+            sourceDocument.removeAttachment(sourceAttachment);
+
+            targetDocument.setAttachment(destination.getName(),
+                sourceAttachment.getContentInputStream(this.xcontextProvider.get()), this.xcontextProvider.get());
+
+            // TODO: remove the redirection class if it exists with the name of the new attachment.
+
+            if (autoRedirect) {
+                int idx = sourceDocument.createXObject(REFERENCE, this.xcontextProvider.get());
+                BaseObject xObject = sourceDocument.getXObject(REFERENCE, idx);
+                xObject.setStringValue(SOURCE_NAME_FIELD, source.getName());
+                xObject.setStringValue(TARGET_NAME_FIELD,
+                    this.entityReferenceSerializer.serialize(destination.getParent()));
+                xObject.setStringValue(TARGET_NAME_FIELD, destination.getName());
+            }
+            // TODO: transaction
+            // TODO: localize
+            if (Objects.equals(source.getParent(), destination.getParent())) {
+                wiki.saveDocument(sourceDocument,
+                    "Attachment " + source.getName() + " renamed  to " + destination.getName(),
+                    this.xcontextProvider.get());
+            } else {
+                wiki.saveDocument(sourceDocument, "Attachment moved to " + destination, this.xcontextProvider.get());
+                wiki.saveDocument(targetDocument, "Attachment moved from " + source, this.xcontextProvider.get());
+            }
+        } catch (XWikiException e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.progressManager.pushLevelProgress(5, this);
+        this.progressManager.startStep(this);
     }
 }

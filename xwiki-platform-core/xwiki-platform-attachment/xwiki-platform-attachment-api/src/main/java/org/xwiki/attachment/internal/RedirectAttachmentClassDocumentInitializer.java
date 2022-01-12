@@ -65,7 +65,7 @@ public class RedirectAttachmentClassDocumentInitializer extends AbstractMandator
     {
         // TODO: What's the max length of an attachment name?
         xclass.addTextField(SOURCE_NAME_FIELD, "Source Name", Integer.MAX_VALUE);
-        xclass.addPageField(TARGET_LOCATION_FIELD, "Target Location", 1);
+        xclass.addTextField(TARGET_LOCATION_FIELD, "Target Location", Integer.MAX_VALUE);
         xclass.addTextField(TARGET_NAME_FIELD, "Target Name", Integer.MAX_VALUE);
     }
 }

@@ -25,10 +25,15 @@ import javax.inject.Singleton;
 
 import org.xwiki.attachment.MoveAttachmentRequest;
 import org.xwiki.attachment.internal.AttachmentsManager;
+import org.xwiki.attachment.internal.job.MoveAttachmentJob;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -43,10 +48,14 @@ import static java.util.Collections.singletonList;
 @Component
 @Singleton
 @Named("attachment")
+@Unstable
 public class AttachmentScriptService implements ScriptService
 {
     @Inject
     private AttachmentsManager attachmentsManager;
+
+    @Inject
+    private JobExecutor jobExecutor;
 
     /**
      * Creates an attachment move request.
@@ -55,15 +64,31 @@ public class AttachmentScriptService implements ScriptService
      * @param sourceName the name of the source attachment
      * @param targetLocation the target location of the document containing the attachment
      * @param targetName the target name of the attachment
+     * @param autoRedirect if {@code true} a redirection will be set from the source location to the target
+     *     location
+     * @param isAsync {@code true} if the job can be executed asynchronously, {@code false} otherwise
      * @return the initialized move attachment request
      */
     public MoveAttachmentRequest createMoveRequest(DocumentReference sourceLocation, String sourceName,
-        DocumentReference targetLocation, String targetName)
+        DocumentReference targetLocation, String targetName, boolean autoRedirect, boolean isAsync)
     {
-        MoveAttachmentRequest moveAttachmentRequest = new MoveAttachmentRequest();
-        moveAttachmentRequest.setEntityReferences(singletonList(new AttachmentReference(sourceName, sourceLocation)));
-        moveAttachmentRequest.setProperty("destination", new AttachmentReference(targetName, targetLocation));
-        return moveAttachmentRequest;
+        MoveAttachmentRequest request = new MoveAttachmentRequest();
+        request.setEntityReferences(singletonList(new AttachmentReference(sourceName, sourceLocation)));
+        request.setProperty("destination", new AttachmentReference(targetName, targetLocation));
+        request.setProperty("autoRedirect", autoRedirect);
+        request.setInteractive(isAsync);
+        return request;
+    }
+
+    /**
+     * Creates an attachment move job from a request.
+     *
+     * @param request a move attachment request to start a job from
+     * @return the initialized move attachment request
+     */
+    public Job createMoveJob(MoveAttachmentRequest request) throws JobException
+    {
+        return this.jobExecutor.execute(MoveAttachmentJob.HINT, request);
     }
 
     /**

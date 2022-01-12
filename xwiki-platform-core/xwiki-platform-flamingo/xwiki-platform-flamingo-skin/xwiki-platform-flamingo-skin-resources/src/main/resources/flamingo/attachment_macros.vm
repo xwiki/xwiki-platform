@@ -109,7 +109,7 @@
         #end
         #if ($hasEdit || $hasAdmin)
           #set ($queryString = $escapetool.url({
-            'xpage': 'attachment/rename',
+            'xpage': 'attachment/move',
             'attachment': $services.model.serialize($attachmentReference, 'default')
           }))
           #set ($moveURL = $xwiki.getURL($attachment.document.documentReference, 'view', $queryString))

@@ -299,9 +299,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     }
 
     /**
+     * Reload the Hibernate setup.
+     * <p>
+     * This method is synchronized to make sure that it's only executed once at a time.
+     * 
      * @since 11.5RC1
      */
-    public void build()
+    public synchronized void build()
     {
         // Check if it's a rebuild
         if (this.sessionFactory != null) {

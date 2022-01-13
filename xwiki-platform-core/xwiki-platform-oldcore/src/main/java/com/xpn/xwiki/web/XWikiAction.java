@@ -590,11 +590,8 @@ public abstract class XWikiAction implements LegacyAction
                 }
 
                 if (renderResult != null) {
-                    // We apply same logic for both view and get
-                    if (doc.isNew() && ("view".equals(context.getAction()) || "get".equals(context.getAction()))
-                        && !"recyclebin".equals(context.getRequest().get("viewer"))
-                        && !"children".equals(context.getRequest().get("viewer"))
-                        && !"siblings".equals(context.getRequest().get("viewer"))) {
+                    // check for doc existence
+                    if (shouldReturnDocDoesNotExist(doc, context)) {
                         String page = Utils.getPage(context.getRequest(), "docdoesnotexist");
 
                         getProgress().startStep(this, "Execute template [" + page + "]");
@@ -735,6 +732,48 @@ public abstract class XWikiAction implements LegacyAction
                 fileupload.cleanFileList(context);
             }
         }
+    }
+
+    /**
+     * Check if the given document exists or not and if it should return a 404 based on the context.
+     * If the action is view, then it should returns a 404 for all viewers except recyclebin, children and siblings.
+     * If the action is get, it should returns a 404 if the sheet parameter is not used (or if the given sheet doesn't
+     * exist either) and if the disableCheckNotExisting parameter is not used.
+     *
+     * @param doc the doc for which to check it exists or not.
+     * @param context the current context
+     * @return {@code true} if we should return a 404
+     */
+    private boolean shouldReturnDocDoesNotExist(XWikiDocument doc, XWikiContext context)
+    {
+        boolean result = false;
+        if (doc.isNew()) {
+            String action = context.getAction();
+            XWikiRequest request = context.getRequest();
+            if ("view".equals(action)) {
+                result = !"recyclebin".equals(request.get("viewer"))
+                    && !"children".equals(request.get("viewer"))
+                    && !"siblings".equals(request.get("viewer"));
+            } else if ("get".equals(action)) {
+                String sheet = request.get("sheet");
+                if (!StringUtils.isEmpty(sheet)) {
+                    DocumentReference sheetReference = getCurrentMixedDocumentReferenceResolver().resolve(sheet);
+                    try {
+                        XWikiDocument sheetDoc = context.getWiki().getDocument(sheetReference, context);
+                        result = sheetDoc.isNew();
+                    } catch (XWikiException e) {
+                        LOGGER.warn("Error while trying to load sheet [{}] for checking status code "
+                            + "on GET request for [{}]: [{}]", sheetReference, doc.getDocumentReference(),
+                            ExceptionUtils.getRootCauseMessage(e));
+                        // there is an error we consider that the sheet doesn't exist.
+                        result = true;
+                    }
+                } else {
+                    result = !"1".equals(request.get("disableCheckNotExisting"));
+                }
+            }
+        }
+        return  result;
     }
 
     private void renderInit(XWikiContext xcontext) throws Exception

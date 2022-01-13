@@ -576,20 +576,13 @@ editors.XDataEditors = Class.create({
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.class.addProperty.done')", "done"));
               }.bind(this),
               onFailure : function(response) {
-                var failureReason = response.statusText;
-                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                  failureReason = 'Server not responding';
-                }
+                var failureReason = response.responseText;
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.class.addProperty.failed') " + failureReason, "error"));
               },
               onComplete : function() {
                 item.disabled = false;
               },
-              // IE converts 204 status code into 1223...
-              on1223 : function(response) {
-                response.request.options.onSuccess(response);
-              },
-              // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+              // 0 is returned for network failures.
               on0 : function(response) {
                 response.request.options.onFailure(response);
               }

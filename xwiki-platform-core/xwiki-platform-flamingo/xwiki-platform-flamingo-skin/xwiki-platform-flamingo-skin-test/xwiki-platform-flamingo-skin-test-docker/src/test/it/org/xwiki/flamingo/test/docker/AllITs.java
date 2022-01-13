@@ -122,4 +122,10 @@ public class AllITs
     class NestedVersionIT extends VersionIT
     {
     }
+    
+    @Nested
+    @DisplayName("Edit Class tests")
+    class NestedEditClassIT extends EditClassIT
+    {
+    }
 }

@@ -257,7 +257,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             .withNetwork(Network.SHARED)
             .withNetworkAliases(this.testConfiguration.getServletEngine().getInternalIP())
             .waitingFor(
-                Wait.forHttp("/xwiki/bin/get/Main/WebHome")
+                Wait.forHttp("/xwiki/rest")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
         List<Integer> exposedPorts = new ArrayList<>();

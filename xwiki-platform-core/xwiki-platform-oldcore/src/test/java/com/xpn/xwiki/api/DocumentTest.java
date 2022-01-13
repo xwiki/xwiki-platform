@@ -24,6 +24,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @OldcoreTest
@@ -51,6 +56,9 @@ class DocumentTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @MockComponent
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
 
     @Test
     void toStringReturnsFullName()
@@ -298,8 +306,12 @@ class DocumentTest
         when(this.oldcore.getMockRightService().hasAccessLevel("edit", this.oldcore.getXWikiContext().getUser(),
             document.getPrefixedFullName(), this.oldcore.getXWikiContext())).thenReturn(true);
 
+        UserReference userReference = mock(UserReference.class);
+        when(this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE))
+            .thenReturn(userReference);
         document.save();
 
+        assertEquals(userReference, document.getAuthors().getOriginalMetadataAuthor());
         assertEquals(authorReference, document.getAuthorReference());
 
         when(this.oldcore.getMockRightService().hasProgrammingRights(this.oldcore.getXWikiContext())).thenReturn(true);

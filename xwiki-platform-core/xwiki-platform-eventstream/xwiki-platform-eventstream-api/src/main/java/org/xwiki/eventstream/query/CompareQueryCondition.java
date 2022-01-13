@@ -62,7 +62,21 @@ public class CompareQueryCondition extends AbstractPropertyQueryCondition
         /**
          * The property value is equals to the passed value.
          */
-        EQUALS
+        EQUALS,
+
+        /**
+         * The property value starts with the passed value.
+         * 
+         * @since 14.0RC1
+         */
+        STARTS_WITH,
+
+        /**
+         * The property value ends with the passed value.
+         * 
+         * @since 14.0RC1
+         */
+        ENDS_WITH
     }
 
     private final Object value;

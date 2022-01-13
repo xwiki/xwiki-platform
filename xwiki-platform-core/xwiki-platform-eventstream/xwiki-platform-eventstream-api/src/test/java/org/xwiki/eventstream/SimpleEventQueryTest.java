@@ -99,6 +99,34 @@ class SimpleEventQueryTest
     }
 
     @Test
+    void startsWith()
+    {
+        SimpleEventQuery query = new SimpleEventQuery();
+
+        query.startsWith("property", "value");
+
+        assertEquals(1, query.getConditions().size());
+        assertEquals("property", ((CompareQueryCondition) query.getConditions().get(0)).getProperty());
+        assertFalse(((CompareQueryCondition) query.getConditions().get(0)).isParameter());
+        assertEquals("value", ((CompareQueryCondition) query.getConditions().get(0)).getValue());
+        assertEquals(CompareType.STARTS_WITH, ((CompareQueryCondition) query.getConditions().get(0)).getType());
+    }
+
+    @Test
+    void endsWith()
+    {
+        SimpleEventQuery query = new SimpleEventQuery();
+
+        query.endsWith("property", "value");
+
+        assertEquals(1, query.getConditions().size());
+        assertEquals("property", ((CompareQueryCondition) query.getConditions().get(0)).getProperty());
+        assertFalse(((CompareQueryCondition) query.getConditions().get(0)).isParameter());
+        assertEquals("value", ((CompareQueryCondition) query.getConditions().get(0)).getValue());
+        assertEquals(CompareType.ENDS_WITH, ((CompareQueryCondition) query.getConditions().get(0)).getType());
+    }
+
+    @Test
     void after()
     {
         Date date = new Date();

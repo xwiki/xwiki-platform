@@ -146,6 +146,7 @@ com.xpn.xwiki.internal.template.TemplateListener
 com.xpn.xwiki.internal.template.VelocityTemplateEvaluator
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.query.CurrentLanguageQueryFilter
+com.xpn.xwiki.internal.redirection.RedirectClassRedirectionFilter
 com.xpn.xwiki.script.sheet.SheetScriptService
 com.xpn.xwiki.internal.sheet.ClassSheetBinder
 com.xpn.xwiki.internal.sheet.DocumentSheetBinder

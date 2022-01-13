@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
@@ -64,7 +66,6 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.observation.ObservationManager;
@@ -74,7 +75,6 @@ import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.NotFoundResourceHandlerException;
-import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceType;
@@ -92,11 +92,11 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
 import com.xpn.xwiki.internal.web.LegacyAction;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
+import com.xpn.xwiki.redirection.RedirectionFilter;
 
 /**
  * <p>
@@ -156,15 +156,14 @@ public abstract class XWikiAction implements LegacyAction
     @Inject
     protected ObservationManager observation;
 
+    @Inject
+    @Named("context")
+    private ComponentManager componentManager;
+
     /**
      * Indicate if the action allow asynchronous display (among which the XWiki initialization).
      */
     protected boolean waitForXWikiInitialization = true;
-
-    /**
-     * Indicate if the XWiki.RedirectClass is handled by the action (see handleRedirectObject()).
-     */
-    protected boolean handleRedirectObject = false;
 
     @Inject
     @Named("currentmixed")
@@ -575,10 +574,7 @@ public abstract class XWikiAction implements LegacyAction
                 getProgress().startStep(this, "Execute action render");
 
                 // Handle the XWiki.RedirectClass object that can be attached to the current document
-                boolean hasRedirect = false;
-                if (handleRedirectObject) {
-                    hasRedirect = handleRedirectObject(context);
-                }
+                boolean hasRedirect = handleRedirect(context);
 
                 // Then call the old Actions for backward compatibility (and because a lot of them have not been
                 // migrated to new Actions yet).
@@ -903,61 +899,15 @@ public abstract class XWikiAction implements LegacyAction
     }
 
     /**
-     * Redirect the user to an other location if the document holds an XWiki.RedirectClass instance (used when a
-     * document is moved).
+     * Indicate if the action support redirection. The default value is {@code false}.
      *
-     * @param context the XWiki context
-     * @return either or not a redirection have been sent
-     * @throws XWikiException if error occurs
-     * @since 8.0RC1
-     * @since 7.4.2
+     * @return {@code true} if the action supports redirections, {@code false} otherwise
+     * @since 14.0RC1
      */
-    protected boolean handleRedirectObject(XWikiContext context) throws XWikiException
+    @Unstable
+    protected boolean supportRedirections()
     {
-        WikiReference wikiReference = context.getWikiReference();
-
-        // Look if the document has a redirect object
-        XWikiDocument doc = context.getDoc();
-        BaseObject redirectObj = doc.getXObject(RedirectClassDocumentInitializer.REFERENCE);
-        if (redirectObj == null) {
-            return false;
-        }
-
-        // Get the location
-        String location = redirectObj.getStringValue("location");
-        if (StringUtils.isBlank(location)) {
-            return false;
-        }
-
-        // Resolve the location to get a reference
-        DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
-        EntityReference locationReference = resolver.resolve(location, wikiReference);
-
-        // Get the type of the current target
-        ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
-        EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
-        EntityReference entityReference = entityResource.getEntityReference();
-
-        // If the entity is inside a document, compute the new entity with the new document part.
-        if (entityReference.getType().ordinal() > EntityType.DOCUMENT.ordinal()) {
-            EntityReference parentDocument = entityReference.extractReference(EntityType.DOCUMENT);
-            locationReference = entityReference.replaceParent(parentDocument, locationReference);
-        }
-
-        // Get the URL corresponding to the location
-        // Note: the anchor part is lost in the process, because it is not sent to the server
-        // (see: http://stackoverflow.com/a/4276491)
-        String url = context.getWiki().getURL(locationReference, context.getAction(),
-            context.getRequest().getQueryString(), null, context);
-
-        // Send the redirection
-        try {
-            context.getResponse().sendRedirect(url);
-        } catch (IOException e) {
-            throw new XWikiException("Failed to redirect.", e);
-        }
-
-        return true;
+        return false;
     }
 
     protected void handleRevision(XWikiContext context) throws XWikiException
@@ -1258,6 +1208,32 @@ public abstract class XWikiAction implements LegacyAction
             return true;
         }
 
+        return false;
+    }
+
+    /**
+     * Loop over the {@link RedirectionFilter} components until one of them perform a redirection. If none of the does,
+     * the action continues normally.
+     *
+     * @param context the current wiki content
+     * @return {@code true} if a redirection has been performed, {@code false} otherwise
+     * @throws XWikiException in case of error during the execution of a redirection filter
+     */
+    private boolean handleRedirect(XWikiContext context) throws XWikiException
+    {
+        // If no redirection are expected, this step is skipped.
+        if (this.supportRedirections()) {
+            try {
+                for (RedirectionFilter filter : this.componentManager.<RedirectionFilter>getInstanceList(
+                    RedirectionFilter.class)) {
+                    if (filter.redirect(context)) {
+                        return true;
+                    }
+                }
+            } catch (ComponentLookupException e) {
+                throw new XWikiException("Failed to resolve the redirection filters list", e);
+            }
+        }
         return false;
     }
 }

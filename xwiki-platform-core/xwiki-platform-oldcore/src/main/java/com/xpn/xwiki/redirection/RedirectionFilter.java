@@ -17,54 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.web;
+package com.xpn.xwiki.redirection;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 /**
+ * Allows to perform a redirection according to the context.
+ *
  * @version $Id$
- * @deprecated since 13.0, it's redundant with {@link ViewAction} which should be preferred
+ * @since 14.0RC1
  */
-@Component
-@Named("viewrev")
-@Singleton
-public class ViewrevAction extends XWikiAction
+@Role
+@Unstable
+public interface RedirectionFilter
 {
     /**
-     * Default constructor.
+     * Possibly perform a redirection according to the context.
+     *
+     * @param context the XWiki context
+     * @return {@code true} if a redirection has been performed, {@code false} otherwise
+     * @throws XWikiException in case of error during the analysis of the context
      */
-    public ViewrevAction()
-    {
-        this.waitForXWikiInitialization = false;
-    }
-
-    @Override
-    public String render(XWikiContext context) throws XWikiException
-    {
-        try {
-            handleRevision(context);
-        } catch (XWikiException e) {
-            if (e.getCode() == XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION) {
-                context.put("message", "revisiondoesnotexist");
-                return "exception";
-
-            } else {
-                throw e;
-            }
-        }
-
-        return "view";
-    }
-
-    @Override
-    protected boolean supportRedirections()
-    {
-        return true;
-    }
+    boolean redirect(XWikiContext context) throws XWikiException;
 }

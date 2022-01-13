@@ -333,6 +333,7 @@ public class XWikiUser
                 XWikiDocument userdoc = getUserDocument(context);
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     ACTIVE_PROPERTY, activeFlag);
+                userdoc.setAuthorReference(context.getUserReference());
                 context.getWiki().saveDocument(userdoc,
                     localizePlainOrKey("core.users." + (disable ? "disable" : "enable") + ".saveComment"), context);
             } catch (XWikiException e) {

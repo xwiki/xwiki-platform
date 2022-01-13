@@ -423,6 +423,11 @@ public class EventStoreTest
         EVENT3.setUser(new DocumentReference("wiki", "space", "user3"));
         EVENT4.setUser(new DocumentReference("wiki", "space", "user4"));
 
+        EVENT1.setDocumentTitle("title1");
+        EVENT2.setDocumentTitle("title2");
+        EVENT3.setDocumentTitle("title3");
+        EVENT4.setDocumentTitle("title4");
+
         this.eventStore.saveEvent(EVENT1);
         this.eventStore.saveEvent(EVENT2);
         this.eventStore.saveEvent(EVENT3);
@@ -470,6 +475,10 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENTOR), new SimpleEventQuery().in(Event.FIELD_ID, EVENTOR.getId()));
 
         this.eventStore.deleteEvent(EVENTOR).get();
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4),
+            new SimpleEventQuery().startsWith(Event.FIELD_ID, "id"));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().endsWith(Event.FIELD_ID, "1"));
     }
 
     @Test

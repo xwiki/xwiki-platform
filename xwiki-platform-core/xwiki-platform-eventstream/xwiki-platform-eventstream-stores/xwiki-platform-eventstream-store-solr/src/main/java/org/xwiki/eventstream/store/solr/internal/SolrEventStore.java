@@ -662,6 +662,16 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             case GREATER_OR_EQUALS:
                 builder.append(toFilterQueryStringRange(condition, null));
                 break;
+
+            case STARTS_WITH:
+                builder.append(this.utils.toFilterQueryString(condition.getValue()));
+                builder.append('*');
+                break;
+
+            case ENDS_WITH:
+                builder.append('*');
+                builder.append(this.utils.toFilterQueryString(condition.getValue()));
+                break;
         }
 
         return builder.toString();

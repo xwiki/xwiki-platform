@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.redirection;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -40,7 +41,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.redirection.RedirectionFilter;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Perform a redirection based on the presence of a {@code XWiki.RedirectClass} XClass.
@@ -53,6 +53,12 @@ import com.xpn.xwiki.web.Utils;
 @Named("XWiki.RedirectClass")
 public class RedirectClassRedirectionFilter implements RedirectionFilter
 {
+    @Inject
+    private DocumentReferenceResolver<String> resolver;
+    
+    @Inject
+    private ResourceReferenceManager resourceReferenceManager;
+    
     @Override
     public boolean redirect(XWikiContext context) throws XWikiException
     {
@@ -71,12 +77,11 @@ public class RedirectClassRedirectionFilter implements RedirectionFilter
             return false;
         }
 
-        // Resolve the location to get a reference
-        DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
-        EntityReference locationReference = resolver.resolve(location, wikiReference);
+        // Resolve the location to get a reference.
+        EntityReference locationReference = this.resolver.resolve(location, wikiReference);
 
         // Get the type of the current target
-        ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
+        ResourceReference resourceReference = this.resourceReferenceManager.getResourceReference();
         EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
         EntityReference entityReference = entityResource.getEntityReference();
 

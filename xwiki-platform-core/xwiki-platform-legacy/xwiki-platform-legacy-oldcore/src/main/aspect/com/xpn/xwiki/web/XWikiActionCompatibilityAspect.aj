@@ -19,25 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.StringUtils;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.ResourceReferenceManager;
-import org.xwiki.resource.entity.EntityResourceReference;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.redirection.RedirectionFilter;
 
 /**

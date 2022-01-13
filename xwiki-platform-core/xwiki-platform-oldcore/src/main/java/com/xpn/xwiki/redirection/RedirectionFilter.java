@@ -29,7 +29,7 @@ import com.xpn.xwiki.XWikiException;
  * Allows to perform a redirection according to the context.
  *
  * @version $Id$
- * @since 13.4RC1
+ * @since 14.0RC1
  */
 @Role
 @Unstable

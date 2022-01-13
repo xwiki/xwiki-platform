@@ -320,7 +320,7 @@ Get the actual notifications.
       .html('$services.icon.renderHTML("trash")&amp;nbsp;$escapetool.xml($escapetool.javascript($services.localization.render('notifications.menu.clear')))')
       .click(function (event) {
         // Avoid the menu closing
-        event.stopPropagation();
+        event.preventDefault();
         // Ask confirmation
         new XWiki.widgets.ConfirmationBox({
           onYes: function(event) {
@@ -896,11 +896,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         <number>4</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -1014,6 +1014,188 @@ separator=true</parameters>
     </property>
     <property>
       <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsDisplayerUIX</name>
+    <number>0</number>
+    <className>XWiki.XWikiComments</className>
+    <guid>8b8068be-17e0-4010-9f4c-821e80ef03de</guid>
+    <class>
+      <name>XWiki.XWikiComments</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <author>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>0</multiSelect>
+        <name>author</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Author</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
+      </author>
+      <comment>
+        <disabled>0</disabled>
+        <editor/>
+        <name>comment</name>
+        <number>5</number>
+        <prettyName>Comment</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </comment>
+      <date>
+        <dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
+        <disabled>0</disabled>
+        <emptyIsToday>1</emptyIsToday>
+        <name>date</name>
+        <number>2</number>
+        <picker>1</picker>
+        <prettyName>Date</prettyName>
+        <size>20</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.DateClass</classType>
+      </date>
+      <highlight>
+        <disabled>0</disabled>
+        <name>highlight</name>
+        <number>3</number>
+        <prettyName>Highlighted Text</prettyName>
+        <rows>2</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </highlight>
+      <originalSelection>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>originalSelection</name>
+        <number>6</number>
+        <prettyName>Original Selection</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </originalSelection>
+      <replyto>
+        <disabled>0</disabled>
+        <name>replyto</name>
+        <number>4</number>
+        <numberType>integer</numberType>
+        <prettyName>Reply To</prettyName>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </replyto>
+      <selection>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>selection</name>
+        <number>3</number>
+        <prettyName>Selection</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </selection>
+      <selectionLeftContext>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>selectionLeftContext</name>
+        <number>4</number>
+        <prettyName>Selection Left Context</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </selectionLeftContext>
+      <selectionRightContext>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>selectionRightContext</name>
+        <number>5</number>
+        <prettyName>Selection Right Context</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </selectionRightContext>
+      <state>
+        <disabled>0</disabled>
+        <name>state</name>
+        <number>8</number>
+        <prettyName>State</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </state>
+      <target>
+        <cache>0</cache>
+        <classname/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>discouraged</freeText>
+        <multiSelect>0</multiSelect>
+        <name>target</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Target</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>30</size>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </target>
+    </class>
+    <property>
+      <author>XWiki.Admin</author>
+    </property>
+    <property>
+      <comment>{{mention reference="XWiki.Admin" style="FULL_NAME" anchor="XWiki-Admin-qwyhtm"/}}</comment>
+    </property>
+    <property>
+      <date>2022-01-13 17:58:50.610</date>
+    </property>
+    <property>
+      <highlight/>
+    </property>
+    <property>
+      <originalSelection/>
+    </property>
+    <property>
+      <replyto/>
+    </property>
+    <property>
+      <selection/>
+    </property>
+    <property>
+      <selectionLeftContext/>
+    </property>
+    <property>
+      <selectionRightContext/>
+    </property>
+    <property>
+      <state/>
+    </property>
+    <property>
+      <target/>
     </property>
   </object>
 </xwikidoc>

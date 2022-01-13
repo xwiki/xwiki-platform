@@ -9,7 +9,7 @@ Starting with XWiki 8.2 this is the default WYSIWYG content editor. On older ver
 * [Issue Tracker](http://jira.xwiki.org/browse/CKEDITOR)
 * Communication: [Mailing List](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists), [IRC]( http://dev.xwiki.org/xwiki/bin/view/Community/IRC)
 * [Development Practices](http://dev.xwiki.org)
-* Minimal XWiki version supported: XWiki 6.2.5
+* Minimal XWiki version supported: XWiki 8.4
 * License: LGPL 2.1+
 * [Translations](http://l10n.xwiki.org/xwiki/bin/view/Contrib/CKEditorIntegration)
 * Sonar Dashboard: N/A

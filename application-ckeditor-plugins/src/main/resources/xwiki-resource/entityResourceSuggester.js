@@ -53,38 +53,15 @@ define('entityResourceSuggester', [
   var convertSearchResultToResource = function(result, expectedEntityType) {
     var entityReference, location, title = result.childNodes[0].nodeValue;
     var entityType = result.getAttribute('type');
-    if (entityType) {
-      var serializedEntityReference = result.getAttribute('id');
-      entityReference = XWiki.Model.resolve(serializedEntityReference, XWiki.EntityType.byName(entityType));
-      location = result.getAttribute('info');
-    } else {
-      // Before XWiki 7.2
-      var serializedDocumentReference = result.getAttribute('info');
-      entityReference = XWiki.Model.resolve(serializedDocumentReference, XWiki.EntityType.DOCUMENT);
-      // We show the document reference as location for both document and attachment search results.
-      location = getLocation(entityReference);
-      if (expectedEntityType === XWiki.EntityType.ATTACHMENT) {
-        entityReference = new XWiki.AttachmentReference(title, entityReference);
-      }
-    }
+    var serializedEntityReference = result.getAttribute('id');
+    entityReference = XWiki.Model.resolve(serializedEntityReference, XWiki.EntityType.byName(entityType));
+    location = result.getAttribute('info');
     return {
       reference: $resource.convertEntityReferenceToResourceReference(entityReference),
       entityReference: entityReference,
       title: title,
       location: location
     };
-  };
-
-  // Before XWiki 7.2
-  var getLocation = function(entityReference) {
-    var references = entityReference.getReversedReferenceChain();
-    if (references[0].type === XWiki.EntityType.WIKI && references[0].name === XWiki.currentWiki) {
-      // Show the local reference if possible.
-      references.shift();
-    }
-    return references.map(function(reference) {
-      return reference.name;
-    }).join(' / ');
   };
 
   var display = function(resource) {

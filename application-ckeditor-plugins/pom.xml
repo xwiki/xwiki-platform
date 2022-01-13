@@ -52,9 +52,9 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
-      <!-- This is the Bootstrap version available in XWiki 6.4. Don't increase this version unless you increase the
+      <!-- This is the Bootstrap version available in XWiki 8.4. Don't increase this version unless you increase the
         parent version. -->
-      <version>3.3.1</version>
+      <version>3.3.7-1</version>
     </dependency>
     <!-- This is used by the resource tree picker on the link modal. -->
     <dependency>

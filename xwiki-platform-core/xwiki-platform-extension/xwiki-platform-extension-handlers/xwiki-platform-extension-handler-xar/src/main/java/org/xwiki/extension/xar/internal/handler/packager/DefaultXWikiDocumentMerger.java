@@ -288,9 +288,11 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         DocumentReference userDocumentReference = configuration != null ? configuration.getAuthorReference() : null;
         if (userDocumentReference != null) {
             UserReference userReference = this.documentReferenceUserReferenceResolver.resolve(userDocumentReference);
-            DocumentAuthors authors = currentDocument.getAuthors();
-            authors.setContentAuthor(userReference);
-            authors.setEffectiveMetadataAuthor(userReference);
+            if (nextDocument != null) {
+                DocumentAuthors authors = nextDocument.getAuthors();
+                authors.setContentAuthor(userReference);
+                authors.setEffectiveMetadataAuthor(userReference);
+            }
 
             for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
                 attachment.setAuthorReference(userDocumentReference);

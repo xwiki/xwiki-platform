@@ -38,6 +38,9 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.internal.document.DefaultDocumentAuthors;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
@@ -48,12 +51,15 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceResolver;
+import org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -73,8 +79,11 @@ import static org.mockito.Mockito.when;
  */
 @ComponentList({
     ContextComponentManagerProvider.class,
-    DefaultXWikiDocumentMerger.class
+    DefaultXWikiDocumentMerger.class,
+    DocumentDocumentReferenceUserReferenceSerializer.class,
+    DocumentDocumentReferenceUserReferenceResolver.class
 })
+@ReferenceComponentList
 @ComponentTest
 public class DocumentMergeImporterTest
 {
@@ -141,15 +150,18 @@ public class DocumentMergeImporterTest
         when(this.previousDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
 
         this.currentDocument = mock(XWikiDocument.class, "current");
+
         when(this.currentDocument.isNew()).thenReturn(false);
         when(this.currentDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
         when(this.xwiki.getDocument(same(this.documentReference), same(xcontext))).thenReturn(this.currentDocument);
 
         this.nextDocument = mock(XWikiDocument.class, "next");
+        when(this.nextDocument.getAuthors()).thenReturn(new DefaultDocumentAuthors(this.currentDocument));
         when(this.nextDocument.isNew()).thenReturn(false);
         when(this.nextDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
 
         this.mergedDocument = mock(XWikiDocument.class, "merged");
+        when(this.mergedDocument.getAuthors()).thenReturn(new DefaultDocumentAuthors(this.mergedDocument));
         when(this.mergedDocument.isNew()).thenReturn(false);
         when(this.mergedDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
 

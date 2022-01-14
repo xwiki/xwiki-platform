@@ -116,7 +116,7 @@ public class EventStreamCleanerJobDocumentInitializer extends AbstractEventListe
     {
         boolean needsUpdate = false;
 
-        DefaultDocumentAuthors authors = new DefaultDocumentAuthors(doc.getAuthors());
+        DefaultDocumentAuthors authors = new DefaultDocumentAuthors(doc);
         if (authors.getEffectiveMetadataAuthor() == null) {
             needsUpdate = true;
             authors.setEffectiveMetadataAuthor(SuperAdminUserReference.INSTANCE);

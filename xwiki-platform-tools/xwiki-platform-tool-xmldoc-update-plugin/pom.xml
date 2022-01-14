@@ -58,6 +58,12 @@
       <!-- Note: Needed to create a XWikiDocument, and xwiki-core does not provide it anymore. -->
       <scope>compile</scope>
     </dependency>
+    <!-- Needed by oldcore to manipulate authors -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Maven -->
     <dependency>

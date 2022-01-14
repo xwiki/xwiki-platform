@@ -128,4 +128,10 @@ public class AllITs
     class NestedEditClassIT extends EditClassIT
     {
     }
+
+    @Nested
+    @DisplayName("Bean Validation tests")
+    class NestedBeanValidationIT extends BeanValidationIT
+    {
+    }
 }

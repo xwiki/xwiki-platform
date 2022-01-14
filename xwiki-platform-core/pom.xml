@@ -148,6 +148,42 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>Not a breaking change, but moved to legacy.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.removed</code>
+                  <old>field com.xpn.xwiki.web.XWikiAction.handleRedirectObject @ com.xpn.xwiki.web.JsxAction</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean com.xpn.xwiki.web.XWikiAction::handleRedirectObject(com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException @ com.xpn.xwiki.web.JsxAction</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.removed</code>
+                  <old>field com.xpn.xwiki.web.XWikiAction.handleRedirectObject @ com.xpn.xwiki.web.SsxAction</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean com.xpn.xwiki.web.XWikiAction::handleRedirectObject(com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException @ com.xpn.xwiki.web.SsxAction</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.removed</code>
+                  <old>field com.xpn.xwiki.web.XWikiAction.handleRedirectObject @ com.xpn.xwiki.web.sx.AbstractSxAction</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean com.xpn.xwiki.web.XWikiAction::handleRedirectObject(com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException @ com.xpn.xwiki.web.sx.AbstractSxAction</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

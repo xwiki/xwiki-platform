@@ -37,10 +37,15 @@ import static java.util.Arrays.asList;
  * @since X.Y.X
  */
 @Component
-@Named("Attachment.Code.RedirectAttachmentClass")
+@Named(RedirectAttachmentClassDocumentInitializer.HINT)
 @Singleton
 public class RedirectAttachmentClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
+    /**
+     * Hint for this class.
+     */
+    public static final String HINT = "Attachment.Code.RedirectAttachmentClass";
+
     /**
      * The local reference of the redirect attachment class.
      */

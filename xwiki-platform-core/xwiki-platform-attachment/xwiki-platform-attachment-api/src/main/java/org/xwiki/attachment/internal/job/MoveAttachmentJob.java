@@ -29,6 +29,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.xwiki.attachment.MoveAttachmentRequest;
+import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -75,7 +76,10 @@ public class MoveAttachmentJob
     private ContextualLocalizationManager contextualLocalizationManager;
 
     @Inject
-    protected EntityReferenceSerializer<String> referenceSerializer;
+    private EntityReferenceSerializer<String> referenceSerializer;
+    
+    @Inject
+    private AttachmentsManager attachmentsManager;
 
     @Override
     public String getType()
@@ -105,7 +109,7 @@ public class MoveAttachmentJob
             targetDocument.setAttachment(destination.getName(),
                 sourceAttachment.getContentInputStream(this.xcontextProvider.get()), this.xcontextProvider.get());
 
-            removeExistingRedirection(destination, targetDocument);
+            this.attachmentsManager.removeExistingRedirection(destination.getName(), targetDocument);
 
             if (autoRedirect) {
                 initializeAutoRedirection(source, destination, sourceDocument);
@@ -150,16 +154,5 @@ public class MoveAttachmentJob
         xObject.setStringValue(TARGET_LOCATION_FIELD,
             this.entityReferenceSerializer.serialize(destination.getParent()));
         xObject.setStringValue(TARGET_NAME_FIELD, destination.getName());
-    }
-
-    private void removeExistingRedirection(AttachmentReference destination, XWikiDocument targetDocument)
-    {
-        List<BaseObject> targetRedirections =
-            targetDocument.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE);
-        for (BaseObject targetRedirection : targetRedirections) {
-            if (targetRedirection.getStringValue(SOURCE_NAME_FIELD).equals(destination.getName())) {
-                targetDocument.removeXObject(targetRedirection);
-            }
-        }
     }
 }

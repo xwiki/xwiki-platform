@@ -32,7 +32,6 @@
     </div>
     <div class="col-xs-12 col-lg-6">
       <dl>
-        >> $moveJobRequest.destination
         #displayLocations('attachment.move.newLocation.label' 'attachment.move.newLocation.hint'
           [$moveJobRequest.destination])
       </dl>

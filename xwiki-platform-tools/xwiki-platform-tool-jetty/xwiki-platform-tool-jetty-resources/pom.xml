@@ -34,7 +34,13 @@
   <properties>
     <!-- Jetty does not work with the Jakarta Annotation API version for some reason (it does not seems to load it without much explanation in the log) -->
     <xwiki.enforcer.enforce-jakarta.annotation-api.skip>true</xwiki.enforcer.enforce-jakarta.annotation-api.skip>
+
+    <!-- 
+         Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
+    -->
+    <apache-el.version>8.5.49</apache-el.version>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -126,6 +132,12 @@
       <version>1.0</version>
       <optional>true</optional>
       <scope>compile</scope>
+    </dependency>
+    <!-- We need a EL implementation for Hiberate Validator -->
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
+      <version>${apache-el.version}</version>
     </dependency>
   </dependencies>
   <build>

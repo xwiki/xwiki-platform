@@ -19,6 +19,7 @@ package org.xwiki.model.internal.document;/*
  */
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -52,7 +53,7 @@ class DefaultDocumentAuthorsTest
     }
 
     @Test
-    void getDisplayedAuthor()
+    void getOriginalMetadataAuthor()
     {
         XWikiDocument xWikiDocument = mock(XWikiDocument.class);
         UserReference contentAuthorRef = mock(UserReference.class);
@@ -70,7 +71,7 @@ class DefaultDocumentAuthorsTest
         documentAuthors.setCreator(creatorRef);
         documentAuthors.setContentAuthor(contentAuthorRef);
         documentAuthors.setEffectiveMetadataAuthor(metadataAuthorRef);
-        assertSame(metadataAuthorRef, documentAuthors.getOriginalMetadataAuthor());
+        assertSame(GuestUserReference.INSTANCE, documentAuthors.getOriginalMetadataAuthor());
     }
 
     @Test

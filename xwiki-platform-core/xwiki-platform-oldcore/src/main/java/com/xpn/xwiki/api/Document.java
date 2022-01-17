@@ -54,6 +54,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
@@ -2556,8 +2557,7 @@ public class Document extends Api
         if (hasAccessLevel("edit")) {
 
             DocumentAuthors authors = this.getAuthors();
-            authors.setOriginalMetadataAuthor(
-                getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
+            authors.setOriginalMetadataAuthor(getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
             // If the current author does not have PR don't let it set current user as author of the saved document
             // since it can lead to right escalation
             if (hasProgrammingRights() || !getConfiguration().getProperty("security.script.save.checkAuthor", true)) {
@@ -2653,8 +2653,8 @@ public class Document extends Api
     {
         XWikiContext xcontext = getXWikiContext();
 
-        getAuthors().setOriginalMetadataAuthor(
-            getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
+        getAuthors()
+            .setOriginalMetadataAuthor(getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
         DocumentReference author = getEffectiveAuthorReference();
         if (hasAccess(Right.EDIT, author)) {
             DocumentReference currentUser = xcontext.getUserReference();
@@ -2681,12 +2681,11 @@ public class Document extends Api
     {
         XWikiDocument doc = getDoc();
 
-        DocumentReference currentUserReference = getXWikiContext().getUserReference();
-
-        doc.setAuthorReference(currentUserReference);
+        UserReference currentUserReference = getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE);
+        doc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
 
         if (doc.isNew()) {
-            doc.setCreatorReference(currentUserReference);
+            doc.getAuthors().setCreator(currentUserReference);
         }
 
         if (checkSaving) {

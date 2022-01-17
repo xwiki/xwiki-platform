@@ -19,8 +19,6 @@
  */
 package org.xwiki.model.document;
 
-import java.util.Optional;
-
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
@@ -82,22 +80,12 @@ public interface DocumentAuthors
      * The original metadata author is the author who have triggered a save on the document, but who does not hold
      * responsibility for those changes in terms of rights. It should be different from the
      * {@link #getEffectiveMetadataAuthor()} when the save is performed through a mechanism which prevent users to need
-     * edit rights for saving the document (e.g. adding a new comment in a page). Note that if there is no original
-     * metadata author defined, it should always fallback to the {@link #getEffectiveMetadataAuthor()}.
+     * edit rights for saving the document (e.g. adding a new comment in a page).
      * Note that this should never return {@code null}.
      *
      * @return the reference of the user who originally triggers the save.
      */
     UserReference getOriginalMetadataAuthor();
-
-    /**
-     * Retrieve the actual original metadata author value, without fallbacks contrarily to
-     * {@link #getOriginalMetadataAuthor()}.
-     *
-     * @return {@link Optional#empty()} if the original metadata author has never been defined, else the actual value in
-     *          an optional.
-     */
-    Optional<UserReference> getOriginalMetadataAuthorWithoutFallback();
 
     /**
      * Specify the original metadata author of the document: the author who have triggered a save on the document,

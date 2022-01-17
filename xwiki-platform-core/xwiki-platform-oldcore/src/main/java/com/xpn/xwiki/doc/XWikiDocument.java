@@ -1901,6 +1901,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             }
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(authorReference);
             this.authors.setEffectiveMetadataAuthor(user);
+            // We also set the original metadata author for backward compatibility.
+            this.authors.setOriginalMetadataAuthor(user);
         }
     }
 

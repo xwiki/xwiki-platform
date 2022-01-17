@@ -24,6 +24,7 @@ import java.util.Calendar;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -57,6 +58,9 @@ public class XWikiTest
 {
     @MockComponent
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
+
+    @MockComponent
+    private ObservationManager observationManager;
 
     private Document apiDocument;
     private XWiki apiXWiki;

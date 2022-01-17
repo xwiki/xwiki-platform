@@ -1023,7 +1023,7 @@ XWiki.Annotation = Class.create({
     wrapper.addClassName('annotation');
     wrapper.addClassName('ID' + ann.annotationId);
 
-    var parentNode = markedNode.parentElement;
+    var parentNode = markedNode.parentNode;
     parentNode.replaceChild(wrapper, markedNode);
     wrapper.appendChild(markedNode);
   },
@@ -1035,7 +1035,7 @@ XWiki.Annotation = Class.create({
    * @param range the DOM range of the annotated text
    */
   fixRangeEndPoints: function(range) {
-    var strictRange = new Range();
+    var strictRange = document.createRange();
 
     // Because the range could start and end in the same text node, the end point is fixed first, since this will not
     // alter the startOffset.
@@ -1072,7 +1072,7 @@ XWiki.Annotation = Class.create({
   getDOMRange: function(annotatedElement, startIndex, endIndex) {
     var startPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, startIndex, true);
     var endPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, endIndex, false);
-    var range = new Range();
+    var range = document.createRange();
     range.setStart(startPosition.node, startPosition.offset);
     range.setEnd(endPosition.node, endPosition.offset);
     return range;
@@ -1151,41 +1151,31 @@ XWiki.Annotation = Class.create({
     var rangeIterator = document.createNodeIterator(
       range.commonAncestorContainer,
       NodeFilter.SHOW_TEXT,
-      {
-        acceptNode: function (node) {
-          // Since an annotation cannot be added to a whitespace node, these are ignored.
-          if (/\S/.test(node.data)) {
-            return NodeFilter.FILTER_ACCEPT
-          }
+      function acceptNode(node) {
+        // Since an annotation cannot be added to a whitespace node, these are ignored.
+        if (/\S/.test(node.data)) {
+          return NodeFilter.FILTER_ACCEPT
         }
-      }
+      },
+      // This needs to be specified since IE doesn't recognize it as optional argument.
+      false
     );
+
     var nodes = [];
     var nodeRange = document.createRange();
-    while (rangeIterator.nextNode()) {
-      nodeRange.selectNode(rangeIterator.referenceNode);
+    while (node = rangeIterator.nextNode()) {
+      nodeRange.selectNode(node);
       // Don't consider nodes before the start of the range.
       if (nodeRange.compareBoundaryPoints(Range.START_TO_START, range) === -1) {
         continue;
       }
-      nodes.push(rangeIterator.referenceNode);
+      nodes.push(node);
       // Stop if the current node is the end of the range.
       if (nodeRange.compareBoundaryPoints(Range.END_TO_END, range) === 0) {
         break;
       }
     }
     return nodes;
-  },
-
-  /**
-   * Remove the wrapper and marker of annotations. The selection highlight is also removed in case the new annotation
-   * was deleted.
-   */
-  removeAnnotationsAndSelectionMarkups: function() {
-    document.querySelectorAll("span.annotation, span.selection-highlight")
-      .forEach(annotationNode =&gt; annotationNode.replaceWith(...annotationNode.childNodes));
-    document.querySelectorAll("span.annotation-marker").forEach(marker =&gt; marker.remove());
-    this.fetchedAnnotations = false;
   },
 
   reloadTab : function(navigateToPane) {
@@ -1969,6 +1959,17 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
         }
         plainTextStartOffset.value = offsetUpdater.findOffsetAfterChanges(changes, parseInt(plainTextStartOffset.value));
         plainTextEndOffset.value = offsetUpdater.findOffsetAfterChanges(changes, parseInt(plainTextEndOffset.value));
+      },
+
+      /**
+       * Remove the wrapper and marker of annotations. The selection highlight is also removed in case the new annotation
+       * was deleted.
+       */
+      removeAnnotationsAndSelectionMarkups: function() {
+        [...document.querySelectorAll("span.annotation, span.selection-highlight")]
+          .forEach(annotationNode =&gt; $(annotationNode).replaceWith(...annotationNode.childNodes));
+        [...document.querySelectorAll("span.annotation-marker")].forEach(marker =&gt; marker.remove());
+        this.fetchedAnnotations = false;
       }
     });
 

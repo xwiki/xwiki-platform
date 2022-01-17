@@ -230,11 +230,15 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
 ###
 ### Display document information
 ###
+### UIXs are split into two columns based on their order so they have some influence on the column they are displayed in
+### as a completely dynamic (e.g., first half left, second half right column) allocation could have strange effects. At
+### the same time, the number of columns can be changed by the skin and should not be dictated by the UIXs.
+###
 <div id="informationcontent" class="xwikiintracontent">
   <div id="_information" class="row xform">
-    ##------------
-    ## Left Column
-    ##------------
+    ##-------------------------------------
+    ## Left Column - UIXs with order < 1000
+    ##-------------------------------------
     <div id="informationleft" class="col-xs-12 col-sm-6">
       <dl>
         #foreach ($extension in $sortedExtensions)
@@ -244,9 +248,9 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
         #end
       </dl>
     </div>
-    ##-------------
-    ## Right Column
-    ##-------------
+    ##---------------------------------------
+    ## Right Column - UIXs with order >= 1000
+    ##---------------------------------------
     <div id="informationright" class="col-xs-12 col-sm-6">
       <dl>
         #foreach ($extension in $sortedExtensions)

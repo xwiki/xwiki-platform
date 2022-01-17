@@ -20,6 +20,7 @@
 package org.xwiki.model.internal.document;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -40,7 +41,7 @@ public class DefaultDocumentAuthors implements DocumentAuthors
     private final XWikiDocument documentHolder;
     private UserReference contentAuthor;
     private UserReference effectiveMetadataAuthor;
-    private UserReference originalMetadataAuthor;
+    private Optional<UserReference> originalMetadataAuthor;
     private UserReference creator;
 
     /**
@@ -53,6 +54,7 @@ public class DefaultDocumentAuthors implements DocumentAuthors
         this.documentHolder = documentHolder;
         this.contentAuthor = GuestUserReference.INSTANCE;
         this.effectiveMetadataAuthor = GuestUserReference.INSTANCE;
+        this.originalMetadataAuthor = Optional.empty();
         this.creator = GuestUserReference.INSTANCE;
     }
 
@@ -62,7 +64,9 @@ public class DefaultDocumentAuthors implements DocumentAuthors
         // Use setters those that metadata dirty are updated if needed
         this.setContentAuthor(documentAuthors.getContentAuthor());
         this.setEffectiveMetadataAuthor(documentAuthors.getEffectiveMetadataAuthor());
-        this.setOriginalMetadataAuthor(documentAuthors.getOriginalMetadataAuthor());
+        if (documentAuthors.getOriginalMetadataAuthorWithoutFallback().isPresent()) {
+            this.setOriginalMetadataAuthor(documentAuthors.getOriginalMetadataAuthor());
+        }
         this.setCreator(documentAuthors.getCreator());
     }
 
@@ -87,8 +91,13 @@ public class DefaultDocumentAuthors implements DocumentAuthors
     @Override
     public void setOriginalMetadataAuthor(UserReference originalMetadataAuthor)
     {
-        if (!Objects.equals(this.originalMetadataAuthor, originalMetadataAuthor)) {
-            this.originalMetadataAuthor = originalMetadataAuthor;
+        // We allow to set back the original author to empty when/if needed.
+        if (originalMetadataAuthor == null && this.originalMetadataAuthor.isPresent()) {
+            this.originalMetadataAuthor = Optional.empty();
+            this.flagMetadataDirty();
+        } else if (originalMetadataAuthor != null && (!this.originalMetadataAuthor.isPresent()
+            || !Objects.equals(this.originalMetadataAuthor.get(), originalMetadataAuthor))) {
+            this.originalMetadataAuthor = Optional.of(originalMetadataAuthor);
             this.flagMetadataDirty();
         }
     }
@@ -122,11 +131,13 @@ public class DefaultDocumentAuthors implements DocumentAuthors
     @Override
     public UserReference getOriginalMetadataAuthor()
     {
-        if (this.originalMetadataAuthor == null) {
-            return this.getEffectiveMetadataAuthor();
-        } else {
-            return this.originalMetadataAuthor;
-        }
+        return this.originalMetadataAuthor.orElseGet(this::getEffectiveMetadataAuthor);
+    }
+
+    @Override
+    public Optional<UserReference> getOriginalMetadataAuthorWithoutFallback()
+    {
+        return this.originalMetadataAuthor;
     }
 
     @Override

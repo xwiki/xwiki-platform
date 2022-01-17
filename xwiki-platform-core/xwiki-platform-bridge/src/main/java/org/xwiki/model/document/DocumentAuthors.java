@@ -19,6 +19,8 @@
  */
 package org.xwiki.model.document;
 
+import java.util.Optional;
+
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
@@ -87,6 +89,15 @@ public interface DocumentAuthors
      * @return the reference of the user who originally triggers the save.
      */
     UserReference getOriginalMetadataAuthor();
+
+    /**
+     * Retrieve the actual original metadata author value, without fallbacks contrarily to
+     * {@link #getOriginalMetadataAuthor()}.
+     *
+     * @return {@link Optional#empty()} if the original metadata author has never been defined, else the actual value in
+     *          an optional.
+     */
+    Optional<UserReference> getOriginalMetadataAuthorWithoutFallback();
 
     /**
      * Specify the original metadata author of the document: the author who have triggered a save on the document,

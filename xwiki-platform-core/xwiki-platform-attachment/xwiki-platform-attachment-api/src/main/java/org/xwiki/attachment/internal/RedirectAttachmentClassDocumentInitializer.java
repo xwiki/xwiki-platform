@@ -31,10 +31,11 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import static java.util.Arrays.asList;
 
 /**
- * TODO: document me.
+ * Initialize the {@code Attachment.Code.RedirectAttachmentClass} XClass. This class is used to save the new location of
+ * moved attachments when a redirection must be preserved.
  *
  * @version $Id$
- * @since X.Y.X
+ * @since 14.0RC1
  */
 @Component
 @Named(RedirectAttachmentClassDocumentInitializer.HINT)

@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.attachment.MoveAttachmentRequest;
 import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.attachment.internal.job.MoveAttachmentJob;
@@ -38,9 +39,11 @@ import org.xwiki.stability.Unstable;
 import com.xpn.xwiki.XWikiException;
 
 import static java.util.Collections.singletonList;
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
- * TODO: document me.
+ * Provides the operations related to attachments manipulation. In particular regarding the operations to move
+ * attachments.
  *
  * @version $Id$
  * @since 14.0RC1
@@ -56,6 +59,9 @@ public class AttachmentScriptService implements ScriptService
 
     @Inject
     private JobExecutor jobExecutor;
+
+    @Inject
+    private Logger logger;
 
     /**
      * Creates an attachment move request.
@@ -100,10 +106,10 @@ public class AttachmentScriptService implements ScriptService
     public boolean locationAvailable(DocumentReference documentReference, String attachmentName)
     {
         try {
-            return this.attachmentsManager.available(
-                new AttachmentReference(attachmentName, documentReference));
+            return this.attachmentsManager.available(new AttachmentReference(attachmentName, documentReference));
         } catch (XWikiException e) {
-            // TODO: check best practices for exception is SS.
+            this.logger.warn("Failed to check if [{}] exists [{}]. Cause: [{}].", attachmentName, documentReference,
+                getRootCauseMessage(e));
             return false;
         }
     }

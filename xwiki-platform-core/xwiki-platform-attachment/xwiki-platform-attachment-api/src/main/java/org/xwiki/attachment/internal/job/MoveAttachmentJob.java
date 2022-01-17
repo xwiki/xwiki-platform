@@ -20,7 +20,6 @@
 package org.xwiki.attachment.internal.job;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -46,15 +45,16 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.SOURCE_NAME_FIELD;
 import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.TARGET_LOCATION_FIELD;
 import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.TARGET_NAME_FIELD;
 
 /**
- * TODO: document me.
+ * This is the job in charge of moving attachments.
  *
  * @version $Id$
- * @since X.Y.X
+ * @since 14.0RC1
  */
 @Component
 @Named(MoveAttachmentJob.HINT)
@@ -77,7 +77,7 @@ public class MoveAttachmentJob
 
     @Inject
     private EntityReferenceSerializer<String> referenceSerializer;
-    
+
     @Inject
     private AttachmentsManager attachmentsManager;
 
@@ -115,7 +115,6 @@ public class MoveAttachmentJob
                 initializeAutoRedirection(source, destination, sourceDocument);
             }
 
-            // TODO: localize
             if (Objects.equals(source.getParent(), destination.getParent())) {
                 wiki.saveDocument(sourceDocument,
                     this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.inPlace",
@@ -132,11 +131,9 @@ public class MoveAttachmentJob
                 wiki.saveDocument(sourceDocument, historyMessageSource, this.xcontextProvider.get());
                 wiki.saveDocument(targetDocument, historyMessageTarget, this.xcontextProvider.get());
             }
-        } catch (XWikiException e) {
-            // TODO: handle exception 
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (XWikiException | IOException e) {
+            this.logger.warn("Failed to move attachment [{}] to [{}]. Cause: [{}]", source, destination,
+                getRootCauseMessage(e));
         } finally {
             this.progressManager.popLevelProgress(this);
         }

@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -41,7 +42,8 @@ import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessa
 import static org.xwiki.attachment.internal.AttachmentsListener.HINT;
 
 /**
- * TODO: document me.
+ * Listen for attachments creation and if the created attachment name matches a redirection, remove the corresponding
+ * XObject.
  *
  * @version $Id$
  * @since 14.0RC1
@@ -61,6 +63,9 @@ public class AttachmentsListener implements EventListener
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private ContextualLocalizationManager contextualLocalizationManager;
 
     @Inject
     private Logger logger;
@@ -85,8 +90,10 @@ public class AttachmentsListener implements EventListener
         if (this.attachmentsManager.removeExistingRedirection(attachmentAddedEvent.getName(), doc)) {
             // The document is only saved if a redirection has actually been removed.
             try {
+                String message = this.contextualLocalizationManager.getTranslationPlain(
+                    "attachment.listener.attachmentAdded.removeRedirection", attachmentAddedEvent.getName());
                 this.xcontextProvider.get().getWiki().saveDocument(doc,
-                    String.format("Remove %s outdated XClass.", RedirectAttachmentClassDocumentInitializer.HINT), true,
+                    message, true,
                     this.xcontextProvider.get());
             } catch (XWikiException e) {
                 this.logger.warn(

@@ -36,7 +36,11 @@
             $xwiki.formatDate($tdoc.date)
           ])
         #else
-          $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.authors.originalMetadataAuthor), $xwiki.formatDate($tdoc.date)])
+          ## Note that this serialization step is mandatory and we cannot count on the UserReferenceConverter here
+          ## because UserReference#toString does not rely on the serializer so it's not the expected format for
+          ## XWiki#getUserName(String).
+          #set ($authorName = $services.user.serialize($tdoc.authors.originalMetadataAuthor))
+          $services.localization.render('core.footer.modification', [$xwiki.getUserName($authorName), $xwiki.formatDate($tdoc.date)])
         #end
       </div>
     #end

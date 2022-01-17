@@ -106,10 +106,11 @@ public class AttachmentsManager
     }
 
     /**
-     * TODO
+     * Remove a redirection if it exists.
      *
-     * @param attachmentName
-     * @param targetDocument
+     * @param attachmentName the name of the redirect attachment
+     * @param targetDocument the document containing the redirection
+     * @return {@code true} if the redirection was removed, {@code false} otherwise
      */
     public boolean removeExistingRedirection(String attachmentName, XWikiDocument targetDocument)
     {

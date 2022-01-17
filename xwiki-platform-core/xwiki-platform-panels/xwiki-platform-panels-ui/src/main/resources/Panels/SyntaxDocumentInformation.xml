@@ -83,7 +83,7 @@
   </object>
   <object>
     <name>Panels.SyntaxDocumentInformation</name>
-    <number>1</number>
+    <number>0</number>
     <className>XWiki.UIExtensionClass</className>
     <guid>86bdf428-e048-4dcf-acbe-eed7afabe3f4</guid>
     <class>

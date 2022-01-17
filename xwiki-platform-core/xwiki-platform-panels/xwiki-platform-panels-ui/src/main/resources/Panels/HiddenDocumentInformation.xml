@@ -83,7 +83,7 @@
   </object>
   <object>
     <name>Panels.HiddenDocumentInformation</name>
-    <number>2</number>
+    <number>0</number>
     <className>XWiki.UIExtensionClass</className>
     <guid>32b2e20b-3801-40a9-a946-b3234b2a6d80</guid>
     <class>

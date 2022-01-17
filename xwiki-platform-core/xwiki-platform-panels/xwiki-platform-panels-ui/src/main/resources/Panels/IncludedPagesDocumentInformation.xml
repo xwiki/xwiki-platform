@@ -120,7 +120,7 @@
   </object>
   <object>
     <name>Panels.IncludedPagesDocumentInformation</name>
-    <number>3</number>
+    <number>0</number>
     <className>XWiki.UIExtensionClass</className>
     <guid>5dc001e6-0ec9-4e90-9336-df0ab13e1054</guid>
     <class>

@@ -23,7 +23,6 @@ import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;

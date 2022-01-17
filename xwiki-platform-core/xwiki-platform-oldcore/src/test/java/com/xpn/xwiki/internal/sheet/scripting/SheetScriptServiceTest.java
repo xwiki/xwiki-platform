@@ -23,12 +23,10 @@ import java.util.Arrays;
 
 import javax.inject.Named;
 
-import org.apache.avalon.framework.component.ComponentManager;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;

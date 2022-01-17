@@ -40,7 +40,6 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.model.document.DocumentAuthors;
-import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;

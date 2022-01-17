@@ -142,8 +142,8 @@ public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilte
 
         // Author
 
-        attachment
-            .setAuthorReference(getUserReference(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
+        attachment.setAuthorReference(
+            getUserDocumentReference(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
 
         // Revision
 

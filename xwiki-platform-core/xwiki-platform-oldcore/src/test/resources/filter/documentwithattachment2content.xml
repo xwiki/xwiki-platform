@@ -47,6 +47,10 @@
                   <string>XWiki.XWikiGuest</string>
                 </entry>
                 <entry>
+                  <string>revision_original_author</string>
+                  <string>XWiki.XWikiGuest</string>
+                </entry>
+                <entry>
                   <string>revision_comment</string>
                   <string></string>
                 </entry>

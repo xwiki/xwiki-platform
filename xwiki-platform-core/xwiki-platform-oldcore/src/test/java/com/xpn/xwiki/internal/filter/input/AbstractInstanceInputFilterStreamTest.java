@@ -39,6 +39,7 @@ import org.xwiki.filter.input.InputFilterStream;
 import org.xwiki.filter.input.InputFilterStreamFactory;
 import org.xwiki.filter.instance.input.InstanceInputProperties;
 import org.xwiki.filter.instance.internal.InstanceModel;
+import org.xwiki.filter.instance.internal.input.InstanceInputFilterStream;
 import org.xwiki.filter.instance.output.InstanceOutputProperties;
 import org.xwiki.filter.output.BeanOutputFilterStreamFactory;
 import org.xwiki.filter.output.OutputFilterStream;
@@ -59,7 +60,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
- * Base class to validate an instance sub {@link InputInstanceFilterStream}.
+ * Base class to validate an instance sub {@link InstanceInputFilterStream}.
  * 
  * @version $Id$
  */

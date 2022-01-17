@@ -146,7 +146,15 @@ public class XarDocumentModel
 
     public static final String ELEMENT_REVISION = "version";
 
-    public static final String ELEMENT_REVISION_AUTHOR = "author";
+    /**
+     * @since 14.0RC1
+     */
+    public static final String ELEMENT_REVISION_EFFECTIVEMEDATAAUTHOR = "author";
+
+    /**
+     * @since 14.0RC1
+     */
+    public static final String ELEMENT_REVISION_ORIGINALMEDATAAUTHOR = "originalMetadataAuthorReference";
 
     public static final String ELEMENT_REVISION_COMMENT = "comment";
 

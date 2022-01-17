@@ -21,6 +21,8 @@
 ### Move attachment template, step 1: choose new name and a new location + updated backlinks + redirection.
 ###
 
+#set ($discard = $xwiki.ssrx.use('css/attachment/move.css'))
+#set ($discard = $xwiki.jsrx.use('js/attachment/move.js'))
 #set($titleToDisplay = $services.localization.render('attachment.move.title', 
   [$attachment.name, $escapetool.xml($doc.plainTitle), $doc.getURL()]))
 <div class="xcontent">
@@ -102,11 +104,47 @@
             #set ($targetRef = $request.targetLocation)
           #end
           #set ($documentReference = $services.model.serialize($targetRef, 'local'))
-          #pagePicker({
-            'id': 'targetLocation',
-            'name': 'targetLocation',
-            'value': $documentReference
-          })
+          <div class="modal fade documentTree" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <h5 class="modal-title">Modal title</h5>
+                </div>
+                <div class="modal-body">
+                  #template("documentTree_macros.vm")
+                  #documentTree({
+                    'class': 'location-tree',
+                    'finder': true,
+                    'showAttachments': false,
+                    'showTerminalDocuments': true,
+                    'showTranslations': false,
+                    'showWikis': true
+                  })
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary">Select</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div>
+              #pagePicker({
+                'id': 'targetLocation',
+                'name': 'targetLocation',
+                'value': $documentReference
+              })
+            </div>
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default newLocationTree" value="doc" title="Select a page">
+                $services.icon.renderHTML( 'chart-organisation')
+              </button>
+            </div>
+          </div>
         </dd>
       </dl>
     </div>

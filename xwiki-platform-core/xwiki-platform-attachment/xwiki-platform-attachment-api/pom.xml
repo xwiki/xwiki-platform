@@ -52,5 +52,10 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-uiextension-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
 </project>

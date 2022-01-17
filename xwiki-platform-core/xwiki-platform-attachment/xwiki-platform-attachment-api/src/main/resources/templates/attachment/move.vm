@@ -21,8 +21,6 @@
 ### Move attachment template
 ###
 
-## Update all the
-
 #set ($attachment = $request.attachment)
 #if ("$!attachment" == '')
   ## Retrieve the value from the submitted form on error.
@@ -48,9 +46,6 @@
     #if ("$!request.moveId" != '')
       ## Display the move status
       #template("attachment/moveStatus.vm")
-##    #elseif ($doc.isNew())
-##      $response.setStatus(404)
-##      #error($services.localization.render('attachment.move.nonExisting'))
     #elseif ($step == 1)
       ## Display the move form
       #template("attachment/moveStep1.vm")
@@ -76,8 +71,9 @@
         #if ($services.attachment.locationAvailable($targetLocation, $targetAttachmentName)) 
           $response.setStatus(409)
           ## TODO: check localization.
-          #error($services.localization.render('attachment.move.alreadyExists', 
-            [${escapetool.xml($targetLocation)}, $xwiki.getURL($targetLocation)]))
+          #error($services.localization.render('attachment.move.alreadyExists', [
+            ${escapetool.xml($targetAttachmentName)}, ${escapetool.xml($targetLocation)}, 
+            $xwiki.getURL($targetLocation)]))
           #template("attachment/moveStep1.vm")
         #elseif (!$xwiki.hasAccessLevel('edit', $xcontext.user, $targetLocation))
           $response.setStatus(403)

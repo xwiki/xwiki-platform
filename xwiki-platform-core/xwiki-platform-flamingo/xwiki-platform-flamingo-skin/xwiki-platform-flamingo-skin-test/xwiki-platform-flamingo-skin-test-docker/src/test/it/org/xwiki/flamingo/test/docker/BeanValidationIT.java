@@ -53,7 +53,7 @@ class BeanValidationIT
 
         String content = setup.getDriver().findElement(By.tagName("body")).getText();
 
-        assertEquals("OK", StringUtils.substringBefore(content, ' '));
+        assertEquals("testmacroOK", StringUtils.substringBefore(content, ' '));
         assertTrue(StringUtils.substringAfter(content, ' ').contains("Failed to validate bean: [must be true]"));
     }
 }

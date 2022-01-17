@@ -2843,17 +2843,50 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public BaseObject getXObject(ObjectReference objectReference)
     {
-        BaseObjectReference baseObjectReference;
-        if (objectReference instanceof BaseObjectReference) {
-            baseObjectReference = (BaseObjectReference) objectReference;
-        } else {
-            baseObjectReference = new BaseObjectReference(objectReference);
-        }
+        BaseObjectReference baseObjectReference = getBaseObjectReference(objectReference);
 
         // If the baseObjectReference has an object number, we return the object with this number,
         // otherwise, we consider it should be the first object, as specified by BaseObjectReference#getObjectNumber
         return baseObjectReference.getObjectNumber() == null ? this.getXObject(baseObjectReference.getXClassReference())
             : getXObject(baseObjectReference.getXClassReference(), baseObjectReference.getObjectNumber());
+    }
+
+    /**
+     * Get or create an object of this document based on its reference.
+     *
+     * @param objectReference The reference of the object.
+     * @param create If the object shall be created if missing.
+     * @param context The XWiki context for creating the object.
+     * @return The found or created objected.
+     * @throws XWikiException If object creation failed.
+     * @since 14.0RC1
+     */
+    @Unstable
+    public BaseObject getXObject(ObjectReference objectReference, boolean create, XWikiContext context)
+        throws XWikiException
+    {
+        BaseObjectReference baseObjectReference = getBaseObjectReference(objectReference);
+
+        // If the baseObjectReference has an object number, we return the object with this number,
+        // otherwise, we consider it should be the first object, as specified by BaseObjectReference#getObjectNumber
+        if (baseObjectReference.getObjectNumber() == null) {
+            return getXObject(baseObjectReference.getXClassReference(), create, context);
+        } else {
+            return getXObject(baseObjectReference.getXClassReference(), baseObjectReference.getObjectNumber(), create,
+                context);
+        }
+    }
+
+    /**
+     * Convert the given {@link ObjectReference} into a {@link BaseObjectReference}.
+     */
+    private BaseObjectReference getBaseObjectReference(ObjectReference objectReference)
+    {
+        if (objectReference instanceof BaseObjectReference) {
+            return (BaseObjectReference) objectReference;
+        } else {
+            return new BaseObjectReference(objectReference);
+        }
     }
 
     /**

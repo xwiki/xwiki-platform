@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
 
 /**
@@ -49,7 +49,7 @@ public class DocumentDocumentReferenceUserReferenceResolver extends AbstractUser
     {
         UserReference reference;
         if (rawReference == null) {
-            reference = CurrentUserReference.INSTANCE;
+            reference = GuestUserReference.INSTANCE;
         } else {
             reference = resolveName(rawReference.getName());
             if (reference == null) {

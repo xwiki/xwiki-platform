@@ -93,6 +93,6 @@ public class DocumentDocumentReferenceUserReferenceResolverTest
     void resolveWhenNull()
     {
         UserReference reference = this.resolver.resolve(null);
-        assertSame(CurrentUserReference.INSTANCE, reference);
+        assertSame(GuestUserReference.INSTANCE, reference);
     }
 }

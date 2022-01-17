@@ -28,7 +28,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
 
 /**
@@ -53,7 +53,7 @@ public class DocumentDocumentReferenceUserReferenceResolver extends AbstractUser
     {
         UserReference reference;
         if (rawReference == null) {
-            reference = CurrentUserReference.INSTANCE;
+            reference = GuestUserReference.INSTANCE;
         } else {
             // small perf improvment to avoid keep duplicated references in memory.
             DocumentReference documentReference = this.entityReferenceFactory.getReference(rawReference);

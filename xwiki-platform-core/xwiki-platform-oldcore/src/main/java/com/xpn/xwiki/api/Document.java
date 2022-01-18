@@ -1379,6 +1379,23 @@ public class Document extends Api
         }
     }
 
+    /**
+     * @param objectReference the object reference
+     * @param create if true, the object will be created when missing
+     * @return the XWiki object from this document that matches the specified object reference
+     * @since 14.0RC1
+     */
+    @Unstable
+    public Object getObject(ObjectReference objectReference, boolean create)
+    {
+        try {
+            BaseObject obj = this.getDoc().getXObject(objectReference, create, getXWikiContext());
+            return obj == null ? null : newObjectApi(obj, getXWikiContext());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private Object newObjectApi(BaseObject obj, XWikiContext context)
     {
         return obj.newObjectApi(obj, context);

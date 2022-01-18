@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -98,6 +99,23 @@ class DocumentTest
 
         lst = adoc.getObjects(adoc.getFullName());
         assertEquals(1, lst.size());
+    }
+
+    @Test
+    void getObject()
+    {
+        XWikiContext context = new XWikiContext();
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
+
+        doc.getXClass().addNumberField("prop", "prop", 5, "long");
+
+        Document apiDocument = new Document(doc, context);
+        ObjectReference objectReference = new ObjectReference("Wiki.Space.Page[2]", doc.getDocumentReference());
+        Object apiObject = apiDocument.getObject(objectReference, true);
+        apiObject.set("prop", 20);
+
+        assertEquals(apiObject, apiDocument.getObject("Wiki.Space.Page", 2));
+        assertEquals(2, apiObject.getNumber());
     }
 
     @Test

@@ -942,7 +942,8 @@
                 **/web/XWikiURLFactoryServiceImpl.java,
                 **/web/XWikiURLFactoryService.java,
                 <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
-                **/stats/impl/xwiki/XWikiStatsReader.java
+                **/stats/impl/xwiki/XWikiStatsReader.java,
+                **/com/xpn/xwiki/internal/filter/output/AbstractEntityOutputFilterStream.java
               </excludes>
               <resourceExcludes>
                 ApplicationResources*.properties

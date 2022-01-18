@@ -32,6 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
@@ -135,6 +136,26 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         userReferenceResolverDescriptor.setRoleHint("default");
         getComponentManager().registerComponent(userReferenceResolverDescriptor,
             (UserReferenceResolver<CurrentUserReference>) mockUserReferenceResolver.proxy());
+
+        Mock mockDocumentUserReferenceResolver = mock(UserReferenceResolver.class);
+        DefaultComponentDescriptor<UserReferenceResolver<DocumentReference>> documentUserReferenceResolverDescriptor =
+            new DefaultComponentDescriptor<>();
+        documentUserReferenceResolverDescriptor.setRoleType(
+            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class));
+        documentUserReferenceResolverDescriptor.setRoleHint("document");
+        getComponentManager().registerComponent(documentUserReferenceResolverDescriptor,
+            (UserReferenceResolver<DocumentReference>) mockDocumentUserReferenceResolver.proxy());
+
+        Mock mockDocumentUserReferenceSerializer = mock(UserReferenceSerializer.class);
+        DefaultComponentDescriptor<UserReferenceSerializer<DocumentReference>>
+            documentUserReferenceSerializerDescriptor = new DefaultComponentDescriptor<>();
+        documentUserReferenceSerializerDescriptor.setRoleType(
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class));
+        documentUserReferenceSerializerDescriptor.setRoleHint("document");
+        getComponentManager().registerComponent(documentUserReferenceSerializerDescriptor,
+            (UserReferenceSerializer<DocumentReference>) mockDocumentUserReferenceSerializer.proxy());
+        mockDocumentUserReferenceSerializer.stubs().method("serialize")
+            .will(returnValue(new DocumentReference("wiki", "XWiki", "User")));
 
         TestListener listener = new TestListener();
         listener.expectedNewStatus = false;

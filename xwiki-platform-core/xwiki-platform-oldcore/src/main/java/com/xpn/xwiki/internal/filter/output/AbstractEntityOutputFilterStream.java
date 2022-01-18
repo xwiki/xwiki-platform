@@ -276,9 +276,12 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
 
         Object reference = get(Object.class, key, parameters, def, false, false);
 
-        if (reference != null && !(reference instanceof DocumentReference)) {
-            // TODO: go straight from String to PageReference
-            userReference = this.userDocumentResolver.resolve(toUserDocumentReference(reference));
+        if (reference != null && !(reference instanceof UserReference)) {
+            if (reference instanceof DocumentReference) {
+                userReference = this.userDocumentResolver.resolve((DocumentReference) reference);
+            } else {
+                userReference = this.userDocumentResolver.resolve(toUserDocumentReference(reference));
+            }
         }
 
         return userReference;

@@ -74,6 +74,8 @@ class DisplayPageTest extends PageTest
 
     private TemplateManager templateManager;
 
+    private String serializedDocumentReference;
+
     @BeforeEach
     void setUp() throws Exception
     {
@@ -101,16 +103,16 @@ class DisplayPageTest extends PageTest
         EntityReferenceSerializer<String> localReferenceSerializer =
             this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
 
-        String serializedReference = localReferenceSerializer.serialize(document.getDocumentReference());
+        this.serializedDocumentReference = localReferenceSerializer.serialize(document.getDocumentReference());
 
         request.put("xpage", "display");
         request.put("type", "object");
-        request.put("property", serializedReference + "." + FIELD_NAME);
     }
 
     @Test
     void displayNonExistingProperty() throws Exception
     {
+        request.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
         String result = this.templateManager.render(DISPLAY_VM);
         assertEquals("", result.trim());
     }
@@ -118,6 +120,7 @@ class DisplayPageTest extends PageTest
     @Test
     void displayNonExistingPropertyWithUpdateOrCreate() throws Exception
     {
+        request.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
         request.put("objectPolicy", "updateOrCreate");
 
         String result = this.templateManager.render(DISPLAY_VM);
@@ -129,6 +132,7 @@ class DisplayPageTest extends PageTest
     {
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.EDIT)).thenReturn(true);
 
+        request.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
         request.put("objectPolicy", "updateOrCreate");
         request.put("mode", "edit");
 
@@ -147,9 +151,23 @@ class DisplayPageTest extends PageTest
         xObject.safeput(FIELD_NAME, ((PropertyClass) xclass.getField(FIELD_NAME)).newProperty());
         this.xwiki.saveDocument(document, this.context);
 
+        request.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
         request.put("mode", "edit");
 
         String result = this.templateManager.render(DISPLAY_VM);
         assertEquals(DEFAULT_SELECT, result.trim());
+    }
+
+    @Test
+    void displayNonExistingPropertyWithNumberEditing() throws Exception
+    {
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.EDIT)).thenReturn(true);
+
+        request.put("property", this.serializedDocumentReference + "[3]." + FIELD_NAME);
+        request.put("objectPolicy", "updateOrCreate");
+        request.put("mode", "edit");
+
+        String result = this.templateManager.render(DISPLAY_VM);
+        assertEquals(DEFAULT_SELECT.replaceAll("_0_", "_3_"), result.trim());
     }
 }

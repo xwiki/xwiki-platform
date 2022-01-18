@@ -229,6 +229,8 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
         assertEquals(toDate("2000-01-01 00:00:00.0 UTC"), document.getCreationDate());
         assertEquals(toDate("2000-01-02 00:00:00.0 UTC"), document.getDate());
         assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), document.getContentUpdateDate());
+        assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
+        assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"), document.getContentAuthorReference());
         assertEquals(true, document.isMinorEdit());
         assertEquals("comment", document.getComment());
         assertEquals("1.1", document.getVersion());

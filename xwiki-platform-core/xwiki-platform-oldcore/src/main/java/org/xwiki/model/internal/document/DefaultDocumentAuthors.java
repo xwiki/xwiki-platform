@@ -23,8 +23,8 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.text.XWikiToStringBuilder;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
 
@@ -170,7 +170,7 @@ public class DefaultDocumentAuthors implements DocumentAuthors
     @Override
     public String toString()
     {
-        return new ToStringBuilder(this)
+        return new XWikiToStringBuilder(this)
             .append("documentHolder", documentHolder)
             .append("contentAuthor", contentAuthor)
             .append("effectiveMetadataAuthor", effectiveMetadataAuthor)

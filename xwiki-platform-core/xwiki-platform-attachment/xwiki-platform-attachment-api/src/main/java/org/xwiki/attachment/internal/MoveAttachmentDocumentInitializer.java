@@ -104,6 +104,12 @@ public class MoveAttachmentDocumentInitializer extends AbstractMandatoryDocument
                         + "[Attachment.Code.MoveAttachment].", e);
             }
         }
-        return !exists;
+
+        Boolean hidden = document.isHidden();
+        if (Boolean.FALSE.equals(hidden)) {
+            document.setHidden(true);
+        }
+
+        return !exists || !hidden;
     }
 }

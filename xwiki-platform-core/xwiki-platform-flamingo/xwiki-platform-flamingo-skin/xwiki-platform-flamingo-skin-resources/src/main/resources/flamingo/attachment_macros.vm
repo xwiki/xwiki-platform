@@ -113,7 +113,7 @@
             'attachment': $services.model.serialize($attachmentReference, 'default')
           }))
           #set ($moveURL = $xwiki.getURL($attachment.document.documentReference, 'view', $queryString))
-          <a class="btn btn-default btn-xs" title="Move or rename this attachment" href="$moveURL#">
+          <a class="btn btn-default btn-xs move-attachment" title="Move or rename this attachment" href="$moveURL#">
             $services.icon.renderHTML('move')
           </a> 
         #end

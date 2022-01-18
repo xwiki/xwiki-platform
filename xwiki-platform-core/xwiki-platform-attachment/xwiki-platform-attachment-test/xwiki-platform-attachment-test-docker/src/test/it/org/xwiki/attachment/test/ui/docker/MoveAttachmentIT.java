@@ -23,17 +23,19 @@ import java.io.File;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
+import org.openqa.selenium.WebElement;
+import org.xwiki.attachment.test.po.AttachmentPane;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.REFERENCE;
 
 /**
  * Tests of the move attachment feature.
@@ -41,19 +43,22 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @version $Id$
  * @since 14.0RC1
  */
-@UITest//(servletEngine = ServletEngine.EXTERNAL)
+@UITest(properties = {
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,"
+        + "com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
+})
 class MoveAttachmentIT
 {
     @Test
     @Order(1)
-    void moveAttachment(TestUtils setup, TestInfo testInfo, TestReference testReference,
-        TestConfiguration testConfiguration)
+    void moveAttachment(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
     {
         DocumentReference sourcePage = new DocumentReference("Source", testReference.getLastSpaceReference());
         DocumentReference targetPage = new DocumentReference("Target", testReference.getLastSpaceReference());
 
         setup.loginAsSuperAdmin();
-        setup.deletePage(testReference.getParent(), true);
+        setup.deletePage(sourcePage);
+        setup.deletePage(targetPage);
         setup.createPage(sourcePage, "");
         setup.createPage(targetPage, "");
 
@@ -63,7 +68,20 @@ class MoveAttachmentIT
             new File(testConfiguration.getBrowser().getTestResourcesPath(), "moveme.txt").getAbsolutePath());
         sourceAttachmentsPane.waitForUploadToFinish("moveme.txt");
 
-//        MovePage attachmentsPane = new MovePage(viewPage).openAttachmentsDocExtraPane();
+        AttachmentPane attachmentsPane = AttachmentPane.moveAttachment("moveme.txt");
 
+        attachmentsPane.setName("newname.txt");
+        attachmentsPane.setRedirect(true);
+        attachmentsPane.setLocation(setup.serializeReference(targetPage));
+        attachmentsPane.submit();
+        attachmentsPane.waitForJobDone();
+
+        ViewPage viewTargetPage = setup.gotoPage(targetPage);
+        AttachmentsPane attachmentsPaneTarget = viewTargetPage.openAttachmentsDocExtraPane();
+        WebElement attachmentLink = attachmentsPaneTarget.getAttachmentLink("newname.txt");
+        assertNotNull(attachmentLink);
+
+        Object object = setup.rest().object(sourcePage, setup.serializeReference(REFERENCE));
+        assertNotNull(object);
     }
 }

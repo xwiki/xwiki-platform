@@ -50,16 +50,23 @@ public class XarDocumentModel
     /**
      * Introduce new way to serialize attachment history.
      * 
-     * @since 9.0RC1
+     * @since 12.0RC1
      */
     public static final String VERSION_14 = "1.4";
+
+    /**
+     * Introduce the concept of original metadata document author.
+     * 
+     * @since 14.0RC1
+     */
+    public static final String VERSION_15 = "1.5";
 
     /**
      * The current version.
      * 
      * @since 9.0RC1
      */
-    public static final String VERSION_CURRENT = VERSION_14;
+    public static final String VERSION_CURRENT = VERSION_15;
 
     public static final String ELEMENT_DOCUMENT = "xwikidoc";
 
@@ -154,7 +161,7 @@ public class XarDocumentModel
     /**
      * @since 14.0RC1
      */
-    public static final String ELEMENT_REVISION_ORIGINALMEDATAAUTHOR = "originalMetadataAuthorReference";
+    public static final String ELEMENT_REVISION_ORIGINALMEDATAAUTHOR = "originalMetadataAuthor";
 
     public static final String ELEMENT_REVISION_COMMENT = "comment";
 

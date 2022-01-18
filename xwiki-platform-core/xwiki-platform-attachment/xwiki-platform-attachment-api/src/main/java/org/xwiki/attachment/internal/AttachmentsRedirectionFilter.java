@@ -20,6 +20,7 @@
 package org.xwiki.attachment.internal;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -61,7 +62,7 @@ public class AttachmentsRedirectionFilter implements RedirectionFilter
     public boolean redirect(XWikiContext context) throws XWikiException
     {
         boolean redirect = false;
-        if (context.getAction().equals(ACTION_NAME)) {
+        if (Objects.equals(context.getAction(), ACTION_NAME)) {
             AttachmentReference attachmentReference = getAttachmentReference();
             Optional<AttachmentReference> redirection = this.attachmentsManager.getRedirection(attachmentReference);
             if (redirection.isPresent()) {

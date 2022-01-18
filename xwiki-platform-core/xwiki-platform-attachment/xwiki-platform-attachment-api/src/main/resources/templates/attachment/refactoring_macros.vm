@@ -27,9 +27,11 @@
 </dt>
 <dd>
   #hierarchy($attachment)
-  <input type="hidden" name="sourceWikiName" value="$!escapetool.xml($doc.wiki)"/>
-  <input type="hidden" name="sourceSpaceName" value="$!escapetool.xml($doc.space)"/>
-  <input type="hidden" name="sourcePageName" value="$!escapetool.xml($doc.documentReference.name)"/>
+##  <input type="hidden" name="sourceWikiName" value="$!escapetool.xml($doc.wiki)"/>
+##  <input type="hidden" name="sourceSpaceName" value="$!escapetool.xml($doc.space)"/>
+##  <input type="hidden" name="sourcePageName" value="$!escapetool.xml($doc.documentReference.name)"/>
+  <input type="hidden" name="sourceLocation" 
+          value="$!escapetool.xml($services.model.serialize($doc.documentReference, 'default'))" />
   <input type="hidden" name="sourceAttachmentName" value="$!escapetool.xml($attachment.name)"/>
 </dd>
 #end
@@ -48,7 +50,7 @@
   <input type="hidden" name="updateLinks" value="false"/>
 </dt>
 <dd#if ($hidden) class="hidden"#end>
-  ## TODO: update once a backlink management mechanism is in place
+  ## TODO: update once a backlink management mechanism is in place.
   #set ($backLinksCount = 0)
   #set ($backLinksURL = '')
   <span class="xHint">

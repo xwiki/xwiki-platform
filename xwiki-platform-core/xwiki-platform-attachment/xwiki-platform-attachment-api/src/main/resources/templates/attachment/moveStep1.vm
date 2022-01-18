@@ -47,7 +47,7 @@
         ##------------
         ## Links field
         ##------------
-        ## TODO: activate one refactoring is supported.
+        ## TODO: activate once refactoring is supported.
         ## #displayAttachmentLinksCheckbox()
         ##--------------------
         ## Auto redirect field
@@ -141,7 +141,7 @@
             </div>
             <div class="input-group-btn">
               <button type="button" class="btn btn-default newLocationTree" value="doc" title="Select a page">
-                $services.icon.renderHTML( 'chart-organisation')
+                $services.icon.renderHTML('chart-organisation')
               </button>
             </div>
           </div>

@@ -19,8 +19,6 @@
 ## ---------------------------------------------------------------------------
 #template('refactoringStatus_macros.vm') 
 
-## TODO: migrate from document to attachment status
-
 #macro (displayMoveJobRequest $moveJobRequest)
   <div class="refactoring-job-request row xform">
     <div class="col-xs-12 col-lg-6">
@@ -41,7 +39,6 @@
 
 #macro (displayMoveJobStatus $moveJobStatus)
   #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
-  ## TODO: allows question templates to inject the web resources they need
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 
     'tree.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($moveJobState = $moveJobStatus.state)

@@ -68,13 +68,13 @@ public class AttachmentsManager
     {
         XWikiDocument document = this.xcontextProvider.get().getWiki()
             .getDocument(attachmentLocation.getDocumentReference(), this.xcontextProvider.get());
-        boolean exists;
+        boolean available;
         if (document == null) {
-            exists = false;
+            available = false;
         } else {
-            exists = document.getAttachment(attachmentLocation.getName()) != null;
+            available = document.getAttachment(attachmentLocation.getName()) == null;
         }
-        return exists;
+        return available;
     }
 
     /**
@@ -89,7 +89,6 @@ public class AttachmentsManager
         XWikiDocument document = this.xcontextProvider.get().getWiki()
             .getDocument(attachmentReference.getDocumentReference(), this.xcontextProvider.get());
         if (document == null) {
-            // TODO:  log warning ?
             return Optional.empty();
         } else {
             return document.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE).stream()
@@ -118,7 +117,7 @@ public class AttachmentsManager
         List<BaseObject> targetRedirections =
             targetDocument.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE);
         for (BaseObject targetRedirection : targetRedirections) {
-            if (targetRedirection.getStringValue(SOURCE_NAME_FIELD).equals(attachmentName)) {
+            if (Objects.equals(targetRedirection.getStringValue(SOURCE_NAME_FIELD), attachmentName)) {
                 changed = true;
                 targetDocument.removeXObject(targetRedirection);
             }

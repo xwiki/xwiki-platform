@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>Provides APIs related to attachments manipulation.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.1</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -97,6 +97,40 @@
       <artifactId>xwiki-platform-skin-skinx</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- Test dependencies. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web-templates</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authorization-script</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <!-- Default icon manager Component List for Page Tests. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-default</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-default</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+      <type>test-jar</type>
     </dependency>
   </dependencies>
 </project>

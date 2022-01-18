@@ -147,9 +147,11 @@ public class MoveAttachmentJob
             this.xcontextProvider.get());
         BaseObject xObject =
             sourceDocument.getXObject(RedirectAttachmentClassDocumentInitializer.REFERENCE, idx);
-        xObject.setStringValue(SOURCE_NAME_FIELD, source.getName());
-        xObject.setStringValue(TARGET_LOCATION_FIELD,
-            this.entityReferenceSerializer.serialize(destination.getParent()));
-        xObject.setStringValue(TARGET_NAME_FIELD, destination.getName());
+        if (xObject != null) {
+            xObject.setStringValue(SOURCE_NAME_FIELD, source.getName());
+            xObject.setStringValue(TARGET_LOCATION_FIELD,
+                this.entityReferenceSerializer.serialize(destination.getParent()));
+            xObject.setStringValue(TARGET_NAME_FIELD, destination.getName());
+        }
     }
 }

@@ -28,7 +28,7 @@
 #end
 #set ($attachment = $services.model.resolveAttachment($attachment))
 
-#if (!$services.security.authorization.hasAccess('view', $attachment.documentReference) && "$!request.moveId" == '')
+#if (!$services.security.authorization.hasAccess('view', $doc.documentReference) && "$!request.moveId" == '')
   #template("accessdenied.vm")
 #elseif ($xcontext.action == 'get' && "$!request.moveId" != '')
   ## AJAX request for move status update.
@@ -53,9 +53,7 @@
       ## CSRF protection
       $response.sendRedirect("$!services.csrf.resubmissionURL")
     #else
-      #set ($sourceWikiName = $request.sourceWikiName)
-      #set ($sourceSpaceName = $request.sourceSpaceName)
-      #set ($sourcePageName = $request.sourcePageName)
+      #set ($sourceLocation = $request.sourceLocation)
       #set ($sourceAttachmentName = $request.sourceAttachmentName)
       #set ($targetLocation = $request.targetLocation)
       #set ($targetAttachmentName = $request.targetAttachmentName)
@@ -68,28 +66,25 @@
         #template("attachment/moveStep1.vm")
       #else
         #template('attachment/refactoring_macros.vm')
-        #if ($services.attachment.locationAvailable($targetLocation, $targetAttachmentName)) 
+        #if (!$services.attachment.locationAvailable($targetLocation, $targetAttachmentName)) 
           $response.setStatus(409)
-          ## TODO: check localization.
           #error($services.localization.render('attachment.move.alreadyExists', [
             ${escapetool.xml($targetAttachmentName)}, ${escapetool.xml($targetLocation)}, 
             $xwiki.getURL($targetLocation)]))
           #template("attachment/moveStep1.vm")
-        #elseif (!$xwiki.hasAccessLevel('edit', $xcontext.user, $targetLocation))
+        #elseif (!$services.security.authorization.hasAccess('edit', $targetLocation))
           $response.setStatus(403)
           #error($services.localization.render('attachment.move.targetNotWritable',
             [${escapetool.xml($targetLocation)}]))
           #template('attachment/moveStep1.vm')
         #else
-          ## TODO: replace the manual serialization with an actual serialization.
           #try("moveJobException")
-            #set ($moveRequest = $services.attachment.createMoveRequest("$sourceWikiName:$sourceSpaceName.$sourcePageName",
-              $sourceAttachmentName, $targetLocation, $targetAttachmentName, $autoRedirect, $isAsync))
+            #set ($moveRequest = $services.attachment.createMoveRequest($sourceLocation, $sourceAttachmentName, 
+              $targetLocation, $targetAttachmentName, $autoRedirect, $isAsync))
             #set ($moveJob = $services.attachment.createMoveJob($moveRequest))
           #end
           #if ("$!moveJobException" != '')
-            ## TODO: localization
-            #displayException('Failed to create a move attachment job', $moveJobException)
+            #displayException($services.localization.render('attachment.job.creation.error'), $moveJobException)
           #else
             #try()
               #set ($discard = $moveJob.join())

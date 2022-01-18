@@ -24,6 +24,8 @@ import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -38,7 +40,7 @@ import static org.mockito.Mockito.verify;
 class DefaultDocumentAuthorsTest
 {
     @Test
-    void constructorClone()
+    void copyAuthors()
     {
         XWikiDocument xWikiDocument = mock(XWikiDocument.class);
         UserReference contentAuthorRef = mock(UserReference.class);
@@ -50,6 +52,11 @@ class DefaultDocumentAuthorsTest
         documentAuthors.setContentAuthor(contentAuthorRef);
         documentAuthors.setEffectiveMetadataAuthor(metadataAuthorRef);
         documentAuthors.setOriginalMetadataAuthor(displayedAuthorRef);
+        
+        DefaultDocumentAuthors otherDocumentAuthors = new DefaultDocumentAuthors(xWikiDocument);
+        assertNotEquals(documentAuthors, otherDocumentAuthors);
+        otherDocumentAuthors.copyAuthors(documentAuthors);
+        assertEquals(otherDocumentAuthors, documentAuthors);
     }
 
     @Test

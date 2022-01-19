@@ -219,7 +219,7 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
     ## Fallback for incomplete/invalid extension orders to avoid breaking the display.
     #set ($order = 0)
   #end
-  #set ($uixMap = { 'content'  : $services.rendering.render($uix.execute(), 'xhtml/1.0'),
+  #set ($uixMap = { 'content'  : $services.rendering.render($uix.execute(), 'html/5.0'),
                     'order'    : $order})
   #set ($discard = $extensions.add($uixMap))
 #end
@@ -227,34 +227,38 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
 ## Sort the extensions by order
 #set ($sortedExtensions = $collectiontool.sort($extensions, 'order'))
 
+##
+## UIXs are split into two columns based on their order so they have some influence on the column they are displayed in
+## as a completely dynamic (e.g., first half left, second half right column) allocation could have strange effects. At
+## the same time, the number of columns can be changed by the skin and should not be dictated by the UIXs.
+## UIXs with a limit below $columnOrderLimit will be displayed in the left column.
+##
+#set ($columnOrderLimit = 1000)
+
 ###
 ### Display document information
 ###
-### UIXs are split into two columns based on their order so they have some influence on the column they are displayed in
-### as a completely dynamic (e.g., first half left, second half right column) allocation could have strange effects. At
-### the same time, the number of columns can be changed by the skin and should not be dictated by the UIXs.
-###
 <div id="informationcontent" class="xwikiintracontent">
   <div id="_information" class="row xform">
-    ##-------------------------------------
-    ## Left Column - UIXs with order < 1000
-    ##-------------------------------------
+    ##--------------------------------------------------
+    ## Left Column - UIXs with order < $columnOrderLimit
+    ##--------------------------------------------------
     <div id="informationleft" class="col-xs-12 col-sm-6">
       <dl>
         #foreach ($extension in $sortedExtensions)
-          #if ($extension.order < 1000)
+          #if ($extension.order < $columnOrderLimit)
             $extension.content
           #end
         #end
       </dl>
     </div>
-    ##---------------------------------------
-    ## Right Column - UIXs with order >= 1000
-    ##---------------------------------------
+    ##----------------------------------------------------
+    ## Right Column - UIXs with order >= $columnOrderLimit
+    ##----------------------------------------------------
     <div id="informationright" class="col-xs-12 col-sm-6">
       <dl>
         #foreach ($extension in $sortedExtensions)
-          #if ($extension.order >= 1000)
+          #if ($extension.order >= $columnOrderLimit)
             $extension.content
           #end
         #end

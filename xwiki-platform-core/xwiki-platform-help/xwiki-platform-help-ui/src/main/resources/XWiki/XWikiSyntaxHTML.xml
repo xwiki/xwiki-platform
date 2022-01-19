@@ -50,12 +50,10 @@
 
 === 2.0 HTML ===
 
-{{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} HTML or XHTML must be entered by using the HTML macro.{{/info}}
+{{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} HTML or XHTML must be entered by using the [[HTML macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/HTML%20Macro]].{{/info}}
 
 |=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
-|{{{{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}} }}}|{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}
-
-{{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}, by default the HTML macro does not understands XWiki Syntax (other macros included since it's XWiki Syntax too). To enable it, use {{{{{html wiki="true"}} }}}.{{/info}}</content>
+|{{{{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}} }}}|{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}</content>
   <object>
     <name>XWiki.XWikiSyntaxHTML</name>
     <number>0</number>

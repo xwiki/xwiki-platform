@@ -106,7 +106,7 @@ public class EditAction extends XWikiAction
 
         // The default values from the template can be overwritten by additional request parameters.
         updateDocumentTitleAndContentFromRequest(editedDocument, context);
-        editedDocument.readObjectsFromForm(editForm, context);
+        editedDocument.readAddedUpdatedAndRemovedObjectsFromForm(editForm, context);
 
         // Set the current user as creator, author and contentAuthor when the edited document is newly created to avoid
         // using XWikiGuest instead (because those fields were not previously initialized).

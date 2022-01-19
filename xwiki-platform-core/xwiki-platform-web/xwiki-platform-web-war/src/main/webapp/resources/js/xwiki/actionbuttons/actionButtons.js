@@ -417,12 +417,9 @@ var XWiki = (function(XWiki) {
       // We don't rely on window.location.reload() since it might keep cached data from the form.
       // We don't rely on window.location.reload(true) either since it's unclear if it's properly supported by
       // all browsers. Instead we rely on a query parameter with the current date.
-      // URLSearchParams is not supported by IE11 but we rely on a polyfill.
-      require(["$services.webjars.url('org.webjars.npm:url-search-params-polyfill', 'index.js')"], function() {
-        var params = new URLSearchParams(window.location.search);
-        params.set("timestamp", new Date().getTime());
-        window.location.search = "?" + params.toString();
-      });
+      var params = new URLSearchParams(window.location.search);
+      params.set("timestamp", new Date().getTime());
+      window.location.search = "?" + params.toString();
     },
     // 401 happens when the user is not authorized to do that: can be a logout or a change in perm
     on401 : function (state, response) {

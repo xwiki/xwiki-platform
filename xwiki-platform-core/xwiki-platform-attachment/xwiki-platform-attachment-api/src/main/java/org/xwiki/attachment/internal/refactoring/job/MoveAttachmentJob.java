@@ -17,19 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment.internal.job;
+package org.xwiki.attachment.internal.refactoring.job;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.xwiki.attachment.MoveAttachmentRequest;
 import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer;
+import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.AttachmentReference;
@@ -91,9 +90,6 @@ public class MoveAttachmentJob
     protected void process(EntityReference source)
     {
         this.progressManager.pushLevelProgress(this);
-        this.request.setId("refactoring", "moveAttachment",
-            String.format("%d-%d", System.currentTimeMillis(), ThreadLocalRandom.current().nextInt(100, 1000)));
-
         AttachmentReference destination = this.request.getProperty(MoveAttachmentRequest.DESTINATION);
         boolean autoRedirect = this.request.getProperty(MoveAttachmentRequest.AUTO_REDIRECT);
 
@@ -106,8 +102,7 @@ public class MoveAttachmentJob
             // Remove the original attachment and create a new one with the same name.
             sourceDocument.removeAttachment(sourceAttachment);
 
-            targetDocument.setAttachment(destination.getName(),
-                sourceAttachment.getContentInputStream(this.xcontextProvider.get()), this.xcontextProvider.get());
+            addAttachment(targetDocument, sourceAttachment, destination.getName());
 
             this.attachmentsManager.removeExistingRedirection(destination.getName(), targetDocument);
 
@@ -121,21 +116,57 @@ public class MoveAttachmentJob
                         source.getName(), destination.getName()),
                     this.xcontextProvider.get());
             } else {
-                // "Attachment moved to " + destination
-                String historyMessageSource =
-                    this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.source",
-                        this.referenceSerializer.serialize(destination));
-                String historyMessageTarget =
-                    this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.target",
-                        this.referenceSerializer.serialize(source));
-                wiki.saveDocument(sourceDocument, historyMessageSource, this.xcontextProvider.get());
-                wiki.saveDocument(targetDocument, historyMessageTarget, this.xcontextProvider.get());
+                transactionalMove(wiki, sourceDocument, targetDocument, sourceAttachment.getFilename(),
+                    destination.getName());
             }
         } catch (XWikiException | IOException e) {
             this.logger.warn("Failed to move attachment [{}] to [{}]. Cause: [{}]", source, destination,
                 getRootCauseMessage(e));
         } finally {
             this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    /**
+     * Move the attachment from one document to another. In case of failure when saving the target document, the source
+     * document is rollback with its attachment.
+     *
+     * @param wiki the wiki instance used to perform the documents save
+     * @param sourceDocument the source document, containing the attachment to move
+     * @param targetDocument the target document, in which to move the attachment
+     * @param sourceFileName the file name of the source attachment
+     * @param targetFileName the file name of the target attachment
+     * @throws XWikiException in case of error when save the document
+     * @throws IOException in case of error when putting back the attachment in the source document during the
+     *     rollback
+     */
+    private void transactionalMove(XWiki wiki, XWikiDocument sourceDocument, XWikiDocument targetDocument,
+        String sourceFileName, String targetFileName) throws XWikiException, IOException
+    {
+        String sourceSerialized = this.referenceSerializer.serialize(sourceDocument.getDocumentReference());
+        String destinationSerialized = this.referenceSerializer.serialize(targetDocument.getDocumentReference());
+        String historyMessageSource =
+            this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.source",
+                destinationSerialized);
+        String historyMessageTarget =
+            this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.target",
+                sourceSerialized);
+        wiki.saveDocument(sourceDocument, historyMessageSource, this.xcontextProvider.get());
+        try {
+            wiki.saveDocument(targetDocument, historyMessageTarget, this.xcontextProvider.get());
+        } catch (Exception e) {
+            // In case of failure during the save of the second document, we rollback the first one to its initial state
+            // (i.e., with the attachment added again).
+            // Remove the added attachment from the target document.
+            XWikiAttachment attachment = targetDocument.getAttachment(targetFileName);
+            addAttachment(sourceDocument, attachment, sourceFileName);
+            targetDocument.removeAttachment(attachment);
+            String historyMessageRollbackTarget =
+                this.contextualLocalizationManager.getTranslationPlain("attachment.job.rollbackDocument.target",
+                    sourceFileName, sourceSerialized);
+            wiki.saveDocument(sourceDocument, historyMessageRollbackTarget, true, this.xcontextProvider.get());
+            // We re-throw the exception since at the end, the job failed.
+            throw e;
         }
     }
 
@@ -153,5 +184,12 @@ public class MoveAttachmentJob
                 this.entityReferenceSerializer.serialize(destination.getParent()));
             xObject.setStringValue(TARGET_NAME_FIELD, destination.getName());
         }
+    }
+
+    private void addAttachment(XWikiDocument document, XWikiAttachment attachment, String name)
+        throws IOException, XWikiException
+    {
+        document.setAttachment(name, attachment.getContentInputStream(this.xcontextProvider.get()),
+            this.xcontextProvider.get());
     }
 }

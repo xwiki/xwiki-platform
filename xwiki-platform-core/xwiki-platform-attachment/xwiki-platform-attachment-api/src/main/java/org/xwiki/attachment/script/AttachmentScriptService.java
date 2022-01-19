@@ -19,14 +19,16 @@
  */
 package org.xwiki.attachment.script;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.xwiki.attachment.MoveAttachmentRequest;
 import org.xwiki.attachment.internal.AttachmentsManager;
-import org.xwiki.attachment.internal.job.MoveAttachmentJob;
+import org.xwiki.attachment.internal.refactoring.job.MoveAttachmentJob;
+import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
@@ -83,6 +85,8 @@ public class AttachmentScriptService implements ScriptService
         request.setProperty(MoveAttachmentRequest.DESTINATION, new AttachmentReference(targetName, targetLocation));
         request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, autoRedirect);
         request.setInteractive(isAsync);
+        request.setId("refactoring", "moveAttachment",
+            String.format("%d-%d", System.currentTimeMillis(), ThreadLocalRandom.current().nextInt(100, 1000)));
         return request;
     }
 

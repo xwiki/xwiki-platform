@@ -19,27 +19,13 @@
  */
 package org.xwiki.attachment.internal;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-
-import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.SOURCE_NAME_FIELD;
-import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.TARGET_LOCATION_FIELD;
-import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.TARGET_NAME_FIELD;
 
 /**
  * Provide operations to inspect and manipulate attachments.
@@ -47,16 +33,9 @@ import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentIniti
  * @version $Id$
  * @since 14.0RC1
  */
-@Component(roles = AttachmentsManager.class)
-@Singleton
-public class AttachmentsManager
+@Role
+public interface AttachmentsManager
 {
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
     /**
      * Check if an attachment exists.
      *
@@ -64,18 +43,7 @@ public class AttachmentsManager
      * @return {@code true} if the attachment is found at the requested location, {@code false} otherwise
      * @throws XWikiException if the attachments couldn't be retrieved
      */
-    public boolean available(AttachmentReference attachmentLocation) throws XWikiException
-    {
-        XWikiDocument document = this.xcontextProvider.get().getWiki()
-            .getDocument(attachmentLocation.getDocumentReference(), this.xcontextProvider.get());
-        boolean available;
-        if (document == null) {
-            available = false;
-        } else {
-            available = document.getAttachment(attachmentLocation.getName()) == null;
-        }
-        return available;
-    }
+    boolean available(AttachmentReference attachmentLocation) throws XWikiException;
 
     /**
      * Return the reference of the new location of the attachment.
@@ -84,25 +52,7 @@ public class AttachmentsManager
      * @return the reference of the new location of the attachment if it exists, {@code Optional#empty} otherwise
      * @throws XWikiException in case of error when accessing the document
      */
-    public Optional<AttachmentReference> getRedirection(AttachmentReference attachmentReference) throws XWikiException
-    {
-        XWikiDocument document = this.xcontextProvider.get().getWiki()
-            .getDocument(attachmentReference.getDocumentReference(), this.xcontextProvider.get());
-        if (document == null) {
-            return Optional.empty();
-        } else {
-            return document.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE).stream()
-                .filter(redirectObj -> Objects.equals(redirectObj.getStringValue(SOURCE_NAME_FIELD),
-                    attachmentReference.getName()))
-                .findFirst()
-                .map(redirectObj -> {
-                    String targetName = redirectObj.getStringValue(TARGET_NAME_FIELD);
-                    DocumentReference targetLocation =
-                        this.documentReferenceResolver.resolve(redirectObj.getStringValue(TARGET_LOCATION_FIELD));
-                    return new AttachmentReference(targetName, targetLocation);
-                });
-        }
-    }
+    Optional<AttachmentReference> getRedirection(AttachmentReference attachmentReference) throws XWikiException;
 
     /**
      * Remove a redirection if it exists.
@@ -111,17 +61,5 @@ public class AttachmentsManager
      * @param targetDocument the document containing the redirection
      * @return {@code true} if the redirection was removed, {@code false} otherwise
      */
-    public boolean removeExistingRedirection(String attachmentName, XWikiDocument targetDocument)
-    {
-        boolean changed = false;
-        List<BaseObject> targetRedirections =
-            targetDocument.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE);
-        for (BaseObject targetRedirection : targetRedirections) {
-            if (Objects.equals(targetRedirection.getStringValue(SOURCE_NAME_FIELD), attachmentName)) {
-                changed = true;
-                targetDocument.removeXObject(targetRedirection);
-            }
-        }
-        return changed;
-    }
+    boolean removeExistingRedirection(String attachmentName, XWikiDocument targetDocument);
 }

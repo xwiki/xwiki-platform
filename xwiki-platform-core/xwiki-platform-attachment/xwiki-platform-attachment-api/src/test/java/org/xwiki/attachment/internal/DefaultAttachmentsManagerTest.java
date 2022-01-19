@@ -55,13 +55,13 @@ import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentIniti
 import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.TARGET_NAME_FIELD;
 
 /**
- * Test of {@link AttachmentsManager}.
+ * Test of {@link DefaultAttachmentsManager}.
  *
  * @version $Id$
  * @since 14.0RC1
  */
 @ComponentTest
-class AttachmentsManagerTest
+class DefaultAttachmentsManagerTest
 {
     public static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Space", "Page");
 
@@ -69,7 +69,7 @@ class AttachmentsManagerTest
         new AttachmentReference("file.txt", DOCUMENT_REFERENCE);
 
     @InjectMockComponents
-    private AttachmentsManager attachmentsManager;
+    private DefaultAttachmentsManager attachmentsManager;
 
     @MockComponent
     private Provider<XWikiContext> xcontextProvider;

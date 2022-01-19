@@ -28,7 +28,7 @@ import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.attachment.internal.AttachmentsManager;
+import org.xwiki.attachment.internal.DefaultAttachmentsManager;
 import org.xwiki.attachment.script.AttachmentScriptService;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
 import org.xwiki.icon.IconManagerScriptService;
@@ -66,7 +66,7 @@ import static org.mockito.Mockito.when;
     ModelScriptService.class,
     IconManagerScriptService.class,
     AttachmentScriptService.class,
-    AttachmentsManager.class,
+    DefaultAttachmentsManager.class,
     DocumentReferenceConverter.class,
     EntityReferenceConverter.class
 })

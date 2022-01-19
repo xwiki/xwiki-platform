@@ -23,8 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.xwiki.attachment.MoveAttachmentRequest;
 import org.xwiki.attachment.internal.AttachmentsManager;
+import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.LogLevel;
@@ -65,7 +65,7 @@ class AttachmentScriptServiceTest
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    void name()
+    void createMoveRequest()
     {
         MoveAttachmentRequest actual =
             this.attachmentScriptService.createMoveRequest(SOURCE_LOCATION, "old.txt", TARGET_LOCATION, "newName", true,
@@ -75,6 +75,9 @@ class AttachmentScriptServiceTest
         expected.setProperty(MoveAttachmentRequest.DESTINATION, new AttachmentReference("newName", TARGET_LOCATION));
         expected.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, true);
         expected.setInteractive(false);
+        // Reset the ids before comparing because we are not interested in the random parts. 
+        actual.setId("");
+        expected.setId("");
         assertEquals(expected, actual);
     }
 

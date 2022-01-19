@@ -1,7 +1,7 @@
 org.xwiki.attachment.script.AttachmentScriptService
-org.xwiki.attachment.internal.AttachmentsManager
+org.xwiki.attachment.internal.DefaultAttachmentsManager
 org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer
-org.xwiki.attachment.internal.job.MoveAttachmentJob
+org.xwiki.attachment.internal.refactoring.job.MoveAttachmentJob
 org.xwiki.attachment.internal.AttachmentsRedirectionFilter
 org.xwiki.attachment.internal.AttachmentsListener
 org.xwiki.attachment.internal.MoveAttachmentDocumentInitializer

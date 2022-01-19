@@ -39,7 +39,7 @@ import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
 
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
-import static org.xwiki.attachment.internal.AttachmentsListener.HINT;
+import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.HINT;
 
 /**
  * Listen for attachments creation and if the created attachment name matches a redirection, remove the corresponding
@@ -53,11 +53,6 @@ import static org.xwiki.attachment.internal.AttachmentsListener.HINT;
 @Named(HINT)
 public class AttachmentsListener implements EventListener
 {
-    /**
-     * The hint for this class.
-     */
-    public static final String HINT = "Attachment.Code.RedirectAttachmentClass";
-
     @Inject
     private AttachmentsManager attachmentsManager;
 

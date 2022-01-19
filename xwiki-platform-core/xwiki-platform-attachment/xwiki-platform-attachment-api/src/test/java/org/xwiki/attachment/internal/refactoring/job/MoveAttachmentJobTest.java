@@ -17,33 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment.internal.job;
+package org.xwiki.attachment.internal.refactoring.job;
 
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
-import org.xwiki.attachment.MoveAttachmentRequest;
 import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer;
+import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import ch.qos.logback.classic.Level;
+
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -97,6 +105,9 @@ class MoveAttachmentJobTest
     @Mock
     private XWikiDocument targetDocument;
 
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     private MoveAttachmentRequest request;
 
     @BeforeEach
@@ -109,9 +120,13 @@ class MoveAttachmentJobTest
 
         // The cast is mandatory otherwise the wrong method is mocked (the DocumentReference one).
         when(this.wiki.getDocument((EntityReference) SOURCE_LOCATION, this.context)).thenReturn(this.sourceDocument);
+        when(this.sourceDocument.getDocumentReference()).thenReturn(SOURCE_LOCATION);
+        when(this.targetDocument.getDocumentReference()).thenReturn(TARGET_LOCATION);
         when(this.wiki.getDocument((EntityReference) TARGET_LOCATION, this.context)).thenReturn(this.targetDocument);
         when(this.referenceSerializer.serialize(TARGET_ATTACHMENT_LOCATION)).thenReturn("xwiki:Space.Target@newName");
         when(this.referenceSerializer.serialize(SOURCE_ATTACHMENT_LOCATION)).thenReturn("xwiki:Space.Source@oldName");
+        when(this.referenceSerializer.serialize(TARGET_LOCATION)).thenReturn("xwiki:Space.Target");
+        when(this.referenceSerializer.serialize(SOURCE_LOCATION)).thenReturn("xwiki:Space.Source");
     }
 
     @Test
@@ -124,19 +139,17 @@ class MoveAttachmentJobTest
         this.request.setInteractive(false);
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
+        when(sourceAttachment.getFilename()).thenReturn("oldName");
         when(this.sourceDocument.getAttachment("oldName")).thenReturn(sourceAttachment);
         when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.source",
-            "xwiki:Space.Target@newName"))
-            .thenReturn("attachment.job.saveDocument.source [xwiki:Space.Target@newName]");
+            "xwiki:Space.Target"))
+            .thenReturn("attachment.job.saveDocument.source [xwiki:Space.Target]");
 
         when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.target",
-            "xwiki:Space.Source@oldName"))
-            .thenReturn("attachment.job.saveDocument.target [xwiki:Space.Source@oldName]");
-        
+            "xwiki:Space.Source"))
+            .thenReturn("attachment.job.saveDocument.target [xwiki:Space.Source]");
+
         this.job.process(SOURCE_ATTACHMENT_LOCATION);
-        assertEquals(3, this.request.getId().size());
-        assertEquals("refactoring", this.request.getId().get(0));
-        assertEquals("moveAttachment", this.request.getId().get(1));
         verify(this.sourceDocument).removeAttachment(sourceAttachment);
         verify(sourceAttachment).getContentInputStream(this.context);
         verify(this.targetDocument).setAttachment("newName", null, this.context);
@@ -144,9 +157,57 @@ class MoveAttachmentJobTest
         // Initialization of the redirection.
         verify(this.sourceDocument).createXObject(RedirectAttachmentClassDocumentInitializer.REFERENCE, this.context);
         verify(this.wiki).saveDocument(this.sourceDocument,
-            "attachment.job.saveDocument.source [xwiki:Space.Target@newName]", this.context);
+            "attachment.job.saveDocument.source [xwiki:Space.Target]", this.context);
         verify(this.wiki).saveDocument(this.targetDocument,
-            "attachment.job.saveDocument.target [xwiki:Space.Source@oldName]", this.context);
+            "attachment.job.saveDocument.target [xwiki:Space.Source]", this.context);
+    }
+
+    @Test
+    void processTargetSaveFail() throws Exception
+    {
+        // Request initialization.
+        this.request.setEntityReferences(singletonList(SOURCE_ATTACHMENT_LOCATION));
+        this.request.setProperty(MoveAttachmentRequest.DESTINATION, TARGET_ATTACHMENT_LOCATION);
+        this.request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, true);
+        this.request.setInteractive(false);
+
+        XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
+        XWikiAttachment targetAttachment = mock(XWikiAttachment.class);
+        when(sourceAttachment.getFilename()).thenReturn("oldName");
+        when(this.sourceDocument.getAttachment("oldName")).thenReturn(sourceAttachment);
+        when(this.targetDocument.getAttachment("newName")).thenReturn(targetAttachment);
+        when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.source",
+            "xwiki:Space.Target"))
+            .thenReturn("attachment.job.saveDocument.source [xwiki:Space.Target]");
+        when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.target",
+            "xwiki:Space.Source"))
+            .thenReturn("attachment.job.saveDocument.target [xwiki:Space.Source]");
+        when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.rollbackDocument.target",
+            "oldName", "xwiki:Space.Source")).thenReturn(
+            "attachment.job.rollbackDocument.target [oldName, xwiki:Space.Source]");
+        doThrow(new XWikiException()).when(this.wiki)
+            .saveDocument(this.targetDocument, "attachment.job.saveDocument.target [xwiki:Space.Source]", this.context);
+
+        this.job.process(SOURCE_ATTACHMENT_LOCATION);
+        verify(this.sourceDocument).removeAttachment(sourceAttachment);
+        verify(sourceAttachment).getContentInputStream(this.context);
+        verify(targetAttachment).getContentInputStream(this.context);
+        verify(this.targetDocument).setAttachment("newName", null, this.context);
+        verify(this.attachmentsManager).removeExistingRedirection("newName", this.targetDocument);
+        // Initialization of the redirection.
+        verify(this.sourceDocument).createXObject(RedirectAttachmentClassDocumentInitializer.REFERENCE, this.context);
+        verify(this.wiki).saveDocument(this.sourceDocument,
+            "attachment.job.saveDocument.source [xwiki:Space.Target]", this.context);
+        // Check that the attachment is rolled back and saved again.
+        verify(this.sourceDocument).setAttachment("oldName", null, this.context);
+        verify(this.wiki).saveDocument(this.sourceDocument,
+            "attachment.job.rollbackDocument.target [oldName, xwiki:Space.Source]", true, this.context);
+        assertEquals(1, this.logCapture.size());
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals(
+            "Failed to move attachment [Attachment xwiki:Space.Source@oldName] to "
+                + "[Attachment xwiki:Space.Target@newName]. Cause: [XWikiException: Error number 0 in 0]",
+            this.logCapture.getMessage(0));
     }
 
     @Test
@@ -160,13 +221,11 @@ class MoveAttachmentJobTest
         this.request.setInteractive(false);
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
+        when(sourceAttachment.getFilename()).thenReturn("oldName");
         when(this.sourceDocument.getAttachment("oldName")).thenReturn(sourceAttachment);
         when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.inPlace",
             "oldName", "newName")).thenReturn("attachment.job.saveDocument.inPlace [oldName, newName]");
         this.job.process(SOURCE_ATTACHMENT_LOCATION);
-        assertEquals(3, this.request.getId().size());
-        assertEquals("refactoring", this.request.getId().get(0));
-        assertEquals("moveAttachment", this.request.getId().get(1));
 
         // Since we rename inside the source, the target document must not be modified.
         verifyNoInteractions(this.targetDocument);

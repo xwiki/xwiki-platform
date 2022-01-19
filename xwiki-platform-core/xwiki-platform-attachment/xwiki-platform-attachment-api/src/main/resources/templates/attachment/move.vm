@@ -31,8 +31,9 @@
 #if (!$services.security.authorization.hasAccess('view', $doc.documentReference) && "$!request.moveId" == '')
   #template("accessdenied.vm")
 #elseif ($xcontext.action == 'get' && "$!request.moveId" != '')
-  ## AJAX request for move status update.
-  #template("attachment/moveStatus.vm")
+  #template('job_macros.vm')
+  #set ($jobStatus = $services.job.getJobStatus($stringtool.split($request.jobId, '/')))
+  #outputJobStatusJSON($jobStatus)
 #else
   #template("startpage.vm")
   #if ("$!step" == '')
@@ -45,7 +46,9 @@
   <div id="mainContentArea">
     #if ("$!request.moveId" != '')
       ## Display the move status
-      #template("attachment/moveStatus.vm")
+      #template('job_macros.vm')
+      #set ($jobStatus = $services.job.getJobStatus($stringtool.split($request.jobId, '/')))
+      #displayJobStatus($jobStatus)
     #elseif ($step == 1)
       ## Display the move form
       #template("attachment/moveStep1.vm")

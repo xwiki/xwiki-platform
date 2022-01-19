@@ -293,6 +293,12 @@
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-xml-module</artifactId>
         <version>${tika.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
@@ -514,6 +520,10 @@
           <exclusion>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1106,14 +1116,6 @@
                   javax.annotation:jsr250-api,
                   javax.annotation:javax.annotation-api
                 </features>
-              </extensionOverride>
-              <extensionOverride>
-                <id>xml-apis:xml-apis</id>
-                <features>xerces:xmlParserAPIs/2.6.2</features>
-              </extensionOverride>
-              <extensionOverride>
-                <id>xerces:xercesImpl</id>
-                <features>xerces:xerces-impl</features>
               </extensionOverride>
               <extensionOverride>
                 <id>com.google.inject:guice:no_aop</id>

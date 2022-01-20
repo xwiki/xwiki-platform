@@ -64,13 +64,12 @@
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
     'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
     'xwiki-l10n': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-localization-webjar', ""l10n${jsExtension}""))",
-    'iscroll': "#removeJsSuffix($services.webjars.url('iscroll/5.1.3/build/iscroll-lite.js'))",
-    'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/jquery.drawer${jsExtension}""))",
+    'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
+    'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/drawer${jsExtension}""))",
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js')
   },
   'shim': {
     'bootstrap' : ['jquery'],
-    'drawer': ['jquery', 'iscroll'],
     'xwiki-entityReference': {
       'exports': 'XWiki'
     }
@@ -139,9 +138,11 @@ if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {
     disablePrototypeJS('hide', pluginsToDisable);
   });
 }
-require(['jquery', 'drawer'], function($) {
-  $(document).ready(function() {
-    $('.drawer-main').closest('body').drawer();
+require(['jquery', 'iscroll', 'drawer'], function($, IScroll) {
+  // Unfortunately drawer doesn't declare the dependency on iscroll and expects it to be defined as a global variable.
+  window.IScroll = IScroll;
+  $(function() {
+    $('.drawer-nav').closest('body').drawer();
   });
 });
 ##

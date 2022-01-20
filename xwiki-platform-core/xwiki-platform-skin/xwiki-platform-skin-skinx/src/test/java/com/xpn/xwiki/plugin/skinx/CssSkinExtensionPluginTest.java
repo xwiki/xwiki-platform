@@ -189,7 +189,7 @@ public class CssSkinExtensionPluginTest
         context.setLocale(Locale.ITALY);
         when(ext1.getVersion()).thenReturn("3.2");
 
-        String expectedQueryString = "language=it_IT&amp;docVersion=3.2";
+        String expectedQueryString = "language=it_IT&docVersion=3.2";
         String extensionLink1 = "https://myextension1";
         URL extensionLink1Url = new URL(extensionLink1);
 
@@ -198,7 +198,7 @@ public class CssSkinExtensionPluginTest
         when(this.urlFactory.getURL(extensionLink1Url, context)).thenReturn(extensionLink1);
 
         String expectedStyle =
-            String.format("<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\" />", extensionLink1);
+            String.format("<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\" />\n", extensionLink1);
 
         String expectedContent = String.format("<body><head>%s</head><body><!-- %s --></body>",
             expectedStyle,

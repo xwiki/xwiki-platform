@@ -37,6 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
+## To avoid mixing wiki syntax with html, unwrap the result of the xproperty displayer.
 #macro (stripHTMLMacro $displayOutput)
   $stringtool.removeEnd($stringtool.removeStart($displayOutput, '{{html clean="false" wiki="false"}}'), '{{/html}}')
 #end
@@ -45,13 +46,11 @@
     &lt;dt&gt;
       #set ($propertyClass = $xclass.get($propertyName))
       &lt;label#if ($editing) for="${lightboxConfigClassName}_0_${propertyName}"#end&gt;
-        $services.localization.render("lightbox.admin.${propertyName}.label")
+        $escapetool.xml($services.localization.render("image.lightbox.admin.${propertyName}.label"))
       &lt;/label&gt;
-      #set ($hint = $propertyClass.hint)
-      #if ("$!hint" == '')
-        #set ($hint = $services.localization.render("lightbox.admin.${propertyName}.hint"))
-      #end
-      &lt;span class="xHint"&gt;$escapetool.xml($hint)&lt;/span&gt;
+      &lt;span class="xHint"&gt;
+        $escapetool.xml($services.localization.render($propertyClass.hint))
+      &lt;/span&gt;
     &lt;/dt&gt;
     #set ($displayOutput = $lightboxConfigDoc.display($propertyName, $mode))
     &lt;dd&gt;#stripHTMLMacro($displayOutput)&lt;/dd&gt;
@@ -323,7 +322,7 @@
       <displayBeforeCategory/>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>lf</displayInCategory>
     </property>
     <property>
       <displayInSection>lightbox</displayInSection>

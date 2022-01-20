@@ -36,9 +36,23 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.lightbox=Lightbox
-lightbox.admin.isLightboxEnabled.label=Enable lightbox
-lightbox.admin.isLightboxEnabled.hint=Enable the possibility to open content images in a lightbox.</content>
+  <content># Admin section
+admin.lightbox=Lightbox
+imgae.lightbox.admin.isLightboxEnabled.label=Enable lightbox
+image.lightbox.admin.isLightboxEnabled.hint=Enable the possibility to open content images in a lightbox.
+
+# Gallery template
+image.lightbox.autoPlay.title=Slideshow
+image.lightbox.caption.label=Caption
+image.lightbox.date.title=Date
+image.lightbox.download.title=Download
+image.lightbox.escape.title=Escape
+image.lightbox.fileName.label=File name
+image.lightbox.fullscreen.title=Fullscreen
+image.lightbox.gallery.label=Image gallery
+image.lightbox.nextSlide.title=Next image
+image.lightbox.prevSlide.title=Previous image
+image.lightbox.publisher.label=Image publisher</content>
   <object>
     <name>XWiki.Lightbox.LightboxTranslations</name>
     <number>0</number>

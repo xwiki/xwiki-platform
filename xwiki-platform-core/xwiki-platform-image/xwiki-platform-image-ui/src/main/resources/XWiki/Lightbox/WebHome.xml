@@ -160,11 +160,19 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
         content: function() {
           return `
             &lt;div class="btn-group imageToolbar"&gt;
-              &lt;a id="openLightbox"&gt;$services.icon.renderHTML("arrows")&lt;/a&gt;
-              &lt;a id="imageDownload" href="${image[0].src}" target="_blank"&gt;$services.icon.renderHTML("download")&lt;/a&gt;
+              &lt;a id="openLightbox"
+                title="$escapetool.xml($services.localization.render('image.lightbox.gallery.title'))"&gt;
+                  $services.icon.renderHTML("arrows")
+              &lt;/a&gt;
+              &lt;a id="imageDownload" href="${image[0].src}" target="_blank"
+                title="$escapetool.xml($services.localization.render('image.lightbox.download.title'))"&gt;
+                  $services.icon.renderHTML("download")
+              &lt;/a&gt;
             &lt;/div&gt;`;
         },
         html: true,
+        // The popover needs to be placed outside of the xwiki content to not depend on it's overflow.
+        container: 'body',
         placement: 'bottom',
         trigger: 'manual'
       }).on('mouseenter', function() {
@@ -240,14 +248,20 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
   /**
    * Update lightbox description using given information.
    */
-  var updateLightboxDescription = function(data) {
+  var updateLightboxDescription = function(data, caption) {
     if (data != undefined) {
-      $('.lightboxDescription').css("display", "grid");
+      $('.lightboxDescription').css("display", "block");
       $('.lightboxDescription').find('.title').text(data.name);
       var translationPublisher = l10n.get('author', XWiki.Model.resolve(data.author, XWiki.EntityType.DOCUMENT).name);
       $('.lightboxDescription').find('.publisher').text(translationPublisher);
       var translationDate = l10n.get('date', new Date(data.date).toLocaleDateString());
       $('.lightboxDescription').find('.date').text(translationDate);
+
+      if (caption != undefined) {
+        $('.lightboxDescription').find('.caption').text(caption);
+      } else {
+        $('.lightboxDescription').find('.caption').empty();
+      }
     } else {
       $(".lightboxDescription").css("display", "none");
     }
@@ -272,6 +286,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
     return deferred.promise();
   };
 
+  var getImageCaption = function(image) {
+    if (image.closest('figure').length &gt; 0) {
+      return image.parent().siblings('figcaption').text();
+    }
+  }
+
   /**
    * Open Gallery lightbox at the current index.
    */
@@ -279,9 +299,11 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
     var media = [];
     $('#xwikicontent').find('img').each(function(index) {
       var imageURL = removeResizeParams(this.src);
+      var caption = getImageCaption($(this));
       media.push({
         href: imageURL,
-        thumbnail: createThumbnailURL(imageURL)
+        thumbnail: createThumbnailURL(imageURL),
+        caption: caption
       });
     });
 
@@ -292,8 +314,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
       closeClass: 'escape',
       playPauseClass: 'autoPlay',
       onslide: function(index, slide) {
+        var caption = this.list[index].caption;
         getAttachmentInfo($(slide).find('img')[0].src).done(function(data) {
-          updateLightboxDescription(data);
+          updateLightboxDescription(data, caption);
         });
       }
     };
@@ -448,21 +471,31 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
       <cache>long</cache>
     </property>
     <property>
-      <code>.lightboxDescription {
-  background-color: white;
-  display: grid;
-  grid-template-columns: auto auto;
-  justify-items: center;
-  align-items: center;
+      <code>@lighbox-description-color: #FFFFFF;
+@lighbox-controls-hover-color: #FFFFFF;
+
+#blueimp-gallery .lightboxDescription {
+  background-color: @lighbox-description-color;
+  display: block;
   position: absolute;
-  font-size: 2vh;
+  font-size: 1.8vh;
   width: 100%;
-  height: 5%;
+  padding: 0.3% 1%;
   bottom: 0;
-  padding: 0;
 }
-.descriptionCol {
-  padding-left: 3%;
+#blueimp-gallery .descriptionRow {
+  position: relative;
+  height: 100%;
+}
+#blueimp-gallery .descriptionColLeft {
+  float: left;
+  width: 68%;
+  font-size: 1.5vh;
+}
+#blueimp-gallery .descriptionColRight {
+  float: right;
+  width: 30%;
+  font-size: 1.5vh;
 }
 #blueimp-gallery &gt; div.slides img {
   bottom: 15%;
@@ -470,7 +503,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
 #blueimp-gallery &gt; .indicator {
   bottom: 10%;
 }
-.controls {
+#blueimp-gallery .controls {
   position: absolute;
   top: 3%;
   right: 3%;
@@ -481,7 +514,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
 .blueimp-gallery .download:hover,
 .blueimp-gallery .autoPlay:hover,
 .blueimp-gallery .escape:hover {
-  color: white;
+  color: @lighbox-controls-hover-color;
   opacity: 1;
 }
 .blueimp-gallery .fullscreen,
@@ -504,7 +537,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
 }</code>
     </property>
     <property>
-      <contentType/>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name>Lightbox Style Sheet</name>
@@ -646,10 +679,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
       <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.requirejs.module.image.lightbox</name>
+      <name>org.xwiki.platform.image.blueimp-gallery-bundle</name>
     </property>
     <property>
-      <parameters>id=xwiki-blueimp-gallery
+      <parameters>id=blueimp-gallery-bundle
 path=$services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'js/blueimp-gallery-bundle.min')
 bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-gallery-indicator,blueimp-gallery-video,blueimp-gallery-vimeo,blueimp-gallery-youtube</parameters>
     </property>
@@ -785,7 +818,8 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
 #set ($lightboxConfigDoc = $xwiki.getDocument('XWiki.Lightbox.LightboxConfiguration'))
 #set ($lightboxConfigObj = $lightboxConfigDoc.getObject('XWiki.Lightbox.LightboxConfigurationClass'))
 #if ($lightboxConfigObj.getValue('isLightboxEnabled').equals(1))
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'css/blueimp-gallery.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery',
+    'css/blueimp-gallery.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.jsx.use('XWiki.Lightbox.WebHome'))
   #set ($discard = $xwiki.ssx.use('XWiki.Lightbox.WebHome'))
   {{html clean="false"}}
@@ -793,7 +827,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
   &lt;div
     id="blueimp-gallery"
     class="blueimp-gallery"
-    aria-label="image gallery"
+    aria-label="$escapetool.xml($services.localization.render('image.lightbox.gallery.label'))"
     aria-modal="true"
     role="dialog"
   &gt;
@@ -801,38 +835,58 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
     &lt;h3 class="title"&gt;&lt;/h3&gt;
     &lt;a
       class="prev" aria-controls="blueimp-gallery"
-      aria-label="previous slide" aria-keyshortcuts="ArrowLeft"
+      aria-label="$escapetool.xml($services.localization.render('image.lightbox.prevSlide.title'))"
+      title="$escapetool.xml($services.localization.render('image.lightbox.prevSlide.title'))"
+      aria-keyshortcuts="ArrowLeft"
     &gt;&lt;/a&gt;
     &lt;a
       class="next" aria-controls="blueimp-gallery"
-      aria-label="next slide" aria-keyshortcuts="ArrowRight"
+      aria-label="$escapetool.xml($services.localization.render('image.lightbox.nextSlide.title'))"
+      title="$escapetool.xml($services.localization.render('image.lightbox.nextSlide.title'))"
+      aria-keyshortcuts="ArrowRight"
     &gt;&lt;/a&gt;
     &lt;div class="controls btn-group"&gt;
       &lt;a
         class="btn fullscreen" id="lightboxFullscreen" aria-controls="blueimp-gallery"
-        aria-label="fullscreen" aria-keyshortcuts="Fullscreen"
+        aria-label="$escapetool.xml($services.localization.render('image.lightbox.fullscreen.title'))"
+        title="$escapetool.xml($services.localization.render('image.lightbox.fullscreen.title'))"
+        aria-keyshortcuts="F11"
       &gt;$services.icon.renderHTML('arrows')&lt;/a&gt;
       &lt;a
         class="btn download" id="lightboxDownload" aria-controls="blueimp-gallery"
-        aria-label="download" aria-keyshortcuts="Download"
+        aria-label="$escapetool.xml($services.localization.render('image.lightbox.download.title'))"
+        title="$escapetool.xml($services.localization.render('image.lightbox.download.title'))"
       &gt;$services.icon.renderHTML('download')&lt;/a&gt;
       &lt;a
-        class="btn autoPlay" aria-controls="blueimp-gallery" aria-label="autoPlay slideshow"
+        class="btn autoPlay" aria-controls="blueimp-gallery"
+        aria-label="$escapetool.xml($services.localization.render('image.lightbox.autoPlay.title'))"
+        title="$escapetool.xml($services.localization.render('image.lightbox.autoPlay.title'))"
         aria-keyshortcuts="Space" aria-pressed="false"
       &gt;$services.icon.renderHTML('play')&lt;/a&gt;
       &lt;a
         class="btn escape" aria-controls="blueimp-gallery"
-        aria-label="escape" aria-keyshortcuts="Escape"
+        aria-label="$escapetool.xml($services.localization.render('image.lightbox.escape.title'))"
+        title="$escapetool.xml($services.localization.render('image.lightbox.escape.title'))"
+        aria-keyshortcuts="Escape"
       &gt;$services.icon.renderHTML('cross')&lt;/a&gt;
     &lt;/div&gt;
     &lt;div class="lightboxDescription"&gt;
-      &lt;div class="descriptionCol"&gt;
-        &lt;span class="title"&gt;&lt;/span&gt;
+      &lt;div class="descriptionRow"&gt;
+        &lt;span class="caption"
+          aria-label="$escapetool.xml($services.localization.render('image.lightbox.caption.label'))"&gt;&lt;/span&gt;
       &lt;/div&gt;
-      &lt;div class="descriptionCol"&gt;
-        &lt;span class="publisher"&gt;&lt;/span&gt;
-        &lt;span class="date"&gt;&lt;/span&gt;
-       &lt;/div&gt;
+      &lt;div class="descriptionRow"&gt;
+        &lt;div class="descriptionColLeft"&gt;
+          &lt;span class="title"
+            aria-label="$escapetool.xml($services.localization.render('image.lightbox.fileName.label'))"&gt;&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class="descriptionColRight"&gt;
+          &lt;span class="publisher"
+            aria-label="$escapetool.xml($services.localization.render('image.lightbox.publisher.label'))"&gt;&lt;/span&gt;
+          &lt;span class="date"
+            aria-label="$escapetool.xml($services.localization.render('image.lightbox.date.label'))"&gt;&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
     &lt;ol class="indicator"&gt;&lt;/ol&gt;
   &lt;/div&gt;
@@ -844,7 +898,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
       <extensionPointId>org.xwiki.platform.template.header.after</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.template.header.after.image.lightbox</name>
+      <name>org.xwiki.platform.image.lightbox</name>
     </property>
     <property>
       <parameters/>

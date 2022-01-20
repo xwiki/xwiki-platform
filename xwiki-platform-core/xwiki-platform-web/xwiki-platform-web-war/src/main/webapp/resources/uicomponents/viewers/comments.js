@@ -48,19 +48,24 @@ viewers.Comments = Class.create({
 
   /** Constructor. Adds all the JS improvements of the Comments area. */
   initialize : function() {
-    var commentsContent = $('commentscontent');
-    if (commentsContent) {
-      // If the comments area is already visible, enhance them.
-      this.startup();
+    // Make sure this class is initialized only once. This can happen when this file is included several times in 
+    // a page.
+    if (XWiki.viewers.initialized === undefined) {
+      XWiki.viewers.initialized = true;
+      var commentsContent = $('commentscontent');
+      if (commentsContent) {
+        // If the comments area is already visible, enhance them.
+        this.startup();
+      }
+      if ($("Commentstab")) {
+        this.container = $("Commentspane");
+      } else if (commentsContent) {
+        // We need to wrap the comments because we replace all of them when a new comment is added.
+        this.container = commentsContent.wrap('div', {'id': 'Commentspane'});
+      }
+      // We wait for a notification for the AJAX loading of the Comments metadata tab.
+      this.addTabLoadListener();
     }
-    if ($("Commentstab")) {
-      this.container = $("Commentspane");
-    } else if (commentsContent) {
-      // We need to wrap the comments because we replace all of them when a new comment is added.
-      this.container = commentsContent.wrap('div', {'id': 'Commentspane'});
-    }
-    // We wait for a notification for the AJAX loading of the Comments metadata tab.
-    this.addTabLoadListener();
   },
   /** Enhance the Comments UI with JS behaviors. */
   startup : function () {

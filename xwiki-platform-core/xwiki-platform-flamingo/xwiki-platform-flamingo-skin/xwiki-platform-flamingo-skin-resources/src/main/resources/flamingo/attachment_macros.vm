@@ -108,6 +108,16 @@
             }))">$services.icon.renderHTML('eye')</a>
         #end
         #if ($hasEdit || $hasAdmin)
+          #set ($queryString = $escapetool.url({
+            'xpage': 'attachment/move',
+            'attachment': $services.model.serialize($attachmentReference, 'default')
+          }))
+          #set ($moveURL = $xwiki.getURL($attachment.document.documentReference, 'view', $queryString))
+          <a class="btn btn-default btn-xs move-attachment" title="Move or rename this attachment" href="$moveURL#">
+            $services.icon.renderHTML('move')
+          </a> 
+        #end
+        #if ($hasEdit || $hasAdmin)
           ## Delete attachment link.
           ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
           ## By providing an anchor this behavior is stopped, without altering the URL functionality.

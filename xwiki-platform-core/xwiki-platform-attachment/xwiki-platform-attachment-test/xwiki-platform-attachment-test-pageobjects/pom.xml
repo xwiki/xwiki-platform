@@ -20,34 +20,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-attachment</artifactId>
+    <artifactId>xwiki-platform-attachment-test</artifactId>
     <version>14.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-attachment-ui</artifactId>
-  <name>XWiki Platform - Attachment - UI</name>
-  <description>Provides a macro to easily upload and select attachments</description>
-  <packaging>xar</packaging>
-  <properties>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Attachment Application</xwiki.extension.name>
-  </properties>
+  <artifactId>xwiki-platform-attachment-test-pageobjects</artifactId>
+  <name>XWiki Platform - Attachment - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Attachment - Tests - Page Objects</description>
   <dependencies>
-    <!-- Needed since we have a wiki macro and we need the XWiki.WikiMacroClass xclass -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-attachment-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

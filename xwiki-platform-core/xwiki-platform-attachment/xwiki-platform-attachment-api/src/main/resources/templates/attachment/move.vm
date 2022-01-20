@@ -32,8 +32,8 @@
   #template("accessdenied.vm")
 #elseif ($xcontext.action == 'get' && "$!request.moveId" != '')
   #template('job_macros.vm')
-  #set ($jobStatus = $services.job.getJobStatus($stringtool.split($request.jobId, '/')))
-  #outputJobStatusJSON($jobStatus)
+  #set ($moveJobStatus = $services.job.getJobStatus(['refactoring', 'moveAttachment', $request.moveId]))
+  #outputJobStatusJSON($moveJobStatus)
 #else
   #template("startpage.vm")
   #if ("$!step" == '')
@@ -87,9 +87,6 @@
           #if ("$!moveJobException" != '')
             #displayException($services.localization.render('attachment.job.creation.error'), $moveJobException)
           #else
-            #try()
-              #set ($discard = $moveJob.join())
-            #end
             $response.sendRedirect($doc.getURL($xcontext.action, $escapetool.url({
               'xpage': 'attachment/move',
               'moveId': $moveRequest.id.get($mathtool.sub($moveRequest.id.size(), 1))

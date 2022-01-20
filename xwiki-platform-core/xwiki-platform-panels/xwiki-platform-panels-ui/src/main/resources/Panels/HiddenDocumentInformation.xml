@@ -20,30 +20,74 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="Panels.DocumentInformation" locale="">
+<xwikidoc version="1.4" reference="Panels.HiddenDocumentInformation" locale="">
   <web>Panels</web>
-  <name>DocumentInformation</name>
+  <name>HiddenDocumentInformation</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Panels.WebHome</parent>
+  <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Document Information</title>
+  <title>Hidden Document Information</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content/>
   <object>
-    <name>Panels.DocumentInformation</name>
+    <name>Panels.HiddenDocumentInformation</name>
     <number>0</number>
-    <className>Panels.PanelClass</className>
-    <guid>0fc28595-9c62-4ef9-b19b-a937f795efd8</guid>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>9bff1690-44fc-4164-a913-c6c6a0281a9a</guid>
     <class>
-      <name>Panels.PanelClass</name>
+      <name>XWiki.DocumentSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Sheet</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>XWiki.UIExtensionSheet</sheet>
+    </property>
+  </object>
+  <object>
+    <name>Panels.HiddenDocumentInformation</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>32b2e20b-3801-40a9-a946-b3234b2a6d80</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
       <customClass/>
       <customMapping/>
       <defaultViewSheet/>
@@ -57,7 +101,7 @@
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>7</number>
+        <number>3</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -70,7 +114,7 @@
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>8</number>
+        <number>4</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>, </separator>
@@ -86,78 +130,70 @@
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>6</number>
+        <number>2</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </async_enabled>
-      <category>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>category</name>
-        <number>1</number>
-        <prettyName>Category</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>Information|Navigation|Tools|Administration|Other</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </category>
       <content>
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>content</name>
-        <number>5</number>
+        <number>1</number>
         <prettyName>Executed Content</prettyName>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </content>
-      <description>
+      <extensionPointId>
         <disabled>0</disabled>
-        <editor>Text</editor>
-        <name>description</name>
-        <number>2</number>
-        <prettyName>Description</prettyName>
-        <rows>5</rows>
-        <size>40</size>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </description>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>3</number>
-        <prettyName>Name</prettyName>
-        <size>40</size>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
-      <type>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText>forbidden</freeText>
         <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
-        <name>type</name>
-        <number>4</number>
-        <prettyName>Panel type</prettyName>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>view|edit</values>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </type>
+      </scope>
     </class>
     <property>
       <async_cached>0</async_cached>
@@ -169,31 +205,29 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <category>Tools</category>
-    </property>
-    <property>
-      <content>{{velocity}}
-#largepanelheader($services.localization.render('panels.documentInformation.title'))
+      <content>{{template name="display_macros.vm" /}}
 
-{{html}}
-&lt;dl&gt;
-#foreach ($extension in $services.uix.getExtensions('org.xwiki.platform.panels.documentInformation', {'sortByParameter': 'order'}))
-  $services.rendering.render($extension.execute(), 'html/5.0')
-#end
-&lt;/dl&gt;
+{{velocity}}
+##--------------------------------------------------------------------------
+{{html clean="false"}}
+&lt;dt&gt;
+&lt;label for="xhidden"&gt;&lt;input id="xhidden" type="checkbox" name="xhidden" #if($tdoc.isHidden()) checked="checked"#end value="1"/&gt;$services.localization.render('panels.documentInformation.hiddenDocument')&lt;/label&gt;
+&lt;/dt&gt;
+&lt;dd&gt;&lt;input name="xhidden" type="hidden" value="0" /&gt;&lt;/dd&gt;
 {{/html}}
-
-#panelfooter()
 {{/velocity}}</content>
     </property>
     <property>
-      <description>Displays and allows editing the document title and syntax, and lists the included documents.</description>
+      <extensionPointId>org.xwiki.platform.panels.documentInformation</extensionPointId>
     </property>
     <property>
-      <name>Document Information</name>
+      <name>org.xwiki.platform.panels.documentInformation.hidden</name>
     </property>
     <property>
-      <type>edit</type>
+      <parameters>order=300</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

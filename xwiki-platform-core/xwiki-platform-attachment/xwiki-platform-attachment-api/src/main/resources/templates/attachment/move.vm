@@ -46,9 +46,7 @@
   <div id="mainContentArea">
     #if ("$!request.moveId" != '')
       ## Display the move status
-      #template('job_macros.vm')
-      #set ($jobStatus = $services.job.getJobStatus($stringtool.split($request.jobId, '/')))
-      #displayJobStatus($jobStatus)
+      #template("attachment/moveStatus.vm")
     #elseif ($step == 1)
       ## Display the move form
       #template("attachment/moveStep1.vm")

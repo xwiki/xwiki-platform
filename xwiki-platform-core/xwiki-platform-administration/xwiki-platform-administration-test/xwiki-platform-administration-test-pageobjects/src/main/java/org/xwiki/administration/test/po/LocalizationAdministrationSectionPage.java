@@ -22,7 +22,6 @@ package org.xwiki.administration.test.po;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BootstrapSelect;
@@ -52,7 +51,8 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
         super("Localization");
         waitUntilActionButtonIsLoaded();
         // Wait for asynchronous widgets to be loaded
-        getDriver().waitUntilElementIsVisible(By.xpath("(//div[contains(@class, 'bootstrap-select')])[3]"));
+        getDriver().waitUntilCondition(driver -> multiLingualSelect.isDisplayed() && defaultLanguageSelect.isDisplayed()
+            && supportedLanguagesSelect.isDisplayed());
     }
 
     public void setMultiLingual(boolean isMultiLingual)

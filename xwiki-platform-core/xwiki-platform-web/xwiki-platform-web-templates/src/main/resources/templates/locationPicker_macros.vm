@@ -219,7 +219,8 @@
             'showRoot': $showRoot,
             'showTerminalDocuments': $showTerminalDocuments,
             'showTranslations': false,
-            'showWikis': $showWikis
+            'showWikis': $showWikis,
+            'exclusions': "$!options.exclusions"
           })
         </div>
         <div class="modal-footer">

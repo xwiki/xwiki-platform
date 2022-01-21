@@ -78,6 +78,8 @@ public class MoveAttachmentDocumentInitializer extends AbstractMandatoryDocument
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
+        boolean superUpdated = super.updateDocument(document);
+
         List<BaseObject> uIExtensionObjects = document.getXObjects(UI_EXTENSION_CLASS);
         boolean exists = uIExtensionObjects.stream().anyMatch(object ->
             Objects.equals(object.getStringValue(EXTENSION_POINT_ID_PROPERTY), UIPX_ID)
@@ -110,6 +112,6 @@ public class MoveAttachmentDocumentInitializer extends AbstractMandatoryDocument
             document.setHidden(true);
         }
 
-        return !exists || !hidden;
+        return superUpdated || !exists || !hidden;
     }
 }

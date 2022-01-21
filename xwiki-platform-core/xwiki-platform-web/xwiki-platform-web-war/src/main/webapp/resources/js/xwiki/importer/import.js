@@ -133,13 +133,7 @@ var XWiki = (function(XWiki){
             });
         },
 
-        // IE converts 204 status code into 1223...
-        on1223 : function(response)
-        {
-          response.request.options.onSuccess(response);
-        },
-
-        // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+        // 0 is returned for network failures.
         on0 : function(response)
         {
           response.request.options.onFailure(response);
@@ -259,9 +253,6 @@ var XWiki = (function(XWiki){
             // Insert options and button to submit the form.
             this.container.insert(  this.createPackageFormSubmit(this.infos) );
 
-            this.container.down("div.packagesubmit input[type=radio]").checked = true;
-            // The line above should not be needed, but as it appears IE will not let one check a checkbox before it's inserted in the DOM
-
             $('#package').xtree({
               plugins: ['checkbox']
             });
@@ -284,12 +275,8 @@ var XWiki = (function(XWiki){
         {
             this.node.update();
 
-            var errorMessage = "Failed to retrieve package information. Reason: ";
-            if (transport.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-              errorMessage += "Server not responding";
-            } else {
-              errorMessage += transport.statusText;
-            }
+            var errorMessage = "Failed to retrieve package information. Reason: " +
+              (transport.statusText || "Server not responding");
             this.node.removeClassName("loading");
             this.node.update( new Element("div", {'class':'errormessage'}).update(errorMessage) );
         },
@@ -394,12 +381,8 @@ var XWiki = (function(XWiki){
                  $('packagecontainer').update(transport.responseText);
               },
               onFailure: function(transport) {
-                   var errorMessage = "Failed to import documents. Reason: ";
-                   if (transport.statusText == '' /* No response */ || transport.status == 12031 /* In IE */) {
-                     errorMessage += "Server not responding";
-                   } else {
-                     errorMessage += transport.statusText;
-                   }
+                   var errorMessage = "Failed to import documents. Reason: " +
+                     (transport.statusText || "Server not responding");
                    $('packagecontainer').removeClassName("loading");
                    $('packagecontainer').update( new Element("div", {'class':'errormessage'}).update(errorMessage) );
               }

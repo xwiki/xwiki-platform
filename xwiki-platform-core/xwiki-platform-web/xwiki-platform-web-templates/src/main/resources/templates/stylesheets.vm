@@ -62,9 +62,5 @@
     #end
   #end
 #end
-## IE specific stylesheets
-<!--[if IE]>
-  <link href="#concatenateQueryParameter($xwiki.getSkinFile('ie-all.css', true), $urlParameters)" rel="stylesheet" type="text/css" />
-<![endif]-->
 ## Hook for inserting CSS skin extensions
 #styleSheetExtensionHooks

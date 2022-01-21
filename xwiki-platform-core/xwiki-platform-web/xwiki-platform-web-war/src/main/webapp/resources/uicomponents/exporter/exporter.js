@@ -167,7 +167,7 @@ define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], functio
     // * if there's no pagination child node then we decide based on whether the parent node is selected or not. If the
     //   parent node is selected then we use excludes (select the parent except for ...). Otherwise, we use includes
     //   (this has the effect that the child pages that don't appear in the tree, for any reason, are not included).
-    var paginationNode = findPaginationNode(childNodes);
+    var paginationNode = childNodes.find(childNode => childNode.data.type === 'pagination');
     var useExcludes = (!tree.is_loaded(parentNode) && tree.is_undetermined(parentNode)) ||
       (paginationNode && tree.is_checked(paginationNode)) ||
       (!paginationNode && tree.is_checked(parentNode));
@@ -195,16 +195,6 @@ define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], functio
         collectExportPages(tree, child, exportPages);
       }
     });
-  };
-
-  // Just because IE11 doesn't support Array.find() ...
-  var findPaginationNode = function(nodes) {
-    for (var i = nodes.length - 1; i >= 0; i--) {
-      var node = nodes[i];
-      if (node.data.type === 'pagination') {
-        return node;
-      }
-    }
   };
 
   var exportTreeAPI = {

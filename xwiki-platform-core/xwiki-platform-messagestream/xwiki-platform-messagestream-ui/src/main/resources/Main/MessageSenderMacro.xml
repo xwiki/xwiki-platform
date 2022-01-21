@@ -185,12 +185,7 @@ XWiki.MessageStream = Class.create({
               document.fire('xwiki:activity:newActivity', msForm);
             },
             onFailure: function(response) {
-              var failureReason = '';
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              } else {
-                failureReason = response.statusText;
-              }
+              var failureReason = response.statusText || 'Server not responding';
               if (msForm) {
                 msForm._disabled = false
                 if (msForm._notification) {

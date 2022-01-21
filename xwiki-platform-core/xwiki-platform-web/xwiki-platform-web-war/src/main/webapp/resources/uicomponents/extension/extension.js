@@ -129,10 +129,7 @@ XWiki.ExtensionBehaviour = Class.create({
       });
       return false;
     } else {
-      var failureReason = response.statusText;
-      if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-        failureReason = 'Server not responding';
-      }
+      var failureReason = response.statusText || 'Server not responding';
       new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('extensions.info.fetch.failed'))" + failureReason, "error");
       return true;
     }

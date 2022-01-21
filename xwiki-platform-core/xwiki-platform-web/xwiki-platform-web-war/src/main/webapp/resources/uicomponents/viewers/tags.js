@@ -61,7 +61,7 @@ viewers.Tags = Class.create({
             onFailure : function (response) {
                new XWiki.widgets.Notification(response.responseText || 'Server not responding', "error");
             },
-            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+            // 0 is returned for network failures.
             on0 : function(response) {
               response.request.options.onFailure(response);
             },
@@ -101,7 +101,7 @@ viewers.Tags = Class.create({
               onFailure : function (response) {
                 new XWiki.widgets.Notification(response.responseText || 'Server not responding', "error");
               },
-              // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+              // 0 is returned for network failures.
               on0 : function(response) {
                 response.request.options.onFailure(response);
               },
@@ -152,7 +152,7 @@ viewers.Tags = Class.create({
               form.enable();
               form.notification.hide();
             },
-            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+            // 0 is returned for network failures.
             on0 : function(response) {
               response.request.options.onFailure(response);
             }

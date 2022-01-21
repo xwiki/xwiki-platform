@@ -1165,8 +1165,6 @@
 @dropdown-bg:                    @gray-light;
 //** Dropdown menu `border-color`.
 @dropdown-border:                transparent;
-//** Dropdown menu `border-color` **for IE8**.
-@dropdown-fallback-border:       transparent;
 //** Divider color for between dropdown items.
 @dropdown-divider-bg:            @body-bg;
 
@@ -1471,8 +1469,6 @@
 @popover-max-width:                   276px;
 //** Popover border color
 @popover-border-color:                transparent;
-//** Popover fallback border color
-@popover-fallback-border-color:       transparent;
 
 //** Popover title background color
 @popover-title-bg:                    @table-bg-hover;
@@ -1486,8 +1482,6 @@
 @popover-arrow-outer-width:           (@popover-arrow-width + 1);
 //** Popover outer arrow color
 @popover-arrow-outer-color:           transparent;
-//** Popover outer arrow fallback color
-@popover-arrow-outer-fallback-color:  transparent;
 
 
 //== Labels
@@ -1529,8 +1523,6 @@
 @modal-content-bg:                             @gray-light;
 //** Modal content border color
 @modal-content-border-color:                   transparent;
-//** Modal content border color **for IE8**
-@modal-content-fallback-border-color:          transparent;
 
 //** Modal backdrop background color
 @modal-backdrop-bg:           #000;

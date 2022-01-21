@@ -162,14 +162,6 @@ editors.AutoSave = Class.create({
         // no: restore the previous value in the input
         this.autosaveInput.value = this.options.frequency;
       }
-      // The input element should look like plain text when not focused.
-      // Since IE doesn't understand :focused, use a classname
-      this.autosaveInput.removeClassName('focused');
-    }.bindAsEventListener(this));
-
-    // The input element should look like any input when focused
-    Event.observe(this.autosaveInput, "focus", function() {
-      this.autosaveInput.addClassName('focused');
     }.bindAsEventListener(this));
 
     this._toggleTimerWhenSaveButtonIsEnabledOrDisabled();

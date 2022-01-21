@@ -105,10 +105,7 @@ define('xwiki-livedata', [
   const Logic = function (element) {
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-config") || "{}");
-    if(this.data.entries) {
-      // Calling Object.freeze(undefined) on IE11 triggers an exception. 
-      this.data.entries = Object.freeze(this.data.entries);
-    }
+    this.data.entries = Object.freeze(this.data.entries);
 
     // Reactive properties must be initialized before Vue is instantiated.
     this.firstEntriesLoading = true;
@@ -543,12 +540,7 @@ define('xwiki-livedata', [
     updateEntries () {
       return this.fetchEntries()
         .then(data => {
-          if(data) {
-            // Calling Object.freeze(undefined) on IE11 triggers an exception.
-            this.data.data = Object.freeze(data);
-          } else {
-            this.data.data = undefined;
-          }
+          this.data.data = Object.freeze(data);
           // Remove the outdated footnotes, they will be recomputed by the new entries.
           this.footnotes.reset()
         })

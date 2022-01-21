@@ -201,10 +201,7 @@ viewers.Comments = Class.create({
                 });
               }.bind(this),
               onFailure : function (response) {
-                var failureReason = response.statusText;
-                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                  failureReason = 'Server not responding';
-                }
+                var failureReason = response.statusText || 'Server not responding';
                 item._x_notification.replace(new XWiki.widgets.Notification(
                     "$services.localization.render('core.viewers.comments.editForm.fetch.failed')" + failureReason,
                     "error"));
@@ -339,10 +336,7 @@ viewers.Comments = Class.create({
               this.editing = false;
             }.bind(this),
             onFailure : function (response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
+              var failureReason = response.statusText || 'Server not responding';
               form._x_notification.replace(new XWiki.widgets.Notification(
                   "$services.localization.render('core.viewers.comments.add.failed')" + failureReason, "error"));
             }.bind(this),
@@ -478,10 +472,7 @@ viewers.Comments = Class.create({
             notification.hide();
           }.bind(this),
           onFailure: function (response) {
-            var failureReason = response.statusText;
-            if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-              failureReason = 'Server not responding';
-            }
+            var failureReason = response.statusText || 'Server not responding';
             notification.replace(new XWiki.widgets.Notification(
                 "$services.localization.render('core.viewers.comments.preview.failed')" + failureReason, "error"));
           },

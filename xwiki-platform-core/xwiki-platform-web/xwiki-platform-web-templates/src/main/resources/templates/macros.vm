@@ -2351,18 +2351,6 @@ $displayName##
 #end
 
 #**
- * Macro that displays a gradient specific to IE browsers (IE6-IE9)
- *
- * @param $startColor initial color for a gradient, format #AARRGGBB, range from #FF000000 to #FFFFFFFF
- * @param $endColor final color for the gradient
- *#
-#macro (css_filterGradient $startColor $endColor)
-  #if (("$!{startColor}" != '') && ("$!{endColor}" != ''))
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=${startColor}, endColorstr=${endColor},GradientType=0 );
-  #end
-#end
-
-#**
  * Macro that adds the prefixes for box-sizing CSS property that alters the default CSS box model used to calculate widths and heights of elements
  *
  *

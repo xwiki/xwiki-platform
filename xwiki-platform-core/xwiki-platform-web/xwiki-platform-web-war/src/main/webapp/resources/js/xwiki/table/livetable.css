@@ -337,13 +337,11 @@ div.xwiki-livetable-pagination-content span.pagenumber:focus {
 }
 
 .icon-manage {
-  box-sizing: content-box; /* Needed by IE9- */
   cursor: pointer;
   padding-right: 10px;
 }
 
 .icon-manageg {
-  box-sizing: content-box; /* Needed by IE */
   padding-right: 10px;
 }
 

@@ -354,10 +354,7 @@ editors.XDataEditors = Class.create({
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.done')", "done"));
               }.bind(this),
               onFailure : function(response) {
-                var failureReason = response.statusText;
-                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                  failureReason = 'Server not responding';
-                }
+                var failureReason = response.statusText || 'Server not responding';
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.failed')" + failureReason, "error"));
               },
               onComplete : function() {
@@ -367,11 +364,7 @@ editors.XDataEditors = Class.create({
                 });
                 document.fire('xwiki:dom:refresh');
               },
-              // IE converts 204 status code into 1223...
-              on1223 : function(response) {
-                response.request.options.onSuccess(response);
-              },
-              // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+              // 0 is returned for network failures.
               on0 : function(response) {
                 response.request.options.onFailure(response);
               }
@@ -509,20 +502,13 @@ editors.XDataEditors = Class.create({
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.removeDeprecatedProperties.done')", "done"));
               },
               onFailure : function(response) {
-                var failureReason = response.statusText;
-                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                  failureReason = 'Server not responding';
-                }
+                var failureReason = response.statusText || 'Server not responding';
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.removeDeprecatedProperties.failed')" + failureReason, "error"));
               },
               onComplete : function() {
                 item.disabled = false;
               },
-              // IE converts 204 status code into 1223...
-              on1223 : function(response) {
-                response.request.options.onSuccess(response);
-              },
-              // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+              // 0 is returned for network failures.
               on0 : function(response) {
                 response.request.options.onFailure(response);
               }
@@ -703,18 +689,11 @@ editors.XDataEditors = Class.create({
               object.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.done')", "done"));
             }.bind(this),
             onFailure : function(response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
+              var failureReason = response.statusText || 'Server not responding';
               object.removeClassName('loading');
               object.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.failed') " + failureReason, "error"));
             },
-            // IE converts 204 status code into 1223...
-            on1223 : function(response) {
-              response.request.options.onSuccess(response);
-            },
-            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+            // 0 is returned for network failures.
             on0 : function(response) {
               response.request.options.onFailure(response);
             }

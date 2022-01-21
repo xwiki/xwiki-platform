@@ -24,9 +24,8 @@ if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeo
   }
 } else {
 /**
- * An AJAX request performed only if the user confirms the action in a modal dialog. It also forwards IE specific status
- * codes for 204 responses to the correct onSuccess function, and it displays (if configured) notification messages for
- * progress, success and failure.
+ * An AJAX request performed only if the user confirms the action in a modal dialog. It also displays (if configured)
+ * notification messages for progress, success and failure.
  * <p>Usage:</p>
  * <code>new XWiki.widgets.ConfirmedAjaxRequest(requestURL, ajaxRequestParameters, interactionParameters)</code>
  * where:
@@ -52,11 +51,7 @@ if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeo
 XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ConfirmationBox, {
   /** Some functions to fix several browser specific problems */
   defaultAjaxRequestParameters : {
-    // IE converts 204 status code into 1223...
-    on1223 : function(response) {
-      response.request.options.onSuccess(response);
-    },
-    // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+    // 0 is returned for network failures.
     on0 : function(response) {
       response.request.options.onFailure(response);
     }
@@ -90,10 +85,7 @@ XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ConfirmationBox,
       }.bind(this),
       onFailure : function(response) {
         if (this.interactionParameters.displayFailureMessage) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           if (this.progressNotification) {
             this.progressNotification.replace(new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error"));
           } else {

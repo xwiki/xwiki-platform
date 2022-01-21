@@ -32,8 +32,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
@@ -49,10 +48,6 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  */
 public class BasePage extends BaseElement
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
-
-    private static final By DRAWER_MATCHER = By.id("tmDrawer");
-
     /**
      * Used for sending keyboard shortcuts to.
      */
@@ -80,7 +75,7 @@ public class BasePage extends BaseElement
     @FindBy(id = "tmPage")
     private WebElement pageMenu;
 
-    @FindBys({ @FindBy(id = "tmRegister"), @FindBy(tagName = "a") })
+    @FindBys({@FindBy(id = "tmRegister"), @FindBy(tagName = "a")})
     private WebElement registerLink;
 
     @FindBy(xpath = "//a[@id='tmLogin']")
@@ -291,14 +286,10 @@ public class BasePage extends BaseElement
      */
     public void toggleDrawer()
     {
-        if (isElementVisible(DRAWER_MATCHER)) {
-            // The drawer is visible, so we close it by clicking outside the drawer
-            this.mainContainerDiv.click();
-            getDriver().waitUntilElementDisappears(DRAWER_MATCHER);
+        if (isDrawerVisible()) {
+            hideDrawer();
         } else {
-            // The drawer is not visible, so we open it
-            this.drawerActivator.click();
-            getDriver().waitUntilElementIsVisible(DRAWER_MATCHER);
+            showDrawer();
         }
     }
 
@@ -309,10 +300,10 @@ public class BasePage extends BaseElement
      */
     public boolean showDrawer()
     {
-        if (!isElementVisible(DRAWER_MATCHER)) {
-            // The drawer is not visible, so we open it
+        if (!isDrawerVisible()) {
+            // Open the drawer.
             this.drawerActivator.click();
-            getDriver().waitUntilElementIsVisible(DRAWER_MATCHER);
+            waitForDrawer(true);
 
             return true;
         }
@@ -327,18 +318,24 @@ public class BasePage extends BaseElement
      */
     public boolean hideDrawer()
     {
-        if (isElementVisible(DRAWER_MATCHER)) {
-            // The drawer is visible, so we close it by clicking outside the drawer
+        if (isDrawerVisible()) {
+            // Close the drawer by clicking outside.
             // We don't perform directly a click since it could lead to a
             // org.openqa.selenium.ElementClickInterceptedException because of a drawer-overlay above it.
             // The click through action is performed with a move and click, which is what we really want.
             getDriver().createActions().click(this.mainContainerDiv).perform();
-            getDriver().waitUntilElementDisappears(DRAWER_MATCHER);
+            waitForDrawer(false);
 
             return true;
         }
 
         return false;
+    }
+
+    private void waitForDrawer(boolean visible)
+    {
+        getDriver().waitUntilCondition(
+            ExpectedConditions.attributeToBe(this.drawerActivator, "aria-expanded", String.valueOf(visible)));
     }
 
     /**
@@ -347,7 +344,7 @@ public class BasePage extends BaseElement
      */
     public boolean isDrawerVisible()
     {
-        return isElementVisible(DRAWER_MATCHER);
+        return "true".equals(this.drawerActivator.getAttribute("aria-expanded"));
     }
 
     /**
@@ -426,7 +423,6 @@ public class BasePage extends BaseElement
      * Specific delete action when the delete action is performed on a page.
      *
      * @return a specialized confirmation page for page deletion
-     *
      * @since 12.8RC1
      */
     public DeletePageConfirmationPage deletePage()
@@ -529,10 +525,8 @@ public class BasePage extends BaseElement
         languagesElement.click();
 
         // Wait for the languages submenu to be open
-        getDriver().waitUntilCondition(webDriver ->
-                getDriver().findElementWithoutWaiting(By.id("tmLanguages_menu")).getAttribute("class")
-                        .contains("collapse in")
-        );
+        getDriver().waitUntilCondition(webDriver -> getDriver().findElementWithoutWaiting(By.id("tmLanguages_menu"))
+            .getAttribute("class").contains("collapse in"));
 
         // Click passed locale
         WebElement localeElement = getDriver().findElementWithoutWaiting(
@@ -660,8 +654,8 @@ public class BasePage extends BaseElement
      */
     public boolean hasLeftPanel(String panelTitle)
     {
-        return getDriver().hasElementWithoutWaiting(By.xpath(
-            "//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle +"']"));
+        return getDriver().hasElementWithoutWaiting(
+            By.xpath("//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle + "']"));
     }
 
     public boolean isForbidden()
@@ -676,8 +670,9 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Use the following keyboard shortcut and wait for a new page to load.
-     * This should be only used for shortcuts that indeed loads a new page.
+     * Use the following keyboard shortcut and wait for a new page to load. This should be only used for shortcuts that
+     * indeed loads a new page.
+     * 
      * @param shortcut the keyboard key combination to perform.
      */
     private void useShortcutKeyAndLoads(CharSequence... shortcut)
@@ -689,6 +684,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to edit page.
+     * 
      * @return a new {@link EditPage}
      * @since 11.9RC1
      */
@@ -700,6 +696,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to wiki edit page.
+     * 
      * @return a new {@link WikiEditPage}
      * @since 11.9RC1
      */
@@ -711,6 +708,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to WYSIWYG edit page.
+     * 
      * @return a new {@link WYSIWYGEditPage}
      * @since 11.9RC1
      */
@@ -722,6 +720,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to Inline Form edit page.
+     * 
      * @return a new {@link InlinePage}
      * @since 11.9RC1
      */
@@ -733,8 +732,9 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to rights edit page.
+     * 
      * @return a new {@link BasePage}: it can be actually either a {@link RightsEditPage} or an AdministrationPage
-     *          depending if the page is terminal or not.
+     *         depending if the page is terminal or not.
      * @since 11.9RC1
      */
     public BasePage useShortcutKeyForRightsEditing()
@@ -745,6 +745,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to object edit page.
+     * 
      * @return a new {@link ObjectEditPage}
      * @since 11.9RC1
      */
@@ -756,6 +757,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to class edit page.
+     * 
      * @return a new {@link ClassEditPage}
      * @since 11.9RC1
      */
@@ -767,6 +769,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to delete page.
+     * 
      * @return a new {@link ConfirmationPage}
      * @since 11.9RC1
      */
@@ -778,6 +781,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to rename page.
+     * 
      * @return a new {@link RenamePage}
      * @since 11.9RC1
      */
@@ -789,6 +793,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to the source view of a page.
+     * 
      * @return a new {@link ViewPage}
      * @since 11.9RC1
      */

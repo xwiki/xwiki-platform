@@ -78,7 +78,7 @@
         <property name="minorEdit1" type="boolean" column="XWD_MINOREDIT" index="DOC_MINOREDIT" not-null="true" />
         <property name="syntaxId" type="string" column="XWD_SYNTAX_ID" length="50" />
         <property name="hidden" type="boolean" column="XWD_HIDDEN" index="DOC_HIDDEN" not-null="true" />
-        <property name="originalMetadataAuthorReference" type="string" column="XWD_DISPLAYED_AUTHOR_REFERENCE" length="768" index="DOC_DISPLAYED_AUTHOR_REFERENCE" />
+        <property name="originalMetadataAuthorReference" type="string" column="XWD_ORIGINAL_METADATA_AUTHOR" length="768" index="DOC_ORIGINAL_METADATA_AUTHOR" />
     </class>
 
     <!-- com.xpn.xwiki.doc.XWikiSpace root -->

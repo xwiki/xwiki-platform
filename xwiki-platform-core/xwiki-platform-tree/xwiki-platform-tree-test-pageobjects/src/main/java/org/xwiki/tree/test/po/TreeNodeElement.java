@@ -101,8 +101,7 @@ public class TreeNodeElement extends BaseElement
      */
     public WebElement getLabelElement()
     {
-        String labelId = getElement().getAttribute("aria-labelledby");
-        return getElement().findElement(By.id(labelId));
+        return getElement().findElement(By.xpath("./*[@role = 'treeitem']"));
     }
 
     /**
@@ -111,7 +110,7 @@ public class TreeNodeElement extends BaseElement
     public List<TreeNodeElement> getChildren()
     {
         List<TreeNodeElement> children = new ArrayList<>();
-        for (WebElement childElement : getElement().findElements(By.xpath("./ul/li"))) {
+        for (WebElement childElement : getElement().findElements(By.xpath("./ul[@role = 'group']/li"))) {
             children.add(new TreeNodeElement(this.treeElement, By.id(childElement.getAttribute(ID))));
         }
         return children;
@@ -130,7 +129,7 @@ public class TreeNodeElement extends BaseElement
      */
     public boolean isOpen()
     {
-        return Boolean.valueOf(getElement().getAttribute("aria-expanded"));
+        return Boolean.valueOf(getLabelElement().getAttribute("aria-expanded"));
     }
 
     /**
@@ -138,7 +137,7 @@ public class TreeNodeElement extends BaseElement
      */
     public boolean isSelected()
     {
-        return Boolean.valueOf(getElement().getAttribute("aria-selected"));
+        return Boolean.valueOf(getLabelElement().getAttribute("aria-selected"));
     }
 
     /**

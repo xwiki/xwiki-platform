@@ -297,7 +297,6 @@ var XWiki = (function(XWiki) {
         method : 'post',
         parameters : formData.toQueryString(),
         onSuccess : this.onSuccess.bind(this, state),
-        on1223 : this.on1223.bind(this),
         on0 : this.on0.bind(this),
         on409 : this.on409.bind(this, state),
         on401 : this.on401.bind(this, state),
@@ -467,7 +466,6 @@ var XWiki = (function(XWiki) {
             method : 'post',
             parameters : "form_token=" + answerJson.newToken,
             onSuccess : self.onSuccess.bind(self, state),
-            on1223 : self.on1223.bind(self),
             on0 : self.on0.bind(self),
             on409 : self.on409.bind(self, state),
             on401 : self.on401.bind(self, state),
@@ -702,7 +700,6 @@ var XWiki = (function(XWiki) {
             this.maybeRedirect(state.isContinue);
           }
         }.bind(this),
-        on1223 : this.on1223.bind(this),
         on0 : this.on0.bind(this),
         onFailure : this.onFailure.bind(this, state)
       });

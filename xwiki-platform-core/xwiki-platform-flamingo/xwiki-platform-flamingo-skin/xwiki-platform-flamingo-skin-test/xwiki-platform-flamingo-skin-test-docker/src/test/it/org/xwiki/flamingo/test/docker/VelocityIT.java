@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -157,7 +158,8 @@ public class VelocityIT
 
         // we cannot check the actual content here, so we're just checking the presence of the CSS class related to
         // code.vm in the content view.
-        assertNotNull(testUtils.getDriver().findElement(By.xpath("//div[@id='xwikicontent']//.[@class='wiki-code']")));
+        WebElement content = testUtils.getDriver().findElementWithoutWaiting(By.id("xwikicontent"));
+        assertNotNull(testUtils.getDriver().findElementWithoutWaiting(content, By.className("wiki-code")));
 
         viewPage = testUtils.createPage(testReference, "{{velocity}}"
             + String.format(templateCode, "../../")

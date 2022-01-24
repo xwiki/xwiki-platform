@@ -197,7 +197,7 @@
 {{/velocity}}</content>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.rendering.error.afterDescription.rendering.macro.error.unknown</extensionPointId>
+      <extensionPointId>org.xwiki.platform.rendering.error.afterDescription.rendering.macro.error.unknown</extensionPointId>
     </property>
     <property>
       <name>extension.rendering.macro.error.unknown</name>

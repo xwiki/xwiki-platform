@@ -48,7 +48,7 @@
     #if ($renderingerror.stackTrace)
       $services.rendering.escape($renderingerror.stackTrace, 'xwiki/2.1')
     #end
-    #uiExtensions('org.xwiki.plaftorm.rendering.error.afterDescription')
-    #uiExtensions("org.xwiki.plaftorm.rendering.error.afterDescription.${renderingerror.messageId}")
+    #uiExtensions('org.xwiki.platform.rendering.error.afterDescription')
+    #uiExtensions("org.xwiki.platform.rendering.error.afterDescription.${renderingerror.messageId}")
   {{/box}}
 {{/velocity}}

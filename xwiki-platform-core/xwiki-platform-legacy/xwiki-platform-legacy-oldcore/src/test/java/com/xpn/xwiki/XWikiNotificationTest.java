@@ -21,8 +21,6 @@ package com.xpn.xwiki;
 
 import java.lang.reflect.InvocationTargetException;
 
-import javax.inject.Provider;
-
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
@@ -35,7 +33,6 @@ import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;

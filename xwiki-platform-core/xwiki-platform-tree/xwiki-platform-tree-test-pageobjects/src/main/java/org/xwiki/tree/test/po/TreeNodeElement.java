@@ -20,6 +20,7 @@
 package org.xwiki.tree.test.po;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -137,7 +138,9 @@ public class TreeNodeElement extends BaseElement
      */
     public boolean isSelected()
     {
-        return Boolean.valueOf(getLabelElement().getAttribute("aria-selected"));
+        // We can't rely on the 'aria-selected' attribute because of https://github.com/vakata/jstree/issues/2596
+        // (aria-selected is not updated when using parent checkbox to check/uncheck child elements)
+        return Arrays.asList(getLabelElement().getAttribute(CLASS).split("\\s+")).contains("jstree-clicked");
     }
 
     /**

@@ -610,9 +610,6 @@ $xwiki.jsx.use($attachmentPickerDocName)
                 new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error");
               }
             },
-            on1223 : function(response) {
-              response.request.options.onSuccess(response);
-            },
             on0 : function(response) {
               response.request.options.onFailure(response);
             },

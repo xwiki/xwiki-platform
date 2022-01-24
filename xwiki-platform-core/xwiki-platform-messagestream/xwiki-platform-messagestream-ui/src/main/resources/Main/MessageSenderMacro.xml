@@ -194,9 +194,6 @@ XWiki.MessageStream = Class.create({
                 msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.failed'): " + failureReason, 'error');
               }
             },
-            on1223 : function(response) { /*SUCCESS*/
-              response.request.options.onSuccess(response);
-            },
             on0 : function(response) {  /*FAILURE*/
               response.request.options.onFailure(response);
             },

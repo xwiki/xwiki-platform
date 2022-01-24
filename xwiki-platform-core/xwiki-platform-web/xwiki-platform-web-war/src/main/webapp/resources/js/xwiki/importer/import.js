@@ -127,7 +127,6 @@ var XWiki = (function(XWiki){
 
             var ajx = new Ajax.Request(url, {
                 onSuccess: this.onSuccess.bindAsEventListener(this),
-                on1223 : this.on1223.bindAsEventListener(this),
                 on0 : this.on0.bindAsEventListener(this),
                 onFailure : this.onFailure.bind(this)
             });

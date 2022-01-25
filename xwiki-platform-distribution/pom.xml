@@ -282,32 +282,6 @@
                 <checkCompileClasspath>false</checkCompileClasspath>
                 <checkTestClasspath>false</checkTestClasspath>
                 <exceptions>
-                  <!-- None of these should bundle org.w3c classes but at least they seem compatible.
-                       See https://issues.apache.org/bugzilla/show_bug.cgi?id=49897,
-                       https://issues.apache.org/bugzilla/show_bug.cgi?id=49206 and http://bugs.jython.org/issue2121 -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>org.apache.xmlgraphics</groupId>
-                        <artifactId>batik-ext</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <classes>
-                      <class>org.w3c.dom.ElementTraversal</class>
-                      <class>org.w3c.dom.events.DocumentEvent</class>
-                      <class>org.w3c.dom.events.Event</class>
-                      <class>org.w3c.dom.events.EventException</class>
-                      <class>org.w3c.dom.events.EventListener</class>
-                      <class>org.w3c.dom.events.EventTarget</class>
-                      <class>org.w3c.dom.events.MouseEvent</class>
-                      <class>org.w3c.dom.events.MutationEvent</class>
-                      <class>org.w3c.dom.events.UIEvent</class>
-                    </classes>
-                  </exception>
                   <!-- This is a PITA. The classes are actually incompatible! We should do something about it but I
                        don't see a solution ATM... -->
                   <exception>
@@ -367,22 +341,6 @@
                     </conflictingDependencies>
                     <packages>
                       <package>org.xmlpull</package>
-                    </packages>
-                  </exception>
-                  <!-- Seems to be the same thing -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <packages>
-                      <package>javax.xml.namespace</package>
                     </packages>
                   </exception>
                   <!-- Does not seems to be an issue -->

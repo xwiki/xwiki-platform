@@ -48,13 +48,6 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
-      <exclusions>
-        <!-- Avoid conflict with the standard JVM classes -->
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- We need this dependency so that the wrapped module is built before this one -->
     <dependency>
@@ -63,13 +56,6 @@
       <version>${project.version}</version>
       <!-- We don't want to draw this dependency since we're wrapping it -->
       <scope>provided</scope>
-      <exclusions>
-        <!-- Avoid conflict with the standard JVM classes -->
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- Legacy oldcore needs some legacy classes from legacy URL -->

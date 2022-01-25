@@ -566,6 +566,8 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # extension.ignoredDependencies=stax:stax-api
 # extension.ignoredDependencies=xalan:xalan
 # extension.ignoredDependencies=xalan:serializer
+# extension.ignoredDependencies=xml-apis:xml-apis
+# extension.ignoredDependencies=xerces:xmlParserAPIs
 
 #-------------------------------------------------------------------------------------
 # Distribution Wizard

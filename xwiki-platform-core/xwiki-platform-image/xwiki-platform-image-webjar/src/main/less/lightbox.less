@@ -1,0 +1,82 @@
+/*! #template('colorThemeInit.vm') */
+
+@bg-color: $theme.pageContentBackgroundColor;
+@text-color: $theme.textColor;
+
+#blueimp-gallery {
+  > div.slides img {
+    bottom: 15%;
+  }
+
+  > .indicator {
+    bottom: 10%;
+  }
+
+  .controls {
+    position: absolute;
+    top: 3%;
+    right: 3%;
+    opacity: .8;
+    cursor: pointer;
+  }
+
+  .lightboxDescription {
+    background-color: @bg-color;
+    color: @text-color;
+    display: block;
+    position: absolute;
+    width: 100%;
+    padding: 0.3% 1%;
+    bottom: 0;
+
+    .descriptionRow {
+      position: relative;
+      height: 100%;
+    }
+
+    .descriptionColLeft {
+      float: left;
+      width: 68%;
+      font-size: smaller;
+    }
+
+    .descriptionColRight {
+      float: right;
+      width: 30%;
+      font-size: smaller;
+    }
+  }
+}
+.blueimp-gallery {
+  .fullscreen:hover,
+  .download:hover,
+  .autoPlay:hover,
+  .escape:hover {
+    color: @bg-color;
+    opacity: 1;
+  }
+
+  .fullscreen,
+  .download,
+  .autoPlay,
+  .escape {
+    display: none;
+  }
+}
+.blueimp-gallery-controls {
+  .fullscreen,
+  .download,
+  .autoPlay,
+  .escape {
+    display: block;
+    /* Fix z-index issues (controls behind slide element) on Android: */
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+#toolbarTemplate {
+  display: none;
+}

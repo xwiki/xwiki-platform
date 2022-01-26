@@ -132,74 +132,66 @@
   ]
 });
 
-require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-gallery', 'blueimp-gallery-fullscreen', 'blueimp-gallery-indicator'], function($, xm, l10n, gallery) {
+require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-gallery-fullscreen',
+    'blueimp-gallery-indicator'], function($, xm, gallery, l10n) {
   var myOpenLightbox;
+  var timeout;
 
   /*
    * Make sure that the toolbar will remain open also while hovering it, not just the image.
    */
   var keepToolbarOpenOnHover = function(image) {
-    var timeout = setTimeout(function() {
+    timeout = setTimeout(function() {
       image.popover('hide');
     }, 3000);
-    $('.imageToolbar').on('mouseenter', function() {
+    $('.popover').on('mouseenter', function() {
       clearTimeout(timeout);
     });
-    $('.imageToolbar').parent().on('mouseleave', function() {
+    $('.popover').on('mouseleave', function() {
       image.popover('hide');
-    });
-  }
-
-  /**
-   * Assign to each given image a toolbar popover with download and lightbox options.
-   */
-  var enableToolbarPopovers = function(images) {
-    images.each(function(index) {
-      var image = $(this);
-      image.popover({
-        content: function() {
-          return `
-            &lt;div class="btn-group imageToolbar"&gt;
-              &lt;a id="openLightbox"
-                title="$escapetool.xml($services.localization.render('image.lightbox.gallery.title'))"&gt;
-                  $services.icon.renderHTML("arrows")
-              &lt;/a&gt;
-              &lt;a id="imageDownload" href="${image[0].src}" target="_blank"
-                title="$escapetool.xml($services.localization.render('image.lightbox.download.title'))"&gt;
-                  $services.icon.renderHTML("download")
-              &lt;/a&gt;
-            &lt;/div&gt;`;
-        },
-        html: true,
-        // The popover needs to be placed outside of the xwiki content to not depend on it's overflow.
-        container: 'body',
-        placement: 'bottom',
-        trigger: 'manual'
-      }).on('mouseenter', function() {
-        image.popover('show');
-        $('#openLightbox').data('index', index);
-        keepToolbarOpenOnHover(image);
-      }).on('show.bs.popover', function() {
-        // Set the attributes for the download button inside lightbox. Since IE11 does not have support for the download attribute,
-        // the image will be displayed in another tab.
-        $('#lightboxDownload').attr('href', image[0].src);
-        $('#lightboxDownload').attr('download', getImageName(image[0].src));
-        $('#lightboxDownload').attr('target', '_blank');
-      }).on('shown.bs.popover', function() {
-        // The popover content does not accept the download attribute, so we need to set this manually.
-        $('#imageDownload').attr('download', getImageName(image[0].src));
-      });
     });
   };
 
   /**
-   * Remove the popover for the given elements.
+   * Assign to each selected image a toolbar popover with download and lightbox options.
    */
-  var removePopovers = function(elements) {
-    elements.each(function(index) {
-      $(this).popover('destroy');
+  var enableToolbarPopovers = function() {
+    // Activate the lightbox for all images inside the xwikicontent.
+    $('#xwikicontent img').popover({
+      content: function() {
+        return $('#toolbarTemplate').html();
+      },
+      html: true,
+      // The popover needs to be placed outside of the xwiki content to not depend on it's overflow.
+      container: 'body',
+      placement: 'bottom',
+      trigger: 'manual'
+    }).on("show.bs.popover", function(e){
+      var img = e.target;
+      // Hide all other popovers.
+      $('.popover').hide();
+      // Set the attributes for the download button inside lightbox.
+      $('#lightboxDownload').attr('href', img.src);
+      $('#lightboxDownload').attr('download', getImageName(img.src));
+      // Remember the index of the image to show first.
+      $('#openLightbox').data('index', [...$('#xwikicontent img')].indexOf(img));
+    }).on('shown.bs.popover', function(e) {
+      $('.popover .imageDownload').attr('href', e.target.src);
+      $('.popover .imageDownload').attr('download', getImageName(e.target.src));
+    }).on('mouseenter', function() {
+      clearTimeout(timeout);
+      $(this).popover('show');
+    }).on('mouseleave', function() {
+      keepToolbarOpenOnHover($(this));
     });
-  }
+  };
+
+  /**
+   * Remove the image toolbars popovers.
+   */
+  var closeImageToolbars = function() {
+    $('.popover').popover('destroy');
+  };
 
   /*
    * Extract the image name from the url. This may not be applied for external urls.
@@ -250,7 +242,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
    */
   var updateLightboxDescription = function(data, caption) {
     if (data != undefined) {
-      $('.lightboxDescription').css("display", "block");
+      $('.lightboxDescription').css('display', 'block');
       $('.lightboxDescription').find('.title').text(data.name);
       var translationPublisher = l10n.get('author', XWiki.Model.resolve(data.author, XWiki.EntityType.DOCUMENT).name);
       $('.lightboxDescription').find('.publisher').text(translationPublisher);
@@ -263,9 +255,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
         $('.lightboxDescription').find('.caption').empty();
       }
     } else {
-      $(".lightboxDescription").css("display", "none");
+      $('.lightboxDescription').css('display', 'none');
     }
-  }
+  };
 
   /**
    * Get information for attachment, when this can be found inside the current page.
@@ -288,9 +280,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
 
   var getImageCaption = function(image) {
     if (image.closest('figure').length &gt; 0) {
-      return image.parent().siblings('figcaption').text();
+      return image.closest('p').siblings('figcaption').text();
     }
-  }
+  };
 
   /**
    * Open Gallery lightbox at the current index.
@@ -327,9 +319,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
    * Initialize the lightbox functionality for a set of images.
    */
   var initLightboxFunctionality = function() {
-    // Activate the lightbox for all images inside the xwikicontent. TODO: filter to consider only rendered images.
-    var contentImages = $('#xwikicontent').find('img');
-    enableToolbarPopovers(contentImages);
+    enableToolbarPopovers();
   };
 
   $(document).on('click', '#openLightbox', openLightbox);
@@ -348,7 +338,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
 
   $(document).on('xwiki:actions:edit', function() {
     $('#blueimp-gallery').data('isViewMode', false);
-    removePopovers($('#xwikicontent').find('img'));
+    closeImageToolbars();
   });
 
   $(document).on('xwiki:actions:view', function() {
@@ -471,69 +461,83 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-
       <cache>long</cache>
     </property>
     <property>
-      <code>@lighbox-description-color: #FFFFFF;
-@lighbox-controls-hover-color: #FFFFFF;
+      <code>#blueimp-gallery {
+  &gt; div.slides img {
+    bottom: 15%;
+  }
 
-#blueimp-gallery .lightboxDescription {
-  background-color: @lighbox-description-color;
-  display: block;
-  position: absolute;
-  font-size: 1.8vh;
-  width: 100%;
-  padding: 0.3% 1%;
-  bottom: 0;
+  &gt; .indicator {
+    bottom: 10%;
+  }
+
+  .controls {
+    position: absolute;
+    top: 3%;
+    right: 3%;
+    opacity: .8;
+    cursor: pointer;
+  }
+
+  .lightboxDescription {
+    background-color: @xwiki-page-content-bg;
+    color: @text-color;
+    display: block;
+    position: absolute;
+    font-size: @font-size-base;
+    width: 100%;
+    padding: 0.3% 1%;
+    bottom: 0;
+
+    .descriptionRow {
+      position: relative;
+      height: 100%;
+    }
+
+    .descriptionColLeft {
+      float: left;
+      width: 68%;
+      font-size: round(@font-size-base * 0.8);
+    }
+
+    .descriptionColRight {
+      float: right;
+      width: 30%;
+      font-size: round(@font-size-base * 0.8);
+    }
+  }
 }
-#blueimp-gallery .descriptionRow {
-  position: relative;
-  height: 100%;
+.blueimp-gallery {
+  .fullscreen:hover,
+  .download:hover,
+  .autoPlay:hover,
+  .escape:hover {
+    color: @xwiki-page-content-bg;
+    opacity: 1;
+  }
+
+  .fullscreen,
+  .download,
+  .autoPlay,
+  .escape {
+    display: none;
+  }
 }
-#blueimp-gallery .descriptionColLeft {
-  float: left;
-  width: 68%;
-  font-size: 1.5vh;
+.blueimp-gallery-controls {
+  .fullscreen,
+  .download,
+  .autoPlay,
+  .escape {
+    display: block;
+    /* Fix z-index issues (controls behind slide element) on Android: */
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
+  }
 }
-#blueimp-gallery .descriptionColRight {
-  float: right;
-  width: 30%;
-  font-size: 1.5vh;
-}
-#blueimp-gallery &gt; div.slides img {
-  bottom: 15%;
-}
-#blueimp-gallery &gt; .indicator {
-  bottom: 10%;
-}
-#blueimp-gallery .controls {
-  position: absolute;
-  top: 3%;
-  right: 3%;
-  opacity: .8;
-  cursor: pointer;
-}
-.blueimp-gallery .fullscreen:hover,
-.blueimp-gallery .download:hover,
-.blueimp-gallery .autoPlay:hover,
-.blueimp-gallery .escape:hover {
-  color: @lighbox-controls-hover-color;
-  opacity: 1;
-}
-.blueimp-gallery .fullscreen,
-.blueimp-gallery .download,
-.blueimp-gallery .autoPlay,
-.blueimp-gallery .escape {
+#toolbarTemplate {
   display: none;
-}
-.blueimp-gallery-controls .fullscreen,
-.blueimp-gallery-controls .download,
-.blueimp-gallery-controls .autoPlay,
-.blueimp-gallery-controls .escape {
-  display: block;
-  /* Fix z-index issues (controls behind slide element) on Android: */
-  -webkit-transform: translateZ(0);
-  -moz-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  -o-transform: translateZ(0);
-  transform: translateZ(0);
 }</code>
     </property>
     <property>
@@ -827,7 +831,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
   &lt;div
     id="blueimp-gallery"
     class="blueimp-gallery"
-    aria-label="$escapetool.xml($services.localization.render('image.lightbox.gallery.label'))"
+    aria-label="$escapetool.xml($services.localization.render('image.lightbox.gallery.title'))"
     aria-modal="true"
     role="dialog"
   &gt;
@@ -853,7 +857,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
         aria-keyshortcuts="F11"
       &gt;$services.icon.renderHTML('arrows')&lt;/a&gt;
       &lt;a
-        class="btn download" id="lightboxDownload" aria-controls="blueimp-gallery"
+        class="btn download" id="lightboxDownload" aria-controls="blueimp-gallery" target="_blank"
         aria-label="$escapetool.xml($services.localization.render('image.lightbox.download.title'))"
         title="$escapetool.xml($services.localization.render('image.lightbox.download.title'))"
       &gt;$services.icon.renderHTML('download')&lt;/a&gt;
@@ -889,6 +893,19 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;ol class="indicator"&gt;&lt;/ol&gt;
+  &lt;/div&gt;
+  &lt;!-- The image toolbar popover template. --&gt;
+  &lt;div id="toolbarTemplate"&gt;
+    &lt;div class="btn-group imageToolbar" hidden&gt;
+      &lt;a id="openLightbox"
+        title="$escapetool.xml($services.localization.render('image.lightbox.gallery.title'))"&gt;
+        $services.icon.renderHTML("arrows")
+      &lt;/a&gt;
+      &lt;a class="imageDownload" target="_blank"
+        title="$escapetool.xml($services.localization.render('image.lightbox.download.title'))"&gt;
+        $services.icon.renderHTML("download")
+      &lt;/a&gt;
+    &lt;/div&gt;
   &lt;/div&gt;
   {{/html}}
 #end

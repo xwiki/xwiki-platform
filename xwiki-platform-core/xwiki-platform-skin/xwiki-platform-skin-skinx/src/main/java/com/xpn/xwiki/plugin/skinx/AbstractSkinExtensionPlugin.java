@@ -71,16 +71,23 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     /**
      * The name of the preference (in the configuration file) specifying what is the default value of the defer, in case
      * nothing is specified in the parameters of this extension.
+     *
+     * @since 14.1RC1
      */
     public static final String DEFER_DEFAULT_PARAM = "xwiki.plugins.skinx.deferred.default";
 
     /**
      * The URL delimiter part of query parameters.
+     *
+     * @since 11.6RC1
+     * @since 11.3.2
      */
     protected static final String QUERY_PARAMETER_DELIMITER = "?";
 
     /**
      * The separator between parameters.
+     *
+     * @since 14.1RC1
      */
     protected static final String PARAMETER_SEPARATOR = "&";
 
@@ -488,9 +495,17 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
         return this.async;
     }
 
+    /**
+     * If the loading of given JavaScript script shall be deferred.
+     *
+     * @param name Name of the script to be loaded (page, file or resource name).
+     * @param context The context to get the parameter from.
+     * @return If the loading shall be deferred, defaults to the preference in the configuration file, which defaults
+     * to true.
+     * @since 14.1RC1
+     */
     protected boolean isDefer(String name, XWikiContext context)
     {
-        // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true
         String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
         boolean defaultDefer = StringUtils.isEmpty(defaultDeferString) || Boolean.parseBoolean(defaultDeferString);
         return BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", name, context), defaultDefer);

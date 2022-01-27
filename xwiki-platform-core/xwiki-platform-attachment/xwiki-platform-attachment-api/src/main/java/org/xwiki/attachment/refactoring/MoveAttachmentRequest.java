@@ -19,6 +19,7 @@
  */
 package org.xwiki.attachment.refactoring;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.stability.Unstable;
@@ -57,5 +58,18 @@ public class MoveAttachmentRequest extends EntityRequest
     public boolean isAutoRedirect()
     {
         return getProperty(AUTO_REDIRECT, true);
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+            .append("entityReferences", getEntityReferences())
+            .append("id", getId())
+            .append("interactive", isInteractive())
+            .append("properties", getProperties())
+            .append("userReference", getUserReference())
+            .append("authorReference", getAuthorReference())
+            .toString();
     }
 }

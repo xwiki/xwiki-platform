@@ -51,9 +51,11 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class AttachmentScriptServiceTest
 {
-    public static final DocumentReference SOURCE_LOCATION = new DocumentReference("xwiki", "Space", "Source");
+    private static final DocumentReference SOURCE_LOCATION = new DocumentReference("xwiki", "Space", "Source");
 
-    public static final DocumentReference TARGET_LOCATION = new DocumentReference("xwiki", "Space", "Target");
+    private static final DocumentReference TARGET_LOCATION = new DocumentReference("xwiki", "Space", "Target");
+
+    private static final DocumentReference USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "User1");
 
     @InjectMockComponents
     private AttachmentScriptService attachmentScriptService;
@@ -68,13 +70,15 @@ class AttachmentScriptServiceTest
     void createMoveRequest()
     {
         MoveAttachmentRequest actual =
-            this.attachmentScriptService.createMoveRequest(SOURCE_LOCATION, "old.txt", TARGET_LOCATION, "newName", true,
+            this.attachmentScriptService.createMoveRequest(SOURCE_LOCATION, "old.txt", TARGET_LOCATION, "newName",
+                USER_REFERENCE, true,
                 false);
         MoveAttachmentRequest expected = new MoveAttachmentRequest();
         expected.setEntityReferences(singletonList(new AttachmentReference("old.txt", SOURCE_LOCATION)));
         expected.setProperty(MoveAttachmentRequest.DESTINATION, new AttachmentReference("newName", TARGET_LOCATION));
         expected.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, true);
         expected.setInteractive(false);
+        expected.setUserReference(USER_REFERENCE);
         // Reset the ids before comparing because we are not interested in the random parts. 
         actual.setId("");
         expected.setId("");

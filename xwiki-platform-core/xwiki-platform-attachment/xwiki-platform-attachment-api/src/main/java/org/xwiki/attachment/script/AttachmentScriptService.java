@@ -72,13 +72,15 @@ public class AttachmentScriptService implements ScriptService
      * @param sourceName the name of the source attachment
      * @param targetLocation the target location of the document containing the attachment
      * @param targetName the target name of the attachment
+     * @param userReference the reference of the user making the move request
      * @param autoRedirect if {@code true} a redirection will be set from the source location to the target
      *     location
      * @param isAsync {@code true} if the job can be executed asynchronously, {@code false} otherwise
      * @return the initialized move attachment request
      */
     public MoveAttachmentRequest createMoveRequest(DocumentReference sourceLocation, String sourceName,
-        DocumentReference targetLocation, String targetName, boolean autoRedirect, boolean isAsync)
+        DocumentReference targetLocation, String targetName, DocumentReference userReference,
+        boolean autoRedirect, boolean isAsync)
     {
         MoveAttachmentRequest request = new MoveAttachmentRequest();
         request.setEntityReferences(singletonList(new AttachmentReference(sourceName, sourceLocation)));
@@ -87,6 +89,7 @@ public class AttachmentScriptService implements ScriptService
         request.setInteractive(isAsync);
         request.setId("refactoring", "moveAttachment",
             String.format("%d-%d", System.currentTimeMillis(), ThreadLocalRandom.current().nextInt(100, 1000)));
+        request.setUserReference(userReference);
         return request;
     }
 

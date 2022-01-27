@@ -19,6 +19,7 @@
  */
 package org.xwiki.attachment.internal.refactoring.job;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,15 +30,19 @@ import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer;
 import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -70,6 +75,8 @@ class MoveAttachmentJobTest
     private static final AttachmentReference SOURCE_ATTACHMENT_LOCATION =
         new AttachmentReference("oldName", SOURCE_LOCATION);
 
+    private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "User1");
+
     private static final DocumentReference TARGET_LOCATION = new DocumentReference("xwiki", "Space", "Target");
 
     private static final AttachmentReference TARGET_ATTACHMENT_LOCATION =
@@ -93,6 +100,13 @@ class MoveAttachmentJobTest
     @MockComponent
     private AttachmentsManager attachmentsManager;
 
+    @MockComponent
+    protected ModelBridge modelBridge;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
     @Mock
     private XWikiContext context;
 
@@ -104,6 +118,15 @@ class MoveAttachmentJobTest
 
     @Mock
     private XWikiDocument targetDocument;
+
+    @Mock
+    private DocumentAuthors sourceAuthors;
+
+    @Mock
+    private DocumentAuthors targetAuthors;
+
+    @Mock
+    private UserReference authorReference;
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -120,13 +143,16 @@ class MoveAttachmentJobTest
 
         // The cast is mandatory otherwise the wrong method is mocked (the DocumentReference one).
         when(this.wiki.getDocument((EntityReference) SOURCE_LOCATION, this.context)).thenReturn(this.sourceDocument);
+        when(this.wiki.getDocument((EntityReference) TARGET_LOCATION, this.context)).thenReturn(this.targetDocument);
+        when(this.sourceDocument.getAuthors()).thenReturn(this.sourceAuthors);
+        when(this.targetDocument.getAuthors()).thenReturn(this.targetAuthors);
         when(this.sourceDocument.getDocumentReference()).thenReturn(SOURCE_LOCATION);
         when(this.targetDocument.getDocumentReference()).thenReturn(TARGET_LOCATION);
-        when(this.wiki.getDocument((EntityReference) TARGET_LOCATION, this.context)).thenReturn(this.targetDocument);
         when(this.referenceSerializer.serialize(TARGET_ATTACHMENT_LOCATION)).thenReturn("xwiki:Space.Target@newName");
         when(this.referenceSerializer.serialize(SOURCE_ATTACHMENT_LOCATION)).thenReturn("xwiki:Space.Source@oldName");
         when(this.referenceSerializer.serialize(TARGET_LOCATION)).thenReturn("xwiki:Space.Target");
         when(this.referenceSerializer.serialize(SOURCE_LOCATION)).thenReturn("xwiki:Space.Source");
+        when(this.documentReferenceUserReferenceResolver.resolve(AUTHOR_REFERENCE)).thenReturn(this.authorReference);
     }
 
     @Test
@@ -137,6 +163,7 @@ class MoveAttachmentJobTest
         this.request.setProperty(MoveAttachmentRequest.DESTINATION, TARGET_ATTACHMENT_LOCATION);
         this.request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, true);
         this.request.setInteractive(false);
+        this.request.setUserReference(AUTHOR_REFERENCE);
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
         when(sourceAttachment.getFilename()).thenReturn("oldName");
@@ -160,6 +187,11 @@ class MoveAttachmentJobTest
             "attachment.job.saveDocument.source [xwiki:Space.Target]", this.context);
         verify(this.wiki).saveDocument(this.targetDocument,
             "attachment.job.saveDocument.target [xwiki:Space.Source]", this.context);
+        verify(this.modelBridge).setContextUserReference(AUTHOR_REFERENCE);
+        verify(this.targetAuthors).setEffectiveMetadataAuthor(this.authorReference);
+        verify(this.sourceAuthors).setEffectiveMetadataAuthor(this.authorReference);
+        verify(this.targetAuthors).setOriginalMetadataAuthor(this.authorReference);
+        verify(this.sourceAuthors).setOriginalMetadataAuthor(this.authorReference);
     }
 
     @Test
@@ -219,6 +251,7 @@ class MoveAttachmentJobTest
             new AttachmentReference("newName", SOURCE_LOCATION));
         this.request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, true);
         this.request.setInteractive(false);
+        this.request.setUserReference(AUTHOR_REFERENCE);
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
         when(sourceAttachment.getFilename()).thenReturn("oldName");
@@ -237,5 +270,8 @@ class MoveAttachmentJobTest
         verify(this.sourceDocument).createXObject(RedirectAttachmentClassDocumentInitializer.REFERENCE, this.context);
         verify(this.wiki).saveDocument(this.sourceDocument, "attachment.job.saveDocument.inPlace [oldName, newName]",
             this.context);
+        verify(this.modelBridge).setContextUserReference(AUTHOR_REFERENCE);
+        verify(this.sourceAuthors, times(2)).setEffectiveMetadataAuthor(this.authorReference);
+        verify(this.sourceAuthors, times(2)).setOriginalMetadataAuthor(this.authorReference);
     }
 }

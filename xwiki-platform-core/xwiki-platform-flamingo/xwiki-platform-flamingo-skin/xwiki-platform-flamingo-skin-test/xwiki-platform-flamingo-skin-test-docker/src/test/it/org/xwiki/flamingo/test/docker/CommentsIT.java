@@ -38,7 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests of the comments feature.
  *
  * @version $Id$
+ * @since 14.1RC1
  * @since 14.0
+ * @since 13.10.3
  */
 @UITest(browser = Browser.CHROME)
 class CommentsIT

@@ -54,6 +54,8 @@
       (this property is defined in platform-core pom; remove this when the CKEditor is integrated in platform)-->
     <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
     <xwiki.issueManagement.jira.id>CKEDITOR</xwiki.issueManagement.jira.id>
+    <!-- Release automatically on JIRA when performing the Maven release. -->
+    <xwiki.release.jira.skip>false</xwiki.release.jira.skip>
   </properties>
   <dependencyManagement>
     <dependencies>

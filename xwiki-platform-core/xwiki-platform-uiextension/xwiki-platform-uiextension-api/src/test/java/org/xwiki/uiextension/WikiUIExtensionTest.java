@@ -20,8 +20,10 @@
 package org.xwiki.uiextension;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
@@ -32,6 +34,7 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRenderer;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.WordBlock;
@@ -42,6 +45,7 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.uiextension.internal.WikiUIExtension;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -52,6 +56,11 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNotNull;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -88,6 +97,12 @@ class WikiUIExtensionTest
     @MockComponent
     private ContentParser contentParser;
 
+    @MockComponent
+    private VelocityManager velocityManager;
+
+    @MockComponent
+    private VelocityContext velocityContext;
+
     @InjectComponentManager
     private ComponentManager componentManager;
 
@@ -105,6 +120,7 @@ class WikiUIExtensionTest
         this.baseObject = new BaseObject();
         this.baseObject.setOwnerDocument(ownerDocument);
         this.baseObject.setXClassReference(CLASS_REF);
+        when(this.velocityManager.getVelocityContext()).thenReturn(this.velocityContext);
     }
 
     @Test
@@ -128,5 +144,16 @@ class WikiUIExtensionTest
             .thenReturn(new WordBlock(""));
 
         assertEquals(new WordBlock(""), wikiUIX.execute());
+    }
+
+    @Test
+    void render() throws Exception
+    {
+        WikiUIExtension wikiUIX = new WikiUIExtension(this.baseObject, "roleHint", "id", "epId", this.componentManager);
+        BlockAsyncRenderer blockAsyncRenderer = mock(BlockAsyncRenderer.class);
+        wikiUIX.render(blockAsyncRenderer, true, true);
+        InOrder inOrder = inOrder(this.velocityContext);
+        inOrder.verify(this.velocityContext).put(eq("uix"), isNotNull());
+        inOrder.verify(this.velocityContext).put(eq("uix"), isNull());
     }
 }

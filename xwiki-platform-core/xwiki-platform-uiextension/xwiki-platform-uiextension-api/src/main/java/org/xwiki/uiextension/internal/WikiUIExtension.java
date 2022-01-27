@@ -34,6 +34,7 @@ import org.xwiki.rendering.async.internal.block.BlockAsyncRenderer;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererDecorator;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
 import org.xwiki.uiextension.UIExtension;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -78,6 +79,8 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
 
     private final Provider<XWikiContext> xcontextProvider;
 
+    private final VelocityManager velocityManager;
+
     /**
      * Parameter manager for this extension.
      */
@@ -103,6 +106,7 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
         this.extensionPointId = extensionPointId;
 
         this.xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
+        this.velocityManager = componentManager.getInstance(VelocityManager.class);
     }
 
     /**
@@ -158,13 +162,16 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
             throw new RenderingException("Failed to get ui extension document", e);
         }
         Map<String, Object> uixContext = new HashMap<>();
-        uixContext.put(WikiUIExtension.CONTEXT_UIX_DOC_KEY, document.newDocument(xcontext));
-        uixContext.put(WikiUIExtension.CONTEXT_UIX_INLINE_KEY, inline);
+        uixContext.put(CONTEXT_UIX_DOC_KEY, document.newDocument(xcontext));
+        uixContext.put(CONTEXT_UIX_INLINE_KEY, inline);
 
         // Remember the previous uix context to restore it
-        Map<String, Object> previousUIXContext = (Map<String, Object>) xcontext.get(WikiUIExtension.CONTEXT_UIX_KEY);
-        // Put the UIX context in the XWiki context
-        xcontext.put(WikiUIExtension.CONTEXT_UIX_KEY, uixContext);
+        Map<String, Object> previousUIXContext = (Map<String, Object>) xcontext.get(CONTEXT_UIX_KEY);
+        // Put the UIX context in the XWiki context. Note that this is deprecated and using the UIX templates is
+        // preferred.
+        xcontext.put(CONTEXT_UIX_KEY, uixContext);
+        // Put the UIX context in the velocity context "uix" key.
+        this.velocityManager.getVelocityContext().put(CONTEXT_UIX_KEY, uixContext);
 
         return previousUIXContext;
     }
@@ -173,8 +180,9 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        // Restore previous uid context
-        xcontext.put(WikiUIExtension.CONTEXT_UIX_KEY, uixContext);
+        // Restore previous uix context in the XWiki and Velocity contexts. 
+        xcontext.put(CONTEXT_UIX_KEY, uixContext);
+        this.velocityManager.getVelocityContext().put(CONTEXT_UIX_KEY, uixContext);
     }
 
     @Override

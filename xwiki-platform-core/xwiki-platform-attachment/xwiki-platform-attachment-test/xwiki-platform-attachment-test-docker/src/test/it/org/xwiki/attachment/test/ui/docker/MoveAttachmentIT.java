@@ -32,8 +32,10 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
+import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.REFERENCE;
 
@@ -59,6 +61,9 @@ class MoveAttachmentIT
         setup.loginAsSuperAdmin();
         setup.deletePage(sourcePage);
         setup.deletePage(targetPage);
+
+        // Create the pages and upload a document with a first user U1.
+        setup.createUserAndLogin("U1", "pU1");
         setup.createPage(sourcePage, "");
         setup.createPage(targetPage, "");
 
@@ -67,6 +72,10 @@ class MoveAttachmentIT
         sourceAttachmentsPane.setFileToUpload(
             new File(testConfiguration.getBrowser().getTestResourcesPath(), "moveme.txt").getAbsolutePath());
         sourceAttachmentsPane.waitForUploadToFinish("moveme.txt");
+
+        // Switch to a second user U2 and come back to the attachment pane of the source page.
+        setup.createUserAndLogin("U2", "pU2");
+        setup.gotoPage(sourcePage).openAttachmentsDocExtraPane();
 
         AttachmentPane attachmentsPane = AttachmentPane.moveAttachment("moveme.txt");
 
@@ -80,7 +89,14 @@ class MoveAttachmentIT
         AttachmentsPane attachmentsPaneTarget = viewTargetPage.openAttachmentsDocExtraPane();
         WebElement attachmentLink = attachmentsPaneTarget.getAttachmentLink("newname.txt");
         assertNotNull(attachmentLink);
+        // Verify that the author is correct in the attachments pane.
+        assertEquals("U2", attachmentsPaneTarget.getUploaderOfAttachment("newname.txt"));
 
+        // Verify that the author is correct in the history.
+        HistoryPane historyPane = viewTargetPage.openHistoryDocExtraPane();
+        assertEquals("U2", historyPane.getCurrentAuthor());
+
+        // Verify that the redirection object has been created on the source page.
         Object object = setup.rest().object(sourcePage, setup.serializeReference(REFERENCE));
         assertNotNull(object);
     }

@@ -81,7 +81,7 @@
         #else
           #try("moveJobException")
             #set ($moveRequest = $services.attachment.createMoveRequest($sourceLocation, $sourceAttachmentName, 
-              $targetLocation, $targetAttachmentName, $autoRedirect, $isAsync))
+              $targetLocation, $targetAttachmentName, $xcontext.user, $autoRedirect, $isAsync))
             #set ($moveJob = $services.attachment.createMoveJob($moveRequest))
           #end
           #if ("$!moveJobException" != '')

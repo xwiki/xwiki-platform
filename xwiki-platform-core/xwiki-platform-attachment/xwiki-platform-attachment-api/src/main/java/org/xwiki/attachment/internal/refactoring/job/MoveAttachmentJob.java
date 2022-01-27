@@ -32,10 +32,13 @@ import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.refactoring.internal.job.AbstractEntityJob;
 import org.xwiki.refactoring.job.EntityJobStatus;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -80,6 +83,10 @@ public class MoveAttachmentJob
     @Inject
     private AttachmentsManager attachmentsManager;
 
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
     @Override
     public String getType()
     {
@@ -94,10 +101,21 @@ public class MoveAttachmentJob
         boolean autoRedirect = this.request.getProperty(MoveAttachmentRequest.AUTO_REDIRECT);
 
         XWiki wiki = this.xcontextProvider.get().getWiki();
+
+        // Update the author for the attribution of the attachment uploader.
+        this.modelBridge.setContextUserReference(this.request.getUserReference());
         try {
             XWikiDocument sourceDocument = wiki.getDocument(source.getParent(), this.xcontextProvider.get());
             XWikiDocument targetDocument = wiki.getDocument(destination.getParent(), this.xcontextProvider.get());
             XWikiAttachment sourceAttachment = sourceDocument.getAttachment(source.getName());
+            
+            // Update the author of the source and target documents.
+            UserReference authorUserReference =
+                this.documentReferenceUserReferenceResolver.resolve(this.request.getUserReference());
+            sourceDocument.getAuthors().setEffectiveMetadataAuthor(authorUserReference);
+            sourceDocument.getAuthors().setOriginalMetadataAuthor(authorUserReference);
+            targetDocument.getAuthors().setEffectiveMetadataAuthor(authorUserReference);
+            targetDocument.getAuthors().setOriginalMetadataAuthor(authorUserReference);
 
             // Remove the original attachment and create a new one with the same name.
             sourceDocument.removeAttachment(sourceAttachment);

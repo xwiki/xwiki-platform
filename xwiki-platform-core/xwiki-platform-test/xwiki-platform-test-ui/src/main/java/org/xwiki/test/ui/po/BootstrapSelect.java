@@ -83,10 +83,7 @@ public class BootstrapSelect
             WebElement element = this.hiddenSelect.findElement(By.xpath("option[@value = \"" + value + "\"]"));
 
             if (element.getAttribute("selected") == null) {
-                // FIXME: this is a workaround as our <option>-tag contains child tags which is invalid HTML and not
-                //  supported by WebElement#getText(). The <option>-tag should be fixed, see
-                //  https://jira.xwiki.org/browse/XWIKI-19342.
-                valuesToToggle.add(element.getAttribute("textContent"));
+                valuesToToggle.add(element.getText());
             }
         }
 
@@ -97,10 +94,7 @@ public class BootstrapSelect
 
                 // Toggle the selection state if the value should not be selected anymore.
                 if (!values.contains(value)) {
-                    // FIXME: this is a workaround as our <option>-tag contains child tags which is invalid HTML and not
-                    //  supported by WebElement#getText(). The <option>-tag should be fixed, see
-                    //  https://jira.xwiki.org/browse/XWIKI-19342.
-                    valuesToToggle.add(element.getAttribute("textContent"));
+                    valuesToToggle.add(element.getText());
                 }
             }
         }

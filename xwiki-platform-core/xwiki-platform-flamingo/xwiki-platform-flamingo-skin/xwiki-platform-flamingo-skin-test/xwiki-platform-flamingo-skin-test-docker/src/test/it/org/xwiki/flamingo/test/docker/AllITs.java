@@ -128,4 +128,10 @@ public class AllITs
     class NestedBeanValidationIT extends BeanValidationIT
     {
     }
+
+    @Nested
+    @DisplayName("Comments tests")
+    class NestedCommentsIT extends CommentsIT
+    {
+    }
 }

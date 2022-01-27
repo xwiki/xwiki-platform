@@ -156,7 +156,7 @@ appWithinMinutes.templateProviderEditor.terminal.hint=应用实体是否在这�
 platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=应用字段清单
 platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=通用字段清单
 platform.appwithinminutes.liveTableEditorHelpTitle=提示信息
-### Missing: platform.appwithinminutes.liveTableEditorHelpDescription=Generic live table columns are independent of your application structure. They provide information about the pages that hold your application data.
+platform.appwithinminutes.liveTableEditorHelpDescription=通用动态列表的字段独立于你的应用结构。它们提供了你的应用数据页面的信息。
 platform.appwithinminutes.liveTableEditorDocTitleColumnName=页面标题
 platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=应用数据页面的标题
 ### Missing: platform.appwithinminutes.liveTableEditorDocNameColumnName=Page Name
@@ -179,7 +179,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=图像
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=显示数据页图像附件的特殊列
 ### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=显示用户头像的特殊列。仅当表格绑定到XWiki.XWikiUsers类时有效
-platform.appwithinminutes.liveTableEditorTitleHint=显示在应用主页、应用面板、动态列表或路径栏等位置的应用标题
+platform.appwithinminutes.liveTableEditorTitleHint=显示在应用主页、应用面板、动态列表或路径栏等位置的应用标题。
 platform.appwithinminutes.liveTableEditorDescriptionHint=显示在首页、位于动态列表之上的应用数据内容。用于描述此应用。
 platform.appwithinminutes.liveTableEditorColumnsHint=选择要显示在应用首页动态列表中的列。
 platform.appwithinminutes.liveTableEditorSaveComment=更新动态列表
@@ -214,27 +214,27 @@ platform.appwithinminutes.deleteAppInvalidAppError=指定的名称不是一个�
 platform.appwithinminutes.deleteAppNotSpecifiedError=没有指定应用名称。
 
 ### Rename Application
-### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
-### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
-### Missing: appWithinMinutes.renameApp.newName.label=New Name
-### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
-### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
-### Missing: appWithinMinutes.renameApp.location.label=New Location
-### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
-### Missing: appWithinMinutes.renameApp.parent.label=New Parent
-### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
-### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
-### Missing: appWithinMinutes.renameApp.done=Application renamed
-### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
+appWithinMinutes.renameApp.changeAppTitleInfo=要更改应用标题而不改变应用名称，只需要编辑应用主页。
+appWithinMinutes.renameApp.regenerateAppCodeWarning=当你重命名应用时，应用代码会重新生成。自定义的代码将被覆盖。
+appWithinMinutes.renameApp.newName.label=新名称
+appWithinMinutes.renameApp.pageExistsError=选择的位置已存在相同名称的页面。
+appWithinMinutes.renameApp.locationForbiddenError=你不能将应用移动到选定的位置。
+appWithinMinutes.renameApp.location.label=新位置
+appWithinMinutes.renameApp.location.hint=你要将应用移动到的页面层级中的位置。
+appWithinMinutes.renameApp.parent.label=新的父项
+appWithinMinutes.renameApp.parent.hint=新的父页面。留空以移动到顶层。
+appWithinMinutes.renameApp.inProgress=正在重命名应用……
+appWithinMinutes.renameApp.done=应用已重命名
+appWithinMinutes.renameApp.failed=应用重命名失败
 
 ### Deprecated keys
 ### Since 8.4
-### Missing: platform.appwithinminutes.appNamePreviewClassReferenceLabel=Application class
-### Missing: platform.appwithinminutes.appNamePreviewDataSpaceLabel=Application data location
-### Missing: platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Space
-### Missing: platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=The name of the space containing the application entry
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=应用类
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=应用数据位置
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=空间
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=包含应用条目的空间名称
 ### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Page full name
-### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=The name of the page that contains the application entry, prefixed with the space name
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=包含应用数据的页面名称，以空间名为前缀
 
 #@deprecated appWithinMinutes.wizardStep.name.name
 platform.appwithinminutes.wizardStep1Name=名称
@@ -256,8 +256,8 @@ platform.appwithinminutes.wizardStep3Title=自定义你的应用主页
 platform.appwithinminutes.wizardStep3Description=自定义应用主页
 
 ### Since 11.0
-### Missing: platform.appwithinminutes.appsLiveTable.doc.space=Application name
+platform.appwithinminutes.appsLiveTable.doc.space=应用名称
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
+appWithinMinutes.templateProviderEditor.title={0} 个条目
 </content>
 </xwikidoc>

@@ -30,8 +30,8 @@
 #set ($currentLocale = $services.localization.currentLocale)
 #foreach ($locale in $collectiontool.sort($services.localization.availableLocales, 'displayName'))
   #if ("$!locale" != '')
-    #set ($localeName = $escapetool.xml($stringtool.capitalize($locale.getDisplayName($locale))) +
-      ' <small class="text-muted">(' + $stringtool.capitalize($locale.getDisplayName($currentLocale)) + ')</small>')
+    #set ($localeName = $escapetool.xml($stringtool.capitalize($locale.getDisplayName($locale)) +
+      ' (' + $stringtool.capitalize($locale.getDisplayName($currentLocale)) + ')'))
     #set ($discard = $locales.add({'code': $locale.toString(), 'name': $localeName}))
   #end
 #end

@@ -23,21 +23,25 @@ You need the following in order to build this extension:
 
 ## Release Steps
 
-    ## Create the next version in JIRA and release the current version.
+```
+## Create the next version in JIRA and release the current version.
 
-    ## Prepare the tag for the new version.
-    mvn release:prepare -DskipTests -Darguments="-DskipTests" -Pintegration-tests,docker
+## Prepare the tag for the new version.
+mvn release:prepare -DskipTests -Darguments="-DskipTests" -Pintegration-tests,docker
 
-    ## Perform the release
-    ## We skip the enforcer because the functional test modules have a recent parent that requires the latest Java (11)
-    ## while the actual code has an older parent (in order to support older versions of XWiki) that requires an older
-    ## version of Java (8). Fortunately, we can release with the latest Java because ATM we don't have Java code outside
-    ## the functional test modules.
-    mvn release:perform -DskipTests -Darguments="-DskipTests -Dxwiki.enforcer.skip=true" -Pintegration-tests,docker
+## Perform the release
+## We skip the enforcer because the functional test modules have a recent parent that requires the latest Java (11)
+## while the actual code has an older parent (in order to support older versions of XWiki) that requires an older
+## version of Java (8). Fortunately, we can release with the latest Java because ATM we don't have Java code outside
+## the functional test modules.
+mvn release:perform -DskipTests -DskipLocalStaging -DautoReleaseAfterClose -Darguments="-DskipTests -DskipLocalStaging -DautoReleaseAfterClose -Dxwiki.enforcer.skip=true" -Pintegration-tests,docker
 
-    ## Update the documentation page on http://extensions.xwiki.org
-    ## Keep the release notes (the list of JIRA issues) only for the 2 most recent releases.
+## Close and Release the staging repo on nexus.xwiki.org
 
-    ## Announce the release on https://forum.xwiki.org/c/News
+## Update the documentation page on http://extensions.xwiki.org
+## Keep the release notes (the list of JIRA issues) only for the 2 most recent releases.
 
-    ## Update the version used in XWiki Standard Flavor
+## Announce the release on https://forum.xwiki.org/c/News
+
+## Update the version used in XWiki Standard Flavor
+```

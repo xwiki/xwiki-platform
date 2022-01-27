@@ -184,7 +184,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * @param filename The name of the file to get the URL for.
      * @param context The current request context.
      * @return The (unescaped) URL of the skin file.
-     * @since 14.0RC1
+     * @since 14.1RC1
      */
     protected String getSkinFileURL(String filename, XWikiContext context)
     {

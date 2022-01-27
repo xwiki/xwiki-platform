@@ -20,11 +20,12 @@
 #template('colorThemeInit.vm')
 
 #macro(concatenateQueryParameter $originalUrl $queryString)
-  #if ($originalUrl.contains("?"))
-$originalUrl&#38;$queryString
-  #else
-$originalUrl?$queryString
-  #end
+## No indent here as it causes whitespace in the output.
+#if ($originalUrl.contains("?"))
+$originalUrl&#38;$queryString## prevent line break in output
+#else
+$originalUrl?$queryString## prevent line break in output
+#end
 #end
 
 ## The default stylesheet configuration option allows to override the default style.css CSS

@@ -26,13 +26,13 @@
 ## JavaScript libraries
 ##
 ## We load RequireJS first because it is used by other JavaScript modules to load their dependencies.
-<script src="$services.webjars.url('requirejs', "require$jsExtension")" data-wysiwyg="true"></script>
+<script src="$escapetool.xml($services.webjars.url('requirejs', "require$jsExtension"))" data-wysiwyg="true"></script>
 ## FIXME: We still have code depending on Prototype.js without declaring it (i.e. without using RequireJS). Short term
 ## goal is to stop loading Prototype.js by default and change the existing code to load it when needed. Long term goal is
 ## to stop relying on Prototype.js . Note that we load Prototype.js before the following inline script because we have to
 ## fix some incompatibilities between Bootstrap and Prototype.js . In the future we should use the 'deferred' RequireJS
 ## plugin to fix the incompatibilities only if / when Prototype.js is loaded.
-<script src="$xwiki.getSkinFile('js/prototype/prototype.js')"></script>
+<script src="$escapetool.xml($xwiki.getSkinFile('js/prototype/prototype.js'))"></script>
 ##
 ## Define the global require.js configuration
 ##
@@ -255,6 +255,6 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
 ## Compatibility "aspect" file for deprecated code.
 ## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
 ##
-<script src="$xwiki.getSkinFile("js/xwiki/compatibility.js", false)" defer="defer"></script>
+<script src="$escapetool.xml($xwiki.getSkinFile("js/xwiki/compatibility.js", false))" defer="defer"></script>
 ## Marker script that signals that all the deferred scripts have indeed been executed, guarding against a premature dom:loaded event
-<script src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>
+<script src="$escapetool.xml($xwiki.getSkinFile("js/xwiki/markerScript.js", false))" defer="defer"></script>

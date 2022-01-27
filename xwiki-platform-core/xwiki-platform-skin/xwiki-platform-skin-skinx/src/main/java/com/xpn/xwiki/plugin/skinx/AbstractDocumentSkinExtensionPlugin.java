@@ -455,7 +455,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     protected String getDocumentSkinExtensionURL(DocumentReference documentReference, String documentName,
             String pluginName, XWikiContext context)
     {
-        String queryString = String.format("%s&amp;%s%s",
+        String queryString = String.format("%s&%s%s",
                 getLanguageQueryString(context),
                 getDocumentVersionQueryString(documentReference, context),
                 parametersAsQueryString(documentName, context));

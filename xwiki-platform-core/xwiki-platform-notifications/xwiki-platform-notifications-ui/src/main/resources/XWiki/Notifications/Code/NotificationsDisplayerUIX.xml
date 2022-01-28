@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsDisplayerUIX" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsDisplayerUIX" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsDisplayerUIX</name>
   <language/>
@@ -29,6 +29,7 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>XWiki.Notifications.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title/>
@@ -76,11 +77,9 @@ Get the actual notifications.
       #if ($services.notification.watch.isEnabled())
         &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
           #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatchedWithAllEventTypes($scope))checked="checked"#end#end
-          &lt;pre&gt;
-            #generateNotificationInput('notificationPageOnly' $requestedDocumentReference 'notifications.filters.preferences.label.page')
-            #generateNotificationInput('notificationPageAndChildren' $requestedDocumentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
-            #generateNotificationInput('notificationWiki' $requestedDocumentReference.wikiReference 'notifications.filters.preferences.label.wiki')
-          &lt;/pre&gt;
+          #generateNotificationInput('notificationPageOnly' $requestedDocumentReference 'notifications.filters.preferences.label.page')
+          #generateNotificationInput('notificationPageAndChildren' $requestedDocumentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
+          #generateNotificationInput('notificationWiki' $requestedDocumentReference.wikiReference 'notifications.filters.preferences.label.wiki')
         &lt;/div&gt;
       #end
       &lt;div class="notifications-header-uix col-xs-12"&gt;
@@ -551,20 +550,7 @@ Get the actual notifications.
     </property>
     <property>
       <code>#if ($services.notification.watch.isEnabled())
-## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
-#set ($jsExtension = '.min.js')
-#if (!$services.debug.minify)
-  #set ($jsExtension = '.js')
-#end
-require.config({
-  paths: {
-    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', "js/bootstrap-switch${jsExtension}")'
-  },
-  shim: {
-    'bootstrap-switch' : ['jquery']
-  }
-});
-require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, xm) {
+require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
   'use strict';
   // Most of the code comes from the deprecated Watchlist Application
   $(document).on('xwiki:notification:loaded', function() {
@@ -616,7 +602,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         placement: 'bottom'
       });
     }
-    
+
     allWatchSwitches.bootstrapSwitch('size', 'small');
 
     /**

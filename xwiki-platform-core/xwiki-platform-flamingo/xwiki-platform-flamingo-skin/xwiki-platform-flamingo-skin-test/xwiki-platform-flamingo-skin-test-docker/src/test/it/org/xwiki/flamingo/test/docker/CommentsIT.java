@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.NotFoundException;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CommentForm;
 import org.xwiki.test.ui.po.CommentsTab;
@@ -42,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.0
  * @since 13.10.3
  */
-@UITest(browser = Browser.CHROME)
+@UITest
 class CommentsIT
 {
     private static final String COMMENT_CONTENT = "Some content";

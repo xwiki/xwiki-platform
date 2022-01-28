@@ -166,27 +166,30 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
 
   /**
    * Get information for attachment, when this can be found inside the current page.
-   * TODO: consider the path of the attachment, not just the current page.
    */
   var getAttachmentInfo = function(imageURL) {
     var deferred = $.Deferred();
     if (cachedAttachments[imageURL] != undefined) {
       deferred.resolve(cachedAttachments[imageURL]);
     } else {
-      var attachmentsURL = xm.restURL + `/attachments`;
-      $.ajax(attachmentsURL, {
+      var serviceDoctRef = XWiki.Model.resolve('XWiki.Lightbox.GetPageAttachmentsService', XWiki.EntityType.DOCUMENT);
+      var serviceDocURL = new XWiki.Document(serviceDoctRef).getURL('get', 'outputSyntax=plain');
+      $.ajax(serviceDocURL, {
         method: 'GET',
         dataType: 'json',
-      }).done(function (data, textStatus, jqXHR) {
+        data: {'imageURL': imageURL}
+      }).done(function (data) {
         var attachment = data.attachments.find(field => field.name == getImageName(imageURL));
-        if (attachment == undefined) {
-          // For an external URL, try to display at least the image name.
-          attachment = {'name': getImageName(imageURL)};
-        }
         cachedAttachments[imageURL] = attachment;
         deferred.resolve(attachment);
-      }).fail(function () {
+      }).fail(function (jqXHR) {
+        if (jqXHR.status == 404) {
+          cachedAttachments[imageURL] = {'name': getImageName(imageURL)};
+          // For an external URL, try to display at least the image name.
+          deferred.resolve({'name': getImageName(imageURL)});
+        } else {
         deferred.reject();
+        }
       });
     }
 
@@ -212,7 +215,8 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
       media.push({
         href: imageURL,
         thumbnail: createThumbnailURL(imageURL),
-        caption: caption
+        caption: caption,
+        alt: $(this).attr('alt')
       });
     });
 
@@ -223,12 +227,15 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
       closeClass: 'escape',
       playPauseClass: 'autoPlay',
       onslide: function(index, slide) {
-        var caption = this.list[index].caption;
-        getAttachmentInfo($(slide).find('img')[0].src).done(function(data) {
+        var imageData = this.list[index];
+        var slideImage = $(slide).find('img');
+        var caption = imageData.caption;
+        getAttachmentInfo(slideImage[0].src).done(function(data) {
           updateLightboxDescription(data, caption);
         }).fail(function() {
           updateLightboxDescription();
         });
+        slideImage.attr('alt', imageData.alt);
       }
     };
     myOpenLightbox = gallery(media, options);

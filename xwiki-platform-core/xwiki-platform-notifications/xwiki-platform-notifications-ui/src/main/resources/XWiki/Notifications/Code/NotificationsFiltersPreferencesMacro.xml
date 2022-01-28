@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsFiltersPreferencesMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsFiltersPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsFiltersPreferencesMacro</name>
   <language/>
@@ -29,6 +29,7 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>XWiki.Notifications.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>NotificationsFiltersPreferencesMacro</title>
@@ -126,20 +127,9 @@
     <property>
       <code>'use strict';
 /**
- * Start the requirejs config.
- */
-require.config({
-  paths: {
-    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', 'js/bootstrap-switch.min')'
-  },
-  shim: {
-    'bootstrap-switch' : ['jquery']
-  }
-});
-/**
  * Start the real script.
  */
-require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, AddNotificationFilterPreferenceLivetable) {
+require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($, AddNotificationFilterPreferenceLivetable) {
 
   /**
    * Page initialization
@@ -323,7 +313,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
         space: [],
         page: []
       }
-      
+
       for (var i = 0; i &lt; nodes.length; ++i) {
         var node = nodes[i];
         var reference = node.data.id;
@@ -459,7 +449,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       <cache>long</cache>
     </property>
     <property>
-      <code>define('ToggleableFilterPreference', ['jquery', 'bootstrap-switch'], function($) {
+      <code>define('ToggleableFilterPreference', ['jquery', 'xwiki-bootstrap-switch'], function($) {
   /**
   * Construct the Toggleable Filter Preference object.
   */
@@ -623,7 +613,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'xwiki-meta', 'ToggleableFilterPreference', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ToggleableFilterPreference) {
+      <code>require(['jquery', 'xwiki-meta', 'ToggleableFilterPreference', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ToggleableFilterPreference) {
 
   $(document).on('xwiki:livetable:notifications-filters:toggle', function(event, data) {
     var changedRow = $(data.row.isEnabled);

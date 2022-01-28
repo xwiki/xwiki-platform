@@ -25,6 +25,8 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -887,14 +889,23 @@ public class InternalTemplateManager implements Initializable
             ? new EnvironmentTemplate(new TemplateSkinResource(path, templateName, this.environment)) : null;
     }
 
-    private Template getClassloaderTemplate(String suffixPath, String templateName)
+    private Template getClassloaderTemplate(String prefixPath, String templateName)
     {
-        return getClassloaderTemplate(Thread.currentThread().getContextClassLoader(), suffixPath, templateName);
+        return getClassloaderTemplate(Thread.currentThread().getContextClassLoader(), prefixPath, templateName);
     }
 
-    private Template getClassloaderTemplate(ClassLoader classloader, String suffixPath, String templateName)
+    private Template getClassloaderTemplate(ClassLoader classloader, String prefixPath, String templateName)
     {
-        String templatePath = suffixPath + templateName;
+        String templatePath = prefixPath + templateName;
+
+        // Prevent access to resources from other directories
+        Path normalizedResource = Paths.get(templatePath).normalize();
+        // Protect against directory attacks.
+        if (!normalizedResource.startsWith(prefixPath)) {
+            this.logger.warn("Direct access to skin file [{}] refused. Possible break-in attempt!", normalizedResource);
+
+            return null;
+        }
 
         URL url = classloader.getResource(templatePath);
 

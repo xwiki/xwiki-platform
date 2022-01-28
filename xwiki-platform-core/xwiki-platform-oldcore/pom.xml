@@ -303,7 +303,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-api</artifactId>
+      <artifactId>xwiki-platform-image-processing-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

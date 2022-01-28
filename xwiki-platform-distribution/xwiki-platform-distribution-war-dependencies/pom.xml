@@ -568,7 +568,7 @@
     <!-- Image plugin -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-plugin</artifactId>
+      <artifactId>xwiki-platform-image-processing-plugin</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

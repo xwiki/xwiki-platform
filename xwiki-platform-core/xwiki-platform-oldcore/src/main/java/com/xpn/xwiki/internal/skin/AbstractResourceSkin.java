@@ -142,7 +142,7 @@ public abstract class AbstractResourceSkin extends AbstractSkin
         String skinFolder = getSkinFolder();
         String resourcePath = skinFolder + resource;
 
-        // Prevent inclusion of templates from other directories
+        // Prevent access to resources from other directories
         Path normalizedResource = Paths.get(resourcePath).normalize();
         // Protect against directory attacks.
         if (!normalizedResource.startsWith(skinFolder)) {

@@ -411,13 +411,13 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery',
     'css/blueimp-gallery.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-image-webjar',
-    'lightbox.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+    'less/lightbox.less', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.jsx.use('XWiki.Lightbox.WebHome'))
   {{html clean="false"}}
   &lt;!-- The Gallery lightbox dialog. --&gt;
   &lt;div
     id="blueimp-gallery"
-    class="blueimp-gallery"
+    class="blueimp-gallery blueimp-gallery-controls"
     aria-label="$escapetool.xml($services.localization.render('image.lightbox.gallery.title'))"
     aria-modal="true"
     role="dialog"
@@ -462,11 +462,11 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
       &gt;$services.icon.renderHTML('cross')&lt;/a&gt;
     &lt;/div&gt;
     &lt;div class="lightboxDescription"&gt;
-      &lt;div class="descriptionRow"&gt;
+      &lt;div class="descriptionRow descriptionCaption"&gt;
         &lt;span class="caption"
           aria-label="$escapetool.xml($services.localization.render('image.lightbox.caption.label'))"&gt;&lt;/span&gt;
       &lt;/div&gt;
-      &lt;div class="descriptionRow"&gt;
+      &lt;div class="descriptionRow descriptionMetadata"&gt;
         &lt;div class="descriptionColLeft"&gt;
           &lt;span class="title"
             aria-label="$escapetool.xml($services.localization.render('image.lightbox.fileName.label'))"&gt;&lt;/span&gt;
@@ -482,7 +482,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
     &lt;ol class="indicator"&gt;&lt;/ol&gt;
   &lt;/div&gt;
   &lt;!-- The image toolbar popover template. --&gt;
-  &lt;div id="toolbarTemplate"&gt;
+  &lt;div id="imageToolbarTemplate"&gt;
     &lt;div class="btn-group imageToolbar" hidden&gt;
       &lt;a id="openLightbox"
         title="$escapetool.xml($services.localization.render('image.lightbox.gallery.title'))"&gt;

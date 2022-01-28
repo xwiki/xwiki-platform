@@ -1,15 +1,19 @@
-/*! #template('colorThemeInit.vm') */
-
-@bg-color: $theme.pageContentBackgroundColor;
-@text-color: $theme.textColor;
-
 #blueimp-gallery {
-  > div.slides img {
-    bottom: 15%;
+  background-color: rgba(0,0,0,0.5);
+
+  > div.slides {
+    bottom: 10%;
   }
 
   > .indicator {
-    bottom: 10%;
+    bottom: 12%;
+
+    /* Make the thumbnails bigger. */
+    > li {
+      width: 20px;
+      height: 20px;
+      border-radius: 10px;
+    }
   }
 
   .controls {
@@ -21,7 +25,7 @@
   }
 
   .lightboxDescription {
-    background-color: @bg-color;
+    background-color: @xwiki-page-content-bg;
     color: @text-color;
     display: block;
     position: absolute;
@@ -34,16 +38,24 @@
       height: 100%;
     }
 
+    .descriptionCaption {
+      overflow: auto;
+      max-height: 4vh;
+    }
+
+    .descriptionMetadata {
+      border-top: 1px solid rgb(224, 224, 224);
+      padding-top: 0.5%;
+    }
+
     .descriptionColLeft {
       float: left;
       width: 68%;
-      font-size: smaller;
     }
 
     .descriptionColRight {
       float: right;
       width: 30%;
-      font-size: smaller;
     }
   }
 }
@@ -52,7 +64,7 @@
   .download:hover,
   .autoPlay:hover,
   .escape:hover {
-    color: @bg-color;
+    color: @text-color;
     opacity: 1;
   }
 
@@ -60,6 +72,7 @@
   .download,
   .autoPlay,
   .escape {
+    color: @xwiki-page-content-bg;
     display: none;
   }
 }
@@ -77,6 +90,6 @@
     transform: translateZ(0);
   }
 }
-#toolbarTemplate {
+#imageToolbarTemplate {
   display: none;
 }

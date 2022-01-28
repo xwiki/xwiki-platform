@@ -89,7 +89,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      *
      * @since 14.1RC1
      */
-    protected static final String PARAMETER_SEPARATOR = "&";
+    static final String PARAMETER_SEPARATOR = "&";
 
     /** Log object to log messages in this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSkinExtensionPlugin.class);
@@ -193,7 +193,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * @return The (unescaped) URL of the skin file.
      * @since 14.1RC1
      */
-    protected String getSkinFileURL(String filename, XWikiContext context)
+    String getSkinFileURL(String filename, XWikiContext context)
     {
         boolean forceSkinAction = BooleanUtils.toBoolean((Boolean) getParameter(FORCE_SKIN_ACTION, filename,
             context));
@@ -504,7 +504,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * to true.
      * @since 14.1RC1
      */
-    protected boolean isDefer(String name, XWikiContext context)
+    boolean isDefer(String name, XWikiContext context)
     {
         String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
         boolean defaultDefer = StringUtils.isEmpty(defaultDeferString) || Boolean.parseBoolean(defaultDeferString);

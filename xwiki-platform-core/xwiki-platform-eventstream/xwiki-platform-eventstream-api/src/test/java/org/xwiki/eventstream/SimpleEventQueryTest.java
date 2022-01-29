@@ -238,7 +238,7 @@ class SimpleEventQueryTest
 
         query.open();
 
-        assertTrue(query.getConditions().isEmpty());
+        assertEquals(1, query.getConditions().size());
 
         query.close();
 
@@ -287,11 +287,8 @@ class SimpleEventQueryTest
         query.close();
 
         assertEquals(1, query.getConditions().size());
-
         group = (GroupQueryCondition) query.getConditions().get(0);
-
         assertEquals(2, group.getConditions().size());
-
         assertEquals(new CompareQueryCondition("property1", "value1", CompareType.EQUALS),
             group.getConditions().get(0));
         assertEquals(new CompareQueryCondition("property2", "value2", CompareType.EQUALS),
@@ -315,14 +312,11 @@ class SimpleEventQueryTest
         query.or();
         query.eq("property2", "value2");
 
-        assertEquals(1, query.getConditions().size());
-        GroupQueryCondition group = (GroupQueryCondition) query.getConditions().get(0);
-
-        assertEquals(2, group.getConditions().size());
-        assertTrue(group.isOr());
-        assertEquals(new CompareQueryCondition("property", "value", CompareType.EQUALS), group.getConditions().get(0));
+        assertEquals(2, query.getConditions().size());
+        assertTrue(query.isOr());
+        assertEquals(new CompareQueryCondition("property", "value", CompareType.EQUALS), query.getConditions().get(0));
         assertEquals(new CompareQueryCondition("property2", "value2", CompareType.EQUALS),
-            group.getConditions().get(1));
+            query.getConditions().get(1));
 
         query = new SimpleEventQuery();
 
@@ -332,16 +326,14 @@ class SimpleEventQueryTest
         query.or();
         query.eq("property3", "value3");
 
-        assertEquals(1, query.getConditions().size());
-        group = (GroupQueryCondition) query.getConditions().get(0);
-        assertEquals(3, group.getConditions().size());
-        assertTrue(group.isOr());
+        assertEquals(3, query.getConditions().size());
+        assertTrue(query.isOr());
         assertEquals(new CompareQueryCondition("property1", "value1", CompareType.EQUALS),
-            group.getConditions().get(0));
+            query.getConditions().get(0));
         assertEquals(new CompareQueryCondition("property2", "value2", CompareType.EQUALS),
-            group.getConditions().get(1));
+            query.getConditions().get(1));
         assertEquals(new CompareQueryCondition("property3", "value3", CompareType.EQUALS),
-            group.getConditions().get(2));
+            query.getConditions().get(2));
 
         query = new SimpleEventQuery();
 
@@ -356,16 +348,127 @@ class SimpleEventQueryTest
         assertEquals(1, query.getConditions().size());
         GroupQueryCondition group1 = (GroupQueryCondition) query.getConditions().get(0);
         assertEquals(2, group1.getConditions().size());
-        assertFalse(group1.isOr());
-        GroupQueryCondition group2 = (GroupQueryCondition) group1.getConditions().get(0);
-        assertEquals(2, group2.getConditions().size());
-        assertTrue(group2.isOr());
+        assertTrue(group1.isOr());
         assertEquals(new CompareQueryCondition("property1", "value1", CompareType.EQUALS),
-            group2.getConditions().get(0));
+            group1.getConditions().get(0));
+        GroupQueryCondition group2 = (GroupQueryCondition) group1.getConditions().get(1);
+        assertEquals(2, group2.getConditions().size());
+        assertFalse(group2.isOr());
         assertEquals(new CompareQueryCondition("property2", "value2", CompareType.EQUALS),
-            group2.getConditions().get(1));
+            group2.getConditions().get(0));
         assertEquals(new CompareQueryCondition("property3", "value3", CompareType.EQUALS),
+            group2.getConditions().get(1));
+
+        query = new SimpleEventQuery();
+
+        query.open();
+        query.eq("property1", "value1");
+        query.or();
+        query.open();
+        query.eq("property2", "value2");
+        query.and();
+        query.eq("property3", "value3");
+        query.close();
+        query.close();
+
+        assertEquals(1, query.getConditions().size());
+        group1 = (GroupQueryCondition) query.getConditions().get(0);
+        assertEquals(2, group1.getConditions().size());
+        assertTrue(group1.isOr());
+        assertEquals(new CompareQueryCondition("property1", "value1", CompareType.EQUALS),
+            group1.getConditions().get(0));
+        group2 = (GroupQueryCondition) group1.getConditions().get(1);
+        assertEquals(2, group2.getConditions().size());
+        assertFalse(group2.isOr());
+        assertEquals(new CompareQueryCondition("property2", "value2", CompareType.EQUALS),
+            group2.getConditions().get(0));
+        assertEquals(new CompareQueryCondition("property3", "value3", CompareType.EQUALS),
+            group2.getConditions().get(1));
+
+        query = new SimpleEventQuery();
+
+        query.eq("property1", "value1");
+        query.and();
+        query.eq("property2", "value2");
+        query.or();
+        query.eq("property3", "value3");
+        query.and();
+        query.eq("property4", "value4");
+        query.or();
+        query.eq("property5", "value5");
+
+        assertEquals(2, query.getConditions().size());
+        assertEquals(new CompareQueryCondition("property1", "value1", CompareType.EQUALS),
+            query.getConditions().get(0));
+        group1 = (GroupQueryCondition) query.getConditions().get(1);
+        assertTrue(group1.isOr());
+        assertEquals(2, group1.getConditions().size());
+        assertEquals(new CompareQueryCondition("property2", "value2", CompareType.EQUALS),
+            group1.getConditions().get(0));
+        group2 = (GroupQueryCondition) group1.getConditions().get(1);
+        assertFalse(group2.isOr());
+        assertEquals(2, group2.getConditions().size());
+        assertEquals(new CompareQueryCondition("property3", "value3", CompareType.EQUALS),
+            group2.getConditions().get(0));
+        GroupQueryCondition group3 = (GroupQueryCondition) group2.getConditions().get(1);
+        assertTrue(group3.isOr());
+        assertEquals(2, group3.getConditions().size());
+        assertEquals(new CompareQueryCondition("property4", "value4", CompareType.EQUALS),
+            group3.getConditions().get(0));
+        assertEquals(new CompareQueryCondition("property5", "value5", CompareType.EQUALS),
+            group3.getConditions().get(1));
+
+        query = new SimpleEventQuery();
+        
+        query.eq("property1", "value1");
+        query.open();
+        query.eq("property2", "value2");
+        query.or();
+        query.eq("property3", "value3");
+        query.and();
+        query.eq("property4", "value4");
+        query.close();
+        query.eq("property5", "value5");
+
+        assertEquals(3, query.getConditions().size());
+        assertEquals(new CompareQueryCondition("property1", "value1", CompareType.EQUALS),
+            query.getConditions().get(0));
+        group1 = (GroupQueryCondition) query.getConditions().get(1);
+        assertTrue(group1.isOr());
+        assertEquals(2, group1.getConditions().size());
+        assertEquals(new CompareQueryCondition("property2", "value2", CompareType.EQUALS),
+            group1.getConditions().get(0));
+        group2 = (GroupQueryCondition) group1.getConditions().get(1);
+        assertFalse(group2.isOr());
+        assertEquals(2, group2.getConditions().size());
+        assertEquals(new CompareQueryCondition("property3", "value3", CompareType.EQUALS),
+            group2.getConditions().get(0));
+        assertEquals(new CompareQueryCondition("property4", "value4", CompareType.EQUALS),
+            group2.getConditions().get(1));
+        assertEquals(new CompareQueryCondition("property5", "value5", CompareType.EQUALS),
+            query.getConditions().get(2));
+
+        query = new SimpleEventQuery();
+
+        query.open();
+        query.open();
+        query.eq("property1", "value1");
+        query.or();
+        query.eq("property2", "value2");
+        query.close();
+        query.close();
+        query.eq("property3", "value3");
+
+        assertEquals(2, query.getConditions().size());
+        assertFalse(query.isOr());
+        group1 = (GroupQueryCondition) query.getConditions().get(0);
+        assertTrue(group1.isOr());
+        assertEquals(new CompareQueryCondition("property1", "value1", CompareType.EQUALS),
+            group1.getConditions().get(0));
+        assertEquals(new CompareQueryCondition("property2", "value2", CompareType.EQUALS),
             group1.getConditions().get(1));
+        assertEquals(new CompareQueryCondition("property3", "value3", CompareType.EQUALS),
+            query.getConditions().get(1));
     }
 
     @Test

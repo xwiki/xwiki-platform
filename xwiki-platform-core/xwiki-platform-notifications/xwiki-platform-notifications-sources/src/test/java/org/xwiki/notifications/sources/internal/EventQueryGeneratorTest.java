@@ -68,13 +68,13 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
  */
 @ComponentList({DefaultStringEntityReferenceSerializer.class, DefaultSymbolScheme.class, QueryExpressionGenerator.class,
     ExpressionNodeToEventQueryConverter.class})
-public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
+class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 {
     @InjectMockComponents
     private EventQueryGenerator generator;
 
     @Test
-    public void generateQueryExpression() throws Exception
+    void generateQueryExpression() throws Exception
     {
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = USER_REFERENCE;
@@ -102,7 +102,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWhenHiddenDocsAreEnabled() throws Exception
+    void generateQueryWhenHiddenDocsAreEnabled() throws Exception
     {
         UserProperties userProperties = mock(UserProperties.class);
         when(userProperties.displayHiddenDocuments()).thenReturn(true);
@@ -133,7 +133,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithUntilDate() throws Exception
+    void generateQueryWithUntilDate() throws Exception
     {
         Date untilDate = new Date(1000000000000L);
 
@@ -167,7 +167,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithUntilDateAndBlackList() throws Exception
+    void generateQueryWithUntilDateAndBlackList() throws Exception
     {
         Date untilDate = new Date(1000000000000L);
 
@@ -200,7 +200,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithLocalUser() throws Exception
+    void generateQueryWithLocalUser() throws Exception
     {
         // Test
         when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
@@ -233,7 +233,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithFilters() throws Exception
+    void generateQueryWithFilters() throws Exception
     {
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
@@ -287,7 +287,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithNoRelevantFilters() throws Exception
+    void generateQueryWithNoRelevantFilters() throws Exception
     {
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
@@ -327,7 +327,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithEventTypesThatHasNoDescriptor() throws Exception
+    void generateQueryWithEventTypesThatHasNoDescriptor() throws Exception
     {
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
@@ -367,7 +367,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithPreFiltering() throws Exception
+    void generateQueryWithPreFiltering() throws Exception
     {
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
@@ -407,7 +407,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithPreFilteringNoUser() throws Exception
+    void generateQueryWithPreFilteringNoUser() throws Exception
     {
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
@@ -447,7 +447,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithPreFilteringOnlyUser() throws Exception
+    void generateQueryWithPreFilteringOnlyUser() throws Exception
     {
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
@@ -487,7 +487,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithPreFilteringEmailReadFilter() throws Exception
+    void generateQueryWithPreFilteringEmailReadFilter() throws Exception
     {
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
@@ -497,13 +497,13 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         NotificationFilter notificationFilter2 = mock(NotificationFilter.class);
         when(notificationFilter2.filterExpression(any(DocumentReference.class), any(Collection.class),
-            any(NotificationPreference.class))).thenReturn(
-                new NotNode(new ForUserNode(USER_REFERENCE, true, NotificationFormat.EMAIL)));
+            any(NotificationPreference.class)))
+                .thenReturn(new NotNode(new ForUserNode(USER_REFERENCE, true, NotificationFormat.EMAIL)));
         when(notificationFilter2.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
 
         when(this.notificationFilterManager.getFiltersRelatedToNotificationPreference(anyCollection(),
             any(NotificationPreference.class)))
-            .thenAnswer(invocationOnMock -> ((Collection) invocationOnMock.getArgument(0)).stream());
+                .thenAnswer(invocationOnMock -> ((Collection) invocationOnMock.getArgument(0)).stream());
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
@@ -526,9 +526,10 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
         assertEquals(new StatusQueryCondition(USER_REFERENCE.toString(), true, false), conditions.next());
-        assertEquals(new GroupQueryCondition(false, true,
-            new MailEntityQueryCondition(SERIALIZED_USER_REFERENCE, false),
-            new StatusQueryCondition(SERIALIZED_USER_REFERENCE, true, false)), conditions.next());
+        assertEquals(
+            new GroupQueryCondition(false, true, new MailEntityQueryCondition(SERIALIZED_USER_REFERENCE, false),
+                new StatusQueryCondition(SERIALIZED_USER_REFERENCE, true, false)),
+            conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();

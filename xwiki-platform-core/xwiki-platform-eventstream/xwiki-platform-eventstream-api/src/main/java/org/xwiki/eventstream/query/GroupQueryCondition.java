@@ -38,7 +38,9 @@ public class GroupQueryCondition extends QueryCondition
 {
     protected final List<QueryCondition> conditions = new ArrayList<>();
 
-    private final boolean or;
+    protected boolean or;
+
+    protected final boolean virtual;
 
     /**
      * @param or true if one of the conditions is enough, if false all conditions must match
@@ -47,9 +49,20 @@ public class GroupQueryCondition extends QueryCondition
      */
     public GroupQueryCondition(boolean or, boolean reversed, QueryCondition... conditions)
     {
+        this(or, reversed, false, conditions);
+    }
+
+    /**
+     * @param or true if one of the conditions is enough, if false all conditions must match
+     * @param reversed true if the condition should be reversed
+     * @param conditions the condition to start with
+     */
+    protected GroupQueryCondition(boolean or, boolean reversed, boolean virtual, QueryCondition... conditions)
+    {
         super(reversed);
 
         this.or = or;
+        this.virtual = virtual;
 
         CollectionUtils.addAll(this.conditions, conditions);
     }

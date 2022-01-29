@@ -471,7 +471,8 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         if (query instanceof SimpleEventQuery) {
             SimpleEventQuery simpleQuery = (SimpleEventQuery) query;
 
-            addConditions(simpleQuery.getConditions(), solrQuery);
+            addConditions(simpleQuery.isOr() && simpleQuery.getConditions().size() > 1
+                ? Collections.singletonList(simpleQuery) : simpleQuery.getConditions(), solrQuery);
         }
 
         return solrQuery;
@@ -588,6 +589,9 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         if (group.getConditions().isEmpty()) {
             return null;
+        } else if (group.getConditions().size() == 1) {
+            // Optimize useless groups
+            return serializeCondition(group.getConditions().get(0));
         }
 
         StringBuilder builder = new StringBuilder();

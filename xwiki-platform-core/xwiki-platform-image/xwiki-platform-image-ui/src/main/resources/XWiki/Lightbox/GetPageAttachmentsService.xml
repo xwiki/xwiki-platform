@@ -42,7 +42,8 @@
   #set ($attachReference = $services.model.resolveAttachment($request.imageURL, 'resource/standard'))
   #set ($attachDocument = $xwiki.getDocument($attachReference.getDocumentReference()))
   #set ($attachName = $attachReference.getName())
-  #if ($attachDocument.getAttachment($attachReference.getName()))
+  ## Send an error in case the user has no rights on the document or the attachment doesn't exist.
+  #if ($attachDocument &amp;&amp; $attachDocument.getAttachment($attachReference.getName()))
     #set ($restURL = $services.rest.url($attachReference.getDocumentReference()) + "/attachments")
     $response.sendRedirect($restURL)
   #else

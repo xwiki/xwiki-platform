@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.xwiki.attachment.test.po.AttachmentPane;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -54,6 +55,7 @@ class MoveAttachmentIT
     @Test
     @Order(1)
     void moveAttachment(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
     {
         DocumentReference sourcePage = new DocumentReference("Source", testReference.getLastSpaceReference());
         DocumentReference targetPage = new DocumentReference("Target", testReference.getLastSpaceReference());
@@ -65,7 +67,9 @@ class MoveAttachmentIT
         // Create the pages and upload a document with a first user U1.
         setup.createUserAndLogin("U1", "pU1");
         setup.createPage(sourcePage, "");
-        setup.createPage(targetPage, "");
+        AttachmentReference sourceAttachmentReference = new AttachmentReference("moveme.txt", sourcePage);
+        String serializedSourceAttachmentReference = setup.serializeReference(sourceAttachmentReference);
+        setup.createPage(targetPage, String.format("[[attach:%s]]", serializedSourceAttachmentReference));
 
         ViewPage viewSourcePage = setup.gotoPage(sourcePage);
         AttachmentsPane sourceAttachmentsPane = viewSourcePage.openAttachmentsDocExtraPane();
@@ -99,5 +103,9 @@ class MoveAttachmentIT
         // Verify that the redirection object has been created on the source page.
         Object object = setup.rest().object(sourcePage, setup.serializeReference(REFERENCE));
         assertNotNull(object);
+
+        // Verify that the refactoring is properly applied.
+        ViewPage viewPage = setup.gotoPage(targetPage);
+        assertEquals("[[attach:newname.txt]]", viewPage.getContent());
     }
 }

@@ -82,7 +82,7 @@ class R1402000XWIKI19352DataMigrationTest
         when(this.contextProvider.get()).thenReturn(this.context);
         when(this.context.getWiki()).thenReturn(this.wiki);
         when(this.context.getWikiId()).thenReturn("wiki1");
-        when(this.queryManager.createQuery("SELECT doc.id, doc.version FROM XWikiDocument doc",
+        when(this.queryManager.createQuery("SELECT doc.id FROM XWikiDocument doc",
             Query.HQL)).thenReturn(this.query);
         when(this.query.setWiki(any())).thenReturn(this.query);
     }
@@ -92,16 +92,13 @@ class R1402000XWIKI19352DataMigrationTest
     {
         when(this.wiki.hasBacklinks(this.context)).thenReturn(true);
 
-        when(this.query.execute()).thenReturn(List.of(
-            new Object[] { 42L, "1.4" },
-            new Object[] { 43L, "1.5" }
-        ));
+        when(this.query.execute()).thenReturn(List.of(42L, 43L));
 
         this.migration.migrate();
 
         verify(this.query).setWiki("wiki1");
-        verify(this.taskManager).replaceTask("wiki1", 42L, "1.4", "links");
-        verify(this.taskManager).replaceTask("wiki1", 43L, "1.5", "links");
+        verify(this.taskManager).addTask("wiki1", 42L,  "links");
+        verify(this.taskManager).addTask("wiki1", 43L, "links");
     }
 
     @Test

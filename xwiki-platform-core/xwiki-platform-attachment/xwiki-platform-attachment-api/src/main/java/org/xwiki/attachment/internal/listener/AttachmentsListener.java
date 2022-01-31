@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment.internal;
+package org.xwiki.attachment.internal.listener;
 
 import java.util.List;
 
@@ -27,6 +27,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.observation.EventListener;

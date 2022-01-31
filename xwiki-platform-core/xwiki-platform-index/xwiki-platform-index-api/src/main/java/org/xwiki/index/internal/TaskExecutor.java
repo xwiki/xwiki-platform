@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -90,7 +91,12 @@ public class TaskExecutor
     private void internalExecute(TaskData task) throws XWikiException, IndexException, ComponentLookupException
     {
         XWikiDocument document = this.tasksStore.get().getDocument(task.getWikiId(), task.getDocId());
-        XWikiDocument doc = this.documentRevisionProvider.getRevision(document, task.getVersion());
+        XWikiDocument doc;
+        if (StringUtils.isBlank(task.getVersion())) {
+            doc = document;
+        } else {
+            doc = this.documentRevisionProvider.getRevision(document, task.getVersion());
+        }
         this.componentManager.get().<TaskConsumer>getInstance(TaskConsumer.class, task.getType())
             .consume(doc.getDocumentReference(), doc.getVersion());
         task.getFuture().complete(task);

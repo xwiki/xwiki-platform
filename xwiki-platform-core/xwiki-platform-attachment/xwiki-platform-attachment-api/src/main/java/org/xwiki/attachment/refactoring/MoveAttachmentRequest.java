@@ -44,6 +44,14 @@ public class MoveAttachmentRequest extends EntityRequest
     public static final String AUTO_REDIRECT = "autoRedirect";
 
     /**
+     * Update references refactoring property name.
+     *
+     * @since 14.2RC1
+     */
+    @Unstable
+    public static final String UPDATE_REFERENCES = "updateReferences";
+
+    /**
      * @return the destination of the move
      */
     public AttachmentReference getDestination()
@@ -58,6 +66,16 @@ public class MoveAttachmentRequest extends EntityRequest
     public boolean isAutoRedirect()
     {
         return getProperty(AUTO_REDIRECT, true);
+    }
+
+    /**
+     * @return {@code true} if the references must be updated, {@code false} otherwise
+     * @since 14.2RC1
+     */
+    @Unstable
+    public boolean isUpdateReferences()
+    {
+        return getProperty(UPDATE_REFERENCES, true);
     }
 
     @Override

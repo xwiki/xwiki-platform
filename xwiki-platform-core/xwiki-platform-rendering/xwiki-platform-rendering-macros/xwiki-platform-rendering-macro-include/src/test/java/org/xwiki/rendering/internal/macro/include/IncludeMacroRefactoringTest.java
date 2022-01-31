@@ -93,14 +93,13 @@ class IncludeMacroRefactoringTest
             .thenReturn(referenceParam);
         when(this.documentReferenceResolver.resolve(referenceParam)).thenReturn(this.sourceReference);
 
-        String targetReference = "foobar42";
         when(this.stringEntityReferenceSerializer.serialize(this.targetReference, this.currentDocumentReference))
-            .thenReturn(targetReference);
+            .thenReturn("foobar42");
         MacroBlock expectedBlock = mock(MacroBlock.class);
         when(this.macroBlock.clone()).thenReturn(expectedBlock);
         assertEquals(Optional.of(expectedBlock), this.includeMacroRefactoring.replaceReference(this.macroBlock,
             this.currentDocumentReference, this.sourceReference, this.targetReference, false));
-        verify(expectedBlock).setParameter(IncludeMacroRefactoring.REFERENCE_MACRO_PARAMETER, targetReference);
+        verify(expectedBlock).setParameter(IncludeMacroRefactoring.REFERENCE_MACRO_PARAMETER, "foobar42");
     }
 
     @Test
@@ -111,14 +110,13 @@ class IncludeMacroRefactoringTest
             .thenReturn(referenceParam);
         when(this.documentReferenceResolver.resolve(referenceParam)).thenReturn(this.sourceReference);
 
-        String targetReference = "foobar42";
         when(this.stringEntityReferenceSerializer.serialize(this.targetReference, this.currentDocumentReference))
-            .thenReturn(targetReference);
+            .thenReturn("foobar42");
         MacroBlock expectedBlock = mock(MacroBlock.class);
         when(this.macroBlock.clone()).thenReturn(expectedBlock);
         assertEquals(Optional.of(expectedBlock), this.includeMacroRefactoring.replaceReference(this.macroBlock,
             this.currentDocumentReference, this.sourceReference, this.targetReference, false));
-        verify(expectedBlock).setParameter(IncludeMacroRefactoring.DOCUMENT_MACRO_PARAMETER, targetReference);
+        verify(expectedBlock).setParameter(IncludeMacroRefactoring.DOCUMENT_MACRO_PARAMETER, "foobar42");
     }
 
     @Test

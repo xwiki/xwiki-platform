@@ -27,9 +27,6 @@
 </dt>
 <dd>
   #hierarchy($attachment)
-##  <input type="hidden" name="sourceWikiName" value="$!escapetool.xml($doc.wiki)"/>
-##  <input type="hidden" name="sourceSpaceName" value="$!escapetool.xml($doc.space)"/>
-##  <input type="hidden" name="sourcePageName" value="$!escapetool.xml($doc.documentReference.name)"/>
   <input type="hidden" name="sourceLocation" 
           value="$!escapetool.xml($services.model.serialize($doc.documentReference, 'default'))" />
   <input type="hidden" name="sourceAttachmentName" value="$!escapetool.xml($attachment.name)"/>
@@ -42,19 +39,18 @@
   ## (i.e. we want to make sure the links are updated for simple users).
 <dt#if ($hidden) class="hidden"#end>
   <label>
-    #set ($checked = !$request.updateLinks || $request.updateLinks == 'true')
-    <input type="checkbox" name="updateLinks" value="true" #if ($checked)checked="checked"#end />
+    #set ($checked = !$request.updateReferences || $request.updateReferences == 'true')
+    <input type="checkbox" name="updateReferences" value="true" #if ($checked)checked="checked"#end />
     $services.localization.render('attachment.move.links.label')
   </label>
   ## The value submitted when the checkbox is not checked, used to preserve the form state.
-  <input type="hidden" name="updateLinks" value="false"/>
+  <input type="hidden" name="updateReferences" value="false"/>
 </dt>
 <dd#if ($hidden) class="hidden"#end>
-  ## TODO: update once a backlink management mechanism is in place.
-  #set ($backLinksCount = 0)
+  #set ($backLinksCount = $services.attachment.backlinksCount($attachment))
   #set ($backLinksURL = '')
   <span class="xHint">
-    $services.localization.render('attachment.move.links.hint', ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])
+    $services.localization.render('attachment.move.links.hint', [$backLinksCount])
   </span>
 </dd>
 #end

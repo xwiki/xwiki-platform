@@ -35,6 +35,7 @@ import org.xwiki.job.AbstractJobStatus;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -541,6 +542,46 @@ class DefaultModelBridgeTest
     }
 
     @Test
+    void getBackLinkedReferencesAttachment() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
+        List<DocumentReference> backlinks = List.of(new DocumentReference("bob", "One", "Two"));
+
+        when(this.xwiki.getStore().loadBacklinks(attachmentReference, true, this.xcontext))
+            .thenReturn(backlinks);
+
+        this.xcontext.setWikiId("wiki0");
+
+        assertEquals(backlinks, this.modelBridge.getBackLinkedReferences(attachmentReference, "wiki"));
+
+        verify(this.xcontext).setWikiId("wiki");
+        verify(this.xcontext).setWikiId("wiki0");
+    }
+
+    @Test
+    void getBackLinkedReferencesAttachmentXWikiException() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
+
+        when(this.xwiki.getStore().loadBacklinks(attachmentReference, true, this.xcontext))
+            .thenThrow(XWikiException.class);
+
+        this.xcontext.setWikiId("wiki0");
+
+        assertEquals(List.of(), this.modelBridge.getBackLinkedReferences(attachmentReference, "wiki"));
+
+        verify(this.xcontext).setWikiId("wiki");
+        verify(this.xcontext).setWikiId("wiki0");
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Failed to retrieve the back-links for attachment "
+            + "[Attachment wiki:space.page@image.png] on wiki [wiki].", this.logCapture.getMessage(0));
+        assertEquals(Level.ERROR, this.logCapture.getLogEvent(0).getLevel());
+    }
+
+    @Test
     void restoreDeletedDocument() throws Exception
     {
         long deletedDocumentId = 42;
@@ -890,4 +931,6 @@ class DefaultModelBridgeTest
             assertLog(i - 1, Level.INFO, "Document [{}] has been permanently deleted.", documentReference);
         }
     }
+    
+    
 }

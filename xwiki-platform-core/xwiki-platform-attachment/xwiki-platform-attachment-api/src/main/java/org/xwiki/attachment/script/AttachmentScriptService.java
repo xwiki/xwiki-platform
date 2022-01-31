@@ -23,12 +23,15 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.attachment.AttachmentException;
 import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.attachment.internal.refactoring.job.MoveAttachmentJob;
 import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
@@ -38,10 +41,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static org.xwiki.attachment.refactoring.MoveAttachmentRequest.AUTO_REDIRECT;
+import static org.xwiki.attachment.refactoring.MoveAttachmentRequest.DESTINATION;
+import static org.xwiki.attachment.refactoring.MoveAttachmentRequest.UPDATE_REFERENCES;
 
 /**
  * Provides the operations related to attachments manipulation. In particular regarding the operations to move
@@ -63,6 +70,13 @@ public class AttachmentScriptService implements ScriptService
     private JobExecutor jobExecutor;
 
     @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    @Named("readonly")
+    private Provider<XWikiContext> xWikiContextProvider;
+
+    @Inject
     private Logger logger;
 
     /**
@@ -75,18 +89,19 @@ public class AttachmentScriptService implements ScriptService
      * @param userReference the reference of the user making the move request
      * @param autoRedirect if {@code true} a redirection will be set from the source location to the target
      *     location
-     * @param isAsync {@code true} if the job can be executed asynchronously, {@code false} otherwise
+     * @param updateReferences if {@code true} the references of the attachments will be refactored
      * @return the initialized move attachment request
      */
     public MoveAttachmentRequest createMoveRequest(DocumentReference sourceLocation, String sourceName,
         DocumentReference targetLocation, String targetName, DocumentReference userReference,
-        boolean autoRedirect, boolean isAsync)
+        boolean autoRedirect, boolean updateReferences)
     {
         MoveAttachmentRequest request = new MoveAttachmentRequest();
         request.setEntityReferences(singletonList(new AttachmentReference(sourceName, sourceLocation)));
-        request.setProperty(MoveAttachmentRequest.DESTINATION, new AttachmentReference(targetName, targetLocation));
-        request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, autoRedirect);
-        request.setInteractive(isAsync);
+        request.setProperty(DESTINATION, new AttachmentReference(targetName, targetLocation));
+        request.setProperty(AUTO_REDIRECT, autoRedirect);
+        request.setProperty(UPDATE_REFERENCES, updateReferences);
+        request.setInteractive(true);
         request.setId("refactoring", "moveAttachment",
             String.format("%d-%d", System.currentTimeMillis(), ThreadLocalRandom.current().nextInt(100, 1000)));
         request.setUserReference(userReference);
@@ -101,6 +116,10 @@ public class AttachmentScriptService implements ScriptService
      */
     public Job createMoveJob(MoveAttachmentRequest request) throws JobException
     {
+        request.setCheckRights(true);
+        request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
+        request.setAuthorReference(this.documentAccessBridge.getCurrentAuthorReference());
+
         return this.jobExecutor.execute(MoveAttachmentJob.HINT, request);
     }
 
@@ -118,6 +137,26 @@ public class AttachmentScriptService implements ScriptService
             this.logger.warn("Failed to check if [{}] exists [{}]. Cause: [{}].", attachmentName, documentReference,
                 getRootCauseMessage(e));
             return false;
+        }
+    }
+
+    /**
+     * Count the number of backlinks toward a given attachment.
+     *
+     * @param attachmentReference an attachment reference
+     * @return the number of backlinks to the attachment
+     * @since 14.2RC1
+     */
+    @Unstable
+    public long backlinksCount(AttachmentReference attachmentReference) throws AttachmentException
+    {
+        XWikiContext xcontext = this.xWikiContextProvider.get();
+
+        try {
+            return xcontext.getWiki().getStore().loadBacklinks(attachmentReference, true, xcontext).size();
+        } catch (XWikiException e) {
+            throw new AttachmentException(
+                String.format("Failed to get the backlinks for attachment [%s]", attachmentReference), e);
         }
     }
 }

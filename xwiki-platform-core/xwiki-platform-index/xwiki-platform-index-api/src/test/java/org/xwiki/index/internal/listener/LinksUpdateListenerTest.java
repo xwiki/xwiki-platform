@@ -19,6 +19,8 @@
  */
 package org.xwiki.index.internal.listener;
 
+import javax.inject.Provider;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -58,6 +60,9 @@ class LinksUpdateListenerTest
     @MockComponent
     private TaskManager taskManager;
 
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
     @Mock
     private XWikiContext context;
 
@@ -67,6 +72,7 @@ class LinksUpdateListenerTest
     @BeforeEach
     void setUp()
     {
+        when(this.contextProvider.get()).thenReturn(this.context);
         when(this.context.getWiki()).thenReturn(this.wiki);
     }
 
@@ -96,8 +102,7 @@ class LinksUpdateListenerTest
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         when(doc.getId()).thenReturn(42L);
         when(doc.getDocumentReference()).thenReturn(documentReference);
-        when(doc.getVersion()).thenReturn("1.1");
         this.linksUpdateListener.onEvent(new DocumentCreatedEvent(), doc, this.context);
-        verify(this.taskManager).replaceTask("wiki", 42L, "1.1", LINKS_TASK_TYPE);
+        verify(this.taskManager).addTask("wiki", 42L, LINKS_TASK_TYPE);
     }
 }

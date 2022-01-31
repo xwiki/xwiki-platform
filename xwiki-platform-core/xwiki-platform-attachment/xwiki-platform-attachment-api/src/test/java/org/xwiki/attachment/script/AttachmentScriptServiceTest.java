@@ -77,7 +77,8 @@ class AttachmentScriptServiceTest
         expected.setEntityReferences(singletonList(new AttachmentReference("old.txt", SOURCE_LOCATION)));
         expected.setProperty(MoveAttachmentRequest.DESTINATION, new AttachmentReference("newName", TARGET_LOCATION));
         expected.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, true);
-        expected.setInteractive(false);
+        expected.setInteractive(true);
+        expected.setProperty(MoveAttachmentRequest.UPDATE_REFERENCES, false);
         expected.setUserReference(USER_REFERENCE);
         // Reset the ids before comparing because we are not interested in the random parts. 
         actual.setId("");

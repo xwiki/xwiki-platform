@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -115,6 +114,12 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
     private final ReentrantReadWriteLock.WriteLock writeLock = this.readWriteLock.writeLock();
 
     @Override
+    public CompletableFuture<TaskData> addTask(String wikiId, long docId, String type)
+    {
+        return addTask(wikiId, docId, "", type);
+    }
+    
+    @Override
     public CompletableFuture<TaskData> addTask(String wikiId, long docId, String version, String type)
     {
         XWikiDocumentIndexingTask xWikiTask = initTask(docId, type, version);
@@ -131,39 +136,6 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
                     type, version, wikiId, getRootCauseMessage(e));
             }
 
-            TaskData taskData = convert(wikiId, xWikiTask);
-            this.queue.add(taskData);
-            return taskData.getFuture();
-        } finally {
-            this.readLock.unlock();
-        }
-    }
-
-    @Override
-    public CompletableFuture<TaskData> replaceTask(String wikiId, long docId, String version, String type)
-    {
-        XWikiDocumentIndexingTask xWikiTask = initTask(docId, type, version);
-        this.readLock.lock();
-        try {
-            try {
-                this.tasksStore.get().replaceTask(wikiId, xWikiTask);
-            } catch (XWikiException e) {
-                this.logger.warn("Failed to persist task with docId [{}], type [{}] and version [{}] in wiki [{}]. The "
-                    + "tasks are replaced but will not be restarted if not completed before the server "
-                    + "stops. Cause: [{}].", docId, type, version, wikiId, getRootCauseMessage(e));
-            }
-
-            Predicate<TaskData> filter = queuedTask -> Objects.equals(queuedTask.getWikiId(), wikiId)
-                && Objects.equals(queuedTask.getType(), type)
-                && Objects.equals(queuedTask.getDocId(), docId);
-
-            // Cancel, then remove, the tasks that need to be replaced.
-            this.queue.forEach(taskData -> {
-                if (filter.test(taskData)) {
-                    taskData.getFuture().cancel(false);
-                }
-            });
-            this.queue.removeIf(filter);
             TaskData taskData = convert(wikiId, xWikiTask);
             this.queue.add(taskData);
             return taskData.getFuture();

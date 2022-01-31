@@ -33,8 +33,10 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -146,13 +148,18 @@ class DefaultLinkRefactoringTest
     @Named("xwiki/2.1")
     private BlockRenderer blockRenderer;
 
+    @MockComponent
+    private JobProgressManager progressManager;
+
     @InjectMockComponents
     private DefaultLinkRefactoring refactoring;
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension();
 
-    private XWikiContext xcontext = mock(XWikiContext.class);
+    @Mock
+    private XWikiContext xcontext;
+
     private MutableRenderingContext mutableRenderingContext;
 
     int logIndex = 0;
@@ -591,7 +598,7 @@ class DefaultLinkRefactoringTest
             componentManager.registerMockComponent(MacroRefactoring.class, "include");
         MacroRefactoring displayMacroRefactoring =
             componentManager.registerMockComponent(MacroRefactoring.class, "display");
-        when(displayMacroRefactoring.replaceReference(any(), any(), any(), any(), anyBoolean()))
+        when(displayMacroRefactoring.replaceReference(any(), any(), any(DocumentReference.class), any(), anyBoolean()))
             .thenReturn(Optional.of(displayMacroBlock));
         when(this.documentAccessBridge.getDocumentInstance(documentReference)).thenReturn(document);
         this.refactoring.renameLinks(documentReference, oldLinkTarget, newLinkTarget);
@@ -606,6 +613,46 @@ class DefaultLinkRefactoringTest
             any());
         verify(this.mutableRenderingContext, times(3)).pop();
         verifyDocumentSave(document, "Renamed back-links.", false, false);
+    }
+
+    @Test
+    void renameLinksAttachments() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        DocumentReference sourceDocument = new DocumentReference("wiki", "Space", "Source");
+        AttachmentReference oldLinkTarget = new AttachmentReference("oldname.txt", sourceDocument);
+        DocumentReference targetDocument = new DocumentReference("wiki", "Space", "Target");
+        AttachmentReference newLinkTarget = new AttachmentReference("newname.txt", targetDocument);
+        ResourceReference resourceReference = new ResourceReference("oldname.txt", ResourceType.ATTACHMENT);
+        LinkBlock documentLinkBlock = new LinkBlock(Collections.emptyList(), resourceReference, false);
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        XDOM xdom = mock(XDOM.class);
+
+        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
+        when(document.getTranslationLocales(this.xcontext)).thenReturn(List.of());
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(document.getXDOM()).thenReturn(xdom);
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(List.of(documentLinkBlock));
+        when(this.resourceReferenceResolver.resolve(resourceReference, null, documentReference)).thenReturn(
+            oldLinkTarget);
+        when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn(
+            "newname.txt");
+
+        this.refactoring.renameLinks(documentReference, oldLinkTarget, newLinkTarget);
+
+        verify(this.progressManager).pushLevelProgress(1, this.refactoring);
+        verify(document).setContent(xdom);
+        verify(document).setContentDirty(false);
+        verify(document).setMetaDataDirty(true);
+        verify(this.xcontext.getWiki()).saveDocument(document, "Renamed back-links.", false, this.xcontext);
+        verify(this.progressManager).popLevelProgress(this.refactoring);
+        assertEquals(1, this.logCapture.size());
+        assertEquals(
+            "The links from [null] that were targeting [Attachment wiki:Space.Source@oldname.txt] have "
+                + "been updated to target [Attachment wiki:Space.Target@newname.txt].", this.logCapture.getMessage(0));
+        assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());
     }
 
     @Test

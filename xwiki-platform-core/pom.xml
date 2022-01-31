@@ -138,7 +138,31 @@
             -->
             <!-- Difference related to the Security refactoring. Start a new <revapi.differences> entry for other
                  differences -->
-            
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.util.Optional&lt;org.xwiki.rendering.block.MacroBlock&gt; org.xwiki.rendering.macro.MacroRefactoring::replaceReference(org.xwiki.rendering.block.MacroBlock, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.AttachmentReference, org.xwiki.model.reference.AttachmentReference, boolean) throws org.xwiki.rendering.macro.MacroRefactoringException</new>
+                  <justification>Young API</justification>
+                  <criticality>allowed</criticality>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.util.concurrent.CompletableFuture&lt;org.xwiki.index.internal.TaskData&gt; org.xwiki.index.TaskManager::addTask(java.lang.String, long, java.lang.String)</new>
+                  <justification>Young API</justification>
+                  <criticality>allowed</criticality>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.util.concurrent.CompletableFuture&lt;org.xwiki.index.internal.TaskData&gt; org.xwiki.index.TaskManager::replaceTask(java.lang.String, long, java.lang.String, java.lang.String)</old>
+                  <justification>Young API</justification>
+                  <criticality>allowed</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

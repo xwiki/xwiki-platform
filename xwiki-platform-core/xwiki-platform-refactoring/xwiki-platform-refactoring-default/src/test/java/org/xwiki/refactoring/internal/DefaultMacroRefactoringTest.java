@@ -156,7 +156,7 @@ class DefaultMacroRefactoringTest
         assertEquals(Optional.empty(),
             this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference,
                 this.sourceReference, this.targetReference, false));
-        verify(this.referenceRenamer, never()).renameReferences(any(), any(), any(), any(), anyBoolean());
+        verify(this.referenceRenamer, never()).renameReferences(any(), any(), any(DocumentReference.class), any(), anyBoolean());
     }
 
     @Test

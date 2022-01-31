@@ -34,6 +34,7 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -171,6 +172,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
     private String configurationCatalog;
 
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
     private DataMigrationManager getDataMigrationManager()
     {
         if (this.dataMigrationManager == null) {
@@ -305,22 +308,28 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      * 
      * @since 11.5RC1
      */
-    public synchronized void build()
+    public void build()
     {
-        // Check if it's a rebuild
-        if (this.sessionFactory != null) {
-            // Get rid of existing session factory
-            disposeInternal();
+        this.lock.writeLock().lock();
 
-            // Recreate the configuration
-            createConfiguration();
+        try {
+            // Check if it's a rebuild
+            if (this.sessionFactory != null) {
+                // Get rid of existing session factory
+                disposeInternal();
+
+                // Recreate the configuration
+                createConfiguration();
+            }
+
+            this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
+            this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
+
+            // Create a new session factory
+            this.sessionFactory = this.configuration.buildSessionFactory(this.standardServiceRegistry);
+        } finally {
+            this.lock.writeLock().unlock();
         }
-
-        this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
-        this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
-
-        // Create a new session factory
-        this.sessionFactory = this.configuration.buildSessionFactory(this.standardServiceRegistry);
     }
 
     private void disposeInternal()
@@ -448,7 +457,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public DatabaseProduct getDatabaseProductName()
     {
         if (this.databaseProductCache == DatabaseProduct.UNKNOWN) {
-            if (this.sessionFactory != null) {
+            if (getSessionFactory() != null) {
                 DatabaseMetaData metaData = getDatabaseMetaData();
                 if (metaData != null) {
                     try {
@@ -836,7 +845,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public SessionFactory getSessionFactory()
     {
-        return this.sessionFactory;
+        this.lock.readLock().lock();
+
+        try {
+            return this.sessionFactory;
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     /**

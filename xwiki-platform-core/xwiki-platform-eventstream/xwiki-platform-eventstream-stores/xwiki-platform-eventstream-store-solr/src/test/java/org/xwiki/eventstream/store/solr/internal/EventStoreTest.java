@@ -467,6 +467,10 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT1, EVENT2),
             new SimpleEventQuery().in(Event.FIELD_ID, EVENT1.getId(), EVENT2.getId()));
 
+        assertSearch(Arrays.asList(), new SimpleEventQuery().in(Event.FIELD_ID));
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().not().in(Event.FIELD_ID));
+
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, true));
         assertSearch(Arrays.asList(EVENT2, EVENT3, EVENT4), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, false));
 

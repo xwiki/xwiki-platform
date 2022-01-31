@@ -577,12 +577,18 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         builder.append(':');
 
-        builder.append('(');
-        builder.append(
-            StringUtils.join(condition.getValues().stream().map(this.utils::toFilterQueryString).iterator(), " OR "));
-        builder.append(')');
+        if (condition.getValues().isEmpty()) {
+            builder.append("[* TO *]");
 
-        return builder.toString();
+            return "(-" + builder.toString() + ')';
+        } else {
+            builder.append('(');
+            builder.append(StringUtils
+                .join(condition.getValues().stream().map(this.utils::toFilterQueryString).iterator(), " OR "));
+            builder.append(')');
+
+            return builder.toString();
+        }
     }
 
     private String serializeGroupCondition(GroupQueryCondition group)
@@ -703,7 +709,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         return property;
     }
 
-    public String toFilterQueryStringRange(CompareQueryCondition greater, CompareQueryCondition less)
+    private String toFilterQueryStringRange(CompareQueryCondition greater, CompareQueryCondition less)
     {
         StringBuilder builder = new StringBuilder();
 

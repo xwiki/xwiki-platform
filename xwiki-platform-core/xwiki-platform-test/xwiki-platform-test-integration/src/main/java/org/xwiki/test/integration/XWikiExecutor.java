@@ -567,6 +567,6 @@ public class XWikiExecutor
                 return directory.getPath();
             }
         }
-        throw new RuntimeException(String.format("Failed to find existing XWiki directory inside [%s]", targetFile));
+        return "target/xwiki";
     }
 }

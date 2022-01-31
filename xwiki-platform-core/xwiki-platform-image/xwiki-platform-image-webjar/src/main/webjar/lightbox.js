@@ -236,6 +236,9 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
           updateLightboxDescription();
         });
         slideImage.attr('alt', imageData.alt);
+        // Set the attributes for the download button inside lightbox.
+        $('#lightboxDownload').attr('href', imageData.href);
+        $('#lightboxDownload').attr('download', getImageName(imageData.href));
       }
     };
     myOpenLightbox = gallery(media, options);

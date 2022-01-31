@@ -619,6 +619,7 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT2),
             new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, new EntityReference(SPACE2_REFERENCE)));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, SPACE2_REFERENCE));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().startsWith(Event.FIELD_SPACE, "space"));
     }
 
     private void searchStatus()

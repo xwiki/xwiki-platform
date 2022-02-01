@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('lightboxTranslationKeys', {
+define('xwiki-lightbox-messages', {
   prefix: 'core.viewers.attachments.',
   keys: [
     'date',
@@ -25,10 +25,123 @@ define('lightboxTranslationKeys', {
   ]
 });
 
-require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslationKeys', 'blueimp-gallery-fullscreen',
-    'blueimp-gallery-indicator'], function($, xm, gallery, l10n) {
+define('xwiki-lightbox-description', ['jquery', 'xwiki-l10n!xwiki-lightbox-messages'], function($, l10n) {
+  var _cachedAttachments = {};
+
+  var invalidateCachedAttachments = function() {
+    _cachedAttachments = {};
+  };
+
+  var clearDescription = function() {
+    $('.lightboxDescription .caption').empty();
+    $('.lightboxDescription .title').empty();
+    $('.lightboxDescription .publisher').empty();
+    $('.lightboxDescription .date').empty();
+  };
+
+  /**
+   * Hide or display the lightbox description.
+   */
+  var toggleDescription = function() {
+    var hasControls = $('.blueimp-gallery-controls').length > 0;
+    var nonEmptyElements = $('#blueimp-gallery').find('.caption, .title, .publisher, .date')
+      .filter((i, el) => !$(el).is(':empty'));
+
+    if (hasControls && nonEmptyElements.length > 0) {
+      $('.lightboxDescription').css('display', 'flex');
+    } else {
+      $('.lightboxDescription').css('display', 'none');
+    }
+  };
+
+  /**
+   * Update lightbox description using given information.
+   */
+  var updateDescriptionData = function(imageData, attachmentData) {
+    if (imageData) {
+      $('.lightboxDescription .caption').html(imageData.caption || imageData.alt || imageData.title);
+    } else if (attachmentData && attachmentData.name) {
+      $('.lightboxDescription .caption').html(attachmentData.name)
+    }
+
+    if (attachmentData) {
+      // If the first paragraph is a caption, then we should also display the file name, when exists.
+      if (imageData.caption && attachmentData.name) {
+        $('.lightboxDescription .title').text(attachmentData.name);
+      }
+
+      if (attachmentData.author) {
+        $('.lightboxDescription .publisher')
+          .text(l10n.get('author', XWiki.Model.resolve(attachmentData.author, XWiki.EntityType.DOCUMENT).name));
+      }
+
+      if (attachmentData.date) {
+        $('.lightboxDescription .date').text(l10n.get('date', new Date(attachmentData.date).toLocaleDateString()));
+      }
+    }
+  };
+
+  /**
+   * Get information for attachment, when this can be found inside the current page.
+   */
+  var getAttachmentInfo = function(imageURL, fileName) {
+    var deferred = $.Deferred();
+    if (_cachedAttachments[imageURL] != undefined) {
+      deferred.resolve(_cachedAttachments[imageURL]);
+    } else {
+      var serviceDocRef = XWiki.Model.resolve('XWiki.Lightbox.GetPageAttachmentsService', XWiki.EntityType.DOCUMENT);
+      var serviceDocURL = new XWiki.Document(serviceDocRef).getURL('get', 'outputSyntax=plain');
+      $.ajax(serviceDocURL, {
+        method: 'GET',
+        dataType: 'json',
+        data: {'imageURL': imageURL}
+      }).done(function (data) {
+        var attachment = data.attachments.find(field => field.name == fileName);
+        _cachedAttachments[imageURL] = attachment;
+        deferred.resolve(attachment);
+      }).fail(function () {
+        // For an external URL, try to display at least the image name.
+        if (fileName) {
+          _cachedAttachments[imageURL] = {'name': fileName};
+          deferred.resolve({'name': fileName});
+        } else {
+          deferred.reject();
+        }
+      });
+    }
+
+    return deferred.promise();
+  };
+
+  var addSlideDescription = function(imageData, fileName) {
+    clearDescription();
+    toggleDescription();
+
+    getAttachmentInfo(imageData.href, fileName).done(function(attachmentData) {
+      updateDescriptionData(imageData, attachmentData);
+      toggleDescription();
+    }).fail(function() {
+      updateDescriptionData(imageData);
+      toggleDescription();
+    });
+  };
+
+  $(document).on('click', '#blueimp-gallery .slides', toggleDescription);
+
+  return {
+    invalidateCachedAttachments: invalidateCachedAttachments,
+    addSlideDescription: addSlideDescription
+  };
+});
+
+define('xwiki-lightbox', [
+  'jquery',
+  'xwiki-lightbox-description',
+  'blueimp-gallery',
+  'blueimp-gallery-fullscreen',
+  'blueimp-gallery-indicator'
+], function($, lightboxDescription, gallery) {
   var myOpenLightbox;
-  var cachedAttachments = {};
 
   /*
    * Make sure that the toolbar will remain open also while hovering it, not just the image.
@@ -94,8 +207,8 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
   /**
    * Rescale image to original size.
    */
-  var removeResizeParams = function(imageSrc) {
-    var url = new URL(imageSrc);
+  var removeResizeParams = function(imageURL) {
+    var url = new URL(imageURL);
     var searchParams = new URLSearchParams(url.search);
     searchParams.delete('width');
     searchParams.delete('height');
@@ -106,8 +219,8 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
   /**
    * Scale image to thumbnail. This may not be applied for external urls.
    */
-  var createThumbnailURL = function(imageSrc) {
-    var url = new URL(imageSrc);
+  var createThumbnailURL = function(imageURL) {
+    var url = new URL(imageURL);
     var searchParams = new URLSearchParams(url.search);
     searchParams.append('width', '150');
     searchParams.append('height', '150');
@@ -115,86 +228,9 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
     return url.toString();
   };
 
-  var clearDescription = function() {
-    $('.lightboxDescription .caption').empty();
-    $('.lightboxDescription .title').empty();
-    $('.lightboxDescription .publisher').empty();
-    $('.lightboxDescription .date').empty();
-  };
-
   /**
-   * Hide or display the lightbox description.
+   * Extract the image caption added using the Figure macro.
    */
-  var toggleDescription = function() {
-    var hasControls = $('.blueimp-gallery-controls').length > 0;
-    var nonEmptyElements = $('#blueimp-gallery').find('.caption, .title, .publisher, .date')
-      .filter((i, el) => !$(el).is(':empty'));
-
-    if (hasControls && nonEmptyElements.length > 0) {
-      $('.lightboxDescription').css('display', 'flex');
-    } else {
-      $('.lightboxDescription').css('display', 'none');
-    }
-  };
-
-  /**
-   * Update lightbox description using given information.
-   */
-  var updateLightboxDescription = function(metadata, caption, alt, title) {
-    $('.lightboxDescription .caption').html(caption || alt || title || (metadata && metadata.name));
-
-    if (metadata) {
-      // If the first paragraph is a caption, then we should also display the file name, when exists.
-      if (caption && metadata.name) {
-        $('.lightboxDescription .title').text(metadata.name);
-      }
-
-      if (metadata.author) {
-        $('.lightboxDescription .publisher')
-          .text(l10n.get('author', XWiki.Model.resolve(metadata.author, XWiki.EntityType.DOCUMENT).name));
-      }
-
-      if (metadata.date) {
-        $('.lightboxDescription .date').text(l10n.get('date', new Date(metadata.date).toLocaleDateString()));
-      }
-    }
-
-    toggleDescription();
-  };
-
-  /**
-   * Get information for attachment, when this can be found inside the current page.
-   */
-  var getAttachmentInfo = function(imageURL) {
-    var deferred = $.Deferred();
-    if (cachedAttachments[imageURL] != undefined) {
-      deferred.resolve(cachedAttachments[imageURL]);
-    } else {
-      var serviceDoctRef = XWiki.Model.resolve('XWiki.Lightbox.GetPageAttachmentsService', XWiki.EntityType.DOCUMENT);
-      var serviceDocURL = new XWiki.Document(serviceDoctRef).getURL('get', 'outputSyntax=plain');
-      $.ajax(serviceDocURL, {
-        method: 'GET',
-        dataType: 'json',
-        data: {'imageURL': imageURL}
-      }).done(function (data) {
-        var attachment = data.attachments.find(field => field.name == getImageName(imageURL));
-        cachedAttachments[imageURL] = attachment;
-        deferred.resolve(attachment);
-      }).fail(function (jqXHR) {
-        // For an external URL, try to display at least the image name.
-        var fileName = getImageName(imageURL);
-        if (fileName) {
-          cachedAttachments[imageURL] = {'name': fileName};
-          deferred.resolve({'name': fileName});
-        } else {
-          deferred.reject();
-        }
-      });
-    }
-
-    return deferred.promise();
-  };
-
   var getImageCaption = function(image) {
     var figure = image.closest('figure');
     if (image.closest('figure').length > 0) {
@@ -229,17 +265,10 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
       // Avoid the hide done by the library on the default h3 title element.
       titleElement: 'h4',
       onslide: function(index, slide) {
-        clearDescription();
-        toggleDescription();
         var imageData = this.list[index];
-        var slideImage = $(slide).find('img');
-        var caption = imageData.caption;
-        getAttachmentInfo(slideImage[0].src).done(function(data) {
-          updateLightboxDescription(data, caption, imageData.alt, imageData.title);
-        }).fail(function() {
-          updateLightboxDescription();
-        });
-        slideImage.attr('alt', imageData.alt);
+        lightboxDescription.addSlideDescription(imageData, getImageName(imageData.href));
+        $(slide).find('img').attr('alt', imageData.alt);
+
         // Set the attributes for the download button inside lightbox.
         $('#lightboxDownload').attr('href', imageData.href);
         $('#lightboxDownload').attr('download', getImageName(imageData.href));
@@ -252,7 +281,7 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
    * Initialize the lightbox functionality for a set of images.
    */
   var initLightboxFunctionality = function() {
-    cachedAttachments = {};
+    lightboxDescription.invalidateCachedAttachments();
     enableToolbarPopovers();
   };
 
@@ -268,8 +297,6 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
       $('#lightboxFullscreen').data('open', false);
     }
   });
-
-  $(document).on('click', '#blueimp-gallery .slides', toggleDescription());
 
   $(function() {
     initLightboxFunctionality();

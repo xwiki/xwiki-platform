@@ -423,6 +423,11 @@ public class EventStoreTest
         EVENT3.setUser(new DocumentReference("wiki", "space", "user3"));
         EVENT4.setUser(new DocumentReference("wiki", "space", "user4"));
 
+        EVENT1.setDocumentTitle("title1");
+        EVENT2.setDocumentTitle("title2");
+        EVENT3.setDocumentTitle("title3");
+        EVENT4.setDocumentTitle("title4");
+
         this.eventStore.saveEvent(EVENT1);
         this.eventStore.saveEvent(EVENT2);
         this.eventStore.saveEvent(EVENT3);
@@ -462,6 +467,10 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT1, EVENT2),
             new SimpleEventQuery().in(Event.FIELD_ID, EVENT1.getId(), EVENT2.getId()));
 
+        assertSearch(Arrays.asList(), new SimpleEventQuery().in(Event.FIELD_ID));
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().not().in(Event.FIELD_ID));
+
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, true));
         assertSearch(Arrays.asList(EVENT2, EVENT3, EVENT4), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, false));
 
@@ -470,6 +479,10 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENTOR), new SimpleEventQuery().in(Event.FIELD_ID, EVENTOR.getId()));
 
         this.eventStore.deleteEvent(EVENTOR).get();
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4),
+            new SimpleEventQuery().startsWith(Event.FIELD_ID, "id"));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().endsWith(Event.FIELD_ID, "1"));
     }
 
     @Test
@@ -610,6 +623,7 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT2),
             new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, new EntityReference(SPACE2_REFERENCE)));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, SPACE2_REFERENCE));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().startsWith(Event.FIELD_SPACE, "space"));
     }
 
     private void searchStatus()

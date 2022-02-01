@@ -92,4 +92,12 @@ public class DocumentDocumentReferenceUserReferenceSerializerTest
         assertEquals("Passed user reference must be of type [org.xwiki.user.internal.document.DocumentUserReference]",
             exception.getMessage());
     }
+
+    @Test
+    void serializeWhenCurrentUserReferenceIsGuest()
+    {
+        when(this.currentUserReferenceUserReferenceResolver.resolve(null)).thenReturn(GuestUserReference.INSTANCE);
+        DocumentReference expected = new DocumentReference("xwiki", "XWiki", "XWikiGuest");
+        assertEquals(expected, this.serializer.serialize(null));
+    }
 }

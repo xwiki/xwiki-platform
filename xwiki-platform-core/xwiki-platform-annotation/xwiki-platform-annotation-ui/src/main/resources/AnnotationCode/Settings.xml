@@ -450,10 +450,6 @@ document.observe('xwiki:annotations:settings:loaded', function() {
   width: 30%;
   margin: 0 0 12px 4px;
 }
-/* IE7 expands the box for an unknown reason, and this seems to fix it: */
-*+html .annotationsettings {
-  zoom: 100%;
-}
 .annotation-filters {
   padding: 8px 4px 4px;
 }
@@ -466,10 +462,6 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 }
 .collapsed .criteria {
   display: none;
-}
-
-*+html .collapsed .criterion-option-list {
-  width: 10px;
 }
 
 #annotation-filters:target .criteria {

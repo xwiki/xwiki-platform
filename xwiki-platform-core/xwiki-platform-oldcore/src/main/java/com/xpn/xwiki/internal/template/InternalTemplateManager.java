@@ -24,6 +24,8 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -278,12 +281,14 @@ public class InternalTemplateManager implements Initializable
 
     private class StringTemplate extends DefaultTemplate
     {
-        StringTemplate(String content, DocumentReference authorReference) throws Exception
+        StringTemplate(String content, DocumentReference authorReference, DocumentReference documentReference)
+            throws Exception
         {
             super(new StringResource(content));
-            // Initialize the template content
+
             // As StringTemplate extends DefaultTemplate, the TemplateContent is DefaultTemplateContent
             ((DefaultTemplateContent) this.getContent()).setAuthorReference(authorReference);
+            ((DefaultTemplateContent) this.getContent()).setDocumentReference(documentReference);
         }
     }
 
@@ -893,14 +898,23 @@ public class InternalTemplateManager implements Initializable
             : null;
     }
 
-    private Template getClassloaderTemplate(String suffixPath, String templateName)
+    private Template getClassloaderTemplate(String prefixPath, String templateName)
     {
-        return getClassloaderTemplate(Thread.currentThread().getContextClassLoader(), suffixPath, templateName);
+        return getClassloaderTemplate(Thread.currentThread().getContextClassLoader(), prefixPath, templateName);
     }
 
-    private Template getClassloaderTemplate(ClassLoader classloader, String suffixPath, String templateName)
+    private Template getClassloaderTemplate(ClassLoader classloader, String prefixPath, String templateName)
     {
-        String templatePath = suffixPath + templateName;
+        String templatePath = prefixPath + templateName;
+
+        // Prevent access to resources from other directories
+        Path normalizedResource = Paths.get(templatePath).normalize();
+        // Protect against directory attacks.
+        if (!normalizedResource.startsWith(prefixPath)) {
+            this.logger.warn("Direct access to skin file [{}] refused. Possible break-in attempt!", normalizedResource);
+
+            return null;
+        }
 
         URL url = classloader.getResource(templatePath);
 
@@ -972,15 +986,19 @@ public class InternalTemplateManager implements Initializable
     }
 
     /**
-     * Create a DefaultTemplate with the given content and the given author.
+     * Create a new template using a given content and a specific author and source document.
      *
-     * @since 9.6RC1
      * @param content the template content
      * @param author the template author
+     * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
+     *            test the author right)
      * @return the template
+     * @throws Exception if an error occurred during template instantiation
+     * @since 14.0RC1
      */
-    public Template createStringTemplate(String content, DocumentReference author) throws Exception
+    public Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
+        throws Exception
     {
-        return new StringTemplate(content, author);
+        return new StringTemplate(content, author, sourceReference);
     }
 }

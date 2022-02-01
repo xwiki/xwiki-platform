@@ -89,7 +89,7 @@ class DefaultMentionsEventExecutorTest
     private EntityReferenceSerializer<String> serializer;
 
     @BeforeComponent
-    void beforeComponent()
+    void beforeComponent() throws Exception
     {
         when(this.threadPoolProvider.initializeThread(any(Runnable.class))).thenReturn(mock(Thread.class));
         this.blockingQueue = mock(BlockingQueue.class);
@@ -98,7 +98,7 @@ class DefaultMentionsEventExecutorTest
     }
 
     @Test
-    void initialize()
+    void initialize() throws Exception
     {
         verify(this.blockingQueueProvider).initBlockingQueue();
         verify(this.jmxRegistration).registerMBean(any(JMXMentions.class), eq("name=mentions"));

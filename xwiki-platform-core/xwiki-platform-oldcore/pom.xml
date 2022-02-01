@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>14.0-SNAPSHOT</version>
+    <version>14.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -188,10 +188,6 @@
     </dependency>
 
     <!-- XML processing -->
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-    </dependency>
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
@@ -607,6 +603,11 @@
       <version>1.6</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava-testlib</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -828,7 +829,7 @@
                 **/store/migration/hibernate/R6079XWIKI1878DataMigration.java,
                 **/store/migration/hibernate/R7350XWIKI2079DataMigration.java,
                 **/store/migration/hibernate/R40000XWIKI6990DataMigration.java,
-                **/store/migration/hibernate/R130200001XWIKI18429DataMigration.java,
+                **/store/migration/hibernate/AbstractResizeMigration.java,
                 **/store/XWikiAttachmentStoreInterface.java,
                 **/store/XWikiBatcherFactory.java,
                 **/store/XWikiBatcher.java,
@@ -937,7 +938,8 @@
                 **/web/XWikiURLFactoryServiceImpl.java,
                 **/web/XWikiURLFactoryService.java,
                 <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
-                **/stats/impl/xwiki/XWikiStatsReader.java
+                **/stats/impl/xwiki/XWikiStatsReader.java,
+                **/com/xpn/xwiki/internal/filter/output/AbstractEntityOutputFilterStream.java
               </excludes>
               <resourceExcludes>
                 ApplicationResources*.properties

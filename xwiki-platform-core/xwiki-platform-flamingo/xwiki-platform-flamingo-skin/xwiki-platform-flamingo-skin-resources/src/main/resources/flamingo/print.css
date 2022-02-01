@@ -6,9 +6,6 @@
   overflow: visible !important;
   width: auto !important;
 }
-* html #body {
-  overflow: auto !important;
-}
 /* Hide unneeded stuff */
 .hidden-print,.edit_section,
 #rightPanels, #leftPanels,

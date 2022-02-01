@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>annotations.title=Anmerken
-annotations.menu.loading=Lade Anmerkungseinstellungen
+annotations.menu.loading=Lade Anmerkungs-Einstellungen
 annotations.menu.loaderror=Fehlgeschlagen:
 annotations.tab.info.noannotations=Keine Anmerkungen auf dieser Seite
 annotations.settings.display=Zeige Anmerkungen
@@ -65,7 +65,7 @@ annotations.action.create.submit.text=Anmerkung hinzufügen
 annotations.action.create.cancel.text=Abbrechen
 annotations.action.create.selection.invalid=Bitte wählen Sie einen nicht-leeren Text im Dokument aus.
 annotations.action.create.form.loaderror=Fehlgeschlagen:
-annotations.action.create.success=Anmerkung hinzugefügt.
+annotations.action.create.success=Anmerkung wurde hinzugefügt.
 annotations.action.create.loaderror=Fehlgeschlagen:
 annotations.action.create.error.unauthorized=Sie sind nicht berechtigt, Anmerkungen in diesem Dokument zu erstellen.
 annotations.action.create.error.unauthorizedguest=Sie sind nicht berechtigt, Anmerkungen in diesem Dokument zu erstellen. Bitte melden Sie sich an.
@@ -99,7 +99,7 @@ AnnotationCode.AnnotationConfig_activated.hint=Entscheiden, ob Anmerkungen im ak
 AnnotationCode.AnnotationConfig_exceptionSpaces=Außer für die folgenden Bereiche
 AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deaktivieren Sie Anmerkungen für die folgende Teilmenge von Positionen:
 AnnotationCode.AnnotationConfig_displayed=Anmerkungen standardmäßig anzeigen
-AnnotationCode.AnnotationConfig_displayed.hint=Entscheiden, ob Anmerkungen standardmäßig angezeigt werden oder nur, wenn "Anmerkungen anzeigen" auf jeder Seite aktiviert ist
+AnnotationCode.AnnotationConfig_displayed.hint=Entschieden Sie ob Anmerkungen standardmäßig angezeigt werden sollen, oder nur wenn "Anmerkungen anzeigen" auf der jeweiligen Seite ausgewählt ist
 AnnotationCode.AnnotationConfig_displayHighlight=Anmerkungen standardmäßig im Text hervorheben
 AnnotationCode.AnnotationConfig_displayHighlight.hint=Entscheide, ob Anmerkungen immer hervorgehoben werden, oder nur wenn die Maus sich über dem entsprechenden Bereich befindet
 AnnotationCode.AnnotationConfig_annotationClass=XWiki Klasse, welche zum Speichern der Anmerkungen verwendet wird

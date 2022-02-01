@@ -33,7 +33,6 @@ import org.xwiki.extension.event.ExtensionEvent;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
-import org.xwiki.extension.version.Version;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
@@ -84,17 +83,13 @@ public class ExtensionInstallListener extends AbstractEventListener
 
     private void onInstalled(ExtensionId extensionId, String namespace) throws SolrServerException, IOException
     {
-        this.store.updateCompatible(extensionId, namespace, false, null);
+        this.store.updateInstalled(extensionId, namespace, true);
         this.store.commit();
     }
 
     private void onUninstalled(ExtensionId extensionId, String namespace) throws SolrServerException, IOException
     {
-        Version compatibleVersion = this.store.getCompatibleVersion(extensionId.getId(), namespace);
-
-        if (compatibleVersion == null) {
-            this.store.updateCompatible(extensionId, namespace, true, null);
-            this.store.commit();
-        }
+        this.store.updateInstalled(extensionId, namespace, false);
+        this.store.commit();
     }
 }

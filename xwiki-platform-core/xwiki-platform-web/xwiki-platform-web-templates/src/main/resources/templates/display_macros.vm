@@ -166,3 +166,12 @@
   #set ($return = $NULL)
   #setVariable("$return" $macro.importStrings)
 #end
+
+#macro (createObjectAndPropertyIfMissing $propertyReference)
+  #set ($propertyReferenceObject = $services.model.resolveObjectProperty($propertyReference))
+  #set ($object = $doc.getObject($propertyReferenceObject.parent, true))
+  ## Properties are only initialized when the document is saved, try initializing the property if it is missing
+  #if (!$object.getProperty($propertyReferenceObject.name))
+    #set ($discard = $object.set($propertyReferenceObject.name, $object.getValue($propertyReferenceObject.name)))
+  #end
+#end

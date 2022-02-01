@@ -964,14 +964,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 docname = doc.getFullName();
             }
 
-            // programming rights can only been given for user of the main wiki
-            // FIXME: Isn't this wrong? The main db is context.getMainWikiName(), not context.getWiki().getDatabase()
-            // (which is the current db).
-            String maindb = context.getWiki().getDatabase();
-            if ((maindb == null) || (!username.startsWith(maindb))) {
-                return false;
-            }
-
             return hasAccessLevel("programming", username, docname, context);
         } catch (Exception e) {
             LOGGER.error("Failed to check programming right for document [{}]", doc.getPrefixedFullName(), e);

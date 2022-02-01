@@ -50,9 +50,6 @@
   background-color: $theme.pageContentBackgroundColor;
 }
 
-* html .fullScreenWrapper {
-  position: absolute !important;
-}
 /* This overrides the pre behavior when the buttons end up as children of such a field */
 #body .fullScreenWrapper {
   white-space: normal;

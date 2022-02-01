@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
+import org.xwiki.xml.XMLUtils;
+
 import com.xpn.xwiki.XWikiContext;
 
 /**
@@ -57,7 +59,7 @@ public class CssResourceSkinExtensionPlugin extends AbstractResourceSkinExtensio
     @Override
     protected String generateLink(String url, String resourceName, XWikiContext context)
     {
-        return "<link rel='stylesheet' type='text/css' href='" + url + "'/>\n";
+        return "<link rel='stylesheet' type='text/css' href='" + XMLUtils.escapeAttributeValue(url) + "'/>\n";
     }
 
     /**

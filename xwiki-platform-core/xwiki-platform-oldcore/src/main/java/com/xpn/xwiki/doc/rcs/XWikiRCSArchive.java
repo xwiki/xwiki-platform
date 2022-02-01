@@ -38,11 +38,14 @@ import org.suigeneris.jrcs.rcs.impl.NodeNotFoundException;
 import org.suigeneris.jrcs.rcs.impl.TrunkNode;
 import org.suigeneris.jrcs.rcs.parse.ParseException;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.doc.rcs.XWikiTrunkNode;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Class for String [de]serialization for {@link com.xpn.xwiki.doc.XWikiDocumentArchive}.
@@ -237,7 +240,9 @@ public class XWikiRCSArchive extends Archive
                     XWikiDocument doc = new XWikiDocument();
                     doc.fromXML(xml);
                     // set this fields from old document
-                    nodeInfo.setAuthor(doc.getAuthor());
+                    UserReferenceSerializer<String> userReferenceSerializer = Utils.getComponent(
+                        new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
+                    nodeInfo.setAuthor(userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor()));
                     nodeInfo.setComment(doc.getComment());
                     nodeInfo.setDate(doc.getDate());
                 } catch (Exception e) {

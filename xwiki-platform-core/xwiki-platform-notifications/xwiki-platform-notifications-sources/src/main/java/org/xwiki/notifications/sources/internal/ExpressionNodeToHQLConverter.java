@@ -264,19 +264,24 @@ public class ExpressionNodeToHQLConverter
 
         if (operator instanceof InNode) {
             InNode inOperator = (InNode) operator;
-            StringBuilder builder = new StringBuilder(parseBlock(inOperator.getLeftOperand(), result));
-            builder.append(" IN (");
+            if (inOperator.getValues().isEmpty()) {
+                // Since an IN node with no value essentially mean "nothing" we replace it with an equivalent
+                returnValue = "true = false";
+            } else {
+                StringBuilder builder = new StringBuilder(parseBlock(inOperator.getLeftOperand(), result));
+                builder.append(" IN (");
 
-            String separator = "";
-            for (AbstractValueNode value : inOperator.getValues()) {
-                builder.append(separator);
-                builder.append(parseBlock(value, result));
-                separator = ", ";
+                String separator = "";
+                for (AbstractValueNode value : inOperator.getValues()) {
+                    builder.append(separator);
+                    builder.append(parseBlock(value, result));
+                    separator = ", ";
+                }
+
+                builder.append(")");
+
+                returnValue = builder.toString();
             }
-
-            builder.append(")");
-
-            returnValue = builder.toString();
         } else if (operator instanceof InSubQueryNode) {
             InSubQueryNode inSubQueryOperator = (InSubQueryNode) operator;
             StringBuilder builder = new StringBuilder(parseBlock(inSubQueryOperator.getLeftOperand(), result));

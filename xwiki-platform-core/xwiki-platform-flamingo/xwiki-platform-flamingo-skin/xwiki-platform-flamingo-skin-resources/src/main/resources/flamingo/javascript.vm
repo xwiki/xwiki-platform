@@ -26,13 +26,13 @@
 ## JavaScript libraries
 ##
 ## We load RequireJS first because it is used by other JavaScript modules to load their dependencies.
-<script src="$services.webjars.url('requirejs', "require$jsExtension")" data-wysiwyg="true"></script>
+<script src="$escapetool.xml($services.webjars.url('requirejs', "require$jsExtension"))" data-wysiwyg="true"></script>
 ## FIXME: We still have code depending on Prototype.js without declaring it (i.e. without using RequireJS). Short term
 ## goal is to stop loading Prototype.js by default and change the existing code to load it when needed. Long term goal is
 ## to stop relying on Prototype.js . Note that we load Prototype.js before the following inline script because we have to
 ## fix some incompatibilities between Bootstrap and Prototype.js . In the future we should use the 'deferred' RequireJS
 ## plugin to fix the incompatibilities only if / when Prototype.js is loaded.
-<script src="$xwiki.getSkinFile('js/prototype/prototype.js')"></script>
+<script src="$escapetool.xml($xwiki.getSkinFile('js/prototype/prototype.js'))"></script>
 ##
 ## Define the global require.js configuration
 ##
@@ -64,13 +64,12 @@
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
     'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
     'xwiki-l10n': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-localization-webjar', ""l10n${jsExtension}""))",
-    'iscroll': "#removeJsSuffix($services.webjars.url('iscroll/5.1.3/build/iscroll-lite.js'))",
-    'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/jquery.drawer${jsExtension}""))",
+    'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
+    'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/drawer${jsExtension}""))",
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js')
   },
   'shim': {
     'bootstrap' : ['jquery'],
-    'drawer': ['jquery', 'iscroll'],
     'xwiki-entityReference': {
       'exports': 'XWiki'
     }
@@ -139,9 +138,18 @@ if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {
     disablePrototypeJS('hide', pluginsToDisable);
   });
 }
-require(['jquery', 'drawer'], function($) {
-  $(document).ready(function() {
-    $('.drawer-main').closest('body').drawer();
+require(['jquery', 'iscroll', 'drawer'], function($, IScroll) {
+  // Unfortunately drawer doesn't declare the dependency on iscroll and expects it to be defined as a global variable.
+  window.IScroll = IScroll;
+  $(function() {
+    // Note that the 'drawer-open' and 'drawer-close' CSS classes are added before the open and close animations end
+    // which prevents us from using them in automated tests. We need something more reliable so we listen to
+    // 'drawer.opened' and 'drawer.closed' events and add our own markers.
+    $('.drawer-nav').closest('body').drawer().on('drawer.opened', function(event) {
+      $('#tmDrawerActivator').attr('aria-expanded', 'true');
+    }).on('drawer.closed', function(event) {
+      $('#tmDrawerActivator').attr('aria-expanded', 'false');
+    });
   });
 });
 ##
@@ -247,6 +255,6 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
 ## Compatibility "aspect" file for deprecated code.
 ## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
 ##
-<script src="$xwiki.getSkinFile("js/xwiki/compatibility.js", false)" defer="defer"></script>
+<script src="$escapetool.xml($xwiki.getSkinFile("js/xwiki/compatibility.js", false))" defer="defer"></script>
 ## Marker script that signals that all the deferred scripts have indeed been executed, guarding against a premature dom:loaded event
-<script src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>
+<script src="$escapetool.xml($xwiki.getSkinFile("js/xwiki/markerScript.js", false))" defer="defer"></script>

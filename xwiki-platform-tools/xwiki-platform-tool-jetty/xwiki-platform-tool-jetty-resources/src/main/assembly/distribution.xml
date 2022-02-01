@@ -94,6 +94,16 @@
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
+    <!-- EL -->
+    <dependencySet>
+      <!-- We don't really need JSP features (only EL implementation) but we keep the same folder and module name to limit customizations -->
+      <outputDirectory>/jetty/lib/apache-jsp</outputDirectory>
+      <includes>
+        <include>org.mortbay.jasper:apache-el</include>
+      </includes>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
   </dependencySets>
   <fileSets>
     <!-- Copy shell scripts and set execute permissions -->

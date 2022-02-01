@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -67,10 +68,28 @@ public class DefaultUIExtensionManager implements UIExtensionManager
     {
         List<UIExtension> extensions = new ArrayList<>();
 
+        ComponentManager componentManager = this.contextComponentManagerProvider.get();
+
+        // Look for a specific UI extension manager for the given extension point
+        if (StringUtils.isNotEmpty(extensionPointId) && !extensionPointId.equals("default")
+            && componentManager.hasComponent(UIExtensionManager.class, extensionPointId)) {
+            try {
+                UIExtensionManager manager = componentManager.getInstance(UIExtensionManager.class, extensionPointId);
+
+                return manager.get(extensionPointId);
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to initialize lookup a specific UIExtensionManager for the hint [{}]",
+                    extensionPointId, e);
+
+                return extensions;
+            }
+        }
+
+        // Fallback on the default behavior
         try {
-            List<UIExtension> allExtensions = contextComponentManagerProvider.get().getInstanceList(UIExtension.class);
+            List<UIExtension> allExtensions = componentManager.getInstanceList(UIExtension.class);
             for (UIExtension extension : allExtensions) {
-                if (extension.getExtensionPointId().equals(extensionPointId)) {
+                if (StringUtils.equals(extension.getExtensionPointId(), extensionPointId)) {
                     extensions.add(extension);
                 }
             }
@@ -79,7 +98,7 @@ public class DefaultUIExtensionManager implements UIExtensionManager
             // soon as a UIExtension component is modified
             this.asyncContext.useComponent(UIExtension.class);
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to lookup UIExtension instances, error: [{}]", e);
+            this.logger.error("Failed to lookup UIExtension instances", e);
         }
 
         return extensions;

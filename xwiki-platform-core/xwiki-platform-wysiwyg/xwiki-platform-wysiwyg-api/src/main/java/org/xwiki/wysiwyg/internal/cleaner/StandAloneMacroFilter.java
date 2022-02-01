@@ -65,7 +65,7 @@ public class StandAloneMacroFilter extends AbstractHTMLFilter
     private List<Element> getStandAloneMacroWrappers(Document document)
     {
         NodeList paragraphs = document.getElementsByTagName("p");
-        List<Element> wrappers = new ArrayList<Element>();
+        List<Element> wrappers = new ArrayList<>();
         for (int i = 0; i < paragraphs.getLength(); i++) {
             Element paragraph = (Element) paragraphs.item(i);
             // See if the paragraph contains only a macro call.

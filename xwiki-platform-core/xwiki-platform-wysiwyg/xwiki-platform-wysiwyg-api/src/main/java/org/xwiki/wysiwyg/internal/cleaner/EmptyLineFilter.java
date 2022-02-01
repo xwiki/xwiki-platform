@@ -46,7 +46,7 @@ public class EmptyLineFilter extends AbstractHTMLFilter
     public void filter(Document document, Map<String, String> parameters)
     {
         NodeList paragraphs = document.getElementsByTagName("p");
-        List<Element> emptyParagraphs = new ArrayList<Element>();
+        List<Element> emptyParagraphs = new ArrayList<>();
         for (int i = 0; i < paragraphs.getLength(); i++) {
             Element paragraph = (Element) paragraphs.item(i);
             if (!paragraph.hasChildNodes()) {

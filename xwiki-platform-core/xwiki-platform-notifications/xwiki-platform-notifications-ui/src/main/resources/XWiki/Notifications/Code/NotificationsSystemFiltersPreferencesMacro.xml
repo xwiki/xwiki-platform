@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsSystemFiltersPreferencesMacro</name>
   <language/>
@@ -29,6 +29,7 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>NotificationsSystemFiltersPreferencesMacro</title>
@@ -126,20 +127,9 @@
     <property>
       <code>'use strict';
 /**
- * Start the requirejs config.
- */
-require.config({
-  paths: {
-    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', 'js/bootstrap-switch.min')'
-  },
-  shim: {
-    'bootstrap-switch' : ['jquery']
-  }
-});
-/**
  * Start the real script.
  */
-require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($) {
+require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($) {
 
   /**
    * Page initialization
@@ -258,7 +248,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
       <cache>long</cache>
     </property>
     <property>
-      <code>define('SystemToggleableFilterPreference', ['jquery', 'bootstrap-switch'], function($) {
+      <code>define('SystemToggleableFilterPreference', ['jquery', 'xwiki-bootstrap-switch'], function($) {
   /**
   * Construct the Toggleable Filter Preference object.
   */
@@ -427,7 +417,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
   'jquery',
   'SystemToggleableFilterPreference',
   'xwiki-meta',
-  'bootstrap-switch',
+  'xwiki-bootstrap-switch',
   'xwiki-events-bridge'
 ], function ($, SystemToggleableFilterPreference, xm) {
   $(document).on('xwiki:livetable:notifications-filters-system:toggle', function(event, data) {

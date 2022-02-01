@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsApplicationsPreferencesMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsApplicationsPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsApplicationsPreferencesMacro</name>
   <language/>
@@ -29,6 +29,7 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>XWiki.Notifications.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>NotificationsApplicationsPreferencesMacro</title>
@@ -126,20 +127,9 @@
     <property>
       <code>'use strict';
 /**
- * Start the requirejs config.
- */
-require.config({
-  paths: {
-    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', 'js/bootstrap-switch.min')'
-  },
-  shim: {
-    'bootstrap-switch' : ['jquery']
-  }
-});
-/**
  * Start the real script.
  */
-require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget) {
+require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget) {
 
   /**
    * Page initialization
@@ -237,7 +227,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     });
 
   };
-  
+
   $(document).ready(preferenceInit);
   $(document).on('xwiki:dom:updated', preferenceInit)
 });
@@ -340,7 +330,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <cache>long</cache>
     </property>
     <property>
-      <code>define('EventTypeWidget', ['jquery', 'xwiki-meta', 'bootstrap-switch'], function($, xm) {
+      <code>define('EventTypeWidget', ['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function($, xm) {
   /**
   * Construct an EventTypeWidget.
   */
@@ -515,7 +505,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <cache>long</cache>
     </property>
     <property>
-      <code>define('ApplicationWidget', ['jquery', 'EventTypeWidget', 'bootstrap-switch'], function($, EventTypeWidget) {
+      <code>define('ApplicationWidget', ['jquery', 'EventTypeWidget', 'xwiki-bootstrap-switch'], function($, EventTypeWidget) {
   /**
    * Construct an application widget.
    */

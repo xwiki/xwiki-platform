@@ -37,10 +37,12 @@ import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -50,6 +52,10 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -1373,6 +1379,23 @@ public class Document extends Api
         }
     }
 
+    /**
+     * @param objectReference the object reference
+     * @param create if true, the object will be created when missing
+     * @return the XWiki object from this document that matches the specified object reference
+     * @since 14.0RC1
+     */
+    @Unstable
+    public Object getObject(ObjectReference objectReference, boolean create)
+    {
+        try {
+            BaseObject obj = this.getDoc().getXObject(objectReference, create, getXWikiContext());
+            return obj == null ? null : newObjectApi(obj, getXWikiContext());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private Object newObjectApi(BaseObject obj, XWikiContext context)
     {
         return obj.newObjectApi(obj, context);
@@ -2540,9 +2563,18 @@ public class Document extends Api
         save(comment, false);
     }
 
+    private UserReferenceResolver<CurrentUserReference> getCurrentUserReferenceResolver()
+    {
+        return Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class,
+                CurrentUserReference.class));
+    }
+
     public void save(String comment, boolean minorEdit) throws XWikiException
     {
         if (hasAccessLevel("edit")) {
+
+            DocumentAuthors authors = this.getAuthors();
+            authors.setOriginalMetadataAuthor(getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
             // If the current author does not have PR don't let it set current user as author of the saved document
             // since it can lead to right escalation
             if (hasProgrammingRights() || !getConfiguration().getProperty("security.script.save.checkAuthor", true)) {
@@ -2638,6 +2670,8 @@ public class Document extends Api
     {
         XWikiContext xcontext = getXWikiContext();
 
+        getAuthors()
+            .setOriginalMetadataAuthor(getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
         DocumentReference author = getEffectiveAuthorReference();
         if (hasAccess(Right.EDIT, author)) {
             DocumentReference currentUser = xcontext.getUserReference();
@@ -2664,12 +2698,11 @@ public class Document extends Api
     {
         XWikiDocument doc = getDoc();
 
-        DocumentReference currentUserReference = getXWikiContext().getUserReference();
-
-        doc.setAuthorReference(currentUserReference);
+        UserReference currentUserReference = getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE);
+        doc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
 
         if (doc.isNew()) {
-            doc.setCreatorReference(currentUserReference);
+            doc.getAuthors().setCreator(currentUserReference);
         }
 
         if (checkSaving) {
@@ -3246,5 +3279,15 @@ public class Document extends Api
     public int getLocalReferenceMaxLength()
     {
         return this.doc.getLocalReferenceMaxLength();
+    }
+
+    /**
+     * @return the authors of the document.
+     * @since 14.0RC1
+     */
+    @Unstable
+    public DocumentAuthors getAuthors()
+    {
+        return doc.getAuthors();
     }
 }

@@ -48,19 +48,24 @@ viewers.Comments = Class.create({
 
   /** Constructor. Adds all the JS improvements of the Comments area. */
   initialize : function() {
-    var commentsContent = $('commentscontent');
-    if (commentsContent) {
-      // If the comments area is already visible, enhance them.
-      this.startup();
+    // Make sure this class is initialized only once. This can happen when this file is included several times in 
+    // a page.
+    if (XWiki.viewers.initialized === undefined) {
+      XWiki.viewers.initialized = true;
+      var commentsContent = $('commentscontent');
+      if (commentsContent) {
+        // If the comments area is already visible, enhance them.
+        this.startup();
+      }
+      if ($("Commentstab")) {
+        this.container = $("Commentspane");
+      } else if (commentsContent) {
+        // We need to wrap the comments because we replace all of them when a new comment is added.
+        this.container = commentsContent.wrap('div', {'id': 'Commentspane'});
+      }
+      // We wait for a notification for the AJAX loading of the Comments metadata tab.
+      this.addTabLoadListener();
     }
-    if ($("Commentstab")) {
-      this.container = $("Commentspane");
-    } else if (commentsContent) {
-      // We need to wrap the comments because we replace all of them when a new comment is added.
-      this.container = commentsContent.wrap('div', {'id': 'Commentspane'});
-    }
-    // We wait for a notification for the AJAX loading of the Comments metadata tab.
-    this.addTabLoadListener();
   },
   /** Enhance the Comments UI with JS behaviors. */
   startup : function () {
@@ -196,10 +201,7 @@ viewers.Comments = Class.create({
                 });
               }.bind(this),
               onFailure : function (response) {
-                var failureReason = response.statusText;
-                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                  failureReason = 'Server not responding';
-                }
+                var failureReason = response.statusText || 'Server not responding';
                 item._x_notification.replace(new XWiki.widgets.Notification(
                     "$services.localization.render('core.viewers.comments.editForm.fetch.failed')" + failureReason,
                     "error"));
@@ -334,10 +336,7 @@ viewers.Comments = Class.create({
               this.editing = false;
             }.bind(this),
             onFailure : function (response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
+              var failureReason = response.statusText || 'Server not responding';
               form._x_notification.replace(new XWiki.widgets.Notification(
                   "$services.localization.render('core.viewers.comments.add.failed')" + failureReason, "error"));
             }.bind(this),
@@ -473,10 +472,7 @@ viewers.Comments = Class.create({
             notification.hide();
           }.bind(this),
           onFailure: function (response) {
-            var failureReason = response.statusText;
-            if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-              failureReason = 'Server not responding';
-            }
+            var failureReason = response.statusText || 'Server not responding';
             notification.replace(new XWiki.widgets.Notification(
                 "$services.localization.render('core.viewers.comments.preview.failed')" + failureReason, "error"));
           },

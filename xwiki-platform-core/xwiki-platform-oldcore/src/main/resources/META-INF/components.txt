@@ -146,6 +146,7 @@ com.xpn.xwiki.internal.template.TemplateListener
 com.xpn.xwiki.internal.template.VelocityTemplateEvaluator
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.query.CurrentLanguageQueryFilter
+com.xpn.xwiki.internal.redirection.RedirectClassRedirectionFilter
 com.xpn.xwiki.script.sheet.SheetScriptService
 com.xpn.xwiki.internal.sheet.ClassSheetBinder
 com.xpn.xwiki.internal.sheet.DocumentSheetBinder
@@ -206,7 +207,8 @@ com.xpn.xwiki.store.migration.hibernate.R911001XWIKI14895DataMigration
 com.xpn.xwiki.store.migration.hibernate.R1008010XWIKI10092DataMigration
 com.xpn.xwiki.store.migration.hibernate.R1138000XWIKI16709DataMigration
 com.xpn.xwiki.store.migration.hibernate.R130200000XWIKI17200DataMigration
-com.xpn.xwiki.store.migration.hibernate.R130200001XWIKI18429DataMigration
+com.xpn.xwiki.store.migration.hibernate.R130407000XWIKI19207DataMigration
+com.xpn.xwiki.store.migration.hibernate.R140000000XWIKI19125DataMigration
 com.xpn.xwiki.store.VoidAttachmentVersioningStore
 com.xpn.xwiki.store.XWikiHibernateStore
 com.xpn.xwiki.store.XWikiHibernateVersioningStore

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsCustomFiltersPreferencesMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsCustomFiltersPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsCustomFiltersPreferencesMacro</name>
   <language/>
@@ -29,6 +29,7 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>NotificationsCustomFiltersPreferencesMacro</title>
@@ -126,20 +127,9 @@
     <property>
       <code>'use strict';
 /**
- * Start the requirejs config.
- */
-require.config({
-  paths: {
-    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', 'js/bootstrap-switch.min')'
-  },
-  shim: {
-    'bootstrap-switch' : ['jquery']
-  }
-});
-/**
  * Start the real script.
  */
-require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, AddCustomNotificationFilterPreferenceLivetable) {
+require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($, AddCustomNotificationFilterPreferenceLivetable) {
 
   /**
    * Page initialization
@@ -274,11 +264,11 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
     self.filterScopeTree = modal.find('.location-tree');
     self.cancelButton = modal.find('button[data-action="cancel"]');
     self.submitButton = modal.find('button[data-action="submit"]');
-    
+
     self.getFormats = function () {
       return self.modal.find('input[name=notificationFilterNotificationFormatSelector]:checked').map(function () { return $(this).val();}).get().join(',');
     };
-    
+
     /**
      * Initialization
      */
@@ -293,7 +283,6 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
           }
         });
       });
-      
 
       self.submitButton.click(self.onSelectButtonClicked);
     };
@@ -315,7 +304,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         eventTypes = eventTypesSelected.join(',');
       }
       var target = self.modal.data('target');
-      
+
       var params = {
         action: 'createScopeFilterPreference',
         target: target,
@@ -466,7 +455,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
       <cache>long</cache>
     </property>
     <property>
-      <code>define('CustomToggleableFilterPreference', ['jquery', 'bootstrap-switch'], function($) {
+      <code>define('CustomToggleableFilterPreference', ['jquery', 'xwiki-bootstrap-switch'], function($) {
   /**
   * Construct the Toggleable Filter Preference object.
   */
@@ -635,7 +624,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
   'jquery',
   'xwiki-meta',
   'CustomToggleableFilterPreference',
-  'bootstrap-switch',
+  'xwiki-bootstrap-switch',
   'xwiki-events-bridge'
 ], function ($, xm, CustomToggleableFilterPreference) {
 

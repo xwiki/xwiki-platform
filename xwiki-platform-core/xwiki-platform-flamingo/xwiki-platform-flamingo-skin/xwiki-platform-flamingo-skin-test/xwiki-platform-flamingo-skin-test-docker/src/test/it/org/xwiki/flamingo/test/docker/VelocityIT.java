@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -30,6 +31,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -138,5 +140,56 @@ public class VelocityIT
             "{{velocity}}$xwiki.flushCache()\n$xwiki.getDocument('Main.WebHome').date.class{{/velocity}}",
             "TestDateClass");
         assertEquals("class java.util.Date", viewPage.getContent());
+    }
+
+    /**
+     * Tests the security measures for calling {@code #ŧemplate('XXX')} in velocity code.
+     */
+    @Order(5)
+    @Test
+    public void velocityTemplate(TestUtils testUtils, TestReference testReference)
+    {
+        String templateCode = "#template('%s')\n";
+        ViewPage viewPage = testUtils.createPage(testReference,
+            "{{velocity}}{{html}}"
+            + String.format(templateCode, "code.vm")
+            + "{{/html}}{{/velocity}}",
+            "TestTemplate");
+
+        // we cannot check the actual content here, so we're just checking the presence of the CSS class related to
+        // code.vm in the content view.
+        WebElement content = testUtils.getDriver().findElementWithoutWaiting(By.id("xwikicontent"));
+        assertNotNull(testUtils.getDriver().findElementWithoutWaiting(content, By.className("wiki-code")));
+
+        viewPage = testUtils.createPage(testReference, "{{velocity}}"
+            + String.format(templateCode, "../../")
+            + "{{/velocity}}",
+            "TestTemplate");
+        assertTrue(viewPage.getContent().isEmpty(), "root directory template call should not display anything.");
+
+        viewPage = testUtils.createPage(testReference, "{{velocity}}"
+                + String.format(templateCode, "asdfasdf")
+                + "{{/velocity}}",
+            "TestTemplate");
+        assertTrue(viewPage.getContent().isEmpty(), "Not existing template call should not display anything.");
+
+        viewPage = testUtils.createPage(testReference, "{{velocity}}"
+                + String.format(templateCode, "../redirect")
+                + "{{/velocity}}",
+            "TestTemplate");
+        assertTrue(viewPage.getContent().isEmpty(), "File in parent directory call should not display anything.");
+
+        viewPage = testUtils.createPage(testReference, "{{velocity}}"
+                + String.format(templateCode, "../WEB-INF/version.properties")
+                + "{{/velocity}}",
+            "TestTemplate");
+        assertTrue(viewPage.getContent().isEmpty(), "File in the wrong directory call should not display anything.");
+
+        viewPage = testUtils.createPage(testReference, "{{velocity}}"
+                + String.format(templateCode, "/chw/../../WEB-INF/../WEB-INF/lib/../version.properties")
+                + "{{/velocity}}",
+            "TestTemplate");
+        assertTrue(viewPage.getContent().isEmpty(), "File in the wrong directory, with not normalized path call should "
+            + "not display anything.");
     }
 }

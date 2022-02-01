@@ -136,30 +136,17 @@ XWiki.Selection = Class.create({
   range : false,
   // the list of elements that wrap the selection to make it colored, in FF
   highlightWrappers : false,
-  // the parent of the selection and the selection inner HTML to make it colored in IE and to be able to rollback this change
-  selectionParent : false,
-  selectionParentInnerHTML : false,
   // position of the last mouse up, to know where to display the dialog
   offsetX : false,
   offsetY : false,
   // how many characters to expand left &amp; right in standard impl
   step : 5,
-  // how may words to expand left &amp; right on IE
-  wordStep : 1,
 
   initialize : function (container) {
     if (!container) {
       return;
     }
     this.container = container;
-    // on IE we listen to the mousedown and remember the position of the mousedown of the selection to know where to display the dialog for annotation creation
-    if (!window.getSelection) {
-      this.container.observe('mousedown', function(event) {
-        // very ugly hack to get these values on body since the first positioned ancestor for the panel to be displayed is the body and we need this offsets
-        this.offsetX = event.pointerX();
-        this.offsetY = event.pointerY();
-      }.bindAsEventListener(this));
-    }
   },
 
   computeSelection : function () {
@@ -169,34 +156,19 @@ XWiki.Selection = Class.create({
     this.selectionContext = false;
     this.selectionOffset = false;
     this.highlightWrappers = false;
-    this.selectionParent = false;
-    this.selectionParentInnerHTML = false;
     // if there is no container to get selection in, selection is always false
     if (!this.container) {
       return;
     }
-    if (window.getSelection) {
-      // FF selection &amp; hopefully other browsers
-      if (window.getSelection().rangeCount == 0) {
-        return;
-      }
-      this.range = window.getSelection().getRangeAt(0);
-      // ignore if the selection is in the passed container
-      if (!this.isDescendantOrSelf(this.container, this.range.commonAncestorContainer)) {
-        return;
-      }
-      this.selectionText = this.range.toString();
-    } else {
-      // IE selection
-      if (document.selection.type == 'Text') {
-        this.range = document.selection.createRange();
-        // ignore if the selection is in the passed container
-        if (!this.isDescendantOrSelf(this.container, this.range.parentElement())) {
-          return;
-        }
-        this.selectionText = this.range.text;
-      }
+    if (!window.getSelection().rangeCount) {
+      return;
     }
+    this.range = window.getSelection().getRangeAt(0);
+    // ignore if the selection is in the passed container
+    if (!this.isDescendantOrSelf(this.container, this.range.commonAncestorContainer)) {
+      return;
+    }
+    this.selectionText = this.range.toString();
     if (this.selectionText.strip() == '') {
       this.selectionText = false;
     }
@@ -221,30 +193,20 @@ XWiki.Selection = Class.create({
       // there should be some selection at this point
       return;
     }
-    if (window.getSelection) {
-      // standard
-      // create an annotation highlight span around this content
-      var highlightWrapperTemplate = new Element('span', {'style': 'background-color: ' + color, 'class' : 'selection-highlight'});
-      // get all the text nodes of this range
-      var rangeTextNodes = this.getRangeTextNodes();
-      // and remove all the ranges in this selection, otherwise so messed up things will happen
-      window.getSelection().removeAllRanges();
-      this.highlightWrappers = new Array();
-      rangeTextNodes.each(function(text) {
-        // clone a highlightWrapper from the template
-        var highlightWrapper = highlightWrapperTemplate.clone();
-        highlightWrapper.update(text.textContent.escapeHTML());
-        text.parentNode.replaceChild(highlightWrapper, text);
-        this.highlightWrappers.push(highlightWrapper);
-      }.bind(this));
-    } else {
-      // IE
-      // get the selection parent and its inner HTML to be able to restore it after
-      this.selectionParent = this.range.parentElement();
-      this.selectionParentInnerHTML = this.selectionParent.innerHTML;
-      // and finally color it
-      this.range.execCommand("BackColor", false, color);
-    }
+    // create an annotation highlight span around this content
+    var highlightWrapperTemplate = new Element('span', {'style': 'background-color: ' + color, 'class' : 'selection-highlight'});
+    // get all the text nodes of this range
+    var rangeTextNodes = this.getRangeTextNodes();
+    // and remove all the ranges in this selection, otherwise so messed up things will happen
+    window.getSelection().removeAllRanges();
+    this.highlightWrappers = new Array();
+    rangeTextNodes.each(function(text) {
+      // clone a highlightWrapper from the template
+      var highlightWrapper = highlightWrapperTemplate.clone();
+      highlightWrapper.update(text.textContent.escapeHTML());
+      text.parentNode.replaceChild(highlightWrapper, text);
+      this.highlightWrappers.push(highlightWrapper);
+    }.bind(this));
   },
 
   /**
@@ -369,16 +331,10 @@ XWiki.Selection = Class.create({
   },
 
   removeSelectionHighlight : function() {
-    if (window.getSelection) {
-      // standard
-      // unwrap
-      this.highlightWrappers.each(function(wrapper) {
-        wrapper.replace(wrapper.innerHTML);
-      });
-    } else {
-      // IE
-      this.selectionParent.update(this.selectionParentInnerHTML);
-    }
+    // unwrap
+    this.highlightWrappers.each(function(wrapper) {
+      wrapper.replace(wrapper.innerHTML);
+    });
   },
 
   getPositionNextToSelection : function() {
@@ -784,10 +740,7 @@ XWiki.Annotation = Class.create({
         }.bind(this),
 
         onFailure: function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           // show the error message at the bottom
           menu._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('annotations.menu.loaderror')" + failureReason, 'error', {timeout : 5}));
         },
@@ -934,10 +887,7 @@ XWiki.Annotation = Class.create({
         }.bind(this),
 
         onFailure: function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           // show the error message at the bottom
           this._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loaderror')" + failureReason, 'error', {timeout : 5}));
           this.setAnnotationVisibility(false);
@@ -1322,10 +1272,7 @@ XWiki.Annotation = Class.create({
               this.fillEditForm(container, response.responseText, id, inBubble);
             }.bind(this),
             onFailure: function(response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
+              var failureReason = response.statusText || 'Server not responding';
               // show the error message at the bottom
               this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.edit.form.loaderror')" + failureReason, 'error', {timeout : 5});
               // load the original content of the container
@@ -1380,10 +1327,7 @@ XWiki.Annotation = Class.create({
         }.bind(this),
 
         onFailure: function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           // hide the loading bubble
           this.hideBubble(newBubble);
           // show the error message at the bottom
@@ -1517,10 +1461,7 @@ XWiki.Annotation = Class.create({
         this.loadAnnotations(response.responseJSON.annotatedContent, this.displayingAnnotations, !inBubble);
       }.bind(this),
       onFailure : function(response) {
-        var failureReason = response.statusText;
-        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-          failureReason = 'Server not responding';
-        }
+        var failureReason = response.statusText || 'Server not responding';
         this._x_notification.replace(new XWiki.widgets.Notification(messages.failureText + failureReason, 'error', {timeout : 5}));
         if (inBubble) {
           // and close the bubble on failure to update
@@ -1720,10 +1661,7 @@ XWiki.Annotation = Class.create({
           }.bind(this),
 
           onFailure: function(response) {
-            var failureReason = response.statusText;
-            if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-              failureReason = 'Server not responding';
-            }
+            var failureReason = response.statusText || 'Server not responding';
             // show the error message at the bottom
             this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.form.loaderror')" + failureReason, 'error', {timeout : 5});
             // and hide the create form panel
@@ -1802,10 +1740,7 @@ XWiki.Annotation = Class.create({
       }.bind(this),
       onFailure : function(response) {
         this.hideAnnotationCreationForm();
-        var failureReason = response.statusText;
-        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-          failureReason = 'Server not responding';
-        }
+        var failureReason = response.statusText || 'Server not responding';
         this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.loaderror')" + failureReason, 'error', {timeout : 5});
       }.bind(this),
       on0 : function (response) {

@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class UsersParameterHandlerTest
+class UsersParameterHandlerTest
 {
     @InjectMockComponents
     private UsersParameterHandler usersParameterHandler;
@@ -68,7 +68,7 @@ public class UsersParameterHandlerTest
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Test
-    public void handlerUsersParameter()
+    void handlerUsersParameter()
     {
         NotificationParameters notificationParameters = new NotificationParameters();
         this.usersParameterHandler.handleUsersParameter(null, notificationParameters);

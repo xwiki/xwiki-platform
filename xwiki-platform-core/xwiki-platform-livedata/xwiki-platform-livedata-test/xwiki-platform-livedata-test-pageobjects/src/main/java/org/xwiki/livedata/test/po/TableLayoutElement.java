@@ -752,7 +752,9 @@ public class TableLayoutElement extends BaseElement
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
 
         // Hover on the property and click on the edit button on the displayed popover.
-        new Actions(getDriver().getWrappedDriver()).moveToElement(element).perform();
+        // We move slightly at the right of the center of the targeted element to prevent to popover of the surrounding 
+        // cells to hide the targeted location of the mouse.
+        new Actions(getDriver().getWrappedDriver()).moveToElement(element, 50, 0).perform();
         By editActionSelector = By.cssSelector(".displayer-action-list span[title='Edit']");
         // Waits to have at least one popover visible and click on the edit action of the last one. While it does not
         // seems to be possible in normal conditions, using selenium and moveToElement, several popover can be visible

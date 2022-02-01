@@ -1410,9 +1410,7 @@ var init = function(event) {
   elements.forEach(function(element) {
     var liveTableElements = element.classList.contains('xwiki-livetable') ? [element] :
       element.querySelectorAll('.xwiki-livetable');
-    // Iterate the NodeList of live table elements in a way that is compatible with IE11.
-    // See XWIKI-17170: LiveTables not working on IE11
-    Array.prototype.forEach.call(liveTableElements, maybeCreateLiveTable);
+    liveTableElements.forEach(maybeCreateLiveTable);
   });
 };
 

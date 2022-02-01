@@ -162,10 +162,7 @@ XWiki.UserWikiTab = Class.create({
       }.bind(this),
 
       onFailure: function(response) {
-        var failureReason = response.statusText;
-        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-          failureReason = 'Server not responding';
-        }
+        var failureReason = response.statusText || 'Server not responding';
         $('wikiActivityColumn').innerHTML = '&lt;span&gt;Failed to load activity stream. Reason:&lt;/span&gt;&lt;br/&gt;&lt;span&gt;' + failureReason + '&lt;/span&gt;';
       }.bind(this),
 

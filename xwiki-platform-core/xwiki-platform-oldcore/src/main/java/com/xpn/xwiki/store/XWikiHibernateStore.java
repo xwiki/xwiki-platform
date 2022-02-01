@@ -66,6 +66,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -613,7 +614,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     doc.setDate(ndate);
                     if (doc.isContentDirty()) {
                         doc.setContentUpdateDate(ndate);
-                        doc.setContentAuthorReference(doc.getAuthorReference());
+                        DocumentAuthors authors = doc.getAuthors();
+                        authors.setContentAuthor(authors.getEffectiveMetadataAuthor());
                     }
                     doc.incrementVersion();
                     if (context.getWiki().hasVersioning(context)) {

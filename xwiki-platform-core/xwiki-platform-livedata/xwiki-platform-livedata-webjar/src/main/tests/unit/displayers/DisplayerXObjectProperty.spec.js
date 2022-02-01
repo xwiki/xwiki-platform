@@ -22,6 +22,7 @@ import DisplayerXObjectProperty from "../../../displayers/DisplayerXObjectProper
 import {initWrapper} from "./displayerTestsHelper";
 import Vue from "vue";
 import $ from 'jquery';
+import flushPromises from "flush-promises";
 
 global.$ = global.jQuery = $;
 
@@ -81,7 +82,7 @@ describe('DisplayerXObjectProperty.vue', () => {
     // of the popover is not currently possible.
     await wrapper.setData({isView: false})
     wrapper.vm.updateEdit()
-    await Vue.nextTick()
+    await flushPromises();
 
     // Checks that the edition form is properly retrieved and displayed.
     expect(wrapper.find('#editForm').exists()).toBe(true);

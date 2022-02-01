@@ -130,9 +130,10 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
         boolean skipRecycleBin = this.configuration.isRecycleBinSkippingActivated()
                                      && this.documentAccessBridge.isAdvancedUser()
                                      && ObjectUtils.defaultIfNull(shouldSkipRecycleBinProperty, false);
-        EntitySelection entitySelection = this.concernedEntities.get(documentReference);
-        if (entitySelection != null && !entitySelection.isSelected()) {
-            // TODO: handle entitySelection == null which means something is wrong
+        EntitySelection entitySelection = this.getConcernedEntitiesEntitySelection(documentReference);
+        if (entitySelection == null) {
+            this.logger.info("Skipping [{}] because it does not match any entity selection.", documentReference);
+        } else if (!entitySelection.isSelected()) {
             this.logger.info("Skipping [{}] because it has been unselected.", documentReference);
         } else if (!this.modelBridge.exists(documentReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", documentReference);

@@ -1156,8 +1156,6 @@
 @dropdown-bg:                    #fff;
 //** Dropdown menu `border-color`.
 @dropdown-border:                rgba(0,0,0,.15);
-//** Dropdown menu `border-color` **for IE8**.
-@dropdown-fallback-border:       #ccc;
 //** Divider color for between dropdown items.
 @dropdown-divider-bg:            rgba(0,0,0,.2);
 
@@ -1462,8 +1460,6 @@
 @popover-max-width:                   276px;
 //** Popover border color
 @popover-border-color:                transparent;
-//** Popover fallback border color
-@popover-fallback-border-color:       @gray-dark;
 
 //** Popover title background color
 @popover-title-bg:                    @popover-bg;
@@ -1477,8 +1473,6 @@
 @popover-arrow-outer-width:           (@popover-arrow-width + 1);
 //** Popover outer arrow color
 @popover-arrow-outer-color:           fadein(@popover-border-color, 5%);
-//** Popover outer arrow fallback color
-@popover-arrow-outer-fallback-color:  darken(@popover-fallback-border-color, 20%);
 
 
 //== Labels
@@ -1520,8 +1514,6 @@
 @modal-content-bg:                             #fff;
 //** Modal content border color
 @modal-content-border-color:                   rgba(0,0,0,.2);
-//** Modal content border color **for IE8**
-@modal-content-fallback-border-color:          #999;
 
 //** Modal backdrop background color
 @modal-backdrop-bg:           #000;

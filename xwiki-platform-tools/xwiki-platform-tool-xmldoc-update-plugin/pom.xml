@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>14.0-SNAPSHOT</version>
+    <version>14.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
   <name>XWiki Platform - Tools - XML Doc Update Plugin</name>
@@ -57,6 +57,12 @@
       <artifactId>javax.servlet-api</artifactId>
       <!-- Note: Needed to create a XWikiDocument, and xwiki-core does not provide it anymore. -->
       <scope>compile</scope>
+    </dependency>
+    <!-- Needed by oldcore to manipulate authors -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- Maven -->

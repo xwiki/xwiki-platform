@@ -356,10 +356,7 @@ XWiki.Dashboard = Class.create( {
           window.location.reload();
         }.bind(this),
         onFailure : function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           this._x_notification.replace(new XWiki.widgets.Notification(
             l10n['dashboard.actions.add.failed'] + failureReason, "error", {timeout: 5}));
         }.bind(this),
@@ -461,10 +458,7 @@ XWiki.Dashboard = Class.create( {
           window.location.reload();
         }.bind(this),
         onFailure : function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           this._x_notification.replace(new XWiki.widgets.Notification(l10n['dashboard.gadget.actions.edit.failed'] +
             failureReason, "error", {timeout: 5}));
         }.bind(this),
@@ -608,10 +602,7 @@ XWiki.Dashboard = Class.create( {
           }
         }.bind(this),
         onFailure: function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           // show the error message at the bottom
           this._x_notification = new XWiki.widgets.Notification(l10n['dashboard.actions.edit.failed'] + failureReason,
             "error", {timeout: 5});

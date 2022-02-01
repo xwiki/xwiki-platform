@@ -34,6 +34,7 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -153,12 +154,11 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
     private DataMigrationManager dataMigrationManager;
 
-    private final BootstrapServiceRegistry bootstrapServiceRegistry =
-        new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
+    private BootstrapServiceRegistry bootstrapServiceRegistry;
 
-    private final MetadataSources metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
+    private MetadataSources metadataSources;
 
-    private final Configuration configuration = new Configuration(this.metadataSources);
+    private HibernateStoreConfiguration configuration;
 
     private StandardServiceRegistry standardServiceRegistry;
 
@@ -171,6 +171,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     private Metadata configurationMetadata;
 
     private String configurationCatalog;
+
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private DataMigrationManager getDataMigrationManager()
     {
@@ -217,9 +219,18 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         return url;
     }
 
+    private void createConfiguration()
+    {
+        this.bootstrapServiceRegistry = new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
+        this.metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
+        this.configuration = new HibernateStoreConfiguration(this.metadataSources, this.configuration);
+    }
+
     @Override
     public void initialize() throws InitializationException
     {
+        createConfiguration();
+
         URL url = getHibernateConfigurationURL();
         if (url != null) {
             this.configuration.configure(url);
@@ -291,18 +302,34 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     }
 
     /**
+     * Reload the Hibernate setup.
+     * <p>
+     * This method is synchronized to make sure that it's only executed once at a time.
+     * 
      * @since 11.5RC1
      */
     public void build()
     {
-        // Get rid of existing session factory
-        disposeInternal();
+        this.lock.writeLock().lock();
 
-        this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
-        this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
+        try {
+            // Check if it's a rebuild
+            if (this.sessionFactory != null) {
+                // Get rid of existing session factory
+                disposeInternal();
 
-        // Create a new session factory
-        this.sessionFactory = this.configuration.buildSessionFactory(this.standardServiceRegistry);
+                // Recreate the configuration
+                createConfiguration();
+            }
+
+            this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
+            this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
+
+            // Create a new session factory
+            this.sessionFactory = this.configuration.buildSessionFactory(this.standardServiceRegistry);
+        } finally {
+            this.lock.writeLock().unlock();
+        }
     }
 
     private void disposeInternal()
@@ -430,7 +457,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public DatabaseProduct getDatabaseProductName()
     {
         if (this.databaseProductCache == DatabaseProduct.UNKNOWN) {
-            if (this.sessionFactory != null) {
+            if (getSessionFactory() != null) {
                 DatabaseMetaData metaData = getDatabaseMetaData();
                 if (metaData != null) {
                     try {
@@ -818,7 +845,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public SessionFactory getSessionFactory()
     {
-        return this.sessionFactory;
+        this.lock.readLock().lock();
+
+        try {
+            return this.sessionFactory;
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     /**

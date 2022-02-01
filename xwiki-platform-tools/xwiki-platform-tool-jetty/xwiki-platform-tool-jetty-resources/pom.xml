@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-jetty</artifactId>
-    <version>14.0-SNAPSHOT</version>
+    <version>14.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Configuration Resources</name>
@@ -34,23 +34,17 @@
   <properties>
     <!-- Jetty does not work with the Jakarta Annotation API version for some reason (it does not seems to load it without much explanation in the log) -->
     <xwiki.enforcer.enforce-jakarta.annotation-api.skip>true</xwiki.enforcer.enforce-jakarta.annotation-api.skip>
-    <!-- Use a possibly different version than the one used for the Jetty JARs packaged inside the XWiki WAR. The
-         reason is because the JARs requiring Jetty may not work work with the Jetty version we use for the standalone
-         packaging (which tends to use a newer version of Jetty). -->
+    <!-- Use a different version of Jetty the one used for the Jetty client JARs packaged inside the XWiki WAR.
+         The reason is because our dependencies (mainly Solr) are not necessarily compatibles with this version of Jetty.
+
+         Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
+    -->
     <jetty.version>10.0.7</jetty.version>
+    <apache-el.version>9.0.52</apache-el.version>
+    <!-- Jetty requires an alpha version of slf4j -->
+    <slf4j.version>2.0.0-alpha5</slf4j.version>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <!-- Jetty 10.0.x is using SLF4J 2.x so we override the dep mgmt of the XWiki top level POM so that the
-             SLF4J version coming from the Jetty deps below is used. When we wrote this we were depending on Jetty
-             10.0.7 which was depending on SLF4J 2.0.0-alpha5, hence the reason we put that as the lower limit. -->
-        <version>[2.0.0-alpha5,)</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -149,6 +143,12 @@
       <artifactId>websocket-javax-client</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
+    </dependency>
+    <!-- We need a EL implementation for Hiberate Validator -->
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
+      <version>${apache-el.version}</version>
     </dependency>
   </dependencies>
   <build>

@@ -49,6 +49,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -98,6 +99,8 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
@@ -146,8 +149,13 @@ import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
@@ -167,6 +175,7 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
+import com.xpn.xwiki.internal.doc.BaseObjects;
 import com.xpn.xwiki.internal.doc.XWikiAttachmentList;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.internal.render.OldRendering;
@@ -417,24 +426,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private String format;
 
-    /**
-     * First author of the document.
-     */
-    private DocumentReference creatorReference;
-
-    /**
-     * The Author is changed when any part of the document changes (content, objects, attachments).
-     */
-    private DocumentReference authorReference;
-
-    /**
-     * The last user that has changed the document's content (ie not object, attachments). The Content author is only
-     * changed when the document content changes. Note that Content Author is used to check programming rights on a
-     * document and this is the reason we need to know the last author who's modified the content since programming
-     * rights depend on this.
-     */
-    private DocumentReference contentAuthorReference;
-
     private String customClass;
 
     private Date contentUpdateDate;
@@ -504,10 +495,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * Map holding document objects indexed by XClass references (i.e. Document References since a XClass reference
-     * points to a document). The map is not synchronized, and uses a TreeMap implementation to preserve index ordering
-     * (consistent sorted order for output to XML, rendering in velocity, etc.)
+     * points to a document). The preserve index ordering (consistent sorted order for output to XML, rendering in
+     * velocity, etc.)
      */
-    private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
+    private Map<DocumentReference, BaseObjects> xObjects = new ConcurrentSkipListMap<>();
 
     private final XWikiAttachmentList attachmentList = new XWikiAttachmentList(XWikiDocument.this);
 
@@ -632,6 +623,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private String localKeyCache;
 
     private RenderingContext renderingContext;
+
+    /**
+     * @see #getAuthors()
+     */
+    private final DefaultDocumentAuthors authors = new DefaultDocumentAuthors(this);
 
     /**
      * Create a document for the given reference, with the {@link Locale#ROOT} even if the reference contains a locale.
@@ -824,6 +820,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private String localizePlainOrKey(String key, Object... parameters)
     {
         return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+    }
+
+    private UserReferenceSerializer<DocumentReference> getUserReferenceDocumentReferenceSerializer()
+    {
+        return Utils.getComponent(
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
+    }
+
+    private UserReferenceResolver<DocumentReference> getUserReferenceDocumentReferenceResolver()
+    {
+        return Utils.getComponent(
+            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
     }
 
     public XWikiStoreInterface getStore(XWikiContext context)
@@ -1864,27 +1872,38 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
+     * @deprecated Since 14.0RC1 rely on {@link #getAuthors}.
      */
+    @Deprecated
     public DocumentReference getAuthorReference()
     {
-        return this.authorReference;
+        UserReference effectiveMetadataAuthor = getAuthors().getEffectiveMetadataAuthor();
+        if (this.getAuthors().getEffectiveMetadataAuthor() != null
+            && effectiveMetadataAuthor != GuestUserReference.INSTANCE) {
+            return this.getUserReferenceDocumentReferenceSerializer().serialize(effectiveMetadataAuthor);
+        } else {
+            return null;
+        }
     }
 
     /**
      * @since 3.0M3
+     * @deprecated Since 14.0RC1 rely on {@link DocumentAuthors#setEffectiveMetadataAuthor(UserReference)}
      */
+    @Deprecated
     public void setAuthorReference(DocumentReference authorReference)
     {
-        if (ObjectUtils.notEqual(authorReference, getAuthorReference())) {
-            setMetaDataDirty(true);
-        }
-
-        this.authorReference = intern(authorReference);
-
-        // Log this since it's probably a mistake so that we find who is doing bad things
-        if (this.authorReference != null && this.authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                new Exception("See stack trace"));
+        if (authorReference == null) {
+            this.authors.setEffectiveMetadataAuthor(GuestUserReference.INSTANCE);
+        } else {
+            if (authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
+                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
+                    new Exception("See stack trace"));
+            }
+            UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(authorReference);
+            this.authors.setEffectiveMetadataAuthor(user);
+            // We also set the original metadata author for backward compatibility.
+            this.authors.setOriginalMetadataAuthor(user);
         }
     }
 
@@ -1912,29 +1931,35 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
+     * @deprecated Since 14.0RC1 rely on {@link #getAuthors()}.
      */
     @Override
     public DocumentReference getContentAuthorReference()
     {
-        return this.contentAuthorReference;
+        UserReference contentAuthor = this.getAuthors().getContentAuthor();
+        if (contentAuthor != null && contentAuthor != GuestUserReference.INSTANCE) {
+            return this.getUserReferenceDocumentReferenceSerializer().serialize(contentAuthor);
+        } else {
+            return null;
+        }
     }
 
     /**
      * @since 3.0M3
+     * @deprecated Since 14.0RC1 rely on {@link DocumentAuthors#setContentAuthor(UserReference)}
      */
+    @Deprecated
     public void setContentAuthorReference(DocumentReference contentAuthorReference)
     {
-        if (ObjectUtils.notEqual(contentAuthorReference, getContentAuthorReference())) {
-            setMetaDataDirty(true);
-        }
-
-        this.contentAuthorReference = intern(contentAuthorReference);
-
-        // Log this since it's probably a mistake so that we find who is doing bad things
-        if (this.contentAuthorReference != null
-            && this.contentAuthorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                new Exception("See stack trace"));
+        if (contentAuthorReference == null) {
+            this.authors.setContentAuthor(GuestUserReference.INSTANCE);
+        } else {
+            if (contentAuthorReference.getName().equals(XWikiRightService.GUEST_USER)) {
+                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
+                    new Exception("See stack trace"));
+            }
+            UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(contentAuthorReference);
+            this.authors.setContentAuthor(user);
         }
     }
 
@@ -1962,27 +1987,35 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
+     * @deprecated since 14.0RC1 use {@link #getAuthors()}.
      */
+    @Deprecated
     public DocumentReference getCreatorReference()
     {
-        return this.creatorReference;
+        UserReference creator = this.getAuthors().getCreator();
+        if (creator != null && creator != GuestUserReference.INSTANCE) {
+            return this.getUserReferenceDocumentReferenceSerializer().serialize(creator);
+        } else {
+            return null;
+        }
     }
 
     /**
      * @since 3.0M3
+     * @deprecated since 14.0RC1 use {@link DocumentAuthors#setCreator(UserReference)}
      */
+    @Deprecated
     public void setCreatorReference(DocumentReference creatorReference)
     {
-        if (ObjectUtils.notEqual(creatorReference, getCreatorReference())) {
-            setMetaDataDirty(true);
-        }
-
-        this.creatorReference = intern(creatorReference);
-
-        // Log this since it's probably a mistake so that we find who is doing bad things
-        if (this.creatorReference != null && this.creatorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                new Exception("See stack trace"));
+        if (creatorReference == null) {
+            this.authors.setCreator(GuestUserReference.INSTANCE);
+        } else {
+            if (creatorReference.getName().equals(XWikiRightService.GUEST_USER)) {
+                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
+                    new Exception("See stack trace"));
+            }
+            UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(creatorReference);
+            this.authors.setCreator(user);
         }
     }
 
@@ -2544,7 +2577,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public Map<DocumentReference, List<BaseObject>> getXObjects()
     {
-        return this.xObjects;
+        return (Map) this.xObjects;
     }
 
     /**
@@ -2572,7 +2605,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         // Replace the current objects with the provided ones.
-        this.xObjects = objects;
+        Map<DocumentReference, BaseObjects> objectsCopy = new ConcurrentSkipListMap<>();
+        objects.forEach((k, v) -> objectsCopy.put(k, new BaseObjects(v)));
+        this.xObjects = objectsCopy;
     }
 
     /**
@@ -2636,9 +2671,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         BaseObject object = BaseClass.newCustomClassInstance(absoluteClassReference, context);
         object.setOwnerDocument(this);
         object.setXClassReference(classReference);
-        List<BaseObject> objects = this.xObjects.get(absoluteClassReference);
+        BaseObjects objects = this.xObjects.get(absoluteClassReference);
         if (objects == null) {
-            objects = new ArrayList<BaseObject>();
+            objects = new BaseObjects();
             this.xObjects.put(absoluteClassReference, objects);
         }
         objects.add(object);
@@ -2758,16 +2793,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         // Add new objects
-        if (objects.isEmpty()) {
-            // Pretty wrong but can't remove that for retro compatibility reasons...
-            // Note that it means that someone can put an unmodifiable list here make impossible to add any object of
-            // this class.
-            this.xObjects.put(classReference, objects);
-        } else {
-            for (BaseObject baseObject : objects) {
-                addXObject(classReference, baseObject);
-            }
-        }
+        this.xObjects.put(classReference, new BaseObjects(objects));
 
         setMetaDataDirty(true);
     }
@@ -2818,17 +2844,50 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public BaseObject getXObject(ObjectReference objectReference)
     {
-        BaseObjectReference baseObjectReference;
-        if (objectReference instanceof BaseObjectReference) {
-            baseObjectReference = (BaseObjectReference) objectReference;
-        } else {
-            baseObjectReference = new BaseObjectReference(objectReference);
-        }
+        BaseObjectReference baseObjectReference = getBaseObjectReference(objectReference);
 
         // If the baseObjectReference has an object number, we return the object with this number,
         // otherwise, we consider it should be the first object, as specified by BaseObjectReference#getObjectNumber
         return baseObjectReference.getObjectNumber() == null ? this.getXObject(baseObjectReference.getXClassReference())
             : getXObject(baseObjectReference.getXClassReference(), baseObjectReference.getObjectNumber());
+    }
+
+    /**
+     * Get or create an object of this document based on its reference.
+     *
+     * @param objectReference The reference of the object.
+     * @param create If the object shall be created if missing.
+     * @param context The XWiki context for creating the object.
+     * @return The found or created objected.
+     * @throws XWikiException If object creation failed.
+     * @since 14.0RC1
+     */
+    @Unstable
+    public BaseObject getXObject(ObjectReference objectReference, boolean create, XWikiContext context)
+        throws XWikiException
+    {
+        BaseObjectReference baseObjectReference = getBaseObjectReference(objectReference);
+
+        // If the baseObjectReference has an object number, we return the object with this number,
+        // otherwise, we consider it should be the first object, as specified by BaseObjectReference#getObjectNumber
+        if (baseObjectReference.getObjectNumber() == null) {
+            return getXObject(baseObjectReference.getXClassReference(), create, context);
+        } else {
+            return getXObject(baseObjectReference.getXClassReference(), baseObjectReference.getObjectNumber(), create,
+                context);
+        }
+    }
+
+    /**
+     * Convert the given {@link ObjectReference} into a {@link BaseObjectReference}.
+     */
+    private BaseObjectReference getBaseObjectReference(ObjectReference objectReference)
+    {
+        if (objectReference instanceof BaseObjectReference) {
+            return (BaseObjectReference) objectReference;
+        } else {
+            return new BaseObjectReference(objectReference);
+        }
     }
 
     /**
@@ -3062,9 +3121,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             object.setNumber(nb);
         }
 
-        List<BaseObject> objects = this.xObjects.get(classReference);
+        BaseObjects objects = this.xObjects.get(classReference);
         if (objects == null) {
-            objects = new ArrayList<BaseObject>();
+            objects = new BaseObjects();
             this.xObjects.put(classReference, objects);
         }
         while (nb >= objects.size()) {
@@ -3088,9 +3147,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         object.setOwnerDocument(this);
         object.setNumber(nb);
 
-        List<BaseObject> objects = this.xObjects.get(object.getXClassReference());
+        BaseObjects objects = this.xObjects.get(object.getXClassReference());
         if (objects == null) {
-            objects = new ArrayList<BaseObject>();
+            objects = new BaseObjects();
             this.xObjects.put(object.getXClassReference(), objects);
         }
         while (nb >= objects.size()) {
@@ -4008,6 +4067,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    /**
+     * Updates properties of existing objects with the values from the given form.
+     *
+     * @param eform The form to read the values from
+     * @param context The context used for getting the classes of objects
+     * @throws XWikiException On errors
+     */
     public void readObjectsFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {
         for (DocumentReference reference : getXObjects().keySet()) {
@@ -4093,6 +4159,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         readDocMetaFromForm(eform, context);
         readTranslationMetaFromForm(eform, context);
 
+        readAddedUpdatedAndRemovedObjectsFromForm(eform, context);
+    }
+
+    /**
+     * Adds objects, applies property updates and removes objects as specified in the form.
+     *
+     * @param eform The form from which the values shall be read.
+     * @param context The XWiki context.
+     * @throws XWikiException If an error occurs.
+     * @since 14.0RC1
+     */
+    @Unstable
+    public void readAddedUpdatedAndRemovedObjectsFromForm(EditForm eform, XWikiContext context) throws XWikiException
+    {
         // We add the new objects that have been submitted in the form, before filling them with their values.
         Map<String, List<Integer>> objectsToAdd = eform.getObjectsToAdd();
         for (String className : objectsToAdd.keySet()) {
@@ -4297,8 +4377,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             } else {
                 doc.setDocumentArchive(getDocumentArchive());
             }
-            doc.setAuthorReference(getAuthorReference());
-            doc.setContentAuthorReference(getContentAuthorReference());
+            doc.getAuthors().copyAuthors(getAuthors());
             doc.setContent(getContent());
             doc.setCreationDate(getCreationDate());
             doc.setDate(getDate());
@@ -4314,7 +4393,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             doc.setStore(getStore());
             doc.setTemplateDocumentReference(getTemplateDocumentReference());
             doc.setParentReference(getRelativeParentReference());
-            doc.setCreatorReference(getCreatorReference());
             doc.setDefaultLocale(getDefaultLocale());
             doc.setDefaultTemplate(getDefaultTemplate());
             doc.setValidationScript(getValidationScript());
@@ -9130,5 +9208,45 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public int getLocalReferenceMaxLength()
     {
         return getStore().getLimitSize(this.getXWikiContext(), this.getClass(), "fullName");
+    }
+
+    @Override
+    public DocumentAuthors getAuthors()
+    {
+        return this.authors;
+    }
+
+    /**
+     * This getter has been created for hibernate in order to properly fill the DB field, it's not meant to be used
+     * for other purpose. For getting the displayed author, rely on {@link #getAuthors()}.
+     *
+     * @return the serialization of the displayed author reference.
+     */
+    private String getOriginalMetadataAuthorReference()
+    {
+        if (this.getAuthors().getOriginalMetadataAuthor() == null
+            || this.getAuthors().getOriginalMetadataAuthor() == GuestUserReference.INSTANCE) {
+            return "";
+        } else {
+            UserReferenceSerializer<String> userReferenceSerializer =
+                Utils.getComponent(new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
+            return userReferenceSerializer.serialize(this.getAuthors().getOriginalMetadataAuthor());
+        }
+    }
+
+    /**
+     * This setter has been created for hibernate in order to properly create the XWikiDocument instance with the
+     * displayed author set, it's not meant to be used for other purpose.
+     *
+     * @param serializedUserReference the serialization of the displayed author reference.
+     */
+    private void setOriginalMetadataAuthorReference(String serializedUserReference)
+    {
+        if (!StringUtils.isEmpty(serializedUserReference)) {
+            UserReferenceResolver<String> userReferenceResolver =
+                Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class, String.class));
+            UserReference userReference = userReferenceResolver.resolve(serializedUserReference);
+            this.authors.setOriginalMetadataAuthor(userReference);
+        }
     }
 }

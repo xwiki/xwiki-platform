@@ -22,6 +22,7 @@ package org.xwiki.mentions.internal;
 import java.util.concurrent.BlockingQueue;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.mentions.MentionException;
 import org.xwiki.mentions.internal.async.MentionsData;
 
 /**
@@ -36,9 +37,10 @@ public interface MentionsBlockingQueueProvider
     /**
      * Initialize a blocking queue.
      *
-     * @return The blocking queue
+     * @return the blocking queue
+     * @throws MentionException if an error occurs during the initialization of the queue
      */
-    BlockingQueue<MentionsData> initBlockingQueue();
+    BlockingQueue<MentionsData> initBlockingQueue() throws MentionException;
 
     /**
      * Close the queue.

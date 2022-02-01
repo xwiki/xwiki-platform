@@ -111,5 +111,19 @@ public class TagNotificationFilterTest
 
         verify(query).bindValue("tagList", Arrays.asList("foo", "bar", "baz"));
         verify(query).setWiki("mywiki");
+
+        // if the returned list of pages for given tag is empty,
+        // the filter should not contain an empty "page in ()" clause,
+        // which results in a syntax error.
+        // instead return an "always wrong" filter.
+        // FIXME: ideally we should return an expression node that can clearly
+        // be optimized away, but for now we leave that to the query optimizer.
+        ExpressionNode emptyPages = value(EventProperty.PAGE).inStrings(Arrays.asList(""))
+            .and(value(EventProperty.WIKI).eq(value("mywiki")));
+
+        List pagesForUnusedTags = Collections.EMPTY_LIST;
+        when(query.execute()).thenReturn(pagesForUnusedTags);
+        assertEquals(emptyPages, tagNotificationFilter.filterExpression(null,
+            preferenceList, NotificationFilterType.EXCLUSIVE, null));
     }
 }

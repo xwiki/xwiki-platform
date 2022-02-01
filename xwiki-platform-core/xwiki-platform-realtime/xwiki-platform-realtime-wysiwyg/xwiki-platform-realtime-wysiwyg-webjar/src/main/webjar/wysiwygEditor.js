@@ -34,13 +34,11 @@ define('xwiki-realtime-wysiwygEditor', [
   'chainpad',
   'xwiki-realtime-crypto',
   'diff-dom',
-  'deferred!ckeditor',
-  // Adds support for XPath API to IE11.
-  'wgxpath'
+  'deferred!ckeditor'
 ], function (
   /* jshint maxparams:false */
   $, realtimeConfig, Messages, ErrorBox, Toolbar, ChainPadNetflux, Hyperjson, Cursor, UserData, TypingTest, JSONSortify,
-  Interface, Saver, Chainpad, Crypto, diffDOM, ckeditorPromise, wgxpath
+  Interface, Saver, Chainpad, Crypto, diffDOM, ckeditorPromise
 ) {
   'use strict';
 
@@ -606,8 +604,6 @@ define('xwiki-realtime-wysiwygEditor', [
           var data = updatedData[id];
           var name = getPrettyName(data.name);
           // Set the user position.
-          // Make sure we have XPath API support in the editor iframe (missing in IE11).
-          wgxpath.install(window.innerDoc.defaultView);
           var element = window.innerDoc.evaluate(data['cursor_' + editorId], window.innerDoc, null,
             XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
           if (!element) {

@@ -46,6 +46,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.context.Execution;
@@ -74,6 +75,9 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.URLConfiguration;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -952,6 +956,33 @@ public class MockitoOldcore
                 {
                     return getXWikiContext().getWikiId();
                 }
+            });
+        }
+
+        DefaultParameterizedType userReferenceDocumentReferenceResolverType =
+            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class);
+        if (!this.componentManager.hasComponent(userReferenceDocumentReferenceResolverType, "document")) {
+            UserReferenceResolver<DocumentReference> userReferenceResolver =
+                getMocker().registerMockComponent(userReferenceDocumentReferenceResolverType, "document");
+
+            DefaultParameterizedType userReferenceDocumentReferenceSerializer =
+                new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class);
+            UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
+            if (!this.componentManager.hasComponent(userReferenceDocumentReferenceSerializer, "document")) {
+                documentReferenceUserReferenceSerializer =
+                    getMocker().registerMockComponent(userReferenceDocumentReferenceSerializer, "document");
+            } else {
+                documentReferenceUserReferenceSerializer =
+                    getMocker().getInstance(userReferenceDocumentReferenceSerializer, "document");
+            }
+
+            // we ensure that when trying to resolve a DocumentReference to UserReference, then the returned mock
+            // will return the original DocumentReference when resolved back to DocumentReference.
+            when(userReferenceResolver.resolve(any())).then(invocationOnMock -> {
+                UserReference userReference = mock(UserReference.class);
+                when(documentReferenceUserReferenceSerializer.serialize(userReference))
+                    .thenReturn(invocationOnMock.getArgument(0));
+                return userReference;
             });
         }
     }

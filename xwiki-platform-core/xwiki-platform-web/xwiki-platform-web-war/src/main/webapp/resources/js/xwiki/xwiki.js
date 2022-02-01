@@ -1492,61 +1492,19 @@ XWiki.Document.getRestSearchURL = function(queryString, space, wiki) {
  * or pass it as the 'element' value of the memo of a 'xwiki:addBehavior:withTip' event.
  */
 (function(){
-  var placeholderPolyfill;
-  if ('placeholder' in document.createElement('input')) {
-    // For browsers that do support the 'placeholder' attribute, we just add support for the older way of supporting this through the 'withTip' classname and the default input value.
-    placeholderPolyfill = function(event) {
-      var item = event.memo.element;
-      if (item.placeholder === '') {
-        if (item.hasClassName('useTitleAsTip')) {
-          // The place-holder text is different than the initial (default) input value.
-          item.placeholder = item.title;
-        } else {
-          // Use the initial (default) input value as place-holder.
-          item.placeholder = item.defaultValue;
-          item.value = '';
-        }
-      }
-    }
-  } else {
-    // For browsers that don't support the 'placeholder' attribute, we simulate it with 'focus' and 'blur' event handlers.
-    var onFocus = function() {
-      var empty = this.hasClassName('empty');
-      this.removeClassName('empty');
-      if (empty) {
-        this.value = '';
+  var placeholderPolyfill = function(event) {
+    var item = event.memo.element;
+    if (item.placeholder === '') {
+      if (item.hasClassName('useTitleAsTip')) {
+        // The place-holder text is different than the initial (default) input value.
+        item.placeholder = item.title;
       } else {
-        this.select();
+        // Use the initial (default) input value as place-holder.
+        item.placeholder = item.defaultValue;
+        item.value = '';
       }
     }
-    var onBlur = function() {
-      if (this.value == '') {
-        this.value = this.defaultValue;
-        this.addClassName('empty');
-      }
-    }
-    placeholderPolyfill = function(event) {
-      var item = event.memo.element;
-      // Backup the initial input value because IE resets it when the default value is set.
-      var initialValue = item.value;
-      if (item.readAttribute('placeholder')) {
-        item.defaultValue = item.readAttribute('placeholder');
-      } else if (item.hasClassName('useTitleAsTip')) {
-        item.defaultValue = item.title;
-      }
-      // Restore the initial input value;
-      item.value = initialValue;
-      if (item.value == item.defaultValue) {
-        // The 'empty' CSS class has two functions:
-        // * display the placeholder value with a different color
-        // * distinguish between the case when the user has left the input empty and the case when he typed exactly the
-        //   default value (which should be valid).
-        item.addClassName('empty');
-      }
-      item.observe('focus', onFocus.bindAsEventListener(item));
-      item.observe('blur', onBlur.bindAsEventListener(item));
-    }
-  }
+  };
   document.observe('xwiki:addBehavior:withTip', placeholderPolyfill);
   document.observe('xwiki:dom:loaded', function() {
     $$("input.withTip", "textarea.withTip", "[placeholder]").each(function(item) {
@@ -1780,11 +1738,9 @@ document.observe("xwiki:dom:loaded", function() {
         }
       }
     });
-    if (!browser.isIE6x) { // IE6 is too dumb to be supported
-      Event.observe(window, 'scroll', handleScroll);
-      // Make sure the annotations settings panel shows up in the right place
-      document.observe('xwiki:annotations:settings:loaded', handleScroll);
-    }
+    Event.observe(window, 'scroll', handleScroll);
+    // Make sure the annotations settings panel shows up in the right place
+    document.observe('xwiki:annotations:settings:loaded', handleScroll);
   }
 
   /**

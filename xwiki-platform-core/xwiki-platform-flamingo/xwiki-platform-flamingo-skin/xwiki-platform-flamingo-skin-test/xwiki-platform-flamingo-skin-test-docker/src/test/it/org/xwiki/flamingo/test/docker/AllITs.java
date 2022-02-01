@@ -122,4 +122,22 @@ public class AllITs
     class NestedVersionIT extends VersionIT
     {
     }
+    
+    @Nested
+    @DisplayName("Edit Class tests")
+    class NestedEditClassIT extends EditClassIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Bean Validation tests")
+    class NestedBeanValidationIT extends BeanValidationIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Comments tests")
+    class NestedCommentsIT extends CommentsIT
+    {
+    }
 }

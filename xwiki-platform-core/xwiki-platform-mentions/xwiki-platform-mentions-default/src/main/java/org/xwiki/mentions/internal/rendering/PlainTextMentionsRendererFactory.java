@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.internal.renderer.AbstractPrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
  * Mentions specific plain text renderer factory.
@@ -41,7 +40,6 @@ public class PlainTextMentionsRendererFactory extends AbstractPrintRendererFacto
     @Override
     public Syntax getSyntax()
     {
-        String plainmentions = "plainmentions";
-        return new Syntax(new SyntaxType(plainmentions, plainmentions), "1.0");
+        return MentionsSyntaxProvider.PLAINMENTIONS_1_0;
     }
 }

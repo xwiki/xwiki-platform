@@ -202,9 +202,10 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     {
         // Perform checks that are specific to the document source/destination type.
 
-        EntitySelection entitySelection = this.concernedEntities.get(oldReference);
-        if (entitySelection != null && !entitySelection.isSelected()) {
-            // TODO: handle entitySelection == null which means something is wrong
+        EntitySelection entitySelection = this.getConcernedEntitiesEntitySelection(oldReference);
+        if (entitySelection == null) {
+            this.logger.info("Skipping [{}] because it does not match any entity selection.", oldReference);
+        } else if (!entitySelection.isSelected()) {
             this.logger.info("Skipping [{}] because it has been unselected.", oldReference);
         } else if (!this.modelBridge.exists(oldReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", oldReference);

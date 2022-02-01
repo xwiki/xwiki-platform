@@ -1649,6 +1649,19 @@ public class TestUtils
         return new ClassEditPage();
     }
 
+    /**
+     * Goes to a page in edit class mode.
+     *
+     * @param reference a document reference
+     * @return the {@link ClassEditPage} Page Object for the page
+     * @since 14.0RC1
+     */
+    public ClassEditPage editClass(DocumentReference reference)
+    {
+        gotoPage(reference, "edit", "editor=class");
+        return new ClassEditPage();
+    }
+
     public String getVersion() throws Exception
     {
         Xwiki xwiki = rest().getResource("", null);

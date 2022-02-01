@@ -471,7 +471,8 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         if (query instanceof SimpleEventQuery) {
             SimpleEventQuery simpleQuery = (SimpleEventQuery) query;
 
-            addConditions(simpleQuery.getConditions(), solrQuery);
+            addConditions(simpleQuery.isOr() && simpleQuery.getConditions().size() > 1
+                ? Collections.singletonList(simpleQuery) : simpleQuery.getConditions(), solrQuery);
         }
 
         return solrQuery;
@@ -576,18 +577,27 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         builder.append(':');
 
-        builder.append('(');
-        builder.append(
-            StringUtils.join(condition.getValues().stream().map(this.utils::toFilterQueryString).iterator(), " OR "));
-        builder.append(')');
+        if (condition.getValues().isEmpty()) {
+            builder.append("[* TO *]");
 
-        return builder.toString();
+            return "(-" + builder.toString() + ')';
+        } else {
+            builder.append('(');
+            builder.append(StringUtils
+                .join(condition.getValues().stream().map(this.utils::toFilterQueryString).iterator(), " OR "));
+            builder.append(')');
+
+            return builder.toString();
+        }
     }
 
     private String serializeGroupCondition(GroupQueryCondition group)
     {
         if (group.getConditions().isEmpty()) {
             return null;
+        } else if (group.getConditions().size() == 1) {
+            // Optimize useless groups
+            return serializeCondition(group.getConditions().get(0));
         }
 
         StringBuilder builder = new StringBuilder();
@@ -662,6 +672,16 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             case GREATER_OR_EQUALS:
                 builder.append(toFilterQueryStringRange(condition, null));
                 break;
+
+            case STARTS_WITH:
+                builder.append(this.utils.toFilterQueryString(condition.getValue()));
+                builder.append('*');
+                break;
+
+            case ENDS_WITH:
+                builder.append('*');
+                builder.append(this.utils.toFilterQueryString(condition.getValue()));
+                break;
         }
 
         return builder.toString();
@@ -689,7 +709,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         return property;
     }
 
-    public String toFilterQueryStringRange(CompareQueryCondition greater, CompareQueryCondition less)
+    private String toFilterQueryStringRange(CompareQueryCondition greater, CompareQueryCondition less)
     {
         StringBuilder builder = new StringBuilder();
 

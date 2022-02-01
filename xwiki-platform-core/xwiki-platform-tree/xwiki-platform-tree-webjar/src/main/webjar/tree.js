@@ -157,6 +157,10 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     var parent = tree.get_node(paginationNode.parent);
     getChildren.call(tree, parent, function(children) {
       var position = paginationElement.parent().children().index(paginationElement[0]);
+      // We have to remove the focus from the pagination node before deleting it in order to overcome
+      // https://github.com/vakata/jstree/issues/2563 (jsTree tries to focus the first sibling of the deleted node using
+      // the wrong function name).
+      tree.get_node(paginationNode, true).children('.jstree-anchor').blur();
       tree.delete_node(paginationNode);
       $.each(children, function(index) {
         // Create the node only if it doesn't exist (the node may have been loaded by a call to openTo).

@@ -51,7 +51,7 @@ public class SelectFilter implements UIExtensionFilter
     public List<UIExtension> filter(List<UIExtension> extensions, String... ids)
     {
         List<String> extensionIds = Arrays.asList(ids);
-        List<UIExtension> results = new ArrayList<UIExtension>();
+        List<UIExtension> results = new ArrayList<>();
 
         for (String id : extensionIds) {
             for (UIExtension extension : extensions) {

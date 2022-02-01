@@ -69,7 +69,7 @@ public class LinkExtensionPlugin extends AbstractSkinExtensionPlugin
             result.append(StringEscapeUtils.escapeXml(entry.getValue().toString()));
             result.append("'");
         }
-        result.append("/>");
+        result.append("/>\n");
         return result.toString();
     }
 

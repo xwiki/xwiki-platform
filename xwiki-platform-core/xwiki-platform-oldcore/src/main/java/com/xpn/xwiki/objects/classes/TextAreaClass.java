@@ -361,7 +361,22 @@ public class TextAreaClass extends StringClass
         parameters.put("rows", getRows());
         parameters.put("disabled", isDisabled());
         parameters.put("sourceDocumentReference", object.getDocumentReference());
-        Syntax syntax = "puretext".equals(editorType) ? Syntax.PLAIN_1_0 : getObjectDocumentSyntax(object, context);
+        Syntax syntax = null;
+        String contentType = getContentType();
+
+        // We set the syntax by first checking the content type: if it's pure text or velocity code
+        // the syntax is necessarily plain syntax.
+        // Else we check if the wanted editor is puretext: in such case we also consider that the syntax is plain/text
+        // finally we fallback on actual document syntax.
+        // FIXME: if the content type is WIKI_TEXT we should probably force the syntax to Wiki syntax, but which one:
+        // 2.0, 2.1?
+        if (StringUtils.equalsIgnoreCase(ContentType.PURE_TEXT.toString(), contentType)
+            || StringUtils.equalsIgnoreCase(ContentType.VELOCITY_CODE.toString(), contentType))
+        {
+            syntax = Syntax.PLAIN_1_0;
+        } else {
+            syntax = "puretext".equals(editorType) ? Syntax.PLAIN_1_0 : getObjectDocumentSyntax(object, context);
+        }
         SyntaxContent syntaxContent = new SyntaxContent(object.getStringValue(name), syntax);
         try {
             buffer.append(editor.render(syntaxContent, parameters));

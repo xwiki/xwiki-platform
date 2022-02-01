@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
@@ -83,7 +84,8 @@ public class EventSearcher
             try {
                 return searchStoreEvents(offset, limit, parameters);
             } catch (EventStreamException e) {
-                this.logger.debug("Failed to get events from the EventStore. Trying on the legacy store", e);
+                this.logger.warn("Failed to get events from the EventStore. Reason: [{}]. Trying the legacy store.",
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
@@ -96,7 +98,6 @@ public class EventSearcher
      * @param limit the maximum number of events to return
      * @param parameters parameters to use
      * @return the found events
-     * @throws QueryException when to search the events
      * @throws EventStreamException when to search the events
      */
     public List<Event> searchStoreEvents(int offset, int limit, NotificationParameters parameters)

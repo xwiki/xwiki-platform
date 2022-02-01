@@ -41,6 +41,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
 
@@ -123,7 +124,9 @@ public class WysiwygEditorScriptService implements ScriptService
 
     /**
      * @return The syntax identifier of the rendered HTML.
+     * @since 14.1RC1
      */
+    @Unstable
     public Syntax getHTMLSyntax()
     {
         return Syntax.ANNOTATED_HTML_5_0;

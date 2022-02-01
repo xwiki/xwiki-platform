@@ -47,7 +47,9 @@
       <enabled>#{env['CI'] == null}</enabled>
     </local>
     <remote>
-      <enabled>false</enabled>
+      <enabled>true</enabled>
+      <!-- Only CI jobs are allowed to store build outputs in the remote cache -->
+      <storeEnabled>#{env['CI'] != null}</storeEnabled>
     </remote>
   </buildCache>
 </gradleEnterprise>

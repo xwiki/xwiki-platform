@@ -358,11 +358,11 @@ define('xwiki-realtime-loader', [
     $('.xwiki-realtime-box').insertAfter(getBoxPosition()).show();
     $('.xwiki-realtime-box').css('margin-bottom', fullScreen ? '0' : '');
     resize();
-  },
+  };
 
   // Detect fullscreen mode in CKeditor.
   // FIXME: Modify the CKEditor to fire the fullscreen events.
-  observer = new MutationObserver(function(mutations) {
+  new MutationObserver(function(mutations) {
     mutations.forEach(function (mutation) {
       if (mutation.type === 'attributes' && mutation.attributeName === 'data-maximized') {
         fullScreen = $('body').attr('data-maximized') === 'true';

@@ -119,7 +119,7 @@ define('edit-bus', ['vue'], (Vue) => {
           })
           .catch(() => {
             new XWiki.widgets.Notification(`The row save action failed.`, 'error');
-          })
+          });
       }
     }
 

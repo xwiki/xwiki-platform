@@ -456,7 +456,7 @@ function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
       } else if (allows.indexOf(right)>=0) {
         r = 1;
       }
-      var chbx = new MSCheckbox(td, right, saveUrl, r, table, i);
+      new MSCheckbox(td, right, saveUrl, r, table, i);
       tr.appendChild(td);
     }
   });
@@ -559,7 +559,7 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
       pivot.src = newSrc;
     }
     new Ajax.Request(saveURL, paramMap);
-  }
+  };
 }
 
 /*

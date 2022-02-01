@@ -197,7 +197,6 @@ editors.XDataEditors = Class.create({
    * @param init true if it's the call performed during the script initialization.
    */
   enhanceClassUX : function(xclass, init) {
-    var xclassName = this.getXClassNameFromXClassId(xclass.id);
     this.ajaxObjectAdd(xclass);
     this.expandCollapseClass(xclass);
 
@@ -525,7 +524,6 @@ editors.XDataEditors = Class.create({
       item._x_propnameElt = $('propname');
       item._x_proptypeElt = $('proptype');
       item._x_form_tokenElt = $('form_token');
-      var token = item._x_form_tokenElt ? item._x_form_tokenElt.value : "";
       item.observe('click', function(event) {
         item.blur();
         event.stop();

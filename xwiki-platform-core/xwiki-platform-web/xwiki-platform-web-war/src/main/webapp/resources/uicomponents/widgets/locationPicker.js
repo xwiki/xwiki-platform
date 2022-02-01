@@ -63,7 +63,7 @@ require([paths.treeRequireConfig], function() {
         var tree = $.jstree.reference(treeElement);
         if (!tree) {
           // Initialize the tree and hook the event listeners.
-          tree = treeElement.xtree({
+          treeElement.xtree({
             core: {
               multiple: treeElement.data('multiple') === 'true'
             }

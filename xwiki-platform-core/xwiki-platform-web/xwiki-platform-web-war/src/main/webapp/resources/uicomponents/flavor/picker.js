@@ -19,26 +19,10 @@
  */
 // TODO: use the xwiki select widget: http://jira.xwiki.org/browse/XWIKI-12503
 require(['jquery'], function($) {
-
-  /**
-   * Count the ajax calls;
-   */
-  var ajaxCalls = 0;
-
-  /**
-   * The last ajax request
-   */
-  var lastAjaxRequest = false;
-
   /**
    * The found flavors
    */
   var flavors = [];
-
-  /**
-   * Number of maximum results per page
-   */
-  var resultsPerPage = 20;
 
   /**
    * Send an event when the selection change or when the results are refreshed
@@ -58,7 +42,7 @@ require(['jquery'], function($) {
 
     // Add namespace to the URL if needed
     var picker = $('.xwiki-flavor-picker');
-    url += encodeURIComponent($('.xwiki-flavor-picker').attr('data-namespace'));
+    url += encodeURIComponent(picker.attr('data-namespace'));
 
     $.getJSON(url).done(function(data) {
       // Update progress
@@ -225,7 +209,7 @@ require(['jquery'], function($) {
    * Initializer called each time the picker's result container is refreshed
    */
   var initPickerResults = function(picker) {
-  
+
     // Called when an option is clicked
     picker.find('.xwiki-flavor-picker-option').click(function (event) {
       var thisOption = $(this);
@@ -235,7 +219,7 @@ require(['jquery'], function($) {
       thisOption.addClass('xwiki-flavor-picker-option-selected');
       sendRefreshEvent(picker);
     });
-    
+
     // Called when a flavor's link is clicked
     picker.find('.xwiki-flavor-picker-option a.popup').click(function (event) {
       // TODO: replace this by a modal box with an iframe
@@ -245,13 +229,13 @@ require(['jquery'], function($) {
 
     sendRefreshEvent(picker);
   }
-  
+
   /**
    * Initializer called when the DOM is ready
    */
   var init = function() {
     initPickerResults($('.xwiki-flavor-picker'));
-    
+
     // Called when the picker's filter is updated on keyboard pressed
     $('input.xwiki-flavor-picker-filter').keyup(function() {
       var filter = $(this);
@@ -259,7 +243,7 @@ require(['jquery'], function($) {
 
       filterFlavors(filterValue);
     });
-    
+
     // Called when the "no flavor" option is clicked
     $('.xwiki-flavor-picker-noflavor').click(function (event) {
       var picker = $(this).parents('.xwiki-flavor-picker');

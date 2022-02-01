@@ -19,7 +19,7 @@
  */
 var XWiki = (function(XWiki) {
 // Start XWiki augmentation.
-var widgets = XWiki.widgets = XWiki.widgets || {};
+XWiki.widgets = XWiki.widgets || {};
 
 /**
   * The class representing an AJAX-populated live table.
@@ -196,8 +196,7 @@ XWiki.widgets.LiveTable = Class.create({
         "tableId" : self.domNodeName
       });
 
-      var ajx = new Ajax.Request(url,
-      {
+      new Ajax.Request(url, {
         method: 'get',
         onComplete: function( transport ) {
           // Let code know loading is finished
@@ -323,7 +322,7 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Let code know displaying is finished
     // 1. Named event (for code interested by that table only)
-    document.fire("xwiki:livetable:" + this.domNodeName + ":displayComplete")
+    document.fire("xwiki:livetable:" + this.domNodeName + ":displayComplete");
     // 2. Generic event (for code potentially interested in any livetable)
     document.fire("xwiki:livetable:displayComplete", {
       "tableId" : this.domNodeName
@@ -575,7 +574,7 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Let code know displaying is finished
     // 1. Named event (for code interested by that table only)
-    document.fire("xwiki:livetable:" + this.domNodeName + ":displayComplete")
+    document.fire("xwiki:livetable:" + this.domNodeName + ":displayComplete");
     // 2. Generic event (for code potentially interested in any livetable)
     document.fire("xwiki:livetable:displayComplete", {
       "tableId" : this.domNodeName

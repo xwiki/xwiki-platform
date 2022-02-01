@@ -141,7 +141,7 @@ viewers.Comments = Class.create({
       item.observe('click', function(event) {
         item.blur();
         event.stop();
-        this.displayHiddenForm()
+        this.displayHiddenForm();
         if (item.disabled) {
           // Do nothing if the button was already clicked and it's waiting for a response from the server.
           return;

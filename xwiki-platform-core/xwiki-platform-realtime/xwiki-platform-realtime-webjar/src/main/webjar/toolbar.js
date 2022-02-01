@@ -46,7 +46,7 @@ define('xwiki-realtime-toolbar', [
   var SPINNER = ['-', '\\', '|', '/'];
   var kickSpinner = function(spinnerElement, reversed) {
     var text = spinnerElement.textContent || '-';
-    var delta = (reversed) ? -1 : 1;
+    var delta = reversed ? -1 : 1;
     spinnerElement.textContent = SPINNER[(SPINNER.indexOf(text) + delta) % SPINNER.length];
     clearTimeout(spinnerElement.timeout);
     spinnerElement.timeout = setTimeout(function () {
@@ -176,7 +176,7 @@ define('xwiki-realtime-toolbar', [
 
     var ks = function() {
       if (connected) {
-        kickSpinner(spinner, false);
+        kickSpinner(spinner);
       }
     };
 

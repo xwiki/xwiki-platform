@@ -285,7 +285,7 @@ export default {
     getConfig (saveKey) {
       let config = "";
       // url search param
-      if (!config && this.urlSearchParam) {
+      if (this.urlSearchParam) {
         config = (new URLSearchParams(window.location.search)).get(saveKey);
       }
       // local storage

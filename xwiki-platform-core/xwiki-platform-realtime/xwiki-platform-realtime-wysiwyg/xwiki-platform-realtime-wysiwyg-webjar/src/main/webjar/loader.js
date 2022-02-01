@@ -71,10 +71,8 @@ define('xwiki-realtime-wysiwygEditor-loader', [
         .before('<br/>');
     } else if (lock) {
       var button = $('<button class="btn btn-primary"/>').text(Loader.messages.get('redirectDialog.create', info.name));
-      var buttons = $('.realtime-buttons');
-      buttons.append('<br/>').append(button);
-      var modal = buttons.data('modal');
-      $(button).click(function() {
+      var buttons = $('.realtime-buttons').append('<br/>').append(button);
+      button.click(function() {
         buttons.find('button').hide();
         var waiting = $('<div/>', {style: 'text-align:center;'}).appendTo(buttons);
         waiting.append($('<span/>', {

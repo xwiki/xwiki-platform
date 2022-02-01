@@ -139,7 +139,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     require(['jquery', 'xwiki-suggestPages'], function($) {
       // Load the required CSS.
       paths.css.selectize.forEach(function(url) {
-        var link = $('<link/>').attr({
+        $('<link/>').attr({
           type: 'text/css',
           rel: 'stylesheet',
           href: url

@@ -29,11 +29,11 @@ define('xwiki-realtime-saver', [
 ], /* jshint maxparams:false */ function($, chainpadNetflux, jsonSortify, Crypto, xwikiMeta, doc, Messages, ErrorBox) {
   'use strict';
 
-  var warn = function(x) {
-    console.log(x);
-  }, debug = function(x) {
-    console.log(x);
-  }, verbose = function(x) {};
+  var warn = function() {
+    console.log.apply(console, arguments);
+  }, debug = function() {
+    console.log.apply(console, arguments);
+  }, verbose = function() {};
 
   var SAVE_DOC_TIME = 60000,
     // How often to check if the document has been saved recently.
@@ -227,7 +227,6 @@ define('xwiki-realtime-saver', [
     });
   },
 
-  ISAVED = 1,
   // sends an ISAVED message
   saveMessage = function(version, hash) {
     var newState = {
@@ -273,7 +272,7 @@ define('xwiki-realtime-saver', [
     }
   },
 
-  // Only used within 'createSaver'.
+  // Only used within Saver.create().
   redirectToView = function() {
     window.location.href = window.XWiki.currentDocument.getURL('view');
   },
@@ -451,7 +450,6 @@ define('xwiki-realtime-saver', [
     var newSave = function(type, msg) {
       var msgSender = msg.by;
       var msgVersion = msg.version;
-      var msgHash = msg.hash;
       var msgEditor = type;
       var msgEditorName = msg.editorName;
 
@@ -534,7 +532,7 @@ define('xwiki-realtime-saver', [
   },
 
   /**
-   * createSaver contains some of the more complicated logic in this script. Clients check for remote changes on random
+   * This contains some of the more complicated logic in this script. Clients check for remote changes on random
    * intervals. If another client has saved outside of the realtime session, changes are merged on the server using
    * XWiki's threeway merge algo. The changes are integrated into the local textarea, which replicates across realtime
    * sessions. If the resulting state does not match the last saved content, then the contents are saved as a new
@@ -542,18 +540,16 @@ define('xwiki-realtime-saver', [
    * their local state to match. During this process, a series of checks are made to reduce the number of unnecessary
    * saves, as well as the number of unnecessary merges.
    */
-  mergeDialogCurrentlyDisplayed = false,
-  createSaver = Saver.create = function(config) {
+  mergeDialogCurrentlyDisplayed = false;
+  Saver.create = function(config) {
     $.extend(mainConfig, config);
     mainConfig.formId = mainConfig.formId || 'edit';
     var netfluxNetwork = config.network;
     var channel = config.channel;
-    var firstConnection = true;
 
     lastSaved.time = now();
 
     var onOpen = function(chan) {
-      var network = netfluxNetwork;
       // Originally implemented as part of 'saveRoutine', abstracted logic such that the merge/save algorithm can
       // terminate with different callbacks for different use cases.
       var saveFinalizer = function(e, shouldSave) {
@@ -613,7 +609,7 @@ define('xwiki-realtime-saver', [
       };
 
       var saveButtonAction = function(cont) {
-        debug("createSaver.saveand" + (cont ? 'view' : 'continue'));
+        debug("Saver.create.saveand" + (cont ? 'view' : 'continue'));
 
         saveRoutine(function(e) {
           if (e) {
@@ -659,11 +655,11 @@ define('xwiki-realtime-saver', [
               // Once you get your isaved back, redirect.
               debug("lastSaved.shouldRedirect " + lastSaved.shouldRedirect);
               if (lastSaved.shouldRedirect) {
-                debug('createSaver.saveandview.receivedOwnIsaved');
+                debug('Saver.create.saveandview.receivedOwnIsaved');
                 debug("redirecting!");
                 redirectToView();
               } else {
-                debug('createSaver.saveandcontinue.receivedOwnIsaved');
+                debug('Saver.create.saveandcontinue.receivedOwnIsaved');
               }
               // Clean up after yourself..
               lastSaved.onReceiveOwnIsave = null;
@@ -712,7 +708,7 @@ define('xwiki-realtime-saver', [
       // TimeOut
       var check = function() {
         clearTimeout(mainConfig.autosaveTimeout);
-        verbose("createSaver.check");
+        verbose("Saver.create.check");
         var periodDuration = Math.random() * SAVE_DOC_CHECK_CYCLE;
         mainConfig.autosaveTimeout = setTimeout(check, periodDuration);
 
@@ -739,54 +735,62 @@ define('xwiki-realtime-saver', [
       check();
     };
 
+    var module = window.SAVER_MODULE = {};
+    mainConfig.initializing = true;
+
     var rtConfig = {
       initialState: '{}',
       network: netfluxNetwork,
       userName: mainConfig.userName || '',
       channel: channel,
-      crypto: Crypto
-    };
-    var module = window.SAVER_MODULE = {};
-    mainConfig.initializing = true;
-    var onRemote = rtConfig.onRemote = function(info) {
-      if (mainConfig.initializing) {
-        return;
-      }
+      crypto: Crypto,
 
-      try {
-        var data = JSON.parse(module.chainpad.getUserDoc());
-        onMessage(data);
-      } catch (e) {
-        warn("Unable to parse realtime data from the saver", e);
+      onRemote: function(info) {
+        if (mainConfig.initializing) {
+          return;
+        }
+
+        try {
+          var data = JSON.parse(module.chainpad.getUserDoc());
+          onMessage(data);
+        } catch (e) {
+          warn("Unable to parse realtime data from the saver", e);
+        }
+      },
+
+      onReady: function(info) {
+        module.chainpad = mainConfig.chainpad = info.realtime;
+        module.leave = mainConfig.leaveChannel = info.leave;
+        try {
+          var data = JSON.parse(module.chainpad.getUserDoc());
+          onMessage(data);
+        } catch (e) {
+          warn("Unable to parse realtime data from the saver", e);
+        }
+        mainConfig.initializing = false;
+        onOpen();
+      },
+
+      onLocal: function(info) {
+        if (mainConfig.initializing) {
+          return;
+        }
+        var sjson = jsonSortify(rtData);
+        module.chainpad.contentUpdate(sjson);
+        if (module.chainpad.getUserDoc() !== sjson) {
+          warn("Saver: userDoc !== sjson");
+        }
+      },
+
+      onAbort: function() {
+        Saver.stop();
       }
     };
-    var onReady = rtConfig.onReady = function(info) {
-      module.chainpad = mainConfig.chainpad = info.realtime;
-      module.leave = mainConfig.leaveChannel = info.leave;
-      try {
-        var data = JSON.parse(module.chainpad.getUserDoc());
-        onMessage(data);
-      } catch (e) {
-        warn("Unable to parse realtime data from the saver", e);
-      }
-      mainConfig.initializing = false;
-      onOpen();
-    };
-    var onLocal = rtConfig.onLocal = mainConfig.onLocal = function(info) {
-      if (mainConfig.initializing) {
-        return;
-      }
-      var sjson = jsonSortify(rtData);
-      module.chainpad.contentUpdate(sjson);
-      if (module.chainpad.getUserDoc() !== sjson) {
-        warn("Saver: userDoc !== sjson");
-      }
-    };
-    var onAbort = rtConfig.onAbort = function() {
-      Saver.stop();
-    };
+
+    mainConfig.onLocal = rtConfig.onLocal;
+
     chainpadNetflux.start(rtConfig);
-  }; // END createSaver
+  }; // END Saver.create()
 
   // Stop the autosaver / merge when the user disallows realtime or when the WebSocket is disconnected.
   Saver.stop = function() {

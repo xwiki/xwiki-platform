@@ -359,7 +359,7 @@ var XWiki = (function(XWiki) {
 
         // We only update this field since the other ones are updated by the callback of setVersion.
         if (editingVersionDateField) {
-          editingVersionDateField.setValue(new Date().getTime())
+          editingVersionDateField.setValue(new Date().getTime());
         }
       }
 
@@ -446,7 +446,7 @@ var XWiki = (function(XWiki) {
     },
     // 403 happens in case of CSRF issue
     on403 : function (state, response) {
-      if (!response.responseJSON || !response.responseJSON.errorType === "CSRF") {
+      if (!response.responseJSON || response.responseJSON.errorType !== "CSRF") {
         return this.on401(state, response);
       }
 

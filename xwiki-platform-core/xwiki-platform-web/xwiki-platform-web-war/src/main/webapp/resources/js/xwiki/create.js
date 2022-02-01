@@ -29,7 +29,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
      * Compute the page name of the target
      */
     var computeTargetPageName = function() {
-      var documentReference = new XWiki.DocumentReference();
+      var documentReference;
       // Test if the parent reference field exists
       if (parentReferenceField.length > 0) {
         var parentReference = parentReferenceField.val();
@@ -160,7 +160,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
           }
 
           return false;
-        }
+        };
 
         // Determine what new value we will set for the parent reference, which needs to respect the restrictions.
         if (isRestrictionOrChildOfRestriction(currentParentReferenceValue)) {

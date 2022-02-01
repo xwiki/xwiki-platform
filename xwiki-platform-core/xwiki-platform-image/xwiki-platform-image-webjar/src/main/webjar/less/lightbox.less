@@ -1,12 +1,12 @@
 #blueimp-gallery {
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.9);
 
   > div.slides {
-    bottom: 10%;
+    padding: 2% 0;
   }
 
   > .indicator {
-    bottom: 12%;
+    bottom: 7%;
 
     /* Make the thumbnails bigger. */
     > li {
@@ -25,38 +25,24 @@
   }
 
   .lightboxDescription {
-    background-color: @xwiki-page-content-bg;
-    color: @text-color;
-    display: block;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #FFFFFF;
+    overflow-wrap: break-word;
+    display: flex;
+    flex-direction: column;
     position: absolute;
-    width: 100%;
-    padding: 0.3% 1%;
-    bottom: 0;
-
-    .descriptionRow {
-      position: relative;
-      height: 100%;
-    }
+    max-width: 45%;
+    max-height: 43%;
+    top: 2%;
+    left: 2%;
+    padding: 2%;
 
     .descriptionCaption {
-      overflow: auto;
-      max-height: 4vh;
+      overflow-y: auto;
     }
 
     .descriptionMetadata {
-      border-top: 1px solid rgb(224, 224, 224);
-      padding-top: 0.5%;
-    }
-
-    .descriptionColLeft {
-      float: left;
-      width: 68%;
-    }
-
-    .descriptionColRight {
-      float: right;
-      width: 30%;
-      text-align: end;
+      padding-top: 1%;
     }
   }
 }

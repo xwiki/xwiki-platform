@@ -83,8 +83,12 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
   /*
    * Extract the image name from the url. This may not be applied for external urls.
    */
-  var getImageName = function(imageLink) {
-    return new URL(imageLink).pathname.split("/").pop();
+  var getImageName = function(imageURL) {
+    var name = new URL(imageURL).pathname.split("/").pop();
+    // Only accept names that may have a file extension.
+    if (/\.[a-zA-Z]*/g.test(name)) {
+      return name;
+    }
   };
 
   /**
@@ -111,57 +115,51 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
     return url.toString();
   };
 
+  var clearDescription = function() {
+    $('.lightboxDescription .caption').empty();
+    $('.lightboxDescription .title').empty();
+    $('.lightboxDescription .publisher').empty();
+    $('.lightboxDescription .date').empty();
+  };
+
   /**
-   * Hide or display the lightbox description, considering the caption.
+   * Hide or display the lightbox description.
    */
-  var toggleDescription = function(display, withCaption) {
-    if (display) {
-      $('.lightboxDescription').css('display', 'block');
-      if (withCaption) {
-        $('#blueimp-gallery >div.slides').css('bottom', '10%');
-        $('#blueimp-gallery .indicator').css('bottom', '12%');
-      } else {
-        $('#blueimp-gallery >div.slides').css('bottom', '5%');
-        $('#blueimp-gallery .indicator').css('bottom', '7%');
-      }
+  var toggleDescription = function() {
+    var hasControls = $('.blueimp-gallery-controls').length > 0;
+    var nonEmptyElements = $('#blueimp-gallery').find('.caption, .title, .publisher, .date')
+      .filter((i, el) => !$(el).is(':empty'));
+
+    if (hasControls && nonEmptyElements.length > 0) {
+      $('.lightboxDescription').css('display', 'flex');
     } else {
       $('.lightboxDescription').css('display', 'none');
-      // Center the image.
-      $('#blueimp-gallery >div.slides').css('bottom', 0);
-      $('#blueimp-gallery .indicator').css('bottom', '2%');
     }
   };
 
   /**
    * Update lightbox description using given information.
    */
-  var updateLightboxDescription = function(metadata, caption) {
-    $('.lightboxDescription .caption').empty();
-    $('.lightboxDescription .title').empty();
-    $('.lightboxDescription .publisher').empty();
-    $('.lightboxDescription .date').empty();
+  var updateLightboxDescription = function(metadata, caption, alt, title) {
+    $('.lightboxDescription .caption').html(caption || alt || title || (metadata && metadata.name));
 
-    if (caption != undefined) {
-      $('.lightboxDescription .caption').html(caption);
-    }
-
-    if (metadata != undefined) {
-      if (metadata.name != undefined) {
+    if (metadata) {
+      // If the first paragraph is a caption, then we should also display the file name, when exists.
+      if (caption && metadata.name) {
         $('.lightboxDescription .title').text(metadata.name);
       }
 
-      if (metadata.author != undefined) {
+      if (metadata.author) {
         $('.lightboxDescription .publisher')
           .text(l10n.get('author', XWiki.Model.resolve(metadata.author, XWiki.EntityType.DOCUMENT).name));
       }
 
-      if (metadata.date != undefined) {
+      if (metadata.date) {
         $('.lightboxDescription .date').text(l10n.get('date', new Date(metadata.date).toLocaleDateString()));
       }
     }
 
-    var displayDescription = metadata != undefined && $('.blueimp-gallery-controls').length > 0;
-    toggleDescription(displayDescription, caption != undefined);
+    toggleDescription();
   };
 
   /**
@@ -183,12 +181,13 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
         cachedAttachments[imageURL] = attachment;
         deferred.resolve(attachment);
       }).fail(function (jqXHR) {
-        if (jqXHR.status == 404) {
-          cachedAttachments[imageURL] = {'name': getImageName(imageURL)};
-          // For an external URL, try to display at least the image name.
-          deferred.resolve({'name': getImageName(imageURL)});
+        // For an external URL, try to display at least the image name.
+        var fileName = getImageName(imageURL);
+        if (fileName) {
+          cachedAttachments[imageURL] = {'name': fileName};
+          deferred.resolve({'name': fileName});
         } else {
-        deferred.reject();
+          deferred.reject();
         }
       });
     }
@@ -216,7 +215,8 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
         href: imageURL,
         thumbnail: createThumbnailURL(imageURL),
         caption: caption,
-        alt: $(this).attr('alt')
+        alt: $(this).attr('alt'),
+        title: $(this).attr('title')
       });
     });
 
@@ -226,12 +226,16 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
       // The class names are overridden since we changed the styles.
       closeClass: 'escape',
       playPauseClass: 'autoPlay',
+      // Avoid the hide done by the library on the default h3 title element.
+      titleElement: 'h4',
       onslide: function(index, slide) {
+        clearDescription();
+        toggleDescription();
         var imageData = this.list[index];
         var slideImage = $(slide).find('img');
         var caption = imageData.caption;
         getAttachmentInfo(slideImage[0].src).done(function(data) {
-          updateLightboxDescription(data, caption);
+          updateLightboxDescription(data, caption, imageData.alt, imageData.title);
         }).fail(function() {
           updateLightboxDescription();
         });
@@ -265,11 +269,7 @@ require(['jquery', 'xwiki-meta', 'blueimp-gallery', 'xwiki-l10n!lightboxTranslat
     }
   });
 
-  $(document).on('click', '#blueimp-gallery .slides', function() {
-    var hasControls = $('.blueimp-gallery-controls').length > 0;
-    var isCaptionEmpty = $('#blueimp-gallery .caption').is(':empty');
-    toggleDescription(hasControls, !isCaptionEmpty);
-  });
+  $(document).on('click', '#blueimp-gallery .slides', toggleDescription());
 
   $(function() {
     initLightboxFunctionality();

@@ -50,6 +50,11 @@
       <enabled>true</enabled>
       <!-- Only CI jobs are allowed to store build outputs in the remote cache -->
       <storeEnabled>#{env['CI'] != null}</storeEnabled>
+      <server>
+        <!-- Note: Remote cache authentication is handled in the Maven settings.xml file. The id below is the one
+       found in settings.xml -->
+        <id>gradleEnterpriseCache</id>
+      </server>
     </remote>
   </buildCache>
 </gradleEnterprise>

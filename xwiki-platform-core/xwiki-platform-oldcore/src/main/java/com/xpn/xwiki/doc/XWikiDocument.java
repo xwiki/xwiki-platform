@@ -4205,12 +4205,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
-    public void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException
-    {
-        String template = eform.getTemplate();
-        readFromTemplate(template, context);
-    }
-
     /**
      * @since 2.2M1
      */
@@ -4264,20 +4258,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 }
             }
         }
-    }
-
-    /**
-     * @deprecated since 2.2M1 use {@link #readFromTemplate(DocumentReference, XWikiContext)} instead
-     */
-    @Deprecated
-    public void readFromTemplate(String template, XWikiContext context) throws XWikiException
-    {
-        // Keep the same behavior for backward compatibility
-        DocumentReference templateDocumentReference = null;
-        if (StringUtils.isNotEmpty(template)) {
-            templateDocumentReference = getCurrentMixedDocumentReferenceResolver().resolve(template);
-        }
-        readFromTemplate(templateDocumentReference, context);
     }
 
     /**

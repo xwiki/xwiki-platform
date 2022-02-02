@@ -52,10 +52,10 @@
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
       <displayType/>
-      <hint>XWiki.XWikiPreferences_isLightboxEnabled.hint</hint>
+      <hint/>
       <name>isLightboxEnabled</name>
       <number>1</number>
-      <prettyName>XWiki.XWikiPreferences_isLightboxEnabled</prettyName>
+      <prettyName>Enable lightbox</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>

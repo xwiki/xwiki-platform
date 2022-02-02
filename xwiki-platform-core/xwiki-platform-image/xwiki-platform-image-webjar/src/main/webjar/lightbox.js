@@ -208,7 +208,7 @@ define('xwiki-lightbox', [
    * Extract the image name from the url. This may not be applied for external urls.
    */
   var getImageName = function(imageURL) {
-    var name = new URL(imageURL).pathname.split("/").pop();
+    var name = decodeURI(new URL(imageURL).pathname.split("/").pop());
     // Only accept names that may have a file extension.
     if (/\.[a-zA-Z]*/g.test(name)) {
       return name;

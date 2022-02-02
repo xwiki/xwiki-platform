@@ -52,16 +52,16 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 
 /**
- * Unit tests for {@link StandardStringEntityReferenceResolver}.
+ * Unit tests for {@link StandardURLStringEntityReferenceResolver}.
  * 
  * @version $Id$
  */
 @ComponentTest
-class StandardStringEntityReferenceResolverTest
+class StandardURLStringEntityReferenceResolverTest
 {
     @InjectMockComponents
-    @Named("resource/standard")
-    private StandardStringEntityReferenceResolver standardReferenceResolver;
+    @Named("resource/standardURL")
+    private StandardURLStringEntityReferenceResolver standardReferenceResolver;
 
     @MockComponent
     private Provider<XWikiContext> xcontextProvider;

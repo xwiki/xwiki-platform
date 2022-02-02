@@ -42,7 +42,6 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.resource.entity.EntityResourceReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 
 import com.xpn.xwiki.XWikiContext;
@@ -55,10 +54,9 @@ import com.xpn.xwiki.XWikiContext;
  * @since 14.1
  */
 @Component
-@Named("resource/standard")
+@Named("resource/standardURL")
 @Singleton
-@Unstable
-public class StandardStringEntityReferenceResolver extends DefaultStringEntityReferenceResolver
+public class StandardURLStringEntityReferenceResolver extends DefaultStringEntityReferenceResolver
 {
     @Inject
     private Logger logger;

@@ -39,7 +39,7 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #if ($request.imageURL)
-  #set ($attachReference = $services.model.resolveAttachment($request.imageURL, 'resource/standard'))
+  #set ($attachReference = $services.model.resolveAttachment($request.imageURL, 'resource/standardURL'))
   #set ($restURL = $services.rest.url($attachReference.getDocumentReference()) + "/attachments")
   $response.sendRedirect($restURL)
 #end

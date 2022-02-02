@@ -25,6 +25,11 @@ define('xwiki-lightbox-messages', {
   ]
 });
 
+define('xwiki-lightbox-config', ['jquery'], function($) {
+  var config = JSON.parse($('#lightbox-config').text());
+  $('body').append(config.HTMLTemplate);
+});
+
 define('xwiki-lightbox-description', ['jquery', 'xwiki-l10n!xwiki-lightbox-messages'], function($, l10n) {
   var _cachedAttachments = {};
 
@@ -105,8 +110,7 @@ define('xwiki-lightbox-description', ['jquery', 'xwiki-l10n!xwiki-lightbox-messa
         method: 'GET',
         dataType: 'json',
         data: {'imageURL': imageURL}
-      }).done(function (data) {
-        var attachment = data.attachments.find(field => field.name == fileName);
+      }).done(function (attachment) {
         _cachedAttachments[imageURL] = attachment;
         deferred.resolve(attachment);
       }).fail(function () {
@@ -148,6 +152,7 @@ define('xwiki-lightbox', [
   'jquery',
   'xwiki-lightbox-description',
   'blueimp-gallery',
+  'xwiki-lightbox-config',
   'blueimp-gallery-fullscreen',
   'blueimp-gallery-indicator'
 ], function($, lightboxDescription, gallery) {

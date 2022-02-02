@@ -91,7 +91,7 @@ public class StandardURLStringEntityReferenceResolver extends DefaultStringEntit
             }
         } catch (CreateResourceReferenceException | UnsupportedResourceReferenceException | CreateResourceTypeException
             | MalformedURLException e) {
-            logger.debug("Failed to extract an EntityReference from [{}].", urlStringRepresentation, e);
+            logger.warn("Failed to extract an EntityReference from [{}].", urlStringRepresentation, e);
         }
 
         return defaultStringResolver.resolve(urlStringRepresentation, type, parameters);

@@ -40,7 +40,9 @@
   <content>{{velocity}}
 #if ($request.imageURL)
   #set ($attachReference = $services.model.resolveAttachment($request.imageURL, 'resource/standardURL'))
-  #set ($restURL = $services.rest.url($attachReference.getDocumentReference()) + "/attachments")
+  #set ($docReference = $attachReference.getDocumentReference())
+  #set ($fileName = $attachReference.getName())
+  #set ($restURL = "${services.rest.url($docReference)}/attachments/${escapetool.url($fileName)}/metadata")
   $response.sendRedirect($restURL)
 #end
 {{/velocity}}</content>

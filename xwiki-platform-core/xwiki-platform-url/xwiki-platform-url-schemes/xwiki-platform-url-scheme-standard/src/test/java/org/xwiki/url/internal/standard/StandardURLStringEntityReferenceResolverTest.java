@@ -32,6 +32,7 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -42,6 +43,8 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -79,6 +82,9 @@ class StandardURLStringEntityReferenceResolverTest
 
     @Mock
     private XWikiContext xcontext;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     public void configure(MockitoComponentManager componentManager) throws Exception
@@ -121,6 +127,9 @@ class StandardURLStringEntityReferenceResolverTest
 
         assertEquals(attachReference,
             standardReferenceResolver.resolve(urlStringRepresentation, EntityType.ATTACHMENT));
+        assertEquals(1, logCapture.size());
+        assertEquals(String.format("Failed to extract an EntityReference from [%s].", urlStringRepresentation),
+            logCapture.getMessage(0));
     }
 
     @Test
@@ -148,6 +157,9 @@ class StandardURLStringEntityReferenceResolverTest
         when(defaultStringResolver.resolve(urlStringRepresentation, EntityType.DOCUMENT)).thenReturn(docReference);
 
         assertEquals(docReference, standardReferenceResolver.resolve(urlStringRepresentation, EntityType.DOCUMENT));
+        assertEquals(1, logCapture.size());
+        assertEquals(String.format("Failed to extract an EntityReference from [%s].", urlStringRepresentation),
+            logCapture.getMessage(0));
     }
 
 }

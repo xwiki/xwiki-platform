@@ -57,6 +57,8 @@ public class GroupQueryCondition extends QueryCondition
      * @param reversed true if the condition should be reversed
      * @param virtual true if the group was created for storage reason and was not explicitly open
      * @param conditions the condition to start with
+     * @since 14.0
+     * @since 13.10.3
      */
     GroupQueryCondition(boolean or, boolean reversed, boolean virtual, QueryCondition... conditions)
     {

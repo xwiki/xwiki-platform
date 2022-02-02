@@ -138,8 +138,20 @@
             -->
             <!-- Difference related to the Security refactoring. Start a new <revapi.differences> entry for other
                  differences -->
-            
-            
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void org.xwiki.eventstream.query.GroupQueryCondition::&lt;init&gt;(boolean, boolean, boolean, org.xwiki.eventstream.query.QueryCondition[])</old>
+                  <new>method void org.xwiki.eventstream.query.GroupQueryCondition::&lt;init&gt;(boolean, boolean, boolean, org.xwiki.eventstream.query.QueryCondition[])</new>
+                  <oldVisibility>protected</oldVisibility>
+                  <newVisibility>package</newVisibility>
+                  <justification>Young API</justification>
+                  <criticality>allowed</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

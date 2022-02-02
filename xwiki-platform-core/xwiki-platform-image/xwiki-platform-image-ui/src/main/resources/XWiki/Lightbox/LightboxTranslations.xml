@@ -39,8 +39,8 @@
   <content># Admin section
 admin.lightbox=Lightbox
 admin.lightbox.description=Configure the image lightbox gallery
-image.lightbox.admin.isLightboxEnabled.label=Enable lightbox
-image.lightbox.admin.isLightboxEnabled.hint=Enable the possibility to open content images in a lightbox.
+XWiki.XWikiPreferences_isLightboxEnabled=Enable the lightbox
+XWiki.XWikiPreferences_isLightboxEnabled.hint=Enable the possibility to open content images in a lightbox.
 
 # Gallery template
 image.lightbox.autoPlay.title=Slideshow

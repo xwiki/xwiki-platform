@@ -57,7 +57,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  * @version $Id$
  */
 @ComponentTest
-public class StandardStringEntityReferenceResolverTest
+class StandardStringEntityReferenceResolverTest
 {
     @InjectMockComponents
     @Named("resource/standard")

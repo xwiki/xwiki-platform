@@ -52,7 +52,7 @@ import com.xpn.xwiki.XWikiContext;
  * {@link StandardExtendedURLResourceTypeResolver}.
  * 
  * @version $Id$
- * @since 14.0
+ * @since 14.1
  */
 @Component
 @Named("resource/standard")
@@ -93,7 +93,7 @@ public class StandardStringEntityReferenceResolver extends DefaultStringEntityRe
             }
         } catch (CreateResourceReferenceException | UnsupportedResourceReferenceException | CreateResourceTypeException
             | MalformedURLException e) {
-            logger.debug("Failed to extract an EntityReference from [{}].".concat(urlStringRepresentation), e);
+            logger.debug("Failed to extract an EntityReference from [{}].", urlStringRepresentation, e);
         }
 
         return defaultStringResolver.resolve(urlStringRepresentation, type, parameters);

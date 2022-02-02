@@ -57,10 +57,10 @@
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType/>
-        <hint>image.lightbox.admin.isLightboxEnabled.hint</hint>
+        <hint>XWiki.XWikiPreferences_isLightboxEnabled.hint</hint>
         <name>isLightboxEnabled</name>
         <number>1</number>
-        <prettyName>Enable the lightbox</prettyName>
+        <prettyName>XWiki.XWikiPreferences_isLightboxEnabled</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>

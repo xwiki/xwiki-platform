@@ -46,7 +46,7 @@
     &lt;dt&gt;
       #set ($propertyClass = $xclass.get($propertyName))
       &lt;label#if ($editing) for="${lightboxConfigClassName}_0_${propertyName}"#end&gt;
-        $escapetool.xml($propertyClass.translatedPrettyName)
+        $escapetool.xml($services.localization.render($propertyClass.translatedPrettyName))
       &lt;/label&gt;
       &lt;span class="xHint"&gt;
         $escapetool.xml($services.localization.render($propertyClass.hint))

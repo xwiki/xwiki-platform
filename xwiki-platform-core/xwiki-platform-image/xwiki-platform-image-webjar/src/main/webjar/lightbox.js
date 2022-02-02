@@ -54,30 +54,40 @@ define('xwiki-lightbox-description', ['jquery', 'xwiki-l10n!xwiki-lightbox-messa
     }
   };
 
+  var updateDescriptionCaption = function(imageData, attachmentData) {
+    if (imageData) {
+      $('.lightboxDescription .caption').html(imageData.caption || imageData.alt || imageData.title);
+    }
+
+    if ($('.lightboxDescription .caption').is(':empty') && attachmentData && attachmentData.name) {
+      $('.lightboxDescription .caption').html(attachmentData.name);
+    }
+  };
+
+  var updateDescriptionMetadata = function(imageData, attachmentData) {
+    // If the first paragraph is a caption, then we should also display the file name, when exists.
+    if (imageData.caption && attachmentData.name) {
+      $('.lightboxDescription .title').text(attachmentData.name);
+    }
+
+    if (attachmentData.author) {
+      $('.lightboxDescription .publisher')
+        .text(l10n.get('author', XWiki.Model.resolve(attachmentData.author, XWiki.EntityType.DOCUMENT).name));
+    }
+
+    if (attachmentData.date) {
+      $('.lightboxDescription .date').text(l10n.get('date', new Date(attachmentData.date).toLocaleDateString()));
+    }
+  };
+
   /**
    * Update lightbox description using given information.
    */
   var updateDescriptionData = function(imageData, attachmentData) {
-    if (imageData) {
-      $('.lightboxDescription .caption').html(imageData.caption || imageData.alt || imageData.title);
-    } else if (attachmentData && attachmentData.name) {
-      $('.lightboxDescription .caption').html(attachmentData.name)
-    }
+    updateDescriptionCaption(imageData, attachmentData);
 
     if (attachmentData) {
-      // If the first paragraph is a caption, then we should also display the file name, when exists.
-      if (imageData.caption && attachmentData.name) {
-        $('.lightboxDescription .title').text(attachmentData.name);
-      }
-
-      if (attachmentData.author) {
-        $('.lightboxDescription .publisher')
-          .text(l10n.get('author', XWiki.Model.resolve(attachmentData.author, XWiki.EntityType.DOCUMENT).name));
-      }
-
-      if (attachmentData.date) {
-        $('.lightboxDescription .date').text(l10n.get('date', new Date(attachmentData.date).toLocaleDateString()));
-      }
+      updateDescriptionMetadata(imageData, attachmentData);
     }
   };
 
@@ -89,7 +99,7 @@ define('xwiki-lightbox-description', ['jquery', 'xwiki-l10n!xwiki-lightbox-messa
     if (_cachedAttachments[imageURL] != undefined) {
       deferred.resolve(_cachedAttachments[imageURL]);
     } else {
-      var serviceDocRef = XWiki.Model.resolve('XWiki.Lightbox.GetPageAttachmentsService', XWiki.EntityType.DOCUMENT);
+      var serviceDocRef = XWiki.Model.resolve('XWiki.Lightbox.AttachmentMetaDataService', XWiki.EntityType.DOCUMENT);
       var serviceDocURL = new XWiki.Document(serviceDocRef).getURL('get', 'outputSyntax=plain');
       $.ajax(serviceDocURL, {
         method: 'GET',
@@ -163,7 +173,8 @@ define('xwiki-lightbox', [
    */
   var enableToolbarPopovers = function() {
     var timeout;
-    // Activate the lightbox for all images inside the xwikicontent. TODO: filter to consider only rendered images.
+    // Activate the lightbox for all images inside the xwikicontent.
+    // TODO: filter to consider only rendered images.
     $('#xwikicontent img').popover({
       content: function() {
         return $('#imageToolbarTemplate').html();

@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.Lightbox.GetPageAttachmentsService" locale="">
+<xwikidoc version="1.5" reference="XWiki.Lightbox.AttachmentMetaDataService" locale="">
   <web>XWiki.Lightbox</web>
-  <name>GetPageAttachmentsService</name>
+  <name>AttachmentMetaDataService</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -32,7 +32,7 @@
   <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>GetPageAttachmentsService</title>
+  <title>AttachmentMetaDataService</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -40,15 +40,8 @@
   <content>{{velocity}}
 #if ($request.imageURL)
   #set ($attachReference = $services.model.resolveAttachment($request.imageURL, 'resource/standard'))
-  #set ($attachDocument = $xwiki.getDocument($attachReference.getDocumentReference()))
-  #set ($attachName = $attachReference.getName())
-  ## Send an error in case the user has no rights on the document or the attachment doesn't exist.
-  #if ($attachDocument &amp;&amp; $attachDocument.getAttachment($attachReference.getName()))
-    #set ($restURL = $services.rest.url($attachReference.getDocumentReference()) + "/attachments")
-    $response.sendRedirect($restURL)
-  #else
-    #set ($discard = $response.sendError(404, "Not an attachment"))
-  #end
+  #set ($restURL = $services.rest.url($attachReference.getDocumentReference()) + "/attachments")
+  $response.sendRedirect($restURL)
 #end
 {{/velocity}}</content>
 </xwikidoc>

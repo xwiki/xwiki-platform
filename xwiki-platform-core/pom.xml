@@ -102,39 +102,39 @@
 
                  Common justification example:
 
-                 <revapi.differences>
-                   <justification>This change is necessary to fix bug #1234</justification>
-                   <criticality>highlight</criticality>
-                   <differences>
-                     <item>
-                       <code>java.method.addToInterface</code>
-                       <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
-                       <new>method void com.acme.ToolInterface::setup()</new>
-                     </item>
-                     <item>
-                       <code>java.method.removed</code>
-                       <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
-                       <old>method void com.acme.ToolInterface::initialize()</old>
-                       <justification>...</justification>
-                     </item>
-                   </differences>
-                 </revapi.differences>
-                 <revapi.differences>
-                   ... other difference group here...
-                 </revapi.differences>
+            <revapi.differences>
+              <justification>This change is necessary to fix bug #1234</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <code>java.method.addToInterface</code>
+                  <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
+                  <new>method void com.acme.ToolInterface::setup()</new>
+                </item>
+                <item>
+                  <code>java.method.removed</code>
+                  <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
+                  <old>method void com.acme.ToolInterface::initialize()</old>
+                  <justification>...</justification>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              ... other difference group here...
+            </revapi.differences>
 
                  Single justification example:
 
-                 <revapi.differences>
-                   <differences>
-                     <item>
-                       <code>java.method.removed</code>
-                       <old>method void org.xwiki.diff.xml.XMLDiff::xxx()</old>
-                       <justification>Unstable API added by mistake.</justification>
-                       <criticality>highlight</criticality>
-                     </item>
-                   </differences>
-                 </revapi.differences>
+            <revapi.differences>
+              <differences>
+                <item>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.diff.xml.XMLDiff::xxx()</old>
+                  <justification>Unstable API added by mistake.</justification>
+                  <criticality>highlight</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
             -->
             <!-- Difference related to the Security refactoring. Start a new <revapi.differences> entry for other
                  differences -->

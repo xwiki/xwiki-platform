@@ -5908,8 +5908,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * Return the first attachment of the attachment list either exactly matching the provided filename or that matches 
+     * the provided filename with a n arbitrary extension (i.e., filename.ext). To get only attachments that exactly
+     * matches the provided filename use {@link #getExactAttachment(String)}.
+     * 
      * @param filename the file name of the attachment with or without the extension
      * @return the {@link XWikiAttachment} corresponding to the file name, null if none can be found
+     * @see #getExactAttachment(String) 
      */
     public XWikiAttachment getAttachment(String filename)
     {
@@ -5925,6 +5930,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return null;
+    }
+
+    /**
+     * Return the attachment that exactly matches the provided file. To also get the first attachment that matches the
+     * provided filename with an arbitrary extension use {@link #getAttachment(String)}.
+     *
+     * @param filename the file name of the attachment
+     * @return the {@link XWikiAttachment} exactly corresponding to the file name, null if none can be found
+     * @since 14.1RC1
+     * @since 13.10.3
+     */
+    public XWikiAttachment getExactAttachment(String filename)
+    {
+        return this.attachmentList.getByFilename(filename);
     }
 
     /**
@@ -6001,7 +6020,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         String filename = fileName.substring(i + 1);
 
-        XWikiAttachment attachment = getAttachment(filename);
+        XWikiAttachment attachment = getExactAttachment(filename);
         if (attachment == null) {
             attachment = new XWikiAttachment(this, filename);
 

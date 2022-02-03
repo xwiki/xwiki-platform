@@ -140,7 +140,7 @@
     <property>
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
-  $(document).ready(function() {
+  $(function() {
     /**
      * Save the new user status.
      */

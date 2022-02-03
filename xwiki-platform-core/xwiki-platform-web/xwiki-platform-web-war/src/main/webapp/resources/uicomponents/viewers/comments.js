@@ -43,7 +43,7 @@ viewers.Comments = Class.create({
    * @returns {boolean} true if the comment block has an object number
    */
   hasCommentNumber : function (comment) {
-    return comment.id.match(this.commentNumberRegex).size() > 1;
+    return comment.id.match(this.commentNumberRegex).length > 1;
   },
 
   /** Constructor. Adds all the JS improvements of the Comments area. */
@@ -502,7 +502,7 @@ viewers.Comments = Class.create({
         commentEditorSelector += "-" + commentNumber;
       }
       const commentElt = $(form).find(commentEditorSelector);
-      if ($(form).find(".commentPreview").size() === 0) {
+      if (!$(form).find(".commentPreview").length) {
         commentElt.before('<div class="commentcontent commentPreview" style="display: none;"></div>');
       }
       const commentPreview = $(form).find(".commentcontent.commentPreview");
@@ -566,7 +566,7 @@ viewers.Comments = Class.create({
   destroyEditor: function (selector, name) {
     require(['jquery', 'xwiki-events-bridge'], function ($) {
       $(document).trigger('xwiki:actions:cancel');
-      if ($(selector).size() > 0) {
+      if ($(selector).length) {
         const parent = $(selector).parent(".commenteditor");
         parent.empty();
       }
@@ -588,7 +588,7 @@ viewers.Comments = Class.create({
     this.destroyEditor("[name='" + name + "']", name);
 
     require(['jquery', 'xwiki-events-bridge'], function ($) {
-      if ($(".commenteditor").size() > 0) {
+      if ($(".commenteditor").length) {
         $.post(new XWiki.Document().getURL("get") + '?' + $.param({
           xpage: 'xpart',
           vm: 'commentfield.vm',
@@ -601,7 +601,7 @@ viewers.Comments = Class.create({
           wf.append(data);
           wf.show();
           $(document).trigger('xwiki:dom:updated', {'elements': wf.toArray()});
-          if ($("#commentCaptcha").size() > 0) {
+          if ($("#commentCaptcha").length) {
             // FIXME: this solution is not good right now since it implies to always display the CAPTCHA
             // however since the idea is now to have a button "Add a comment", I won't got further: we should
             // display the captcha when the user decide to add a comment.
@@ -727,7 +727,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    */
   var updateCount = function() {
     var commentsTab = $('#Commentstab').find('.itemCount');
-    var commentsNumber = $('.xwikicomment').size();
+    var commentsNumber = $('.xwikicomment').length;
     if(commentsTab) {
       commentsTab.text("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", commentsNumber));
     }

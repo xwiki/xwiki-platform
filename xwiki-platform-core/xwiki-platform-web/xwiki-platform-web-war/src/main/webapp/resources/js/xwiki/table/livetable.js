@@ -1220,7 +1220,7 @@ var LiveTableTagCloud = Class.create({
       this.domNode = $(domNodeName);
       this.cloudFilter = false;
       this.selectedTags = {};
-      for (var i = 0; i < table.tags.size(); i++) {
+      for (var i = 0; i < table.tags.length; i++) {
         this.selectedTags[table.tags[i]] = {};
       }
       if (Object.isArray(tags)) {

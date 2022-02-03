@@ -134,7 +134,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'xwiki-boot
   /**
    * Page initialization
    */
-  $(document).ready(function() {
+  $(function() {
 
     new AddCustomNotificationFilterPreferenceLivetable($('#modal-add-custom-filter-preference'), window['livetable_notificationCustomFilterPreferencesLiveTable'], $('.customFilterPreferences button.btn-addfilter'),
       $('.customFilterPreferences').attr('data-doc-url'));

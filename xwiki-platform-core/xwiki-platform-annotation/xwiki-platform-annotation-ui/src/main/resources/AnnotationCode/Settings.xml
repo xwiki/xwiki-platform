@@ -258,7 +258,7 @@ XWiki.AnnotationSettings = Class.create({
         var input = event.element();
         input.up().toggleClassName('selected');
         var criterion = input.up('.criterion');
-        if (criterion.select('label.selected').size() &gt; 0) {
+        if (criterion.select('label.selected').length) {
           criterion.addClassName('active');
         } else {
           criterion.removeClassName('active');

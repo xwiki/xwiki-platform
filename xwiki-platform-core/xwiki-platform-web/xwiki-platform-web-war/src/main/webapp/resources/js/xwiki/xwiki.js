@@ -1746,7 +1746,7 @@ document.observe("xwiki:dom:loaded", function() {
   function handleScroll() {
     var menuExtras = $$('.annotationsettings');
     var extraHeight = 0;
-    if (menuExtras && menuExtras.size() > 0) {
+    if (menuExtras && menuExtras.length) {
       menu.__fm_extra = menuExtras[0];
       createGhost(menu.__fm_extra);
       extraHeight = menu.__fm_extra.getHeight();

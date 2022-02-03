@@ -187,8 +187,8 @@
   };
 
   var updateExpandCollapseAllFacetsState = function(facetsContainer) {
-    var facetCount = facetsContainer.find('.search-facet').size();
-    var expandedFacetCount = facetsContainer.find('.search-facet.expanded').size();
+    var facetCount = facetsContainer.find('.search-facet').length;
+    var expandedFacetCount = facetsContainer.find('.search-facet.expanded').length;
     if (expandedFacetCount &gt; facetCount / 2) {
       facetsContainer.find('.search-facets-action-collapseAll').show()
         .parent().children('.search-facets-action-expandAll').hide();
@@ -284,7 +284,7 @@
   var reloadSearchUI = function(event) {
     event.preventDefault();
     var anchor = $(event.target).closest('a');
-    anchor.size() &gt; 0 &amp;&amp; $(document).trigger('xwiki:search:update', anchor.attr('href'));
+    anchor.length &amp;&amp; $(document).trigger('xwiki:search:update', anchor.attr('href'));
   };
 
   // Others (e.g. a custom facet) can trigger a search UI update by firing this event.

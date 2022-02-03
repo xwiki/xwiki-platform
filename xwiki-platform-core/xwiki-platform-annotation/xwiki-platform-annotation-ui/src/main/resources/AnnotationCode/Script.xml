@@ -848,7 +848,7 @@ XWiki.Annotation = Class.create({
     }
     // get all the extra fields requested and add them to the request
     var extraFields = this.getExtraFields();
-    if (extraFields.size() &gt; 0) {
+    if (extraFields.length) {
       parametersHash.set('request_field', []);
     }
     for (var i = 0; i &lt; extraFields.length; i++) {
@@ -951,10 +951,10 @@ XWiki.Annotation = Class.create({
 
     // Add the marker span after the last span of this annotation.
     var allSpans = this.annotatedElement.select('[class~=ID' + ann.annotationId + ']');
-    if (allSpans.size() == 0) {
+    if (!allSpans.length) {
       return;
     }
-    var lastSpan = allSpans[allSpans.size() - 1];
+    var lastSpan = allSpans[allSpans.length - 1];
     // Create the annotation markers hidden by default, since annotations are added on the document hidden by default.
     var markerSpan = new Element('span', {'id': 'ID' + ann.annotationId, 'class' : 'hidden annotation-marker ' + ann.state});
     lastSpan.insert({after: markerSpan});
@@ -1565,12 +1565,12 @@ XWiki.Annotation = Class.create({
   },
 
   registerShortcuts : function(annotationShorcuts, method) {
-    for (var i = 0; i &lt; annotationShorcuts.size(); ++i) {
+    for (var i = 0; i &lt; annotationShorcuts.length; ++i) {
       shortcut.add(annotationShorcuts[i], method.bindAsEventListener(this));
     }
   },
   unregisterShortcuts : function(annotationShorcuts) {
-    for (var i = 0; i &lt; annotationShorcuts.size(); ++i) {
+    for (var i = 0; i &lt; annotationShorcuts.length; ++i) {
       shortcut.remove(annotationShorcuts[i]);
     }
   },
@@ -1866,7 +1866,7 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
        *        still left to display)
        */
       loadAnnotations: function(annotatedContent, andShow, navigateToPane, force) {
-        if (annotatedContent.annotations.size() == 0 &amp;&amp; !force) {
+        if (!annotatedContent.annotations.length &amp;&amp; !force) {
           return;
         }
         // For avoiding adding the same annotation twice, all the annotations markups are removed before adding them

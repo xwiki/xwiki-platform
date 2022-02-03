@@ -255,7 +255,7 @@ require(['jquery'], function($) {
     maybeNextStatus();
   }
 
-  $(window).ready(init);
+  $(init);
 
 });
 

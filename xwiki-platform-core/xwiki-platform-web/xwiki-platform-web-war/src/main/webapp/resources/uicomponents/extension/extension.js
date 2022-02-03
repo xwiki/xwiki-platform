@@ -756,7 +756,7 @@ require(['jquery'], function($) {
   var maybeScheduleRefresh = function(timeout) {
     // this = .extensionUpdater
     // Refresh if the upgrade plan job is running (if the progress bar is displayed).
-    if ($(this).children('.ui-progress').size() > 0) {
+    if ($(this).children('.ui-progress').length) {
       setTimeout($.proxy(refresh, this), timeout || 1000);
     } else {
       // Re-enable the buttons.
@@ -792,7 +792,7 @@ require(['jquery'], function($) {
     // AJAX form submit.
     event.preventDefault();
     // Select this button if it is part of a drop down.
-    if ($(this).parent('.dropdown-menu').size() > 0) {
+    if ($(this).parent('.dropdown-menu').length) {
       var dropDownToggle = $(this).closest('.button-group').children('.dropdown-toggle');
       dropDownToggle.prev().insertAfter(this);
       dropDownToggle.before(this);

@@ -623,7 +623,7 @@ function panelEditorInit() {
 
   // Update the enabled/disable state of the left/right panel inputs.
   var selectedLayout = $('selectedoption');
-  changePreviewLayout(selectedLayout, selectedLayout.previousSiblings().size());
+  changePreviewLayout(selectedLayout, selectedLayout.previousSiblings().length);
 }
 
 // Wait for asynchronous elements

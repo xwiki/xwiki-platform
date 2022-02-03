@@ -134,7 +134,7 @@ require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($
   /**
    * Page initialization
    */
-  $(document).ready(function() {
+  $(function() {
     var initBootstrapSwitches = function () {
       $('#notificationSystemFilterPreferencesLiveTable .notificationFilterPreferenceCheckbox, #notificationSystemFilterPreferencesLiveTable .toggleableFilterPreferenceCheckbox').bootstrapSwitch({
         size: 'mini',

@@ -326,7 +326,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
       return $('&lt;span/&gt;').text(selectedPages.length + ' pages')[0];
     } else {
       selectedPages.removeClass('selected');
-      var isFromDynamicFilter = draggedPage.closest('.exclusion-filter-dynamic').size() &gt; 0;
+      var isFromDynamicFilter = draggedPage.closest('.exclusion-filter-dynamic').length;
       return (isFromDynamicFilter ? draggedPage.clone() : draggedPage)[0];
     }
   };

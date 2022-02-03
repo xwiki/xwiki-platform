@@ -265,23 +265,23 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
   /**
    * Initialization
    */
-  $(document).ready(function() {
+  $(function() {
     // Define the selector for the elements on which we will use the jquery-ui sortable plugin, which allows to sort 
     // inner elements with drag &amp;amp; drop.
     var sortableSelector = '.appsPanel &gt; div &gt; ul';
-    
+
     // Enable the sortable plugin.
     // The 'connectWith' option allows the drag &amp; drop from a sortable list (e.g. the displayed panels) to an other
     // sortable list (e.g. the blacklisted panels).
     // Here we create 2 sortable lists, because the selector match those 2.
     $(sortableSelector).sortable({connectWith: sortableSelector});
-    
+
     // Allow reverting the changes
     $('#bt-revert').click(function(){
       // Refresh the page
       window.location.reload();
     });
-    
+
     // Redefine the save action
     $('#bt-save').click(save);
   });

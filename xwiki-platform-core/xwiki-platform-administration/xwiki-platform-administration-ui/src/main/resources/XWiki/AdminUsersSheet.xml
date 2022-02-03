@@ -410,7 +410,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
   var createUserModal = $('#createUserModal');
 
   var validateCreateUserForm = function(form) {
-    return form.size() &gt; 0 &amp;&amp; (!window.LiveValidation ||
+    return form.length &amp;&amp; (!window.LiveValidation ||
       LiveValidation.massValidate(LiveValidationForm.getInstance(form[0]).fields));
   };
 
@@ -425,7 +425,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       createUserModalBody.removeClass('loading').append(createUserForm);
       $(document).trigger('xwiki:dom:updated', {'elements': createUserModalBody.toArray()});
       createUserForm.find(':input').filter(':visible').first().focus();
-      createUserButton.prop('disabled', createUserForm.size() === 0);
+      createUserButton.prop('disabled', !createUserForm.length);
     });
   }).on('click', '.btn-primary', function(event) {
     var createUserForm = createUserModal.find('form#register');
@@ -439,7 +439,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     );
     $.post(createUserForm.attr('action'), createUserForm.serialize()).done(function(html) {
       var errorMessage = $('&lt;div/&gt;').html(html).find('.errormessage, .LV_validation_message.LV_invalid');
-      if (errorMessage.size() &gt; 0) {
+      if (errorMessage.length) {
         createUserButton.prop('disabled', false);
         notification.replace(new XWiki.widgets.Notification(errorMessage.text(), 'error'));
       } else {
@@ -482,7 +482,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       $(document).trigger('xwiki:dom:updated', {'elements': self.toArray()});
       var editUserForm = editUserModal.find('form#edituser');
       editUserForm.find(':input').filter(':visible').first().focus();
-      saveButton.prop('disabled', editUserForm.size() === 0);
+      saveButton.prop('disabled', !editUserForm.length);
     });
   };
 

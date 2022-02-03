@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 require(['jquery', 'xwiki-meta'], function($, xm) {
-  $(document).ready(function() {
+  $(function() {
 
     var form = $('form#create');
     var nameField = form.find('input.location-name-field');
@@ -122,7 +122,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       var pageShouldBeTerminalString = input.attr('data-terminal');
       var pageShouldBeTerminal = false;
       if (pageShouldBeTerminalString) {
-        pageShouldBeTerminal = $.parseJSON(input.attr('data-terminal'));
+        pageShouldBeTerminal = JSON.parse(input.attr('data-terminal'));
       }
       // Set the default value for the page type.
       terminalCheckbox.prop('checked', pageShouldBeTerminal);
@@ -143,7 +143,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       var allowedSpacesData = input.attr('data-allowed-spaces');
       var allowedSpaces = [];
       if (allowedSpacesData) {
-        allowedSpaces = $.parseJSON(input.attr('data-allowed-spaces'));
+        allowedSpaces = JSON.parse(input.attr('data-allowed-spaces'));
       }
 
       var newParentReferenceValue = currentParentReferenceValue;

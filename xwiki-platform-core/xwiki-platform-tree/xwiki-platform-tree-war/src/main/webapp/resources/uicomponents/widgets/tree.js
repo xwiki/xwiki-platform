@@ -40,7 +40,7 @@ require([paths.treeRequireConfig], function() {
       });
     };
 
-    $(document).ready(init).on('xwiki:dom:updated', init);
+    $(init).on('xwiki:dom:updated', init);
   });
 });
 

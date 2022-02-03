@@ -332,7 +332,7 @@ Get the actual notifications.
               outputSyntax: 'plain',
               action: 'clear',
               date: startDate
-            }).success(function (){
+            }).done(function (){
               // Display the success message
               notification.hide();
               new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.cleared'))", 'done');
@@ -383,7 +383,7 @@ Get the actual notifications.
   /**
    * Initialize the widget.
    */
-  $(document).ready(function () {
+  $(function () {
 
     var container = $('.notification-uix');
     getUnreadNotificationsCount();
@@ -436,7 +436,7 @@ Get the actual notifications.
           outputSyntax: 'html',
           action: 'getNotifications',
           document: documentReference
-        }).success(function (data){
+        }).done(function (data){
           $('.notification-uix').html(data).removeClass('loading');
           $('.notification-uix').find('.notifications-macro').each(function() {
             new XWikiAsyncNotificationsMacro(this);

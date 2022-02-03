@@ -38,7 +38,7 @@
  * Expand hierarchy breadcrumbs on clicks.
  */
 require(['jquery', 'xwiki-events-bridge'], function($) {
-  $(document).ready(function() {
+  $(function() {
 
     /**
      * Function that expand a breadcumb on some events.

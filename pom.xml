@@ -410,7 +410,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery</artifactId>
-        <version>2.2.4</version>
+        <version>3.6.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>

@@ -80,7 +80,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     $.get(source.attr('data-recordsURL')).done(function(html) {
       recordsForm.replaceWith(html);
       recordsForm = sourceSelector.next('.extension-history-records-form');
-      recordsForm.size() > 0 && $(document).trigger('xwiki:dom:updated', {'elements': recordsForm.toArray()});
+      recordsForm.length && $(document).trigger('xwiki:dom:updated', {'elements': recordsForm.toArray()});
     }).fail(function() {
       // TODO
     });
@@ -205,7 +205,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       extensionHistory.find('.extension-history-replay-options').show().addClass('hidden');
       extensionHistory.append(html);
       var replayPlan = extensionHistory.find('.extension-history-replay-plan');
-      replayPlan.size() > 0 && $(document).trigger('xwiki:dom:updated', {'elements': replayPlan.toArray()});
+      replayPlan.length && $(document).trigger('xwiki:dom:updated', {'elements': replayPlan.toArray()});
       enhanceReplayPlan(replayPlan);
     }).fail(function() {
       // TODO
@@ -263,7 +263,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 
   var getReplayStatusUIState = function(container) {
     return {
-      'logOpened': container.find('.log.hidden').size() === 0
+      'logOpened': !container.find('.log.hidden').length
     };
   };
 

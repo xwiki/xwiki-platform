@@ -78,7 +78,7 @@ var XWiki = (function(XWiki) {
       }
       for (var key in shortcuts) {
         var targetButtons = $$("input[name=" + key + "]");
-        if (targetButtons.size() > 0) {
+        if (targetButtons.length) {
           shortcut.add(shortcuts[key], function() {
             this.click();
           }.bind(targetButtons.first()));

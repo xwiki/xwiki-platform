@@ -143,7 +143,7 @@
     }).done(function() {
       notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
         'notifications.settings.saved')), 'done'));
-    }).error(function() {
+    }).fail(function() {
       notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
         'notifications.settings.savingfailed')), 'error'));
     });

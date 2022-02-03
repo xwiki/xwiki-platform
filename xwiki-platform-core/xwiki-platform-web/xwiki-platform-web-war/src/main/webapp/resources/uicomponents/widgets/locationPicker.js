@@ -70,7 +70,7 @@ require([paths.treeRequireConfig], function() {
           }).one('ready.jstree', function(event, data) {
             openToNodeId && data.instance.openTo(openToNodeId);
           }).on('changed.jstree', function(event, data) {
-            selectButton.prop('disabled', data.selected.size() === 0);
+            selectButton.prop('disabled', !data.selected.length);
           }).on('dblclick', '.jstree-anchor', function() {
             selectButton.click();
           });
@@ -542,7 +542,7 @@ require(['jquery'], function($) {
       // Read the alowed spaces specified by the template provider, unless they are just suggestions in which case they
       // should be ignored by validation.
       if (!restrictionsAreSuggestions && allowedSpacesData) {
-        allowedSpaces = $.parseJSON(input.attr('data-allowed-spaces'));
+        allowedSpaces = JSON.parse(input.attr('data-allowed-spaces'));
       }
 
       var message = input.attr('data-allowed-spaces-message');

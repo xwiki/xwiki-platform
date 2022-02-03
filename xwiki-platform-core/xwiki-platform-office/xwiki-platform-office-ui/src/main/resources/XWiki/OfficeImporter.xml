@@ -261,8 +261,8 @@
     </property>
     <property>
       <code>require(['jquery'], function($) {
-  $(document).ready(function() {
-  
+  $(function() {
+
     // Add a validator on the document input
     var documentValidator = new LiveValidation($('#filepath')[0], {
       validMessage: "$services.localization.render('core.validation.valid.message')"
@@ -274,7 +274,7 @@
         return typeof value === 'string' &amp;&amp; value.strip().length &gt; 0;
       }
     });
-  
+
     /**
      * Enable/disable the split option depending of the value of the split document checkbox
      */
@@ -283,13 +283,13 @@
       $('#headingLevelsToSplitInputId').prop('disabled', splitOptionsDisabled);
       $('#childPagesNamingMethodInputId').prop('disabled', splitOptionsDisabled);
     }
-    
+
     // Initalize the default state
     maybeDisableSplitOptions();
-  
+
     // Enable/disable the split options when the checkbox's value changes
     $('#splitDocumentInputId').change(maybeDisableSplitOptions);
-    
+
     /**
      * Event sent when the form is submitted
      */
@@ -300,7 +300,7 @@
         // Except if the "append content" checkbox is enabled or if it is not present!
         return true;
       }
-      
+
       // The document exist
       new XWiki.widgets.ConfirmationBox({
         onYes: function() {
@@ -312,10 +312,10 @@
       }, {
         confirmationText: "$escapetool.javascript($services.localization.render('platform.office.importDocumentOverwriteConfirmation'))"
       });
-      
+
       return false;
     });
-  
+
   });
 });
 </code>

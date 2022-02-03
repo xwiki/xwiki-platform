@@ -585,7 +585,7 @@
     }
   };
 
-  $(document).ready(function() {
+  $(function() {
     $('#refresh').click(refreshPreview);
 
     // Update the preview when the user modifies the LESS variables.

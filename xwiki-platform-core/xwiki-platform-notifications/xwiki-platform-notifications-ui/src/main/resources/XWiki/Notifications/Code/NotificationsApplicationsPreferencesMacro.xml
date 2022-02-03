@@ -189,7 +189,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
       }).done(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).error(function() {
+      }).fail(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
       }).always(function() {
@@ -228,7 +228,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
 
   };
 
-  $(document).ready(preferenceInit);
+  $(preferenceInit);
   $(document).on('xwiki:dom:updated', preferenceInit)
 });
 </code>

@@ -633,7 +633,7 @@ editors.XDataEditors = Class.create({
   },
   // Update the number of objects displayed in the class group title, when objects are added or deleted
   updateXObjectCount: function(xclass) {
-    var xobjectCount = xclass.select('.xobject').size();
+    var xobjectCount = xclass.select('.xobject').length;
     if (xobjectCount == 0) {
       xclass.remove();
     } else {
@@ -772,7 +772,7 @@ editors.XDataEditors = Class.create({
   },
   updateOrder : function(container) {
     var children = container.childElements();
-    for (var i = 0; i < children.size(); ++i) {
+    for (var i = 0; i < children.length; ++i) {
       var child = children[i].down(".xproperty-content");
       child.numberProperty.value = i+1;
     }

@@ -134,7 +134,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
   /**
    * Page initialization
    */
-  $(document).ready(function() {
+  $(function() {
 
     new AddNotificationFilterPreferenceLivetable($('#modal-add-filter-preference'), window['livetable_notificationFilterPreferencesLiveTable'], $('.filterPreferences button.btn-addfilter'),
       $('.filterPreferences').attr('data-user-url'));
@@ -685,7 +685,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
   });
 
   // Initializer
-  $(document).ready(function() {
+  $(function() {
     // This script is usually loaded after the livetable is displayed and so the previous callback is not called.
     // Because of that, we need
     if (window.livetable_notificationFilterPreferencesLiveTable) {

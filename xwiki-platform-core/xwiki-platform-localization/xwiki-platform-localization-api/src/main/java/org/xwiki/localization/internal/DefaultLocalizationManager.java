@@ -38,6 +38,9 @@ import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.TranslationBundleDoesNotExistsException;
 import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
 /**
  * Default implementation of the {@link LocalizationManager} component.
@@ -61,6 +64,13 @@ public class DefaultLocalizationManager implements LocalizationManager
      */
     @Inject
     private TranslationBundleContext bundleContext;
+
+    /**
+     * The plain text renderer.
+     */
+    @Inject
+    @Named("plain/1.0")
+    private BlockRenderer plainRenderer;
 
     /**
      * The logger to log.
@@ -92,9 +102,25 @@ public class DefaultLocalizationManager implements LocalizationManager
     }
 
     @Override
+    public String getTranslationPlain(String key, Locale locale, Object... parameters)
+    {
+        Translation translation = getTranslation(key, locale);
+
+        if (translation == null) {
+            return null;
+        }
+
+        Block block = translation.render(parameters);
+
+        DefaultWikiPrinter wikiPrinter = new DefaultWikiPrinter();
+        this.plainRenderer.render(block, wikiPrinter);
+
+        return wikiPrinter.toString();
+    }
+
+    @Override
     public TranslationBundle getTranslationBundle(String bundleType, String bundleId)
         throws TranslationBundleDoesNotExistsException, TranslationBundleFactoryDoesNotExistsException
-
     {
         if (this.componentManagerProvider.get().hasComponent(TranslationBundle.class, bundleType + ':' + bundleId)) {
             try {
@@ -123,5 +149,11 @@ public class DefaultLocalizationManager implements LocalizationManager
         TranslationBundle bundle = getTranslationBundle(bundleType, bundleId);
 
         this.bundleContext.addBundle(bundle);
+    }
+
+    @Override
+    public Locale getDefaultLocale()
+    {
+        return Locale.getDefault();
     }
 }

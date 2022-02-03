@@ -27,7 +27,7 @@ define('xwiki-lightbox-messages', {
 
 define('xwiki-lightbox-config', ['jquery'], function($) {
   var config = JSON.parse($('#lightbox-config').text());
-  $('body').append(config.HTMLTemplate);
+  $('body').append($(config.HTMLTemplate));
 });
 
 define('xwiki-lightbox-description', ['jquery', 'xwiki-l10n!xwiki-lightbox-messages'], function($, l10n) {

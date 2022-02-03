@@ -50,6 +50,24 @@ public interface LocalizationManager
     Translation getTranslation(String key, Locale locale);
 
     /**
+     * Find a translation in the current language.
+     * 
+     * @param key the key identifying the message to look for
+     * @param locale the {@link Locale} for which this translation is searched. The result might me associated to a
+     *            different {@link Locale} (for example getting the {@code fr} translation when asking for the
+     *            {@code fr_FR} one).
+     * @param parameters the parameters
+     * @return the translation in the current language rendered as plain text, null if no translation could be found
+     * @see #getTranslation(String, Locale)
+     * @since 14.1RC1
+     * @since 13.10.3
+     */
+    default String getTranslationPlain(String key, Locale locale, Object... parameters)
+    {
+        return null;
+    }
+
+    /**
      * Find a bundle.
      * 
      * @param bundleType a hint identifying the bundle type.
@@ -77,4 +95,14 @@ public interface LocalizationManager
      */
     void use(String bundleType, String bundleId)
         throws TranslationBundleDoesNotExistsException, TranslationBundleFactoryDoesNotExistsException;
+
+    /**
+     * @return the {@link Locale} configured as the default
+     * @since 14.1RC1
+     * @since 13.10.3
+     */
+    default Locale getDefaultLocale()
+    {
+        return Locale.getDefault();
+    }
 }

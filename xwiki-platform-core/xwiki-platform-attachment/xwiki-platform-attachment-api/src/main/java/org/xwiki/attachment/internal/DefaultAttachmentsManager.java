@@ -66,7 +66,7 @@ public class DefaultAttachmentsManager implements AttachmentsManager
         if (document == null) {
             available = false;
         } else {
-            available = document.getAttachment(attachmentLocation.getName()) == null;
+            available = document.getExactAttachment(attachmentLocation.getName()) == null;
         }
         return available;
     }

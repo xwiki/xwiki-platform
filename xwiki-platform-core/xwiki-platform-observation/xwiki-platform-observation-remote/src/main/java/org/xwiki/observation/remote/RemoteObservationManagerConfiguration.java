@@ -22,6 +22,7 @@ package org.xwiki.observation.remote;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide configuration for remote observation manager.
@@ -46,4 +47,11 @@ public interface RemoteObservationManagerConfiguration
      * @return the identifier of the network adapter implementation to use to actually send and receive network messages
      */
     String getNetworkAdapter();
+
+    /**
+     * @return the unique identifier of the instance in the cluster
+     * @since 14.1RC1
+     */
+    @Unstable
+    String getId();
 }

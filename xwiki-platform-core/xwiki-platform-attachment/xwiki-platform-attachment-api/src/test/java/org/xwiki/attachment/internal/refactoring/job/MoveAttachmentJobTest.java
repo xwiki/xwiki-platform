@@ -167,7 +167,7 @@ class MoveAttachmentJobTest
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
         when(sourceAttachment.getFilename()).thenReturn("oldName");
-        when(this.sourceDocument.getAttachment("oldName")).thenReturn(sourceAttachment);
+        when(this.sourceDocument.getExactAttachment("oldName")).thenReturn(sourceAttachment);
         when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.source",
             "xwiki:Space.Target"))
             .thenReturn("attachment.job.saveDocument.source [xwiki:Space.Target]");
@@ -206,8 +206,8 @@ class MoveAttachmentJobTest
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
         XWikiAttachment targetAttachment = mock(XWikiAttachment.class);
         when(sourceAttachment.getFilename()).thenReturn("oldName");
-        when(this.sourceDocument.getAttachment("oldName")).thenReturn(sourceAttachment);
-        when(this.targetDocument.getAttachment("newName")).thenReturn(targetAttachment);
+        when(this.sourceDocument.getExactAttachment("oldName")).thenReturn(sourceAttachment);
+        when(this.targetDocument.getExactAttachment("newName")).thenReturn(targetAttachment);
         when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.source",
             "xwiki:Space.Target"))
             .thenReturn("attachment.job.saveDocument.source [xwiki:Space.Target]");
@@ -255,7 +255,7 @@ class MoveAttachmentJobTest
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
         when(sourceAttachment.getFilename()).thenReturn("oldName");
-        when(this.sourceDocument.getAttachment("oldName")).thenReturn(sourceAttachment);
+        when(this.sourceDocument.getExactAttachment("oldName")).thenReturn(sourceAttachment);
         when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.inPlace",
             "oldName", "newName")).thenReturn("attachment.job.saveDocument.inPlace [oldName, newName]");
         this.job.process(SOURCE_ATTACHMENT_LOCATION);

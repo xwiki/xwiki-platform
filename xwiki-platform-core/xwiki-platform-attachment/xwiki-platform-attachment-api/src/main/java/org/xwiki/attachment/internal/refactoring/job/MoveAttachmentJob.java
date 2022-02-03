@@ -107,7 +107,7 @@ public class MoveAttachmentJob
         try {
             XWikiDocument sourceDocument = wiki.getDocument(source.getParent(), this.xcontextProvider.get());
             XWikiDocument targetDocument = wiki.getDocument(destination.getParent(), this.xcontextProvider.get());
-            XWikiAttachment sourceAttachment = sourceDocument.getAttachment(source.getName());
+            XWikiAttachment sourceAttachment = sourceDocument.getExactAttachment(source.getName());
             
             // Update the author of the source and target documents.
             UserReference authorUserReference =
@@ -176,7 +176,7 @@ public class MoveAttachmentJob
             // In case of failure during the save of the second document, we rollback the first one to its initial state
             // (i.e., with the attachment added again).
             // Remove the added attachment from the target document.
-            XWikiAttachment attachment = targetDocument.getAttachment(targetFileName);
+            XWikiAttachment attachment = targetDocument.getExactAttachment(targetFileName);
             addAttachment(sourceDocument, attachment, sourceFileName);
             targetDocument.removeAttachment(attachment);
             String historyMessageRollbackTarget =

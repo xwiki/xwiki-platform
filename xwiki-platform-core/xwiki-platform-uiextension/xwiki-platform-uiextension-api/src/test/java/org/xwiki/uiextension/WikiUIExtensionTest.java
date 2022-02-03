@@ -19,8 +19,9 @@
  */
 package org.xwiki.uiextension;
 
+import javax.script.ScriptContext;
+
 import org.apache.commons.collections.MapUtils;
-import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -42,10 +43,10 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.uiextension.internal.WikiUIExtension;
-import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -54,6 +55,7 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
+import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -98,10 +100,10 @@ class WikiUIExtensionTest
     private ContentParser contentParser;
 
     @MockComponent
-    private VelocityManager velocityManager;
+    private ScriptContextManager scriptContextManager;
 
     @MockComponent
-    private VelocityContext velocityContext;
+    private ScriptContext scriptContext;
 
     @InjectComponentManager
     private ComponentManager componentManager;
@@ -120,7 +122,7 @@ class WikiUIExtensionTest
         this.baseObject = new BaseObject();
         this.baseObject.setOwnerDocument(ownerDocument);
         this.baseObject.setXClassReference(CLASS_REF);
-        when(this.velocityManager.getVelocityContext()).thenReturn(this.velocityContext);
+        when(this.scriptContextManager.getScriptContext()).thenReturn(this.scriptContext);
     }
 
     @Test
@@ -152,8 +154,8 @@ class WikiUIExtensionTest
         WikiUIExtension wikiUIX = new WikiUIExtension(this.baseObject, "roleHint", "id", "epId", this.componentManager);
         BlockAsyncRenderer blockAsyncRenderer = mock(BlockAsyncRenderer.class);
         wikiUIX.render(blockAsyncRenderer, true, true);
-        InOrder inOrder = inOrder(this.velocityContext);
-        inOrder.verify(this.velocityContext).put(eq("uix"), isNotNull());
-        inOrder.verify(this.velocityContext).put(eq("uix"), isNull());
+        InOrder inOrder = inOrder(this.scriptContext);
+        inOrder.verify(this.scriptContext).setAttribute(eq("uix"), isNotNull(), eq(ENGINE_SCOPE));
+        inOrder.verify(this.scriptContext).setAttribute(eq("uix"), isNull(), eq(ENGINE_SCOPE));
     }
 }

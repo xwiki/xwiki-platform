@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Provider;
+import javax.script.ScriptContext;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -33,13 +34,15 @@ import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRenderer;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererDecorator;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.uiextension.UIExtension;
-import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+
+import static javax.script.ScriptContext.ENGINE_SCOPE;
 
 /**
  * Represents a dynamic component instance of a UI Extension (ie a UI Extension defined in a Wiki page) that we register
@@ -79,12 +82,24 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
 
     private final Provider<XWikiContext> xcontextProvider;
 
-    private final VelocityManager velocityManager;
+    private final ScriptContextManager scriptContextManager;
 
     /**
      * Parameter manager for this extension.
      */
     private WikiUIExtensionParameters parameters;
+
+    /**
+     * Save the value of "uix" in the {@link XWikiContext} before the initialization, to restore it after the
+     * rendering.
+     */
+    private Map<String, Object> previousUIXContext;
+
+    /**
+     * Save the value of "uix" in the {@link ScriptContext} before the initialization, to restore it after the
+     * rendering.
+     */
+    private Object previousScriptUIXContext;
 
     /**
      * Default constructor.
@@ -106,7 +121,7 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
         this.extensionPointId = extensionPointId;
 
         this.xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
-        this.velocityManager = componentManager.getInstance(VelocityManager.class);
+        this.scriptContextManager = componentManager.getInstance(ScriptContextManager.class);
     }
 
     /**
@@ -151,7 +166,7 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
         }
     }
 
-    private Object before(boolean inline) throws RenderingException
+    private void before(boolean inline) throws RenderingException
     {
         // Get the document holding the UIX and put it in the UIX context
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -166,35 +181,36 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
         uixContext.put(CONTEXT_UIX_INLINE_KEY, inline);
 
         // Remember the previous uix context to restore it
-        Map<String, Object> previousUIXContext = (Map<String, Object>) xcontext.get(CONTEXT_UIX_KEY);
+        this.previousUIXContext = (Map<String, Object>) xcontext.get(CONTEXT_UIX_KEY);
         // Put the UIX context in the XWiki context. Note that this is deprecated and using the UIX templates is
         // preferred.
         xcontext.put(CONTEXT_UIX_KEY, uixContext);
         // Put the UIX context in the velocity context "uix" key.
-        this.velocityManager.getVelocityContext().put(CONTEXT_UIX_KEY, uixContext);
-
-        return previousUIXContext;
+        ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
+        this.previousScriptUIXContext = scriptContext.getAttribute(CONTEXT_UIX_KEY, ENGINE_SCOPE);
+        scriptContext.setAttribute(CONTEXT_UIX_KEY, uixContext, ENGINE_SCOPE);
     }
 
-    private void after(Object uixContext)
+    private void after()
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
         // Restore previous uix context in the XWiki and Velocity contexts. 
-        xcontext.put(CONTEXT_UIX_KEY, uixContext);
-        this.velocityManager.getVelocityContext().put(CONTEXT_UIX_KEY, uixContext);
+        xcontext.put(CONTEXT_UIX_KEY, this.previousUIXContext);
+        this.scriptContextManager.getScriptContext()
+            .setAttribute(CONTEXT_UIX_KEY, this.previousScriptUIXContext, ENGINE_SCOPE);
     }
 
     @Override
     public BlockAsyncRendererResult render(BlockAsyncRenderer renderer, boolean async, boolean cached)
         throws RenderingException
     {
-        Object obj = before(renderer.isInline());
+        before(renderer.isInline());
 
         try {
             return renderer.render(async, cached);
         } finally {
-            after(obj);
+            after();
         }
     }
 }

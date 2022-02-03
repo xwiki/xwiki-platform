@@ -95,7 +95,7 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
         Path observation = getObservationDirectory();
         observation.toFile().mkdir();
         Path idFile = getIdFile();
-        if (!idFile.toFile().exists()) {
+        if (!Files.exists(idFile)) {
             try {
                 String idString = UUID.randomUUID().toString();
                 Files.writeString(idFile, idString);
@@ -116,7 +116,7 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
 
     private Path getIdFile()
     {
-        return getObservationDirectory().resolve("id");
+        return getObservationDirectory().resolve("id.txt");
     }
 
     private Path getObservationDirectory()

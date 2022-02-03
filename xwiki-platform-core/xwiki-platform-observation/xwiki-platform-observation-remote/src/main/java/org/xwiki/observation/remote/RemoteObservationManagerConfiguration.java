@@ -49,9 +49,13 @@ public interface RemoteObservationManagerConfiguration
     String getNetworkAdapter();
 
     /**
-     * @return the unique identifier of the instance in the cluster
+     * @return the unique identifier of the instance in the cluster, or {@code null} if the component does not support
+     *     provisioning an identifier (e.g., a component implemented before 14.1RC1)
      * @since 14.1RC1
      */
     @Unstable
-    String getId();
+    default String getId()
+    {
+        return null;
+    }
 }

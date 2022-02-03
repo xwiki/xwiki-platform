@@ -122,7 +122,7 @@ class WikiUIExtensionTest
         this.baseObject = new BaseObject();
         this.baseObject.setOwnerDocument(ownerDocument);
         this.baseObject.setXClassReference(CLASS_REF);
-        when(this.scriptContextManager.getScriptContext()).thenReturn(this.scriptContext);
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(this.scriptContext);
     }
 
     @Test

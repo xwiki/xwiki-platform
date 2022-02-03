@@ -65,7 +65,7 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
 
     /**
      * The key used to indicate of the UIX is executed in an inline context.
-     * 
+     *
      * @since 14.0RC1
      */
     public static final String CONTEXT_UIX_INLINE_KEY = "inline";
@@ -88,18 +88,6 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
      * Parameter manager for this extension.
      */
     private WikiUIExtensionParameters parameters;
-
-    /**
-     * Save the value of "uix" in the {@link XWikiContext} before the initialization, to restore it after the
-     * rendering.
-     */
-    private Map<String, Object> previousUIXContext;
-
-    /**
-     * Save the value of "uix" in the {@link ScriptContext} before the initialization, to restore it after the
-     * rendering.
-     */
-    private Object previousScriptUIXContext;
 
     /**
      * Default constructor.
@@ -166,7 +154,7 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
         }
     }
 
-    private void before(boolean inline) throws RenderingException
+    private PreviousContexts before(boolean inline) throws RenderingException
     {
         // Get the document holding the UIX and put it in the UIX context
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -181,36 +169,62 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
         uixContext.put(CONTEXT_UIX_INLINE_KEY, inline);
 
         // Remember the previous uix context to restore it
-        this.previousUIXContext = (Map<String, Object>) xcontext.get(CONTEXT_UIX_KEY);
+        Map<String, Object> previousUIXContext = (Map<String, Object>) xcontext.get(CONTEXT_UIX_KEY);
         // Put the UIX context in the XWiki context. Note that this is deprecated and using the UIX templates is
         // preferred.
         xcontext.put(CONTEXT_UIX_KEY, uixContext);
         // Put the UIX context in the velocity context "uix" key.
-        ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
-        this.previousScriptUIXContext = scriptContext.getAttribute(CONTEXT_UIX_KEY, ENGINE_SCOPE);
+        ScriptContext scriptContext = this.scriptContextManager.getCurrentScriptContext();
+        Object previousScriptUIXContext = scriptContext.getAttribute(CONTEXT_UIX_KEY, ENGINE_SCOPE);
         scriptContext.setAttribute(CONTEXT_UIX_KEY, uixContext, ENGINE_SCOPE);
+        return new PreviousContexts(previousUIXContext, previousScriptUIXContext);
     }
 
-    private void after()
+    private void after(PreviousContexts contexts)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
         // Restore previous uix context in the XWiki and Velocity contexts. 
-        xcontext.put(CONTEXT_UIX_KEY, this.previousUIXContext);
-        this.scriptContextManager.getScriptContext()
-            .setAttribute(CONTEXT_UIX_KEY, this.previousScriptUIXContext, ENGINE_SCOPE);
+        xcontext.put(CONTEXT_UIX_KEY, contexts.previousUIXContext);
+        this.scriptContextManager.getCurrentScriptContext()
+            .setAttribute(CONTEXT_UIX_KEY, contexts.previousScriptUIXContext, ENGINE_SCOPE);
     }
 
     @Override
     public BlockAsyncRendererResult render(BlockAsyncRenderer renderer, boolean async, boolean cached)
         throws RenderingException
     {
-        before(renderer.isInline());
+        PreviousContexts contexts = before(renderer.isInline());
 
         try {
             return renderer.render(async, cached);
         } finally {
-            after();
+            after(contexts);
+        }
+    }
+
+    /**
+     * Store the value of the contexts modified during {@link #before(boolean)} to restore them on {@link
+     * #after(PreviousContexts)}.
+     */
+    private final class PreviousContexts
+    {
+        /**
+         * Save the value of "uix" in the {@link XWikiContext} before the initialization, to restore it after the
+         * rendering.
+         */
+        private final Object previousUIXContext;
+
+        /**
+         * Save the value of "uix" in the {@link ScriptContext} before the initialization, to restore it after the
+         * rendering.
+         */
+        private final Object previousScriptUIXContext;
+
+        private PreviousContexts(Object previousUIXContext, Object previousScriptUIXContext)
+        {
+            this.previousUIXContext = previousUIXContext;
+            this.previousScriptUIXContext = previousScriptUIXContext;
         }
     }
 }

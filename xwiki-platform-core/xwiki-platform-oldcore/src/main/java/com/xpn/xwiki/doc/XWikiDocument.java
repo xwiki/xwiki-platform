@@ -834,6 +834,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
     }
 
+    private UserReferenceSerializer<String> getUserReferenceStringSerializer()
+    {
+        return Utils.getComponent(new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
+    }
+
+    private UserReferenceResolver<String> getUserReferenceStringResolver()
+    {
+        return Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class, String.class));
+    }
+
     public XWikiStoreInterface getStore(XWikiContext context)
     {
         return context.getWiki().getStore();
@@ -6739,8 +6749,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             list.add(new MetaDataDiff("parent", fromDoc.getParent(), toDoc.getParent()));
         }
 
-        if (ObjectUtils.notEqual(fromDoc.getAuthorReference(), toDoc.getAuthorReference())) {
-            list.add(new MetaDataDiff("author", fromDoc.getAuthor(), toDoc.getAuthor()));
+        UserReference fromDocOriginalAuthor = fromDoc.getAuthors().getOriginalMetadataAuthor();
+        UserReference toDocOriginalAuthor = toDoc.getAuthors().getOriginalMetadataAuthor();
+        if (ObjectUtils.notEqual(fromDocOriginalAuthor, toDocOriginalAuthor)) {
+            list.add(new MetaDataDiff("author", getUserReferenceStringSerializer().serialize(fromDocOriginalAuthor),
+                getUserReferenceStringSerializer().serialize(toDocOriginalAuthor)));
         }
 
         if (ObjectUtils.notEqual(fromDoc.getDocumentReference(), toDoc.getDocumentReference())) {
@@ -9227,9 +9240,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             || this.getAuthors().getOriginalMetadataAuthor() == GuestUserReference.INSTANCE) {
             return "";
         } else {
-            UserReferenceSerializer<String> userReferenceSerializer =
-                Utils.getComponent(new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
-            return userReferenceSerializer.serialize(this.getAuthors().getOriginalMetadataAuthor());
+            return getUserReferenceStringSerializer().serialize(this.getAuthors().getOriginalMetadataAuthor());
         }
     }
 
@@ -9242,9 +9253,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private void setOriginalMetadataAuthorReference(String serializedUserReference)
     {
         if (!StringUtils.isEmpty(serializedUserReference)) {
-            UserReferenceResolver<String> userReferenceResolver =
-                Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class, String.class));
-            UserReference userReference = userReferenceResolver.resolve(serializedUserReference);
+            UserReference userReference = getUserReferenceStringResolver().resolve(serializedUserReference);
             this.authors.setOriginalMetadataAuthor(userReference);
         }
     }

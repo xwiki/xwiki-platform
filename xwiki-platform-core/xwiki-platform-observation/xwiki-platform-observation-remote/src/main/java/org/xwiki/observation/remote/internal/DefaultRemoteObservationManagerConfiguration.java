@@ -93,7 +93,7 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
     public void initialize() throws InitializationException
     {
         Path observation = getObservationDirectory();
-        observation.toFile().mkdir();
+        observation.toFile().mkdirs();
         Path idFile = getIdFile();
         if (!Files.exists(idFile)) {
             try {

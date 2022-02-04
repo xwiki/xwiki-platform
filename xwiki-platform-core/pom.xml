@@ -162,6 +162,20 @@
                   <justification>Change in a generated class for the REST model to integrate new originalMetadataAuthor information.</justification>
                   <criticality>highlight</criticality>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.doc.XWikiDocument::readFromTemplate(com.xpn.xwiki.web.EditForm, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                  <criticality>allowed</criticality>
+                  <justification>Deprecated API moved to legacy.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.doc.XWikiDocument::readFromTemplate(java.lang.String, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                  <criticality>allowed</criticality>
+                  <justification>Deprecated API moved to legacy.</justification>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

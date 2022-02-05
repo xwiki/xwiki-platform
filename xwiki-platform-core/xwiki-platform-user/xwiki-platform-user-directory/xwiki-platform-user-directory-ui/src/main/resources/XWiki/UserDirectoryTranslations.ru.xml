@@ -39,17 +39,16 @@
   <content>XWiki.UserDirectoryPreferencesClass_columns=Столбцы для отображения
 XWiki.UserDirectoryPreferencesClass_columns_hint=Список столбцов, соответствующих свойствам класса, для отображения в каталоге пользователя
 XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Скрыть отключенные профили пользователей
-XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Исключить из каталога пользователей пользователей, чей профиль отключен
-
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Исключить из каталога пользователей, чей профиль отключен
 userdirectory.userScopeFilter=Область пользователя:
 userdirectory.userScopeFilter.hint=Выберите категорию пользователей, которых вы хотите отобразить.
 userdirectory.userScopeFilter.local=Локальные пользователи
 userdirectory.userScopeFilter.global=Глобальные пользователи, которые являются членами этой вики
 userdirectory.configuration.title=Настройки
 userdirectory.configuration.columns.editHint=Нажмите, чтобы выбрать столбцы
-
 platform.userdirectory.customizeNotAllowed=Вам не разрешено настраивать этот каталог пользователей.
 platform.userdirectory.configTitle=Настройки каталога пользователя
 platform.userdirectory.configSheetTitle=Лист настроек каталога пользователя
-platform.userdirectory.configSheetApplyOnConfiguration=Этот лист должен быть применен к документу Настройки каталога пользователей.</content>
+platform.userdirectory.configSheetApplyOnConfiguration=Этот лист должен быть применен к документу Настройки каталога пользователей.
+</content>
 </xwikidoc>

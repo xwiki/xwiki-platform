@@ -156,18 +156,18 @@ XWiki.ConfigurableClass_displayInSection=Отображать в разделе
 XWiki.ConfigurableClass_heading=Заголовок
 XWiki.ConfigurableClass_configurationClass=Класс конфигурации
 XWiki.ConfigurableClass_linkPrefix=Префикс ссылки
-### Missing: XWiki.ConfigurableClass_propertiesToShow=Properties to show
-### Missing: XWiki.ConfigurableClass_codeToExecute=Code to execute
-### Missing: XWiki.ConfigurableClass_iconAttachment=Icon attachment
-### Missing: XWiki.ConfigurableClass_displayInCategory=Display in category
-### Missing: XWiki.ConfigurableClass_displayBeforeCategory=Display before category
-### Missing: XWiki.ConfigurableClass_categoryIcon=Category icon
-### Missing: XWiki.ConfigurableClass_scope=Scope
-### Missing: XWiki.ConfigurableClass_scope_WIKI=Wiki
-### Missing: XWiki.ConfigurableClass_scope_SPACE=Current space
-### Missing: XWiki.ConfigurableClass_scope_ALL_SPACES=All spaces
-### Missing: XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki and all spaces
-### Missing: XWiki.ConfigurableClass_sectionOrder=Section order
+XWiki.ConfigurableClass_propertiesToShow=Отображаемые свойства
+XWiki.ConfigurableClass_codeToExecute=Исполняемый код
+XWiki.ConfigurableClass_iconAttachment=Вложение с иконкой
+XWiki.ConfigurableClass_displayInCategory=Отображать в категории
+XWiki.ConfigurableClass_displayBeforeCategory=Отображать перед категорией
+XWiki.ConfigurableClass_categoryIcon=Иконка категории
+XWiki.ConfigurableClass_scope=Область видимости
+XWiki.ConfigurableClass_scope_WIKI=Вики
+XWiki.ConfigurableClass_scope_SPACE=Текущий раздел
+XWiki.ConfigurableClass_scope_ALL_SPACES=Все разделы
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Вики и все разделы
+XWiki.ConfigurableClass_sectionOrder=Позиция раздела
 
 
 ## Used to indicate where deprecated keys end
@@ -175,10 +175,10 @@ XWiki.ConfigurableClass_linkPrefix=Префикс ссылки
 
 ## Deprecated since 11.6RC1
 XWiki.XWikiPreferences_auth_active_check.hint=Если установлено значение "Да", пользователи не смогут войти в систему без ввода токена, который ранее был отправлен по электронной почте.
-### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+administration.section.users.deleteUser.markInactiveMessage=Вместо удаления пользователя вы можете пометить его профиль как неактивный. Это не позволит ему войти в систему, но сохранит права доступа, связанные с написанными им скриптами.
 
 ## Deprecated since 11.8RC1
-### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+administration.section.users.deleteUser.markDisabledMessage=Вместо удаления пользователя вы можете пометить его профиль как отключенный. Это не позволит ему войти в систему, но сохранит права доступа, связанные с написанными им скриптами.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

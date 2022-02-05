@@ -67,13 +67,11 @@ XWiki может быть использована как база знаний 
 
 Вы также можете использовать [[Песочницу&gt;&gt;Sandbox.WebHome]] для большего количества демо-контента и в целом как место для экспериментов с возможностями вашей вики. 
 
- {{box}}
-Узнайте больше о том, как использовать XWiki из {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.
-{{/box}}
+ {{box}}Узнайте больше о том, как использовать XWiki из {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
 
-(%class="row"%)
+(% class="row" %)
 (((
-(%class="col-xs-12 col-sm-6"%)
+(% class="col-xs-12 col-sm-6" %)
 (((
 = Расширьте свою вики =
 
@@ -82,7 +80,7 @@ XWiki может быть использована как база знаний 
 Для просмотра более 900 созданных сообществом расширений для XWiki, перейдите в [[Репозиторий расширений&gt;&gt;http://extensions.xwiki.org]].
 )))
 
-(%class="col-xs-12 col-sm-6"%)
+(% class="col-xs-12 col-sm-6" %)
 (((
 = Создайте своё приложение =
 

@@ -27,24 +27,12 @@
     <artifactId>xwiki-platform-image</artifactId>
     <version>14.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-image-api</artifactId>
-  <name>XWiki Platform - Image - API</name>
-  <properties>
-    <thumbnailator.version>0.4.8</thumbnailator.version>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-component-multi</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- Used by the image plugin to resize the images (i.e. create thumbnails) on the server side. -->
-    <dependency>
-      <groupId>net.coobird</groupId>
-      <artifactId>thumbnailator</artifactId>
-      <version>${thumbnailator.version}</version>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-image-processing</artifactId>
+  <name>XWiki Platform - Image - Processing</name>
+  <description>Code related to image processing</description>
+  <packaging>pom</packaging>
+  <modules>
+    <module>xwiki-platform-image-processing-api</module>
+    <module>xwiki-platform-image-processing-plugin</module>
+  </modules>
 </project>

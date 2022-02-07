@@ -19,27 +19,28 @@
  */
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the range parser from {@link AbstractTableBlockDataSource}.
  * 
  * @version $Id$
  */
-public class RangeParserTest
+class RangeParserTest
 {
     @Test
-    public void getColumnNumberFromIdentifier()
+    void getColumnNumberFromIdentifier()
     {
-        Assert.assertTrue(0 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("A4"));
-        Assert.assertTrue(1 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("B4"));
-        Assert.assertTrue(25 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("Z4"));
-        Assert.assertTrue(26 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("AA4"));
-        Assert.assertTrue(27 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("AB4"));
-        Assert.assertTrue(52 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("BA4"));
-        Assert.assertTrue(53 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("BB4"));
-        Assert.assertTrue(701 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("ZZ4"));
-        Assert.assertTrue(null == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("."));
+        assertTrue(0 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("A4"));
+        assertTrue(1 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("B4"));
+        assertTrue(25 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("Z4"));
+        assertTrue(26 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("AA4"));
+        assertTrue(27 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("AB4"));
+        assertTrue(52 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("BA4"));
+        assertTrue(53 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("BB4"));
+        assertTrue(701 == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("ZZ4"));
+        assertTrue(null == AbstractTableBlockDataSource.getColumnNumberFromIdentifier("."));
     }
 }

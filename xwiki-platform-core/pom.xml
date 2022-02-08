@@ -176,6 +176,34 @@
                   <criticality>allowed</criticality>
                   <justification>Deprecated API moved to legacy.</justification>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.externalClassExposedInAPI</code>
+                  <new>class com.xpn.xwiki.XWiki</new>
+                  <criticality>allowed</criticality>
+                  <justification>Deprecated API from XWiki class moved to legacy.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.externalClassExposedInAPI</code>
+                  <new>class com.xpn.xwiki.XWikiConfig</new>
+                  <criticality>allowed</criticality>
+                  <justification>Deprecated API from XWiki class moved to legacy.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.externalClassExposedInAPI</code>
+                  <new>class com.xpn.xwiki.XWikiContext</new>
+                  <criticality>allowed</criticality>
+                  <justification>Deprecated API from XWiki class moved to legacy.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.externalClassExposedInAPI</code>
+                  <new>class com.xpn.xwiki.XWikiException</new>
+                  <criticality>allowed</criticality>
+                  <justification>Deprecated API from XWiki class moved to legacy.</justification>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

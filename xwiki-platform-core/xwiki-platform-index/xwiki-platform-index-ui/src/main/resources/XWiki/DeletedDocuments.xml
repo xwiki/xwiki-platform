@@ -384,13 +384,13 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
         'emptybin': true,
         'form_token': xm.form_token,
         'ajax': 1
-    }).done(function() {
+    }).then(() =&gt; {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('platform.index.trashDocumentsDeleteDone')),
         'done'
       ));
       trashDocumentsLivetable.refresh();
-    }).fail(function() {
+    }).catch(() =&gt; {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('platform.index.trashDocumentsDeleteFailed')),
         'error'

@@ -152,7 +152,7 @@
         'csrf': xm.form_token,
         'user': XWiki.Model.serialize(xm.documentReference),
         'target': 'user'
-      }).done(function() {
+      }).then(() =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.done'))", 'done');
         if (action == 'watchUser') {
@@ -162,7 +162,7 @@
           $('.notificationWatchUserFollowing').addClass('hidden');
           $('.notificationWatchUserNotFollowing').removeClass('hidden');
         }
-      }).fail(function() {
+      }).catch(() =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.error'))", 'error');
       });
@@ -175,7 +175,7 @@
         'action': action,
         'csrf': xm.form_token,
         'userId': XWiki.Model.serialize(xm.documentReference)
-      }).done(function(data) {
+      }).then(data =&gt; {
         notification.hide();
         if (data.success) {
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.done'))", 'done');
@@ -189,7 +189,7 @@
         } else {
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.error'))", 'error');
         }
-      }).fail(function() {
+      }).catch(() =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.error'))", 'error');
       });

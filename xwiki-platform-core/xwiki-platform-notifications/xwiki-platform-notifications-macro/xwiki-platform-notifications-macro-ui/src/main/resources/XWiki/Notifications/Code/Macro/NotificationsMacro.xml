@@ -328,7 +328,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
 
     self.doLoad = function(params, untilDate, promise) {
       var restURL = '$!{escapetool.javascript($request.contextPath)}/rest/notifications?media=json';
-      $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function (data, textStatus, jqXHR) {
+      $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function(data, textStatus, jqXHR) {
         switch (jqXHR.status) {
             case 200:
               // 200 means that the search is done, we displayer the received notifications
@@ -340,7 +340,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
               setTimeout(self.doLoad, 1000, params, untilDate, promise);
               break;
         }
-      }).fail(function () {
+      }).catch(() =&gt; {
         self.displayNoNotification();
       });
     };

@@ -44,7 +44,7 @@ require(['jquery'], function($) {
     var picker = $('.xwiki-flavor-picker');
     url += encodeURIComponent(picker.attr('data-namespace'));
 
-    $.getJSON(url).done(function(data) {
+    $.getJSON(url).then(data => {
       // Update progress
       var jobState = data.state;
 
@@ -69,7 +69,7 @@ require(['jquery'], function($) {
         // Progress callback (if needed)
         maybeNextStatus();
       }
-    }).fail(function(){
+    }).catch(() => {
       new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('flavor.picker.ajaxError'))", 'error');
     });
   }
@@ -82,7 +82,7 @@ require(['jquery'], function($) {
     var picker = $('.xwiki-flavor-picker');
     url += '&namespace=' + encodeURIComponent(picker.attr('data-namespace'));
 
-    $.getJSON(url).done(function(data) {
+    $.getJSON(url).then(data => {
       // Update the list of flavors
       flavors = data;
 
@@ -93,7 +93,7 @@ require(['jquery'], function($) {
 
       // Update event listeners
       initPickerResults($('.xwiki-flavor-picker'));
-    }).fail(function(data){
+    }).catch(() => {
       new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('flavor.picker.ajaxError'))", 'error');
     });
   }

@@ -348,10 +348,10 @@
 
   var requestQueueSizeUpdate = function() {
     var queueSizeContainer = this;
-    $.ajax({
-      url: "$xwiki.getURL('XWiki.SolrSearchAdmin', 'get', 'outputSyntax=plain')",
-      data: {action: 'getQueueSize'}
-    }).done(function(data) {
+    $.get(new XWiki.Document('SolrSearchAdmin', 'XWiki').getURL('get'), {
+      outputSyntax: 'plain',
+      action: 'getQueueSize'
+    }).then(data =&gt; {
       updateQueueSize.call(queueSizeContainer, data);
     });
   };

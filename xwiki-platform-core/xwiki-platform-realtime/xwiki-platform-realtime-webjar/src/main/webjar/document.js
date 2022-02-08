@@ -56,17 +56,17 @@ define('xwiki-realtime-document', [
       }, jqXHR => {
         if (jqXHR.status === 404) {
           // The document doesn't exist anymore. Maybe it was deleted?
-          return $.Deferred().resolve($.extend(this, {
+          return $.extend(this, {
             version: '1.1',
             modified: 0,
             content: '',
             isNew: true
-          })).promise();
+          });
         } else {
           // Reload failed. Continue using the current data.
           return this;
         }
-      }).done($.proxy(this, 'update'));
+      }).then($.proxy(this, 'update'));
     },
 
     update: function(data) {
@@ -77,6 +77,7 @@ define('xwiki-realtime-document', [
         $('#editingVersionDate').val(this.modified);
         $('#isNew').val(this.isNew);
       }
+      return this;
     },
 
     save: function(data) {
@@ -105,7 +106,7 @@ define('xwiki-realtime-document', [
       return $.getJSON(url, $.param(params, true)).then(function(data) {
         if (!Array.isArray(data)) {
           console.error('Failed to retrieve the list of document channels.');
-          return $.Deferred().reject(data).promise();
+          return Promise.reject(data);
         } else {
           return $.extend(data, channelListAPI);
         }

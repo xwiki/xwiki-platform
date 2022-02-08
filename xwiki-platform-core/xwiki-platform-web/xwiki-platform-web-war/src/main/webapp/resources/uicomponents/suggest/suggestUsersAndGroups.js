@@ -44,7 +44,7 @@ define('xwiki-selectize-utils', ['jquery'], function($) {
           return suggestions;
         }, function() {
           // Failure.
-          return $.Deferred().resolve(suggestions);
+          return suggestions;
         });
       } else {
         return suggestions;
@@ -60,7 +60,7 @@ define('xwiki-selectize-utils', ['jquery'], function($) {
     loadSuggestions: function(sources, params) {
       return sources.reduce(function(promise, source) {
         return promise.then(maybeLoadMoreSuggestions(source, params));
-      }, $.Deferred().resolve([]));
+      }, Promise.resolve([]));
     }
   };
 });
@@ -76,13 +76,13 @@ define('xwiki-suggestUsers', ['jquery', 'xwiki-selectize-utils', 'xwiki-selectiz
         loadUsers(select.attr('data-userScope'), {
           'input': text,
           'limit': 10,
-        }).done(callback).fail(callback);
+        }).then(callback, callback);
       },
       loadSelected: function(text, callback) {
         loadUsers(select.attr('data-userScope'), {
           'input': text,
           'exactMatch': true
-        }).done(callback).fail(callback);
+        }).then(callback, callback);
       }
     };
   };
@@ -133,13 +133,13 @@ define('xwiki-suggestGroups', ['jquery', 'xwiki-selectize-utils', 'xwiki-selecti
         loadGroups(select.attr('data-userScope'), {
           'input': text,
           'limit': 10
-        }).done(callback).fail(callback);
+        }).then(callback, callback);
       },
       loadSelected: function(text, callback) {
         loadGroups(select.attr('data-userScope'), {
           'input': text,
           'exactMatch': true
-        }).done(callback).fail(callback);
+        }).then(callback, callback);
       }
     };
   };

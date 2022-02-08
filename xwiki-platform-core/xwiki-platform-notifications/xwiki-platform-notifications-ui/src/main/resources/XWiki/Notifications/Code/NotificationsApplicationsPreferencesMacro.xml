@@ -180,19 +180,19 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
         var targetUser = $('.notifPreferences').attr('data-user');
       }
       var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
-      $.post(url, {
+      Promise.resolve($.post(url, {
         action: 'savePreferences',
         target: $('.notifPreferences').attr('data-target'),
         user: targetUser,
         json: JSON.stringify(data),
         csrf: xm.form_token
-      }).done(function() {
+      })).then(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).fail(function() {
+      }).catch(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
-      }).always(function() {
+      }).finally(function() {
         // Enable again the triggers
         toggles.bootstrapSwitch('disabled', false);
       });

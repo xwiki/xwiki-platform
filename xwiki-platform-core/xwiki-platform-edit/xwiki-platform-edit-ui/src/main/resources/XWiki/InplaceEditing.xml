@@ -242,19 +242,16 @@ define('xwiki-document-api', ['jquery'], function($) {
         // See XRENDERING-78: Add markers to modified XDOM by Transformations/Macros
         queryString.transformations = 'macro';
       }
-      var thisXWikiDocument = this;
-      return $.get(this.getURL('view'), queryString).fail(function() {
-        new XWiki.widgets.Notification(l10n['edit.inplace.page.renderFailed'], 'error');
-      }).then(function(html) {
+      return Promise.resolve($.get(this.getURL('view'), queryString)).then(html =&gt; {
         // Render succeeded.
         var container = $('&lt;div/&gt;').html(html);
-        return $.extend(thisXWikiDocument, {
+        return $.extend(this, {
           renderedTitle: container.find('#document-title h1').html(),
           renderedContent: container.find('#xwikicontent').html()
         });
-      }, function() {
-        // Render failed.
-        return thisXWikiDocument;
+      }).catch(() =&gt; {
+        new XWiki.widgets.Notification(l10n['edit.inplace.page.renderFailed'], 'error');
+        return Promise.reject(this);
       });
     },
 
@@ -264,20 +261,19 @@ define('xwiki-document-api', ['jquery'], function($) {
      * @return a promise that resolves to this document instance if the reload request succeeds
      */
     reload: function() {
-      var thisXWikiDocument = this;
-      return $.getJSON(this.getRestURL(), {
+      return Promise.resolve($.getJSON(this.getRestURL(), {
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
-      }).then(function(newXWikiDocument) {
+      })).then(newXWikiDocument =&gt; {
         // Reload succeeded.
         // Resolve the document reference.
-        thisXWikiDocument.documentReference = XWiki.Model.resolve(newXWikiDocument.id, XWiki.EntityType.DOCUMENT);
+        this.documentReference = XWiki.Model.resolve(newXWikiDocument.id, XWiki.EntityType.DOCUMENT);
         // We were able to load the document so it's not new.
-        thisXWikiDocument.isNew = false;
-        return $.extend(thisXWikiDocument, newXWikiDocument);
-      }, function() {
+        this.isNew = false;
+        return $.extend(this, newXWikiDocument);
+      }).catch(() =&gt; {
         // Reload failed.
-        return thisXWikiDocument;
+        return Promise.reject(this);
       });
     },
 
@@ -288,9 +284,8 @@ define('xwiki-document-api', ['jquery'], function($) {
      * @return a promise that resolves to this document instance if the lock request succeeds
      */
     lock: function(action, force) {
-      var thisXWikiDocument = this;
       action = action || 'edit';
-      return $.getJSON(this.getURL('get'), {
+      return Promise.resolve($.getJSON(this.getURL('get'), {
         sheet: 'XWiki.InplaceEditing',
         action: 'lock',
         lockAction: action,
@@ -299,20 +294,20 @@ define('xwiki-document-api', ['jquery'], function($) {
         outputSyntax: 'plain',
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
-      }).then(function() {
+      })).then(() =&gt; {
         // Lock succeeded.
-        thisXWikiDocument.locked = action;
-        return thisXWikiDocument;
-      }, function(response) {
+        this.locked = action;
+        return this;
+      }).catch(response =&gt; {
         // Lock failed.
-        delete thisXWikiDocument.locked;
+        delete this.locked;
         // Check if the user can force the lock.
         var lockConfirmation = response.responseJSON;
         if (response.status === 423 &amp;&amp; lockConfirmation) {
           // The user can force the lock, but needs confirmation.
-          thisXWikiDocument.lockConfirmation = lockConfirmation;
+          this.lockConfirmation = lockConfirmation;
         }
-        return thisXWikiDocument;
+        return Promise.reject(this);
       });
     },
 
@@ -407,28 +402,12 @@ define('editInPlace', [
         $('#xwikicontent').removeAttr('tabindex');
         if (sectionId) {
           // Select the heading of the specified section.
-          $('#xwikicontent &gt; #' + escapeSelector(sectionId)).each(function() {
+          $('#xwikicontent &gt; #' + $.escapeSelector(sectionId)).each(function() {
             selectText(this);
           });
         }
       }
     });
-  };
-
-  var escapeSelector = function(selector) {
-    if (window.CSS &amp;&amp; typeof CSS.escape === 'function') {
-      // Not supported by Internet Explorer.
-      return CSS.escape(selector);
-    } else if (typeof $.escapeSelector === 'function') {
-      // Added in jQuery 3.0
-      return $.escapeSelector(selector);
-    } else if (typeof selector === 'string') {
-      // Simple implementation.
-      // See https://learn.jquery.com/using-jquery-core/faq/how-do-i-select-an-element-by-an-id-that-has-characters-used-in-css-notation/
-      return selector.replace(/(:|\.|\[|\]|,|=|@)/g, '\\$1');
-    } else {
-      return selector;
-    }
   };
 
   // We preserve the document data between edits in order to be able to know which document translation should be edited
@@ -438,6 +417,11 @@ define('editInPlace', [
     language: xcontext.locale
   }, xwikiDocumentAPI);
 
+  var setCurrentXWikiDocument = function(xwikiDocument) {
+    currentXWikiDocument = xwikiDocument;
+    return Promise.resolve(xwikiDocument);
+  };
+
   var editInPlace = function(options) {
     options = $.extend({
       afterEdit: function() {},
@@ -445,11 +429,16 @@ define('editInPlace', [
     }, options);
     $('#xwikicontent').addClass('loading');
     // Lock the document first.
-    return lock(currentXWikiDocument).fail(options.lockFailed)
+    return lock(currentXWikiDocument)
       // Then load the document only if we managed to lock it.
-      .then(load)
+      .then(load, xwikiDocument =&gt; {
+        options.lockFailed(xwikiDocument);
+        return Promise.reject(xwikiDocument);
       // Then load the editors only if we managed to load the document.
-      .then(edit).done(options.afterEdit).always(function() {
+      }).then(edit).then(xwikiDocument =&gt; {
+        options.afterEdit(xwikiDocument);
+        return xwikiDocument;
+      }).finally(() =&gt; {
         $('#xwikicontent').removeClass('loading');
       // Then wait for an action (save, cancel, reload) only if the editors were loaded successfuly.
       }).then(maybeSave)
@@ -457,34 +446,34 @@ define('editInPlace', [
       .then(unlock, unlock)
       // Finally view the document both when the edit ended with success and with a failure.
       .then(view, view)
-      .always(function(xwikiDocument) {
-        // Update the current document for the next edit session.
-        currentXWikiDocument = xwikiDocument;
-      });
+      // Update the current document for the next edit session.
+      .then(setCurrentXWikiDocument, setCurrentXWikiDocument);
   };
 
   var lock = function(xwikiDocument) {
-    return xwikiDocument.lock().then(null, function(xwikiDocument) {
+    return xwikiDocument.lock().catch(function(xwikiDocument) {
       // If the document was already locked then we need to ask the user if they want to force the lock.
       if (xwikiDocument.lockConfirmation) {
         var confirmation = xwikiDocument.lockConfirmation;
         delete xwikiDocument.lockConfirmation;
         return maybeForceLock(confirmation).then($.proxy(xwikiDocument, 'lock', 'edit', true), function() {
           // Cancel the edit action.
-          return xwikiDocument;
+          return Promise.reject(xwikiDocument);
         });
       } else {
         new XWiki.widgets.Notification(l10n['edit.inplace.page.lockFailed'], 'error');
-        return xwikiDocument;
+        return Promise.reject(xwikiDocument);
       }
     });
   };
 
   var maybeForceLock = function(confirmation) {
-    var deferred = $.Deferred();
+    var deferred, promise = new Promise((resolve, reject) =&gt; {
+      deferred = {resolve, reject};
+    });
     // Reuse the confirmation modal once it is created.
     var modal = $('.force-edit-lock-modal');
-    if (modal.length === 0) {
+    if (!modal.length) {
       modal = createForceLockModal();
     }
     // Update the deferred that needs to be resolved or rejected.
@@ -500,7 +489,7 @@ define('editInPlace', [
     }
     // Show the confirmation modal.
     modal.modal('show');
-    return deferred.promise();
+    return promise;
   };
 
   var createForceLockModal = function() {
@@ -541,14 +530,16 @@ define('editInPlace', [
   };
 
   var load = function(xwikiDocument) {
-    return xwikiDocument.reload().done(function(xwikiDocument) {
+    return xwikiDocument.reload().then(xwikiDocument =&gt; {
       // Clone the current document version and keep a reference to it in order to be able to restore it on cancel.
       xwikiDocument.originalDocument = $.extend(true, {
         renderedTitle: $('#document-title h1').html(),
         renderedContent: $('#xwikicontent').html()
       }, xwikiDocument);
-    }).fail(function() {
+      return xwikiDocument;
+    }).catch(xwikiDocument =&gt; {
       new XWiki.widgets.Notification(l10n['edit.inplace.page.loadFailed'], 'error');
+      return Promise.reject(xwikiDocument);
     // Render the document for edit, in order to have the annotated content HTML. The annotations are used to protect
     // the rendering transformations (e.g. macros) when editing the content.
     }).then($.proxy(render, null, false));
@@ -564,7 +555,7 @@ define('editInPlace', [
   };
 
   var maybeSave = function(xwikiDocument) {
-    return waitForAction(xwikiDocument).then(function(action) {
+    return waitForAction(xwikiDocument).then(action =&gt; {
       switch(action.name) {
         case 'save': return save({
           document: action.document,
@@ -577,29 +568,29 @@ define('editInPlace', [
   };
 
   var waitForAction = function(xwikiDocument) {
-    var deferred = $.Deferred();
-    // We wait for the first save, reload or cancel event, whichever is triggered first. Note that the event listeners
-    // that are not executed first will remain registered but that doesn't cause any problems because the state of a
-    // deferred object (promise) cannot change once it was resolved. So the first event that fires will resolve the
-    // promise and the remaining events won't be able to change that. The remaining event listeners could be called
-    // later but they won't have any effect on the deferred object.
-    $(document).one([
-      'xwiki:actions:save',
-      'xwiki:actions:reload',
-      'xwiki:actions:cancel',
-    ].join(' '), '.xcontent.form', function(event, data) {
-      deferred.resolve({
-        name: event.type.substring('xwiki:actions:'.length),
-        document: xwikiDocument,
-        data: data
+    return new Promise((resolve, reject) =&gt; {
+      // We wait for the first save, reload or cancel event, whichever is triggered first. Note that the event listeners
+      // that are not executed first will remain registered but that doesn't cause any problems because the state of a
+      // deferred object (promise) cannot change once it was resolved. So the first event that fires will resolve the
+      // promise and the remaining events won't be able to change that. The remaining event listeners could be called
+      // later but they won't have any effect on the deferred object.
+      $(document).one([
+        'xwiki:actions:save',
+        'xwiki:actions:reload',
+        'xwiki:actions:cancel',
+      ].join(' '), '.xcontent.form', function(event, data) {
+        resolve({
+          name: event.type.substring('xwiki:actions:'.length),
+          document: xwikiDocument,
+          data: data
+        });
       });
     });
-    return deferred.promise();
   };
 
   var save = function(data) {
     // Push the changes to the server.
-    return push(data.document).then(function(xwikiDocument) {
+    return push(data.document).then(xwikiDocument =&gt; {
       // Save succeeded.
       return shouldReload(xwikiDocument).then(
         // The document was saved with merge and thus if we want to continue eding we need to reload the editor (because
@@ -614,15 +605,15 @@ define('editInPlace', [
 
   var push = function(xwikiDocument) {
     // Let actionButtons.js do the push. We just catch the result.
-    var deferred = $.Deferred();
-    // We wait for the save request to either succeed or fail. Note that one of the event listeners will remain
-    // registered but that doesn't cause any problems because the state of a deferred object (promise) cannot change
-    // once it was resolved or rejected. So the first event that fires will resolve/reject the promise and the remaining
-    // event won't be able to change that. The remaining event listener could be called later but it won't have any
-    // effect.
-    $(document).one('xwiki:document:saved', '.xcontent.form', $.proxy(deferred, 'resolve', xwikiDocument));
-    $(document).one('xwiki:document:saveFailed', '.xcontent.form', $.proxy(deferred, 'reject', xwikiDocument));
-    return deferred.promise();
+    return new Promise((resolve, reject) =&gt; {
+      // We wait for the save request to either succeed or fail. Note that one of the event listeners will remain
+      // registered but that doesn't cause any problems because the state of a deferred object (promise) cannot change
+      // once it was resolved or rejected. So the first event that fires will resolve/reject the promise and the
+      // remaining event won't be able to change that. The remaining event listener could be called later but it won't
+      // have any effect.
+      $(document).one('xwiki:document:saved', '.xcontent.form', $.proxy(resolve, null, xwikiDocument));
+      $(document).one('xwiki:document:saveFailed', '.xcontent.form', $.proxy(reject, null, xwikiDocument));
+    });
   };
 
   var maybeContinueEditing = function(continueEditing, xwikiDocument) {
@@ -671,18 +662,18 @@ define('editInPlace', [
     $(document).one('xwiki:actions:reload.maybe', '.xcontent.form', function() {
       reloadEventFired = true;
     });
-    var deferred = $.Deferred();
-    // Wait a bit to see if the reload event is fired.
-    setTimeout(function() {
-      // Remove the listener in case the reload event wasn't fired.
-      $(document).off('xwiki:actions:reload.maybe');
-      if (reloadEventFired) {
-        deferred.resolve(xwikiDocument);
-      } else {
-        deferred.reject(xwikiDocument);
-      }
-    }, 0);
-    return deferred.promise();
+    return new Promise((resolve, reject) =&gt; {
+      // Wait a bit to see if the reload event is fired.
+      setTimeout(function() {
+        // Remove the listener in case the reload event wasn't fired.
+        $(document).off('xwiki:actions:reload.maybe');
+        if (reloadEventFired) {
+          resolve(xwikiDocument);
+        } else {
+          reject(xwikiDocument);
+        }
+      }, 0);
+    });
   };
 
   var reload = function(xwikiDocument) {
@@ -709,7 +700,7 @@ define('editInPlace', [
     if (window.location.hash === '#edit' || window.location.hash === '#translate') {
       history.replaceState(null, null, '#');
     }
-    return $.Deferred().resolve(xwikiDocument).promise();
+    return Promise.resolve(xwikiDocument);
   };
 
   var edit = function(xwikiDocument) {
@@ -754,7 +745,7 @@ define('editInPlace', [
         // action buttons so we need to re-enable them each time we enter the edit mode.
         fakeForm.enable();
       }
-      return $.Deferred().resolve(xwikiDocument).promise();
+      return Promise.resolve(xwikiDocument);
     }
   };
 
@@ -815,9 +806,9 @@ define('editInPlace', [
           .parent().removeClass('hidden');
       }
     });
-    return $.get(XWiki.currentDocument.getURL('get'), {
+    return Promise.resolve($.get(XWiki.currentDocument.getURL('get'), {
       xpage: 'editactions'
-    }).then(function(html) {
+    })).then(html =&gt; {
       actionButtons.html(html);
       // Fix the name of the Save &amp; View action.
       actionButtons.find('.btn-primary').first().attr('name', 'action_save');
@@ -827,21 +818,21 @@ define('editInPlace', [
       actionButtons.append('&lt;div class="hidden extra"/&gt;');
       // Let the others know that the DOM has been updated, in order to enhance it.
       $(document).trigger('xwiki:dom:updated', {'elements': actionButtons.toArray()});
-      var deferred = $.Deferred();
-      require(['xwiki-actionButtons', 'xwiki-diff', 'xwiki-autoSave'], function() {
-        overrideEditActions();
-        overrideAjaxSaveAndContinue();
-        // Activate the auto-save feature passing our fake edit form. Note that autosave.js also creates an instance of
-        // AutoSave but it doesn't do anything because it doesn't find a real edit form in the page. This is why we have
-        // to create our own instance of AutoSave passing the right (fake) form.
-        new XWiki.editors.AutoSave({form: fakeForm});
-        var xwikiDocument = actionButtons.data('xwikiDocument');
-        // Enable the action buttons (and their shortcut keys) only if we're editing a document.
-        actionButtons.find(':input').prop('disabled', !xwikiDocument);
-        deferred.resolve(xwikiDocument);
+      return new Promise((resolve, reject) =&gt; {
+        require(['xwiki-actionButtons', 'xwiki-diff', 'xwiki-autoSave'], function() {
+          overrideEditActions();
+          overrideAjaxSaveAndContinue();
+          // Activate the auto-save feature passing our fake edit form. Note that autosave.js also creates an instance of
+          // AutoSave but it doesn't do anything because it doesn't find a real edit form in the page. This is why we have
+          // to create our own instance of AutoSave passing the right (fake) form.
+          new XWiki.editors.AutoSave({form: fakeForm});
+          var xwikiDocument = actionButtons.data('xwikiDocument');
+          // Enable the action buttons (and their shortcut keys) only if we're editing a document.
+          actionButtons.find(':input').prop('disabled', !xwikiDocument);
+          resolve(xwikiDocument);
+        });
       });
-      return deferred.promise();
-    }, function() {
+    }).catch(() =&gt; {
       new XWiki.widgets.Notification(l10n['edit.inplace.actionButtons.loadFailed'], 'error');
     });
   };
@@ -987,7 +978,7 @@ define('editInPlace', [
       deferred: $.Deferred()
     });
     editContent.trigger('xwiki:actions:edit', data);
-    return data.deferred.done(function() {
+    return data.deferred.promise().then(() =&gt; {
       editContent.show();
       viewContent.remove();
       if (withFocus) {
@@ -998,7 +989,8 @@ define('editInPlace', [
           editContent[0].focus({preventScroll: true});
         }, 0);
       }
-    }).promise();
+      return xwikiDocument;
+    });
   };
 
   var startRealTimeEditingSession = function(xwikiDocument) {
@@ -1063,7 +1055,7 @@ require(['jquery'], function($) {
     require(['editInPlace', wysiwygEditorModule], function(editInPlace) {
       // Re-enable the translate button because it can be used while editing to create the missing translation.
       translateButton.removeClass('disabled');
-      handler.edit(editInPlace, data).always(function() {
+      handler.edit(editInPlace, data).finally(function() {
         // Restore only the edit button at the end because:
         // * the translate button is restored (if needed) by the editInPlace module
         // * the section edit links are restored when the document is rendered for view

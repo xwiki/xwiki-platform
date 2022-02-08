@@ -140,10 +140,10 @@
       target: target,
       user: input.data('user'),
       csrf: xm.form_token
-    }).done(function() {
+    }).then(() =&gt; {
       notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
         'notifications.settings.saved')), 'done'));
-    }).fail(function() {
+    }).catch(() =&gt; {
       notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
         'notifications.settings.savingfailed')), 'error'));
     });

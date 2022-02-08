@@ -155,12 +155,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
      **/
     var getPageName = function(title) {
       var url = XWiki.currentDocument.getURL("get");
-      return $.get(url, {
+      return Promise.resolve($.get(url, {
         'xpage': 'entitynamevalidation_json',
         'outputSyntax': 'plain',
         'name': title,
         'form_token': xm.form_token
-      });
+      }));
     };
 
     /**
@@ -206,7 +206,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       disableButtons();
       var titleInputVal = titleInput.val();
       // Update the name field.
-      getPageName(titleInputVal).done(function(data) {
+      getPageName(titleInputVal).then(data => {
         // Ensure that the input didn't change while we were waiting the answer.
         // It also protects the value if a previous request was slow to arrive.
         if (titleInputVal === titleInput.val()) {
@@ -216,9 +216,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
           // Update the location preview.
           updateLocationFromTitleInput();
         }
-        // enable back the buttons
-        enableButtons();
-      }).fail(function (response) {
+      }).catch(() => {
         if (titleInputVal === titleInput.val()) {
           new XWiki.widgets.Notification(l10n['entitynamevalidation.nametransformation.error'], 'error');
           // we trigger a change so we can validate the name
@@ -226,7 +224,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
           // Update the location preview.
           updateLocationFromTitleInput();
         }
-        // enable back the buttons
+      }).finally(() => {
+        // Enable back the buttons
         enableButtons();
       });
     };

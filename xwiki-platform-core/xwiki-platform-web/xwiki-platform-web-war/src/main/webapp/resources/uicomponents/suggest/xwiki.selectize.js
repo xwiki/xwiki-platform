@@ -154,10 +154,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     wrapper.addClass(selectize.settings.loadingClass);
     selectize.loading++;
     selectize.items.reduce(function(deferred, value) {
-      return deferred.then(function() {
-        return loadSelectedValue(selectize, value);
-      });
-    }, $.Deferred().resolve()).always(function() {
+      return deferred.then(() => loadSelectedValue(selectize, value));
+    }, Promise.resolve()).finally(function() {
       selectize.loading = Math.max(selectize.loading - 1, 0);
       if (!selectize.loading) {
         wrapper.removeClass(selectize.settings.loadingClass);
@@ -166,29 +164,29 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
   };
 
   var loadSelectedValue = function(selectize, value) {
-    var deferred = $.Deferred();
-    var load;
-    if (typeof selectize.settings.loadSelected === 'function') {
-      load = selectize.settings.loadSelected;
-    } else {
-      load = selectize.settings.load;
-    }
-    if (value && typeof load === 'function') {
-      load.call(selectize, value, function(options) {
-        $.isArray(options) && options.forEach(function(option) {
-          var value = option[selectize.settings.valueField];
-          if (selectize.options.hasOwnProperty(value)) {
-            selectize.updateOption(value, option);
-          } else {
-            selectize.addOption(option);
-          }
+    return new Promise((resolve, reject) => {
+      var load;
+      if (typeof selectize.settings.loadSelected === 'function') {
+        load = selectize.settings.loadSelected;
+      } else {
+        load = selectize.settings.load;
+      }
+      if (value && typeof load === 'function') {
+        load.call(selectize, value, function(options) {
+          $.isArray(options) && options.forEach(function(option) {
+            var value = option[selectize.settings.valueField];
+            if (selectize.options.hasOwnProperty(value)) {
+              selectize.updateOption(value, option);
+            } else {
+              selectize.addOption(option);
+            }
+          });
+          resolve();
         });
-        deferred.resolve();
-      });
-    } else {
-      deferred.resolve();
-    }
-    return deferred.promise();
+      } else {
+        resolve();
+      }
+    });
   };
 
   var customize = function() {

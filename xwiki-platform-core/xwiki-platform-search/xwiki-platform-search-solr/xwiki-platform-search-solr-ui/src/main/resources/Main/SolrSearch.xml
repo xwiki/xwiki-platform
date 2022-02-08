@@ -271,7 +271,8 @@
     searchRequest &amp;&amp; searchRequest.abort();
     $('.search-ui').attr('aria-busy', true);
     var getURL = XWiki.currentDocument.getURL('get', getQueryString(viewURL));
-    searchRequest = $.get(getURL).done(function(html) {
+    searchRequest = $.get(getURL);
+    searchRequest.then(html =&gt; {
       var state = getSearchUIState();
       updateSearchUI(html);
       setSearchUIState(state);
@@ -298,7 +299,8 @@
     $('.search-ui').attr('aria-busy', true);
     var state = event.originalEvent.state;
     var getURL = XWiki.currentDocument.getURL('get', window.location.search.substr(1));
-    searchRequest = $.get(getURL).done(function(html) {
+    searchRequest = $.get(getURL);
+    searchRequest.then(html =&gt; {
       updateSearchUI(html);
       setSearchUIState(state);
     });

@@ -29,7 +29,7 @@ define('xwiki-l10n', ['module', 'jquery'], function(module, $) {
   'use strict';
 
   var getTranslations = function(specs) {
-    return $.getJSON(module.config().url, $.param({
+    return Promise.resolve($.getJSON(module.config().url, $.param({
       // It's good to specify the locale when getting the translation messages because the current locale can change
       // between the moment the page is loaded and the moment the translation messages are requested (e.g. if the user
       // opens another page in another browser tab with a different locale specified). We take the current locale from
@@ -37,7 +37,7 @@ define('xwiki-l10n', ['module', 'jquery'], function(module, $) {
       locale: specs.locale || document.documentElement.getAttribute('lang'),
       prefix: specs.prefix,
       key: specs.keys
-    }, true)).then($.proxy(toTranslationsMap, null, specs.prefix || ''));
+    }, true))).then($.proxy(toTranslationsMap, null, specs.prefix || ''));
   };
 
   var toTranslationsMap = function(prefix, responseJSON) {
@@ -69,10 +69,10 @@ define('xwiki-l10n', ['module', 'jquery'], function(module, $) {
   var load = function(name, parentRequire, onLoad, config) {
     parentRequire([name], function(specs) {
       if (module.config().url) {
-        getTranslations(specs).done(function(translations) {
+        getTranslations(specs).then(translations => {
           translations.get = getTranslation;
           onLoad(translations);
-        }).fail(function() {
+        }).catch(() => {
           onLoad(emptyResourceBundle);
         });
       } else {

@@ -30,7 +30,7 @@ define('xwiki-realtime-wikiEditor-loader', [
     compatible: ['wiki', 'wysiwyg']
   };
 
-  Loader.bootstrap(info).done(function(keys) {
+  Loader.bootstrap(info).then(keys => {
     require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
       if (RealtimeWikiEditor && RealtimeWikiEditor.main) {
         keys._update = $.proxy(Loader, 'updateKeys', editorId);

@@ -131,12 +131,12 @@
   }
 });
 require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], function (ckeditorPromise, suggestUsers, $, xm) {
-  
+
   /**
    * Get the current wiki scope for displaying global, local or global and local users
    */
   const userScope = "$!services.wiki.user.userScope";
-  
+
   // see https://stackoverflow.com/a/6248722/657524
   function random6chars() {
     // I generate the UID from two parts here 
@@ -147,7 +147,7 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
     secondPart = ("000" + secondPart.toString(36)).slice(-3);
     return firstPart + secondPart;
   }
-  
+
   /**
    * Compute a new unique anchor for the given reference.
    * The unique anchor is based on the mentionned user id, concatenaed with a random string of 6 alphanumeric
@@ -166,8 +166,8 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
       'input': text,
       'limit': 6,
     };
-    $.when(suggestUsers.loadUsers(userScope, params)).then(function (user) {
-      const cct = user.map(function (x) {
+    suggestUsers.loadUsers(userScope, params).then(users =&gt; {
+      const cct = users.map(function (x) {
         // insert an id because that's required by the mentions plugins.
         x.id = x.value;
         // Make sure to display the icon avatar or the image one.
@@ -183,10 +183,10 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
         return x;
       });
       callback(cct);
-    })
+    });
   }
 
-  ckeditorPromise.done(function (ckeditor) {
+  ckeditorPromise.then(ckeditor =&gt; {
     function confMentions(name) {
       return {
         feed: function (opts, callback) {

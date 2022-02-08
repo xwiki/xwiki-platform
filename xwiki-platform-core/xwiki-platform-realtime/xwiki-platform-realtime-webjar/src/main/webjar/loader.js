@@ -99,7 +99,7 @@ define('xwiki-realtime-loader', [
   module.checkSessions = function(info) {
     if (lock) {
       // Found an edit lock link.
-      checkSocket().done(function(types) {
+      checkSocket().then(types => {
         // Determine if it's a realtime session.
         if (types.length) {
           console.log('Found an active realtime session.');
@@ -628,7 +628,7 @@ define('xwiki-realtime-loader', [
       path: doc.language + '/events/all',
       create: true
     });
-    getChannels().done(function(channels) {
+    getChannels().then(channels => {
       var channelKey = channels[0].key;
       if (channelKey) {
         require(['netflux-client', 'xwiki-realtime-errorBox'], function(Netflux, ErrorBox) {
@@ -672,9 +672,7 @@ define('xwiki-realtime-loader', [
     network.on('reconnect', function() {
       hideWarning();
       hideWsError();
-      getChannels().done(function(channels) {
-        network.join(channels[0].key).then(onOpen, onError);
-      });
+      getChannels().then(channels => network.join(channels[0].key)).then(onOpen, onError);
     });
     network.on('disconnect', function() {
       if (module.isRt) {
@@ -733,16 +731,16 @@ define('xwiki-realtime-loader', [
   },
 
   beforeLaunchRealtime = function(keys) {
-    var deferred = $.Deferred();
-    if (module.isRt) {
-      module.whenReady(function(wsAvailable) {
-        module.isRt = wsAvailable;
-        deferred.resolve(keys);
-      });
-    } else {
-      deferred.resolve(keys);
-    }
-    return deferred.promise();
+    return new Promise((resolve, reject) => {
+      if (module.isRt) {
+        module.whenReady(function(wsAvailable) {
+          module.isRt = wsAvailable;
+          resolve(keys);
+        });
+      } else {
+        resolve(keys);
+      }
+    });
   },
 
   parseKeyData = function(editorId, channels) {
@@ -837,30 +835,30 @@ define('xwiki-realtime-loader', [
     },
 
     bootstrap: function(info) {
-      var deferred = $.Deferred();
-      this.setAvailableRt(info);
-      if (lock) {
-        // Found a lock link. Check active sessions.
-        this.checkSessions(info);
-        deferred.reject();
-      } else if (window.XWiki.editor === info.type) {
-        // No lock and we are using the right editor. Start realtime.
-        this.updateKeys(info.type).done(keys => {
-          if (!keys[info.type] || !keys.events || !keys.userdata) {
-            ErrorBox.show('unavailable');
-            console.error('You are not allowed to create a new realtime session for that document.');
-            deferred.reject();
-          } else if (!Object.keys(keys.active).length || keys[info.type + '_users'] > 0) {
-            deferred.resolve(keys);
-          } else {
-            // Let the user choose between joining the existing real-time session (with a different editor) or create a
-            // new real-time session with the current editor.
-            console.log('Join the existing realtime session or create a new one.');
-            this.displayModal(info.type, Object.keys(keys.active), $.proxy(deferred, 'resolve', keys), info);
-          }
-        });
-      }
-      return deferred.then(beforeLaunchRealtime).promise();
+      return new Promise((resolve, reject) => {
+        this.setAvailableRt(info);
+        if (lock) {
+          // Found a lock link. Check active sessions.
+          this.checkSessions(info);
+          reject();
+        } else if (window.XWiki.editor === info.type) {
+          // No lock and we are using the right editor. Start realtime.
+          this.updateKeys(info.type).then(keys => {
+            if (!keys[info.type] || !keys.events || !keys.userdata) {
+              ErrorBox.show('unavailable');
+              console.error('You are not allowed to create a new realtime session for that document.');
+              reject();
+            } else if (!Object.keys(keys.active).length || keys[info.type + '_users'] > 0) {
+              resolve(keys);
+            } else {
+              // Let the user choose between joining the existing real-time session (with a different editor) or create a
+              // new real-time session with the current editor.
+              console.log('Join the existing realtime session or create a new one.');
+              this.displayModal(info.type, Object.keys(keys.active), $.proxy(resolve, null, keys), info);
+            }
+          });
+        }
+      }).then(beforeLaunchRealtime);
     }
   });
 

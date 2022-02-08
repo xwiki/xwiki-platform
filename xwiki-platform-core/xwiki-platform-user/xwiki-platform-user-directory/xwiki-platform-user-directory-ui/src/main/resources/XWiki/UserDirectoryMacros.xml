@@ -466,7 +466,7 @@
     var data = $(this).serialize();
     var oldLiveTableContainer = $('.xwiki-livetable-container').addClass('loading');
     // We can't use load() here because the live table has in-line script tags that have to be evaluated.
-    $.get(url, data).done(function(html) {
+    $.get(url, data).then(html =&gt; {
       var newLiveTableContainer = $('&lt;div/&gt;').html(html).find('.xwiki-livetable-container');
       oldLiveTableContainer.replaceWith(newLiveTableContainer);
       $(document).trigger('xwiki:dom:updated', {elements: newLiveTableContainer.toArray()});

@@ -46,7 +46,7 @@ define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($)
           } else {
             return [];
           }
-        }).done(callback).fail(callback);
+        }).then(callback, callback);
       };
     }
 

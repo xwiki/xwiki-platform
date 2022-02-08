@@ -41,13 +41,13 @@ define('xwiki-realtime-wysiwygEditor-loader', [
     compatible: ['wysiwyg', 'wiki']
   };
 
-  Loader.bootstrap(info).done(function(keys) {
+  Loader.bootstrap(info).then(keys => {
     require(['xwiki-realtime-wysiwygEditor'], function(RealtimeWysiwygEditor) {
       if (RealtimeWysiwygEditor && RealtimeWysiwygEditor.main) {
         keys._update = $.proxy(Loader, 'updateKeys', editorId);
         var config = Loader.getConfig();
         config.rtURL = Loader.getEditorURL(window.location.href, info);
-        RealtimeWysiwygEditor.main(config, keys, Loader.isRt).done(function(editor) {
+        RealtimeWysiwygEditor.main(config, keys, Loader.isRt).then(editor => {
           RealtimeWysiwygEditor.currentMode = editor.mode;
           if (Loader.isRt) {
             $('.cke_button__source').remove();
@@ -102,7 +102,7 @@ define('xwiki-realtime-wysiwygEditor-loader', [
           } else if (state === 1) {
             // Accepted
             var whenReady = function(callback) {
-              Loader.updateKeys(editorId).done(function(keys) {
+              Loader.updateKeys(editorId).then(keys => {
                 if (keys[editorId + '_users'] > 0) {
                   return void callback();
                 }

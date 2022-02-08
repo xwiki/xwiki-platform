@@ -339,13 +339,13 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'xwiki-boot
         url: serviceURL,
         data: params,
         traditional: true
-      }).done(function (data) {
+      }).then(data =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
 
         // Reload the livetable
         self.filterPreferencesLivetable.refresh();
-      }).fail(function () {
+      }).catch(() =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
       });
@@ -490,11 +490,11 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'xwiki-boot
           'property#filterName': filterName,
           'property#isEnabled': state ? '1' : '0'
         };
-        $.post(restURL, params).done(function (data) {
+        $.post(restURL, params).then(data =&gt; {
           self.domElement.attr('data-objectNumber', data.number);
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
-        }).fail(function () {
+        }).catch(() =&gt; {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
@@ -506,11 +506,11 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'xwiki-boot
           method: 'PUT',
           contentType: 'text/plain',
           data: state ? '1' : '0'
-        }).done(function (data) {
+        }).then(data =&gt; {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
           $(document).trigger('xwiki:livetable:notifications-filters-custom:toggle', {'row': self.row, 'state': state});
-        }).fail(function () {
+        }).catch(() =&gt; {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
@@ -668,11 +668,11 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'xwiki-boot
             action: 'deleteFilterPreference',
             filterPreferenceId: data.filterPreferenceId
           };
-          $.post(serviceURL, $.extend({}, params, postParams)).done(function() {
+          $.post(serviceURL, $.extend({}, params, postParams)).then(() =&gt; {
             notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
               'notifications.filters.preferences.delete.done')), 'done'));
             window.livetable_notificationCustomFilterPreferencesLiveTable.refresh();
-          }).fail(function() {
+          }).catch(() =&gt; {
             notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
               'notifications.filters.preferences.delete.error')), 'error'));
           });
@@ -689,11 +689,11 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'xwiki-boot
         filterPreferenceId: data.filterPreferenceId,
         enabled: state
       };
-      $.post(serviceURL, $.extend({}, params, postParams)).done(function() {
+      $.post(serviceURL, $.extend({}, params, postParams)).then(() =&gt; {
         notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
           'notifications.filters.preferences.setEnabled.done')), 'done'));
         $(document).trigger('xwiki:livetable:notifications-filters-custom:toggle', {'row': data, 'state': state});
-      }).fail(function() {
+      }).catch(() =&gt; {
         notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
           'notifications.filters.preferences.setEnabled.error')), 'error'));
       });

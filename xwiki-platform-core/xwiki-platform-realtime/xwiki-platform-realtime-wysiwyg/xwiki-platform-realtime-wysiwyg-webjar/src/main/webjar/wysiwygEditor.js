@@ -128,23 +128,21 @@ define('xwiki-realtime-wysiwygEditor', [
 
   var waitForEditorInstance = function(name) {
     name = name || 'content';
-    return ckeditorPromise.then(function(ckeditor) {
-      var deferred = $.Deferred();
+    return ckeditorPromise.then(ckeditor => new Promise((resolve, reject) => {
       var editor = ckeditor.instances[name];
       if (editor) {
         if (editor.status === 'ready') {
-          deferred.resolve(editor);
+          resolve(editor);
         } else {
-          editor.on('instanceReady', $.proxy(deferred, 'resolve', editor));
+          editor.on('instanceReady', $.proxy(resolve, null, editor));
         }
       } else {
         ckeditor.on('instanceReady', function(event) {
           if (event.editor.name === name) {
-            deferred.resolve(event.editor);
+            resolve(event.editor);
           }
         });
       }
-      return deferred.promise();
     });
   };
 
@@ -157,7 +155,7 @@ define('xwiki-realtime-wysiwygEditor', [
      * Update the channels keys for reconnecting WebSocket.
      */
     var updateKeys = function() {
-      return docKeys._update().done(function(keys) {
+      return docKeys._update().then(keys => {
         if (keys[editorId] && keys[editorId] !== channel) {
           channel = keys[editorId];
         }
@@ -167,6 +165,7 @@ define('xwiki-realtime-wysiwygEditor', [
         if (keys.userdata && keys.userdata !== userdataChannel) {
           userdataChannel = keys.userdata;
         }
+        return keys;
       });
     };
 
@@ -198,7 +197,7 @@ define('xwiki-realtime-wysiwygEditor', [
       // When someone is offline, they may have left their tab open for a long time and the lock may have disappeared.
       // We're refreshing it when the editor is focused so that other users will know that someone is editing the
       // document.
-      waitForEditorInstance().done(function(editor) {
+      waitForEditorInstance().then(editor => {
         editor.on('focus', function() {
           XWiki.EditLock = new XWiki.DocumentLock();
           XWiki.EditLock.lock();
@@ -488,9 +487,7 @@ define('xwiki-realtime-wysiwygEditor', [
                 convert: true,
                 text: newText
               };
-              $.post(editorConfig.htmlConverterUrl, object).done(function(data) {
-                andThen(data);
-              }).fail(function(err) {
+              $.post(editorConfig.htmlConverterUrl, object).then(andThen).catch(() => {
                 var debugLog = {
                   state: editorId + '/convertHTML',
                   postData: object
@@ -801,7 +798,7 @@ define('xwiki-realtime-wysiwygEditor', [
 
         beforeReconnecting: function(callback) {
           var oldChannel = channel;
-          updateKeys().done(function() {
+          updateKeys().then(() => {
             if (channel !== oldChannel) {
               editorConfig.onKeysChanged();
               setEditable(false);
@@ -868,9 +865,10 @@ define('xwiki-realtime-wysiwygEditor', [
       };
     };
 
-    return waitForEditorInstance().done(function(editor) {
+    return waitForEditorInstance().then(editor => {
       // FIXME: This works only with the stand-alone (classic) editor.
       whenReady(editor, $(editor.container.$).find('iframe')[0]);
+      return editor;
     });
   };
 

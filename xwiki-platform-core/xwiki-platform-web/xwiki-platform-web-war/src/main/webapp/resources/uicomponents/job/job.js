@@ -65,7 +65,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
       // Remember the answer callback
       jobQuestion.data('answerCallback', answerCallback);
 
-      $.ajax(displayerURL).done($.proxy(updateQuestionContent, jobQuestion));
+      $.get(displayerURL).then($.proxy(updateQuestionContent, jobQuestion));
     } else {
       jobQuestion.empty();
     }
@@ -196,9 +196,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
               );
 
             // Send the answer
-            answerCallback(properties).done(new function() {
-              notif.hide();
-            });
+            answerCallback(properties).then(() => notif.hide());
           }
         }
       }
@@ -258,8 +256,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
 
       new JobRunner(runnerConfig).resume()
         .progress($.proxy(updateStatus, this))
-        .done($.proxy(notifyJobDone, this))
-        .fail($.proxy(notifyConnectionFailure, this));
+        .then($.proxy(notifyJobDone, this), $.proxy(notifyConnectionFailure, this));
     }
   });
 });

@@ -40,7 +40,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     deleteLink.addClass('loading').children().hide();
     // Reduce the cost of the request by disabling the redirect.
     var deleteURL = deleteLink.attr('href').replace(/xredirect=/, 'xfoo=');
-    $.get(deleteURL).done(function() {
+    $.get(deleteURL).then(() => {
       var source = deleteLink.closest('.extension-history-source');
       if (source.hasClass('selected')) {
         // Select the 'local history' source.
@@ -48,7 +48,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         onSelectHistorySource.call(localHistorySource.children('.extension-history-source-name'));
       }
       source.remove();
-    }).fail(function() {
+    }).catch(() => {
       deleteLink.removeClass('loading').children().show();
     });
   };
@@ -77,11 +77,11 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     recordsForm.children('.extension-history-records')
       .append('<li class="extension-history-record loading"><span style="visibility:hidden">Loading</span></li>');
     // Request the history records.
-    $.get(source.attr('data-recordsURL')).done(function(html) {
+    $.get(source.attr('data-recordsURL')).then(html => {
       recordsForm.replaceWith(html);
       recordsForm = sourceSelector.next('.extension-history-records-form');
       recordsForm.length && $(document).trigger('xwiki:dom:updated', {'elements': recordsForm.toArray()});
-    }).fail(function() {
+    }).catch(() => {
       // TODO
     });
   };
@@ -125,12 +125,12 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     event.preventDefault();
     var moreLink = $(event.target).css('visibility', 'hidden');
     var loadingRecord = moreLink.closest('.extension-history-record').addClass('loading');
-    $.get(moreLink.attr('href')).done(function(html) {
+    $.get(moreLink.attr('href')).then(html => {
       var container = $(document.createElement('div'));
       var newRecords = container.append(html).find('.extension-history-record');
       $(document).trigger('xwiki:dom:updated', {'elements': container.toArray()});
       loadingRecord.replaceWith(newRecords);
-    }).fail(function() {
+    }).catch(() => {
       loadingRecord.removeClass('loading');
       moreLink.css('visibility', null);
       // TODO: Notify the user about the failed request.
@@ -198,17 +198,16 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var forms = extensionHistory.children('form');
     var data = forms.serialize() + '&data=replayPlan';
     forms.find(':input').prop('disabled', true);
-    replayPlanRequest = $.post(forms.attr('action'), data).always(function() {
-      forms.find(':input').prop('disabled', false);
-    }).done(function(html) {
+    replayPlanRequest = $.post(forms.attr('action'), data);
+    Promise.resolve(replayPlanRequest).then(html => {
       extensionHistory.children().hide();
       extensionHistory.find('.extension-history-replay-options').show().addClass('hidden');
       extensionHistory.append(html);
       var replayPlan = extensionHistory.find('.extension-history-replay-plan');
       replayPlan.length && $(document).trigger('xwiki:dom:updated', {'elements': replayPlan.toArray()});
       enhanceReplayPlan(replayPlan);
-    }).fail(function() {
-      // TODO
+    }).finally(() => {
+      forms.find(':input').prop('disabled', false);
     });
   };
 
@@ -224,7 +223,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var replayButton = $(this).prop('disabled', true);
     var form = replayButton.closest('form');
     var data = form.serialize() + '&action=replay';
-    $.post(form.attr('action'), data).done(function(data) {
+    $.post(form.attr('action'), data).then(data => {
       // Make sure we remove the document fragment identifier from the end of the URL.
       var replayStatusURL = window.location.href.replace(/#.*$/, '');
       replayStatusURL += replayStatusURL.indexOf('?') < 0 ? '?' : '&';
@@ -232,7 +231,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         'data': 'replayStatus',
         'jobId': data.jobId
       });
-    }).fail(function() {
+    }).catch(() => {
       replayButton.prop('disabled', false);
       // TODO: Display the error message.
     });
@@ -277,7 +276,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         'jobId': container.attr('data-jobId')
       };
     }
-    $.post(container.attr('data-extensionHistoryURL'), data).done(function(html) {
+    $.post(container.attr('data-extensionHistoryURL'), data).then(html => {
       var uiState = getReplayStatusUIState(container);
       var wrapper = $(document.createElement('div'));
       wrapper.append(html);
@@ -285,9 +284,9 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       var newElements = wrapper.children();
       container.replaceWith(newElements);
       $(document).trigger('xwiki:dom:updated', {'elements': newElements.toArray()});
-    }).fail(function() {
+    }).catch(() => {
       // TODO
-    })
+    });
   };
 
   enhanceReplayStatus($('.extension-history-replay-status'));

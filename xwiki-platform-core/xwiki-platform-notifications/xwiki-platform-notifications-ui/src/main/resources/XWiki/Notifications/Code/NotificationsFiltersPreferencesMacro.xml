@@ -333,13 +333,13 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
         url: serviceURL,
         data: params,
         traditional: true
-      }).done(function (data) {
+      }).then(data =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
 
         // Reload the livetable
         self.filterPreferencesLivetable.refresh();
-      }).fail(function () {
+      }).catch(() =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
       });
@@ -483,11 +483,11 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
           'property#filterName': filterName,
           'property#isEnabled': state ? '1' : '0'
         };
-        $.post(restURL, params).done(function (data) {
+        $.post(restURL, params).then(data =&gt; {
           self.domElement.attr('data-objectNumber', data.number);
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
-        }).fail(function () {
+        }).catch(() =&gt; {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
@@ -499,11 +499,11 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
           method: 'PUT',
           contentType: 'text/plain',
           data: state ? '1' : '0'
-        }).done(function (data) {
+        }).then(data =&gt; {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
           $(document).trigger('xwiki:livetable:notifications-filters:toggle', {'row': self.row, 'state': state});
-        }).fail(function () {
+        }).catch(() =&gt; {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
@@ -647,11 +647,11 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
             user: targetUser,
             filterPreferenceId: data.data.filterPreferenceId,
             csrf: xm.form_token
-          }).done(function() {
+          }).then(() =&gt; {
             notif.hide();
             new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.done'))", 'done');
             window.livetable_notificationFilterPreferencesLiveTable.refresh();
-          }).fail(function() {
+          }).catch(() =&gt; {
             notif.hide();
             new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.error'))", 'error');
           });
@@ -669,11 +669,11 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
         user: targetUser,
         enabled: state,
         csrf: xm.form_token
-      }).done(function() {
+      }).then(() =&gt; {
         notif.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
         $(document).trigger('xwiki:livetable:notifications-filters:toggle', {'row': data.data, 'state': state});
-      }).fail(function() {
+      }).catch(() =&gt; {
         notif.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
       });

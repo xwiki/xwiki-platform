@@ -28,7 +28,7 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
   function setLocalization($t) {
     this.$t = $t;
   }
-  
+
   /**
    * Resolve the url of the document reference in the given mode.
    * @param documentReference the document reference
@@ -47,24 +47,20 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
       return className + '[0].' + propertyName;
     }
   }
-  
+
   function load(mode, documentReference, property, className) {
     const targetUrl = computeTargetURL(documentReference, 'get');
-    return new Promise((resolve, reject) => {
-      $.get(targetUrl, {
+    return Promise.resolve($.get(targetUrl, {
         xpage: 'display',
         mode: mode,
         // TODO: handle the object index when provided
         property: getPropertyReference(property, className),
         type: property.startsWith('doc.') ? 'document' : 'object',
         language: xcontext.locale
-      }).done((html) => {
-        // Update the viewer.
-        resolve(html);
-      }).fail(() => {
+      })).catch(() => {
         new XWiki.widgets.Notification(
           this.$t('livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage', [mode]), 'error');
-        reject();
+        return Promise.reject();
       })
     });
   }

@@ -194,7 +194,7 @@ define('xwiki-realtime-saver', [
     if (versionData) {
       success(versionData);
     } else {
-      doc.reload().done(success).fail(function(error) {
+      doc.reload().then(success).catch(error => {
         var debugLog = {
           state: 'bumpVersion',
           lastSavedVersion: lastSaved.version,
@@ -213,17 +213,18 @@ define('xwiki-realtime-saver', [
     return doc.save($.extend({
       // TODO make this translatable
       comment: 'Auto-Saved by Realtime Session'
-    }, data)).fail(function(jqXHR, textStatus, errorThrown) {
+    }, data)).catch(response => {
       var debugLog = {
         state: 'saveDocument',
         lastSavedVersion: lastSaved.version,
         lastSavedContent: lastSaved.content,
         cUser: mainConfig.userName,
         cContent: mainConfig.getTextValue(),
-        err: textStatus
+        err: response.statusText
       };
       ErrorBox.show('save', JSON.stringify(debugLog));
-      warn(textStatus);
+      warn(response.statusText);
+      return Promise.reject();
     });
   },
 
@@ -282,14 +283,13 @@ define('xwiki-realtime-saver', [
     lastSaved.wasEditedLocally = condition;
   },
 
-  resolveMergeConflicts = function(merge) {
+  resolveMergeConflictsPromise = function(merge, deferred) {
     // There was a merge conflict we'll need to resolve.
     warn(merge.error);
 
     // Halt the autosave cycle to give the user time. Don't halt forever though, because you might disconnect and hang.
     mergeDialogCurrentlyDisplayed = true;
 
-    var deferred = $.Deferred();
     presentMergeDialog(
       Messages['mergeDialog.prompt'],
 
@@ -313,56 +313,51 @@ define('xwiki-realtime-saver', [
           restURL = restURL + doc.language;
         }
 
-        $.ajax({
-          url: restURL + '?media=json',
-          method: 'GET',
-          dataType: 'json',
-          success: function (data) {
-            mainConfig.setTextValue(data.content, true, function() {
-              debug("Overwrote the realtime session's content with the latest saved state.");
-              bumpVersion(function() {
-                lastSaved.mergeMessage('mergeOverwrite', []);
-              });
-              deferred.resolve();
+        $.getJSON(restURL).then(data => {
+          mainConfig.setTextValue(data.content, true, function() {
+            debug("Overwrote the realtime session's content with the latest saved state.");
+            bumpVersion(function() {
+              lastSaved.mergeMessage('mergeOverwrite', []);
             });
-          },
-          error: function (error) {
-            mainConfig.safeCrash('keepremote');
-            warn("Encountered an error while fetching remote content.");
-            warn(error);
-            deferred.reject();
-          }
+            deferred.resolve();
+          });
+        }).catch(error => {
+          mainConfig.safeCrash('keepremote');
+          warn("Encountered an error while fetching remote content.");
+          warn(error);
+          deferred.reject();
         });
       }
     );
-    return deferred.promise();
+  },
+
+  resolveMergeConflicts = function(merge) {
+    return new Promise((resolve, reject) => resolveMergeConflictsPromise(merge, {resolve, reject}));
   },
 
   mergedWithoutConflicts = function(merge, preMergeContent) {
-    var deferred = $.Deferred();
-    // The content was merged and there were no errors / conflicts.
-    if (preMergeContent !== mainConfig.getTextValue()) {
-      // There have been changes since merging. Don't overwrite if there have been changes while merging
-      // See http://jira.xwiki.org/browse/RTWIKI-37
-      // Try again in one cycle.
-      deferred.reject();
-    } else {
-      // Walk the tree of hashes and if merge.previousVersionContent exists, then this merge is quite possibly faulty.
-      if (mainConfig.realtime.getDepthOfState(merge.previousVersionContent) !== -1) {
-        debug("The server merged a version which already existed in the history. " +
-          "Reversions shouldn't merge. Ignoring merge.");
-        debug("waseverstate=true");
-        deferred.resolve();
+    return new Promise((resolve, reject) => {
+      // The content was merged and there were no errors / conflicts.
+      if (preMergeContent !== mainConfig.getTextValue()) {
+        // There have been changes since merging. Don't overwrite if there have been changes while merging
+        // See http://jira.xwiki.org/browse/RTWIKI-37
+        // Try again in one cycle.
+        reject();
       } else {
-        debug("The latest version content does not exist anywhere in our history.");
-        debug("Continuing...");
-        // There were no errors or local changes. Push to the textarea.
-        mainConfig.setTextValue(merge.content, false, function() {
-          deferred.resolve();
-        });
+        // Walk the tree of hashes and if merge.previousVersionContent exists, then this merge is quite possibly faulty.
+        if (mainConfig.realtime.getDepthOfState(merge.previousVersionContent) !== -1) {
+          debug("The server merged a version which already existed in the history. " +
+            "Reversions shouldn't merge. Ignoring merge.");
+          debug("waseverstate=true");
+          resolve();
+        } else {
+          debug("The latest version content does not exist anywhere in our history.");
+          debug("Continuing...");
+          // There were no errors or local changes. Push to the textarea.
+          mainConfig.setTextValue(merge.content, false, resolve);
+        }
       }
-    }
-    return deferred.promise();
+    });
   },
 
   // callback takes signature (error, shouldSave)
@@ -414,11 +409,11 @@ define('xwiki-realtime-saver', [
       }
       // A merge took place.
       if (merge.error) {
-        resolveMergeConflicts(merge).done($.proxy(mergeContinuation, null, merge, andThen));
+        resolveMergeConflicts(merge).then($.proxy(mergeContinuation, null, merge, andThen));
       } else {
-        mergedWithoutConflicts(merge, preMergeContent).done(function() {
+        mergedWithoutConflicts(merge, preMergeContent).then(() => {
           mergeContinuation(merge, andThen);
-        }).fail(function() {
+        }).catch(() => {
           andThen("The realtime content changed while we were performing our asynchronous merge.", false);
         });
       }
@@ -560,7 +555,7 @@ define('xwiki-realtime-saver', [
         if (e) {
           warn(e);
         } else if (shouldSave) {
-          saveDocument(mainConfig.getSaveValue()).done(function(doc) {
+          saveDocument(mainConfig.getSaveValue()).then(doc => {
             // Cache this because bumpVersion will increment it.
             var lastVersion = lastSaved.version;
 
@@ -646,7 +641,7 @@ define('xwiki-realtime-saver', [
         // Update your content.
         updateLastSaved(toSave);
 
-        doc.reload().done(function(doc) {
+        doc.reload().then(doc => {
           if (doc.isNew) {
             // It didn't actually save?
             ErrorBox.show('save');
@@ -674,7 +669,7 @@ define('xwiki-realtime-saver', [
               lastSaved.mergeMessage('saved', [doc.version]);
             }, doc);
           }
-        }).fail(function(error) {
+        }).catch(error => {
           warn(error);
           ErrorBox.show('save');
         });

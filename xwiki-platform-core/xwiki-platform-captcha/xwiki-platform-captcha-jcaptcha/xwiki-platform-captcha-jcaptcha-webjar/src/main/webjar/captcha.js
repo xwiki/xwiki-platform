@@ -49,5 +49,5 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 
   // Does nothing but break Firefox's bfcache (back-forward cache) to make sure the CAPTCHA is reloaded when pressing
   // back and not showing a stale CAPTCHA.
-  $(window).unload(function(){});
+  $(window).on('unload', function() {});
 });

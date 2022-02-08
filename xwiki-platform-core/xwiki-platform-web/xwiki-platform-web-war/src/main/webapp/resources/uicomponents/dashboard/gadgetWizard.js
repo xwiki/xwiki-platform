@@ -60,11 +60,11 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
   };
 
   var getMacroWizard = function(ckeditor) {
-    var deferred = $.Deferred();
-    require(['macroWizard'], function(macroWizard) {
-      deferred.resolve(ckeditor, macroWizard);
+    return new Promise((resolve, reject) => {
+      require(['macroWizard'], function(macroWizard) {
+        resolve({ckeditor, macroWizard});
+      });
     });
-    return deferred.promise();
   };
 
   var getDefaultGadgetTitle = function(macroEditor) {
@@ -130,7 +130,7 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
         title: $('.macro-editor input[name="$gadgetTitle"]').val(),
         content: ckeditor.plugins.registered['xwiki-macro'].serializeMacroCall(macroCall)
       };
-    }).always(function() {
+    }).finally(function() {
       currentGadget = null;
       restoreMacroSelector();
       restoreMacroEditor();
@@ -138,7 +138,7 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
   };
 
   return function(gadget) {
-    return ckeditorPromise.then(getMacroWizard).then($.proxy(runGadgetWizard, null, gadget));
+    return ckeditorPromise.then(getMacroWizard).then(data => runGadgetWizard(gadget, data.ckeditor, data.macroWizard));
   };
 });
 

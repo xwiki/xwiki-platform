@@ -28,7 +28,7 @@
     <version>14.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-image-processing</artifactId>
-  <name>XWiki Platform - Image - Processing</name>
+  <name>XWiki Platform - Image - Processing - Parent POM</name>
   <description>Code related to image processing</description>
   <packaging>pom</packaging>
   <modules>

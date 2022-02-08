@@ -39,8 +39,8 @@ require.config({
 define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], function($, Selectize) {
   var optionTemplate = [
     '<div class="xwiki-selectize-option" data-value="">',
-      '<span class="xwiki-selectize-option-icon" />',
-      '<span class="xwiki-selectize-option-label" />',
+      '<span class="xwiki-selectize-option-icon"></span>',
+      '<span class="xwiki-selectize-option-label"></span>',
     '</div>'
   ].join('');
 
@@ -70,7 +70,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     }
     var url = option && option.url;
     if (typeof url === 'string') {
-      var anchor = $('<a class="xwiki-selectize-option-label" />').attr('href', url);
+      var anchor = $('<a class="xwiki-selectize-option-label"></a>').attr('href', url);
       output.find('.xwiki-selectize-option-label').replaceWith(anchor);
     }
     var label = (option && typeof option === 'object') ? (option.label || option.value) : option;
@@ -85,10 +85,10 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     // We need a wrapper around the icon in order to center it because it looks better if the labels are aligned when
     // the suggestions are displayed on separate lines in the drop down list. We don't need to center the icon for the
     // selected suggestions because they are displayed in-line so the labels don't have to be aligned.
-    output.find('.xwiki-selectize-option-icon').wrap('<span class="xwiki-selectize-option-icon-wrapper"/>');
+    output.find('.xwiki-selectize-option-icon').wrap('<span class="xwiki-selectize-option-icon-wrapper"></span>');
     var hint = option && option.hint;
     if (typeof hint === 'string' && hint !== '') {
-      output.append($('<div class="xwiki-selectize-option-hint"/>').text(hint));
+      output.append($('<div class="xwiki-selectize-option-hint"></div>').text(hint));
     }
     return output;
   }
@@ -126,9 +126,9 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       item: renderItem,
       option: renderOption,
       option_create: function(data, escapeHTML) {
-        var label = escapeHTML(l10n.selectTypedText).replace('{0}', '<em/>');
+        var label = escapeHTML(l10n.selectTypedText).replace('{0}', '<em></em>');
         // The 'option' class is needed starting with v0.12.5 in order to have proper styling.
-        var output = $('<div class="create option"/>').html(label);
+        var output = $('<div class="create option"></div>').html(label);
         output.find('em').text(data.input);
         return output;
       }

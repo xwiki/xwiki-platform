@@ -32,8 +32,8 @@ define('xwiki-realtime-toolbar', [
   var createRealtimeToolbar = function($container) {
     return $(
       '<div class="rt-toolbar">' +
-        '<div class="rt-toolbar-leftside"/>' +
-        '<div class="rt-toolbar-rightside"/>' +
+        '<div class="rt-toolbar-leftside"></div>' +
+        '<div class="rt-toolbar-rightside"></div>' +
       '</div>'
     ).attr('id', uid()).prependTo($container.first());
   };

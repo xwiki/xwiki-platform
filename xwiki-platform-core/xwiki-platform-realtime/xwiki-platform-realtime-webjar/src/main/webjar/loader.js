@@ -201,9 +201,9 @@ define('xwiki-realtime-loader', [
   createModalContent = function(message, primaryActionLabel) {
     var content = $(
       '<div class="modal-popup">' +
-        '<p/>' +
+        '<p></p>' +
         '<div class="realtime-buttons">' +
-          '<button class="btn btn-primary"/>' +
+          '<button class="btn btn-primary"></button>' +
         '</div>' +
       '</div>'
     );

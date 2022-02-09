@@ -245,7 +245,7 @@
     <property>
       <code>require(['jquery', 'xwiki-events-bridge'], function ($) {
   'use strict';
-  
+
   /**
    * Add a 'launch tour' button into the 'actions' columns.
    */
@@ -263,7 +263,7 @@
       targetPageDocument = new XWiki.Document(targetPage.name,
         targetPage.extractReferenceValue(XWiki.EntityType.SPACE));
     }
-    
+
     // Add a launch tour link to the actions column.
     if (row.find('.actionLaunch').length == 0) {
       $('&lt;a class="action actionLaunch"&gt;$services.icon.renderHTML("play") $escapetool.javascript($escapetool.xml($services.localization.render("tour.livetable._actions.launch")))&lt;/a&gt;')
@@ -271,7 +271,7 @@
         .css('padding-left', '1px').appendTo(row.find('.actions'));
     }
   }
-  
+
   /**
    * Add the launch button into each livetable raw.
    */
@@ -281,8 +281,8 @@
     });
   }
   $(document).on('xwiki:livetable:ready', initLivetableResults);
-  $(document).ready(initLivetableResults);
-  
+  $(initLivetableResults);
+
   /**
    * Add the launch button into each new livetable raw.
    */

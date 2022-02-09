@@ -255,18 +255,18 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       // Avoid having the close button on top of the title
       $('.tour .popover-title').css('padding-right',  $(closeButtonSelector).outerWidth() + 10 + 'px');
   }
-      
+
   /**
    * Create a tour from a JSON file
    */
   var createTour = function (jsonData) {
     // Add stylesheet only when needed
     var cssURL = "$services.webjars.url('bootstrap-tour', 'css/bootstrap-tour.min.css', {'wiki':$xcontext.database})";
-    $('&lt;link&gt;').attr('rel', 'stylesheet').attr('type', 'text/css').attr('href', cssURL).appendTo($(document.head));
-    
+    $('&lt;link/&gt;').attr('rel', 'stylesheet').attr('type', 'text/css').attr('href', cssURL).appendTo($(document.head));
+
     // Require 'bootstrap-tour' only when needed
     require(['bootstrap-tour'], function(Tour) {
-      
+
       // Create the tour
       var tourName = escapeTourName('tour_' + jsonData.name);
       var tour     = new Tour({
@@ -277,19 +277,19 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
         orphan  : false,
         template: getTemplate
       });
-      
+
       // Create the steps
       for (var i = 0; i &lt; jsonData.steps.length; i++) {
         tour.addStep(jsonData.steps[i]);
       }
-      
+
       // Look if the tour should be started regardless of its status on the local storage
       var getQueryStringParameterByName = function (name) {
         var match = RegExp('[?&amp;]' + name + '=([^&amp;]*)').exec(window.location.search);
         return match &amp;&amp; decodeURIComponent(match[1].replace(/\+/g, ' '));
       }
       var forceStart = getQueryStringParameterByName('startTour') == 'true';
-      
+
       // Launch the tour
       tour.init();
       if (forceStart) {
@@ -297,21 +297,21 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       } else if (window.localStorage.getItem(tourName + '_end') == null) {
         tour.start();
       }
-      
+
       // Create a resume button if the tour has already been closed by the user in the past
       if (window.localStorage.getItem(tourName + '_end') == 'yes') {
         createResumeButton(tour, false, tourName);
       }
     });
   };
-  
+
   /**
    * Load asynchronously the list of steps concerning the current page.
    * It's done asynchronously so it does not improve the page rendering time. It's important since this code is used
    * everywhere.
-   */ 
-  $(document).ready(function () {
-  
+   */
+  $(function() {
+
     /**
      * The tour is not adapted for little screen sizes like mobile phones have.
      * The value 768 is taken from bootstrap in order to be consistent with their media queries.
@@ -319,13 +319,12 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     if ($(window).innerWidth() &lt;= 768) {
       return;
     }
-  
-    var ajaxOptions = {
-      url         : new XWiki.Document('TourJson', 'TourCode').getURL('get', 'xpage=plain&amp;outputSyntax=plain'),
-      dataType    : 'json',
-      data        : { tourDoc: xm.document }
-    };
-    $.ajax(ajaxOptions).success( function(json) {
+
+    $.getJSON(new XWiki.Document('TourJson', 'TourCode').getURL('get'), {
+      xpage: 'plain',
+      outputSyntax: 'plain',
+      tourDoc: xm.document
+    }).done(function(json) {
       for (var i = 0; i &lt; json.tours.length; ++i) {
         var tour = json.tours[i];
         if (tour.steps.length &gt; 0) {

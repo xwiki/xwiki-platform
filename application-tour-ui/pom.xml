@@ -46,6 +46,19 @@
     <tag>HEAD</tag>
   </scm>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars-api</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
     <!-- Library used by this application to create tours integrated with bootstrap -->
     <dependency>
       <groupId>org.webjars</groupId>

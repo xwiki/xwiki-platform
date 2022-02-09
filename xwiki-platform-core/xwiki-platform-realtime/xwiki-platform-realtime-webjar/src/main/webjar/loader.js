@@ -851,8 +851,8 @@ define('xwiki-realtime-loader', [
             } else if (!Object.keys(keys.active).length || keys[info.type + '_users'] > 0) {
               resolve(keys);
             } else {
-              // Let the user choose between joining the existing real-time session (with a different editor) or create a
-              // new real-time session with the current editor.
+              // Let the user choose between joining the existing real-time session (with a different editor) or create
+              // a new real-time session with the current editor.
               console.log('Join the existing realtime session or create a new one.');
               this.displayModal(info.type, Object.keys(keys.active), $.proxy(resolve, null, keys), info);
             }

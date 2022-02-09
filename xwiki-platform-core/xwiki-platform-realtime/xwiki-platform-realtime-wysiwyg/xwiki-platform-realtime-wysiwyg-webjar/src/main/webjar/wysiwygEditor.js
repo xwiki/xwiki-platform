@@ -143,7 +143,7 @@ define('xwiki-realtime-wysiwygEditor', [
           }
         });
       }
-    });
+    }));
   };
 
   module.main = function(editorConfig, docKeys, useRt) {

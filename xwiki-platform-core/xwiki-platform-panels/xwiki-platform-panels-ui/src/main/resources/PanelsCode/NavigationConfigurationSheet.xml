@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="PanelsCode.NavigationConfigurationSheet" locale="">
+<xwikidoc version="1.5" reference="PanelsCode.NavigationConfigurationSheet" locale="">
   <web>PanelsCode</web>
   <name>NavigationConfigurationSheet</name>
   <language/>
@@ -29,6 +29,7 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>xwiki:PanelsCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title/>
@@ -221,6 +222,8 @@
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -268,6 +271,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -285,19 +290,18 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require.config({
-  paths: {
-    'jquery-ui' : "$!services.webjars.url('jquery-ui', 'jquery-ui.min')",
-    // The WebJar version doesn't match the version of the packaged jquery-ui-touch-punch library so we are forced to
-    // specify the library version when computing the WebJar resource URL.
-    'jquery-ui-touch-punch' : "$!services.webjars.url('jquery-ui-touch-punch/0.2.3/jquery.ui.touch-punch.min')"
-  },
-  shim: {
-    'jquery-ui' : ['jquery'],
-    'jquery-ui-touch-punch': ['jquery-ui']
-  }
+      <code>define('xwiki-panels-navigation-config-messages', {
+  keys: [
+    'index.documentTree.empty'
+  ]
 });
-require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
+
+require([
+  'jquery',
+  'xwiki-l10n!xwiki-panels-navigation-config-messages',
+  'jquery-ui',
+  'jquery-ui-touch-punch'
+], function($, l10n) {
   var getLocalDocumentReference = function(absoluteDocumentReference) {
     var documentReference = XWiki.Model.resolve(absoluteDocumentReference, XWiki.EntityType.DOCUMENT);
     var localDocumentReference = documentReference.relativeTo(new XWiki.WikiReference(XWiki.currentWiki));
@@ -422,7 +426,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
       if (!emptyNode) {
         tree.create_node(null, {
           'id': 'empty',
-          'text': $jsontool.serialize($services.localization.render('index.documentTree.empty')),
+          'text': l10n['index.documentTree.empty'],
           'children': false,
           'data': {
             'type': 'empty',
@@ -439,8 +443,6 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   // Drop excluded page over the Navigation Panel.
   $('.navigationPanelConfiguration .panel.expanded').droppable({
     accept: '.page',
-    activeClass: 'ui-droppable-active',
-    hoverClass: 'ui-droppable-hover',
     drop: function(event, ui) {
       var tree = $(this).find('.jstree').jstree(true);
       var selectedPages = $('.navigationPanelConfiguration .page.selected');
@@ -561,7 +563,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>
@@ -586,6 +588,8 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -614,6 +618,8 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -649,6 +655,8 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

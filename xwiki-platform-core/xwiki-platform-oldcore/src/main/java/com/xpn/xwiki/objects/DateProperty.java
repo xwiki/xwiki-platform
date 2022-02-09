@@ -94,19 +94,16 @@ public class DateProperty extends BaseProperty implements Cloneable
     @Override
     public DateProperty clone()
     {
-        DateProperty property = (DateProperty) super.clone();
-
-        if (property.value != null) {
-            property.value = (Date) property.value.clone();
-        }
-
-        return property;
+        return (DateProperty) super.clone();
     }
 
     @Override
     protected void cloneInternal(BaseProperty clone)
     {
         DateProperty property = (DateProperty) clone;
-        property.setValue(getValue());
+
+        if (property.value != null) {
+            property.value = (Date) property.value.clone();
+        }
     }
 }

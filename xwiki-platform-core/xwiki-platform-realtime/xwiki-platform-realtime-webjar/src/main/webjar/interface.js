@@ -47,7 +47,7 @@ define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-message
   };
 
   var createMergeMessageElement = function(container) {
-    var $merges = $('<div class="realtime-merge"/>').attr('id', uid()).prependTo(container);
+    var $merges = $('<div class="realtime-merge"></div>').attr('id', uid()).prependTo(container);
 
     var timeout;
 

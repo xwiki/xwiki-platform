@@ -108,11 +108,11 @@ require(['jquery'], function($) {
     var flavorElement = results.find('input[value="' + flavorValue + '"]');
     if (flavorElement.length == 0) {
       // Add new flavor
-      var li = $('<li class="xwiki-flavor-picker-option"/>');
+      var li = $('<li class="xwiki-flavor-picker-option"></li>');
       li.append($('<input type="radio"/>').attr('name', fieldName).attr('value', flavorValue).attr('id', fieldName + '_' + key));
       li.append("<span class=\"xwiki-flavor-picker-option-icon\">$escapetool.javascript($services.icon.renderHTML('wiki'))</span>");
-      var div = $('<div/>');
-      var label = $('<div/>');
+      var div = $('<div></div>');
+      var label = $('<div></div>');
       label.attr('for', fieldName + '_' + key);
 
       // Name
@@ -123,7 +123,7 @@ require(['jquery'], function($) {
         text = flavor.id.id;
       }
       if (flavor.website != null && flavor.website != '') {
-        label.append($('<a class="popup"/>').attr('href', flavor.website).text(text));
+        label.append($('<a class="popup"></a>').attr('href', flavor.website).text(text));
       } else {
         label.text(text);
       }
@@ -131,20 +131,20 @@ require(['jquery'], function($) {
       label.append(' ');
 
       // Version
-      label.append($('<small/>').text(flavor.id.version.value));
+      label.append($('<small></small>').text(flavor.id.version.value));
 
       // Rating
       var star = "$escapetool.javascript($services.icon.renderHTML('star'))";
       if (flavor.rating != null && flavor.rating > 0) {
         label.append(Array(Math.round(flavor.rating)).join(star));
       }
-      
+
       div.append(label);
 
       // Authors
       if (flavor.authors.length > 0) {
-        var authors = $('<p class="authors"/>');
-        var authorsBy = $('<small/>');
+        var authors = $('<p class="authors"></p>');
+        var authorsBy = $('<small></small>');
         authorsBy.text("$escapetool.javascript($services.localization.render('flavor.picker.authorsBy')) ");
 
         $.each(flavor.authors, function(key, author) {
@@ -152,7 +152,7 @@ require(['jquery'], function($) {
             authorsBy.append(', ');
           }
           if (author.url != null && author.url != '') {
-            authorsBy.append($('<a/>').attr('href', author.url).text(author.name));
+            authorsBy.append($('<a></a>').attr('href', author.url).text(author.name));
           } else {
             authorsBy.append(author.name);
           }
@@ -163,7 +163,7 @@ require(['jquery'], function($) {
 
       // Summary
       if (flavor != null && flavor.summary != '') {
-        div.append($('<p class="xHint"/>').text(flavor.summary));
+        div.append($('<p class="xHint"></p>').text(flavor.summary));
       }
 
       li.append($('<input type="hidden" name="match"/>').attr('value', JSON.stringify(flavor)));

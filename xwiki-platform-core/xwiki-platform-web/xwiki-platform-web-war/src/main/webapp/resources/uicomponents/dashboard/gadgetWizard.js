@@ -45,7 +45,7 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
     '<li class="macro-parameter" data-id="$gadgetTitle">' +
       '<div class="macro-parameter-name"></div>' +
       '<div class="macro-parameter-description"></div>' +
-      '<input type="text" class="macro-parameter-field" name="$gadgetTitle"/>' + 
+      '<input type="text" class="macro-parameter-field" name="$gadgetTitle"/>' +
     '</li>'
   );
   gadgetTitleTemplate.find('.macro-parameter-name').text(l10n['dashboard.gadgetEditor.gadgetTitle.label']);

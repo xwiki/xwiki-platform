@@ -24,7 +24,7 @@
   'save',
   'core.editors.saveandcontinue.notification.inprogress',
   'core.editors.saveandcontinue.notification.done',
-  ['core.editors.saveandcontinue.notification.error', '<span id="saveFailureReason"/>'],
+  ['core.editors.saveandcontinue.notification.error', '<span id="saveFailureReason"></span>'],
   'web.editableProperty.editFailed',
   'web.editableProperty.viewFailed'
 ])
@@ -79,7 +79,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
     // Prepare the editor. The 'form' CSS class is important because it ensures the action events (e.g.
     // xwiki:actions:beforeSave or xwiki:actions:cancel) don't have effects outside of this element. For instance,
     // saving or canceling one editable property shouldn't affect the other properties or the other forms on the page.
-    $('<dd class="editableProperty-editor form"/>').hide().insertAfter(viewer);
+    $('<dd class="editableProperty-editor form"></dd>').hide().insertAfter(viewer);
   };
 
   // Event listeners

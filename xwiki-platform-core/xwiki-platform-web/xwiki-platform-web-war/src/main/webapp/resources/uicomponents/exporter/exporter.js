@@ -435,7 +435,7 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   });
 
   // Create the container for the hidden inputs used to submit the selected pages from the export tree.
-  var hiddenContainer = $('<div class="hidden"/>').insertAfter('.export-tree');
+  var hiddenContainer = $('<div class="hidden"></div>').insertAfter('.export-tree');
 
   $('form#export').submit(function() {
     var exportTree = $.jstree.reference($(this).find('.export-tree'));
@@ -464,7 +464,7 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   };
 
   // Create the hidden form that we're going to use.
-  var form = $('<form/>').attr({
+  var form = $('<form></form>').attr({
     id: 'export-modal-form',
     method: 'post'
   }).appendTo("body");

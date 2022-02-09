@@ -24,7 +24,7 @@ require([ "jquery", "$!services.webjars.url('jstree', 'jstree.js')" ], function(
       var uninstalledExtensions = $('#uninstalled_extensions');
       uninstalledExtensions.empty();
       data.selected.forEach(function(e) {
-        uninstalledExtensions.append($('<input>').attr({
+        uninstalledExtensions.append($('<input/>').attr({
           type: 'hidden',
           name: 'uninstalled_extensions',
           value: e

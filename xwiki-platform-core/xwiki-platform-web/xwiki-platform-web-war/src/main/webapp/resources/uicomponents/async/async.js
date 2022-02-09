@@ -53,9 +53,9 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
   var showSpinner = function(element)
   {
     if (element.tagName == 'div') {
-      element.html('<div class="fa fa-spinner fa-spin"/>');
+      element.html('<div class="fa fa-spinner fa-spin"></div>');
     } else {
-      element.html('<span class="fa fa-spinner fa-spin"/>');
+      element.html('<span class="fa fa-spinner fa-spin"></span>');
     }
   };
   

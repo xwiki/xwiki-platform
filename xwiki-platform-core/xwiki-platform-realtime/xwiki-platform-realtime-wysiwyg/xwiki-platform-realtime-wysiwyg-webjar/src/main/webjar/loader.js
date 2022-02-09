@@ -64,24 +64,25 @@ define('xwiki-realtime-wysiwygEditor-loader', [
     // (either drop it or find a clean way to load it on the edit lock page).
     var lock = Loader.getDocLock();
     if ($('.realtime-button-' + info.type).length) {
-      $('<button class="btn btn-success"/>').click(function() {
+      $('<button class="btn btn-success"></button>').click(function() {
         window.location.href = Loader.getEditorURL(window.location.href, info);
       }).text(Loader.messages.get('redirectDialog.join', info.name))
         .prependTo('.realtime-button-' + info.type)
         .before('<br/>');
     } else if (lock) {
-      var button = $('<button class="btn btn-primary"/>').text(Loader.messages.get('redirectDialog.create', info.name));
+      var button = $('<button class="btn btn-primary"></button>').text(
+        Loader.messages.get('redirectDialog.create', info.name));
       var buttons = $('.realtime-buttons').append('<br/>').append(button);
       button.click(function() {
         buttons.find('button').hide();
-        var waiting = $('<div/>', {style: 'text-align:center;'}).appendTo(buttons);
-        waiting.append($('<span/>', {
+        var waiting = $('<div></div>', {style: 'text-align:center;'}).appendTo(buttons);
+        waiting.append($('<span></span>', {
           'class': 'fa fa-spinner fa-2x fa-spin',
           style: 'vertical-align: middle'
-        })).append($('<span/>', {
+        })).append($('<span></span>', {
           style: 'vertical-align: middle'
         }).text(Loader.messages.waiting));
-        var autoForce = $('<div/>').appendTo(buttons);
+        var autoForce = $('<div></div>').appendTo(buttons);
         var i = 60;
         var it = setInterval(function() {
           i--;

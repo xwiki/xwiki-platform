@@ -620,7 +620,7 @@ define('xwiki-realtime-wysiwygEditor', [
           if (data.avatar) {
             $indicator = $('<img alt=""/>').attr('src', data.avatar);
           } else {
-            $indicator = $('<div/>').text(name.substring(0, 1));
+            $indicator = $('<div></div>').text(name.substring(0, 1));
           }
           $indicator.addClass('rt-non-realtime rt-user-position').attr({
             id: 'rt-user-' + id,

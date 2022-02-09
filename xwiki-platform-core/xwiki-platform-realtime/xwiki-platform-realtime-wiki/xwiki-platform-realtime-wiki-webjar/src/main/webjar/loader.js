@@ -55,10 +55,12 @@ define('xwiki-realtime-wikiEditor-loader', [
     var wikiLock = getWikiLock();
     var button = $();
     if ($('.realtime-button-' + info.type).length) {
-      button = $('<button class="btn btn-success"/>').text(Loader.messages.get('redirectDialog.join', info.name));
+      button = $('<button class="btn btn-success"></button>').text(
+        Loader.messages.get('redirectDialog.join', info.name));
       $('.realtime-button-' + info.type).prepend(button).prepend('<br/>');
     } else if (lock && wikiLock) {
-      button = $('<button class="btn btn-primary"/>').text(Loader.messages.get('redirectDialog.create', info.name));
+      button = $('<button class="btn btn-primary"></button>').text(
+        Loader.messages.get('redirectDialog.create', info.name));
       $('.realtime-buttons').append('<br/>').append(button);
     }
     button.click(function() {

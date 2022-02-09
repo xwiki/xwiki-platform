@@ -491,7 +491,7 @@ define('xwiki-suggestAttachments', [
         return oldCreate.apply(this, arguments);
       } else {
         // Allow the user to upload a file.
-        return $('<div class="create upload option"/>').text(l10n.upload);
+        return $('<div class="create upload option"></div>').text(l10n.upload);
       }
     };
 
@@ -559,7 +559,7 @@ define('xwiki-suggestAttachments', [
   };
 
   var uploadFileAndShowProgress = function(attachment, selectize) {
-    var attachmentName = '<em>' + $('<em/>').text(attachment.label).html() + '</em>';
+    var attachmentName = $('<em></em>').text(attachment.label).prop('outerHTML');
     var notification = new XWiki.widgets.Notification(l10n.uploading(attachmentName), 'inprogress');
     attachment.data.upload = {
       status: 'pending',
@@ -647,7 +647,7 @@ define('xwiki-suggestAttachments', [
         hint.remove();
       } else if (hint.length === 1) {
         // Show a bigger attachment icon.
-        $('<div class="xwiki-selectize-option-label-wrapper"/>')
+        $('<div class="xwiki-selectize-option-label-wrapper"></div>')
           .append(output.find('.xwiki-selectize-option-label'))
           .append(hint)
           .appendTo(output);

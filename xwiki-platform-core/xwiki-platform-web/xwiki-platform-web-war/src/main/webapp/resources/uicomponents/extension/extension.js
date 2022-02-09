@@ -734,7 +734,8 @@ require(['jquery'], function($) {
     $(this).hasClass('collapsible') && parents.click(toggleCollapsed);
     if ($(this).hasClass('selectable')) {
       parents.append('<span class="actions"><input type="checkbox"/></span>');
-      parents.find('.actions input[type="checkbox"]').click(toggleSelection).before('<span class="selectedCount"/>')
+      parents.find('.actions input[type="checkbox"]').click(toggleSelection)
+        .before('<span class="selectedCount"></span>')
         .prev('.selectedCount').each(updateSelectedCount);
       $(this).find('input[type="checkbox"]').click(function() {
         $(tree).find('.selectedCount').each(updateSelectedCount);

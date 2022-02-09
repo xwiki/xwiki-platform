@@ -1840,7 +1840,7 @@ require(['jquery'], function($) {
    */
   var extendPageHead = function(html) {
     var loadedResources;
-    var contentToInject = $('<div/>').html(html);
+    var contentToInject = $('<div></div>').html(html);
     // Remove resources that are already loaded.
     contentToInject.find('link[href], script[src]').filter(function() {
       if (!loadedResources) {

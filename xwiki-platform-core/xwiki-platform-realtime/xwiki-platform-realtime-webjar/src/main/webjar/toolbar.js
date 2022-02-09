@@ -39,7 +39,7 @@ define('xwiki-realtime-toolbar', [
   };
 
   var createSpinner = function($container) {
-    return $('<div class="rt-spinner"/>').attr('id', uid()).appendTo($container)[0];
+    return $('<div class="rt-spinner"></div>').attr('id', uid()).appendTo($container)[0];
   };
 
   var SPINNER_DISAPPEAR_TIME = 3000;
@@ -55,7 +55,7 @@ define('xwiki-realtime-toolbar', [
   };
 
   var createUserList = function($container) {
-    return $('<div class="rt-user-list"/>').attr('id', uid()).appendTo($container)[0];
+    return $('<div class="rt-user-list"></div>').attr('id', uid()).appendTo($container)[0];
   };
 
   var getOtherUsers = function(myUserId, userList, usersData) {
@@ -86,7 +86,7 @@ define('xwiki-realtime-toolbar', [
       return user;
     }).map(function(user) {
       // Display the users.
-      var userDisplay = $('<a/>').attr({
+      var userDisplay = $('<a></a>').attr({
         'class': Config.marginAvatar === 1 ? 'rt-user-link' : '',
         'href': new XWiki.Document(XWiki.Model.resolve(user.reference, XWiki.EntityType.DOCUMENT)).getURL(),
         'data-id': user.id,
@@ -102,7 +102,7 @@ define('xwiki-realtime-toolbar', [
             title: user.name
           }).prependTo(userDisplay);
         } else if (user.avatar === '') {
-          $('<span class="rt-user-fake-avatar"/>').attr('title', user.name).text(user.name.substring(0, 1))
+          $('<span class="rt-user-fake-avatar"></span>').attr('title', user.name).text(user.name.substring(0, 1))
             .prependTo(userDisplay);
         }
       }
@@ -133,7 +133,7 @@ define('xwiki-realtime-toolbar', [
   };
 
   var createLagElement = function($container) {
-    return $('<div class="rt-lag"/>').attr('id', uid()).appendTo($container)[0];
+    return $('<div class="rt-lag"></div>').attr('id', uid()).appendTo($container)[0];
   };
 
   var checkLag = function(getLag, lagElement) {

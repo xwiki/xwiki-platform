@@ -216,7 +216,7 @@ define('xwiki-realtime-loader', [
     var content = createModalContent(Messages['requestDialog.prompt'], Messages.get('requestDialog.create', info.name));
 
     // Initialize auto-accept
-    var autoAccept = $('<p/>').appendTo(content);
+    var autoAccept = $('<p></p>').appendTo(content);
     var i = 30;
     var interval = setInterval(function() {
       i--;
@@ -237,7 +237,7 @@ define('xwiki-realtime-loader', [
       }
     });
 
-    var buttonReject = $('<button class="btn btn-danger"/>').text(Messages['requestDialog.reject']);
+    var buttonReject = $('<button class="btn btn-danger"></button>').text(Messages['requestDialog.reject']);
     buttonReject.insertBefore(buttonCreate).click(function() {
       clearInterval(interval);
       try {
@@ -259,7 +259,7 @@ define('xwiki-realtime-loader', [
 
   getReloadContent = function() {
     var content = createModalContent(Messages['reloadDialog.prompt'], Messages['reloadDialog.exit']);
-    var buttonReload = $('<button class="btn btn-default"/>').text(Messages['reloadDialog.reload']);
+    var buttonReload = $('<button class="btn btn-default"></button>').text(Messages['reloadDialog.reload']);
     buttonReload.click($.proxy(window.location, 'reload', true)).insertAfter(content.find('button'));
     return content[0];
   },
@@ -276,7 +276,7 @@ define('xwiki-realtime-loader', [
     var content = createModalContent(Messages['disableDialog.prompt'], Messages['disableDialog.ok']);
 
     var buttonOK = content.find('button').click($.proxy(callback, null, true));
-    $('<button class="btn btn-default"/>').text(Messages['disableDialog.exit']).insertBefore(buttonOK)
+    $('<button class="btn btn-default"></button>').text(Messages['disableDialog.exit']).insertBefore(buttonOK)
       .click($.proxy(callback, null, false));
     return void displayCustomModal(content[0]);
   };
@@ -395,23 +395,23 @@ define('xwiki-realtime-loader', [
       return;
     }
     warningVisible = true;
-    var $warning = $('<div>', {
+    var $warning = $('<div></div>', {
       'class': 'xwiki-realtime-warning xwiki-realtime-box box warningmessage'
     }).insertAfter($after);
     scrollToBox($warning);
-    $('<strong>').text(Messages.conflictsWarning).appendTo($warning);
-    $('<br>').appendTo($warning);
-    $('<span>').text(Messages.wsErrorConflicts).appendTo($warning);
+    $('<strong></strong>').text(Messages.conflictsWarning).appendTo($warning);
+    $('<br/>').appendTo($warning);
+    $('<span></span>').text(Messages.wsErrorConflicts).appendTo($warning);
     var editor = isEditorCompatible();
     if (!module.isRt && editor) {
-      $('<br>').appendTo($warning);
-      $('<span>').html(Messages.conflictsWarningInfo).appendTo($warning);
-      $('<a>', {
+      $('<br/>').appendTo($warning);
+      $('<span></span>').html(Messages.conflictsWarningInfo).appendTo($warning);
+      $('<a></a>', {
         href: getRTEditorURL(window.location.href, availableRt[editor].info)
       }).text(Messages.conflictsWarningInfoLink).appendTo($warning);
     } else if (module.isRt) {
-      $('<br>').appendTo($warning);
-      $('<span>').text(Messages.conflictsWarningInfoRt).appendTo($warning);
+      $('<br/>').appendTo($warning);
+      $('<span></span>').text(Messages.conflictsWarningInfoRt).appendTo($warning);
     }
   },
 
@@ -422,16 +422,16 @@ define('xwiki-realtime-loader', [
     }
     warningVisible = true;
     var type = isError ? 'errormessage' : 'warningmessage';
-    var $warning = $('<div>', {
+    var $warning = $('<div></div>', {
       'class': 'xwiki-realtime-warning xwiki-realtime-box box ' + type
     }).insertAfter($after);
     scrollToBox($warning);
-    $('<strong>').text(Messages.wsError).appendTo($warning);
-    $('<br>').appendTo($warning);
-    $('<span>').text(Messages.wsErrorInfo).appendTo($warning);
+    $('<strong></strong>').text(Messages.wsError).appendTo($warning);
+    $('<br/>').appendTo($warning);
+    $('<span></span>').text(Messages.wsErrorInfo).appendTo($warning);
     if (module.isForced) {
-      $('<br>').appendTo($warning);
-      $('<span>').text(Messages.wsErrorConflicts).appendTo($warning);
+      $('<br/>').appendTo($warning);
+      $('<span></span>').text(Messages.wsErrorConflicts).appendTo($warning);
     }
   },
 
@@ -448,11 +448,11 @@ define('xwiki-realtime-loader', [
       return;
     }
     connectingVisible = true;
-    var $warning = $('<div>', {
+    var $warning = $('<div></div>', {
       'class': 'xwiki-realtime-connecting xwiki-realtime-box box infomessage'
     }).insertAfter($after);
     scrollToBox($warning);
-    $('<strong>').text(Messages.connectingBox).appendTo($warning);
+    $('<strong></strong>').text(Messages.connectingBox).appendTo($warning);
   },
 
   hideConnecting = function() {
@@ -468,13 +468,13 @@ define('xwiki-realtime-loader', [
       return;
     }
     wsErrorVisible = true;
-    var $warning = $('<div>', {
+    var $warning = $('<div></div>', {
       'class': 'xwiki-realtime-disconnected xwiki-realtime-box box errormessage'
     }).insertAfter($after);
     scrollToBox($warning);
-    $('<strong>').text(Messages.connectionLost).appendTo($warning);
-    $('<br>').appendTo($warning);
-    $('<span>').text(Messages.connectionLostInfo).appendTo($warning);
+    $('<strong></strong>').text(Messages.connectionLost).appendTo($warning);
+    $('<br/>').appendTo($warning);
+    $('<span></span>').text(Messages.connectionLostInfo).appendTo($warning);
   },
 
   hideWsError = function() {

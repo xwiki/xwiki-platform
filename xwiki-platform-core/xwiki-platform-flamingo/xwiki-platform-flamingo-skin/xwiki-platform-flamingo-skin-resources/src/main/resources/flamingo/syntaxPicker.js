@@ -268,7 +268,7 @@ define('xwiki-syntax-converter', ['jquery', 'xwiki-meta'], function($, xcontext)
       }
       return $.post(XWiki.currentDocument.getURL('preview'), data).then(function(html) {
         // Extract the rendered title and content.
-        var container = $('<div/>').html(html);
+        var container = $('<div></div>').html(html);
         return {
           renderedTitle: container.find('#document-title h1').html(),
           renderedContent: container.find('#xwikicontent').html()

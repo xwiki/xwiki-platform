@@ -1941,9 +1941,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated Since 14.0RC1 rely on {@link #getAuthors()}.
+     * @deprecated use {@link #getAuthors()} instead
      */
     @Override
+    @Deprecated(since = "14.0RC1")
     public DocumentReference getContentAuthorReference()
     {
         UserReference contentAuthor = this.getAuthors().getContentAuthor();

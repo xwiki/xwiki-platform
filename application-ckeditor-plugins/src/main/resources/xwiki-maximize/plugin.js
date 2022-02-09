@@ -169,7 +169,7 @@
       // Use a backdrop to hide the rest of the page content while the editor is maximized. This is needed especially
       // when switching editing modes while the editor is maximized because removing the current editable reveals the
       // content below it.
-      $('<div class="cke_maximize_backdrop"/>').appendTo(document.body);
+      $('<div class="cke_maximize_backdrop"></div>').appendTo(document.body);
     };
 
     var leaveFullScreenMode = function(editor) {
@@ -177,7 +177,7 @@
         listener.removeListener();
       });
       $(window).off('resize.maximize');
-      
+
       // Remove the backdrop.
       $('body > div.cke_maximize_backdrop').remove();
 

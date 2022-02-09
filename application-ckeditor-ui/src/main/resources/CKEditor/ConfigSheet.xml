@@ -185,9 +185,9 @@ require(['jquery', 'xwiki-ckeditor', 'bootstrap-select'], function($, ckeditorPr
 
   var enhanceList = function(input, allowedValues) {
     var values = input.hide().val().split(commaSeparator);
-    var select = $('&lt;select class="form-control" multiple/&gt;').insertAfter(input);
+    var select = $('&lt;select class="form-control" multiple&gt;&lt;/select&gt;').insertAfter(input);
     allowedValues.sort().forEach(function(value) {
-      select.append($('&lt;option/&gt;').text(value));
+      select.append($('&lt;option&gt;&lt;/option&gt;').text(value));
     });
     select.selectpicker({
       container: 'body',

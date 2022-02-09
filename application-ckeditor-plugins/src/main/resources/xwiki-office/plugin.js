@@ -16,7 +16,7 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
           $.get(formURL).done(function(html) {
             modalBody.html(html);
           }).fail(function() {
-            var errorMessage = $('<div class="box errormessage"/>')
+            var errorMessage = $('<div class="box errormessage"></div>')
               .text(l10n.get('xwiki-office.importer.failedToLoadForm'));
             modalBody.empty().append(errorMessage);
           }).always(function() {

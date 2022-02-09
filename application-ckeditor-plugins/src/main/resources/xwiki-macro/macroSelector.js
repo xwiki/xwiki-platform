@@ -128,15 +128,15 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
     var categoryFilter = $(
       '<div class="macro-categories input-group-btn">' +
         '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ' +
-          'aria-haspopup="true" aria-expanded="false"><span class="caret"/></button>' +
+          'aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>' +
         '<ul class="dropdown-menu dropdown-menu-right"></ul>' +
       '</div>'
     );
     var categoryTemplate = [
       '<li class="macro-category">',
         '<a href="#">',
-          '<span class="macro-category-name"/>',
-          '<span class="macro-category-count badge"/>',
+          '<span class="macro-category-name"></span>',
+          '<span class="macro-category-count badge"></span>',
         '</a>',
       '</li>'].join('');
     categoryFilter.find('ul.dropdown-menu').append(categories.map(function(category) {
@@ -275,7 +275,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
   maybeShowError = function(requestNumber) {
     // Check if the error corresponds to the last request.
     if (this.prop('requestNumber') === requestNumber) {
-      var errorMessage = $('<div class="box errormessage"/>').text(translations.get('failedToRetrieveMacros'));
+      var errorMessage = $('<div class="box errormessage"></div>').text(translations.get('failedToRetrieveMacros'));
       this.removeClass('loading').append(errorMessage);
     }
   },
@@ -314,7 +314,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
   selectMacro = $modal.createModalStep({
     'class': 'macro-selector-modal',
     title: translations.get('title'),
-    content: '<div class="macro-selector loading"/>',
+    content: '<div class="macro-selector loading"></div>',
     acceptLabel: translations.get('select'),
     onLoad: function() {
       var modal = this;

@@ -423,7 +423,7 @@
   };
 
   // Use tabs to configure each of the available editors.
-  var editorTabList = $('&lt;ul class="nav nav-tabs" role="tablist"/&gt;').prependTo(adminPageContent);
+  var editorTabList = $('&lt;ul class="nav nav-tabs" role="tablist"&gt;&lt;/ul&gt;').prependTo(adminPageContent);
   var editorTabContent = $('&lt;div class="tab-content"&gt;').insertAfter(editorTabList);
   forms.each(function() {
     // The Bootstrap Tab plugin uses the tab id in a CSS selector and since dot is a special character we need to avoid
@@ -442,7 +442,7 @@
         $(this).tab('show');
       });
     // Add the tab content.
-    $('&lt;div role="tabpanel" class="tab-pane"/&gt;').attr('id', tabId).appendTo(editorTabContent)
+    $('&lt;div role="tabpanel" class="tab-pane"&gt;&lt;/div&gt;').attr('id', tabId).appendTo(editorTabContent)
       .append($(this).closest('#admin-page-content &gt; *'));
   });
 

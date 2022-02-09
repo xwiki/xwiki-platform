@@ -23,7 +23,7 @@ define('entityResourceDisplayer', ['jquery', 'resource'], function($, $resource)
   var displayFromBreadcrumb = function(resourceReference, breadcrumb) {
     breadcrumb.addClass('resource-hint');
     var label = breadcrumb.find('.active').remove();
-    label = label.has('a').length ? label.find('a') : $('<span/>').text(label.text());
+    label = label.has('a').length ? label.find('a') : $('<span></span>').text(label.text());
     label.addClass('resource-label');
     var icon = $('<span class="resource-icon"></span>').addClass($resource.types[resourceReference.type].icon);
     var remove = $('<span class="glyphicon glyphicon-remove remove"></span>');

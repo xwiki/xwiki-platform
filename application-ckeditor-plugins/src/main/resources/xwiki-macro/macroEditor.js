@@ -391,7 +391,7 @@ define('xwiki-skinx', ['jquery'], function($) {
           return $(this).attr('href') || $(this).attr('src');
         }).get();
       };
-      $('<div/>').html(requiredSkinExtensions).find('link, script').filter(function() {
+      $('<div></div>').html(requiredSkinExtensions).find('link, script').filter(function() {
         if (!existingSkinExtensions) {
           existingSkinExtensions = getExistingSkinExtensions();
         }
@@ -409,7 +409,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor', 'xwiki-skin
   'use strict';
 
   var displayMacroParameterTree = function(macroParameterTree, requiredSkinExtensions) {
-    var output = $('<div/>');
+    var output = $('<div></div>');
     output.append(macroParameterTree.children.map(displayMacroParameterTreeNode));
     output.find('.more').click(toggleMacroParameters).click();
     output.find('a[role="tab"]').click(function (event) {
@@ -426,9 +426,9 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor', 'xwiki-skin
       case 'group-multiple': return displayMultipleChoiceGroup(node);
       case 'group-single': return displaySingleChoiceGroup(node);
       case 'parameter': return displayMacroParameter(node.data);
-      case 'more': return $('<li class="more"><span class="arrow arrow-down"/> <a href="#more"/></li>')
+      case 'more': return $('<li class="more"><span class="arrow arrow-down"></span> <a href="#more"></a></li>')
         .find('a').text(translations.get('more')).end();
-      case 'empty': return $('<li class="empty"/>').text(translations.get('noParameters'));
+      case 'empty': return $('<li class="empty"></li>').text(translations.get('noParameters'));
     }
   },
 
@@ -497,8 +497,8 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor', 'xwiki-skin
 
   macroParameterTemplate =
     '<li class="macro-parameter">' +
-      '<div class="macro-parameter-name"/>' +
-      '<div class="macro-parameter-description"/>' +
+      '<div class="macro-parameter-name"></div>' +
+      '<div class="macro-parameter-description"></div>' +
     '</li>',
 
   displayMacroParameter = function(parameter) {
@@ -513,7 +513,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor', 'xwiki-skin
   },
 
   displayMacroParameterField = function(parameter) {
-    var field = $('<div/>').addClass('macro-parameter-field').html(parameter.editTemplate);
+    var field = $('<div></div>').addClass('macro-parameter-field').html(parameter.editTemplate);
     // Look for input elements whose name matches the parameter id.
     var valueInputs = field.find(':input').filter(function() {
       return $(this).attr('name') === parameter.id;
@@ -547,7 +547,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor', 'xwiki-skin
           value = matchedOption.val();
         } else {
           // Add the missing option.
-          $('<option/>').val(value).text(value).appendTo(valueInputs);
+          $('<option></option>').val(value).text(value).appendTo(valueInputs);
         }
       }
     }
@@ -588,9 +588,9 @@ define(
 
   var macroEditorTemplate =
     '<div>' +
-      '<div class="macro-name"/>' +
-      '<div class="macro-description"/>' +
-      '<ul class="macro-parameters"/>' +
+      '<div class="macro-name"></div>' +
+      '<div class="macro-description"></div>' +
+      '<ul class="macro-parameters"></ul>' +
     '</div>',
 
   createMacroEditor = function(macroCall, macroDescriptor) {
@@ -618,7 +618,7 @@ define(
     if (this.prop('requestNumber') === requestNumber) {
       this.removeClass('loading').append(
         '<div class="box errormessage">' +
-          translations.get('descriptorRequestFailed', '<strong/>') +
+          translations.get('descriptorRequestFailed', '<strong></strong>') +
         '</div>'
       ).find('strong').text(this.attr('data-macroId'));
     }
@@ -717,7 +717,7 @@ define(
   editMacro = $modal.createModalStep({
     'class': 'macro-editor-modal',
     title: translations.get('title'),
-    content: '<div class="macro-editor xform"/>',
+    content: '<div class="macro-editor xform"></div>',
     acceptLabel: translations.get('submit'),
     onLoad: function() {
       var modal = this;
@@ -763,7 +763,7 @@ define(
           modal.data('output', output).modal('hide');
         }
       });
-      var changeMacroButton = $('<button type="button" class="btn btn-default pull-left"/>')
+      var changeMacroButton = $('<button type="button" class="btn btn-default pull-left"></button>')
         .text(translations.get('changeMacro'))
         .prependTo(submitButton.parent());
       changeMacroButton.click(function(event) {

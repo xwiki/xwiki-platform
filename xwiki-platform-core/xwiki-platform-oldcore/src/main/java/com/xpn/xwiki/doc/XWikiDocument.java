@@ -1882,7 +1882,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated use {@link #getAuthors} instead
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#getEffectiveMetadataAuthor()} instead
      */
     @Deprecated(since = "14.0RC1")
     public DocumentReference getAuthorReference()
@@ -1898,7 +1898,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated use {@link DocumentAuthors#setEffectiveMetadataAuthor(UserReference)} instead
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#setEffectiveMetadataAuthor(UserReference)}
+     * instead
      */
     @Deprecated(since = "14.0RC1")
     public void setAuthorReference(DocumentReference authorReference)
@@ -1941,7 +1942,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated use {@link #getAuthors()} instead
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#getContentAuthor()} instead
      */
     @Override
     @Deprecated(since = "14.0RC1")
@@ -1957,7 +1958,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated use {@link DocumentAuthors#setContentAuthor(UserReference)} instead
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#setContentAuthor(UserReference)} instead
      */
     @Deprecated(since = "14.0RC1")
     public void setContentAuthorReference(DocumentReference contentAuthorReference)
@@ -1998,7 +1999,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated use {@link #getAuthors()} instead
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#getCreator()} instead
      */
     @Deprecated(since = "14.0RC1")
     public DocumentReference getCreatorReference()
@@ -2013,7 +2014,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated use {@link DocumentAuthors#setCreator(UserReference)} instead
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#setCreator(UserReference)} instead
      */
     @Deprecated(since = "14.0RC1")
     public void setCreatorReference(DocumentReference creatorReference)

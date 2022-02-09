@@ -342,10 +342,10 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
         resolve(node);
       } else if (canAcceptChild(parent, pathElement) && siblings.length > 0 &&
           this.get_node(siblings.last()).data.type === 'pagination') {
-        // The corresponding node is probably not displayed because of the pagination. It's expensive to retrieve all the
-        // rest of the siblings (i.e. all the next pages) until we find the node that corresponds to the given path
-        // element, so we simply add the node to the parent. Don't worry, the node won't be duplicated when the pagination
-        // is triggered.
+        // The corresponding node is probably not displayed because of the pagination. It's expensive to retrieve all
+        // the rest of the siblings (i.e. all the next pages) until we find the node that corresponds to the given path
+        // element, so we simply add the node to the parent. Don't worry, the node won't be duplicated when the
+        // pagination is triggered.
         this.create_node(parent, pathElement, siblings.length - 1, resolve);
       } else {
         // The specified path element can't be loaded.

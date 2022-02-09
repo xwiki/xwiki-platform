@@ -51,17 +51,16 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
   function load(mode, documentReference, property, className) {
     const targetUrl = computeTargetURL(documentReference, 'get');
     return Promise.resolve($.get(targetUrl, {
-        xpage: 'display',
-        mode: mode,
-        // TODO: handle the object index when provided
-        property: getPropertyReference(property, className),
-        type: property.startsWith('doc.') ? 'document' : 'object',
-        language: xcontext.locale
-      })).catch(() => {
-        new XWiki.widgets.Notification(
-          this.$t('livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage', [mode]), 'error');
-        return Promise.reject();
-      })
+      xpage: 'display',
+      mode: mode,
+      // TODO: handle the object index when provided
+      property: getPropertyReference(property, className),
+      type: property.startsWith('doc.') ? 'document' : 'object',
+      language: xcontext.locale
+    })).catch(() => {
+      new XWiki.widgets.Notification(
+        this.$t('livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage', [mode]), 'error');
+      return Promise.reject();
     });
   }
 

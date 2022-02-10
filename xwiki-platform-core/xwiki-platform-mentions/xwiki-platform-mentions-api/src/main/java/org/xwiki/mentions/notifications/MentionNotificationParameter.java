@@ -35,6 +35,8 @@ import org.xwiki.text.XWikiToStringBuilder;
  */
 public class MentionNotificationParameter implements Serializable
 {
+    private static final long serialVersionUID = -8933896168459931795L;
+
     private final String reference;
 
     private final String anchorId;

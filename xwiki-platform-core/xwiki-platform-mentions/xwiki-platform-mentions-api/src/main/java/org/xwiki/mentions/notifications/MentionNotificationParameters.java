@@ -45,6 +45,8 @@ import org.xwiki.text.XWikiToStringBuilder;
  */
 public class MentionNotificationParameters implements Serializable
 {
+    private static final long serialVersionUID = -8847694983380889549L;
+
     private final Map<String, Set<MentionNotificationParameter>> newMentions;
 
     private final Map<String, Set<MentionNotificationParameter>> unmodifiableNewMentions;

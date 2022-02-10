@@ -1,0 +1,3 @@
+org.xwiki.index.internal.DefaultTasksManager
+org.xwiki.index.internal.TasksStore
+org.xwiki.index.internal.TaskExecutor

@@ -17,36 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions.internal;
+package org.xwiki.index.internal.jmx;
 
-import java.util.concurrent.BlockingQueue;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.mentions.MentionException;
-import org.xwiki.mentions.internal.async.MentionsData;
+import java.util.Map;
 
 /**
- * Blocking queue provider.
+ * Interface of the {@link JMXTasks} MBean.
  *
  * @version $Id$
- * @since 12.6
+ * @since 14.1RC1
  */
-@Role
-public interface MentionsBlockingQueueProvider
+public interface JMXTasksMBean
 {
     /**
-     * Initialize a blocking queue.
-     *
-     * @return the blocking queue
-     * @throws MentionException if an error occurs during the initialization of the queue
+     * @return the total number of tasks in the queue
      */
-    BlockingQueue<MentionsData> initBlockingQueue() throws MentionException;
+    long getQueueSize();
 
     /**
-     * Close the queue.
-     *
-     * @since 12.6.1
-     * @since 12.7RC1
+     * 
+     * @return the total number of tasks in the queue, grouped per type of tasks
      */
-    void closeQueue();
+    Map<String, Long> getQueueSizePerType();
 }

@@ -17,23 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions.internal;
+package org.xwiki.index;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
- * Provide a thread pool to analyze the mentions.
+ * Provide the operation to consume a task.
  *
  * @version $Id$
- * @since 12.6
+ * @since 14.1RC1
  */
 @Role
-public interface MentionsThreadsProvider
+@Unstable
+public interface TaskConsumer
 {
     /**
-     * Initialize a thead.
-     * @param runnable a runnable 
-     * @return a thread initialized with the runnable
+     * Consume a task.
+     *
+     * @param documentReference of the document to analyze
+     * @param version the version of the document to analyze
+     * @throws IndexException in case of error during the execution of the task
      */
-    Thread initializeThread(Runnable runnable);
+    void consume(DocumentReference documentReference, String version) throws IndexException;
 }

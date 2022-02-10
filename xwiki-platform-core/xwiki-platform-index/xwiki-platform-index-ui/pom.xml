@@ -92,5 +92,12 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Used to display the indexing tasks queue information. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

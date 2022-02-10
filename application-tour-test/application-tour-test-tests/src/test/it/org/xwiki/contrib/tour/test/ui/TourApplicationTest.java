@@ -19,6 +19,8 @@
  */
 package org.xwiki.contrib.tour.test.ui;
 
+import java.util.Arrays;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.contrib.tour.test.po.PageWithTour;
@@ -26,6 +28,7 @@ import org.xwiki.contrib.tour.test.po.StepEditModal;
 import org.xwiki.contrib.tour.test.po.TourEditPage;
 import org.xwiki.contrib.tour.test.po.TourFromLivetable;
 import org.xwiki.contrib.tour.test.po.TourHomePage;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
@@ -92,7 +95,7 @@ public class TourApplicationTest extends AbstractTest
         // First, we need to create a tour
         TourHomePage tourHomePage = TourHomePage.gotoPage();
         TourEditPage tourEditPage = tourHomePage.addNewEntry("Test");
-        setUpTour(tourEditPage, "My nice description", true, "Tour.StartTour", "");
+        setUpTour(tourEditPage, "My nice description", true, "Tour.StartTour.WebHome", "");
 
         // Test to put a translation key, use the translation macro
         setUpStep(tourEditPage, "body", "tour.app.name", "{{translation key=\"TourCode.TourClass_description\" /}}",
@@ -133,11 +136,17 @@ public class TourApplicationTest extends AbstractTest
 
         // Verify that the tour is displayed in the LT
         tourHomePage = TourHomePage.gotoPage();
-        assertTrue(tourHomePage.getTours().contains(new TourFromLivetable("Test", "Tour.StartTour", true, "-")));
+        // Note that non-existing pages are considered (based on the meta tags in the HTML head) nested pages (even when
+        // the URL doesn't end with a slash) and since we're not creating (saving) the target page for our tour it means
+        // we have to use a nested page reference. Which is not bad because this way we also test how the tour behaves
+        // with a nested page as target.
+        assertTrue(
+            tourHomePage.getTours().contains(new TourFromLivetable("Test", "Tour.StartTour.WebHome", true, "-")));
 
         // Try the tour by navigating to its target page (it'll be started automatically)
-        getUtil().gotoPage("Tour", "StartTour");
-        PageWithTour homePage = new PageWithTour();
+        LocalDocumentReference targetPageReference =
+            new LocalDocumentReference(Arrays.asList("Tour", "StartTour"), "WebHome");
+        PageWithTour homePage = PageWithTour.gotoPage(targetPageReference);
         assertTrue(homePage.isTourDisplayed());
 
         // Step 1
@@ -238,7 +247,7 @@ public class TourApplicationTest extends AbstractTest
         assertFalse(secondPage.isTourDisplayed());
         assertTrue(secondPage.hasResumeButton());
 
-        getUtil().gotoPage("Tour", "StartTour");
+        secondPage = PageWithTour.gotoPage(targetPageReference);
         assertFalse(secondPage.isTourDisplayed());
         assertTrue(secondPage.hasResumeButton());
 

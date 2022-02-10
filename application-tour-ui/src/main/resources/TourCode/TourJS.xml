@@ -152,7 +152,7 @@ require.config({
 //----------------------------------
 require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
-  
+
   /**
    * Escape strings so they respect the Tour API constraints.
    */
@@ -164,7 +164,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       return '_'+character.charCodeAt(0)+'_';
     });
   };
-  
+
   /**
    * Add a resume button to start the tour again when it has been closed
    */
@@ -205,7 +205,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       }, 7000);
     }
   }
-  
+
   /**
    * The template to display a step.
    */
@@ -300,7 +300,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
 
       // Create a resume button if the tour has already been closed by the user in the past
       if (window.localStorage.getItem(tourName + '_end') == 'yes') {
-        createResumeButton(tour, false, tourName);
+        createResumeButton(tour, false);
       }
     });
   };

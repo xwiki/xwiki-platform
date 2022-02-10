@@ -255,14 +255,7 @@
         return;
     }
     var targetPage = XWiki.Model.resolve(row.find('.targetPage').text(), XWiki.EntityType.DOCUMENT);
-    var targetPageDocument;
-    // Two behaviours depending of the handling of the Nested Pages feature.
-    if (XWiki.Document.initializeFromReference) {
-      targetPageDocument = new XWiki.Document(targetPage);
-    } else {
-      targetPageDocument = new XWiki.Document(targetPage.name,
-        targetPage.extractReferenceValue(XWiki.EntityType.SPACE));
-    }
+    var targetPageDocument = new XWiki.Document(targetPage);
 
     // Add a launch tour link to the actions column.
     if (row.find('.actionLaunch').length == 0) {

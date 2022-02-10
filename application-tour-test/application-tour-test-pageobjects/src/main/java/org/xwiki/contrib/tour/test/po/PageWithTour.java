@@ -21,6 +21,8 @@ package org.xwiki.contrib.tour.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -31,7 +33,18 @@ public class PageWithTour extends ViewPage
 {
     public static PageWithTour gotoPage(String space, String page)
     {
-        getUtil().gotoPage(space, page);
+        return gotoPage(new LocalDocumentReference(space, page));
+    }
+
+    public static PageWithTour gotoPage(EntityReference entityReference)
+    {
+        String url = getUtil().getURL(entityReference, "view", null);
+        // Remove the "WebHome" suffix from the URL of nested pages in order to match the URL expected by the tour.
+        // Otherwise resuming the tour will "reload" the page in order to have the expected URL.
+        if (url.endsWith("/WebHome")) {
+            url = url.substring(0, url.length() - "WebHome".length());
+        }
+        getUtil().gotoPage(url);
         return new PageWithTour();
     }
 

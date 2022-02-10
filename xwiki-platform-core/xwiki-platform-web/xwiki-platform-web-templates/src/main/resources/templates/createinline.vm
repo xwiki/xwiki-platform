@@ -46,7 +46,7 @@
 #if ("$!request.title" != '')
   #set ($title = "$!request.title")
 #else
-  #set ($title = "$!name")
+  #set ($title = "$!{escapetool.velocity($name)}")
 #end
 
 ## ---------------------------------------------------------------------------------------------------------

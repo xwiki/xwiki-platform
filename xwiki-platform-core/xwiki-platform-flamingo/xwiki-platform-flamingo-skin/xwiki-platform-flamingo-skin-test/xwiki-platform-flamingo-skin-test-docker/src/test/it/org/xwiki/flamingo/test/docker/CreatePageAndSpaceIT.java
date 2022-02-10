@@ -176,6 +176,29 @@ class CreatePageAndSpaceIT
         createPage.getDocumentPicker().setParent("");
         createPage.waitForLocationPreviewContent("/" + newTitle);
     }
+    
+    /**
+     * Make sure the default title rally is displayed as the page name even when the page name contains Velocity syntax.
+     */
+    @Test
+    @Order(3)
+    void createPageWithDefaultTitleWithVelocity(TestUtils setup, TestReference reference) throws Exception
+    {
+        DocumentReference pageWithVelocity = new DocumentReference("#if()", reference.getLastSpaceReference());
+
+        // Make sure the page does not exist yet
+        setup.rest().delete(pageWithVelocity);
+
+        // Go the not existing page
+        ViewPage viewPage = setup.gotoPage(pageWithVelocity);
+
+        // Click create
+        CreatePagePage createPage = viewPage.createPage();
+        createPage.clickCreate();
+        EditPage editPage = new EditPage();
+
+        assertEquals("${escapetool.h}if()", editPage.getDocumentTitle());
+    }
 
     // TODO: Add a test for the input validation.
 }

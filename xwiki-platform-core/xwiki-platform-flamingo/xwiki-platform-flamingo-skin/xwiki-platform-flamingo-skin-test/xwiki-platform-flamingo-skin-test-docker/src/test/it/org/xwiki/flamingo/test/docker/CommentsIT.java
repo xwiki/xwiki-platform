@@ -123,6 +123,14 @@ class CommentsIT
         commentIndex = commentsTab.postComment(COMMENT_CONTENT, true);
         commentsTab.editCommentByID(commentIndex, COMMENT_REPLACED_CONTENT);
         assertEquals(COMMENT_REPLACED_CONTENT, commentsTab.getCommentContentByID(commentIndex));
+        
+        // Open then cancel the edit comment forms
+        commentsTab.openCommentForm();
+        commentsTab.cancelCommentForm();
+        commentsTab.editCommentByID(commentIndex);
+        commentsTab.cancelCommentForm();
+        commentsTab.clickOnReplyToCommentByID(commentIndex);
+        commentsTab.cancelCommentForm();
     }
 
     @Test

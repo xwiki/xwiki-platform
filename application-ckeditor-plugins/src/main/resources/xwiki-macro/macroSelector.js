@@ -193,7 +193,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
   navigateMacroList = function(macroList, up) {
     var direction = up ? 'prev' : 'next';
     var selectedItem = macroList.children('.selected');
-    if (selectedItem.size() > 0) {
+    if (selectedItem.length) {
       selectedItem = selectedItem[direction]();
     } else {
       selectedItem = macroList.children()[up ? 'last' : 'first']();

@@ -45,12 +45,12 @@ define('entityResourcePicker', [
     var validateSelection = function(tree) {
       // jshint camelcase:false
       var selectedNodes = tree.get_selected(true);
-      for (var i = 0; i < selectedNodes.size(); i++) {
+      for (var i = 0; i < selectedNodes.length; i++) {
         if (!handler.canSelect(selectedNodes[i])) {
           return false;
         }
       }
-      return selectedNodes.size() > 0;
+      return selectedNodes.length > 0;
     };
 
     modal.on('shown.bs.modal', function(event) {

@@ -408,7 +408,7 @@
   var adminPageContent = $('#admin-page-content');
   var forms = adminPageContent.find('form');
   // Check if we need to enhance the WYSIWYG administration section with tabs (one tab for each editor).
-  if (forms.size() &lt; 2 || forms.is('#wysiwyg')) {
+  if (forms.length &lt; 2 || forms.is('#wysiwyg')) {
     // Either there is only one editor available or the WYSIWYG administration section handles the tabs itself
     // (XWiki 9.2RC1+). Leave the administration page as it is.
     // This JavaScript code is executed after the page has been loaded so in order to avoid flickering UI we hide the
@@ -448,7 +448,7 @@
 
   // Show the configuration for the active editor, or the first one if none is active.
   var activeTab = editorTabList.find('a[data-editorId="$!services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id"]');
-  if (activeTab.size() === 0) {
+  if (!activeTab.length) {
     activeTab = editorTabList.find('a').first();
   }
   activeTab.tab('show');

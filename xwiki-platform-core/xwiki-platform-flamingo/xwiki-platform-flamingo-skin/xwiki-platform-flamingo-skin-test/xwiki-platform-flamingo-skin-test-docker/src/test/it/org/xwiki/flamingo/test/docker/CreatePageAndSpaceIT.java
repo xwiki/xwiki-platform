@@ -17,17 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.flamingo.test.ui;
+package org.xwiki.flamingo.test.docker;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests basic page and space creation.
@@ -35,30 +39,35 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 7.2M2
  */
-public class CreatePageAndSpaceIT extends AbstractTest
+@UITest
+class CreatePageAndSpaceIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+    @BeforeAll
+    public void setup(TestUtils setup) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+    }
 
     @Test
-    public void createSpaceAndPage()
+    @Order(1)
+    void createSpaceAndPage(TestUtils setup, TestReference reference)
     {
         // Test 1:  Test Space creation when on an existing page (i.e. the space creation UI will open to ask for the
         //          space name.
 
         // Clean up before the test starts
         // Note that we introduce a special character to verify we support non-ASCII characters in page and space names
-        String existingPageName = getTestMethodName() + "\u0219";
-        String spaceName = getTestClassName() + "\u0219";
-        getUtil().deleteSpace(spaceName);
-        getUtil().deletePage(spaceName, existingPageName);
+        String existingPageName = reference.getName() + "\u0219";
+        String spaceName = reference.getLastSpaceReference().getName() + "\u0219";
+        setup.deleteSpace(spaceName);
+        setup.deletePage(spaceName, existingPageName);
 
         // Create the page that's supposed to exist.
-        getUtil().createPage(spaceName, existingPageName, "Dummy", "Dummy Title");
+        setup.createPage(spaceName, existingPageName, "Dummy", "Dummy Title");
 
         // Since the Flamingo skin no longer supports creating a space from the UI, trigger the Space creation UI
         // by using directly the direct action URL for it.
-        getUtil().gotoPage(getUtil().getURL("create", new String[] {spaceName, existingPageName}, "tocreate=space"));
+        setup.gotoPage(setup.getURL("create", new String[] {spaceName, existingPageName}, "tocreate=space"));
         CreatePagePage cpp = new CreatePagePage();
         EditPage editSpaceWebhomePage = cpp.createPage("", spaceName);
 
@@ -74,7 +83,7 @@ public class CreatePageAndSpaceIT extends AbstractTest
 
         // Since the Flamingo skin no longer supports creating a space from the UI, trigger the Space creation UI
         // by using directly the direct action URL for it. This time on a non-exsiting page.
-        getUtil().gotoPage(getUtil().getURL("create", new String[]{ spaceName, "NonExistingPage" },
+        setup.gotoPage(setup.getURL("create", new String[]{ spaceName, "NonExistingPage" },
                 "tocreate=space&type=blank"));
         EditPage editPage = new EditPage();
 
@@ -89,11 +98,11 @@ public class CreatePageAndSpaceIT extends AbstractTest
         //          for the space + page names.
 
         // Note that we introduce a special character to verify we support non-ASCII characters in page names
-        String newPageName = getTestMethodName() + "2" + "\u0219";
-        getUtil().deletePage(spaceName, newPageName);
+        String newPageName = reference.getName() + "2" + "\u0219";
+        setup.deletePage(spaceName, newPageName);
 
         // Navigate to an existing page before clicking on the Add button
-        ViewPage vp = getUtil().gotoPage(spaceName, existingPageName);
+        ViewPage vp = setup.gotoPage(spaceName, existingPageName);
         cpp = vp.createPage();
         editPage = cpp.createPage(spaceName, newPageName, true);
 
@@ -110,20 +119,23 @@ public class CreatePageAndSpaceIT extends AbstractTest
      * Test that the inputs in the create UI are updated, depending on the case.
      */
     @Test
-    public void testCreateUIInteraction()
+    @Order(2)
+    void testCreateUIInteraction(TestUtils setup, TestReference reference)
     {
+        SpaceReference spaceReference = (SpaceReference) reference.getParent().getParent();
+
         // Cleanup of the test space for any leftovers from previous tests.
-        getUtil().deleteSpace(getTestClassName());
+        setup.deleteSpace(spaceReference);
 
         // Create an existent page that will also be the parent of our documents.
         String existingPageTitle = "Test Area";
-        getUtil().createPage(getTestClassName(), "WebHome", "", existingPageTitle);
+        setup.createPage(new DocumentReference("WebHome", spaceReference), "", existingPageTitle);
 
         CreatePagePage createPage = new ViewPage().createPage();
         // Check that by default we have an empty title and name and the parent is the current document's space.
         assertEquals("", createPage.getDocumentPicker().getTitle());
         assertEquals("", createPage.getDocumentPicker().getName());
-        assertEquals(getTestClassName(), createPage.getDocumentPicker().getParent());
+        assertEquals(spaceReference.getName(), createPage.getDocumentPicker().getParent());
         // Check the initial state of the breadcrumb.
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/");
 

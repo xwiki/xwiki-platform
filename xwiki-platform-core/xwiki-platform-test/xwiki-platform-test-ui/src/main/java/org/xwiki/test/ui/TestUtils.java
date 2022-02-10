@@ -745,6 +745,16 @@ public class TestUtils
         return getURL(space, "WebHome", "deletespace", "confirm=1&async=false&affectChidlren=on");
     }
 
+    /**
+     * @param space the reference of the space to delete
+     * @return the URL that can be used to delete the specified pace
+     * @since 14.1RC1
+     */
+    public String getURLToDeleteSpace(EntityReference space)
+    {
+        return getURL(space, "WebHome", "deletespace", "confirm=1&async=false&affectChidlren=on");
+    }
+
     public ViewPage createPage(String space, String page, String content, String title)
     {
         return createPage(Collections.singletonList(space), page, content, title);
@@ -973,6 +983,17 @@ public class TestUtils
      * @since 4.5
      */
     public void deleteSpace(String space)
+    {
+        getDriver().get(getURLToDeleteSpace(space));
+    }
+
+    /**
+     * Accesses the URL to delete the specified space.
+     *
+     * @param space the reference of the space to delete
+     * @since 14.1RC1
+     */
+    public void deleteSpace(EntityReference space)
     {
         getDriver().get(getURLToDeleteSpace(space));
     }

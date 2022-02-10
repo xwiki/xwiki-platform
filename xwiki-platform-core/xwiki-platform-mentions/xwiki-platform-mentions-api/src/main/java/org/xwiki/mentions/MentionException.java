@@ -27,6 +27,8 @@ package org.xwiki.mentions;
  */
 public class MentionException extends Exception
 {
+    private static final long serialVersionUID = -8133809120828519176L;
+
     /**
      * Construct a new {@code MentionsException} with the specified detail message.
      *

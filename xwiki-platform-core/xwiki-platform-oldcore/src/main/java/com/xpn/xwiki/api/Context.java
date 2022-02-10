@@ -650,4 +650,19 @@ public class Context extends Api
     {
         return (String) this.context.get("message");
     }
+
+    /**
+     * Return the current uix object. This method is defined to allow to access this object without programming rights.
+     * Note that this method is deprecated since 14.1RC1, use the "uix" key from the velocity context instead in the 
+     * UIX templates.
+     *
+     * @return the current uix object
+     * @since 14.1RC1
+     * @since 13.10.3
+     * 
+     */
+    public java.lang.Object getUix()
+    {
+        return getXWikiContext().get("uix");
+    }
 }

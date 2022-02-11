@@ -223,7 +223,8 @@ class NotificationsSettingsIT
 
         // Filter 2
         assertEquals("Own Events Filter", preferences.get(2).getFilterName());
-        assertEquals("Hide notifications about your own activity", preferences.get(2).getDescription());
+        assertEquals("Hide notifications about your own activity unless the event specifically targets you",
+            preferences.get(2).getDescription());
         assertEquals(Arrays.asList("Alert", "Email"), preferences.get(2).getFormats());
         assertTrue(preferences.get(2).isEnabled());
 
@@ -241,7 +242,8 @@ class NotificationsSettingsIT
 
         // Filter 5
         assertEquals("System Filter", preferences.get(5).getFilterName());
-        assertEquals("Hide notifications from the System user", preferences.get(5).getDescription());
+        assertEquals("Hide notifications from the System user unless the event specifically targets you",
+            preferences.get(5).getDescription());
         assertEquals(Arrays.asList("Alert", "Email"), preferences.get(5).getFormats());
         assertTrue(preferences.get(5).isEnabled());
     }

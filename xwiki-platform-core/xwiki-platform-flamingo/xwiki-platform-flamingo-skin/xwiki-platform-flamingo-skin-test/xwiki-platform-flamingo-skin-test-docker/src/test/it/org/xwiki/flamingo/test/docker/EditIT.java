@@ -934,7 +934,7 @@ public class EditIT
     {
         // Fixture: enable the XHTML syntax.
         setup.addObject("Rendering", "RenderingConfig", "Rendering.RenderingConfigClass",
-            "disabledSyntaxes", "plain/1.0,xdom+xml/current,xwiki/2.0");
+            "disabledSyntaxes", "plain/1.0,xdom+xml/current,xwiki/2.0,xhtml/5,html/5.0");
         setup.deletePage(testReference);
 
         String pageContent = "= First heading =\n"

@@ -724,7 +724,7 @@ class DefaultWikiMacroTest
         String expect =
             "beginDocument [[syntax]=[XWiki 2.1]]\n"
             + "beginMacroMarkerStandalone [wikimacro] [] [[[label>>path:reference]]]\n"
-            + "onRawText [<span class='class'>] [xhtml/1.0]\n"
+            + "onRawText [<span class='class'>] [html/5.0]\n"
             + "beginMetaData [[non-generated-content]="
                 + "[java.util.List<org.xwiki.rendering.block.Block>][wikimacrocontent]=[true]]\n"
             + "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
@@ -732,7 +732,7 @@ class DefaultWikiMacroTest
             + "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
             + "endMetaData [[non-generated-content]="
                 + "[java.util.List<org.xwiki.rendering.block.Block>][wikimacrocontent]=[true]]\n"
-            + "onRawText [</span>] [xhtml/1.0]\n"
+            + "onRawText [</span>] [html/5.0]\n"
             + "endMacroMarkerStandalone [wikimacro] [] [[[label>>path:reference]]]\n"
             + "endDocument [[syntax]=[XWiki 2.1]]";
         //@formatter:on
@@ -764,7 +764,7 @@ class DefaultWikiMacroTest
         String expect =
             "beginDocument [[syntax]=[XWiki 2.1]]\n"
             + "beginMacroMarkerStandalone [wikimacro] [param1=[[label>>path:reference]]]\n"
-            + "onRawText [<span class='class'>] [xhtml/1.0]\n"
+            + "onRawText [<span class='class'>] [html/5.0]\n"
             + "beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
                 + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n"
             + "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
@@ -772,7 +772,7 @@ class DefaultWikiMacroTest
             + "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
             + "endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
                 + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n"
-            + "onRawText [</span>] [xhtml/1.0]\n"
+            + "onRawText [</span>] [html/5.0]\n"
             + "endMacroMarkerStandalone [wikimacro] [param1=[[label>>path:reference]]]\n" +
             "endDocument [[syntax]=[XWiki 2.1]]";
         //@formatter:on

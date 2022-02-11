@@ -35,6 +35,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
@@ -703,15 +704,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 saveXWikiCollection(obj, context, false);
                             }
                         }
-                    }
-                }
-
-                if (context.getWiki().hasBacklinks(context)) {
-                    try {
-                        saveLinks(doc, context, true);
-                    } catch (Exception e) {
-                        this.logger.error("Failed to save links for document [{}]",
-                            doc.getDocumentReferenceWithLocale(), e);
                     }
                 }
 
@@ -2219,7 +2211,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             // the select clause is compulsory to reach the fullName i.e. the page pointed
             Query<String> query = session.createQuery(
-                "select backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink", String.class);
+                "select distinct backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink",
+                String.class);
 
             // if we are in the same wiki context, we should only get the local reference
             // but if we are not, then we have to check the full reference, containing the wiki part since
@@ -2292,14 +2285,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             String fullName = this.localEntityReferenceSerializer.serialize(doc.getDocumentReference());
 
-            // Add wiki syntax links.
-            Set<String> linkedPages = doc.getUniqueLinkedPages(context);
-            for (String linkedPage : linkedPages) {
+            // Add entity references.
+            for (EntityReference entityReference : doc.getUniqueLinkedEntities(context)) {
                 XWikiLink wikiLink = new XWikiLink();
 
                 wikiLink.setDocId(doc.getId());
                 wikiLink.setFullName(fullName);
-                wikiLink.setLink(linkedPage);
+                wikiLink.setLink(this.localEntityReferenceSerializer.serialize(
+                    entityReference.extractReference(EntityType.DOCUMENT)));
+                if (Objects.equals(entityReference.getType(), EntityType.ATTACHMENT)) {
+                    wikiLink.setAttachmentName(entityReference.getName());
+                }
+                wikiLink.setType(entityReference.getType().getLowerCase());
 
                 links.add(wikiLink);
             }
@@ -2312,7 +2309,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 wikiLink.setDocId(doc.getId());
                 wikiLink.setFullName(fullName);
                 wikiLink.setLink(includedPage);
-
+                wikiLink.setType(EntityType.DOCUMENT.getLowerCase());
                 links.add(wikiLink);
             }
 

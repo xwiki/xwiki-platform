@@ -19,9 +19,11 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -37,7 +39,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.block.Block;
@@ -61,15 +62,8 @@ import org.xwiki.rendering.macro.MacroRefactoringException;
 @Singleton
 public class LinkParser
 {
-    private static final Set<ResourceType> SUPPORTED_BACKLINK_TYPES = new HashSet<>(
-        Arrays.asList(ResourceType.SPACE, ResourceType.DOCUMENT, ResourceType.ATTACHMENT, ResourceType.PAGE));
-
     @Inject
     private EntityReferenceResolver<ResourceReference> entityReferenceResolver;
-
-    @Inject
-    @Named("current")
-    private DocumentReferenceResolver<EntityReference> currentDocumentReferenceResolver;
 
     @Inject
     private Provider<MacroRefactoring> defaultMacroRefactoringProvider;
@@ -82,11 +76,11 @@ public class LinkParser
     private Logger logger;
 
     /**
-     * Extract all the references of an XDOM and return them as {@link ResourceReference}.
-     * This method specifically checks for references in {@link LinkBlock}, {@link ImageBlock} and {@link MacroBlock}.
-     * For {@link MacroBlock} it checks if there's a dedicated {@link MacroRefactoring} component associated with the
-     * block id to perform the extraction, else it's using the default component implementation.
-     * Note that this method logs any exception that it might occur as a warning, so it doesn't throw any of them.
+     * Extract all the references of an XDOM and return them as {@link ResourceReference}. This method specifically
+     * checks for references in {@link LinkBlock}, {@link ImageBlock} and {@link MacroBlock}. For {@link MacroBlock} it
+     * checks if there's a dedicated {@link MacroRefactoring} component associated with the block id to perform the
+     * extraction, else it's using the default component implementation. Note that this method logs any exception that
+     * it might occur as a warning, so it doesn't throw any of them.
      *
      * @param dom an XDOM that might contain references.
      * @return a set of {@link ResourceReference} contained in that XDOM.
@@ -130,37 +124,40 @@ public class LinkParser
     }
 
     /**
-     * Retrieve all linked entity references contained in the given XDOM.
-     * This method checks for references contained in links, images, or macros.
+     * Retrieve all linked entity references contained in the given XDOM. This method checks for references contained in
+     * links, images, or macros.
      *
      * @param dom the XDOM for which to retrieve links.
-     * @param entityType the entity type to use for resolving the references.
+     * @param entityTypes mapping of the types of references to return (and their corresponding resource types)
+     *     references
      * @param currentReference the current document reference for making a relative resolution.
      * @return a set of references contained in the XDOM.
      */
-    public Set<EntityReference> getUniqueLinkedEntityReferences(XDOM dom, EntityType entityType,
-        DocumentReference currentReference)
+    public Set<EntityReference> getUniqueLinkedEntityReferences(XDOM dom,
+        Map<EntityType, Set<ResourceType>> entityTypes, DocumentReference currentReference)
     {
         Set<EntityReference> result = new HashSet<>();
 
         Set<ResourceReference> resourceReferences = this.extractReferences(dom);
         for (ResourceReference resourceReference : resourceReferences) {
-            this.addReference(resourceReference, entityType, currentReference, result);
+            this.addReference(resourceReference, entityTypes, currentReference, result);
         }
 
         return result;
     }
 
-
-
-    private void addReference(ResourceReference reference, EntityType entityType, DocumentReference currentReference,
-        Set<EntityReference> references)
+    private void addReference(ResourceReference reference, Map<EntityType, Set<ResourceType>> entityTypes,
+        DocumentReference currentReference, Set<EntityReference> references)
     {
         String referenceString = reference.getReference();
         ResourceType resourceType = reference.getType();
 
-        if (!SUPPORTED_BACKLINK_TYPES.contains(resourceType)) {
-            // We are only interested in resources leading to a document
+        Optional<EntityType> entityType =
+            entityTypes.entrySet().stream().filter(e -> e.getValue().contains(resourceType)).map(Map.Entry::getKey)
+                .findFirst();
+
+        if (entityType.isEmpty()) {
+            // We are only interested in resources leading to an entity type mapped to the resource type.
             return;
         }
 
@@ -169,16 +166,10 @@ public class LinkParser
             return;
         }
 
-        // Get the EntityReference corresponding to the ResourceReference in the current context
-        EntityReference linkEntityReference = this.entityReferenceResolver.resolve(reference, entityType);
+        EntityReference linkEntityReference = this.entityReferenceResolver.resolve(reference, entityType.get());
 
-        // Get the DocumentReference corresponding the the EntityReference (the document version of a page reference,
-        // the document of an attachment, etc.)
-        DocumentReference linkDocumentReference = this.currentDocumentReferenceResolver
-            .resolve(linkEntityReference, EntityType.DOCUMENT);
-
-        // Verify after resolving it that the link is not an autolink(i.e. a link to the current document)
-        if (!linkDocumentReference.equals(currentReference)) {
+        // Verify after resolving it that the link is not an autolink (i.e., a link to the current document)
+        if (!Objects.equals(linkEntityReference.extractReference(currentReference.getType()), currentReference)) {
             // Since this method is used for saving backlinks and since backlinks must be
             // saved with the space and page name but without the wiki part, we remove the wiki
             // part before serializing.

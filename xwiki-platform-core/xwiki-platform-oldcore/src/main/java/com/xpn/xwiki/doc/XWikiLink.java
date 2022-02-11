@@ -20,11 +20,14 @@
 package com.xpn.xwiki.doc;
 
 import java.io.Serializable;
+import java.util.Objects;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
+/**
+ * Represent the relation between a document using a link to an entity, and the used entity.
+ */
 public class XWikiLink implements Serializable
 {
     private long docId;
@@ -33,21 +36,59 @@ public class XWikiLink implements Serializable
 
     private String fullName;
 
+    private String type;
+
+    private String attachmentName;
+
+    /**
+     * Default constructor.
+     */
     public XWikiLink()
     {
         this.setDocId(0);
     }
 
+    /**
+     * Initializes only the docId.
+     *
+     * @param docId the value of the docId
+     */
     public XWikiLink(long docId)
     {
         this.setDocId(docId);
     }
 
+    /**
+     * Initializes the docId as well as the link (the used entity) and the fullName (the reference of the document using
+     * the entity). The type is initialized to "document" by default.
+     *
+     * @param docId the docId of the document using the entity
+     * @param link the link of the used entity
+     * @param fullName the full name of the document using the entity
+     */
     public XWikiLink(long docId, String link, String fullName)
     {
         this.setDocId(docId);
         this.setLink(link);
         this.setFullName(fullName);
+        this.setType("document");
+    }
+
+    /**
+     * Initializes the docId as well as the link (the used entity), the fullName (the reference of the document using
+     * the entity), and the type of the linked entity.
+     *
+     * @param docId the docId of the document using the entity
+     * @param link the link of the used entity
+     * @param fullName the full name of the document using the entity
+     * @param type the type of the used entity
+     */
+    public XWikiLink(long docId, String link, String fullName, String type)
+    {
+        this.setDocId(docId);
+        this.setLink(link);
+        this.setFullName(fullName);
+        this.setType(type);
     }
 
     /**
@@ -90,39 +131,79 @@ public class XWikiLink implements Serializable
         this.fullName = fullName;
     }
 
-    @Override
-    public boolean equals(Object obj)
+    /**
+     * @param type the type of the link (e.g., document or attachment)
+     * @since 14.2RC1
+     */
+    @Unstable
+    public void setType(String type)
     {
-        if (this == obj) {
+        this.type = type;
+    }
+
+    /**
+     * @return the type of the link (e.g., document or attachment)
+     * @since 14.2RC1
+     */
+    @Unstable
+    public String getType()
+    {
+        return this.type;
+    }
+
+    /**
+     * @param attachmentName the name of the attachment if the link is an attachment, {@code null} otherwise
+     * @since 14.2RC1
+     */
+    @Unstable
+    public void setAttachmentName(String attachmentName)
+    {
+        this.attachmentName = attachmentName;
+    }
+
+    /**
+     * 
+     * @return the name of the attachment if the link is an attachment, {@code null} otherwise
+     * @since 14.2RC1
+     */
+    @Unstable
+    public String getAttachmentName()
+    {
+        return this.attachmentName;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
             return true;
         }
-
-        if (!(obj instanceof XWikiLink)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        XWikiLink o = (XWikiLink)obj;
-
-        EqualsBuilder builder = new EqualsBuilder();
-        builder.append(getDocId(), o.getDocId());
-        builder.append(getLink(), o.getLink());
-        builder.append(getFullName(), o.getFullName());
-
-        return builder.isEquals();
+        XWikiLink xWikiLink = (XWikiLink) o;
+        return this.docId == xWikiLink.docId
+            && this.link.equals(xWikiLink.link)
+            && this.fullName.equals(xWikiLink.fullName)
+            && Objects.equals(this.type, xWikiLink.type)
+            && Objects.equals(this.attachmentName, xWikiLink.attachmentName);
     }
 
     @Override
     public int hashCode()
     {
-        return ("" + getDocId() + this.link).hashCode();
+        return Objects.hash(this.docId, this.link, this.fullName, this.type, this.attachmentName);
     }
 
+    @Override
     public String toString()
     {
-        ToStringBuilder builder = new XWikiToStringBuilder(this);
-        builder.append("DocId", getDocId())
-                .append("FullName", getFullName())
-                .append("Link", getLink());
-        return builder.toString();
+        return new XWikiToStringBuilder(this)
+            .append("DocId", getDocId())
+            .append("FullName", getFullName())
+            .append("Link", getLink())
+            .append("Type", getType())
+            .append("AttachmentName", getAttachmentName())
+            .toString();
     }
 }

@@ -165,8 +165,12 @@
             <key-property name="link" type="string">
                 <column name="XWL_LINK" index="XWLNK_LINK" length="766" />
             </key-property>
+            <key-property name="type" type="string" >
+                <column name="XWL_TYPE" default="'document'" length="768" />
+            </key-property>
         </composite-id>
         <property name="fullName" type="string" column="XWL_FULLNAME" length="768" />
+        <property name="attachmentName" type="string" column="XWL_ATTACHMENT_NAME" length="768" />
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">

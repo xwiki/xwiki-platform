@@ -133,6 +133,7 @@ import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.internal.parser.LinkParser;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
@@ -5522,11 +5523,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * document's content to others entities (documents, attachments, etc.).
      *
      * @param context the XWiki context.
-     * @param entityType the type of references to return
+     * @param entityTypes the mapping of the types of references to return (and their corresponding resource types)
      * @return the references of the linked entities (documents, attachments, etc.), if null an error append.
      * @since 11.2RC1
      */
-    private Set<EntityReference> getUniqueLinkedEntityReferences(XWikiContext context, EntityType entityType)
+    private Set<EntityReference> getUniqueLinkedEntityReferences(XWikiContext context,
+        Map<EntityType, Set<ResourceType>> entityTypes)
     {
         Set<EntityReference> references;
 
@@ -5546,12 +5548,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
                 // Document content
                 XDOM dom = getXDOM();
-                getUniqueLinkedEntityReferences(dom, entityType, references);
+                getUniqueLinkedEntityReferences(dom, entityTypes, references);
 
                 // XObjects
                 for (List<BaseObject> xobjects : getXObjects().values()) {
                     xobjects.stream()
-                        .forEach(xobject -> getUniqueLinkedEntityReferences(xobject, entityType, references, context));
+                        .forEach(xobject -> getUniqueLinkedEntityReferences(xobject, entityTypes, references, context));
                 }
             }
         } finally {
@@ -5562,7 +5564,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return references;
     }
 
-    private void getUniqueLinkedEntityReferences(BaseObject xobject, EntityType entityType,
+    private void getUniqueLinkedEntityReferences(BaseObject xobject, Map<EntityType, Set<ResourceType>> entityTypes,
         Set<EntityReference> references, XWikiContext xcontext)
     {
         if (xobject == null) {
@@ -5583,7 +5585,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
                     try {
                         XDOM dom = parseContent(getSyntax(), largeField.getValue(), getDocumentReference());
-                        getUniqueLinkedEntityReferences(dom, entityType, references);
+                        getUniqueLinkedEntityReferences(dom, entityTypes, references);
                     } catch (XWikiException e) {
                         LOGGER.warn("Failed to extract links from xobject property [{}], skipping it. Error: {}",
                             largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
@@ -5593,10 +5595,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
-    private void getUniqueLinkedEntityReferences(XDOM dom, EntityType entityType, Set<EntityReference> references)
+    private void getUniqueLinkedEntityReferences(XDOM dom, Map<EntityType, Set<ResourceType>> entityTypes,
+        Set<EntityReference> references)
     {
         Set<EntityReference> uniqueLinkedEntityReferences =
-            getLinkParser().getUniqueLinkedEntityReferences(dom, entityType, getDocumentReference());
+            getLinkParser().getUniqueLinkedEntityReferences(dom, entityTypes, getDocumentReference());
         references.addAll(uniqueLinkedEntityReferences);
     }
 
@@ -5623,8 +5626,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public Set<String> getUniqueLinkedPages(XWikiContext context)
     {
-        Set<DocumentReference> references = toDocumentReferenceSet(
-            getUniqueLinkedEntityReferences(context, EntityType.DOCUMENT), getDocumentReference());
+        Set<EntityReference> references = getUniqueLinkedEntityReferences(context, Map.of(EntityType.DOCUMENT,
+            Set.of(ResourceType.SPACE, ResourceType.DOCUMENT, ResourceType.ATTACHMENT, ResourceType.PAGE)));
         Set<String> documentNames = new LinkedHashSet<>(references.size());
 
         XWikiDocument contextDoc = context.getDoc();
@@ -5645,7 +5648,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 serializer = getCompactWikiEntityReferenceSerializer();
             }
 
-            for (DocumentReference reference : references) {
+            for (EntityReference reference : references) {
                 documentNames.add(serializer.serialize(reference));
             }
         } finally {
@@ -5654,6 +5657,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return documentNames;
+    }
+
+    /**
+     * Extract all the unique static (i.e. not generated by macros) wiki links (pointing to wiki page or attachments)
+     * from this document's content to others documents.
+     *
+     * @param context the XWiki context
+     * @return the document names for linked pages and attachments, if {@code null} an error appens
+     * @since 14.2RC1
+     */
+    @Unstable
+    public Set<EntityReference> getUniqueLinkedEntities(XWikiContext context)
+    {
+        return getUniqueLinkedEntityReferences(context, Map.of(
+            EntityType.DOCUMENT, Set.of(ResourceType.SPACE, ResourceType.DOCUMENT, ResourceType.PAGE),
+            EntityType.ATTACHMENT, Set.of(ResourceType.ATTACHMENT)
+        ));
     }
 
     /**

@@ -47,8 +47,8 @@
 
 |=Funktion|=XWiki Syntax 1.0|=Ergebnis
 |Einfache horizontale Linie|{{{----}}}|(((----)))
-|Parametrisierte horizontale Linie|&lt;hr style="color:blue"/&gt;|(((
-(% style="color:blue" %)
+|Parametrisierte horizontale Linie|&lt;hr style="border-color:blue"/&gt;|(((
+(% style="border-color:blue" %)
 ----
 )))
 
@@ -59,10 +59,10 @@
 |=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Ergebnis
 |Einfache horizontale Linie|{{{----}}}|(((----)))
 |Parametrisierte horizontale Linie|((({{{
-(% style="color:blue" %)
+(% style="border-color:blue" %)
 ----
 }}})))|(((
-(% style="color:blue" %)
+(% style="border-color:blue" %)
 ----
 )))</content>
 </xwikidoc>

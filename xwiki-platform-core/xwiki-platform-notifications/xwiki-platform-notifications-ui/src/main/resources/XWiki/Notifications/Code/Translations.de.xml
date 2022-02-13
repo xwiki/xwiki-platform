@@ -55,9 +55,9 @@ notifications.filters.advanced.modal.close=Schließen
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=Systemfilter
-notifications.filters.description.systemUserNotificationFilter=Benachrichtigungen vom System-Benutzer verbergen
+notifications.filters.description.systemUserNotificationFilter=Benachrichtigungen des Systembenutzers ausblenden, es sei denn, das Ereignis richtet sich speziell an Sie
 notifications.filters.name.ownEventsNotificationFilter=Filter zu eigenen Ereignissen
-notifications.filters.description.ownEventsNotificationFilter=Verberge Benachrichtigungen über meine eigenen Aktivitäten
+notifications.filters.description.ownEventsNotificationFilter=Blenden Sie Benachrichtigungen über Ihre eigene Aktivität aus, es sei denn, das Ereignis richtet sich speziell an Sie
 notifications.filters.name.eventReadAlertFilter=Gelesene Benachrichtigungen filtern (Alarm)
 notifications.filters.description.eventReadAlertFilter=Benachrichtigungen verbergen, die als gelesen gekennzeichnet wurden
 notifications.filters.name.eventReadEmailFilter=Gelesene Benachrichtigungen filtern (E-Mail)

@@ -81,8 +81,8 @@
 #set ($momentRelativePath = 'min/moment.min')
 #set ($momentBasePath =
   $stringtool.substringBeforeLast($services.webjars.url('momentjs', 'min/moment.min'), $momentRelativePath))
-// We have to declare momentjs as a RequireJS package in order to be able to load momentjs locales on demand using
-// RequireJS. See https://github.com/requirejs/requirejs/issues/1554 .
+## We have to declare momentjs as a RequireJS package in order to be able to load momentjs locales on demand using
+## RequireJS. See https://github.com/requirejs/requirejs/issues/1554 .
 #set ($requireConfig.packages = [{
   'name': 'moment',
   'location': $stringtool.stripEnd($momentBasePath, '/'),

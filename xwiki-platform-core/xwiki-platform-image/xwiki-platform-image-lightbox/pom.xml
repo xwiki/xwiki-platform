@@ -24,15 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-image</artifactId>
     <version>14.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-image</artifactId>
-  <name>XWiki Platform - Image - Parent POM</name>
-  <description>XWiki Platform - Image - Parent POM</description>
+  <artifactId>xwiki-platform-image-lightbox</artifactId>
+  <name>XWiki Platform - Image - Lightbox - Parent POM</name>
+  <description>Image lightbox functionality</description>
   <packaging>pom</packaging>
   <modules>
-    <module>xwiki-platform-image-lightbox</module>
-    <module>xwiki-platform-image-processing</module>
+    <module>xwiki-platform-image-lightbox-ui</module>
+    <module>xwiki-platform-image-lightbox-webjar</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-image-lightbox-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

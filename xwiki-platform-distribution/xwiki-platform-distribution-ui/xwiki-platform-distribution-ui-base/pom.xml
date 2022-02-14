@@ -197,7 +197,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-ui</artifactId>
+      <artifactId>xwiki-platform-image-lightbox-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>

@@ -24,11 +24,11 @@ require([ "jquery", "$!services.webjars.url('jstree', 'jstree.js')" ], function(
       var uninstalledExtensions = $('#uninstalled_extensions');
       uninstalledExtensions.empty();
       data.selected.forEach(function(e) {
-        uninstalledExtensions.append($('<input>').attr({
+        uninstalledExtensions.append($('<input/>').attr({
           type: 'hidden',
           name: 'uninstalled_extensions',
           value: e
-        }));        
+        }));
       });
     })
     .jstree({
@@ -47,7 +47,7 @@ require([ "jquery", "$!services.webjars.url('jstree', 'jstree.js')" ], function(
 
   var maybeScheduleRefresh = function(jobStatus) {
     // Refresh if the job is running (if the progress bar is displayed).
-    if (jobStatus.children('.ui-progress').size() > 0) {
+    if (jobStatus.children('.ui-progress').length) {
       setTimeout(maybeScheduleRefresh, 500, jobStatus);
     } else {
       // Re-enable the buttons.

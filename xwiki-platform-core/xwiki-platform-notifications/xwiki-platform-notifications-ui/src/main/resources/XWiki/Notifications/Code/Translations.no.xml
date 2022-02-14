@@ -55,9 +55,9 @@ notifications.filters.advanced.modal.close=Lukk
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=Systemfilter
-notifications.filters.description.systemUserNotificationFilter=Skjul varsler fra systembrukeren
+notifications.filters.description.systemUserNotificationFilter=Skjul varsler fra systembrukeren med mindre hendelsen er spesifikt rettet mot deg
 notifications.filters.name.ownEventsNotificationFilter=Egne hendelsesfilter
-notifications.filters.description.ownEventsNotificationFilter=Skjul varsler om din egen aktivitet
+notifications.filters.description.ownEventsNotificationFilter=Skjul varsler om din egen aktivitet med mindre hendelsen er spesifikt rettet mot deg
 notifications.filters.name.eventReadAlertFilter=Les hendelsesfilter (varsel)
 notifications.filters.description.eventReadAlertFilter=Skjul varsler du har markert som lest
 notifications.filters.name.eventReadEmailFilter=Les hendelsesfilter (e-post)

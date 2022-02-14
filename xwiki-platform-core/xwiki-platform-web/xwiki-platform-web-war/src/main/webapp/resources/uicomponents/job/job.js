@@ -50,8 +50,8 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
     var percent = Math.floor((job.progress.offset || 0) * 100);
     jobUI.find('.ui-progress-bar').css('width', percent + '%');
     var jobLog = job.log.items || [];
-    if (jobLog.size() > 0) {
-      jobUI.find('.ui-progress-message').html(jobLog[jobLog.size() - 1].renderedMessage);
+    if (jobLog.length) {
+      jobUI.find('.ui-progress-message').html(jobLog[jobLog.length - 1].renderedMessage);
     }
   };
 
@@ -65,7 +65,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
       // Remember the answer callback
       jobQuestion.data('answerCallback', answerCallback);
 
-      $.ajax(displayerURL).done($.proxy(updateQuestionContent, jobQuestion));
+      $.get(displayerURL).then($.proxy(updateQuestionContent, jobQuestion));
     } else {
       jobQuestion.empty();
     }
@@ -90,7 +90,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
     jobLogUI.find('.log-item-loading').removeClass('log-item-loading');
     $.each(jobLog, function(index, item) {
       var classNames = ['log-item', 'log-item-' + item.level];
-      if (job.state !== 'FINISHED' && index === jobLog.size() - 1) {
+      if (job.state !== 'FINISHED' && index === jobLog.length - 1) {
         classNames.push('log-item-loading');
       }
       $(document.createElement('li')).addClass(classNames.join(' ')).html(item.renderedMessage).appendTo(jobLogUI);
@@ -196,9 +196,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
               );
 
             // Send the answer
-            answerCallback(properties).done(new function() {
-              notif.hide();
-            });
+            answerCallback(properties).then(() => notif.hide());
           }
         }
       }
@@ -231,7 +229,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
             return {
               url: url,
               data: {
-                'logOffset': jobLog.find('.log-item').size()
+                'logOffset': jobLog.find('.log-item').length
               }
             };
           };
@@ -258,8 +256,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
 
       new JobRunner(runnerConfig).resume()
         .progress($.proxy(updateStatus, this))
-        .done($.proxy(notifyJobDone, this))
-        .fail($.proxy(notifyConnectionFailure, this));
+        .then($.proxy(notifyJobDone, this), $.proxy(notifyConnectionFailure, this));
     }
   });
 });

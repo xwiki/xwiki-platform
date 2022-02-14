@@ -175,6 +175,11 @@
         <artifactId>xwiki-platform-security-authorization-script</artifactId>
         <version>14.1-SNAPSHOT</version>
       </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-webjars-api</artifactId>
+        <version>14.1-SNAPSHOT</version>
+      </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>
         <groupId>org.xwiki.rendering</groupId>

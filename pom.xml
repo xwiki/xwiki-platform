@@ -49,14 +49,14 @@
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>
     <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
-    <hsqldb.version>2.5.2</hsqldb.version>
+    <hsqldb.version>2.6.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.59</ckeditor.version>
+    <ckeditor.version>1.60-SNAPSHOT</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.14</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>2.2.1</tika.version>
+    <tika.version>2.3.0</tika.version>
     <pdfbox.version>2.0.25</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 
@@ -64,7 +64,7 @@
     <jetty.version>9.4.29.v20200521</jetty.version>
 
     <!-- Netty version -->
-    <netty.version>4.1.73.Final</netty.version>
+    <netty.version>4.1.74.Final</netty.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -103,7 +103,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.3.1</pgsql.version>
+    <pgsql.version>42.3.2</pgsql.version>
     <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>
@@ -410,7 +410,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery</artifactId>
-        <version>2.2.4</version>
+        <version>3.6.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>

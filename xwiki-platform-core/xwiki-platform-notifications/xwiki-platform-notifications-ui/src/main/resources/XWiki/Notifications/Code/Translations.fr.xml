@@ -54,9 +54,9 @@ notifications.filters.advanced.modal.close=Fermer
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=Filtre Système
-notifications.filters.description.systemUserNotificationFilter=Masquer les notifications provenant de l'utilisateur Système
+notifications.filters.description.systemUserNotificationFilter=Masquer les notifications provenant de l'utilisateur Système sauf si l'événement vous concerne directement
 notifications.filters.name.ownEventsNotificationFilter=Filtre de vos propres événements
-notifications.filters.description.ownEventsNotificationFilter=Masquer les notifications de votre activité
+notifications.filters.description.ownEventsNotificationFilter=Masquer les notifications de votre activité sauf si l'événement vous concerne directement
 notifications.filters.name.eventReadAlertFilter=Filtre d'événement lu (Alerte)
 notifications.filters.description.eventReadAlertFilter=Masquer les notifications que vous avez marquées comme lu
 notifications.filters.name.eventReadEmailFilter=Filtre d'événement lu (Email)

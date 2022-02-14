@@ -104,7 +104,7 @@ class DefaultAttachmentsManagerTest
     void availableDocumentHasAttachment() throws Exception
     {
         when(this.wiki.getDocument(DOCUMENT_REFERENCE, this.xWikiContext)).thenReturn(this.document);
-        when(this.document.getAttachment("file.txt")).thenReturn(mock(XWikiAttachment.class));
+        when(this.document.getExactAttachment("file.txt")).thenReturn(mock(XWikiAttachment.class));
         assertFalse(this.attachmentsManager.available(ATTACHMENT_LOCATION));
     }
 
@@ -160,7 +160,7 @@ class DefaultAttachmentsManagerTest
     }
 
     @Test
-    void removeExistingRedirection() throws Exception
+    void removeExistingRedirection()
     {
         BaseObject redirection1 = mock(BaseObject.class);
         BaseObject redirection2 = mock(BaseObject.class);

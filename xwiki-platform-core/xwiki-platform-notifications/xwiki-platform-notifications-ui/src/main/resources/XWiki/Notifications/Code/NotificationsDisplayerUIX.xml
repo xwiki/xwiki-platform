@@ -332,7 +332,7 @@ Get the actual notifications.
               outputSyntax: 'plain',
               action: 'clear',
               date: startDate
-            }).success(function (){
+            }).then(() =&gt; {
               // Display the success message
               notification.hide();
               new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.cleared'))", 'done');
@@ -383,7 +383,7 @@ Get the actual notifications.
   /**
    * Initialize the widget.
    */
-  $(document).ready(function () {
+  $(function () {
 
     var container = $('.notification-uix');
     getUnreadNotificationsCount();
@@ -436,8 +436,8 @@ Get the actual notifications.
           outputSyntax: 'html',
           action: 'getNotifications',
           document: documentReference
-        }).success(function (data){
-          $('.notification-uix').html(data).removeClass('loading');
+        }).then(html =&gt; {
+          $('.notification-uix').html(html).removeClass('loading');
           $('.notification-uix').find('.notifications-macro').each(function() {
             new XWikiAsyncNotificationsMacro(this);
           });
@@ -621,7 +621,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
         'location': location,
         'type': type,
         'currentDoc': XWiki.Model.serialize(xm.documentReference)
-      }).done(function (data) {
+      }).then(data =&gt; {
         // Unfortunately, bootstrap switch does not allow to change the state if it is disabled
         allWatchSwitches.bootstrapSwitch('disabled', false);
         // Update states
@@ -629,11 +629,11 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
         watchSpaceSwitch.bootstrapSwitch('state', data.space, true);
         watchWikiSwitch.bootstrapSwitch('state', data.wiki, true);
         // Display success message
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).fail (function() {
-        notification.hide();
-        new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('notifications.switches.changeStatusError'))', 'error');
+        notification.replace(new XWiki.widgets.Notification(
+          "$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done'));
+      }).catch(() =&gt; {
+        notification.replace(new XWiki.widgets.Notification(
+          '$escapetool.javascript($services.localization.render('notifications.switches.changeStatusError'))', 'error'));
         allWatchSwitches.bootstrapSwitch('disabled', false);
       });
     };

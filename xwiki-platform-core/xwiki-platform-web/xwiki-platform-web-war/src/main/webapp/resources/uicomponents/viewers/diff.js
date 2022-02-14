@@ -48,7 +48,7 @@ define('xwiki-diff', ['jquery', 'xwiki-events-bridge'], function($) {
 
   var enhanceDiffSummaryItem = function() {
     var details = $(this).next('ul');
-    if (details.size() > 0) {
+    if (details.length) {
       details.hide();
       $(this).find('a').click(function(event) {
         event.preventDefault();

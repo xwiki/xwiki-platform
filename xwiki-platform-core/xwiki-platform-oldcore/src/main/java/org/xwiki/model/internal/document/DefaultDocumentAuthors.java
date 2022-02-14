@@ -149,10 +149,10 @@ public class DefaultDocumentAuthors implements DocumentAuthors
         DefaultDocumentAuthors that = (DefaultDocumentAuthors) o;
 
         return new EqualsBuilder()
-            .append(contentAuthor, that.contentAuthor)
-            .append(effectiveMetadataAuthor, that.effectiveMetadataAuthor)
-            .append(originalMetadataAuthor, that.originalMetadataAuthor)
-            .append(creator, that.creator)
+            .append(this.contentAuthor, that.contentAuthor)
+            .append(this.effectiveMetadataAuthor, that.effectiveMetadataAuthor)
+            .append(this.originalMetadataAuthor, that.originalMetadataAuthor)
+            .append(this.creator, that.creator)
             .isEquals();
     }
 
@@ -160,10 +160,10 @@ public class DefaultDocumentAuthors implements DocumentAuthors
     public int hashCode()
     {
         return new HashCodeBuilder(17, 67)
-            .append(contentAuthor)
-            .append(effectiveMetadataAuthor)
-            .append(originalMetadataAuthor)
-            .append(creator)
+            .append(this.contentAuthor)
+            .append(this.effectiveMetadataAuthor)
+            .append(this.originalMetadataAuthor)
+            .append(this.creator)
             .toHashCode();
     }
 
@@ -171,11 +171,11 @@ public class DefaultDocumentAuthors implements DocumentAuthors
     public String toString()
     {
         return new XWikiToStringBuilder(this)
-            .append("documentHolder", documentHolder)
-            .append("contentAuthor", contentAuthor)
-            .append("effectiveMetadataAuthor", effectiveMetadataAuthor)
-            .append("originalMetadataAuthor", originalMetadataAuthor)
-            .append("creator", creator)
+            .append("documentHolder", this.documentHolder)
+            .append("contentAuthor", this.contentAuthor)
+            .append("effectiveMetadataAuthor", this.effectiveMetadataAuthor)
+            .append("originalMetadataAuthor", this.originalMetadataAuthor)
+            .append("creator", this.creator)
             .toString();
     }
 }

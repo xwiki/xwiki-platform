@@ -42,11 +42,9 @@ solr.admin.error.action={0} ошибка:
 solr.admin.error.notallowed=У Вас нет прав для выполнения этого действия.
 solr.admin.error.norights=Для доступа к этому разделу необходимы права Администратора.
 solr.admin.success.action={0} успешно запущен.
-
 solr.admin.status.title=Состояние
 solr.admin.status.queueSize.label=Размер очереди
 solr.admin.status.queueSize.hint=Количество объектов, которые будут индексированы, переиндексированы или удалены из индекса (в зависимости от выполненного действия).
-
 solr.admin.indexing.title=Индексация
 solr.admin.indexing.action.label=Действие
 solr.admin.indexing.action.hint=Действие для выполнения над индексом.
@@ -58,9 +56,7 @@ solr.admin.indexing.wiki.hint=Вики, для которой все ее док
 solr.admin.indexing.wiki.select_farm=Везде
 solr.admin.indexing.query.label=Произвольный запрос
 solr.admin.indexing.query.hint=Необязательный запрос для ограничения документов, которые будут затронуты выбранным действием в индексе.
-
 solr.admin.info.affectedDocuments=Затронутых документов в индексе:
-
 solr.sortBy=Сортировать:
 solr.sortBy.score=Значимость
 solr.sortBy.title_sort=Заголовок страницы
@@ -72,20 +68,17 @@ solr.sortBy.attdate_sort=Дата загрузки
 solr.sortBy.attauthor_display_sort=Загружено
 solr.sortOrder.asc=По возрастанию
 solr.sortOrder.desc=По убыванию
-
 solr.options=Показать:
 solr.options.highlight=Подсветка
 solr.options.highlight.title=Показать выдержку из того, что было найдено в каждом результате
 solr.options.facet=Фасеты
 solr.options.facet.title=Разрешить дополнительную фильтрацию результата
-
 solr.result.language=Язык
 solr.result.locatedIn=Расположен в
 solr.result.author=Изменено {0} на {1}
 solr.result.mediaType=Файл типа {0}
 solr.result.uploadedBy=Загружено {0} на {1} ({2})
 solr.result.highlightAll=Подсветка всех совпадений
-
 solr.facets.title=Уточните свой поиск
 solr.facets.hint=Выберите категорию и активируйте фильтры по текущим результатам
 solr.facets.resetAll=Сбросить все
@@ -93,12 +86,10 @@ solr.facets.expandAll=Развернуть все
 solr.facets.collapseAll=Свернуть все
 solr.facets.emptyValue=Пустое значение
 solr.facets.moreValues={0} больше
-
 solr.filterBy.type.document=Документ
 solr.filterBy.type.attachment=Вложение
 solr.filterBy.type.object=Объект
 solr.filterBy.type.object_property=Свойство объекта
-
 solr.filterBy.fileType.image=Изображение
 solr.filterBy.fileType.audio=Аудио
 solr.filterBy.fileType.video=Видео
@@ -118,7 +109,6 @@ solr.facet.fileType.image.icon=Иконка
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
 solr.facet.fileType.other.octet-stream=Бинарные данные
-
 solr.facet.date.today=Сегодня
 solr.facet.date.last7Days=7 дней назад
 solr.facet.date.last30Days=30 дней назад
@@ -131,7 +121,6 @@ solr.facet.date.between=Из {0} в {1}
 solr.facet.date.after=После {0}
 solr.facet.date.before=До {0}
 solr.facet.date.any=Любая дата
-
 solr.facet.size.tiny=Крошечный
 solr.facet.size.small=Маленький
 solr.facet.size.medium=Средний
@@ -140,7 +129,6 @@ solr.facet.size.between=Между {0} и {1}
 solr.facet.size.lessThan=Меньше чем {0}
 solr.facet.size.moreThan=Больше чем {0}
 solr.facet.size.any=Любой размер
-
 solr.field.type=Тип результата
 solr.field.locale=Язык
 solr.field.locale.emptyValue=Язык не установлен
@@ -173,7 +161,6 @@ solr.field.attauthor=Загружено
 solr.field.attauthor_display=Загружено
 solr.field.attdate=Дата загрузки
 solr.field.attsize=Размер файла
-
 solr.uix.docdoesnotexist.title=Вы искали одну из следующих страниц?
 solr.uix.attachmentdoesnotexist.title=Вы искали одно из следующих вложений?
 
@@ -181,11 +168,12 @@ solr.uix.attachmentdoesnotexist.title=Вы искали одно из следу
 #@deprecatedstart
 
 ## until 7.2M3
-### Missing: solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
+solr.result.location=Находится в {0} » {1} » {2}
 
 ## until 7.2RC1
-### Missing: solr.field.space=Location
+solr.field.space=Расположение
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

@@ -43,7 +43,7 @@ viewers.Comments = Class.create({
    * @returns {boolean} true if the comment block has an object number
    */
   hasCommentNumber : function (comment) {
-    return comment.id.match(this.commentNumberRegex).size() > 1;
+    return comment.id.match(this.commentNumberRegex).length > 1;
   },
 
   /** Constructor. Adds all the JS improvements of the Comments area. */
@@ -80,6 +80,7 @@ viewers.Comments = Class.create({
     if(openCommentForm) {
       openCommentForm.observe('click', function (event) {
         event.stop();
+        $(this.commentPlaceHolderSelector).show();
         this.displayHiddenForm()
         this.reloadEditor({
           callback: function () {
@@ -110,9 +111,9 @@ viewers.Comments = Class.create({
       if (placeHolder) {
         placeHolder.removeClassName('hidden');
       }
-      var button = $('openCommentForm');
+      const button = $('openCommentForm');
       if (button) {
-        button.remove();
+        button.hide();
       }
       this.formDisplayed = true;
     }
@@ -141,7 +142,8 @@ viewers.Comments = Class.create({
       item.observe('click', function(event) {
         item.blur();
         event.stop();
-        this.displayHiddenForm()
+        this.displayHiddenForm();
+        this.resetForm();
         if (item.disabled) {
           // Do nothing if the button was already clicked and it's waiting for a response from the server.
           return;
@@ -232,14 +234,7 @@ viewers.Comments = Class.create({
     const name = "XWiki.XWikiComments_" + commentNbr + "_comment";
     this.destroyEditor("[name='" + name + "']", name);
     comment.show();
-    $(this.commentPlaceHolderSelector).show();
-    this.reloadEditor({
-          callback: function () {
-            this.getForm();
-            this.addSubmitListener(this.form);
-            this.addCancelListener();
-            this.addPreview(this.form);
-          }.bind(this)});
+    this.resetForm();
     this.cancelPreview(editActivator._x_editForm);
     this.editing = false;
   },
@@ -268,7 +263,6 @@ viewers.Comments = Class.create({
     item.observe('click', function(event) {
       item.blur();
       event.stop();
-      this.displayHiddenForm();
       this.getForm();
       // If the form was already displayed as a reply, re-enable the Reply button for the old location
       if (this.form.up('.commentthread')) {
@@ -372,18 +366,19 @@ viewers.Comments = Class.create({
                   // Forces displayHiddenForm to display the comment form with the content of the comment
                   // before submission.
                   this.formDisplayed = false;
+                  this.displayHiddenForm();
+                  this.reloadEditor({
+                    content: submittedComment,
+                    callback: function () {
+                      this.getForm();
+                      this.addSubmitListener(this.form);
+                      this.addCancelListener();
+                      this.addPreview(this.form);
+                    }.bind(this)
+                  });
+                } else {
+                  this.resetForm(); 
                 }
-
-                this.displayHiddenForm();
-                this.reloadEditor({
-                  content: submittedComment,
-                  callback: function () {
-                    this.getForm();
-                    this.addSubmitListener(this.form);
-                    this.addCancelListener();
-                    this.addPreview(this.form);
-                  }.bind(this)
-                });
 
                 document.fire("xwiki:docextra:loaded", {
                   "id": "Comments",
@@ -502,7 +497,7 @@ viewers.Comments = Class.create({
         commentEditorSelector += "-" + commentNumber;
       }
       const commentElt = $(form).find(commentEditorSelector);
-      if ($(form).find(".commentPreview").size() === 0) {
+      if (!$(form).find(".commentPreview").length) {
         commentElt.before('<div class="commentcontent commentPreview" style="display: none;"></div>');
       }
       const commentPreview = $(form).find(".commentcontent.commentPreview");
@@ -540,16 +535,21 @@ viewers.Comments = Class.create({
     if (event) {
       event.stop();
     }
-    this.getForm();
-    if (this.form.up('.commentthread')) {
-      // Show the comment's reply button
-      this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
-      // Put the form back to its initial location and clear the contents
-      this.initialLocation.insert({after: this.form});
-    }
-    this.form["XWiki.XWikiComments_replyto"].value = "";
-    this.reloadEditor();
-    this.cancelPreview(this.form);
+    require(['jquery'], function ($) {
+      const commentPlaceHolder = $('#' + this.commentPlaceHolderSelector);
+      if (this.form.up('.commentthread')) {
+        // Show the comment's reply button back
+        this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
+        // Move back to form to its default location.
+        commentPlaceHolder.empty().append(this.form)
+      }
+      // Hides the form and display the "add comment" button
+      commentPlaceHolder.addClass("hidden");
+      this.formDisplayed = false;
+      $('#openCommentForm').show();
+      this.form["XWiki.XWikiComments_replyto"].value = "";
+      this.cancelPreview(this.form);
+    }.bind(this));
   },
   /**
    * Registers a listener that watches for the insertion of the Comments tab and triggers the enhancements.
@@ -566,7 +566,7 @@ viewers.Comments = Class.create({
   destroyEditor: function (selector, name) {
     require(['jquery', 'xwiki-events-bridge'], function ($) {
       $(document).trigger('xwiki:actions:cancel');
-      if ($(selector).size() > 0) {
+      if ($(selector).length) {
         const parent = $(selector).parent(".commenteditor");
         parent.empty();
       }
@@ -588,7 +588,7 @@ viewers.Comments = Class.create({
     this.destroyEditor("[name='" + name + "']", name);
 
     require(['jquery', 'xwiki-events-bridge'], function ($) {
-      if ($(".commenteditor").size() > 0) {
+      if ($(".commenteditor").length) {
         $.post(new XWiki.Document().getURL("get") + '?' + $.param({
           xpage: 'xpart',
           vm: 'commentfield.vm',
@@ -601,7 +601,7 @@ viewers.Comments = Class.create({
           wf.append(data);
           wf.show();
           $(document).trigger('xwiki:dom:updated', {'elements': wf.toArray()});
-          if ($("#commentCaptcha").size() > 0) {
+          if ($("#commentCaptcha").length) {
             // FIXME: this solution is not good right now since it implies to always display the CAPTCHA
             // however since the idea is now to have a button "Add a comment", I won't got further: we should
             // display the captcha when the user decide to add a comment.
@@ -727,7 +727,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    */
   var updateCount = function() {
     var commentsTab = $('#Commentstab').find('.itemCount');
-    var commentsNumber = $('.xwikicomment').size();
+    var commentsNumber = $('.xwikicomment').length;
     if(commentsTab) {
       commentsTab.text("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", commentsNumber));
     }

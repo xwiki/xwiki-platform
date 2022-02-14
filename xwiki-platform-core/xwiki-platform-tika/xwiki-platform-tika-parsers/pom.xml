@@ -121,6 +121,13 @@
       <artifactId>tika-parser-image-module</artifactId>
     </dependency>
 
+    <!-- We need a Log4j 2.x implementation since some Tika parsers use Log4j 2.x -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-to-slf4j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- Replace the version triggered by Tika parsers by a more accurate one -->
     <dependency>
       <groupId>jakarta.annotation</groupId>

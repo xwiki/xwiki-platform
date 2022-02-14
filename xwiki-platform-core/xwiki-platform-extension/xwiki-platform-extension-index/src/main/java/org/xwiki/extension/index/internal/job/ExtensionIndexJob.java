@@ -256,9 +256,9 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     private Map<String, SortedSet<Version>> getIndexedExtensions() throws SolrServerException, IOException
     {
         SolrQuery solrQuery = new SolrQuery();
-        Set<ExtensionId> extensoinIds = this.indexStore.searchExtensionIds(solrQuery);
-        Map<String, SortedSet<Version>> extensions = new HashMap<>(extensoinIds.size());
-        for (ExtensionId extensionId : extensoinIds) {
+        Set<ExtensionId> extensionIds = this.indexStore.searchExtensionIds(solrQuery);
+        Map<String, SortedSet<Version>> extensions = new HashMap<>(extensionIds.size());
+        for (ExtensionId extensionId : extensionIds) {
             add(extensionId, extensions);
         }
 

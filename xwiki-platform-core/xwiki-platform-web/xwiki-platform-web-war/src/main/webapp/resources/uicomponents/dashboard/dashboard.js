@@ -309,7 +309,7 @@ XWiki.Dashboard = Class.create( {
     }
     button.addClassName('loading');
     require(['gadgetWizard'], function(gadgetWizard) {
-      gadgetWizard(gadget).done(callback).always(function() {
+      gadgetWizard(gadget).then(callback).finally(() => {
         button.removeClassName('loading');
       });
     });

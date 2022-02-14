@@ -56,6 +56,7 @@ com.xpn.xwiki.internal.filter.output.XWikiDocumentOutputFilterStream
 com.xpn.xwiki.script.display.DisplayScriptService
 com.xpn.xwiki.internal.job.JobRequestContextInitializer
 com.xpn.xwiki.internal.localization.XWikiLocalizationContext
+500:com.xpn.xwiki.internal.localization.XWikiLocalizationManager
 com.xpn.xwiki.internal.mandatory.DocumentAsyncClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer

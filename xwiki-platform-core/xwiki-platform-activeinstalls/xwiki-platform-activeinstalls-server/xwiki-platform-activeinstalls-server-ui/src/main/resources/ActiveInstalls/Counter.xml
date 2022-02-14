@@ -1105,7 +1105,7 @@ define('flipCounter', function() {
       let sourceReference = XWiki.Model.resolve($(this).data('source'), XWiki.EntityType.DOCUMENT, sourceBaseReference);
       let url = new XWiki.Document(sourceReference).getURL('get');
       let flipCounter = $(this).data('flipCounter');
-      $.get(url, {outputSyntax: 'plain'}).done(function(value) {
+      $.get(url, {outputSyntax: 'plain'}).then(value =&gt; {
         let intValue = parseInt(value);
         if (!isNaN(intValue)) {
           flipCounter.setValue(intValue);

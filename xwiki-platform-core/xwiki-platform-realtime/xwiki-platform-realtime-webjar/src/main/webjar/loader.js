@@ -99,7 +99,7 @@ define('xwiki-realtime-loader', [
   module.checkSessions = function(info) {
     if (lock) {
       // Found an edit lock link.
-      checkSocket().done(function(types) {
+      checkSocket().then(types => {
         // Determine if it's a realtime session.
         if (types.length) {
           console.log('Found an active realtime session.');
@@ -201,9 +201,9 @@ define('xwiki-realtime-loader', [
   createModalContent = function(message, primaryActionLabel) {
     var content = $(
       '<div class="modal-popup">' +
-        '<p/>' +
+        '<p></p>' +
         '<div class="realtime-buttons">' +
-          '<button class="btn btn-primary"/>' +
+          '<button class="btn btn-primary"></button>' +
         '</div>' +
       '</div>'
     );
@@ -216,7 +216,7 @@ define('xwiki-realtime-loader', [
     var content = createModalContent(Messages['requestDialog.prompt'], Messages.get('requestDialog.create', info.name));
 
     // Initialize auto-accept
-    var autoAccept = $('<p/>').appendTo(content);
+    var autoAccept = $('<p></p>').appendTo(content);
     var i = 30;
     var interval = setInterval(function() {
       i--;
@@ -237,7 +237,7 @@ define('xwiki-realtime-loader', [
       }
     });
 
-    var buttonReject = $('<button class="btn btn-danger"/>').text(Messages['requestDialog.reject']);
+    var buttonReject = $('<button class="btn btn-danger"></button>').text(Messages['requestDialog.reject']);
     buttonReject.insertBefore(buttonCreate).click(function() {
       clearInterval(interval);
       try {
@@ -259,7 +259,7 @@ define('xwiki-realtime-loader', [
 
   getReloadContent = function() {
     var content = createModalContent(Messages['reloadDialog.prompt'], Messages['reloadDialog.exit']);
-    var buttonReload = $('<button class="btn btn-default"/>').text(Messages['reloadDialog.reload']);
+    var buttonReload = $('<button class="btn btn-default"></button>').text(Messages['reloadDialog.reload']);
     buttonReload.click($.proxy(window.location, 'reload', true)).insertAfter(content.find('button'));
     return content[0];
   },
@@ -276,7 +276,7 @@ define('xwiki-realtime-loader', [
     var content = createModalContent(Messages['disableDialog.prompt'], Messages['disableDialog.ok']);
 
     var buttonOK = content.find('button').click($.proxy(callback, null, true));
-    $('<button class="btn btn-default"/>').text(Messages['disableDialog.exit']).insertBefore(buttonOK)
+    $('<button class="btn btn-default"></button>').text(Messages['disableDialog.exit']).insertBefore(buttonOK)
       .click($.proxy(callback, null, false));
     return void displayCustomModal(content[0]);
   };
@@ -358,11 +358,11 @@ define('xwiki-realtime-loader', [
     $('.xwiki-realtime-box').insertAfter(getBoxPosition()).show();
     $('.xwiki-realtime-box').css('margin-bottom', fullScreen ? '0' : '');
     resize();
-  },
+  };
 
   // Detect fullscreen mode in CKeditor.
   // FIXME: Modify the CKEditor to fire the fullscreen events.
-  observer = new MutationObserver(function(mutations) {
+  new MutationObserver(function(mutations) {
     mutations.forEach(function (mutation) {
       if (mutation.type === 'attributes' && mutation.attributeName === 'data-maximized') {
         fullScreen = $('body').attr('data-maximized') === 'true';
@@ -395,23 +395,23 @@ define('xwiki-realtime-loader', [
       return;
     }
     warningVisible = true;
-    var $warning = $('<div>', {
+    var $warning = $('<div></div>', {
       'class': 'xwiki-realtime-warning xwiki-realtime-box box warningmessage'
     }).insertAfter($after);
     scrollToBox($warning);
-    $('<strong>').text(Messages.conflictsWarning).appendTo($warning);
-    $('<br>').appendTo($warning);
-    $('<span>').text(Messages.wsErrorConflicts).appendTo($warning);
+    $('<strong></strong>').text(Messages.conflictsWarning).appendTo($warning);
+    $('<br/>').appendTo($warning);
+    $('<span></span>').text(Messages.wsErrorConflicts).appendTo($warning);
     var editor = isEditorCompatible();
     if (!module.isRt && editor) {
-      $('<br>').appendTo($warning);
-      $('<span>').html(Messages.conflictsWarningInfo).appendTo($warning);
-      $('<a>', {
+      $('<br/>').appendTo($warning);
+      $('<span></span>').html(Messages.conflictsWarningInfo).appendTo($warning);
+      $('<a></a>', {
         href: getRTEditorURL(window.location.href, availableRt[editor].info)
       }).text(Messages.conflictsWarningInfoLink).appendTo($warning);
     } else if (module.isRt) {
-      $('<br>').appendTo($warning);
-      $('<span>').text(Messages.conflictsWarningInfoRt).appendTo($warning);
+      $('<br/>').appendTo($warning);
+      $('<span></span>').text(Messages.conflictsWarningInfoRt).appendTo($warning);
     }
   },
 
@@ -422,16 +422,16 @@ define('xwiki-realtime-loader', [
     }
     warningVisible = true;
     var type = isError ? 'errormessage' : 'warningmessage';
-    var $warning = $('<div>', {
+    var $warning = $('<div></div>', {
       'class': 'xwiki-realtime-warning xwiki-realtime-box box ' + type
     }).insertAfter($after);
     scrollToBox($warning);
-    $('<strong>').text(Messages.wsError).appendTo($warning);
-    $('<br>').appendTo($warning);
-    $('<span>').text(Messages.wsErrorInfo).appendTo($warning);
+    $('<strong></strong>').text(Messages.wsError).appendTo($warning);
+    $('<br/>').appendTo($warning);
+    $('<span></span>').text(Messages.wsErrorInfo).appendTo($warning);
     if (module.isForced) {
-      $('<br>').appendTo($warning);
-      $('<span>').text(Messages.wsErrorConflicts).appendTo($warning);
+      $('<br/>').appendTo($warning);
+      $('<span></span>').text(Messages.wsErrorConflicts).appendTo($warning);
     }
   },
 
@@ -448,11 +448,11 @@ define('xwiki-realtime-loader', [
       return;
     }
     connectingVisible = true;
-    var $warning = $('<div>', {
+    var $warning = $('<div></div>', {
       'class': 'xwiki-realtime-connecting xwiki-realtime-box box infomessage'
     }).insertAfter($after);
     scrollToBox($warning);
-    $('<strong>').text(Messages.connectingBox).appendTo($warning);
+    $('<strong></strong>').text(Messages.connectingBox).appendTo($warning);
   },
 
   hideConnecting = function() {
@@ -468,13 +468,13 @@ define('xwiki-realtime-loader', [
       return;
     }
     wsErrorVisible = true;
-    var $warning = $('<div>', {
+    var $warning = $('<div></div>', {
       'class': 'xwiki-realtime-disconnected xwiki-realtime-box box errormessage'
     }).insertAfter($after);
     scrollToBox($warning);
-    $('<strong>').text(Messages.connectionLost).appendTo($warning);
-    $('<br>').appendTo($warning);
-    $('<span>').text(Messages.connectionLostInfo).appendTo($warning);
+    $('<strong></strong>').text(Messages.connectionLost).appendTo($warning);
+    $('<br/>').appendTo($warning);
+    $('<span></span>').text(Messages.connectionLostInfo).appendTo($warning);
   },
 
   hideWsError = function() {
@@ -628,7 +628,7 @@ define('xwiki-realtime-loader', [
       path: doc.language + '/events/all',
       create: true
     });
-    getChannels().done(function(channels) {
+    getChannels().then(channels => {
       var channelKey = channels[0].key;
       if (channelKey) {
         require(['netflux-client', 'xwiki-realtime-errorBox'], function(Netflux, ErrorBox) {
@@ -672,9 +672,7 @@ define('xwiki-realtime-loader', [
     network.on('reconnect', function() {
       hideWarning();
       hideWsError();
-      getChannels().done(function(channels) {
-        network.join(channels[0].key).then(onOpen, onError);
-      });
+      getChannels().then(channels => network.join(channels[0].key)).then(onOpen, onError);
     });
     network.on('disconnect', function() {
       if (module.isRt) {
@@ -733,16 +731,16 @@ define('xwiki-realtime-loader', [
   },
 
   beforeLaunchRealtime = function(keys) {
-    var deferred = $.Deferred();
-    if (module.isRt) {
-      module.whenReady(function(wsAvailable) {
-        module.isRt = wsAvailable;
-        deferred.resolve(keys);
-      });
-    } else {
-      deferred.resolve(keys);
-    }
-    return deferred.promise();
+    return new Promise((resolve, reject) => {
+      if (module.isRt) {
+        module.whenReady(function(wsAvailable) {
+          module.isRt = wsAvailable;
+          resolve(keys);
+        });
+      } else {
+        resolve(keys);
+      }
+    });
   },
 
   parseKeyData = function(editorId, channels) {
@@ -837,30 +835,30 @@ define('xwiki-realtime-loader', [
     },
 
     bootstrap: function(info) {
-      var deferred = $.Deferred();
-      this.setAvailableRt(info);
-      if (lock) {
-        // Found a lock link. Check active sessions.
-        this.checkSessions(info);
-        deferred.reject();
-      } else if (window.XWiki.editor === info.type) {
-        // No lock and we are using the right editor. Start realtime.
-        this.updateKeys(info.type).done(keys => {
-          if (!keys[info.type] || !keys.events || !keys.userdata) {
-            ErrorBox.show('unavailable');
-            console.error('You are not allowed to create a new realtime session for that document.');
-            deferred.reject();
-          } else if (!Object.keys(keys.active).length || keys[info.type + '_users'] > 0) {
-            deferred.resolve(keys);
-          } else {
-            // Let the user choose between joining the existing real-time session (with a different editor) or create a
-            // new real-time session with the current editor.
-            console.log('Join the existing realtime session or create a new one.');
-            this.displayModal(info.type, Object.keys(keys.active), $.proxy(deferred, 'resolve', keys), info);
-          }
-        });
-      }
-      return deferred.then(beforeLaunchRealtime).promise();
+      return new Promise((resolve, reject) => {
+        this.setAvailableRt(info);
+        if (lock) {
+          // Found a lock link. Check active sessions.
+          this.checkSessions(info);
+          reject();
+        } else if (window.XWiki.editor === info.type) {
+          // No lock and we are using the right editor. Start realtime.
+          this.updateKeys(info.type).then(keys => {
+            if (!keys[info.type] || !keys.events || !keys.userdata) {
+              ErrorBox.show('unavailable');
+              console.error('You are not allowed to create a new realtime session for that document.');
+              reject();
+            } else if (!Object.keys(keys.active).length || keys[info.type + '_users'] > 0) {
+              resolve(keys);
+            } else {
+              // Let the user choose between joining the existing real-time session (with a different editor) or create
+              // a new real-time session with the current editor.
+              console.log('Join the existing realtime session or create a new one.');
+              this.displayModal(info.type, Object.keys(keys.active), $.proxy(resolve, null, keys), info);
+            }
+          });
+        }
+      }).then(beforeLaunchRealtime);
     }
   });
 

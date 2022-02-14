@@ -237,7 +237,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    */
   var updateCount = function() {
     var itemCount = $('#Attachmentstab').find('.itemCount');
-    var attachmentsNumber = $("#Attachmentspane .attachment").size();
+    var attachmentsNumber = $("#Attachmentspane .attachment").length;
     if(itemCount) {
       itemCount.text(l10n['docextra.extranb'].replace("__number__", attachmentsNumber));
     };

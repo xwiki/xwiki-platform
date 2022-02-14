@@ -44,6 +44,7 @@
       <artifactId>xwiki-platform-mentions-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <scope>runtime</scope>
     </dependency>
     <!-- ================================
         Test only dependencies

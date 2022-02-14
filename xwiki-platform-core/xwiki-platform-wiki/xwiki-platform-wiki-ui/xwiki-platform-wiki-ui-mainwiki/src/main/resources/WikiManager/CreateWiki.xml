@@ -1266,7 +1266,7 @@ return XWiki;
  * Code to make the dynamic "flavor/template" tab bar
  **************************************************************/
 require(['jquery'], function($) {
-  $(window).ready(function(){
+  $(function(){
     $('.flavor_template  &gt; .xwikitabbar &gt; li &gt; a').click(function(event) {
       var thisTabWidget = $(this).parents('.flavor_template');
       // Change the tab bar
@@ -1290,7 +1290,7 @@ require(['jquery'], function($) {
  * Code to only have a flavor or a template used, never both
  **************************************************************/
 require(['jquery'], function($) {
-  $(window).ready(function(){
+  $(function(){
     /**
      * When a template is selected, unselect the flavor
      */
@@ -1300,7 +1300,7 @@ require(['jquery'], function($) {
         $('input[name="flavor"]:radio:checked').prop('checked', false);
       }
     });
-    
+
     /**
      * When a flavor is selected, unselect the template
      */

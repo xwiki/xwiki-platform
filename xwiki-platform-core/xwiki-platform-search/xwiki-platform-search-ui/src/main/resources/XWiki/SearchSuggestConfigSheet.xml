@@ -337,22 +337,19 @@
     $(this).addClass('loading');
     var notification = new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.inProgress')", 'inprogress');
     var addLink = this;
-    $.get(targetDocument.getURL('objectadd'), {
+    Promise.resolve($.get(targetDocument.getURL('objectadd'), {
       form_token: $(this).closest('form').find('input[name="form_token"]').prop('value'),
       classname: 'XWiki.SearchSuggestSourceClass',
       xredirect: targetDocument.getURL('get', $.param({
         sheet: 'XWiki.SearchSuggestSourceSheet',
         xobjectNumber: '',
       }))
-    })
-    .done(function(data) {
+    })).then(function(data) {
       insertSource.call(addLink, data);
       notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.done')", 'done'));
-    })
-    .fail(function() {
+    }).catch(function() {
       notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.failed')", 'error'));
-    })
-    .always(function() {
+    }).finally(function() {
       $(addLink).removeClass('loading');
     });
   });

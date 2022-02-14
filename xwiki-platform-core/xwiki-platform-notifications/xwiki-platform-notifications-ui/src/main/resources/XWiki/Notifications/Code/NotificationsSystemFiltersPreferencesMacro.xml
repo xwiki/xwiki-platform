@@ -134,7 +134,7 @@ require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($
   /**
    * Page initialization
    */
-  $(document).ready(function() {
+  $(function() {
     var initBootstrapSwitches = function () {
       $('#notificationSystemFilterPreferencesLiveTable .notificationFilterPreferenceCheckbox, #notificationSystemFilterPreferencesLiveTable .toggleableFilterPreferenceCheckbox').bootstrapSwitch({
         size: 'mini',
@@ -283,11 +283,11 @@ require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($
           'property#filterName': filterName,
           'property#isEnabled': state ? '1' : '0'
         };
-        $.post(restURL, params).done(function (data) {
+        $.post(restURL, params).then(data =&gt; {
           self.domElement.attr('data-objectNumber', data.number);
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
-        }).fail(function () {
+        }).catch(() =&gt; {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
@@ -299,11 +299,11 @@ require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($
           method: 'PUT',
           contentType: 'text/plain',
           data: state ? '1' : '0'
-        }).done(function (data) {
+        }).then(data =&gt; {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
           $(document).trigger('xwiki:livetable:notifications-filters-system:toggle', {'row': self.row, 'state': state});
-        }).fail(function () {
+        }).catch(() =&gt; {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
@@ -459,11 +459,11 @@ require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($
         filterPreferenceId: data.filterPreferenceId,
         enabled: state
       };
-      $.post(serviceURL, $.extend({}, params, postParams)).done(function() {
+      $.post(serviceURL, $.extend({}, params, postParams)).then(() =&gt; {
         notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
           'notifications.filters.preferences.setEnabled.done')), 'done'));
         $(document).trigger('xwiki:livetable:notifications-filters-system:toggle', {'row': data, 'state': state});
-      }).fail(function() {
+      }).catch(() =&gt; {
         notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
           'notifications.filters.preferences.setEnabled.error')), 'error'));
       });

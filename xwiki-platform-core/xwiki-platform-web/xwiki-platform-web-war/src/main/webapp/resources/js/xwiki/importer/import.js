@@ -125,7 +125,7 @@ var XWiki = (function(XWiki){
 
             var url = window.docgeturl + "?xpage=packagedescriptor&package=" + encodeURIComponent(name);
 
-            var ajx = new Ajax.Request(url, {
+            new Ajax.Request(url, {
                 onSuccess: this.onSuccess.bindAsEventListener(this),
                 on0 : this.on0.bindAsEventListener(this),
                 onFailure : this.onFailure.bind(this)
@@ -175,7 +175,7 @@ var XWiki = (function(XWiki){
             // Request the server for information about the desired package,
             // and bind the response to the proper callbacks (success or failure).
             this.node.addClassName("loading");
-            var ajx = new importer.PackageInformationRequest(name,{
+            new importer.PackageInformationRequest(name,{
               onSuccess: this.onPackageInfosAvailable.bind(this),
               onFailure: this.onPackageInfosRequestFailed.bind(this)
             });

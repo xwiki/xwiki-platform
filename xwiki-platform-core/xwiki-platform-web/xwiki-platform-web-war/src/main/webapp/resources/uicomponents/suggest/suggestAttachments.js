@@ -103,7 +103,7 @@ define('xwiki-attachments-store', ['jquery'], function($) {
         }, false);
         return xhr;
       }
-    }).done($.proxy(deferred, 'resolve')).fail($.proxy(deferred, 'reject'));
+    }).then($.proxy(deferred, 'resolve'), $.proxy(deferred, 'reject'));
     return deferred.promise();
   };
 
@@ -156,8 +156,9 @@ define('xwiki-attachments-icon', ['jquery'], function($) {
       };
       if (attachment.file) {
         // Show the icon using the local file while the file is being uploaded.
-        icon.promise = readAsDataURL(attachment.file).done(function(dataURL) {
+        icon.promise = readAsDataURL(attachment.file).then(function(dataURL) {
           icon.url = dataURL;
+          return dataURL;
         });
       }
       return icon;
@@ -167,15 +168,13 @@ define('xwiki-attachments-icon', ['jquery'], function($) {
   };
 
   var readAsDataURL = function(file) {
-    var deferred = $.Deferred();
-    if (typeof FileReader !== 'undefined') {
+    return new Promise((resolve, reject) => {
       var fileReader = new FileReader();
-      fileReader.onload = function (event) {
-        deferred.resolve(event.target.result);
+      fileReader.onload = function(event) {
+        resolve(event.target.result);
       };
       fileReader.readAsDataURL(file);
-    }
-    return deferred.promise();
+    });
   };
 
   var getIcon = function(mimeType, fileName) {
@@ -195,18 +194,18 @@ define('xwiki-attachments-icon', ['jquery'], function($) {
   };
 
   var loadAttachmentIcon = function(attachment) {
-    var deferred = $.Deferred();
-    if (attachment.icon.iconSetType === 'IMAGE') {
-      var image = new Image();
-      image.onload = function() {
-        deferred.resolve(attachment);
-      };
-      image.src = attachment.icon.url;
-    } else {
-      // Nothing to load.
-      deferred.resolve(attachment);
-    }
-    return deferred.promise();
+    return new Promise((resolve, reject) => {
+      if (attachment.icon.iconSetType === 'IMAGE') {
+        var image = new Image();
+        image.onload = function() {
+          resolve(attachment);
+        };
+        image.src = attachment.icon.url;
+      } else {
+        // Nothing to load.
+        resolve(attachment);
+      }
+    });
   };
 
   return {
@@ -252,8 +251,10 @@ define('xwiki-attachments-filter', ['jquery'], function($) {
 
 define('xwiki-file-picker', ['jquery'], function($) {
   var pickLocalFiles = function(options) {
-    var deferred = $.Deferred();
+    return new Promise((resolve, reject) => pickLocalFilesPromise(options, {resolve, reject}));
+  };
 
+  var pickLocalFilesPromise = function(options, deferred) {
     // There's no clean way to detect when the file browser dialog is canceled so we must rely on a hack: catch
     // when the current window gets back the focus after the file browser dialog is closed, making sure the
     // listener is removed in case some files were selected. In some cases (e.g. Chrome on MacOS) the file browser
@@ -282,8 +283,6 @@ define('xwiki-file-picker', ['jquery'], function($) {
       fileInput.remove();
     // Open the file browser dialog.
     }).click();
-
-    return deferred.promise();
   };
 
   return {pickLocalFiles};
@@ -343,10 +342,10 @@ define('xwiki-suggestAttachments', [
       // If nothing is specified then no restriction is applied.
       accept: select.data('accept'),
       load: function(text, callback) {
-        loadAttachments(text, this.settings).done(callback).fail(callback);
+        loadAttachments(text, this.settings).then(callback, callback);
       },
       loadSelected: function(text, callback) {
-        loadAttachment(text, this.settings).done(callback).fail(callback);
+        loadAttachment(text, this.settings).then(callback, callback);
       },
       create: function(input, callback) {
         if (input.length > 0) {
@@ -356,7 +355,7 @@ define('xwiki-suggestAttachments', [
           data[this.settings.valueField] = input;
           return data;
         } else {
-          createFromLocalFiles(this).done(callback).fail(callback);
+          createFromLocalFiles(this).then(callback, callback);
         }
       }
     };
@@ -492,7 +491,7 @@ define('xwiki-suggestAttachments', [
         return oldCreate.apply(this, arguments);
       } else {
         // Allow the user to upload a file.
-        return $('<div class="create upload option"/>').text(l10n.upload);
+        return $('<div class="create upload option"></div>').text(l10n.upload);
       }
     };
 
@@ -535,20 +534,16 @@ define('xwiki-suggestAttachments', [
     selectize.addOption(attachments);
     // Uploading the files in parallel can cause problems, at least until XWIKI-13473 (Exception when the same document
     // is saved at the same time in 2 different threads) is fixed. Let's upload them sequentially for now.
-    var deferred = $.Deferred();
-    var uploadQueue = deferred;
-    attachments.forEach(function(attachment) {
+    attachments.reduce((uploadQueue, attachment) => {
       // Select the attachments.
       selectize.addItem(attachment.value);
       // Use the local file as icon while the file is being uploaded.
-      attachment.icon.promise && attachment.icon.promise.done(function() {
+      attachment.icon.promise && attachment.icon.promise.then(function() {
         selectize.updateOption(attachment.value, attachment);
       });
       var uploadNextFile = $.proxy(uploadFileAndShowProgress, null, attachment, selectize);
-      uploadQueue = uploadQueue.then(uploadNextFile, uploadNextFile);
-    });
-    // Start the upload.
-    deferred.resolve();
+      return uploadQueue.then(uploadNextFile, uploadNextFile);
+    }, Promise.resolve());
     return attachments;
   };
 
@@ -564,7 +559,7 @@ define('xwiki-suggestAttachments', [
   };
 
   var uploadFileAndShowProgress = function(attachment, selectize) {
-    var attachmentName = '<em>' + $('<em/>').text(attachment.label).html() + '</em>';
+    var attachmentName = $('<em></em>').text(attachment.label).prop('outerHTML');
     var notification = new XWiki.widgets.Notification(l10n.uploading(attachmentName), 'inprogress');
     attachment.data.upload = {
       status: 'pending',
@@ -578,18 +573,20 @@ define('xwiki-suggestAttachments', [
     .then($.proxy(processAttachment, null, selectize.settings))
     // Load the attachment icon before updating the display in order to reduce the flickering.
     .then(attachmentsIcon.loadIcon)
-    .progress(function(data) {
+    .progress(data => {
       attachment.data.upload.status = 'running';
       attachment.data.upload.progress = data;
       selectize.updateOption(attachment.value, attachment);
-    }).done(function(attachment) {
+    }).then(attachment => {
       attachment.data.upload = {status: 'done'};
       selectize.updateOption(attachment.value, attachment);
       notification.replace(new XWiki.widgets.Notification(l10n.uploadDone(attachmentName), 'done'));
-    }).fail(function() {
+      return attachment;
+    }).catch(() => {
       attachment.data.upload.status = 'failed';
       selectize.updateOption(attachment.value, attachment);
       notification.replace(new XWiki.widgets.Notification(l10n.uploadFailed(attachmentName), 'error'));
+      return Promise.reject();
     });
   };
 
@@ -622,7 +619,7 @@ define('xwiki-suggestAttachments', [
   var onDropHTML = function(selectize, html) {
     $(html).find('[data-entity-type="ATTACHMENT"][data-entity-reference]').each(function() {
       var attachmentReference = XWiki.Model.resolve($(this).data('entityReference'), XWiki.EntityType.ATTACHMENT);
-      attachmentsStore.get(attachmentReference).done(function(attachment) {
+      attachmentsStore.get(attachmentReference).then(attachment => {
         var attachments = processAttachments(selectize.settings, {
           attachments: attachmentsFilter.filter([attachment], selectize.settings.accept)
         });
@@ -650,7 +647,7 @@ define('xwiki-suggestAttachments', [
         hint.remove();
       } else if (hint.length === 1) {
         // Show a bigger attachment icon.
-        $('<div class="xwiki-selectize-option-label-wrapper"/>')
+        $('<div class="xwiki-selectize-option-label-wrapper"></div>')
           .append(output.find('.xwiki-selectize-option-label'))
           .append(hint)
           .appendTo(output);

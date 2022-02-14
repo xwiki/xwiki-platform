@@ -650,9 +650,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #XWikiDocument(org.xwiki.model.reference.DocumentReference)} instead
+     * @deprecated use {@link #XWikiDocument(org.xwiki.model.reference.DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public XWikiDocument()
     {
         this(null);
@@ -664,9 +664,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      *
      * @param space the space this document belongs to
      * @param name the name of the document
-     * @deprecated since 2.2M1 use {@link #XWikiDocument(org.xwiki.model.reference.DocumentReference)} instead
+     * @deprecated use {@link #XWikiDocument(org.xwiki.model.reference.DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public XWikiDocument(String space, String name)
     {
         this(null, space, name);
@@ -678,9 +678,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param wiki The wiki this document belongs to.
      * @param space The space this document belongs to.
      * @param name The name of the document (can contain either the page name or the space and page name)
-     * @deprecated since 2.2M1 use {@link #XWikiDocument(org.xwiki.model.reference.DocumentReference)} instead
+     * @deprecated use {@link #XWikiDocument(org.xwiki.model.reference.DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public XWikiDocument(String wiki, String space, String name)
     {
         // We allow to specify the space in the name (eg name = "space.page"). In this case the passed space is
@@ -834,15 +834,25 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
     }
 
+    private UserReferenceSerializer<String> getUserReferenceStringSerializer()
+    {
+        return Utils.getComponent(new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
+    }
+
+    private UserReferenceResolver<String> getUserReferenceStringResolver()
+    {
+        return Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class, String.class));
+    }
+
     public XWikiStoreInterface getStore(XWikiContext context)
     {
         return context.getWiki().getStore();
     }
 
     /**
-     * @deprecated since 9.9RC1, use {@link XWiki#getDefaultAttachmentContentStore()} instead
+     * @deprecated use {@link XWiki#getDefaultAttachmentContentStore()} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     public XWikiAttachmentStoreInterface getAttachmentStore(XWikiContext context)
     {
         return context.getWiki().getAttachmentStore();
@@ -947,9 +957,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
      * @return the local reference the space of the document as String
-     * @deprecated since 2.2M1 used {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public String getSpace()
     {
         return LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference().getLastSpaceReference());
@@ -961,9 +971,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
      * @see #getSpace()
-     * @deprecated since 2.2M1 used {@link #setDocumentReference(DocumentReference)} instead
+     * @deprecated use {@link #setDocumentReference(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void setSpace(String spaces)
     {
         if (spaces != null) {
@@ -1068,9 +1078,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the parent reference stored in the database, which is relative to this document, or an empty string ("")
      *         if the parent is not set
      * @see #getParentReference()
-     * @deprecated since 2.2M1 use {@link #getParentReference()} instead
+     * @deprecated use {@link #getParentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public String getParent()
     {
         String parentReferenceAsString;
@@ -1083,9 +1093,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getParentReference()} instead
+     * @deprecated use {@link #getParentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public XWikiDocument getParentDoc()
     {
         return new XWikiDocument(getParentReference());
@@ -1110,9 +1120,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
      * @param parent the reference of the parent relative to the document
-     * @deprecated since 2.2M1, use {@link #setParentReference(EntityReference)} instead
+     * @deprecated use {@link #setParentReference(EntityReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void setParent(String parent)
     {
         // If the passed parent is an empty string we also need to set the reference to null. The reason is that
@@ -1564,9 +1574,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 2.2M1 used {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public String getName()
     {
         return getDocumentReference().getName();
@@ -1575,9 +1585,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
-     * @deprecated since 2.2M1 used {@link #setDocumentReference(DocumentReference)} instead
+     * @deprecated use {@link #setDocumentReference(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void setName(String name)
     {
         if (name != null) {
@@ -1635,9 +1645,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @return the document's space + page name (eg "space.page")
-     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     @Override
     public String getFullName()
     {
@@ -1646,9 +1656,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @return the docoument's wiki + space + page name (eg "wiki:space.page")
-     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public String getPrefixedFullName()
     {
         return getDefaultEntityReferenceSerializer().serialize(getDocumentReference());
@@ -1656,10 +1666,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 2.2M1
-     * @deprecated since 2.2.3 don't change the reference of a document once it's been constructed. Instead you can
+     * @deprecated don't change the reference of a document once it's been constructed. Instead you can
      *             clone the doc, rename it or copy it.
      */
-    @Deprecated
+    @Deprecated(since = "2.2.3")
     public void setDocumentReference(DocumentReference reference)
     {
         // Don't allow setting a null reference for now, ie. don't do anything to preserve backward compatibility
@@ -1692,18 +1702,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)} instead
+     * @deprecated use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void setFullName(String name)
     {
         setFullName(name, null);
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)} instead
+     * @deprecated use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void setFullName(String fullName, XWikiContext context)
     {
         // We ignore the passed full name if it's null to be backward compatible with previous behaviors and to be
@@ -1719,9 +1729,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * {@inheritDoc}
      *
      * @see DocumentModelBridge#getWikiName()
-     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     @Override
     public String getWikiName()
     {
@@ -1732,9 +1742,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * {@inheritDoc}
      *
      * @see DocumentModelBridge#getSpaceName()
-     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     @Override
     public String getSpaceName()
     {
@@ -1745,9 +1755,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * {@inheritDoc}
      *
      * @see DocumentModelBridge#getSpaceName()
-     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     @Override
     public String getPageName()
     {
@@ -1872,9 +1882,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated Since 14.0RC1 rely on {@link #getAuthors}.
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#getEffectiveMetadataAuthor()} instead
      */
-    @Deprecated
+    @Deprecated(since = "14.0RC1")
     public DocumentReference getAuthorReference()
     {
         UserReference effectiveMetadataAuthor = getAuthors().getEffectiveMetadataAuthor();
@@ -1888,9 +1898,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated Since 14.0RC1 rely on {@link DocumentAuthors#setEffectiveMetadataAuthor(UserReference)}
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#setEffectiveMetadataAuthor(UserReference)}
+     * instead
      */
-    @Deprecated
+    @Deprecated(since = "14.0RC1")
     public void setAuthorReference(DocumentReference authorReference)
     {
         if (authorReference == null) {
@@ -1921,9 +1932,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
-     * @deprecated since 3.0M3 use {@link #setAuthorReference} instead
+     * @deprecated use {@link #setAuthorReference} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.0M3")
     public void setAuthor(String author)
     {
         setAuthorReference(userStringToReference(author));
@@ -1931,9 +1942,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated Since 14.0RC1 rely on {@link #getAuthors()}.
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#getContentAuthor()} instead
      */
     @Override
+    @Deprecated(since = "14.0RC1")
     public DocumentReference getContentAuthorReference()
     {
         UserReference contentAuthor = this.getAuthors().getContentAuthor();
@@ -1946,9 +1958,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated Since 14.0RC1 rely on {@link DocumentAuthors#setContentAuthor(UserReference)}
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#setContentAuthor(UserReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "14.0RC1")
     public void setContentAuthorReference(DocumentReference contentAuthorReference)
     {
         if (contentAuthorReference == null) {
@@ -1966,9 +1978,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 3.0M3 use {@link #getContentAuthorReference()} instead
+     * @deprecated use {@link #getContentAuthorReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.0M3")
     public String getContentAuthor()
     {
         return userReferenceToString(getContentAuthorReference());
@@ -1977,9 +1989,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
-     * @deprecated since 3.0M3 use {@link #setContentAuthorReference} instead
+     * @deprecated use {@link #setContentAuthorReference} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.0M3")
     public void setContentAuthor(String contentAuthor)
     {
         setContentAuthorReference(userStringToReference(contentAuthor));
@@ -1987,9 +1999,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated since 14.0RC1 use {@link #getAuthors()}.
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#getCreator()} instead
      */
-    @Deprecated
+    @Deprecated(since = "14.0RC1")
     public DocumentReference getCreatorReference()
     {
         UserReference creator = this.getAuthors().getCreator();
@@ -2002,9 +2014,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @since 3.0M3
-     * @deprecated since 14.0RC1 use {@link DocumentAuthors#setCreator(UserReference)}
+     * @deprecated use {@link #getAuthors()} and then {@link DocumentAuthors#setCreator(UserReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "14.0RC1")
     public void setCreatorReference(DocumentReference creatorReference)
     {
         if (creatorReference == null) {
@@ -2022,9 +2034,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 3.0M2 use {@link #getCreatorReference()} instead
+     * @deprecated use {@link #getCreatorReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.0M2")
     public String getCreator()
     {
         return userReferenceToString(getCreatorReference());
@@ -2033,9 +2045,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
-     * @deprecated since 3.0M2 use {@link #setCreatorReference} instead
+     * @deprecated use {@link #setCreatorReference} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.0M2")
     public void setCreator(String creator)
     {
         setCreatorReference(userStringToReference(creator));
@@ -2619,9 +2631,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXObject()} instead
+     * @deprecated use {@link #getXObject()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public BaseObject getxWikiObject()
     {
         return getXObject(getDocumentReference());
@@ -2684,9 +2696,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #createXObject(EntityReference, XWikiContext)} instead
+     * @deprecated use {@link #createXObject(EntityReference, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public int createNewObject(String className, XWikiContext context) throws XWikiException
     {
         return createXObject(
@@ -2718,9 +2730,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXObjectSize(DocumentReference)} instead
+     * @deprecated use {@link #getXObjectSize(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public int getObjectNumbers(String className)
     {
         return getXObjectSize(resolveClassReference(className));
@@ -2768,9 +2780,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXObjects(DocumentReference)} instead
+     * @deprecated use {@link #getXObjects(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public Vector<BaseObject> getObjects(String className)
     {
         List<BaseObject> result = this.xObjects.get(resolveClassReference(className));
@@ -2909,9 +2921,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXObject(DocumentReference)} instead
+     * @deprecated use {@link #getXObject(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public BaseObject getObject(String className)
     {
         return getXObject(resolveClassReference(className));
@@ -2973,9 +2985,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXObject(DocumentReference, int)} instead
+     * @deprecated use {@link #getXObject(DocumentReference, int)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public BaseObject getObject(String className, int nb)
     {
         return getXObject(resolveClassReference(className), nb);
@@ -2990,9 +3002,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXObject(DocumentReference, String, String)} instead
+     * @deprecated use {@link #getXObject(DocumentReference, String, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public BaseObject getObject(String className, String key, String value)
     {
         return getObject(className, key, value, false);
@@ -3057,9 +3069,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXObject(DocumentReference, String, String, boolean)} instead
+     * @deprecated use {@link #getXObject(DocumentReference, String, String, boolean)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public BaseObject getObject(String className, String key, String value, boolean failover)
     {
         return getXObject(resolveClassReference(className), key, value, failover);
@@ -3101,9 +3113,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #addXObject(BaseObject)} instead
+     * @deprecated use {@link #addXObject(BaseObject)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void addObject(String className, BaseObject object)
     {
         addXObject(resolveClassReference(className), object);
@@ -3160,9 +3172,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #setXObject(DocumentReference, int, BaseObject)} instead
+     * @deprecated use {@link #setXObject(DocumentReference, int, BaseObject)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void setObject(String className, int nb, BaseObject object)
     {
         setXObject(resolveClassReference(className), nb, object);
@@ -3199,9 +3211,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #mergeXClass(XWikiDocument)} instead
+     * @deprecated use {@link #mergeXClass(XWikiDocument)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void mergexWikiClass(XWikiDocument templatedoc)
     {
         mergeXClass(templatedoc);
@@ -3232,9 +3244,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #mergeXObjects(XWikiDocument)} instead
+     * @deprecated use {@link #mergeXObjects(XWikiDocument)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void mergexWikiObjects(XWikiDocument templatedoc)
     {
         mergeXObjects(templatedoc);
@@ -3298,9 +3310,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getTemplateDocumentReference()} instead
+     * @deprecated use {@link #getTemplateDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public String getTemplate()
     {
         String templateReferenceAsString;
@@ -3325,9 +3337,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #setTemplateDocumentReference(DocumentReference)} instead
+     * @deprecated use {@link #setTemplateDocumentReference(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void setTemplate(String template)
     {
         DocumentReference templateReference = null;
@@ -3741,9 +3753,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1, use {@link #displayForm(DocumentReference, String, String, XWikiContext)} instead
+     * @deprecated use {@link #displayForm(DocumentReference, String, String, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public String displayForm(String className, String header, String format, XWikiContext context)
     {
         return displayForm(className, header, format, true, context);
@@ -3829,10 +3841,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1, use {@link #displayForm(DocumentReference, String, String, boolean, XWikiContext)}
-     *             instead
+     * @deprecated use {@link #displayForm(DocumentReference, String, String, boolean, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public String displayForm(String className, String header, String format, boolean linebreak, XWikiContext context)
     {
         return displayForm(resolveClassReference(className), header, format, linebreak, context);
@@ -3903,9 +3914,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1, use {@link #displayForm(DocumentReference, XWikiContext)} instead
+     * @deprecated use {@link #displayForm(DocumentReference, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public String displayForm(String className, XWikiContext context)
     {
         return displayForm(resolveClassReference(className), context);
@@ -4205,12 +4216,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
-    public void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException
-    {
-        String template = eform.getTemplate();
-        readFromTemplate(template, context);
-    }
-
     /**
      * @since 2.2M1
      */
@@ -4264,20 +4269,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 }
             }
         }
-    }
-
-    /**
-     * @deprecated since 2.2M1 use {@link #readFromTemplate(DocumentReference, XWikiContext)} instead
-     */
-    @Deprecated
-    public void readFromTemplate(String template, XWikiContext context) throws XWikiException
-    {
-        // Keep the same behavior for backward compatibility
-        DocumentReference templateDocumentReference = null;
-        if (StringUtils.isNotEmpty(template)) {
-            templateDocumentReference = getCurrentMixedDocumentReferenceResolver().resolve(template);
-        }
-        readFromTemplate(templateDocumentReference, context);
     }
 
     /**
@@ -4801,9 +4792,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException when an error occurs during xwiki operations
      * @throws IOException when an error occurs during streaming operations
      * @since 2.3M2
-     * @deprecated since 4.1M2
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "4.1M2")
     public void addToZip(ZipOutputStream zos, String zipname, boolean withVersions, XWikiContext context)
         throws XWikiException, IOException
     {
@@ -4823,9 +4814,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException when an error occurs during xwiki operations
      * @throws IOException when an error occurs during streaming operations
      * @since 2.3M2
-     * @deprecated since 4.2M2
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "4.2M2")
     public void addToZip(ZipOutputStream zos, boolean withVersions, XWikiContext context)
         throws XWikiException, IOException
     {
@@ -4848,9 +4839,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException when an error occurs during xwiki operations
      * @throws IOException when an error occurs during streaming operations
      * @since 2.3M2
-     * @deprecated since 4.1M2
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "4.1M2")
     public void addToZip(ZipOutputStream zos, XWikiContext context) throws XWikiException, IOException
     {
         addToZip(zos, true, context);
@@ -4889,10 +4880,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context current XWikiContext
      * @return a {@link DOMDocument} containing the serialized document.
      * @throws XWikiException when an errors occurs during wiki operations
-     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, boolean, String)}
-     *             instead
+     * @deprecated use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, boolean, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public Document toXMLDocument(XWikiContext context) throws XWikiException
     {
         return toXMLDocument(true, false, false, false, context);
@@ -4911,10 +4901,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context current XWikiContext
      * @return a {@link DOMDocument} containing the serialized document.
      * @throws XWikiException when an errors occurs during wiki operations
-     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, boolean, String)}
-     *             instead
+     * @deprecated use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, boolean, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public Document toXMLDocument(boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
         boolean bWithVersions, XWikiContext context) throws XWikiException
     {
@@ -4940,10 +4929,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException when an errors occurs during wiki operations
      * @throws IOException when an errors occurs during streaming operations
      * @since 2.3M2
-     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, boolean, String)}
-     *             instead
+     * @deprecated use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, boolean, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public void toXML(XMLWriter wr, boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
         boolean bWithVersions, XWikiContext context) throws XWikiException, IOException
     {
@@ -5135,9 +5123,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 9.0RC1, use {@link #fromXML(InputStream)} instead
+     * @deprecated use {@link #fromXML(InputStream)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public void fromXML(Document domdoc, boolean withArchive) throws XWikiException
     {
         // Serialize the Document (could not find a way to convert a dom4j Document into a usable StAX source)
@@ -5265,9 +5253,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 9.9RC1, use {@link XWikiAttachment#loadContent(XWikiContext)}
+     * @deprecated use {@link XWikiAttachment#loadContent(XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         String database = context.getWikiId();
@@ -5354,9 +5342,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #getBackLinkedReferences(XWikiContext)}
+     * @deprecated use {@link #getBackLinkedReferences(XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public List<String> getBackLinkedPages(XWikiContext context) throws XWikiException
     {
         return getStore(context).loadBacklinks(getFullName(), context, true);
@@ -5633,9 +5621,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #getChildrenReferences(XWikiContext)}
+     * @deprecated use {@link #getChildrenReferences(XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public List<String> getChildren(XWikiContext context) throws XWikiException
     {
         return getChildren(0, 0, context);
@@ -5693,9 +5681,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #getChildrenReferences(XWikiContext)}
+     * @deprecated use {@link #getChildrenReferences(XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public List<String> getChildren(int nb, int start, XWikiContext context) throws XWikiException
     {
         List<String> childrenNames = new ArrayList<String>();
@@ -5742,9 +5730,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #renameProperties(DocumentReference, Map)} instead
+     * @deprecated use {@link #renameProperties(DocumentReference, Map)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public void renameProperties(String className, Map<String, String> fieldsToRename)
     {
         renameProperties(resolveClassReference(className), fieldsToRename);
@@ -5786,9 +5774,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #addXObjectToRemove(BaseObject)} )} instead
+     * @deprecated use {@link #addXObjectToRemove(BaseObject)} )} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public void addObjectsToRemove(BaseObject object)
     {
         addXObjectToRemove(object);
@@ -5803,9 +5791,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #getObjectsToRemove()} instead
+     * @deprecated use {@link #getObjectsToRemove()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public ArrayList<BaseObject> getObjectsToRemove()
     {
         return (ArrayList<BaseObject>) getXObjectsToRemove();
@@ -5928,8 +5916,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * Return the first attachment of the attachment list either exactly matching the provided filename or that matches 
+     * the provided filename with a n arbitrary extension (i.e., filename.ext). To get only attachments that exactly
+     * matches the provided filename use {@link #getExactAttachment(String)}.
+     * 
      * @param filename the file name of the attachment with or without the extension
      * @return the {@link XWikiAttachment} corresponding to the file name, null if none can be found
+     * @see #getExactAttachment(String) 
      */
     public XWikiAttachment getAttachment(String filename)
     {
@@ -5948,13 +5941,27 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * Return the attachment that exactly matches the provided file. To also get the first attachment that matches the
+     * provided filename with an arbitrary extension use {@link #getAttachment(String)}.
+     *
+     * @param filename the file name of the attachment
+     * @return the {@link XWikiAttachment} exactly corresponding to the file name, null if none can be found
+     * @since 14.1RC1
+     * @since 13.10.3
+     */
+    public XWikiAttachment getExactAttachment(String filename)
+    {
+        return this.attachmentList.getByFilename(filename);
+    }
+
+    /**
      * Add passed attachment to the document.
      *
      * @param attachment the attachment to add
      * @since 5.3M2
-     * @deprecated since 9.10RC1, use {@link #setAttachment(XWikiAttachment)} instead
+     * @deprecated use {@link #setAttachment(XWikiAttachment)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.10RC1")
     public void addAttachment(XWikiAttachment attachment)
     {
         setAttachment(attachment);
@@ -5993,9 +6000,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the new attachment
      * @throws XWikiException never sent
      * @throws IOException when failing to read the passed content
-     * @deprecated since 9.10RC1, use {@link #setAttachment(String, InputStream, XWikiContext)} instead
+     * @deprecated use {@link #setAttachment(String, InputStream, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.10RC1")
     public XWikiAttachment addAttachment(String fileName, InputStream content, XWikiContext context)
         throws XWikiException, IOException
     {
@@ -6021,7 +6028,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         String filename = fileName.substring(i + 1);
 
-        XWikiAttachment attachment = getAttachment(filename);
+        XWikiAttachment attachment = getExactAttachment(filename);
         if (attachment == null) {
             attachment = new XWikiAttachment(this, filename);
 
@@ -6081,9 +6088,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setProperty(EntityReference, String, BaseProperty)} instead
+     * @deprecated use {@link #setProperty(EntityReference, String, BaseProperty)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public void setProperty(String className, String fieldName, BaseProperty value)
     {
         setProperty(getXClassEntityReferenceResolver().resolve(className, EntityType.DOCUMENT, getDocumentReference()),
@@ -6118,9 +6125,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #getIntValue(DocumentReference, String)} instead
+     * @deprecated use {@link #getIntValue(DocumentReference, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public int getIntValue(String className, String fieldName)
     {
         return getIntValue(resolveClassReference(className), fieldName);
@@ -6140,9 +6147,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #getLongValue(DocumentReference, String)} instead
+     * @deprecated use {@link #getLongValue(DocumentReference, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public long getLongValue(String className, String fieldName)
     {
         return getLongValue(resolveClassReference(className), fieldName);
@@ -6175,9 +6182,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #getStringValue(DocumentReference, String)} instead
+     * @deprecated use {@link #getStringValue(DocumentReference, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public String getStringValue(String className, String fieldName)
     {
         return getStringValue(resolveClassReference(className), fieldName);
@@ -6228,9 +6235,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setStringValue(EntityReference, String, String)} instead
+     * @deprecated use {@link #setStringValue(EntityReference, String, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public void setStringValue(String className, String fieldName, String value)
     {
         setStringValue(
@@ -6252,9 +6259,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #getListValue(DocumentReference, String)} instead
+     * @deprecated use {@link #getListValue(DocumentReference, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public List getListValue(String className, String fieldName)
     {
         return getListValue(resolveClassReference(className), fieldName);
@@ -6280,9 +6287,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setStringListValue(EntityReference, String, List)} instead
+     * @deprecated use {@link #setStringListValue(EntityReference, String, List)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public void setStringListValue(String className, String fieldName, List value)
     {
         setStringListValue(
@@ -6300,9 +6307,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setDBStringListValue(EntityReference, String, List)} instead
+     * @deprecated use {@link #setDBStringListValue(EntityReference, String, List)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public void setDBStringListValue(String className, String fieldName, List value)
     {
         setDBStringListValue(
@@ -6320,9 +6327,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setLargeStringValue(EntityReference, String, String)} instead
+     * @deprecated use {@link #setLargeStringValue(EntityReference, String, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public void setLargeStringValue(String className, String fieldName, String value)
     {
         setLargeStringValue(
@@ -6340,9 +6347,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setIntValue(EntityReference, String, int)} instead
+     * @deprecated use {@link #setIntValue(EntityReference, String, int)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public void setIntValue(String className, String fieldName, int value)
     {
         setIntValue(getXClassEntityReferenceResolver().resolve(className, EntityType.DOCUMENT, getDocumentReference()),
@@ -6352,9 +6359,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public String getDatabase()
     {
         return getDocumentReference().getWikiReference().getName();
@@ -6363,9 +6370,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
-     * @deprecated since 2.2M1 use {@link #setDocumentReference(DocumentReference)} instead
+     * @deprecated use {@link #setDocumentReference(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void setDatabase(String database)
     {
         if (database != null) {
@@ -6381,9 +6388,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 4.3M2 use {@link #getLocale()} instead
+     * @deprecated use {@link #getLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public String getLanguage()
     {
         return getLocale().toString();
@@ -6392,9 +6399,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 4.3M2 use {@link #setLocale(Locale)} instead
+     * @deprecated use {@link #setLocale(Locale)} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public void setLanguage(String language)
     {
         setLocale(LocaleUtils.toLocale(Util.normalizeLanguage(language), Locale.ROOT));
@@ -6428,9 +6435,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 4.3M2 use {@link #getDefaultLocale()} instead
+     * @deprecated use {@link #getDefaultLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public String getDefaultLanguage()
     {
         return getDefaultLocale().toString();
@@ -6439,9 +6446,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 4.3M2 use {@link #setDefaultLocale(Locale)} instead
+     * @deprecated use {@link #setDefaultLocale(Locale)} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public void setDefaultLanguage(String defaultLanguage)
     {
         setDefaultLocale(LocaleUtils.toLocale(defaultLanguage, Locale.ROOT));
@@ -6467,10 +6474,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's called by Hibernate when loading a XWikiDocument.
      *
-     * @deprecated since 5.4.6, stored in the database to speedup some queries (really ?) but in {@link XWikiDocument}
+     * @deprecated stored in the database to speedup some queries (really ?) but in {@link XWikiDocument}
      *             it's calculated based on the document locale
      */
-    @Deprecated
+    @Deprecated(since = "5.4.6")
     public void setTranslation(int translation)
     {
         // Do nothing
@@ -6504,9 +6511,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the XWiki Context
      * @return the document in the provided language or this if the provided language does not exists
      * @throws XWikiException error when loading the document
-     * @deprecated since 4.3M2 use {@link #getTranslatedDocument(Locale, XWikiContext)} insead
+     * @deprecated use {@link #getTranslatedDocument(Locale, XWikiContext)} insead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public XWikiDocument getTranslatedDocument(String language, XWikiContext context) throws XWikiException
     {
         return getTranslatedDocument(LocaleUtils.toLocale(language, Locale.ROOT), context);
@@ -6544,9 +6551,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 4.3M1 use {@link #getRealLocale()} instead
+     * @deprecated use {@link #getRealLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M1")
     public String getRealLanguage(XWikiContext context) throws XWikiException
     {
         return getRealLanguage();
@@ -6556,10 +6563,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * {@inheritDoc}
      *
      * @see org.xwiki.bridge.DocumentModelBridge#getRealLanguage()
-     * @deprecated since 4.3M1 use {@link #getRealLocale()} instead
+     * @deprecated use {@link #getRealLocale()} instead
      */
     @Override
-    @Deprecated
+    @Deprecated(since = "4.3M1")
     public String getRealLanguage()
     {
         String lang = getLanguage();
@@ -6584,9 +6591,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 5.1M2 use {@link #getTranslationLocales(XWikiContext)} instead
+     * @deprecated use {@link #getTranslationLocales(XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.1M2")
     public List<String> getTranslationList(XWikiContext context) throws XWikiException
     {
         // in few cases like accessing a deleted document, the store might be null.
@@ -6740,8 +6747,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             list.add(new MetaDataDiff("parent", fromDoc.getParent(), toDoc.getParent()));
         }
 
-        if (ObjectUtils.notEqual(fromDoc.getAuthorReference(), toDoc.getAuthorReference())) {
-            list.add(new MetaDataDiff("author", fromDoc.getAuthor(), toDoc.getAuthor()));
+        UserReference fromDocOriginalAuthor = fromDoc.getAuthors().getOriginalMetadataAuthor();
+        UserReference toDocOriginalAuthor = toDoc.getAuthors().getOriginalMetadataAuthor();
+        if (ObjectUtils.notEqual(fromDocOriginalAuthor, toDocOriginalAuthor)) {
+            list.add(new MetaDataDiff("author", getUserReferenceStringSerializer().serialize(fromDocOriginalAuthor),
+                getUserReferenceStringSerializer().serialize(toDocOriginalAuthor)));
         }
 
         if (ObjectUtils.notEqual(fromDoc.getDocumentReference(), toDoc.getDocumentReference())) {
@@ -6980,10 +6990,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      * @since 2.2M2
-     * @deprecated Since 12.5RC1 prefer using
-     *          {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)}.
+     * @deprecated use
+     *     {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "12.5RC1")
     public void rename(DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
     {
         rename(newDocumentReference, getBackLinkedReferences(context), context);
@@ -7011,10 +7021,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      * @since 2.2M2
-     * @deprecated Since 12.5RC1 prefer using
-     *            {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)}.
+     * @deprecated use
+     *     {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "12.5RC1")
     public void rename(DocumentReference newDocumentReference, List<DocumentReference> backlinkDocumentReferences,
         XWikiContext context) throws XWikiException
     {
@@ -7033,10 +7043,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      * @since 2.2M2
-     * @deprecated Since 12.5RC1 prefer using
-     *            {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)}.
+     * @deprecated use
+     *     {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "12.5RC1")
     public void rename(DocumentReference newDocumentReference, List<DocumentReference> backlinkDocumentReferences,
         List<DocumentReference> childDocumentReferences, XWikiContext context) throws XWikiException
     {
@@ -7111,9 +7121,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #copyDocument(DocumentReference, XWikiContext)} instead
+     * @deprecated use {@link #copyDocument(DocumentReference, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public XWikiDocument copyDocument(String newDocumentName, XWikiContext context) throws XWikiException
     {
         return copyDocument(getCurrentMixedDocumentReferenceResolver().resolve(newDocumentName), context);
@@ -7172,10 +7182,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXClassXML()} instead Hibernate uses this through reflection. It cannot be
+     * @deprecated use {@link #getXClassXML()} instead as Hibernate uses this through reflection. It cannot be
      *             removed without altering hibernate.cfg.xml
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public String getxWikiClassXML()
     {
         return getXClassXML();
@@ -7190,10 +7200,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #setXClassXML(String)} ()} instead Hibernate uses this through reflection. It
+     * @deprecated use {@link #setXClassXML(String)} ()} instead as Hibernate uses this through reflection. It
      *             cannot be removed without altering hibernate.cfg.xml
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public void setxWikiClassXML(String xClassXML)
     {
         setXClassXML(xClassXML);
@@ -7405,10 +7415,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * </p>
      *
      * @see org.xwiki.bridge.DocumentModelBridge#getSyntaxId()
-     * @deprecated since 2.3M1, use {link #getSyntax()} instead
+     * @deprecated use {link #getSyntax()} instead
      */
     @Override
-    @Deprecated
+    @Deprecated(since = "2.3M1")
     public String getSyntaxId()
     {
         return getSyntax().toIdString();
@@ -7433,9 +7443,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      *
      * @param syntaxId the new syntax id to set (e.g. {@code xwiki/2.0}, {@code xwiki/2.1}, etc)
      * @see #getSyntaxId()
-     * @deprecated since 2.3M1, use {link #setSyntax(Syntax)} instead
+     * @deprecated use {link #setSyntax(Syntax)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.3M1")
     public void setSyntaxId(String syntaxId)
     {
         Syntax syntax;
@@ -7553,9 +7563,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(EntityReference, XWikiContext)}
+     * @deprecated use {@link #addXObjectFromRequest(EntityReference, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public BaseObject addObjectFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return addObjectFromRequest(className, "", 0, context);
@@ -7573,9 +7583,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(DocumentReference, String, XWikiContext)}
+     * @deprecated use {@link #addXObjectFromRequest(DocumentReference, String, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public BaseObject addObjectFromRequest(String className, String prefix, XWikiContext context) throws XWikiException
     {
         return addObjectFromRequest(className, prefix, 0, context);
@@ -7593,9 +7603,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #addXObjectsFromRequest(DocumentReference, XWikiContext)}
+     * @deprecated use {@link #addXObjectsFromRequest(DocumentReference, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public List<BaseObject> addObjectsFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return addObjectsFromRequest(className, "", context);
@@ -7631,9 +7641,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #addXObjectsFromRequest(DocumentReference, String, XWikiContext)}
+     * @deprecated use {@link #addXObjectsFromRequest(DocumentReference, String, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public List<BaseObject> addObjectsFromRequest(String className, String pref, XWikiContext context)
         throws XWikiException
     {
@@ -7652,9 +7662,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(DocumentReference, int, XWikiContext)}
+     * @deprecated use {@link #addXObjectFromRequest(DocumentReference, int, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public BaseObject addObjectFromRequest(String className, int num, XWikiContext context) throws XWikiException
     {
         return addObjectFromRequest(className, "", num, context);
@@ -7678,9 +7688,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(EntityReference, String, int, XWikiContext)}
+     * @deprecated use {@link #addXObjectFromRequest(EntityReference, String, int, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public BaseObject addObjectFromRequest(String className, String prefix, int num, XWikiContext context)
         throws XWikiException
     {
@@ -7699,9 +7709,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(EntityReference, XWikiContext)}
+     * @deprecated use {@link #updateXObjectFromRequest(EntityReference, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public BaseObject updateObjectFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return updateObjectFromRequest(className, "", context);
@@ -7719,9 +7729,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(EntityReference, String, XWikiContext)}
+     * @deprecated use {@link #updateXObjectFromRequest(EntityReference, String, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public BaseObject updateObjectFromRequest(String className, String prefix, XWikiContext context)
         throws XWikiException
     {
@@ -7757,9 +7767,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(EntityReference, String, int, XWikiContext)}
+     * @deprecated use {@link #updateXObjectFromRequest(EntityReference, String, int, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public BaseObject updateObjectFromRequest(String className, String prefix, int num, XWikiContext context)
         throws XWikiException
     {
@@ -7780,9 +7790,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #updateXObjectsFromRequest(EntityReference, XWikiContext)}
+     * @deprecated use {@link #updateXObjectsFromRequest(EntityReference, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public List<BaseObject> updateObjectsFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return updateObjectsFromRequest(className, "", context);
@@ -7819,9 +7829,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #updateXObjectsFromRequest(EntityReference, String, XWikiContext)}
+     * @deprecated use {@link #updateXObjectsFromRequest(EntityReference, String, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public List<BaseObject> updateObjectsFromRequest(String className, String pref, XWikiContext context)
         throws XWikiException
     {
@@ -7912,9 +7922,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param object the object to remove
      * @return {@code true} if the object was successfully removed, {@code false} if the object was not found in the
      *         current document.
-     * @deprecated since 2.2M1, use {@link #removeXObject(com.xpn.xwiki.objects.BaseObject)} instead
+     * @deprecated use {@link #removeXObject(com.xpn.xwiki.objects.BaseObject)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public boolean removeObject(BaseObject object)
     {
         return removeXObject(object);
@@ -7977,9 +7987,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param className The class name of the objects to be removed.
      * @return {@code true} if the objects were successfully removed, {@code false} if no object from the target class
      *         was in the current document.
-     * @deprecated since 2.2M1 use {@link #removeXObjects(org.xwiki.model.reference.DocumentReference)} instead
+     * @deprecated use {@link #removeXObjects(org.xwiki.model.reference.DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public boolean removeObjects(String className)
     {
         return removeXObjects(resolveClassReference(className));
@@ -8452,9 +8462,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #newXObject(EntityReference, XWikiContext)}
+     * @deprecated use {@link #newXObject(EntityReference, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public BaseObject newObject(String className, XWikiContext context) throws XWikiException
     {
         return newXObject(
@@ -8507,9 +8517,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #getXObject(DocumentReference, boolean, XWikiContext)}
+     * @deprecated use {@link #getXObject(DocumentReference, boolean, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public BaseObject getObject(String className, boolean create, XWikiContext context)
     {
         return getXObject(
@@ -8999,11 +9009,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the XWiki context
      * @return a repport of what happen during the merge (errors, etc.)
      * @since 3.2M1
-     * @deprecated Starting with 11.8RC1 use
-     *      {@link MergeManager#mergeDocument(DocumentModelBridge, DocumentModelBridge, DocumentModelBridge,
-     *          MergeConfiguration)}.
+     * @deprecated use {@link MergeManager#mergeDocument(DocumentModelBridge, DocumentModelBridge, DocumentModelBridge,
+     *  MergeConfiguration)} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.8RC1")
     public MergeResult merge(XWikiDocument previousDocument, XWikiDocument newDocument,
         MergeConfiguration configuration, XWikiContext context)
     {
@@ -9228,9 +9237,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             || this.getAuthors().getOriginalMetadataAuthor() == GuestUserReference.INSTANCE) {
             return "";
         } else {
-            UserReferenceSerializer<String> userReferenceSerializer =
-                Utils.getComponent(new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
-            return userReferenceSerializer.serialize(this.getAuthors().getOriginalMetadataAuthor());
+            return getUserReferenceStringSerializer().serialize(this.getAuthors().getOriginalMetadataAuthor());
         }
     }
 
@@ -9243,9 +9250,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private void setOriginalMetadataAuthorReference(String serializedUserReference)
     {
         if (!StringUtils.isEmpty(serializedUserReference)) {
-            UserReferenceResolver<String> userReferenceResolver =
-                Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class, String.class));
-            UserReference userReference = userReferenceResolver.resolve(serializedUserReference);
+            UserReference userReference = getUserReferenceStringResolver().resolve(serializedUserReference);
             this.authors.setOriginalMetadataAuthor(userReference);
         }
     }

@@ -499,7 +499,7 @@
   });
   // Show the configuration for the active editor, or the first one if none is active.
   var activeTab = editorTabs.find('a[data-editorId="' + editorTabs.attr('data-defaultEditorId') + '"]');
-  if (activeTab.size() === 0) {
+  if (!activeTab.length) {
     activeTab = editorTabs.find('a[data-editorId]').first();
   }
   activeTab.tab('show');

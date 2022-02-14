@@ -29,12 +29,9 @@
   </parent>
   <artifactId>xwiki-platform-image</artifactId>
   <name>XWiki Platform - Image - Parent POM</name>
-  <description>Code related to image processing</description>
+  <description>XWiki Platform - Image - Parent POM</description>
   <packaging>pom</packaging>
   <modules>
-    <module>xwiki-platform-image-ui</module>
-    <module>xwiki-platform-image-webjar</module>
-    <module>xwiki-platform-image-api</module>
-    <module>xwiki-platform-image-plugin</module>
+    <module>xwiki-platform-image-processing</module>
   </modules>
 </project>

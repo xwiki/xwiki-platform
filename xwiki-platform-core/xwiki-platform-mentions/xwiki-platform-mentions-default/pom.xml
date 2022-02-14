@@ -55,12 +55,5 @@
       <artifactId>xwiki-platform-annotation-core</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- third party-->
-    <!-- Use to persist on disk a map of data not yet processed -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2-mvstore</artifactId>
-      <version>2.1.210</version>
-    </dependency>
   </dependencies>
 </project>

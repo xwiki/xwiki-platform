@@ -140,4 +140,10 @@ public class AllITs
     class NestedCommentsIT extends CommentsIT
     {
     }
+
+    @Nested
+    @DisplayName("Create Page And Space tests")
+    class NestedCreatePageAndSpaceIT extends CreatePageAndSpaceIT
+    {
+    }
 }

@@ -120,8 +120,8 @@ export default {
         // TODO: Support multiple search URLs (sources). See suggestUsersAndGroups.js for an example.
         const searchURL = this.config.searchURL.replace('{encodedQuery}', encodeURIComponent(text));
         $.getJSON(searchURL, searchParams)
-          .done((results) => callback(this.getResultsAdapter(results)))
-          .fail(() => callback(this.getResultsAdapter()));
+          .then(results => callback(this.getResultsAdapter(results)))
+          .catch(() => callback(this.getResultsAdapter()));
       };
     },
 

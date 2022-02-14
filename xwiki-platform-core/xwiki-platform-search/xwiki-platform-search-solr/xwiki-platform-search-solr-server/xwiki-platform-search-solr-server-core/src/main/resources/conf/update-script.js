@@ -9,8 +9,8 @@
 
 function processAdd(cmd) {
 
-  doc = cmd.solrDoc;  // org.apache.solr.common.SolrInputDocument
-  id = doc.getFieldValue("id");
+  var doc = cmd.solrDoc;  // org.apache.solr.common.SolrInputDocument
+  var id = doc.getFieldValue("id");
   logger.info("update-script#processAdd: id=" + id);
 
 // Set a field value:

@@ -21,17 +21,18 @@ package org.xwiki.rendering.internal.macro.chart;
 
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.macro.chart.ChartMacroParameters;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,40 +41,44 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 4.2M3
  */
-public class TemporaryChartImageWriterTest
+@ComponentTest
+class TemporaryChartImageWriterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<TemporaryChartImageWriter> componentManager =
-        new MockitoComponentMockingRule<TemporaryChartImageWriter>(TemporaryChartImageWriter.class);
+    @InjectMockComponents
+    private TemporaryChartImageWriter writer;
+
+    @MockComponent
+    private ModelContext modelContext;
+
+    @MockComponent
+    private Environment environment;
+
+    @MockComponent
+    private DocumentAccessBridge dab;
 
     @Test
-    public void getStorageLocation() throws Exception
+    void getStorageLocation() throws Exception
     {
         WikiReference currentWikiReference = new WikiReference("wiki");
-        ModelContext modelContext = this.componentManager.getInstance(ModelContext.class);
-        when(modelContext.getCurrentEntityReference()).thenReturn(currentWikiReference);
+        when(this.modelContext.getCurrentEntityReference()).thenReturn(currentWikiReference);
 
-        Environment environment = this.componentManager.getInstance(Environment.class);
-        when(environment.getTemporaryDirectory()).thenReturn(new File("/tmpdir"));
+        when(this.environment.getTemporaryDirectory()).thenReturn(new File("/tmpdir"));
 
-        File location = this.componentManager.getComponentUnderTest().getStorageLocation(
-            new ImageId(new ChartMacroParameters()));
-        Assert.assertTrue("Got: " + location.toString(),
-            location.toString().matches("/tmpdir/temp/chart/wiki/space/page/.*\\.png"));
+        File location = this.writer.getStorageLocation(new ImageId(new ChartMacroParameters()));
+        assertTrue(location.toString().matches("/tmpdir/temp/chart/wiki/space/page/.*\\.png"),
+            "Got: " + location);
     }
 
     @Test
-    public void getURL() throws Exception
+    void getURL() throws Exception
     {
         WikiReference currentWikiReference = new WikiReference("wiki");
-        ModelContext modelContext = this.componentManager.getInstance(ModelContext.class);
-        when(modelContext.getCurrentEntityReference()).thenReturn(currentWikiReference);
+        when(this.modelContext.getCurrentEntityReference()).thenReturn(currentWikiReference);
 
-        DocumentAccessBridge dab = this.componentManager.getInstance(DocumentAccessBridge.class);
-        when(dab.getDocumentURL(new DocumentReference("wiki", "space", "page"), "temp", null, null)).thenReturn(
+        when(this.dab.getDocumentURL(new DocumentReference("wiki", "space", "page"), "temp", null, null)).thenReturn(
             "temp/Space/Page");
 
-        String location = this.componentManager.getComponentUnderTest().getURL(new ImageId(new ChartMacroParameters()));
-        Assert.assertTrue("Got: " + location, location.toString().matches("temp/Space/Page/chart/.*\\.png"));
+        String location = this.writer.getURL(new ImageId(new ChartMacroParameters()));
+        assertTrue(location.matches("temp/Space/Page/chart/.*\\.png"), "Got: " + location);
     }
 }

@@ -72,19 +72,16 @@
     };
 
     var maybeLoadLocale = function(locale) {
-      var deferred = $.Deferred();
-      // Convert the Java locale name to the moment locale name (en_US -> en-us).
-      var momentLocale = locale.toLowerCase().replace(/_/g, '-');
-      var resolve = function() {
-        deferred.resolve();
-      };
-      // Check if the locale is already loaded.
-      if (moment.locales().indexOf(momentLocale) < 0) {
-        require(['moment/locale/' + momentLocale], resolve, resolve);
-      } else {
-        resolve();
-      }
-      return deferred.promise();
+      return new Promise((resolve, reject) => {
+        // Convert the Java locale name to the moment locale name (en_US -> en-us).
+        var momentLocale = locale.toLowerCase().replace(/_/g, '-');
+        // Check if the locale is already loaded.
+        if (moment.locales().indexOf(momentLocale) < 0) {
+          require(['moment/locale/' + momentLocale], resolve, resolve);
+        } else {
+          resolve();
+        }
+      });
     };
 
     var createDateTimePicker = function(dateTimeInput) {

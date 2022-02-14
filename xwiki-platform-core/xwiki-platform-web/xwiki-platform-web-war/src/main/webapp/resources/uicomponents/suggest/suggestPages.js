@@ -46,10 +46,10 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
       // that appears in the value.
       searchField: ['searchValue', 'label', 'hint'],
       load: function(text, callback) {
-        loadPages(text, this.settings).done(callback).fail(callback);
+        loadPages(text, this.settings).then(callback, callback);
       },
       loadSelected: function(text, callback) {
-        loadPage(text, this.settings).done(callback).fail(callback);
+        loadPage(text, this.settings).then(callback, callback);
       }
     }
   };

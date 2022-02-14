@@ -246,7 +246,7 @@
       <code>require(['jquery'], function ($) {
   'use strict';
 
-  $(document).ready(function() {
+  $(function() {
 
     /**
      * Show only options of the current scope (local/global)

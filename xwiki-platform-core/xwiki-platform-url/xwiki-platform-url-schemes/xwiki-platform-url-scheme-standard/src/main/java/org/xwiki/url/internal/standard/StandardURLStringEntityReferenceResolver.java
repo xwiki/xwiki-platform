@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -91,7 +92,8 @@ public class StandardURLStringEntityReferenceResolver extends DefaultStringEntit
             }
         } catch (CreateResourceReferenceException | UnsupportedResourceReferenceException | CreateResourceTypeException
             | MalformedURLException e) {
-            logger.warn("Failed to extract an EntityReference from [{}].", urlStringRepresentation, e);
+            logger.warn("Failed to extract an EntityReference from [{}]. Root cause is [{}].", urlStringRepresentation,
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         return defaultStringResolver.resolve(urlStringRepresentation, type, parameters);

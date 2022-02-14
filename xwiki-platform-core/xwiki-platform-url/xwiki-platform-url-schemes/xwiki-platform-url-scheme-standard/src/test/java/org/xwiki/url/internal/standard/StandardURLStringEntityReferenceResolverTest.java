@@ -20,12 +20,14 @@
 package org.xwiki.url.internal.standard;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -38,6 +40,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.resource.CreateResourceTypeException;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
@@ -108,7 +111,8 @@ class StandardURLStringEntityReferenceResolverTest
 
         DocumentReference parentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         AttachmentReference attachReference = new AttachmentReference("attachment.png", parentReference);
-        EntityResourceReference reference = new EntityResourceReference(attachReference, new EntityResourceAction("download"));
+        EntityResourceReference reference =
+            new EntityResourceReference(attachReference, new EntityResourceAction("download"));
         when(this.resourceResolver.resolve(extendedURL, type, Collections.emptyMap())).thenReturn(reference);
 
         assertEquals(attachReference,
@@ -118,24 +122,27 @@ class StandardURLStringEntityReferenceResolverTest
     @Test
     void resolveInvalidAttachmentURL() throws Exception
     {
-        String urlStringRepresentation = "http://localhost:8080/test/attachment.png";
+        String urlStringRepresentation = "http://localhost:8080/xwiki/bin/download/Path/To/Page/attachment.png";
 
         DocumentReference parentReference = new DocumentReference("wiki", "Default", "Page");
         AttachmentReference attachReference =
             new AttachmentReference("http://localhost:8080/test/attachment.png", parentReference);
         when(defaultStringResolver.resolve(urlStringRepresentation, EntityType.ATTACHMENT)).thenReturn(attachReference);
+        when(this.typeResolver.resolve(any(ExtendedURL.class), any(Map.class)))
+            .thenThrow(new CreateResourceTypeException("error"));
 
         assertEquals(attachReference,
             standardReferenceResolver.resolve(urlStringRepresentation, EntityType.ATTACHMENT));
         assertEquals(1, logCapture.size());
-        assertEquals(String.format("Failed to extract an EntityReference from [%s].", urlStringRepresentation),
-            logCapture.getMessage(0));
+        assertEquals(String.format(
+            "Failed to extract an EntityReference from [%s]. Root cause is [CreateResourceTypeException: error].",
+            urlStringRepresentation), logCapture.getMessage(0));
     }
 
     @Test
     void resolveDocumentURL() throws Exception
     {
-        String urlStringRepresentation = "http://localhost:8080/xwiki/bin/view/Path/To/Page?xpage=test";
+        String urlStringRepresentation = "http://localhost:8080/xwiki/bin/view/Path/To/Page";
         ExtendedURL extendedURL = new ExtendedURL(new URL(urlStringRepresentation), "/xwiki");
 
         ResourceType type = new ResourceType("doc");
@@ -151,15 +158,18 @@ class StandardURLStringEntityReferenceResolverTest
     @Test
     void resolveInvalidDocumentURL() throws Exception
     {
-        String urlStringRepresentation = "http://localhost:8080/test";
+        String urlStringRepresentation = "http://localhost:8080/xwiki/bin/view/Path/To/Page";
 
         DocumentReference docReference = new DocumentReference("wiki", "Default", "Page");
         when(defaultStringResolver.resolve(urlStringRepresentation, EntityType.DOCUMENT)).thenReturn(docReference);
+        when(this.typeResolver.resolve(any(ExtendedURL.class), any(Map.class)))
+            .thenThrow(new CreateResourceTypeException("error"));
 
         assertEquals(docReference, standardReferenceResolver.resolve(urlStringRepresentation, EntityType.DOCUMENT));
         assertEquals(1, logCapture.size());
-        assertEquals(String.format("Failed to extract an EntityReference from [%s].", urlStringRepresentation),
-            logCapture.getMessage(0));
+        assertEquals(String.format(
+            "Failed to extract an EntityReference from [%s]. Root cause is [CreateResourceTypeException: error].",
+            urlStringRepresentation), logCapture.getMessage(0));
     }
 
 }

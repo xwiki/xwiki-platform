@@ -403,6 +403,8 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
     <property>
       <content>{{velocity}}
 #macro (lightboxHTMLTemplate)
+#set ($defaultDateFormat = 'yyyy/MM/dd HH:mm')
+#set ($dateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
 &lt;!-- The Gallery lightbox dialog. --&gt;
 &lt;div
   id="blueimp-gallery"
@@ -462,7 +464,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
       &lt;div class="descriptionRow"&gt;
         &lt;span class="publisher"
           aria-label="$escapetool.xml($services.localization.render('image.lightbox.publisher.label'))"&gt;&lt;/span&gt;
-        &lt;span class="date"
+        &lt;span class="date" data-dateFormat="$dateFormat"
           aria-label="$escapetool.xml($services.localization.render('image.lightbox.date.label'))"&gt;&lt;/span&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -472,7 +474,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
 &lt;!-- The image toolbar popover template. --&gt;
 &lt;div id="imageToolbarTemplate"&gt;
   &lt;div class="btn-group imageToolbar" hidden&gt;
-    &lt;a id="openLightbox"
+    &lt;a class="openLightbox"
       title="$escapetool.xml($services.localization.render('image.lightbox.gallery.title'))"&gt;
       $services.icon.renderHTML("arrows")
     &lt;/a&gt;
@@ -494,7 +496,8 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
   #set ($config = {})
   #set ($discard = $config.put('HTMLTemplate', "#lightboxHTMLTemplate"))
   {{html clean="false"}}
-  &lt;script id="lightbox-config" type="application/json"&gt;$jsontool.serialize($config)&lt;/script&gt;
+  &lt;script id="lightbox-config" type="application/json"&gt;$jsontool.serialize($config).replace('&amp;lt;', '\u003C')
+  &lt;/script&gt;
   {{/html}}
 #end
 {{/velocity}}</content>
@@ -646,7 +649,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
     </property>
     <property>
       <parameters>id=xwiki-lightbox
-path=$services.webjars.url('org.xwiki.platform:xwiki-platform-image-webjar', 'lightbox.js')</parameters>
+path=$services.webjars.url('org.xwiki.platform:xwiki-platform-image-webjar', "lightbox#if ($services.debug.minify).min#{end}.js")</parameters>
     </property>
     <property>
       <scope>wiki</scope>

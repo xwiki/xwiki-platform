@@ -30,7 +30,12 @@ define('xwiki-lightbox-config', ['jquery'], function($) {
   $('body').append($(config.HTMLTemplate));
 });
 
-define('xwiki-lightbox-description', ['jquery', 'xwiki-l10n!xwiki-lightbox-messages'], function($, l10n) {
+define('xwiki-lightbox-description', [
+  'jquery',
+  'xwiki-l10n!xwiki-lightbox-messages',
+  'moment',
+  'moment-jdateformatparser'
+], function($, l10n, moment) {
   var _cachedAttachments = {};
 
   var invalidateCachedAttachments = function() {
@@ -61,11 +66,19 @@ define('xwiki-lightbox-description', ['jquery', 'xwiki-l10n!xwiki-lightbox-messa
 
   var updateDescriptionCaption = function(imageData, attachmentData) {
     if (imageData) {
-      $('.lightboxDescription .caption').html(imageData.caption || imageData.alt || imageData.title);
+      // Verify to not display the url as caption, since this is the default value for alt.
+      var alt = imageData.alt == decodeURIComponent(imageData.href) ? '' : imageData.alt;
+      $('.lightboxDescription .caption').html(imageData.caption || alt || imageData.title);
     }
 
-    if ($('.lightboxDescription .caption').is(':empty') && attachmentData && attachmentData.name) {
+    if (!$('.lightboxDescription .caption').is(':empty')) {
+      return;
+    }
+
+    if (attachmentData && attachmentData.name) {
       $('.lightboxDescription .caption').html(attachmentData.name);
+    } else if (imageData && imageData.fileName) {
+      $('.lightboxDescription .caption').html(imageData.fileName);
     }
   };
 
@@ -81,7 +94,8 @@ define('xwiki-lightbox-description', ['jquery', 'xwiki-l10n!xwiki-lightbox-messa
     }
 
     if (attachmentData.date) {
-      $('.lightboxDescription .date').text(l10n.get('date', new Date(attachmentData.date).toLocaleDateString()));
+      var dateFormat = moment().toMomentFormatString($('.lightboxDescription .date').attr('data-dateFormat'));
+      $('.lightboxDescription .date').text(l10n.get('date', moment(attachmentData.date).format(dateFormat)));
     }
   };
 
@@ -127,11 +141,11 @@ define('xwiki-lightbox-description', ['jquery', 'xwiki-l10n!xwiki-lightbox-messa
     return deferred.promise();
   };
 
-  var addSlideDescription = function(imageData, fileName) {
+  var addSlideDescription = function(imageData) {
     clearDescription();
     toggleDescription();
 
-    getAttachmentInfo(imageData.href, fileName).done(function(attachmentData) {
+    getAttachmentInfo(imageData.href, imageData.fileName).done(function(attachmentData) {
       updateDescriptionData(imageData, attachmentData);
       toggleDescription();
     }).fail(function() {
@@ -197,7 +211,7 @@ define('xwiki-lightbox', [
       $('#lightboxDownload').attr('href', img.src);
       $('#lightboxDownload').attr('download', getImageName(img.src));
       // Remember the index of the image to show first.
-      $('#openLightbox').data('index', [...$('#xwikicontent img')].indexOf(img));
+      $('.openLightbox').data('index', [...$('#xwikicontent img')].indexOf(img));
     }).on('shown.bs.popover', function(e) {
       $('.popover .imageDownload').attr('href', e.target.src);
       $('.popover .imageDownload').attr('download', getImageName(e.target.src));
@@ -267,6 +281,7 @@ define('xwiki-lightbox', [
         href: imageURL,
         thumbnail: createThumbnailURL(imageURL),
         caption: caption,
+        fileName: getImageName(imageURL),
         alt: $(this).attr('alt'),
         title: $(this).attr('title')
       });
@@ -274,7 +289,7 @@ define('xwiki-lightbox', [
 
     var options = {
       container: '#blueimp-gallery',
-      index: parseInt($('#openLightbox').data('index')),
+      index: parseInt($('.openLightbox').data('index')),
       // The class names are overridden since we changed the styles.
       closeClass: 'escape',
       playPauseClass: 'autoPlay',
@@ -282,12 +297,12 @@ define('xwiki-lightbox', [
       titleElement: 'h4',
       onslide: function(index, slide) {
         var imageData = this.list[index];
-        lightboxDescription.addSlideDescription(imageData, getImageName(imageData.href));
+        lightboxDescription.addSlideDescription(imageData);
         $(slide).find('img').attr('alt', imageData.alt);
 
         // Set the attributes for the download button inside lightbox.
         $('#lightboxDownload').attr('href', imageData.href);
-        $('#lightboxDownload').attr('download', getImageName(imageData.href));
+        $('#lightboxDownload').attr('download', imageData.fileName);
       }
     };
     myOpenLightbox = gallery(media, options);
@@ -301,7 +316,7 @@ define('xwiki-lightbox', [
     enableToolbarPopovers();
   };
 
-  $(document).on('click', '#openLightbox', openLightbox);
+  $(document).on('click', '.openLightbox', openLightbox);
 
   $(document).on('click', '#lightboxFullscreen', function() {
     // Open lightbox in fullscreen mode, or close it if already open.

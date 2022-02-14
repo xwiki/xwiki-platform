@@ -208,7 +208,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
 
   // Initialize add new step button
-  $('#addStep').click(function() {
+  $('#addStep').on('click', function() {
     var tourName = $('#tourName').val();
     $('.xdialog-modal-container').remove();
     new XWiki.widgets.StepPopup({pageURL: bstStepURL + '&amp;tourName=' + tourName});

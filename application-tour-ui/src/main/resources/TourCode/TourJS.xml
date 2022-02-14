@@ -176,7 +176,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     var button = $('&lt;button id="tourResume" class="btn btn-default btn-xs"&gt;$services.icon.renderHTML("info") #tr("tour.popover.show")&lt;/button&gt;').appendTo(buttonContainer);
     buttonContainer.hide();
     buttonContainer.fadeIn();
-    button.click(function () {
+    button.on('click', function() {
       if (createPopover) {
         button.popover('destroy');
       }

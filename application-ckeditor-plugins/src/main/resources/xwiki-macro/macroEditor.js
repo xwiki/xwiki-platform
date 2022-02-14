@@ -156,7 +156,7 @@ define('macroParameterTreeBuilder', ['jquery', 'l10n!macroEditor'], function($, 
 
   addMacroParameterTreeNode = function(parameter, macroParameterTree, macroDescriptor) {
     var parentNode = macroParameterTree;
-    if ($.isArray(parameter.group)) {
+    if (Array.isArray(parameter.group)) {
       parameter.group.forEach(function(groupId) {
         var childNode = getChildNode(parentNode, groupId);
         if (!childNode) {
@@ -411,8 +411,8 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor', 'xwiki-skin
   var displayMacroParameterTree = function(macroParameterTree, requiredSkinExtensions) {
     var output = $('<div></div>');
     output.append(macroParameterTree.children.map(displayMacroParameterTreeNode));
-    output.find('.more').click(toggleMacroParameters).click();
-    output.find('a[role="tab"]').click(function (event) {
+    output.find('.more').on('click', toggleMacroParameters).click();
+    output.find('a[role="tab"]').on('click', function(event) {
       event.preventDefault();
       $(this).tab('show');
     });
@@ -633,7 +633,7 @@ define(
       var value = data[parameter.name];
       if (value === undefined) {
         data[parameter.name] = parameter.value;
-      } else if ($.isArray(value)) {
+      } else if (Array.isArray(value)) {
         value.push(parameter.value);
       } else {
         data[parameter.name] = [value, parameter.value];
@@ -661,7 +661,7 @@ define(
       var parameterDescriptor = macroDescriptor.parameterDescriptorMap[parameterId.toLowerCase()];
       if (parameterDescriptor) {
         var value = formData[parameterId];
-        if ($.isArray(value)) {
+        if (Array.isArray(value)) {
           value = isBooleanType(parameterDescriptor.type) ? value[0] : value.join();
         }
         var defaultValue = parameterDescriptor.defaultValue;
@@ -746,7 +746,7 @@ define(
           macroEditorAPI.update(macroCall, input.syntaxId);
         }
       });
-      submitButton.click(function(event) {
+      submitButton.on('click', function(event) {
         var macroEditor = modal.find('.macro-editor');
         var macroEditorAPI = macroEditor.xwikiMacroEditor();
         if (macroEditorAPI.validate()) {
@@ -766,7 +766,7 @@ define(
       var changeMacroButton = $('<button type="button" class="btn btn-default pull-left"></button>')
         .text(translations.get('changeMacro'))
         .prependTo(submitButton.parent());
-      changeMacroButton.click(function(event) {
+      changeMacroButton.on('click', function(event) {
         var macroEditorAPI = modal.find('.macro-editor').xwikiMacroEditor();
         var output = modal.data('input');
         output.action = 'changeMacro';

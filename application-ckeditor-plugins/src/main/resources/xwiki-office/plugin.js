@@ -27,7 +27,7 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
       modal.on('change', 'input[name="filePath"]', function(event) {
         submitButton.prop('disabled', !$(event.target).val());
       });
-      submitButton.click(function(event) {
+      submitButton.on('click', function(event) {
         var output = {
           files: modalBody.find('input[name="filePath"]')[0].files,
           filterStyles: modalBody.find('input[name="filterStyles"]').prop('checked'),

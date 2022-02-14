@@ -105,7 +105,7 @@ define('resourcePicker', [
 
     // Dedicated resource pickers.
     var resourceTypeButton = resourcePicker.find('button.resourceType');
-    resourceTypeButton.click(openPicker);
+    resourceTypeButton.on('click', openPicker);
 
     var resourceDisplay = resourcePicker.find('.resourceDisplay');
     var resourceReferenceInput = resourcePicker.find('input.resourceReference');
@@ -117,7 +117,7 @@ define('resourcePicker', [
       // Prevent the users from leaving the edit mode by mistake.
       event.preventDefault();
     });
-    resourceReferenceInput.change(function(event) {
+    resourceReferenceInput.on('change', function(event) {
       // Update the original resource reference input if there's no resource displayed.
       if (resourceDisplay.hasClass('hidden')) {
         // We don't fire the selectResource event because we don't need to update the resource picker display.
@@ -289,7 +289,7 @@ define('resourcePicker', [
     resourceReferenceInput.typeahead('destroy');
     var suggester = $resource.suggesters[data.newValue];
     if (suggester) {
-      resourceReferenceInput.keydown(stopPropagationIfShowingSuggestions).typeahead({
+      resourceReferenceInput.on('keydown', stopPropagationIfShowingSuggestions).typeahead({
         afterSelect: $.proxy(selectResource, resourcePicker),
         delay: 500,
         displayText: function(resource) {

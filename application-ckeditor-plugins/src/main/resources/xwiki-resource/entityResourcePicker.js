@@ -87,7 +87,7 @@ define('entityResourcePicker', [
       }
     });
 
-    selectButton.click(function() {
+    selectButton.on('click', function() {
       modal.modal('hide');
       var tree = $.jstree.reference(treeElement);
       // jshint camelcase:false

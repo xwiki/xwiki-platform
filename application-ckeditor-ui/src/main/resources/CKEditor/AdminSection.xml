@@ -437,7 +437,7 @@
         'href': '#' + tabId,
         'data-editorId': tabName.toLowerCase()
       }).text(tabName)
-      .click(function(event) {
+      .on('click', function(event) {
         event.preventDefault();
         $(this).tab('show');
       });

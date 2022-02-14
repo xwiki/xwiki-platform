@@ -58,6 +58,7 @@
 #set ($requireConfig = {
   'paths': {
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
+    'jquery-migrate': "#removeJsSuffix($services.webjars.url('jquery-migrate', ""jquery-migrate${jsExtension}""))",
     'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
     'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
     'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
@@ -83,6 +84,9 @@
     'jquery': 'jQueryNoConflict'
   },
   'jQueryNoConflict': {
+    'jquery': 'jquery'
+  },
+  'jquery-migrate': {
     'jquery': 'jquery'
   }
 })
@@ -116,7 +120,14 @@
   #end
 #end
 require.config($jsontool.serialize($requireConfig));
-define('jQueryNoConflict', ['jquery'], function ($) {
+#set ($jQueryNoConflictDeps = ['jquery'])
+#if ($services.extension.installed.getInstalledExtension('org.webjars:jquery-migrate', "wiki:$xcontext.database"))
+  #set ($discard = $jQueryNoConflictDeps.add('jquery-migrate'))
+## The minified version of jquery-migrate is expecting a global 'jQuery' variable to be defined (even though it also uses
+## RequireJS to access jQuery). The unminified version is only relying on RequireJS so it doesn't have this problem.
+var jQuery = {};
+#end
+define('jQueryNoConflict', $jsontool.serialize($jQueryNoConflictDeps), function ($) {
   return $.noConflict();
 });
 if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {

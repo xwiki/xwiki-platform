@@ -113,6 +113,12 @@
       <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed to resolve the user serializer component -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>

@@ -525,7 +525,7 @@
     // Disable the membership type radio buttons when the user scope is local only.
     $('input[type=radio][name=WikiManager\\.WikiUserClass_0_membershipType]').prop('disabled', value === 'local_only');
   };
-  userScope.click(userScopeChanged);
+  userScope.on('click', userScopeChanged);
   userScopeChanged();
 });
 

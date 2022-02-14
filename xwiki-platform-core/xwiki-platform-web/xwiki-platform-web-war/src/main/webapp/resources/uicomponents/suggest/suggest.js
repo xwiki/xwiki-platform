@@ -448,7 +448,7 @@ var XWiki = (function(XWiki){
       if (!jsondata) {
         return null;
       }
-      if (Object.isArray(jsondata)) {
+      if (Array.isArray(jsondata)) {
         var results = jsondata;
       } else {
         var results = this._getNestedProperty(jsondata, source.resultsParameter || this.options.resultsParameter);

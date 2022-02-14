@@ -25,7 +25,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   // Hide the submit button
   $('.extension-history-source-upload input[type=submit]').addClass('hidden');
 
-  $('.extension-history-sources-header').click(function() {
+  $('.extension-history-sources-header').on('click', function() {
     $(this).closest('.extension-history-sources-selector').toggleClass('opened');
   });
 
@@ -87,8 +87,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   };
 
   var enhanceHistorySources = function(container) {
-    container.find('.extension-history-source a.deleteLink').click(onDeleteHistorySource);
-    container.find('a.extension-history-source-name').click(onSelectHistorySource);
+    container.find('.extension-history-source a.deleteLink').on('click', onDeleteHistorySource);
+    container.find('a.extension-history-source-name').on('click', onSelectHistorySource);
   };
   enhanceHistorySources($('.extension-history-sources'));
 
@@ -145,10 +145,10 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 
   var enhanceHistoryRecordsForm = function(recordsForm) {
     // Enhance the 'more' link.
-    recordsForm.find('.extension-history-record a.more').click(loadMoreHistoryRecords);
+    recordsForm.find('.extension-history-record a.more').on('click', loadMoreHistoryRecords);
     // Enable/Disable the history actions based on the number of records selected.
     enableDisableActions.call(recordsForm);
-    recordsForm.find('.extension-history-record input[type="checkbox"]').click(enableDisableActions);
+    recordsForm.find('.extension-history-record input[type="checkbox"]').on('click', enableDisableActions);
   };
 
   enhanceHistoryRecordsForm($('.extension-history-records-form'));
@@ -172,25 +172,25 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     }
   };
 
-  $('.extension-history-actions button[value="replayPlan"]').click(onPreviewReplayPlan);
+  $('.extension-history-actions button[value="replayPlan"]').on('click', onPreviewReplayPlan);
   $(document).on('xwiki:dom:updated', function(event, data) {
-    $(data.elements).find('.extension-history-actions button[value="replayPlan"]').click(onPreviewReplayPlan);
+    $(data.elements).find('.extension-history-actions button[value="replayPlan"]').on('click', onPreviewReplayPlan);
   });
 
-  $('.extension-history-replay-options button[value="replayPlan"]').click(function(event) {
+  $('.extension-history-replay-options button[value="replayPlan"]').on('click', function(event) {
     event.preventDefault();
     getReplayPlan($(event.target).closest('.extension-history'));
   });
 
-  $('.extension-history-replay-options a.btn-default').click(function(event) {
+  $('.extension-history-replay-options a.btn-default').on('click', function(event) {
     event.preventDefault();
     replayPlanRequest && replayPlanRequest.abort();
     $(event.target).closest('.extension-history-replay-options').addClass('hidden').prevAll().show();
   });
 
   var enhanceReplayPlan = function(replayPlan) {
-    replayPlan.find('a.btn-default').click(cancelReplayPlan);
-    replayPlan.find('button[value="replay"]').click(submitReplayPlan);
+    replayPlan.find('a.btn-default').on('click', cancelReplayPlan);
+    replayPlan.find('button[value="replay"]').on('click', submitReplayPlan);
   };
 
   var replayPlanRequest;
@@ -250,11 +250,11 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 
     var jobState = container.attr('data-jobState');
     if (jobState == 'WAITING') {
-      container.find('form.extension-question button[value="continue"]').click($.proxy(updateReplayStatus, null,
-        container, 'action=continue'));
+      container.find('form.extension-question button[value="continue"]')
+        .on('click', $.proxy(updateReplayStatus, null, container, 'action=continue'));
       // Some questions have their own buttons (e.g. the "Show changes" button on the merge conflict question).
-      container.find('form.extension-question button[name="extensionAction"]').click($.proxy(updateReplayStatus, null,
-        container, 'data=replayStatus'));
+      container.find('form.extension-question button[name="extensionAction"]')
+        .on('click', $.proxy(updateReplayStatus, null, container, 'data=replayStatus'));
     } else if (typeof jobState == 'string' && jobState != 'FINISHED') {
       setTimeout($.proxy(updateReplayStatus, this, container), 1000);
     }

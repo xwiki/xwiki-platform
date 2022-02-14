@@ -76,7 +76,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         if (!ellipsis.children().first().is('a')) {
           ellipsis.wrapInner(function () {
             // Wrap the ellipsis with a link (to be consistent with other path items) that expands the breadcrumb
-            return $('<a href="#"></a>').click(expandBreadCrumb);
+            return $('<a href="#"></a>').on('click', expandBreadCrumb);
           });
         }
       });
@@ -108,7 +108,7 @@ require([paths.treeRequireConfig], function() {
             });
           }
         });
-      }).children('.dropdown-menu').click(function(event) {
+      }).children('.dropdown-menu').on('click', function(event) {
         // Prevent the drop-down from closing when the user expands the tree nodes.
         event.stopPropagation();
       });

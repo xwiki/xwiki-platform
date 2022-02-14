@@ -47,7 +47,7 @@ require([paths.treeRequireConfig], function() {
       var treeElement = modal.find('.location-tree');
       var selectButton = modal.find('.modal-footer .btn-primary');
 
-      trigger.click(function(event) {
+      trigger.on('click', function(event) {
         event.preventDefault();
         modal.modal();
       });
@@ -81,7 +81,7 @@ require([paths.treeRequireConfig], function() {
         }
       });
 
-      selectButton.click(function() {
+      selectButton.on('click', function() {
         modal.modal('hide');
         modal.triggerHandler('xwiki:locationTreePicker:select', {
           'tree': $.jstree.reference(treeElement)
@@ -99,7 +99,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     var wikiField = picker.find('.location-wiki-field');
     var parentField = picker.find('input.location-parent-field');
 
-    picker.find('.location-action-pick').click(function(event) {
+    picker.find('.location-action-pick').on('click', function(event) {
       var selectedValue = parentField.val();
       if (selectedValue) {
         var wiki = wikiField.val() || xm.wiki;
@@ -328,7 +328,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     // We catch the change event because we want to make sure everything's updated when the user change fields
     // (particulary useful in our automated tests).
     titleInput.on('input change', scheduleUpdateOfLocationAndNameFromTitleInput);
-    wikiField.change(updateLocationFromWikiField);
+    wikiField.on('change', updateLocationFromWikiField);
     nameInput.on('input change', updateLocationFromNameInput);
     spaceReferenceInput.on('input change xwiki:suggest:selected', updateLocationFromSpaceReference);
 
@@ -346,7 +346,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
 
     // Show the location edit options when pressing the pencil button.
     var locationEdit = picker.find('.location-edit');
-    picker.find('.location-action-edit').click(function(event) {
+    picker.find('.location-action-edit').on('click', function(event) {
       event.preventDefault();
       // Note: Using toggleClass() instead of toggle() because using the 'hidden' class
       // allows us to have the element hidden by default more easily from Velocity.
@@ -470,16 +470,16 @@ require(['jquery'], function($) {
     });
 
     // Trigger validation when the terminal status changes.
-    terminalCheckbox.change(function() {
+    terminalCheckbox.on('change', function() {
       spaceValidator.validate();
     });
   };
 
   var synchChildrenWithTerminalPage = function(deepCheckbox, terminalCheckbox) {
-    deepCheckbox.change(function() {
+    deepCheckbox.on('change', function() {
       deepCheckbox.prop('checked') && terminalCheckbox.prop('checked', false);
     });
-    terminalCheckbox.change(function() {
+    terminalCheckbox.on('change', function() {
       terminalCheckbox.prop('checked') && deepCheckbox.prop('checked', false);
     });
   };
@@ -506,7 +506,7 @@ require(['jquery'], function($) {
 
     // If the form is not valid on submission and the location edit is hidden, make sure to display it so that
     // validation errors are also displayed.
-    picker.closest('form').submit(function(event) {
+    picker.closest('form').on('submit', function(event) {
       var isValid = LiveValidation.massValidate(pickerValidators);
       if (!isValid && locationEdit.hasClass('hidden')) {
         locationEditToggle.click();
@@ -587,7 +587,7 @@ require(['jquery'], function($) {
     addTerminalPageValidation(spaceValidator, terminalCheckbox);
     synchChildrenWithTerminalPage(deepCheckbox, terminalCheckbox);
 
-    languageSelect.change(function() {
+    languageSelect.on('change', function() {
       if (languageSelect.val() === 'ALL') {
         deepCheckbox.prop('disabled', false);
       } else {

@@ -449,7 +449,7 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
 
   var customTreeAPI = {
     openTo: function(nodeIds, callback) {
-      var isArray = $.isArray(nodeIds);
+      var isArray = Array.isArray(nodeIds);
       if (!isArray) {
         nodeIds = [nodeIds];
       }

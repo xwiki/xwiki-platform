@@ -173,7 +173,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       }
       if (value && typeof load === 'function') {
         load.call(selectize, value, function(options) {
-          $.isArray(options) && options.forEach(function(option) {
+          Array.isArray(options) && options.forEach(function(option) {
             var value = option[selectize.settings.valueField];
             if (selectize.options.hasOwnProperty(value)) {
               selectize.updateOption(value, option);

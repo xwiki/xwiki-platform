@@ -37,7 +37,7 @@ define('xwiki-selectize-utils', ['jquery'], function($) {
       if (suggestions.length < params.limit) {
         return source.call(null, params).then(function(response) {
           // Success.
-          if ($.isArray(response)) {
+          if (Array.isArray(response)) {
             suggestions.push.apply(suggestions, response.slice(0, params.limit - suggestions.length));
             suggestions.sort(suggestionComparator);
           }

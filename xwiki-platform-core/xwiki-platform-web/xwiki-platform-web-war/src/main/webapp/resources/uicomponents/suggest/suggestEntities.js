@@ -32,7 +32,7 @@ require.config({paths});
 define('xwiki-entityTypeSwitch', ['jquery', 'xwiki-suggestPages', 'xwiki-suggestAttachments'], function($) {
   var maybeEnableEntityTypeSwitch = function(entityTypeField) {
     var referenceField = getReferenceField(entityTypeField);
-    entityTypeField.change(function(event) {
+    entityTypeField.on('change', function(event) {
       updateReferencePicker(referenceField, entityTypeField.val());
     });
     // Activate the picker that corresponds to the default entity type.

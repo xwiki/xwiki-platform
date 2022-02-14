@@ -195,21 +195,21 @@
       });
     };
 
-    $('#disable').click(function (event) {
+    $('#disable').on('click', function(event) {
       setUserDisableStatus('disable');
     });
 
-    $('#enable').click(function (event) {
+    $('#enable').on('click', function(event) {
       setUserDisableStatus('enable');
     });
 
     /**
      * DOM events
      */
-    $('.notificationWatchUserAdd').click(function (event) {
+    $('.notificationWatchUserAdd').on('click', function(event) {
       changeUserStatus('watchUser');
     });
-    $('.notificationWatchUserRemove').click(function (event) {
+    $('.notificationWatchUserRemove').on('click', function(event) {
       changeUserStatus('unwatchUser');
     });
   });

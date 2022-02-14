@@ -277,13 +277,13 @@ require([
     $(sortableSelector).sortable({connectWith: sortableSelector});
 
     // Allow reverting the changes
-    $('#bt-revert').click(function(){
+    $('#bt-revert').on('click', function() {
       // Refresh the page
       window.location.reload();
     });
 
     // Redefine the save action
-    $('#bt-save').click(save);
+    $('#bt-save').on('click', save);
   });
 });
 </code>

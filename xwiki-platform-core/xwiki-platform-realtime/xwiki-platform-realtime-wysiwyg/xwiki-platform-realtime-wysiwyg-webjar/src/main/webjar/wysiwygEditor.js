@@ -175,7 +175,7 @@ define('xwiki-realtime-wysiwygEditor', [
     // * realtime is disabled and we're not an advanced user
     if (useRt !== 0 && (useRt || editorConfig.isAdvancedUser)) {
       var allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(Interface.realtimeAllowed());
-      allowRealtimeCheckbox.change(function() {
+      allowRealtimeCheckbox.on('change', function() {
         if (allowRealtimeCheckbox.prop('checked')) {
           Interface.realtimeAllowed(true);
           // TODO: Join the RT session without reloading the page?

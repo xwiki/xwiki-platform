@@ -288,12 +288,12 @@
     maybeDisableSplitOptions();
 
     // Enable/disable the split options when the checkbox's value changes
-    $('#splitDocumentInputId').change(maybeDisableSplitOptions);
+    $('#splitDocumentInputId').on('change', maybeDisableSplitOptions);
 
     /**
      * Event sent when the form is submitted
      */
-    $('#officeImportForm').submit(function(event) {
+    $('#officeImportForm').on('submit', function(event) {
       // Verify that the target document does not already exist
       var appendContentCheckbox = $('#appendContentInputId');
       if (appendContentCheckbox.length == 0 || appendContentCheckbox.prop('checked')) {

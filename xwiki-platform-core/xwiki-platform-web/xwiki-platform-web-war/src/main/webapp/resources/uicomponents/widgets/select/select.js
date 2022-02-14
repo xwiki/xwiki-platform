@@ -130,8 +130,9 @@ require(['jquery'], function($) {
     /* Initialization
      */
     self.init = function () {
-      self.selectWidget.find('.xwiki-select-option').click(self.onOptionClicked);
-      self.selectWidget.find('input.xwiki-select-filter').change(self.onFilterChange).keyup(self.onFilterChange);
+      self.selectWidget.find('.xwiki-select-option').on('click', self.onOptionClicked);
+      self.selectWidget.find('input.xwiki-select-filter').on('change', self.onFilterChange)
+        .on('keyup', self.onFilterChange);
     };
 
     /**

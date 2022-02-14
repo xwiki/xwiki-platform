@@ -211,7 +211,7 @@ require(['jquery'], function($) {
   var initPickerResults = function(picker) {
 
     // Called when an option is clicked
-    picker.find('.xwiki-flavor-picker-option').click(function (event) {
+    picker.find('.xwiki-flavor-picker-option').on('click', function(event) {
       var thisOption = $(this);
       var picker = thisOption.parents('.xwiki-flavor-picker');
       picker.find('.xwiki-flavor-picker-option-selected').removeClass('xwiki-flavor-picker-option-selected');
@@ -221,7 +221,7 @@ require(['jquery'], function($) {
     });
 
     // Called when a flavor's link is clicked
-    picker.find('.xwiki-flavor-picker-option a.popup').click(function (event) {
+    picker.find('.xwiki-flavor-picker-option a.popup').on('click', function(event) {
       // TODO: replace this by a modal box with an iframe
       window.open(this.href, 'flavor-popup', config='height=600, width=700, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=yes');
       return false;
@@ -237,7 +237,7 @@ require(['jquery'], function($) {
     initPickerResults($('.xwiki-flavor-picker'));
 
     // Called when the picker's filter is updated on keyboard pressed
-    $('input.xwiki-flavor-picker-filter').keyup(function() {
+    $('input.xwiki-flavor-picker-filter').on('keyup', function() {
       var filter = $(this);
       var filterValue = filter.val();
 
@@ -245,7 +245,7 @@ require(['jquery'], function($) {
     });
 
     // Called when the "no flavor" option is clicked
-    $('.xwiki-flavor-picker-noflavor').click(function (event) {
+    $('.xwiki-flavor-picker-noflavor').on('click', function(event) {
       var picker = $(this).parents('.xwiki-flavor-picker');
       picker.find('.xwiki-flavor-picker-option-selected').removeClass('xwiki-flavor-picker-option-selected');
       sendRefreshEvent(picker);

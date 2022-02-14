@@ -71,7 +71,7 @@ define('xwiki-realtime-wikiEditor', [
     var allowRealtimeCheckbox = $('.buttons input[type=checkbox].realtime-allow');
     if (!allowRealtimeCheckbox.length) {
       allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(true);
-      allowRealtimeCheckbox.change(function() {
+      allowRealtimeCheckbox.on('change', function() {
         if (allowRealtimeCheckbox.prop('checked')) {
           module.main(editorConfig, docKeys);
         } else {

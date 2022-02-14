@@ -394,7 +394,7 @@
     form.find('input:visible, textarea:visible, select:visible').prop('disabled', useGlobal);
     $(this).prop('disabled', false);
   };
-  $('#XWiki\\.Realtime\\.Configuration_XWiki\\.Realtime\\.ConfigurationClass_0_useGlobalConfig').change(onChange)
+  $('#XWiki\\.Realtime\\.Configuration_XWiki\\.Realtime\\.ConfigurationClass_0_useGlobalConfig').on('change', onChange)
     .trigger('change');
 });</code>
     </property>

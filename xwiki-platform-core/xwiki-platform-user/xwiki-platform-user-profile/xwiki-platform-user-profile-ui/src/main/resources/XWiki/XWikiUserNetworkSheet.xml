@@ -267,7 +267,7 @@
     <property>
       <code>'use strict';
 require(['jquery', 'xwiki-meta'], function ($, xm) {
-  $('ul.followed-users a.userstatus-follow').click(function(event) {
+  $('ul.followed-users a.userstatus-follow').on('click', function(event) {
     var button = $(this);
     var behavior = {
       onYes: function() {

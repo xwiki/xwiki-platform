@@ -63,7 +63,7 @@ define('xwiki-realtime-wikiEditor-loader', [
         Loader.messages.get('redirectDialog.create', info.name));
       $('.realtime-buttons').append('<br/>').append(button);
     }
-    button.click(function() {
+    button.on('click', function() {
       window.location.href = Loader.getEditorURL(window.location.href, info);
     });
   };

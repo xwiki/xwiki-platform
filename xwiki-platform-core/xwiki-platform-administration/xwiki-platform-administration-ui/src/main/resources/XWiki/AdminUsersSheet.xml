@@ -636,7 +636,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     });
   });
 
-  deleteUserButton.click(function() {
+  deleteUserButton.on('click', function() {
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('xe.admin.users.delete.inProgress')),
       'inprogress'

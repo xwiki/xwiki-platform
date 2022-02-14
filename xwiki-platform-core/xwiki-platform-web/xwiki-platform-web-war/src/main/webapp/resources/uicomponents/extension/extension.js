@@ -731,13 +731,13 @@ require(['jquery'], function($) {
     };
 
     var parents = $(this).find('ul').prev('.node').addClass('parent');
-    $(this).hasClass('collapsible') && parents.click(toggleCollapsed);
+    $(this).hasClass('collapsible') && parents.on('click', toggleCollapsed);
     if ($(this).hasClass('selectable')) {
       parents.append('<span class="actions"><input type="checkbox"/></span>');
-      parents.find('.actions input[type="checkbox"]').click(toggleSelection)
+      parents.find('.actions input[type="checkbox"]').on('click', toggleSelection)
         .before('<span class="selectedCount"></span>')
         .prev('.selectedCount').each(updateSelectedCount);
-      $(this).find('input[type="checkbox"]').click(function() {
+      $(this).find('input[type="checkbox"]').on('click', function() {
         $(tree).find('.selectedCount').each(updateSelectedCount);
       });
     }
@@ -807,5 +807,5 @@ require(['jquery'], function($) {
     form.next('.extensionUpdater').each($.proxy(refresh, null, params));
   };
 
-  $('.extensionUpdater').each(maybeScheduleRefresh).prev('form').find('button').click(onCheckForUpdates);
+  $('.extensionUpdater').each(maybeScheduleRefresh).prev('form').find('button').on('click', onCheckForUpdates);
 });

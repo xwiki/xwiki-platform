@@ -477,7 +477,7 @@ require([
     });
   };
 
-  $('.exclusion-filter-dynamic input[type="checkbox"]').click(function() {
+  $('.exclusion-filter-dynamic input[type="checkbox"]').on('click', function() {
     var pages = $(this).closest('.exclusion-filter').find('.exclusion-filter-pages').toggleClass('hidden');
     var tree = $('.navigationPanelConfiguration .jstree').jstree(true);
     if ($(this).prop('checked')) {

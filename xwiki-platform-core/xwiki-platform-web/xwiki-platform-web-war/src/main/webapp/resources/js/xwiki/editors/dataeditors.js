@@ -808,7 +808,7 @@ return XWiki;
 
 // Class Switcher
 require(['jquery', 'xwiki-events-bridge'], function($) {
-  $('#switch-xclass').change(function(event) {
+  $('#switch-xclass').on('change', function(event) {
     var selectedClass = $(event.target).val();
     if (selectedClass) {
       var selectedClassReference = XWiki.Model.resolve(selectedClass, XWiki.EntityType.DOCUMENT,

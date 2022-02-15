@@ -47,7 +47,7 @@ require(['jquery', config.treeWebjar], function ($) {
     return pageWhiteIcon;
   }
 
-  treeSelector.click(function () {
+  treeSelector.on('click', function() {
     modal.modal({show: true});
     if (tree === undefined) {
       tree = $('#move.xform .location-tree').xtree({
@@ -68,7 +68,7 @@ require(['jquery', config.treeWebjar], function ($) {
     }
   });
 
-  selectButton.click(function () {
+  selectButton.on('click', function() {
     modal.modal('hide');
     var docReference = $.jstree.reference(tree).get_selected(false)[0]
     const idx = docReference.indexOf(':')

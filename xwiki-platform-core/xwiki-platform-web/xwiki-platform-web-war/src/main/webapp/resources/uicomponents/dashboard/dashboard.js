@@ -714,7 +714,9 @@ function init() {
     // edit first dashboard FIXME: to create a dashboard editor for all dashboards
     var dashboardRootElt = $$('.dashboard')[0];
     if (dashboardRootElt) {
-      new XWiki.Dashboard(dashboardRootElt);
+      require(['scriptaculous/dragdrop'], function() {
+        new XWiki.Dashboard(dashboardRootElt);
+      });
     }
   }
   return true;

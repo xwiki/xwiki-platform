@@ -1076,7 +1076,7 @@ var LiveTableFilter = Class.create({
       if ((this.inputs[i].type == "radio") || (this.inputs[i].type == "checkbox")) {
         var filter = this.filters[key];
         if (filter) {
-          if (Object.isArray(filter)) {
+          if (Array.isArray(filter)) {
             this.inputs[i].checked = (filter.indexOf(this.inputs[i].value.strip()) != -1);
           } else {
             this.inputs[i].checked = (filter == this.inputs[i].value.strip());
@@ -1092,7 +1092,7 @@ var LiveTableFilter = Class.create({
 
     this.selects.each(function(select) {
       var values = this.filters[select.name];
-      if (!Object.isArray(values)) {
+      if (!Array.isArray(values)) {
         values = [values];
       }
       var selectedValues = [];
@@ -1138,7 +1138,7 @@ var LiveTableFilter = Class.create({
   },
 
   _isBlank: function(value) {
-    var values = Object.isArray(value) ? value : [value];
+    var values = Array.isArray(value) ? value : [value];
     return values.every(function(value) {
       return typeof value !== 'string' || value.blank();
     });
@@ -1223,7 +1223,7 @@ var LiveTableTagCloud = Class.create({
       for (var i = 0; i < table.tags.length; i++) {
         this.selectedTags[table.tags[i]] = {};
       }
-      if (Object.isArray(tags)) {
+      if (Array.isArray(tags)) {
          this.tags = tags;
          if (tags.length > 0) {
            this.updateTagCloud(tags);

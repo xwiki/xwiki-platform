@@ -64,17 +64,7 @@ XWiki.DocumentLock = Class.create({
   unlock: function() {
     if (this._locked) {
       this._locked = false;
-      if (typeof navigator.sendBeacon === 'function') {
-        navigator.sendBeacon(this._getURL('cancel'));
-      } else {
-        // Synchronous XHR is deprecated. We keep this for browsers that don't support the Beacon API.
-        new Ajax.Request(this._getURL('cancel'), {
-          method: 'get',
-          // Keep the request synchronous because otherwise the page can unload before the request is sent.
-          // See https://developer.mozilla.org/en/DOM/XMLHttpRequest/Synchronous_and_Asynchronous_Requests#Irreplaceability_of_the_synchronous_use
-          asynchronous: false
-        });
-      }
+      navigator.sendBeacon(this._getURL('cancel'));
     }
   },
 

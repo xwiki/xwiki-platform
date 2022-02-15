@@ -25,12 +25,12 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     }
 
     // Click listener for the audio CAPTCHA play/listen button.
-    $(container).find('.captcha-play').click(function() {
+    $(container).find('.captcha-play').on('click', function() {
       $(this).siblings('audio.captcha-challenge')[0].play();
     });
 
     // Click listener for the CAPTCHA refresh/reload button.
-    $(container).find('.captcha-refresh').click(function() {
+    $(container).find('.captcha-refresh').on('click', function() {
       // We simply reset the 'src' attribute's value to make the CAPTCHA display a new challenge.
       var currentSrc = $(this).siblings('.captcha-challenge').prop('src');
       // Make sure to append a cache-buster to the src, since some elements might not reload if the src is the same

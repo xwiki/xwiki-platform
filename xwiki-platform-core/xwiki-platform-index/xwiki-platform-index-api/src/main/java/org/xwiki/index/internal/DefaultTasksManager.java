@@ -75,13 +75,12 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
 
     @Inject
     private JMXBeanRegistration jmxRegistration;
-    
+
     @Inject
     private TaskExecutor taskExecutor;
 
     @Inject
     private Logger logger;
-
 
     /**
      * When {@code true}, indicates that the {@link #run()} method should stop.
@@ -141,7 +140,6 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
                 () -> this.queue.stream().collect(Collectors.groupingBy(TaskData::getType, Collectors.counting()))),
             MBEAN_NAME);
         this.queue = new PriorityBlockingQueue<>(11, Comparator.comparingLong(TaskData::getTimestamp));
-        this.startThread();
     }
 
     @Override
@@ -151,7 +149,10 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
         this.queue.add(TaskData.STOP);
     }
 
-    private void startThread()
+    /**
+     * Start the consumer thread.
+     */
+    public void startThread()
     {
         Thread thread = new Thread(this);
         thread.setName("task-manager-consumer");

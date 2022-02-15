@@ -314,74 +314,61 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     return $.extend(true, defaultTemplate, template || {});
   };
 
-  var getPath = function(nodeId, callback) {
+  var getPath = function(nodeId) {
     // 'this' is the tree instance.
-    callback = $.proxy(callback, this);
     if (this.get_node(nodeId)) {
       // The specified node is already loaded in the tree.
-      callback(this.get_path(nodeId, false, true));
+      return Promise.resolve(this.get_path(nodeId, false, true));
     } else {
       // We need to retrieve the node path from the server.
       var url = this.element.attr('data-url');
       if (url) {
-        $.get(url, {data: 'path', 'id': nodeId}).then(callback, () => callback([]));
+        return Promise.resolve($.get(url, {data: 'path', 'id': nodeId}));
       } else {
-        callback([]);
+        return Promise.reject();
       }
     }
   };
 
-  // A path element is either a string (node id) or an object (node definition).
-  var maybeLoadPathElement = function(parent, pathElement) {
+  // A node is specified either as a string (node id) or as an object (node definition).
+  var maybeCreateNode = function(nodeSpec, parent) {
     // 'this' is the tree instance.
-    var node = this.get_node(pathElement);
+    var node = this.get_node(nodeSpec);
     var siblings = this.get_children_dom(parent);
     return new Promise((resolve, reject) => {
       if (node) {
-        // The specified path element is already loaded.
+        // The specified node already exists.
         resolve(node);
-      } else if (canAcceptChild(parent, pathElement) && siblings.length > 0 &&
+      } else if (canAcceptChild(parent, nodeSpec) && siblings.length > 0 &&
           this.get_node(siblings.last()).data.type === 'pagination') {
         // The corresponding node is probably not displayed because of the pagination. It's expensive to retrieve all
         // the rest of the siblings (i.e. all the next pages) until we find the node that corresponds to the given path
         // element, so we simply add the node to the parent. Don't worry, the node won't be duplicated when the
         // pagination is triggered.
-        this.create_node(parent, pathElement, siblings.length - 1, resolve);
+        this.create_node(parent, nodeSpec, siblings.length - 1, resolve);
       } else {
-        // The specified path element can't be loaded.
+        // The specified node can't be created.
         reject();
       }
     });
   };
 
-  var openPath = function(parent, path, callback) {
+  var openNode = function(node) {
     // 'this' is the tree instance.
-    if (path && path.length > 0) {
-      var promise = maybeLoadPathElement.call(this, parent, path[0]);
-      if (promise) {
-        // The next path element can be loaded. Open it after it's loaded.
-        return promise.then(node => {
-          this.open_node(node, function() {
-            openPath.call(this, node, path.slice(1), callback);
-          });
-          return node;
-        });
-      }
-    }
-    // If we get here then it means we cannot advance any more.
-    if (callback) {
-      callback(parent);
-    }
+    return new Promise((resolve, reject) => this.open_node(node, resolve));
+  };
+
+  var openPath = function(path) {
+    // 'this' is the tree instance.
+    var root = this.get_node($.jstree.root);
+    return path.reduce((openParent, childNode) => {
+      return openParent.then($.proxy(maybeCreateNode, this, childNode)).then($.proxy(openNode, this));
+    }, Promise.resolve(root));
   };
 
   var openToNode = function(tree, nodeId) {
-    return new Promise((resolve, reject) => {
-      // We need to open all the ancestors of the specified node.
-      getPath.call(tree, nodeId, function(path) {
-        var root = this.get_node($.jstree.root);
-        openPath.call(this, root, path, resolve);
-      });
-    });
+    // We need to open all the ancestors of the specified node.
+    return getPath.call(tree, nodeId).then($.proxy(openPath, tree));
   };
 
   // Attempts to open each of the specified nodes, one by one. The reason we open the nodes sequentially is because
@@ -390,12 +377,16 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
   // doesn't support that well adding new nodes at the same time (in parallel).
   var openToNodes = function(tree, nodeIds) {
     // Chain all the 'openToNode' promises (open the next node only after the current node is opened).
-    return nodeIds.reduce(function(promise, nodeId) {
-      return promise.then(function(nodes) {
-        return openToNode(tree, nodeId).then(function(node) {
+    return nodeIds.reduce((openPreviousNodes, nodeId) => {
+      return openPreviousNodes.then(openedNodes => {
+        return openToNode(tree, nodeId).then(node => {
           // Filter the value of the openToNode promise because we want to collect the nodes.
-          nodes.push(node);
-          return nodes;
+          openedNodes.push(node);
+          return openedNodes;
+        }).catch(() => {
+          // Opening the node failed. Ignore and try opening the next nodes.
+          console.log(`Failed to open the tree to node ${nodeId}.`);
+          return openedNodes;
         });
       });
     // Resolve using an empty array because we want to collect the nodes that have been opened to.
@@ -458,7 +449,7 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
 
   var customTreeAPI = {
     openTo: function(nodeIds, callback) {
-      var isArray = $.isArray(nodeIds);
+      var isArray = Array.isArray(nodeIds);
       if (!isArray) {
         nodeIds = [nodeIds];
       }

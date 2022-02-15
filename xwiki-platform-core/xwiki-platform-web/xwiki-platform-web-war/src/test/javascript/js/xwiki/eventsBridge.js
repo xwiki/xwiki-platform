@@ -19,13 +19,9 @@
  */
 require.config({
   paths: {
-    'prototype': 'js/prototype/prototype.min',
     'xwiki-events-bridge': 'js/xwiki/eventsBridge.min'
   },
   shim: {
-    'prototype': {
-      exports: '$'
-    },
     'xwiki-events-bridge': {
       // The dependency on Prototype.js is not declared.
       deps: ['jquery', 'prototype']

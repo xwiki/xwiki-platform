@@ -513,7 +513,7 @@ define('editInPlace', [
       '&lt;/div&gt;'
     ].join(''));
     modal.find('.close').attr('aria-label', l10n['edit.inplace.close']);
-    modal.find('.modal-footer .btn-warning').click(function() {
+    modal.find('.modal-footer .btn-warning').on('click', function() {
       // The user has confirmed they want to force the lock.
       modal.data('deferred').resolve();
       modal.modal('hide');

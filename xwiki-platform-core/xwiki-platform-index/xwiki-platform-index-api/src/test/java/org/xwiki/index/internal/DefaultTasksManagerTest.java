@@ -19,6 +19,8 @@
  */
 package org.xwiki.index.internal;
 
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 
@@ -128,6 +130,7 @@ class DefaultTasksManagerTest
     @Test
     void addTask() throws Exception
     {
+        this.tasksManager.startThread();
         CompletableFuture<TaskData> taskFuture =
             this.tasksManager.addTask("wikiId", 42, "1.3", "testtask");
 
@@ -148,6 +151,7 @@ class DefaultTasksManagerTest
     @Test
     void addTaskFailsOnce() throws Exception
     {
+        this.tasksManager.startThread();
         // Fails the first time, then succeeds the second time execute is called.
         doThrow(new RuntimeException("Test")).doAnswer(invocation -> {
             TaskData taskData = invocation.getArgument(0);
@@ -180,6 +184,7 @@ class DefaultTasksManagerTest
     @Test
     void addTaskDatabaseIssue() throws Exception
     {
+        this.tasksManager.startThread();
         XWikiDocumentIndexingTask task = new XWikiDocumentIndexingTask();
         XWikiDocumentIndexingTaskId taskId = new XWikiDocumentIndexingTaskId();
         taskId.setDocId(42);
@@ -207,6 +212,7 @@ class DefaultTasksManagerTest
     @Test
     void replaceTask() throws Exception
     {
+        this.tasksManager.startThread();
         CompletableFuture<Void> blockTask = new CompletableFuture<>();
         // Block the fist task and let the next tasks execute instantly.
         doAnswer(invocation -> {
@@ -254,6 +260,7 @@ class DefaultTasksManagerTest
     @Test
     void replaceTaskDatabaseIssue() throws Exception
     {
+        this.tasksManager.startThread();
         doThrow(new XWikiException()).when(this.tasksStore).replaceTask(any(), any());
 
         CompletableFuture<TaskData> future = this.tasksManager.replaceTask("wikiId", 42, "1.3", "testtask");
@@ -274,4 +281,33 @@ class DefaultTasksManagerTest
             + " Cause: [XWikiException: Error number 0 in 0].", this.logCapture.getMessage(0));
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
     }
+
+    @Test
+    void initQueueFromDatabase() throws Exception
+    {
+        when(this.wikiDescriptorManager.getAllIds()).thenReturn(List.of("wikiId", "wikiB"));
+        XWikiDocumentIndexingTask xWikiTask = new XWikiDocumentIndexingTask();
+        xWikiTask.setTimestamp(new Date());
+        XWikiDocumentIndexingTaskId id = new XWikiDocumentIndexingTaskId();
+        id.setVersion("1.3");
+        id.setType("testtask");
+        id.setDocId(42);
+        xWikiTask.setId(id);
+        when(this.tasksStore.getAllTasks("wikiId", INSTANCE_ID)).thenReturn(List.of(xWikiTask));
+
+        this.tasksManager.startThread();
+
+        // Queue a new task to have something to wait for Waits 1ms to make sure that the task is with a timestamps 
+        // higher than the tasks from the database.
+        Thread.sleep(1);
+        CompletableFuture<TaskData> future = this.tasksManager.addTask("wikiId", 42, "1.3", "othertask");
+
+        // Wait for the new task to be consumed to make sure that all the initialization process is completed.
+        assertNotNull(future.get());
+        verify(this.tasksStore).getAllTasks("wikiId", INSTANCE_ID);
+        verify(this.tasksStore).getAllTasks("wikiB", INSTANCE_ID);
+        verify(this.taskExecutor).execute(new TaskData(42, "1.3", "testtask", "wikiId"));
+        verify(this.taskExecutor).execute(new TaskData(42, "1.3", "othertask", "wikiId"));
+    }
+
 }

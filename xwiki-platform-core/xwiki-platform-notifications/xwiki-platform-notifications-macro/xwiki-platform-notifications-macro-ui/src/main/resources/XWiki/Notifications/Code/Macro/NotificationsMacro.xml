@@ -368,7 +368,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         btn.addClass('btn').addClass('btn-default').addClass('btn-block');
         loadMore.append(btn);
         self.insertElementInMacroContainer(loadMore);
-        btn.click(function(event) {
+        btn.on('click', function(event) {
           loadMore.text('').addClass('loading').css('height', '50px');
           // We use the date of the last displayed event as an offset to display those that come next
           self.load(lastEventDate);
@@ -428,7 +428,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         readButtonLabel.text("$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
         readButton.append(readButtonIcon).append(readButtonLabel);
         // On click
-        readButton.click(function() {
+        readButton.on('click', function() {
           var notif = $(this).parents('div.notification-event');
           notif.removeClass('notification-event-unread');
           var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
@@ -446,7 +446,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       var details = notif.find('.notification-event-details');
       details.hide();
       var arrow = notif.find('.notification-event-arrow');
-      notif.find('.toggle-notification-event-details').click(function() {
+      notif.find('.toggle-notification-event-details').on('click', function() {
         details.toggle();
         arrow.text(arrow.text() == '▸' ? '▾' : '▸');
       });
@@ -582,7 +582,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         btn.text("$escapetool.javascript($services.localization.render('notifications.menu.more'))");
         btn.addClass('btn').addClass('btn-default').addClass('btn-block');
         loadMore.append(btn);
-        btn.click(function(event) {
+        btn.on('click', function(event) {
           loadMore.text('').addClass('loading').css('height', '50px');
           // We use the date of the last displayed event as an offset to display those that come next
           var lastEventDate = self.macro.find('.notification-event').last().attr('data-eventdate');
@@ -608,7 +608,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
           readButtonLabel.text("$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
           readButton.append(readButtonIcon).append(readButtonLabel);
           // On click
-          readButton.click(function() {
+          readButton.on('click', function() {
             var notif = $(this).parents('div.notification-event');
             notif.removeClass('notification-event-unread');
             var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
@@ -626,7 +626,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         var details = entry.find('.notification-event-details');
         details.hide();
         var arrow = entry.find('.notification-event-arrow');
-        entry.find('.toggle-notification-event-details').click(function() {
+        entry.find('.toggle-notification-event-details').on('click', function() {
           details.toggle();
           arrow.text(arrow.text() == '▸' ? '▾' : '▸');
         });

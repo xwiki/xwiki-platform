@@ -78,7 +78,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     /**
      * Set the correct template or redirect to the correct page when the form is submitted
      */
-    form.submit(function() {
+    form.on('submit', function() {
       // Get the type of the page to create
       var typeField = $('input[name="type"]:checked');
       var type = typeField.attr('data-type');

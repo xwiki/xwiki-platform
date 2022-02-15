@@ -584,14 +584,14 @@
   };
 
   $(function() {
-    $('#refresh').click(refreshPreview);
+    $('#refresh').on('click', refreshPreview);
 
     // Update the preview when the user modifies the LESS variables.
     $('#bt-variables').on('change', 'input, select', onLESSVariableChange);
 
     // Event handler for the logo field.
     var logoFieldInput = $('#var-logo input');
-    logoFieldInput.change(updatePreviewLogo);
+    logoFieldInput.on('change', updatePreviewLogo);
     // Since the logo input is hidden (by the attachment selector macro), we need to do some black magic (i.e. register
     // a mutation observer) to make it trigger the "change" event.
     trackValueChange(logoFieldInput[0]);

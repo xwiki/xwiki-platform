@@ -71,7 +71,7 @@ define('xwiki-realtime-wikiEditor', [
     var allowRealtimeCheckbox = $('.buttons input[type=checkbox].realtime-allow');
     if (!allowRealtimeCheckbox.length) {
       allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(true);
-      allowRealtimeCheckbox.change(function() {
+      allowRealtimeCheckbox.on('change', function() {
         if (allowRealtimeCheckbox.prop('checked')) {
           module.main(editorConfig, docKeys);
         } else {
@@ -147,8 +147,8 @@ define('xwiki-realtime-wikiEditor', [
       };
 
       // Wiki
-      var useCodeMirror = function() {
-        editor._ = $('.CodeMirror')[0].CodeMirror;
+      var useCodeMirror = function(codeMirrorInstance) {
+        editor._ = codeMirrorInstance;
         editor.getValue = function() {
           return editor._.getValue();
         };
@@ -181,24 +181,20 @@ define('xwiki-realtime-wikiEditor', [
         editor.onChange(onChangeHandler);
       };
 
-      if ($('.CodeMirror').prop('CodeMirror')) {
-        // CodeMirror already loaded.
-        useCodeMirror();
-      }
-
-      // Change the editor to CodeMirror if it is completely loaded after the initializaion of real-time wiki editor.
-      $('body').on('DOMNodeInserted', function(e) {
-        if ($(e.target).is('.CodeMirror')) {
-          var enableCodeMirror = function() {
-            if ($(e.target)[0] && $(e.target)[0].CodeMirror) {
-              useCodeMirror();
-            } else {
-              setTimeout(enableCodeMirror, 100);
+      if ($('#content ~ .CodeMirror').prop('CodeMirror')) {
+        // The content text area has a CodeMirror instance attached. Use it for real-time editing.
+        useCodeMirror($('#content ~ .CodeMirror').prop('CodeMirror'));
+      } else {
+        // Detect when a CodeMirror instance is attached to the content text area and update the real-time editor.
+        require(['deferred!SyntaxHighlighting_cm/lib/codemirror'], async function(codeMirrorPromise) {
+          CodeMirror = await codeMirrorPromise;
+          CodeMirror.defineInitHook(instance => {
+            if ($(instance.getTextArea?.()).attr('id') === 'content') {
+              useCodeMirror(instance);
             }
-          };
-          enableCodeMirror();
-        }
-      });
+          });
+        });
+      }
 
       module.setEditable = function(bool) {
         editor.setReadOnly(!bool);

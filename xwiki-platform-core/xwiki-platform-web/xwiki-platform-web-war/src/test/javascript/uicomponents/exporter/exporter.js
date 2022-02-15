@@ -49,7 +49,7 @@ define(['jquery', 'xwiki-export-tree', 'xwiki-export-tree-filter'], function($) 
       }
       // We also need to handle the tree pagination.
       // See XWIKI-17425: A tree node with checkboxes and pagination is removed from the tree when you open it
-      if ($.isArray(data)) {
+      if (Array.isArray(data)) {
         var offset = (arguments[1] || {}).offset || 0;
         data = extractPage(data, offset);
       }

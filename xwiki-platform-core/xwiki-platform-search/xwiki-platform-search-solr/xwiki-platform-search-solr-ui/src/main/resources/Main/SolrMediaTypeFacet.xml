@@ -292,7 +292,7 @@
     var selected = category.add(subtypes).find('.selected, input:checked').length &gt; 0;
     !selected &amp;&amp; category.addClass('closed');
     subtypes.toggle(selected);
-    category.find('.itemCount').click(function(event) {
+    category.find('.itemCount').on('click', function(event) {
       category.toggleClass('closed');
       subtypes.toggle();
     });

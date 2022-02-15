@@ -275,7 +275,7 @@ define('xwiki-file-picker', ['jquery'], function($) {
       fileInput.attr('accept', options.accept.replace(/\/(\s*(,|$))/g, '/*$1'));
     }
 
-    fileInput.change(function(event) {
+    fileInput.on('change', function(event) {
       // The user has selected some files to upload. Make sure the promise is not rejected.
       $(window).off('focus.filePicker');
       clearTimeout(rejectTimeout);
@@ -414,7 +414,7 @@ define('xwiki-suggestAttachments', [
    * Adapt the JSON returned by the REST call to the format expected by the Selectize widget.
    */
   var processAttachments = function(options, response) {
-    if ($.isArray(response.attachments)) {
+    if (Array.isArray(response.attachments)) {
       return response.attachments.map($.proxy(processAttachment, null, options));
     } else {
       return [];

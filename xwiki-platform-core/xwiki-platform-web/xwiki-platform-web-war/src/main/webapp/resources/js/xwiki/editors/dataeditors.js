@@ -795,7 +795,10 @@ editors.XDataEditors = Class.create({
 });
 
 function init() {
-  return new editors.XDataEditors();
+  require(['scriptaculous/dragdrop'], function() {
+    new editors.XDataEditors()
+  });
+  return true;
 }
 
 // When the document is loaded, create the Autosave control
@@ -808,7 +811,7 @@ return XWiki;
 
 // Class Switcher
 require(['jquery', 'xwiki-events-bridge'], function($) {
-  $('#switch-xclass').change(function(event) {
+  $('#switch-xclass').on('change', function(event) {
     var selectedClass = $(event.target).val();
     if (selectedClass) {
       var selectedClassReference = XWiki.Model.resolve(selectedClass, XWiki.EntityType.DOCUMENT,

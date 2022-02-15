@@ -64,7 +64,7 @@ define('xwiki-realtime-wysiwygEditor-loader', [
     // (either drop it or find a clean way to load it on the edit lock page).
     var lock = Loader.getDocLock();
     if ($('.realtime-button-' + info.type).length) {
-      $('<button class="btn btn-success"></button>').click(function() {
+      $('<button class="btn btn-success"></button>').on('click', function() {
         window.location.href = Loader.getEditorURL(window.location.href, info);
       }).text(Loader.messages.get('redirectDialog.join', info.name))
         .prependTo('.realtime-button-' + info.type)
@@ -73,7 +73,7 @@ define('xwiki-realtime-wysiwygEditor-loader', [
       var button = $('<button class="btn btn-primary"></button>').text(
         Loader.messages.get('redirectDialog.create', info.name));
       var buttons = $('.realtime-buttons').append('<br/>').append(button);
-      button.click(function() {
+      button.on('click', function() {
         buttons.find('button').hide();
         var waiting = $('<div></div>', {style: 'text-align:center;'}).appendTo(buttons);
         waiting.append($('<span></span>', {

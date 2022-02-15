@@ -230,6 +230,13 @@
       <artifactId>xwiki-platform-webjars-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Temporary dependency until we migrate recommended extensions to jQuery 3.x -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery-migrate</artifactId>
+      <version>3.3.2</version>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
   <profiles>
     <profile>

@@ -317,7 +317,7 @@ Get the actual notifications.
     var markAllReadButton = $('&lt;a href="#"&gt;')
       .addClass('notification-event-clean')
       .html('$services.icon.renderHTML("trash")&amp;nbsp;$escapetool.xml($escapetool.javascript($services.localization.render('notifications.menu.clear')))')
-      .click(function (event) {
+      .on('click', function (event) {
         // Avoid the menu closing
         event.preventDefault();
         // Ask confirmation
@@ -399,10 +399,10 @@ Get the actual notifications.
     /**
      * Prevent the dropdown menu for being closed when the user clicks on the notifications menu.
      */
-    $('#tmNotifications .dropdown-menu').click(function(event) {
+    $('#tmNotifications .dropdown-menu').on('click', function(event) {
       event.stopPropagation();
     });
-    
+
     var processEvents = function (mutations) {
       for (var i = 0; i &lt; mutations.length; i++) {
         var mutation = mutations[i];
@@ -654,7 +654,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
     ///
     /// Avoid the dropdown menu to be closed when the user click on the bootstrap switch
     ///
-    $('.notifications-toggles .bootstrap-switch').click(function(event) {
+    $('.notifications-toggles .bootstrap-switch').on('click', function(event) {
       event.stopImmediatePropagation();
     });
  });

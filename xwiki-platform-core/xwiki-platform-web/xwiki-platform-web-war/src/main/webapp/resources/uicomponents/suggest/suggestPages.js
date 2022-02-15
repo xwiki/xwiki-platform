@@ -114,7 +114,7 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
    * Adapt the JSON returned by the REST call to the format expected by the Selectize widget.
    */
   var processPages = function(options, response) {
-    if ($.isArray(response.searchResults)) {
+    if (Array.isArray(response.searchResults)) {
       return response.searchResults.map($.proxy(processPage, null, options));
     } else {
       return [];

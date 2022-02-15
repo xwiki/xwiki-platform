@@ -350,7 +350,7 @@ require(['jquery', 'bootstrap-form-validation'], function($, validation) {
     }
   });
 
-  createGroupModal.submit(function(event) {
+  createGroupModal.on('submit', function(event) {
     event.preventDefault();
     var data = createGroupModal.find('form').serializeArray();
     data.push({name: 'ajax', value: 1});
@@ -458,7 +458,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal'], function($, xm) {
       groupReference = XWiki.Model.serialize(groupReference);
     }
     deleteGroupModal.find('.groupName').text(groupReference);
-  }).find('.btn-danger').click(function() {
+  }).find('.btn-danger').on('click', function() {
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('xe.admin.groups.delete.inProgress')),
       'inprogress'

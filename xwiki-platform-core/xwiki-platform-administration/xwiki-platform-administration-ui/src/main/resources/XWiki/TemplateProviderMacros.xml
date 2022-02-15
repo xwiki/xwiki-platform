@@ -265,7 +265,7 @@
         }
       });
 
-      selectButton.click(function() {
+      selectButton.on('click', function() {
         modal.modal('hide');
         modal.triggerHandler('xwiki:locationTreePicker:select', {
           'tree': $.jstree.reference(treeElement)

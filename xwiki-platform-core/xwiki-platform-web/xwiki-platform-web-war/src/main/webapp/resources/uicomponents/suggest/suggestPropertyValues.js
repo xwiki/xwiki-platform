@@ -41,7 +41,7 @@ define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($)
     var getLoad = function(getOptions) {
       return function(text, callback) {
         $.getJSON(loadURL, getOptions(text)).then(function(response) {
-          if (response && $.isArray(response.propertyValues)) {
+          if (response && Array.isArray(response.propertyValues)) {
             return response.propertyValues.map(getSuggestion);
           } else {
             return [];

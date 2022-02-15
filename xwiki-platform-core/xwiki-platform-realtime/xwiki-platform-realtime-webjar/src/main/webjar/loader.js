@@ -159,7 +159,7 @@ define('xwiki-realtime-loader', [
         var content = createModalContent(message, Messages.get('redirectDialog.create', info.name));
         var classesButtons = existingTypes.map(type => 'realtime-button-' + type).join(' ');
         var buttonsDiv = content.find('.realtime-buttons').addClass(classesButtons).data('modal', this);
-        buttonsDiv.find('button').click(function() {
+        buttonsDiv.find('button').on('click', function() {
           callback();
           buttonsDiv.data('modal').closeDialog();
         }).toggle(!!createType);
@@ -189,7 +189,7 @@ define('xwiki-realtime-loader', [
         this.showDialog();
       },
       createContent: function() {
-        $(content).find('button, input').click($.proxy(function() {
+        $(content).find('button, input').on('click', $.proxy(function() {
           this.closeDialog();
         }, this));
         return content;
@@ -228,7 +228,7 @@ define('xwiki-realtime-loader', [
       }
     }, 1000);
 
-    var buttonCreate = content.find('button').click(function() {
+    var buttonCreate = content.find('button').on('click', function() {
       clearInterval(interval);
       try {
         callback(true);
@@ -238,7 +238,7 @@ define('xwiki-realtime-loader', [
     });
 
     var buttonReject = $('<button class="btn btn-danger"></button>').text(Messages['requestDialog.reject']);
-    buttonReject.insertBefore(buttonCreate).click(function() {
+    buttonReject.insertBefore(buttonCreate).on('click', function() {
       clearInterval(interval);
       try {
         callback(false);
@@ -260,7 +260,7 @@ define('xwiki-realtime-loader', [
   getReloadContent = function() {
     var content = createModalContent(Messages['reloadDialog.prompt'], Messages['reloadDialog.exit']);
     var buttonReload = $('<button class="btn btn-default"></button>').text(Messages['reloadDialog.reload']);
-    buttonReload.click($.proxy(window.location, 'reload', true)).insertAfter(content.find('button'));
+    buttonReload.on('click', $.proxy(window.location, 'reload', true)).insertAfter(content.find('button'));
     return content[0];
   },
 
@@ -275,9 +275,9 @@ define('xwiki-realtime-loader', [
   module.displayDisableModal = function(callback) {
     var content = createModalContent(Messages['disableDialog.prompt'], Messages['disableDialog.ok']);
 
-    var buttonOK = content.find('button').click($.proxy(callback, null, true));
+    var buttonOK = content.find('button').on('click', $.proxy(callback, null, true));
     $('<button class="btn btn-default"></button>').text(Messages['disableDialog.exit']).insertBefore(buttonOK)
-      .click($.proxy(callback, null, false));
+      .on('click', $.proxy(callback, null, false));
     return void displayCustomModal(content[0]);
   };
 
@@ -719,7 +719,7 @@ define('xwiki-realtime-loader', [
       save(/* continue: */ $(this).attr('name') !== 'action_save');
     });
 
-    previewButton.click(function(event) {
+    previewButton.on('click', function(event) {
       if (previewButton.data('checked')) {
         previewButton.data('checked', false);
       } else {

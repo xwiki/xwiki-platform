@@ -273,7 +273,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'xwiki-boot
      * Initialization
      */
     self.init = function () {
-      self.buttonAddFilter.click(function() {
+      self.buttonAddFilter.on('click', function() {
         self.filterScopeTree.xtree();
         self.submitButton.prop('disabled', 'disabled');
 
@@ -284,7 +284,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'xwiki-boot
         });
       });
 
-      self.submitButton.click(self.onSelectButtonClicked);
+      self.submitButton.on('click', self.onSelectButtonClicked);
     };
 
     /**

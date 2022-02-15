@@ -270,7 +270,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
      * Initialization
      */
     self.init = function () {
-      self.buttonAddFilter.click(function() {
+      self.buttonAddFilter.on('click', function() {
         self.filterScopeTree.xtree();
         self.submitButton.prop('disabled', 'disabled');
 
@@ -281,7 +281,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
         });
       });
 
-      self.submitButton.click(self.onSelectButtonClicked);
+      self.submitButton.on('click', self.onSelectButtonClicked);
     };
 
     /**
@@ -636,7 +636,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
   // Callback on livetable row printing
   $(document).on('xwiki:livetable:notificationFilterPreferencesLiveTable:newrow', function(event, data) {
     // Delete action
-    $(data.row).find('a.actiondelete').click(function(event) {
+    $(data.row).find('a.actiondelete').on('click', function(event) {
       event.preventDefault();
       new XWiki.widgets.ConfirmationBox({
         onYes: function() {

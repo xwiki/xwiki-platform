@@ -290,10 +290,10 @@ define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], functio
       // Select all the pages by default.
       tree.select_all();
       // Handle the Select All / Node actions.
-      $(this).closest('.export-tree-container').find('.export-tree-action.selectAll').click(function(event) {
+      $(this).closest('.export-tree-container').find('.export-tree-action.selectAll').on('click', function(event) {
         event.preventDefault();
         tree.select_all();
-      }).addBack().find('.export-tree-action.selectNone').click(function(event) {
+      }).addBack().find('.export-tree-action.selectNone').on('click', function(event) {
         event.preventDefault();
         tree.deselect_all();
       });
@@ -421,7 +421,7 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   //
 
   // Enable / disable the corresponding settings when the target XWiki version changes.
-  $('#targetXWikiVersion').change(function() {
+  $('#targetXWikiVersion').on('change', function() {
     // Disable all settings.
     $('#targetXWikiVersionSettings fieldset').prop('disabled', true);
     // Enable the settings that correspond to the selected value.
@@ -437,7 +437,7 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   // Create the container for the hidden inputs used to submit the selected pages from the export tree.
   var hiddenContainer = $('<div class="hidden"></div>').insertAfter('.export-tree');
 
-  $('form#export').submit(function() {
+  $('form#export').on('submit', function() {
     var exportTree = $.jstree.reference($(this).find('.export-tree'));
     // We submit only the tree filter when all nodes are selected (in order to optimize the final database query).
     if (exportTree && !exportTree.isExportingAllPages()) {
@@ -470,7 +470,7 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   }).appendTo("body");
 
   // Export modal submit.
-  $('#exportModalOtherCollapse a.btn-primary').click(function (event) {
+  $('#exportModalOtherCollapse a.btn-primary').on('click', function (event) {
     var exportTree = $(this).closest('#exportModalOtherCollapse').find('.export-tree');
     if (exportTree.length > 0) {
       event.preventDefault();

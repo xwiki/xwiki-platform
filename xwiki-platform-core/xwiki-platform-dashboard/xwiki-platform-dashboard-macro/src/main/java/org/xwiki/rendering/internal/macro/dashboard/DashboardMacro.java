@@ -275,9 +275,6 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         this.ssfx.use("uicomponents/dashboard/dashboard.css", fxParamsForceSkinAction);
         // include the js resources, for editing, in edit mode only
         if (editMode) {
-            // include the effects.js and dragdrop.js that are needed by the dashboard js
-            this.jsfx.use("js/scriptaculous/effects.js");
-            this.jsfx.use("js/scriptaculous/dragdrop.js");
             this.jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);
         }
     }

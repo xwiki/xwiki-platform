@@ -119,5 +119,10 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Used to implement drag & drop in the "Structure" (class definition) and  "Presentation" (home page) steps. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>scriptaculous</artifactId>
+    </dependency>
   </dependencies>
 </project>

@@ -2,6 +2,8 @@ paths: {
   'jquery': '/webjars/jquery.min',
   'jQueryNoConflict': '/spec/jQueryNoConflict',
 
+  'prototype': '/webjars/prototype',
+
   'bootstrap': '/webjars/bootstrap.min',
 
   // Tree
@@ -24,6 +26,9 @@ map: {
   }
 },
 shim: {
+  'prototype': {
+    exports: '$'
+  },
   'bootstrap': ['jquery'],
   'xwiki-entityReference': {
     exports: 'XWiki'

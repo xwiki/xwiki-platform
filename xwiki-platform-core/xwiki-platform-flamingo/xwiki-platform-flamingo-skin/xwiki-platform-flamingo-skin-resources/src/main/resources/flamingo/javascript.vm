@@ -32,7 +32,7 @@
 ## to stop relying on Prototype.js . Note that we load Prototype.js before the following inline script because we have to
 ## fix some incompatibilities between Bootstrap and Prototype.js . In the future we should use the 'deferred' RequireJS
 ## plugin to fix the incompatibilities only if / when Prototype.js is loaded.
-<script src="$escapetool.xml($xwiki.getSkinFile('js/prototype/prototype.js'))"></script>
+<script src="$escapetool.xml($services.webjars.url('prototype', 'prototype.js'))"></script>
 ##
 ## Define the global require.js configuration
 ##
@@ -56,9 +56,17 @@
 ## See https://requirejs.org/docs/api.html#config
 ##
 #set ($requireConfig = {
+  'packages': [
+    {
+      'name': 'scriptaculous',
+      'location': $stringtool.removeEnd($services.webjars.url('scriptaculous', ''), '/'),
+      'main': 'scriptaculous'
+    }
+  ],
   'paths': {
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url('jquery-migrate', ""jquery-migrate${jsExtension}""))",
+    'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
     'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
     'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
     'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
@@ -70,6 +78,10 @@
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js')
   },
   'shim': {
+    'prototype': {
+      'exports': '$'
+    },
+    'scriptaculous/dragdrop': ['scriptaculous/effects'],
     'bootstrap' : ['jquery'],
     'xwiki-entityReference': {
       'exports': 'XWiki'

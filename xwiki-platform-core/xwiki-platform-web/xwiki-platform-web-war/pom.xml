@@ -84,6 +84,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>prototype</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tree-webjar</artifactId>
       <version>${project.version}</version>
@@ -131,8 +136,6 @@
             <configuration>
               <excludes>
                 <!-- See the next execution for the reason we exclude these files. -->
-                <exclude>**/prototype.js</exclude>
-                <exclude>**/scriptaculous/dragdrop.js</exclude>
                 <exclude>**/panelWizard.js</exclude>
               </excludes>
             </configuration>
@@ -145,10 +148,6 @@
             </goals>
             <configuration>
               <includes>
-                <!-- Sets the read-only 'prototype' property of native objects. -->
-                <include>**/prototype.js</include>
-                <!-- Uses "arguments.callee" and "with" statement. -->
-                <include>**/scriptaculous/dragdrop.js</include>
                 <!-- Sets many global variables. -->
                 <include>**/panelWizard.js</include>
               </includes>
@@ -268,8 +267,6 @@
         <configuration>
           <excludes>
             <!-- Exclude JS files that not under an XWiki license, so that we don't check the license for them -->
-            <exclude>src/**/scriptaculous/**/*.js</exclude>
-            <exclude>src/**/prototype/**/*.js</exclude>
             <exclude>src/**/xwiki/accordion/accordion.js</exclude>
             <exclude>src/**/xwiki/panelwizard/ieemu.js</exclude>
             <exclude>src/**/xwiki/table/tablefilterNsort.js</exclude>

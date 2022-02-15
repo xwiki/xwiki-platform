@@ -92,15 +92,23 @@
       <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
     </dependency>
+    <!-- Loaded from javascript.vm by default because it's still used in many JavaScript modules from the XWiki WAR. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>prototype</artifactId>
+    </dependency>
+    <!-- Used by the class editor (editclass.vm) to reorder properties with drag & drop. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>scriptaculous</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>Keypress</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>

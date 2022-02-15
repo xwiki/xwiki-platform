@@ -70,7 +70,6 @@ class LightboxIT
         // Setup page.
         testUtils.createPage(testReference, this.getSimpleImage(images.get(0)));
         imagePage = new ImagePage();
-        
 
         String lastUploadDate =
             imagePage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));

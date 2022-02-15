@@ -29,10 +29,13 @@
   </parent>
   <artifactId>xwiki-platform-image-lightbox-ui</artifactId>
   <name>XWiki Platform - Image - Lightbox - UI</name>
+  <description>Display images from the page content in a lightbox</description>
   <packaging>xar</packaging>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Image Lightbox UI</xwiki.extension.name>
+    <xwiki.extension.name>Image Lightbox Application</xwiki.extension.name>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>application</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

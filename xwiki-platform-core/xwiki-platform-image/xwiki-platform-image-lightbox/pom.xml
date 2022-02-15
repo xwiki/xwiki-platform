@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-image-lightbox</artifactId>
   <name>XWiki Platform - Image - Lightbox - Parent POM</name>
-  <description>Image lightbox functionality</description>
+  <description>Display images from the page content in a lightbox</description>
   <packaging>pom</packaging>
   <modules>
     <module>xwiki-platform-image-lightbox-ui</module>

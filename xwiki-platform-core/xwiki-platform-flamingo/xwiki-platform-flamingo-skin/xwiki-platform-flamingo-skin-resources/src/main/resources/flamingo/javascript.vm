@@ -54,6 +54,8 @@
 ##
 ## Start the requirejs config.
 ## See https://requirejs.org/docs/api.html#config
+## Note that we have to declare momentjs as a RequireJS package in order to be able to load momentjs locales on demand
+## using RequireJS. See https://github.com/requirejs/requirejs/issues/1554 .
 ##
 #set ($requireConfig = {
   'packages': [
@@ -61,6 +63,10 @@
       'name': 'scriptaculous',
       'location': $stringtool.removeEnd($services.webjars.url('scriptaculous', ''), '/'),
       'main': 'scriptaculous'
+    }, {
+      'name': 'moment',
+      'location': $stringtool.removeEnd($services.webjars.url('momentjs', ''), '/'),
+      'main': 'min/moment.min'
     }
   ],
   'paths': {
@@ -91,16 +97,6 @@
   'bundles': {},
   'config': {}
 })
-#set ($momentRelativePath = 'min/moment.min')
-#set ($momentBasePath =
-  $stringtool.substringBeforeLast($services.webjars.url('momentjs', 'min/moment.min'), $momentRelativePath))
-## We have to declare momentjs as a RequireJS package in order to be able to load momentjs locales on demand using
-## RequireJS. See https://github.com/requirejs/requirejs/issues/1554 .
-#set ($requireConfig.packages = [{
-  'name': 'moment',
-  'location': $stringtool.stripEnd($momentBasePath, '/'),
-  'main': $momentRelativePath
-}])
 ## momentjs locales depend on '../moment' which gets resolved as 'moment/moment' due to our package configuration, which
 ## points to the unminified version. The consequence is that we end up loading both the minified and the unminified
 ## version of momentjs and, more importantly, the locales are loaded into the moment instance created by the unminified

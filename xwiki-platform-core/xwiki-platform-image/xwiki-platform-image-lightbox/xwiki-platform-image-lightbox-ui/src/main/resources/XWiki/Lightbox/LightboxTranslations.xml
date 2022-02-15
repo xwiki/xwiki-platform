@@ -45,7 +45,7 @@ XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=Enable the poss
 # Gallery template
 image.lightbox.autoPlay.title=Slideshow
 image.lightbox.caption.label=Caption
-image.lightbox.date.title=Date
+image.lightbox.date.label=Date
 image.lightbox.download.title=Download
 image.lightbox.escape.title=Escape
 image.lightbox.fileName.label=File name

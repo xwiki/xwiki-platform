@@ -26,43 +26,59 @@
 //
 // For more information refer to: http://docs.ckeditor.com/#!/guide/dev_styles-section-style-rules
 
-CKEDITOR.stylesSet.add('default', [
-  /* Block styles */
+[4, 5].forEach(htmlVersion => {
+    const styles = [
+        /* Block styles */
 
-  {name: 'Box', element: 'div', attributes: {'class': 'box'}},
-  {name: 'Info Box', element: 'div', attributes: {'class': 'box infomessage'}},
-  {name: 'Warning Box', element: 'div', attributes: {'class': 'box warningmessage'}},
-  {name: 'Success Box', element: 'div', attributes: {'class': 'box successmessage'}},
-  {name: 'Error Box', element: 'div', attributes: {'class': 'box errormessage'}},
-  {name: 'Floating Box', element: 'div', attributes: {'class': 'box floatinginfobox'}},
+        {name: 'Box', element: 'div', attributes: {'class': 'box'}},
+        {name: 'Info Box', element: 'div', attributes: {'class': 'box infomessage'}},
+        {name: 'Warning Box', element: 'div', attributes: {'class': 'box warningmessage'}},
+        {name: 'Success Box', element: 'div', attributes: {'class': 'box successmessage'}},
+        {name: 'Error Box', element: 'div', attributes: {'class': 'box errormessage'}},
+        {name: 'Floating Box', element: 'div', attributes: {'class': 'box floatinginfobox'}},
 
-  {name: 'Lead Paragraph', element: 'p', attributes: {'class': 'lead'}},
-  {name: 'Reverse Block Quote', element: 'blockquote', attributes: {'class': 'blockquote-reverse'}},
+        {name: 'Lead Paragraph', element: 'p', attributes: {'class': 'lead'}},
+        {name: 'Reverse Block Quote', element: 'blockquote', attributes: {'class': 'blockquote-reverse'}}
+    ];
 
-  /* Inline styles */
+    /* Inline styles */
 
-  {name: 'Typewriter', element: 'tt'},
-  {name: 'Marker', element: 'span', attributes: {'class': 'mark'}},
-  {name: 'Small', element: 'span', attributes: {'class': 'small'}},
-  {name: 'Uppercase', element: 'span', attributes: {'class': 'text-uppercase'}},  
+    if (htmlVersion === 4) {
+        styles.push({name: 'Typewriter', element: 'tt'});
+    } else {
+        styles.push({name: 'Typewriter', element: 'span', attributes: {'class': 'monospace'}});
+    }
 
-  /* Object styles */
+    styles.push(
+        {name: 'Marker', element: 'span', attributes: {'class': 'mark'}},
+        {name: 'Small', element: 'span', attributes: {'class': 'small'}},
+        {name: 'Uppercase', element: 'span', attributes: {'class': 'text-uppercase'}},
 
-  {name: 'Striped Table', element: 'table', attributes: {'class': 'table-striped'}},
-  {name: 'Bordered Table', element: 'table', attributes: {'class': 'table-bordered'}},
-  {name: 'Hover Table', element: 'table', attributes: {'class': 'table-hover'}},
-  {name: 'Condensed Table', element: 'table', attributes: {'class': 'table-condensed'}},
-  {name: 'Responsive Table', element: 'table', attributes: {'class': 'responsive-table'}},
+        /* Object styles */
 
-  {name: 'Active Row', element: 'tr', attributes: {'class': 'active'}},
-  {name: 'Success Row', element: 'tr', attributes: {'class': 'success'}},
-  {name: 'Info Row', element: 'tr', attributes: {'class': 'info'}},
-  {name: 'Warning Row', element: 'tr', attributes: {'class': 'warning'}},
-  {name: 'Danger Row', element: 'tr', attributes: {'class': 'danger'}},
+        {name: 'Striped Table', element: 'table', attributes: {'class': 'table-striped'}},
+        {name: 'Bordered Table', element: 'table', attributes: {'class': 'table-bordered'}},
+        {name: 'Hover Table', element: 'table', attributes: {'class': 'table-hover'}},
+        {name: 'Condensed Table', element: 'table', attributes: {'class': 'table-condensed'}},
+        {name: 'Responsive Table', element: 'table', attributes: {'class': 'responsive-table'}},
 
-  /* Widget styles */
+        {name: 'Active Row', element: 'tr', attributes: {'class': 'active'}},
+        {name: 'Success Row', element: 'tr', attributes: {'class': 'success'}},
+        {name: 'Info Row', element: 'tr', attributes: {'class': 'info'}},
+        {name: 'Warning Row', element: 'tr', attributes: {'class': 'warning'}},
+        {name: 'Danger Row', element: 'tr', attributes: {'class': 'danger'}},
 
-  {name: 'Rounded Image', type: 'widget', widget: 'image', element: 'img', attributes: {'class': 'img-rounded'}},
-  {name: 'Circle Image', type: 'widget', widget: 'image', element: 'img', attributes: {'class': 'img-circle'}},
-  {name: 'Thumbnail Image', type: 'widget', widget: 'image', element: 'img', attributes: {'class': 'img-thumbnail'}}
-]);
+        /* Widget styles */
+
+        {name: 'Rounded Image', type: 'widget', widget: 'image', element: 'img', attributes: {'class': 'img-rounded'}},
+        {name: 'Circle Image', type: 'widget', widget: 'image', element: 'img', attributes: {'class': 'img-circle'}},
+        {
+            name: 'Thumbnail Image',
+            type: 'widget',
+            widget: 'image',
+            element: 'img',
+            attributes: {'class': 'img-thumbnail'}
+        });
+
+    CKEDITOR.stylesSet.add('html' + htmlVersion, styles);
+});

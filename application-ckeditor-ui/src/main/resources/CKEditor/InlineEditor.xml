@@ -160,7 +160,8 @@
     container.attr({
       'data-sourceDocumentReference': XWiki.Model.serialize(config.document.documentReference),
       'data-sourceDocumentSyntax': config.document.syntax,
-      'data-officeImporterSupported': config.enableOfficeImport
+      'data-officeImporterSupported': config.enableOfficeImport,
+      'data-syntax': 'syntax' in config ? config['syntax'] : 'annotatedxhtml/1.0'
     }).each(function() {
       try {
         createEditor(ckeditor, this, config).done($.proxy(config.deferred, 'resolve', config.document));

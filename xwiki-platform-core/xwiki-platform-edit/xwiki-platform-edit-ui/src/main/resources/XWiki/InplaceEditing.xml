@@ -235,9 +235,10 @@ define('xwiki-document-api', ['jquery'], function($) {
         timestamp: new Date().getTime()
       };
       if (!forView) {
-        // We need the annotated XHTML when editing in order to be able to protect the rendering transformations and to
+        // We need the annotated HTML when editing in order to be able to protect the rendering transformations and to
         // be able to recreate the wiki syntax.
-        queryString.outputSyntax = 'annotatedxhtml';
+        queryString.outputSyntax = 'annotatedhtml';
+        queryString.outputSyntaxVersion = '5.0'
         // Currently, only the macro transformations are protected and thus can be edited.
         // See XRENDERING-78: Add markers to modified XDOM by Transformations/Macros
         queryString.transformations = 'macro';
@@ -1584,6 +1585,7 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
       'translateButtonSelector': '#tmTranslate &gt; a',
       'enableSourceMode': true,
       'enableOfficeImport': $services.officemanager.isConnected(),
+      'syntax': $services.wysiwyg.HTMLSyntax.toIdString(),
       'paths': {
         'js': {
           'xwiki-actionButtons': "#getSkinFileWithParams('js/xwiki/actionbuttons/actionButtons.js' $jsParams)",

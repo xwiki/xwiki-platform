@@ -196,7 +196,7 @@ require(['jquery'], function($) {
 
   var filterFlavors = function(filterString) {
     var picker = $('.xwiki-flavor-picker');
-    if (!filterString || $.trim(filterString) === '') {
+    if (typeof filterString !== 'string' || filterString.trim() === '') {
       picker.find('li').removeClass('hidden');
     } else {
       picker.find('li').each(function(i) {

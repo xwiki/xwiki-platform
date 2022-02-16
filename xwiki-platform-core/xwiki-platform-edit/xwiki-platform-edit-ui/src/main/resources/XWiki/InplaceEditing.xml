@@ -457,7 +457,7 @@ define('editInPlace', [
       if (xwikiDocument.lockConfirmation) {
         var confirmation = xwikiDocument.lockConfirmation;
         delete xwikiDocument.lockConfirmation;
-        return maybeForceLock(confirmation).then($.proxy(xwikiDocument, 'lock', 'edit', true), function() {
+        return maybeForceLock(confirmation).then(xwikiDocument.lock.bind(xwikiDocument, 'edit', true), function() {
           // Cancel the edit action.
           return Promise.reject(xwikiDocument);
         });
@@ -543,7 +543,7 @@ define('editInPlace', [
       return Promise.reject(xwikiDocument);
     // Render the document for edit, in order to have the annotated content HTML. The annotations are used to protect
     // the rendering transformations (e.g. macros) when editing the content.
-    }).then($.proxy(render, null, false));
+    }).then(render.bind(null, false));
   };
 
   /**
@@ -598,7 +598,7 @@ define('editInPlace', [
         // its content doesn't match the saved content).
         reload,
         // No need to reload the editor because either the action was Save &amp; View or there was no merge on save.
-        $.proxy(maybeContinueEditing, null, data['continue'])
+        maybeContinueEditing.bind(null, data['continue'])
       );
     // Save failed. Continue editing because we may have unsaved content.
     }, maybeSave);
@@ -612,8 +612,8 @@ define('editInPlace', [
       // once it was resolved or rejected. So the first event that fires will resolve/reject the promise and the
       // remaining event won't be able to change that. The remaining event listener could be called later but it won't
       // have any effect.
-      $(document).one('xwiki:document:saved', '.xcontent.form', $.proxy(resolve, null, xwikiDocument));
-      $(document).one('xwiki:document:saveFailed', '.xcontent.form', $.proxy(reject, null, xwikiDocument));
+      $(document).one('xwiki:document:saved', '.xcontent.form', resolve.bind(null, xwikiDocument));
+      $(document).one('xwiki:document:saveFailed', '.xcontent.form', reject.bind(null, xwikiDocument));
     });
   };
 
@@ -635,9 +635,9 @@ define('editInPlace', [
 
     // Reload the document JSON data (to have the new version) and render the document for view. We need the view HTML
     // both if we stop editing now and if we continue but cancel the edit later.
-    return xwikiDocument.reload().then($.proxy(render, null, true)).then(
-      $.proxy(afterReloadAndRender, null, /* success: */ true),
-      $.proxy(afterReloadAndRender, null, /* success: */ false)
+    return xwikiDocument.reload().then(render.bind(null, true)).then(
+      afterReloadAndRender.bind(null, /* success: */ true),
+      afterReloadAndRender.bind(null, /* success: */ false)
     );
   };
 
@@ -656,7 +656,7 @@ define('editInPlace', [
   };
 
   // Make sure we unlock the document when the user navigates to another page.
-  $(window).on('unload pagehide', $.proxy(unlock, null, currentXWikiDocument));
+  $(window).on('unload pagehide', unlock.bind(null, currentXWikiDocument));
 
   var shouldReload = function(xwikiDocument) {
     var reloadEventFired = false;
@@ -1063,7 +1063,7 @@ require(['jquery'], function($) {
         editButton.removeClass('disabled');
       });
     // Fallback on the standalone edit mode if we fail to load the required modules.
-    }, $.proxy(disableInPlaceEditing, event.target));
+    }, disableInPlaceEditing.bind(event.target));
   };
 
   var disableInPlaceEditing = function() {

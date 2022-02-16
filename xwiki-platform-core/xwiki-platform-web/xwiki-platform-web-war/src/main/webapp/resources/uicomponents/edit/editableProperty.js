@@ -205,7 +205,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
   };
 
   var saveAndView = function(editableProperty) {
-    return save(editableProperty).then($.proxy(view, null, editableProperty));
+    return save(editableProperty).then(view.bind(null, editableProperty));
   };
 });
 

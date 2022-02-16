@@ -749,7 +749,7 @@ require(['jquery'], function($) {
     var panelGroup = $(this).closest('.panel-group');
     var text = $(this).val().toLowerCase();
     // Schedule a new filter operation.
-    timeoutId = setTimeout($.proxy(filterPanelGroup, panelGroup, text), 500);
+    timeoutId = setTimeout(filterPanelGroup.bind(panelGroup, text), 500);
 
   // Finally, enable the search input.
   }).prop('disabled', false);

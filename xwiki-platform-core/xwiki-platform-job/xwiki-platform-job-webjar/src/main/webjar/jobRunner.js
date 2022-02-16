@@ -33,7 +33,7 @@ define(['jquery'], function($) {
       return promise;
     };
 
-    var onFailure = $.proxy(promise.reject, promise);
+    var onFailure = promise.reject.bind(promise);
 
     var refresh = function(job) {
       var request = config.createStatusRequest(job.id);
@@ -43,7 +43,7 @@ define(['jquery'], function($) {
     var onProgress = function(job) {
       if (job && job.id && job.state && job.progress) {
         if (job.state == 'WAITING') {
-          promise.notify(job, $.proxy(answerJobQuestion, job));
+          promise.notify(job, answerJobQuestion.bind(job));
 
           // Restart the progress if the question timeout is reached
           var timeout = job.questionTimeLeft;

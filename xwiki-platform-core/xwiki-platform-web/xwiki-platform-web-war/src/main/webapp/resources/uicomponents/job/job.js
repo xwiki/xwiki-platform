@@ -65,7 +65,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
       // Remember the answer callback
       jobQuestion.data('answerCallback', answerCallback);
 
-      $.get(displayerURL).then($.proxy(updateQuestionContent, jobQuestion));
+      $.get(displayerURL).then(updateQuestionContent.bind(jobQuestion));
     } else {
       jobQuestion.empty();
     }
@@ -255,8 +255,8 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
       }
 
       new JobRunner(runnerConfig).resume()
-        .progress($.proxy(updateStatus, this))
-        .then($.proxy(notifyJobDone, this), $.proxy(notifyConnectionFailure, this));
+        .progress(updateStatus.bind(this))
+        .then(notifyJobDone.bind(this), notifyConnectionFailure.bind(this));
     }
   });
 });

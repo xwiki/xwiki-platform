@@ -229,7 +229,7 @@
     $('.jcaptcha .engine.' + this.value).removeClass('hidden');
 
     // Check the first option for the new type.
-    $('.jcaptcha .engine:visible:first input').prop('checked', true);
+    $('.jcaptcha .engine:visible').first().find('input').prop('checked', true);
 
     // Clear the custom value since it will not match the new type.
     $('.customEngine').val('');

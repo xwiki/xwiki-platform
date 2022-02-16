@@ -203,7 +203,7 @@
     checkBox.prop('checked', $(this).hasClass('selected'));
     // Add the 'checked' attribute so that it can be easily located with CSS.
     checkBox.prop('checked') &amp;&amp; checkBox.attr('checked', 'checked');
-    checkBox.on('click', $.proxy(this, 'click'));
+    checkBox.on('click', this.click.bind(this));
     // Remove the 'selected' class because the selected state is marked using the check box.
     $(this).removeClass('selected').before(checkBox);
   };

@@ -427,7 +427,8 @@
     }).on('load', function() {
       // We need to refresh just after LESS is loaded because the fist rendering does not handle the variables of the
       // flamingo theme. Unfortunately, it means that the preview is rendered twice at the loading of the page.
-      initPreview(iframe).then(refreshPreview).then($.proxy(deferred, 'resolve')).catch($.proxy(deferred, 'reject'));
+      initPreview(iframe).then(refreshPreview).then(deferred.resolve.bind(deferred))
+        .catch(deferred.reject.bind(deferred));
     }).insertBefore('#preview-curtain');
 
     // Update the preview curtain size and position.

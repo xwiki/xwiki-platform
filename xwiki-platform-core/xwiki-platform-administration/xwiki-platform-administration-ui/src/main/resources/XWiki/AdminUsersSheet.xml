@@ -557,8 +557,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
         actionTrigger.removeClass('pending');
       });
     };
-    $('#userstable').on('click', 'a.actionenable', $.proxy(onToggleUser, null, 'enable'));
-    $('#userstable').on('click', 'a.actiondisable', $.proxy(onToggleUser, null, 'disable'));
+    $('#userstable').on('click', 'a.actionenable', onToggleUser.bind(null, 'enable'));
+    $('#userstable').on('click', 'a.actiondisable', onToggleUser.bind(null, 'disable'));
   })();
 
   //

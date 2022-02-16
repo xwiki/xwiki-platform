@@ -33,7 +33,7 @@ define('xwiki-realtime-wikiEditor-loader', [
   Loader.bootstrap(info).then(keys => {
     require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
       if (RealtimeWikiEditor && RealtimeWikiEditor.main) {
-        keys._update = $.proxy(Loader, 'updateKeys', editorId);
+        keys._update = Loader.updateKeys.bind(Loader, editorId);
         var config = Loader.getConfig();
         config.rtURL = Loader.getEditorURL(window.location.href, info);
         RealtimeWikiEditor.main(config, keys);

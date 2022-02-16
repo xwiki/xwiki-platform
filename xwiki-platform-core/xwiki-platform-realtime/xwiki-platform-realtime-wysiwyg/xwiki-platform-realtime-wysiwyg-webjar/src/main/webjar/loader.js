@@ -44,7 +44,7 @@ define('xwiki-realtime-wysiwygEditor-loader', [
   Loader.bootstrap(info).then(keys => {
     require(['xwiki-realtime-wysiwygEditor'], function(RealtimeWysiwygEditor) {
       if (RealtimeWysiwygEditor && RealtimeWysiwygEditor.main) {
-        keys._update = $.proxy(Loader, 'updateKeys', editorId);
+        keys._update = Loader.updateKeys.bind(Loader, editorId);
         var config = Loader.getConfig();
         config.rtURL = Loader.getEditorURL(window.location.href, info);
         RealtimeWysiwygEditor.main(config, keys, Loader.isRt).then(editor => {

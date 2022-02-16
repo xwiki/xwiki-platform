@@ -78,9 +78,9 @@ define('xwiki-realtime-loader', [
       userAvatarURL: realtimeConfig.user.avatarURL,
       isAdvancedUser: realtimeConfig.user.advanced,
       network: allRt.network,
-      abort: $.proxy(module, 'onRealtimeAbort'),
-      onKeysChanged: $.proxy(module, 'onKeysChanged'),
-      displayDisableModal: $.proxy(module, 'displayDisableModal'),
+      abort: module.onRealtimeAbort.bind(module),
+      onKeysChanged: module.onKeysChanged.bind(module),
+      displayDisableModal: module.displayDisableModal.bind(module),
     };
   },
 
@@ -189,9 +189,7 @@ define('xwiki-realtime-loader', [
         this.showDialog();
       },
       createContent: function() {
-        $(content).find('button, input').on('click', $.proxy(function() {
-          this.closeDialog();
-        }, this));
+        $(content).find('button, input').on('click', this.closeDialog.bind(this));
         return content;
       }
     });
@@ -260,7 +258,7 @@ define('xwiki-realtime-loader', [
   getReloadContent = function() {
     var content = createModalContent(Messages['reloadDialog.prompt'], Messages['reloadDialog.exit']);
     var buttonReload = $('<button class="btn btn-default"></button>').text(Messages['reloadDialog.reload']);
-    buttonReload.on('click', $.proxy(window.location, 'reload', true)).insertAfter(content.find('button'));
+    buttonReload.on('click', window.location.reload.bind(window.location, true)).insertAfter(content.find('button'));
     return content[0];
   },
 
@@ -275,9 +273,9 @@ define('xwiki-realtime-loader', [
   module.displayDisableModal = function(callback) {
     var content = createModalContent(Messages['disableDialog.prompt'], Messages['disableDialog.ok']);
 
-    var buttonOK = content.find('button').on('click', $.proxy(callback, null, true));
+    var buttonOK = content.find('button').on('click', callback.bind(null, true));
     $('<button class="btn btn-default"></button>').text(Messages['disableDialog.exit']).insertBefore(buttonOK)
-      .on('click', $.proxy(callback, null, false));
+      .on('click', callback.bind(null, false));
     return void displayCustomModal(content[0]);
   };
 
@@ -285,7 +283,7 @@ define('xwiki-realtime-loader', [
   module.setAvailableRt = function(info) {
     availableRt[info.type] = {
       info,
-      cb: $.proxy(createRt, null, info)
+      cb: createRt.bind(null, info)
     };
   };
 
@@ -624,7 +622,7 @@ define('xwiki-realtime-loader', [
 
   joinAllUsers = function() {
     var config = getConfig();
-    var getChannels = $.proxy(doc, 'getChannels', {
+    var getChannels = doc.getChannels.bind(doc, {
       path: doc.language + '/events/all',
       create: true
     });
@@ -638,7 +636,7 @@ define('xwiki-realtime-loader', [
             console.error(error);
           };
           // Connect to the websocket server.
-          Netflux.connect(config.WebsocketURL).then($.proxy(onNetfluxConnect, null, config, getChannels, channelKey,
+          Netflux.connect(config.WebsocketURL).then(onNetfluxConnect.bind(null, config, getChannels, channelKey,
             onError), onError);
         });
       }
@@ -780,7 +778,7 @@ define('xwiki-realtime-loader', [
           doc.language + '/content/',
         ],
         create: true
-      }).then($.proxy(parseKeyData, module, editorId));
+      }).then(parseKeyData.bind(module, editorId));
     },
 
     requestRt: function(type, callback) {
@@ -822,7 +820,7 @@ define('xwiki-realtime-loader', [
         displayWsWarning(true);
         callback(false);
       } else {
-        setTimeout($.proxy(module, 'whenReady', callback), 100);
+        setTimeout(module.whenReady.bind(module, callback), 100);
       }
     },
 
@@ -854,7 +852,7 @@ define('xwiki-realtime-loader', [
               // Let the user choose between joining the existing real-time session (with a different editor) or create
               // a new real-time session with the current editor.
               console.log('Join the existing realtime session or create a new one.');
-              this.displayModal(info.type, Object.keys(keys.active), $.proxy(resolve, null, keys), info);
+              this.displayModal(info.type, Object.keys(keys.active), resolve.bind(null, keys), info);
             }
           });
         }

@@ -37,7 +37,7 @@ define('xwiki-l10n', ['module', 'jquery'], function(module, $) {
       locale: specs.locale || document.documentElement.getAttribute('lang'),
       prefix: specs.prefix,
       key: specs.keys
-    }, true))).then($.proxy(toTranslationsMap, null, specs.prefix || ''));
+    }, true))).then(toTranslationsMap.bind(null, specs.prefix || ''));
   };
 
   var toTranslationsMap = function(prefix, responseJSON) {

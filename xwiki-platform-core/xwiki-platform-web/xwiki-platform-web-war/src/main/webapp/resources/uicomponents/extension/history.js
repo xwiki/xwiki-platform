@@ -251,12 +251,12 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var jobState = container.attr('data-jobState');
     if (jobState == 'WAITING') {
       container.find('form.extension-question button[value="continue"]')
-        .on('click', $.proxy(updateReplayStatus, null, container, 'action=continue'));
+        .on('click', updateReplayStatus.bind(null, container, 'action=continue'));
       // Some questions have their own buttons (e.g. the "Show changes" button on the merge conflict question).
       container.find('form.extension-question button[name="extensionAction"]')
-        .on('click', $.proxy(updateReplayStatus, null, container, 'data=replayStatus'));
+        .on('click', updateReplayStatus.bind(null, container, 'data=replayStatus'));
     } else if (typeof jobState == 'string' && jobState != 'FINISHED') {
-      setTimeout($.proxy(updateReplayStatus, this, container), 1000);
+      setTimeout(updateReplayStatus.bind(this, container), 1000);
     }
   };
 

@@ -49,7 +49,7 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
 
   var getChildren = function(node, callback, parameters) {
     // 'this' is the tree instance.
-    callback = $.proxy(callback, this);
+    callback = callback.bind(this);
     if (node.id === $.jstree.root && !node.data) {
       // Take the root node data from the tree container element.
       node.data = this.get_container().data('root') || {};
@@ -362,13 +362,13 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     // 'this' is the tree instance.
     var root = this.get_node($.jstree.root);
     return path.reduce((openParent, childNode) => {
-      return openParent.then($.proxy(maybeCreateNode, this, childNode)).then($.proxy(openNode, this));
+      return openParent.then(maybeCreateNode.bind(this, childNode)).then(openNode.bind(this));
     }, Promise.resolve(root));
   };
 
   var openToNode = function(tree, nodeId) {
     // We need to open all the ancestors of the specified node.
-    return getPath.call(tree, nodeId).then($.proxy(openPath, tree));
+    return getPath.call(tree, nodeId).then(openPath.bind(tree));
   };
 
   // Attempts to open each of the specified nodes, one by one. The reason we open the nodes sequentially is because
@@ -454,7 +454,7 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
         nodeIds = [nodeIds];
       }
       // Select the nodes if no callback is provided.
-      callback = callback || $.proxy(this, 'select_node');
+      callback = callback || this.select_node.bind(this);
       openToNodes(this, nodeIds).then(function(nodes) {
         return isArray ? nodes : nodes[0];
       }).then(callback);

@@ -66,7 +66,7 @@ define('xwiki-realtime-document', [
           // Reload failed. Continue using the current data.
           return this;
         }
-      }).then($.proxy(this, 'update'));
+      }).then(this.update.bind(this));
     },
 
     update: function(data) {
@@ -94,7 +94,7 @@ define('xwiki-realtime-document', [
         editingVersionDate: this.modified,
         minorEdit: 1,
         ajax: true
-      }, data), true)).then($.proxy(this, 'reload'));
+      }, data), true)).then(this.reload.bind(this));
     },
 
     getChannels: function(params) {

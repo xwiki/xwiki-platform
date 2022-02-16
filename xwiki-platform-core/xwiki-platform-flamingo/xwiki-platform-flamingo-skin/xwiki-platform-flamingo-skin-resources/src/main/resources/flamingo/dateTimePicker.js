@@ -67,7 +67,7 @@
       var container = $((data && data.elements) || document);
       container.find('input.datetime').each(function() {
         var dateTimeInput = $(this);
-        maybeLoadLocale(dateTimeInput.data('locale')).then($.proxy(createDateTimePicker, null, dateTimeInput));
+        maybeLoadLocale(dateTimeInput.data('locale')).then(createDateTimePicker.bind(null, dateTimeInput));
       });
     };
 

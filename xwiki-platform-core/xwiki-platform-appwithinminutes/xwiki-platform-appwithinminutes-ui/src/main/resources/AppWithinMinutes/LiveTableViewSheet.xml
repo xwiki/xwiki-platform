@@ -455,7 +455,7 @@ require(['jquery', 'bootstrap'], function($) {
         $.ajax({
           type: 'HEAD',
           url: newAppHomePage.getURL()
-        }).then($.proxy(endValidation, null, pageExistsError), response =&gt; {
+        }).then(endValidation.bind(null, pageExistsError), response =&gt; {
           if (response.status === 404) {
             $.ajax({
               type: 'HEAD',

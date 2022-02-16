@@ -758,7 +758,7 @@ require(['jquery'], function($) {
     // this = .extensionUpdater
     // Refresh if the upgrade plan job is running (if the progress bar is displayed).
     if ($(this).children('.ui-progress').length) {
-      setTimeout($.proxy(refresh, this), timeout || 1000);
+      setTimeout(refresh.bind(this), timeout || 1000);
     } else {
       // Re-enable the buttons.
       $(this).prev('form').find('button').prop('disabled', false);
@@ -768,9 +768,9 @@ require(['jquery'], function($) {
   var refresh = function(parameters) {
     // this = .extensionUpdater
     var url = $(this).prev('form').find('input[name=asyncURL]').prop('value');
-    $.post(url, parameters || {}).then($.proxy(onRefresh, this))
+    $.post(url, parameters || {}).then(onRefresh.bind(this))
       // Wait 10s before trying again if the request has failed.
-      .catch($.proxy(maybeScheduleRefresh, this, 10000));
+      .catch(maybeScheduleRefresh.bind(this, 10000));
   };
 
   var onRefresh = function(data) {
@@ -804,7 +804,7 @@ require(['jquery'], function($) {
     // The actual form submit.
     var params = {};
     params[this.name] = this.value;
-    form.next('.extensionUpdater').each($.proxy(refresh, null, params));
+    form.next('.extensionUpdater').each(refresh.bind(null, params));
   };
 
   $('.extensionUpdater').each(maybeScheduleRefresh).prev('form').find('button').on('click', onCheckForUpdates);

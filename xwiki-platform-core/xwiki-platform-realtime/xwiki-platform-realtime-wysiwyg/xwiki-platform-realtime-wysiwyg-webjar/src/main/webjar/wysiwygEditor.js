@@ -134,7 +134,7 @@ define('xwiki-realtime-wysiwygEditor', [
         if (editor.status === 'ready') {
           resolve(editor);
         } else {
-          editor.on('instanceReady', $.proxy(resolve, null, editor));
+          editor.on('instanceReady', resolve.bind(null, editor));
         }
       } else {
         ckeditor.on('instanceReady', function(event) {

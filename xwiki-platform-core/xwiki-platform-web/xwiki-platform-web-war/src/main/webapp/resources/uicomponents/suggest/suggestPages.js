@@ -86,7 +86,7 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
       number: 10,
       localeAware: true,
       prettyNames: true
-    }, true)).then($.proxy(processPages, null, options));
+    }, true)).then(processPages.bind(null, options));
   };
 
   var loadPage = function(value, options) {
@@ -94,7 +94,7 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
     var documentRestURL = new XWiki.Document(documentReference).getRestURL();
     return $.getJSON(documentRestURL, $.param({
       prettyNames: true
-    })).then($.proxy(processPage, null, options)).then(function(page) {
+    })).then(processPage.bind(null, options)).then(function(page) {
       // An array is expected in xwiki.selectize.js
       return [page];
     });
@@ -115,7 +115,7 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
    */
   var processPages = function(options, response) {
     if (Array.isArray(response.searchResults)) {
-      return response.searchResults.map($.proxy(processPage, null, options));
+      return response.searchResults.map(processPage.bind(null, options));
     } else {
       return [];
     }

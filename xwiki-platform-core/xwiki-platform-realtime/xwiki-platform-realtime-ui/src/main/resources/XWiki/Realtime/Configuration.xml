@@ -386,7 +386,7 @@
       <code>require(['jquery'], function ($) {
   var form = $('#realtime\\ editors_XWiki\\.Realtime\\.Configuration');
   if (XWiki.mainWiki === XWiki.currentWiki) {
-    form.find('dt:first').hide();
+    form.find('dt').first().hide();
     return;
   }
   var onChange = function () {

@@ -103,7 +103,7 @@ define('xwiki-attachments-store', ['jquery'], function($) {
         }, false);
         return xhr;
       }
-    }).then($.proxy(deferred, 'resolve'), $.proxy(deferred, 'reject'));
+    }).then(deferred.resolve.bind(deferred), deferred.reject.bind(deferred));
     return deferred.promise();
   };
 
@@ -397,13 +397,13 @@ define('xwiki-suggestAttachments', [
       name: text,
       types: options.accept,
       number: options.maxOptions
-    }).then($.proxy(processAttachments, null, options));
+    }).then(processAttachments.bind(null, options));
   };
 
   var loadAttachment = function(value, options) {
     var attachmentReference = getAttachmentReferenceFromValue(value, options);
     return attachmentsStore.get(attachmentReference)
-      .then($.proxy(processAttachment, null, options))
+      .then(processAttachment.bind(null, options))
       .then(function(attachment) {
         // An array is expected in xwiki.selectize.js
         return [attachment];
@@ -415,7 +415,7 @@ define('xwiki-suggestAttachments', [
    */
   var processAttachments = function(options, response) {
     if (Array.isArray(response.attachments)) {
-      return response.attachments.map($.proxy(processAttachment, null, options));
+      return response.attachments.map(processAttachment.bind(null, options));
     } else {
       return [];
     }
@@ -519,7 +519,7 @@ define('xwiki-suggestAttachments', [
     return filePicker.pickLocalFiles({
       accept: selectize.settings.accept,
       multiple: selectize.settings.maxItems !== 1
-    }).then($.proxy(selectAndUploadFiles, null, selectize));
+    }).then(selectAndUploadFiles.bind(null, selectize));
   };
 
   var selectAndUploadFiles = function(selectize, files) {
@@ -541,7 +541,7 @@ define('xwiki-suggestAttachments', [
       attachment.icon.promise && attachment.icon.promise.then(function() {
         selectize.updateOption(attachment.value, attachment);
       });
-      var uploadNextFile = $.proxy(uploadFileAndShowProgress, null, attachment, selectize);
+      var uploadNextFile = uploadFileAndShowProgress.bind(null, attachment, selectize);
       return uploadQueue.then(uploadNextFile, uploadNextFile);
     }, Promise.resolve());
     return attachments;
@@ -570,7 +570,7 @@ define('xwiki-suggestAttachments', [
       }
     };
     return uploadFile(attachment.data)
-    .then($.proxy(processAttachment, null, selectize.settings))
+    .then(processAttachment.bind(null, selectize.settings))
     // Load the attachment icon before updating the display in order to reduce the flickering.
     .then(attachmentsIcon.loadIcon)
     .progress(data => {

@@ -409,7 +409,7 @@ define('xwiki-realtime-saver', [
       }
       // A merge took place.
       if (merge.error) {
-        resolveMergeConflicts(merge).then($.proxy(mergeContinuation, null, merge, andThen));
+        resolveMergeConflicts(merge).then(mergeContinuation.bind(null, merge, andThen));
       } else {
         mergedWithoutConflicts(merge, preMergeContent).then(() => {
           mergeContinuation(merge, andThen);
@@ -428,7 +428,7 @@ define('xwiki-realtime-saver', [
     // Post your current version to the server to see if it must merge. Remember the current state so you can check if
     // it has changed.
     var preMergeContent = mainConfig.getTextValue();
-    ajaxMerge(preMergeContent, $.proxy(mergeCallback, null, preMergeContent, andThen));
+    ajaxMerge(preMergeContent, mergeCallback.bind(null, preMergeContent, andThen));
   },
 
   onMessage = function(data) {
@@ -802,7 +802,7 @@ define('xwiki-realtime-saver', [
     $(document).off('xwiki:document:saved.realtime-saver xwiki:document:saveFailed.realtime-saver');
     // Remove our custom click listeners from the save buttons and restore the original click listeners.
     $('[name="action_save"], [name="action_saveandcontinue"]').off('click.realtime-saver').each(function() {
-      $(this).data('prototype.js/clickListeners')?.forEach($.proxy(this, 'observe', 'click'));
+      $(this).data('prototype.js/clickListeners')?.forEach(this.observe.bind(this, 'click'));
     });
   };
 

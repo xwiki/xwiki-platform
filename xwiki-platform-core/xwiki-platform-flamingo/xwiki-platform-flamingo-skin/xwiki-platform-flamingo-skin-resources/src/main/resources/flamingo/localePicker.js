@@ -54,7 +54,7 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
   });
 
   $.fn.localePicker = function(settings) {
-    return this.each($.proxy(init, null, settings));
+    return this.each(init.bind(null, settings));
   };
 
   var defaultSettings = {

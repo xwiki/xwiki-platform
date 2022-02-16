@@ -104,7 +104,7 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
     });
     syntaxPicker.prop('disabled', true).trigger('xwiki:document:syntaxChange', data);
     // Re-enable the syntax picker after the UI has been updated.
-    data.promise.finally($.proxy(syntaxPicker, 'prop', 'disabled', false));
+    data.promise.finally(syntaxPicker.prop.bind(syntaxPicker, 'disabled', false));
     // Update the previous syntax.
     syntaxPicker.data('previousSyntax', data.syntax);
   };
@@ -351,7 +351,8 @@ require(['jquery'], function($) {
     // the user can change the syntax multiple times before saving. Note that this check works as long as the document
     // content doesn't have unsaved changes, which is true because we are only viewing the content in this case.
     if (data.convertSyntax && data.syntax.id !== data.savedSyntax.id) {
-      return data.syntaxConverter.convert(data.syntax).then($.proxy(data.syntaxConverter, 'render', data.syntax));
+      return data.syntaxConverter.convert(data.syntax)
+        .then(data.syntaxConverter.render.bind(data.syntaxConverter, data.syntax));
     } else {
       return data.syntaxConverter.render(data.syntax);
     }

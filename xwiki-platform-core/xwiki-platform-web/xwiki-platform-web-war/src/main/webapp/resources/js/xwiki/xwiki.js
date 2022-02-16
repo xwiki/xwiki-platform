@@ -1876,7 +1876,7 @@ require(['jquery'], function($) {
     var originalOpen = window.XMLHttpRequest.prototype.open;
     window.XMLHttpRequest.prototype.open = function() {
       this.addEventListener('load', function() {
-        handleResponseHeaders($.proxy(this, 'getResponseHeader'));
+        handleResponseHeaders(this.getResponseHeader.bind(this));
       });
       return originalOpen.apply(this, arguments);
     };
@@ -1890,7 +1890,7 @@ require(['jquery'], function($) {
     if (originalFetch) {
       window.fetch = function() {
         return originalFetch.apply(this, arguments).then(function(response) {
-          handleResponseHeaders($.proxy(response.headers, 'get'));
+          handleResponseHeaders(response.headers.get.bind(response.headers));
           return response;
         });
       };

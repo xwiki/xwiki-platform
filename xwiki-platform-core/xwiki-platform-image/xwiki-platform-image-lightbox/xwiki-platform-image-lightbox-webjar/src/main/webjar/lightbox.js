@@ -120,11 +120,7 @@ define('xwiki-lightbox-description', [
     } else {
       var serviceDocRef = XWiki.Model.resolve('XWiki.Lightbox.AttachmentMetaDataService', XWiki.EntityType.DOCUMENT);
       var serviceDocURL = new XWiki.Document(serviceDocRef).getURL('get', 'outputSyntax=plain');
-      $.ajax(serviceDocURL, {
-        method: 'GET',
-        dataType: 'json',
-        data: {'imageURL': imageURL}
-      }).done(function (attachment) {
+      $.getJSON(serviceDocURL, {imageURL}).done(function (attachment) {
         _cachedAttachments[imageURL] = attachment;
         deferred.resolve(attachment);
       }).fail(function () {

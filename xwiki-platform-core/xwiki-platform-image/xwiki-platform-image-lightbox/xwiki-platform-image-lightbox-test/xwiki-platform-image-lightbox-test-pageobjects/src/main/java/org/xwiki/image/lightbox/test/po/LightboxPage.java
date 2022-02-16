@@ -23,28 +23,46 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ViewPage;
 
-public class ImagePage extends ViewPage
+/**
+ * Actions for interacting with page images and their attached popover.
+ * 
+ * @version $Id$
+ */
+public class LightboxPage extends ViewPage
 {
-    public void hoverImage(int index)
+    public Optional<ImagePopover> hoverImage(int index)
     {
-        WebElement image = getImage(index);
-        assertTrue(image.isDisplayed());
+        try {
+            WebElement image = getImageElement(index);
+            assertTrue(image.isDisplayed());
 
-        Actions action = new Actions(getDriver().getWrappedDriver());
-        action.moveToElement(image).build().perform();
+            Actions action = new Actions(getDriver().getWrappedDriver());
+            action.moveToElement(image).build().perform();
 
-        // Workaround to manually display the popup since in firefox the hover is not always triggered even if the mouse
-        // is moved over the image.
-        showPopup(image);
+            // Workaround to manually display the popup since in firefox the hover is not always triggered even if the
+            // mouse is moved over the image.
+            showPopup(image);
+
+            getDriver().waitUntilElementIsVisible(By.cssSelector(".popover .imageDownload"));
+            // This attribute is set when the show transition of the popover is complete.
+            getDriver().waitUntilElementHasNonEmptyAttributeValue(By.cssSelector(".popover .imageDownload"),
+                "download");
+
+            return Optional.of(new ImagePopover());
+        } catch (TimeoutException e) {
+            return Optional.empty();
+        }
     }
 
     private void showPopup(WebElement image)
@@ -53,35 +71,22 @@ public class ImagePage extends ViewPage
         js.executeScript("jQuery(arguments[0]).popover('show');", image);
     }
 
-    public WebElement getImage(int index)
+    public WebElement getImageElement(int index)
     {
-        By xpath = By.xpath(".//*[@id='xwikicontent']//img");
-        getDriver().waitUntilElementsAreVisible(new By[] {xpath}, true);
-        List<WebElement> images = getDriver().findElements(xpath);
+        By selector = By.cssSelector("#xwikicontent img");
+        List<WebElement> images = getDriver().findElements(selector);
         return images.get(index);
     }
 
-    public void openLightboxAtImage(int index)
+    public Lightbox openLightboxAtImage(int index)
     {
         hoverImage(index);
 
-        By lightboxPath = By.cssSelector(".popover .openLightbox");
-        getDriver().waitUntilElementIsVisible(lightboxPath);
-        getDriver().findElementWithoutWaiting(lightboxPath).click();
+        By lightboxButtonSelector = By.cssSelector(".popover .openLightbox");
+        getDriver().waitUntilElementIsVisible(lightboxButtonSelector);
+        getDriver().findElementWithoutWaiting(lightboxButtonSelector).click();
 
-        By className = By.className("blueimp-gallery-display");
-        getDriver().waitUntilElementIsVisible(className);
-        assertTrue(getDriver().findElement(className).isDisplayed());
-    }
-
-    public boolean isToolbarOpen()
-    {
-        try {
-            By popoverSelector = By.cssSelector(".popover");
-            return getDriver().findElementWithoutWaiting(popoverSelector).isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+        return new Lightbox();
     }
 
     public boolean isLightboxOpen()
@@ -92,18 +97,6 @@ public class ImagePage extends ViewPage
         } catch (NoSuchElementException e) {
             return false;
         }
-    }
-
-    public WebElement getToolbarDownload()
-    {
-        By downloadSelector = By.cssSelector(".popover .imageDownload");
-        return getDriver().findElementWithoutWaiting(downloadSelector);
-    }
-
-    public void downloadFile()
-    {
-        By path = By.cssSelector(".popover .imageDownload");
-        getDriver().findElement(path).click();
     }
 
     private File getFileToUpload(String testResourcePath, String filename)

@@ -22,16 +22,36 @@ package org.xwiki.image.lightbox.test.po;
 import static org.openqa.selenium.support.ui.ExpectedConditions.attributeToBe;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.po.ViewPage;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.xwiki.test.ui.po.BaseElement;
 
-public class Lightbox extends ViewPage
+/**
+ * The image lightbox gallery.
+ * 
+ * @version $Id$
+ */
+public class Lightbox extends BaseElement
 {
-    public boolean waitUntilIsSlideDisplayed(int index)
+    public boolean isDisplayed()
+    {
+        try {
+            By className = By.className("blueimp-gallery-display");
+            getDriver().waitUntilElementIsVisible(className);
+            return getDriver().findElement(className).isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    private boolean waitForSlide(int index)
     {
         try {
             By slideSelector = By.cssSelector("#blueimp-gallery .slide-active");
@@ -42,7 +62,7 @@ public class Lightbox extends ViewPage
         }
     }
 
-    public WebElement getSlide()
+    public WebElement getSlideElement()
     {
         By slideSelector = By.cssSelector("#blueimp-gallery .slide-active");
         return getDriver().findElement(slideSelector);
@@ -54,25 +74,25 @@ public class Lightbox extends ViewPage
         return getDriver().findElement(slideSelector).getAttribute("data-index");
     }
 
-    public String getCaptionContent()
+    public String getCaption()
     {
         By captionSelector = By.cssSelector("#blueimp-gallery .caption");
         return getDriver().findElement(captionSelector).getText();
     }
 
-    public String getTitleContent()
+    public String getTitle()
     {
         By titleSelector = By.cssSelector("#blueimp-gallery .title");
         return getDriver().findElement(titleSelector).getText();
     }
 
-    public String getPublisherContent()
+    public String getPublisher()
     {
         By publisherSelector = By.cssSelector("#blueimp-gallery .publisher");
         return getDriver().findElement(publisherSelector).getText();
     }
 
-    public String getDateContent()
+    public String getDate()
     {
         By dateSelector = By.cssSelector("#blueimp-gallery .date");
         return getDriver().findElement(dateSelector).getText().replace("on", "");
@@ -84,7 +104,7 @@ public class Lightbox extends ViewPage
         return getDriver().findElement(downloadSelector);
     }
 
-    public boolean isMissingImageOpen()
+    public boolean isImageMissing()
     {
         try {
             return getDriver().findElement(By.cssSelector("#blueimp-gallery .slide-error")).isDisplayed();
@@ -93,37 +113,73 @@ public class Lightbox extends ViewPage
         }
     }
 
-    public void clickEscape()
+    public boolean isSlideDisplayed(int index)
+    {
+        return this.waitForSlide(index);
+    }
+
+    public void close()
     {
         By escapeSelector = By.cssSelector("#blueimp-gallery .escape");
         getDriver().findElement(escapeSelector).click();
+        getDriver().waitUntilElementDisappears(By.className("blueimp-gallery-display"));
     }
 
-    public void clickNext()
+    public void next(int nextSlideIndex)
     {
         By nextSelector = By.cssSelector("#blueimp-gallery .next");
         getDriver().findElement(nextSelector).click();
+
+        waitForSlide(nextSlideIndex);
     }
 
-    public void clickPrev()
+    public void previous(int nextSlideIndex)
     {
         By prevSelector = By.cssSelector("#blueimp-gallery .prev");
         getDriver().findElement(prevSelector).click();
+
+        waitForSlide(nextSlideIndex);
     }
 
-    public void clickFullscreen()
+    public Optional<WebElement> toggleFullscreen()
     {
+        WebElement fullscreen = getFullscreenElement();
+        boolean wasFullscreenOn = fullscreen != null && fullscreen.isDisplayed();
+
         By fullscreenSelector = By.cssSelector("#blueimp-gallery .fullscreen");
         getDriver().findElement(fullscreenSelector).click();
+
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                WebElement fullscreen = getFullscreenElement();
+                return wasFullscreenOn ? fullscreen == null : (fullscreen != null && fullscreen.isDisplayed());
+            }
+
+        });
+
+        return Optional.ofNullable(getFullscreenElement());
+    }
+
+    private WebElement getFullscreenElement()
+    {
+        JavascriptExecutor js = ((JavascriptExecutor) getDriver());
+        WebElement fullscreen =
+            (WebElement) js.executeScript("var element = document.fullscreenElement; return element");
+        return fullscreen;
     }
 
     public void clickThumbnail(int index)
     {
         List<WebElement> thumbnails = getDriver().findElements(By.cssSelector("#blueimp-gallery .indicator >li"));
         thumbnails.get(index).click();
+
+        waitForSlide(index);
     }
 
-    public void clickSlideshow()
+    public void toggleSlideshow()
     {
         By slideshowSelector = By.cssSelector("#blueimp-gallery .autoPlay");
         getDriver().findElement(slideshowSelector).click();

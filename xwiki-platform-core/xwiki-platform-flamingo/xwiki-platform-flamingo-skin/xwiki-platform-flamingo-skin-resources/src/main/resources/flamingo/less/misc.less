@@ -121,11 +121,6 @@
   }
 }
 
-// FIX: Editor
-.editor-wysiwyg #titleinput { // IMPROVEMENT: Better spacing
-  //padding-bottom: @padding-grid-vertical;
-}
-
 // FIX: Livetables
 .xwiki-livetable {
   .pagesizeselect { // PROBLEM: General styling reset
@@ -285,7 +280,7 @@
     // Increase the minimum width because the hint is displayed on multiple lines.
     min-width: 320px;
     // Fixes list padding overwritten by the panel styles.
-    padding: @line-height-computed/4 0;
+    padding: (@line-height-computed / 4) 0;
 
     li .xHint {
       // The hint can be displayed on multiple lines.
@@ -295,7 +290,7 @@
 }
 
 .export-tree-legend {
-  margin: @line-height-computed/4 0 0;
+  margin: (@line-height-computed / 4) 0 0;
 }
 dl.export-tree-legend dt,
 dl.export-tree-legend dd {
@@ -320,7 +315,7 @@ dl.export-tree-legend dt + dd {
 #moreExportOptionsToggle {
   color: @text-muted;
   display: inline-block;
-  margin-bottom: @line-height-computed/2;
+  margin-bottom: (@line-height-computed / 2);
 }
 #moreExportOptionsToggle .more,
 #moreExportOptionsToggle.collapsed .less {
@@ -486,7 +481,7 @@ a.html-diff-context-toggle {
 }
 .deleteWarningButtons {
   margin: 0;
-  padding: @line-height-computed / 2;
+  padding: (@line-height-computed / 2);
 }
 
 // Tree Webjar (XWIKI-15089) ---------------------------------------------------

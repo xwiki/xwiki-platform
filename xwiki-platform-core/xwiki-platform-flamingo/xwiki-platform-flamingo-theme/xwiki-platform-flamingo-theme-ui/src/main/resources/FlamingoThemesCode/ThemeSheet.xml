@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="FlamingoThemesCode.ThemeSheet" locale="">
+<xwikidoc version="1.5" reference="FlamingoThemesCode.ThemeSheet" locale="">
   <web>FlamingoThemesCode</web>
   <name>ThemeSheet</name>
   <language/>
@@ -29,6 +29,7 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>FlamingoThemesCode.ThemeClass</parent>
   <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>#if($doc.documentReference.name == 'ThemeSheet')Theme Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
@@ -445,7 +446,8 @@
     var link = document.createElement('link');
     link.rel = 'stylesheet/less';
     link.type = 'text/css';
-    link.href = $jsontool.serialize($xwiki.getSkinFile('less/style.less.vm', true)) + '?colorTheme=no';
+    link.href = $jsontool.serialize($xwiki.getSkinFile('less/style.less.vm', true));
+    link.href += (link.href.indexOf('?') &lt; 0 ? '?' : '&amp;') + 'colorTheme=no';
     iframeHead.appendChild(link);
 
     // Add the LESS plugin we have developed which appends dynamically the content of the @lessCode variable to the
@@ -458,7 +460,7 @@
     script.innerHTML = `
       require.config({
         paths: {
-          lessJs: $jsontool.serialize($services.webjars.url('less', 'less.min.js')),
+          lessJs: $jsontool.serialize($services.webjars.url('org.webjars.npm:less', 'dist/less.min.js')),
           lessCodePlugin: '$escapetool.d{pluginURL}'
         }
       });
@@ -469,7 +471,9 @@
       require(['lessCodePlugin'], function(lessCodePlugin) {
         // We defined it as a global variable so we can re-use it afterwards.
         window.lessCodePlugin = lessCodePlugin;
-        window.less = {plugins: [lessCodePlugin]};
+        window.less = {
+          plugins: [lessCodePlugin]
+        };
         // Now we can load the LESS preprocessor.
         require(['lessJs'], function(lessJs) {
           // We defined it as a global variable so we can re-use it afterwards.

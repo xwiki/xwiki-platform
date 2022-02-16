@@ -30,6 +30,8 @@
 #set ($theme = {'pageBackgroundColor': '#ECECEC',
 'pageHeaderBackgroundColor'        : '#FFFFFF',
 'pageContentBackgroundColor'       : '#FFFFFF',
+'headerBackgroundImage'            : 'unset',
+'headerBackgroundPosition'         : 'unset',
 'textColor'                        : '#4D4D4D',
 'textPrimaryColor'                 : '#656565',
 'textSecondaryColor'               : '#656565',

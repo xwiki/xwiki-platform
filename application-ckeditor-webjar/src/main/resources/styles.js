@@ -26,7 +26,7 @@
 //
 // For more information refer to: http://docs.ckeditor.com/#!/guide/dev_styles-section-style-rules
 
-[4, 5].forEach(htmlVersion => {
+[4, 5].forEach(function (htmlVersion) {
     const styles = [
         /* Block styles */
 

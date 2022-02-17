@@ -22,18 +22,15 @@ package org.xwiki.notifications.sources.internal;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.user.UserReferenceResolver;
 
 /**
  * Generate a query to retrieve notifications events according to the preferences of the user.
@@ -53,10 +50,6 @@ public class QueryGenerator
 
     @Inject
     private ExpressionNodeToHQLConverter hqlConverter;
-
-    @Inject
-    @Named("document")
-    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     /**
      * Generate the query.

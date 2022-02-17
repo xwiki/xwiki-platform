@@ -573,7 +573,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(toSolrFieldName(condition));
+        builder.append(toSearchFieldName(toSolrFieldName(condition)));
 
         builder.append(':');
 

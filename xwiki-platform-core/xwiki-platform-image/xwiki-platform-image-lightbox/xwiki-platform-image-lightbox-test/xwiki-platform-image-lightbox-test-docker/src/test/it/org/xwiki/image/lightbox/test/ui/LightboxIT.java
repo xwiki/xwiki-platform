@@ -45,6 +45,7 @@ import org.xwiki.test.ui.TestUtils;
  * Functional tests for the image lightbox.
  * 
  * @version $Id$
+ * @since 14.1RC1
  */
 @UITest(properties = {
     // Add the FileUploadPlugin which is needed by the test to upload attachment files
@@ -101,14 +102,19 @@ class LightboxIT
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
 
-        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
-        assertTrue(lightbox.isDisplayed());
+        Optional<Lightbox> lightboxOptional = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightboxOptional.isPresent());
 
-        assertEquals("0", lightbox.getSlideIndex());
-        assertEquals(images.get(0), lightbox.getCaption());
-        assertEquals("", lightbox.getTitle());
-        assertEquals("Posted by JohnDoe", lightbox.getPublisher());
-        assertEquals(lastUploadDate, lightbox.getDate());
+        if (lightboxOptional.isPresent()) {
+            Lightbox lightbox = lightboxOptional.get();
+            assertTrue(lightbox.isDisplayed());
+
+            assertEquals("0", lightbox.getSlideIndex());
+            assertEquals(images.get(0), lightbox.getCaption());
+            assertEquals("", lightbox.getTitle());
+            assertEquals("Posted by JohnDoe", lightbox.getPublisher());
+            assertEquals(lastUploadDate, lightbox.getDate());
+        }
     }
 
     @Test
@@ -128,14 +134,19 @@ class LightboxIT
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
 
-        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
-        assertTrue(lightbox.isDisplayed());
+        Optional<Lightbox> lightboxOptional = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightboxOptional.isPresent());
 
-        assertEquals("0", lightbox.getSlideIndex());
-        assertEquals("Caption", lightbox.getCaption());
-        assertEquals(images.get(0), lightbox.getTitle());
-        assertEquals("Posted by JohnDoe", lightbox.getPublisher());
-        assertEquals(lastUploadDate, lightbox.getDate());
+        if (lightboxOptional.isPresent()) {
+            Lightbox lightbox = lightboxOptional.get();
+            assertTrue(lightbox.isDisplayed());
+
+            assertEquals("0", lightbox.getSlideIndex());
+            assertEquals("Caption", lightbox.getCaption());
+            assertEquals(images.get(0), lightbox.getTitle());
+            assertEquals("Posted by JohnDoe", lightbox.getPublisher());
+            assertEquals(lastUploadDate, lightbox.getDate());
+        }
     }
 
     @Test
@@ -155,14 +166,19 @@ class LightboxIT
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
 
-        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
-        assertTrue(lightbox.isDisplayed());
+        Optional<Lightbox> lightboxOptional = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightboxOptional.isPresent());
 
-        assertEquals("0", lightbox.getSlideIndex());
-        assertEquals("Alternative text", lightbox.getCaption());
-        assertEquals("", lightbox.getTitle());
-        assertEquals("Posted by JohnDoe", lightbox.getPublisher());
-        assertEquals(lastUploadDate, lightbox.getDate());
+        if (lightboxOptional.isPresent()) {
+            Lightbox lightbox = lightboxOptional.get();
+            assertTrue(lightbox.isDisplayed());
+
+            assertEquals("0", lightbox.getSlideIndex());
+            assertEquals("Alternative text", lightbox.getCaption());
+            assertEquals("", lightbox.getTitle());
+            assertEquals("Posted by JohnDoe", lightbox.getPublisher());
+            assertEquals(lastUploadDate, lightbox.getDate());
+        }
     }
 
     @Test
@@ -174,14 +190,19 @@ class LightboxIT
 
         testUtils.createPage(testReference, "[[image:icon:accept]]");
 
-        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
-        assertTrue(lightbox.isDisplayed());
+        Optional<Lightbox> lightboxOptional = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightboxOptional.isPresent());
 
-        assertEquals("0", lightbox.getSlideIndex());
-        assertEquals("accept", lightbox.getCaption());
-        assertEquals("", lightbox.getTitle());
-        assertEquals("", lightbox.getPublisher());
-        assertEquals("", lightbox.getDate());
+        if (lightboxOptional.isPresent()) {
+            Lightbox lightbox = lightboxOptional.get();
+            assertTrue(lightbox.isDisplayed());
+
+            assertEquals("0", lightbox.getSlideIndex());
+            assertEquals("accept", lightbox.getCaption());
+            assertEquals("", lightbox.getTitle());
+            assertEquals("", lightbox.getPublisher());
+            assertEquals("", lightbox.getDate());
+        }
     }
 
     @Test
@@ -199,11 +220,16 @@ class LightboxIT
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
 
-        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
-        assertTrue(lightbox.isDisplayed());
+        Optional<Lightbox> lightboxOptional = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightboxOptional.isPresent());
 
-        lightbox.close();
-        assertFalse(lightboxPage.isLightboxOpen());
+        if (lightboxOptional.isPresent()) {
+            Lightbox lightbox = lightboxOptional.get();
+            assertTrue(lightbox.isDisplayed());
+
+            lightbox.close();
+            assertFalse(lightbox.isDisplayed());
+        }
     }
 
     @Test
@@ -222,20 +248,25 @@ class LightboxIT
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
 
-        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
-        assertTrue(lightbox.isDisplayed());
+        Optional<Lightbox> lightboxOptional = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightboxOptional.isPresent());
 
-        // Using arrows.
-        lightbox.next(1);
-        assertEquals("1", lightbox.getSlideIndex());
-        lightbox.previous(0);
-        assertEquals("0", lightbox.getSlideIndex());
+        if (lightboxOptional.isPresent()) {
+            Lightbox lightbox = lightboxOptional.get();
+            assertTrue(lightbox.isDisplayed());
 
-        // Using thumbnails icons.
-        lightbox.clickThumbnail(1);
-        assertEquals("1", lightbox.getSlideIndex());
-        lightbox.clickThumbnail(0);
-        assertEquals("0", lightbox.getSlideIndex());
+            // Using arrows.
+            lightbox.next(1);
+            assertEquals("1", lightbox.getSlideIndex());
+            lightbox.previous(0);
+            assertEquals("0", lightbox.getSlideIndex());
+
+            // Using thumbnails icons.
+            lightbox.clickThumbnail(1);
+            assertEquals("1", lightbox.getSlideIndex());
+            lightbox.clickThumbnail(0);
+            assertEquals("0", lightbox.getSlideIndex());
+        }
     }
 
     @Test
@@ -255,18 +286,23 @@ class LightboxIT
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
 
-        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
-        assertTrue(lightbox.isDisplayed());
+        Optional<Lightbox> lightboxOptional = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightboxOptional.isPresent());
 
-        // Start auto play.
-        lightbox.toggleSlideshow();
-        assertTrue(lightbox.isSlideDisplayed(1));
-        assertTrue(lightbox.isSlideDisplayed(2));
-        assertTrue(lightbox.isSlideDisplayed(0));
+        if (lightboxOptional.isPresent()) {
+            Lightbox lightbox = lightboxOptional.get();
+            assertTrue(lightbox.isDisplayed());
 
-        // Stop auto play.
-        lightbox.toggleSlideshow();
-        assertFalse(lightbox.isSlideDisplayed(1));
+            // Start auto play.
+            lightbox.toggleSlideshow();
+            assertTrue(lightbox.waitForSlide(1));
+            assertTrue(lightbox.waitForSlide(2));
+            assertTrue(lightbox.waitForSlide(0));
+
+            // Stop auto play.
+            lightbox.toggleSlideshow();
+            assertFalse(lightbox.waitForSlide(1));
+        }
     }
 
     @Test
@@ -282,14 +318,19 @@ class LightboxIT
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
 
-        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
-        assertTrue(lightbox.isDisplayed());
+        Optional<Lightbox> lightboxOptional = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightboxOptional.isPresent());
 
-        assertTrue(lightbox.isImageMissing());
-        assertEquals("0", lightbox.getSlideIndex());
-        assertEquals(images.get(2), lightbox.getCaption());
-        assertEquals("", lightbox.getTitle());
-        assertEquals("", lightbox.getDate());
+        if (lightboxOptional.isPresent()) {
+            Lightbox lightbox = lightboxOptional.get();
+            assertTrue(lightbox.isDisplayed());
+
+            assertTrue(lightbox.isImageMissing());
+            assertEquals("0", lightbox.getSlideIndex());
+            assertEquals(images.get(2), lightbox.getCaption());
+            assertEquals("", lightbox.getTitle());
+            assertEquals("", lightbox.getDate());
+        }
     }
 
     @Test
@@ -307,16 +348,21 @@ class LightboxIT
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
 
-        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
-        assertTrue(lightbox.isDisplayed());
+        Optional<Lightbox> lightboxOptional = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightboxOptional.isPresent());
 
-        Optional<WebElement> fullscreenOn = lightbox.toggleFullscreen();
-        if (fullscreenOn.isPresent()) {
-            assertTrue(fullscreenOn.get().isDisplayed());
+        if (lightboxOptional.isPresent()) {
+            Lightbox lightbox = lightboxOptional.get();
+            assertTrue(lightbox.isDisplayed());
+
+            Optional<WebElement> fullscreenOn = lightbox.toggleFullscreen();
+            if (fullscreenOn.isPresent()) {
+                assertTrue(fullscreenOn.get().isDisplayed());
+            }
+
+            Optional<WebElement> fullscreenOff = lightbox.toggleFullscreen();
+            assertFalse(fullscreenOff.isPresent());
         }
-
-        Optional<WebElement> fullscreenOff = lightbox.toggleFullscreen();
-        assertFalse(fullscreenOff.isPresent());
     }
 
     @Test
@@ -341,19 +387,25 @@ class LightboxIT
             ImagePopover currentImagePopover = imagePopover.get();
             assertTrue(currentImagePopover.isImagePopoverDisplayed());
 
-            WebElement popoverDownload = currentImagePopover.getDownloadElement();
+            WebElement popoverDownload = currentImagePopover.getDownloadButton();
             assertEquals(lightboxPage.getImageElement(0).getAttribute("src"), popoverDownload.getAttribute("href"));
             assertEquals("image1.png", popoverDownload.getAttribute("download"));
         }
 
         // Verify the image lightbox download action.
-        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
-        assertTrue(lightbox.isDisplayed());
+        Optional<Lightbox> lightboxOptional = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightboxOptional.isPresent());
 
-        WebElement slide = lightbox.getSlideElement();
-        WebElement lightboxDownload = lightbox.getDownloadElement();
-        assertEquals(slide.findElement(By.tagName("img")).getAttribute("src"), lightboxDownload.getAttribute("href"));
-        assertEquals(images.get(0), lightboxDownload.getAttribute("download"));
+        if (lightboxOptional.isPresent()) {
+            Lightbox lightbox = lightboxOptional.get();
+            assertTrue(lightbox.isDisplayed());
+
+            WebElement slide = lightbox.getSlideElement();
+            WebElement lightboxDownload = lightbox.getDownloadButton();
+            assertEquals(slide.findElement(By.tagName("img")).getAttribute("src"),
+                lightboxDownload.getAttribute("href"));
+            assertEquals(images.get(0), lightboxDownload.getAttribute("download"));
+        }
     }
 
     private String getSimpleImage(String image)

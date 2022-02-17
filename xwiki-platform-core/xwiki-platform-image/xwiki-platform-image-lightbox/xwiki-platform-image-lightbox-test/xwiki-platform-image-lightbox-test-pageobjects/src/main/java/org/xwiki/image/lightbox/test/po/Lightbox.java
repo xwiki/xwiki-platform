@@ -37,21 +37,20 @@ import org.xwiki.test.ui.po.BaseElement;
  * The image lightbox gallery.
  * 
  * @version $Id$
+ * @since 14.1RC1
  */
 public class Lightbox extends BaseElement
 {
     public boolean isDisplayed()
     {
         try {
-            By className = By.className("blueimp-gallery-display");
-            getDriver().waitUntilElementIsVisible(className);
-            return getDriver().findElement(className).isDisplayed();
+            return getDriver().findElement(By.className("blueimp-gallery-display")).isDisplayed();
         } catch (NoSuchElementException e) {
             return false;
         }
     }
 
-    private boolean waitForSlide(int index)
+    public boolean waitForSlide(int index)
     {
         try {
             By slideSelector = By.cssSelector("#blueimp-gallery .slide-active");
@@ -98,7 +97,7 @@ public class Lightbox extends BaseElement
         return getDriver().findElement(dateSelector).getText().replace("on", "");
     }
 
-    public WebElement getDownloadElement()
+    public WebElement getDownloadButton()
     {
         By downloadSelector = By.cssSelector("#blueimp-gallery .download");
         return getDriver().findElement(downloadSelector);
@@ -111,11 +110,6 @@ public class Lightbox extends BaseElement
         } catch (NoSuchElementException e) {
             return false;
         }
-    }
-
-    public boolean isSlideDisplayed(int index)
-    {
-        return this.waitForSlide(index);
     }
 
     public void close()

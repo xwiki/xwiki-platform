@@ -27,7 +27,6 @@ import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -38,6 +37,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Actions for interacting with page images and their attached popover.
  * 
  * @version $Id$
+ * @since 14.1RC1
  */
 public class LightboxPage extends ViewPage
 {
@@ -78,25 +78,16 @@ public class LightboxPage extends ViewPage
         return images.get(index);
     }
 
-    public Lightbox openLightboxAtImage(int index)
+    public Optional<Lightbox> openLightboxAtImage(int index)
     {
-        hoverImage(index);
+        Optional<ImagePopover> imagePopover = hoverImage(index);
 
-        By lightboxButtonSelector = By.cssSelector(".popover .openLightbox");
-        getDriver().waitUntilElementIsVisible(lightboxButtonSelector);
-        getDriver().findElementWithoutWaiting(lightboxButtonSelector).click();
-
-        return new Lightbox();
-    }
-
-    public boolean isLightboxOpen()
-    {
-        try {
-            By className = By.className("blueimp-gallery-display");
-            return getDriver().findElement(className).isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
+        if (imagePopover.isPresent()) {
+            return imagePopover.get().openLightbox(index);
+        } else {
+            return Optional.empty();
         }
+
     }
 
     private File getFileToUpload(String testResourcePath, String filename)

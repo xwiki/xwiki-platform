@@ -19,8 +19,11 @@
  */
 package org.xwiki.image.lightbox.test.po;
 
+import java.util.Optional;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -28,9 +31,24 @@ import org.xwiki.test.ui.po.BaseElement;
  * The toolbar opened on image hover.
  * 
  * @version $Id$
+ * @since 14.1RC1
  */
 public class ImagePopover extends BaseElement
 {
+    public Optional<Lightbox> openLightbox(int index)
+    {
+        try {
+            By lightboxButtonSelector = By.cssSelector(".popover .openLightbox");
+            getDriver().waitUntilElementIsVisible(lightboxButtonSelector);
+            getDriver().findElementWithoutWaiting(lightboxButtonSelector).click();
+            getDriver().waitUntilElementIsVisible(By.className("blueimp-gallery-display"));
+
+            return Optional.of(new Lightbox());
+        } catch (TimeoutException e) {
+            return Optional.empty();
+        }
+    }
+
     public boolean isImagePopoverDisplayed()
     {
         try {
@@ -41,7 +59,7 @@ public class ImagePopover extends BaseElement
         }
     }
 
-    public WebElement getDownloadElement()
+    public WebElement getDownloadButton()
     {
         By downloadSelector = By.cssSelector(".popover .imageDownload");
         return getDriver().findElement(downloadSelector);

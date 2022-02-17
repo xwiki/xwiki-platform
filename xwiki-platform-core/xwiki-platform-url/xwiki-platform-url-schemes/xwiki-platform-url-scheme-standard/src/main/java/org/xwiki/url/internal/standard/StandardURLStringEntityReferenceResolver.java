@@ -52,7 +52,7 @@ import com.xpn.xwiki.XWikiContext;
  * {@link StandardExtendedURLResourceTypeResolver}.
  * 
  * @version $Id$
- * @since 14.1
+ * @since 14.1RC1
  */
 @Component
 @Named("resource/standardURL")

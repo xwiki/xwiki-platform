@@ -111,6 +111,12 @@
         originalData.call(this);
       };
 
+      // Adds support for configuring the allowed content for image caption (currently hard-coded).
+      var captionAllowedContent = (editor.config['xwiki-image'] || {}).captionAllowedContent;
+      if (captionAllowedContent) {
+        imageWidget.editables.caption.allowedContent = captionAllowedContent;
+      }
+
       //
       // Don't remove the width/height if they are specified using percentage.
       // See CKEDITOR-122: CKEditor removes image width when specified as percentage

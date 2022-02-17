@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -235,7 +234,7 @@ define('xwiki-ckeditor', [
           // Formatting
           span: true, strong: true, em: true, ins: true, del: true, sub: true, sup: true, tt: true, pre: true,
           // Others
-          div: true, hr: true, p: true, a: true, img: true, blockquote: true
+          div: true, hr: true, p: true, a: true, img: true, blockquote: true, figure: true
         },
         // The elements above can have any attribute, through the parameter (%%) syntax.
         attributes: '*',
@@ -244,7 +243,7 @@ define('xwiki-ckeditor', [
       },
       '$2': {
         // The XWiki syntax doesn't support parameters for the following elements.
-        elements: {br: true, dd: true, dt: true, li: true, tbody: true}
+        elements: {br: true, dd: true, dt: true, li: true, tbody: true, figcaption: true}
       },
       '$3': {
         // Wiki syntax macros can output any HTML.
@@ -260,7 +259,10 @@ define('xwiki-ckeditor', [
   // This is a hack, increasing the technical debt since the CKEditor module should not know about the Markdown
   // syntax. Actually it should not know either about the xwiki/2.0 and xwiki/2.1 syntaxes ;)
   // This should be fixed by implementing https://jira.xwiki.org/browse/CKEDITOR-319
-  allowedContentBySyntax['markdown/1.2'] = allowedContentBySyntax['xwiki/2.1'];
+  allowedContentBySyntax['markdown/1.2'] = $.extend(true, {}, allowedContentBySyntax['xwiki/2.1']);
+  // Markdown doesn't allow figures at the moment.
+  delete allowedContentBySyntax['markdown/1.2']['$1'].elements.figure;
+  delete allowedContentBySyntax['markdown/1.2']['$2'].elements.figcaption;
 
   var currentLocale = $('html').attr('lang') || '';
 
@@ -285,8 +287,25 @@ define('xwiki-ckeditor', [
       sourceDocument = new XWiki.Document(XWiki.Model.resolve(sourceDocumentReference, XWiki.EntityType.DOCUMENT));
     }
     sourceDocument.syntax = $(element).attr('data-sourceDocumentSyntax');
+    var isHTML5 = $(element).data('syntax') !== 'annotatedxhtml/1.0';
+
+    var allowedContent;
+    var allowedContentWithoutFigure;
+    if (sourceDocument.syntax in allowedContentBySyntax) {
+      allowedContent = allowedContentBySyntax[sourceDocument.syntax];
+      // Try removing the figure/figcaption tags for caption content to forbid nested figures.
+      allowedContentWithoutFigure = $.extend(true, {}, allowedContent);
+      delete allowedContentWithoutFigure['$1']?.elements?.figure;
+      delete allowedContentWithoutFigure['$2']?.elements?.figcaption;
+
+      // Disable figure support if the syntax isn't HTML 5.
+      if (!isHTML5) {
+        allowedContent = allowedContentWithoutFigure;
+      }
+    }
+
     var config = {
-      allowedContent: allowedContentBySyntax[sourceDocument.syntax],
+      allowedContent: allowedContent,
       editorplaceholder: $jsontool.serialize($services.localization.render('ckeditor.content.placeholder')),
       filebrowserUploadUrl: getUploadURL(sourceDocument, 'filebrowser'),
       // This is used in CKEditor.FileUploader so we must keep them in sync.
@@ -295,7 +314,10 @@ define('xwiki-ckeditor', [
       // CKEditor uses '-' (dash) as locale separator (between the language code and the country code).
       language: currentLocale.toLowerCase().replace('_', '-'),
       uploadUrl: getUploadURL(sourceDocument, 'filetools'),
-      stylesSet: $(element).data('syntax') === 'annotatedxhtml/1.0' ? 'html4' : 'html5',
+      stylesSet: isHTML5 ? 'html5' : 'html4',
+      'xwiki-image' : {
+        captionAllowedContent: allowedContentWithoutFigure
+      },
       'xwiki-link': {
         labelGenerator: sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.LinkLabelGenerator',

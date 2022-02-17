@@ -33,7 +33,7 @@
         var widgetDefinition = event.data;
         if (widgetDefinition.name === "image") {
           // Adds support for configuring the allowed content for image caption (currently hard-coded).
-          event.data.editables.caption.allowedContent = event.editor.config['xwiki-image'].captionAllowedContent;
+          widgetDefinition.editables.caption.allowedContent = (editor.config['xwiki-image'] || {}).captionAllowedContent;
           if (widgetDefinition.dialog === "image2") {
             this.overrideImageWidget(editor, widgetDefinition);
           }

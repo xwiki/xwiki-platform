@@ -54,6 +54,8 @@
 ##
 ## Start the requirejs config.
 ## See https://requirejs.org/docs/api.html#config
+## Note that we have to declare momentjs as a RequireJS package in order to be able to load momentjs locales on demand
+## using RequireJS. See https://github.com/requirejs/requirejs/issues/1554 .
 ##
 #set ($requireConfig = {
   'packages': [
@@ -61,6 +63,10 @@
       'name': 'scriptaculous',
       'location': $stringtool.removeEnd($services.webjars.url('scriptaculous', ''), '/'),
       'main': 'scriptaculous'
+    }, {
+      'name': 'moment',
+      'location': $stringtool.removeEnd($services.webjars.url('momentjs', ''), '/'),
+      'main': 'min/moment.min'
     }
   ],
   'paths': {
@@ -75,7 +81,8 @@
     'xwiki-l10n': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-localization-webjar', ""l10n${jsExtension}""))",
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/drawer${jsExtension}""))",
-    'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js')
+    'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
+    'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min')
   },
   'shim': {
     'prototype': {
@@ -90,10 +97,16 @@
   'bundles': {},
   'config': {}
 })
+## momentjs locales depend on '../moment' which gets resolved as 'moment/moment' due to our package configuration, which
+## points to the unminified version. The consequence is that we end up loading both the minified and the unminified
+## version of momentjs and, more importantly, the locales are loaded into the moment instance created by the unminified
+## code. In order to fix this we map the unminified version to the minified version so that we work with a single moment
+## instance (that has the locales loaded).
 ## See http://requirejs.org/docs/jquery.html#noconflictmap to understand why this works.
 #set ($requireConfig.map = {
   '*': {
-    'jquery': 'jQueryNoConflict'
+    'jquery': 'jQueryNoConflict',
+    'moment/moment': 'moment'
   },
   'jQueryNoConflict': {
     'jquery': 'jquery'

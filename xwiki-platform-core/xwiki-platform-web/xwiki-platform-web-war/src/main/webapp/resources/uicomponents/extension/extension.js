@@ -804,7 +804,7 @@ require(['jquery'], function($) {
     // The actual form submit.
     var params = {};
     params[this.name] = this.value;
-    form.next('.extensionUpdater').each(refresh.bind(null, params));
+    form.next('.extensionUpdater').each((index, extensionUpdater) => refresh.call(extensionUpdater, params));
   };
 
   $('.extensionUpdater').each(maybeScheduleRefresh).prev('form').find('button').on('click', onCheckForUpdates);

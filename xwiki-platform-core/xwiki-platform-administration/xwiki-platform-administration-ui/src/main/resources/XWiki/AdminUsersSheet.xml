@@ -536,7 +536,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
         failed: $jsontool.serialize($services.localization.render('administration.section.users.disableUser.failed'))
       }
     }
-    var onToggleUser = function(action, event) {
+    var onToggleUser = function(event) {
       event.preventDefault();
       var actionTrigger = $(this);
       if (actionTrigger.hasClass('pending')) {
@@ -544,6 +544,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
         return;
       }
       actionTrigger.addClass('pending');
+      var action = event.data.action;
       var notification = new XWiki.widgets.Notification(notificationMessage[action].inProgress, 'inprogress');
       // The enable and disable actions redirect to the user profile by default which may take a lot of time to render so
       // we redirect to a URL that doesn't render anything.
@@ -557,8 +558,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
         actionTrigger.removeClass('pending');
       });
     };
-    $('#userstable').on('click', 'a.actionenable', onToggleUser.bind(null, 'enable'));
-    $('#userstable').on('click', 'a.actiondisable', onToggleUser.bind(null, 'disable'));
+    $('#userstable').on('click', 'a.actionenable', {action: 'enable'}, onToggleUser);
+    $('#userstable').on('click', 'a.actiondisable', {action: 'disable'}, onToggleUser);
   })();
 
   //

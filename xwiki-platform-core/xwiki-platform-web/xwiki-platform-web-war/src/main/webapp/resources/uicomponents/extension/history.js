@@ -256,7 +256,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       container.find('form.extension-question button[name="extensionAction"]')
         .on('click', updateReplayStatus.bind(null, container, 'data=replayStatus'));
     } else if (typeof jobState == 'string' && jobState != 'FINISHED') {
-      setTimeout(updateReplayStatus.bind(this, container), 1000);
+      setTimeout(updateReplayStatus.bind(null, container), 1000);
     }
   };
 
@@ -269,7 +269,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   var updateReplayStatus = function(container, data, event) {
     if (event) {
       event.preventDefault();
-      data += '&' + $(this).closest('form').serialize();
+      data += '&' + $(event.target).closest('form').serialize();
     } else {
       data = data || {
         'data': 'replayStatus',

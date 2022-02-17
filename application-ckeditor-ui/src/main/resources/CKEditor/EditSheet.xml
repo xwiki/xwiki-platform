@@ -293,9 +293,14 @@ define('xwiki-ckeditor', [
     var allowedContentWithoutFigure;
     if (sourceDocument.syntax in allowedContentBySyntax) {
       allowedContent = allowedContentBySyntax[sourceDocument.syntax];
+      // Try removing the figure/figcaption tags for caption content to forbid nested figures.
       allowedContentWithoutFigure = $.extend(true, {}, allowedContent);
-      delete allowedContentWithoutFigure['$1'].elements.figure;
-      delete allowedContentWithoutFigure['$2'].elements.figcaption;
+      if ('$1' in allowedContentWithoutFigure &amp;&amp; 'elements' in allowedContentWithoutFigure['$1']) {
+        delete allowedContentWithoutFigure['$1'].elements.figure;
+      }
+      if ('$2' in allowedContentWithoutFigure &amp;&amp; 'elements' in allowedContentWithoutFigure['$2']) {
+        delete allowedContentWithoutFigure['$2'].elements.figcaption;
+      }
 
       // Disable figure support if the syntax isn't HTML 5.
       if (!isHTML5) {

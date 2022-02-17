@@ -31,12 +31,8 @@
     beforeInit: function(editor) {
       editor.on('widgetDefinition', function (event) {
         var widgetDefinition = event.data;
-        if (widgetDefinition.name === "image") {
-          // Adds support for configuring the allowed content for image caption (currently hard-coded).
-          widgetDefinition.editables.caption.allowedContent = (editor.config['xwiki-image'] || {}).captionAllowedContent;
-          if (widgetDefinition.dialog === "image2") {
-            this.overrideImageWidget(editor, widgetDefinition);
-          }
+        if (widgetDefinition.name === "image" && widgetDefinition.dialog === "image2") {
+          this.overrideImageWidget(editor, widgetDefinition);
         }
       }, this);
     },
@@ -114,6 +110,12 @@
         }
         originalData.call(this);
       };
+
+      // Adds support for configuring the allowed content for image caption (currently hard-coded).
+      var captionAllowedContent = (editor.config['xwiki-image'] || {}).captionAllowedContent;
+      if (captionAllowedContent) {
+        imageWidget.editables.caption.allowedContent = captionAllowedContent;
+      }
 
       //
       // Don't remove the width/height if they are specified using percentage.

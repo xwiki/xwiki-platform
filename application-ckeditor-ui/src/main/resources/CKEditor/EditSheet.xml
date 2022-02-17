@@ -318,7 +318,7 @@ define('xwiki-ckeditor', [
       // CKEditor uses '-' (dash) as locale separator (between the language code and the country code).
       language: currentLocale.toLowerCase().replace('_', '-'),
       uploadUrl: getUploadURL(sourceDocument, 'filetools'),
-      stylesSet: $(element).data('syntax') === isHTML5 ? 'html5' : 'html4',
+      stylesSet: isHTML5 ? 'html5' : 'html4',
       'xwiki-image' : {
         captionAllowedContent: allowedContentWithoutFigure
       },

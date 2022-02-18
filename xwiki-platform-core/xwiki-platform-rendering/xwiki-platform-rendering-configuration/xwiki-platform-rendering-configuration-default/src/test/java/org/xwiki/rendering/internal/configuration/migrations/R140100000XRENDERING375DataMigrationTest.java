@@ -40,13 +40,13 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link HTML5ParserDisabledByDefaultMigrator}.
+ * Unit tests for {@link R140100000XRENDERING375DataMigration}.
  *
  * @version $Id$
  * @since 14.1RC1
  */
 @ComponentTest
-class HTML5ParserDisabledByDefaultMigratorTest
+class R140100000XRENDERING375DataMigrationTest
 {
     private static final String DISABLED_SYNTAXES_PROPERTY = "disabledSyntaxes";
 
@@ -55,14 +55,14 @@ class HTML5ParserDisabledByDefaultMigratorTest
     private ConfigurationSource renderingConfiguration;
 
     @InjectMockComponents(role = HibernateDataMigration.class)
-    private HTML5ParserDisabledByDefaultMigrator html5ParserDisabledByDefaultMigrator;
+    private R140100000XRENDERING375DataMigration r140100000XRENDERING375DataMigration;
 
     @Test
     void doNothingWhenEmpty() throws DataMigrationException
     {
         when(this.renderingConfiguration.getProperty(DISABLED_SYNTAXES_PROPERTY)).thenReturn(null);
 
-        this.html5ParserDisabledByDefaultMigrator.migrate();
+        this.r140100000XRENDERING375DataMigration.migrate();
 
         verify(this.renderingConfiguration).getProperty(DISABLED_SYNTAXES_PROPERTY);
         verifyNoMoreInteractions(this.renderingConfiguration);
@@ -74,7 +74,7 @@ class HTML5ParserDisabledByDefaultMigratorTest
         when(this.renderingConfiguration.getProperty(DISABLED_SYNTAXES_PROPERTY)).thenReturn(
             List.of(Syntax.XWIKI_2_0.toIdString(), Syntax.HTML_5_0.toIdString(), Syntax.XHTML_5.toIdString()));
 
-        this.html5ParserDisabledByDefaultMigrator.migrate();
+        this.r140100000XRENDERING375DataMigration.migrate();
 
         verify(this.renderingConfiguration).getProperty(DISABLED_SYNTAXES_PROPERTY);
         verifyNoMoreInteractions(this.renderingConfiguration);
@@ -86,7 +86,7 @@ class HTML5ParserDisabledByDefaultMigratorTest
         when(this.renderingConfiguration.getProperty(DISABLED_SYNTAXES_PROPERTY)).thenReturn(
             List.of(Syntax.XWIKI_2_0.toIdString()));
 
-        this.html5ParserDisabledByDefaultMigrator.migrate();
+        this.r140100000XRENDERING375DataMigration.migrate();
 
         verify(this.renderingConfiguration).setProperties(Map.of(DISABLED_SYNTAXES_PROPERTY,
             List.of(Syntax.XWIKI_2_0.toIdString(), Syntax.HTML_5_0.toIdString(), Syntax.XHTML_5.toIdString())));

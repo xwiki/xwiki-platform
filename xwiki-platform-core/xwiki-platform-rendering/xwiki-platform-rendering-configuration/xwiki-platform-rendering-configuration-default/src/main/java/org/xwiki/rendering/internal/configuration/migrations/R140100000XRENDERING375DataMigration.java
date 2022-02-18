@@ -43,9 +43,9 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * @since 14.1RC1
  */
 @Component
-@Named("R140100000XRENDERING375")
+@Named("R140100000XRENDERING375DataMigration")
 @Singleton
-public class HTML5ParserDisabledByDefaultMigrator extends AbstractHibernateDataMigration
+public class R140100000XRENDERING375DataMigration extends AbstractHibernateDataMigration
 {
     private static final String DISABLED_SYNTAXES_PROPERTY = "disabledSyntaxes";
 

@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -38,6 +39,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.StringProperty;
 
 import static org.xwiki.uiextension.internal.WikiUIExtensionConstants.CONTENT_PROPERTY;
 import static org.xwiki.uiextension.internal.WikiUIExtensionConstants.EXTENSION_POINT_ID_PROPERTY;
@@ -55,6 +57,8 @@ import static org.xwiki.uiextension.internal.WikiUIExtensionConstants.UI_EXTENSI
 @Component
 @Singleton
 @Named("Attachment.Code.MoveAttachment")
+// Set priority to be after the UI Extension class.
+@Priority(2000)
 public class MoveAttachmentDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
     private static final String UIPX_ID = "org.xwiki.platform.template.header.after";
@@ -78,40 +82,49 @@ public class MoveAttachmentDocumentInitializer extends AbstractMandatoryDocument
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
-        boolean superUpdated = super.updateDocument(document);
+        boolean updated = super.updateDocument(document);
 
         List<BaseObject> uIExtensionObjects = document.getXObjects(UI_EXTENSION_CLASS);
-        boolean exists = uIExtensionObjects.stream().anyMatch(object ->
+        BaseObject xObject = uIExtensionObjects.stream().filter(object ->
             Objects.equals(object.getStringValue(EXTENSION_POINT_ID_PROPERTY), UIPX_ID)
-                && Objects.equals(object.getStringValue(ID_PROPERTY), UIX_ID));
-        if (!exists) {
+                && Objects.equals(object.getStringValue(ID_PROPERTY), UIX_ID))
+            .findFirst().orElse(null);
+        if (xObject == null) {
+            updated = true;
             try {
                 EntityReference uIExtensionClass = new EntityReference(UI_EXTENSION_CLASS);
-                int idx = document.createXObject(uIExtensionClass, this.contextProvider.get());
-                BaseObject xObject = document.getXObject(uIExtensionClass, idx);
-                xObject.setStringValue(EXTENSION_POINT_ID_PROPERTY, UIPX_ID);
-                xObject.setStringValue(ID_PROPERTY, UIX_ID);
-                xObject.setStringValue(CONTENT_PROPERTY, "{{velocity}}\n"
+                XWikiContext context = this.contextProvider.get();
+                xObject = document.newXObject(uIExtensionClass, context);
+                xObject.set(EXTENSION_POINT_ID_PROPERTY, UIPX_ID, context);
+                xObject.set(ID_PROPERTY, UIX_ID, context);
+                xObject.set(CONTENT_PROPERTY, "{{velocity}}\n"
                     + "{{html clean=\"false\"}}\n"
                     + "<script id=\"attachment-move-config\" type=\"application/json\">$jsontool.serialize({\n"
                     + "  'treeWebjar': $!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "
                     + "'require-config.min.js', {'evaluate': true})"
                     + "})</script>\n"
                     + "{{/html}}\n"
-                    + "{{/velocity}}");
-                xObject.setStringValue(SCOPE_PROPERTY, "wiki");
+                    + "{{/velocity}}", context);
+                xObject.set(SCOPE_PROPERTY, "wiki", context);
             } catch (XWikiException e) {
                 this.logger.error(
                     "Error while trying to initialize a [org.xwiki.platform.template.header.after] UIX in "
                         + "[Attachment.Code.MoveAttachment].", e);
             }
+        } else {
+            // XWIKI-19426 - the content property used the wrong property type.
+            if (xObject.safeget(CONTENT_PROPERTY) instanceof StringProperty) {
+                xObject.setLargeStringValue(CONTENT_PROPERTY, xObject.getStringValue(CONTENT_PROPERTY));
+                updated = true;
+            }
         }
 
         Boolean hidden = document.isHidden();
         if (Boolean.FALSE.equals(hidden)) {
+            updated = true;
             document.setHidden(true);
         }
 
-        return superUpdated || !exists || !hidden;
+        return updated;
     }
 }

@@ -35,7 +35,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 /**
  * Migration for XWIKI-19125: Copy the author reference value to the new original metadata author reference.
  *
- * @since 11.8RC1
+ * @since 14.0RC1
  * @version $Id$
  */
 @Component

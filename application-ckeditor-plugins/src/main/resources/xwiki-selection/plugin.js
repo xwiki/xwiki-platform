@@ -72,7 +72,7 @@
     if (selection && selection.isFake) {
       var nativeSelection = selection.document.$.defaultView.getSelection();
       nativeSelection.removeAllRanges();
-      selection.getRanges().map(toNativeRange).forEach($.proxy(nativeSelection, 'addRange'));
+      selection.getRanges().map(toNativeRange).forEach(nativeSelection.addRange.bind(nativeSelection));
     }
   };
 

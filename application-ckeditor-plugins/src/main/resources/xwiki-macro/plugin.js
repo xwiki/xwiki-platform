@@ -241,7 +241,7 @@
             // The editor is not visible so we can't determine if the macro widget is visible. We can't detect when the
             // editor becomes visible either so the workaround we use is to ensure the macro is visible next time the
             // editor receives the focus (i.e. when the user starts editing).
-            editor.once('focus', $.proxy(ensureMacroWidgetVisible, null, this));
+            editor.once('focus', ensureMacroWidgetVisible.bind(null, this));
           }
           // Initialize the widget data.
           var data = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
@@ -344,8 +344,8 @@
             require(['macroWizard'], function() {
               $(editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
             });
-            editor.setData(html, {callback: $.proxy(command, 'done', true)});
-          }).fail($.proxy(this, 'done'));
+            editor.setData(html, {callback: command.done.bind(command, true)});
+          }).fail(this.done.bind(this));
         },
         done: function(success) {
           editor.setLoading(false);
@@ -377,7 +377,7 @@
         },
         refresh: function(editor, path) {
           // The nested editables are not marked as focused right away in Chrome so we need to defer the refresh a bit.
-          setTimeout($.proxy(this, '_refresh', editor, path), 0);
+          setTimeout(this._refresh.bind(this, editor, path), 0);
         },
         _refresh: function(editor, path) {
           var currentWidget = this.getCurrentWidget(editor);
@@ -452,7 +452,7 @@
         }
       });
       // Refresh all the macros because a change in one macro can affect the output of the other macros.
-      setTimeout($.proxy(editor, 'execCommand', 'xwiki-refresh'), 0);
+      setTimeout(editor.execCommand.bind(editor, 'xwiki-refresh'), 0);
     },
 
     createMacroWidget: function(editor, data) {
@@ -512,7 +512,7 @@
         var nestedEditable = nestedEditables.getItem(i);
         // The specified widget can have nested widgets. Initialize only the nested editables that correspond to the
         // current widget.
-        var nestedEditableOwner = nestedEditable.getAscendant($.proxy(this, 'isDomMacroElement'));
+        var nestedEditableOwner = nestedEditable.getAscendant(this.isDomMacroElement.bind(this));
         if (!widget.element.equals(nestedEditableOwner)) {
           continue;
         }

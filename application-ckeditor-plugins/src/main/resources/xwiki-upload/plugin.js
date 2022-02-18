@@ -121,7 +121,7 @@
       var xhr = event.data.fileLoader.xhr;
       // We need to know when the upload ends (load, error or abort) in order to perform the next upload.
       var uploadPromise = $.Deferred();
-      xhr.addEventListener('loadend', $.proxy(uploadPromise, 'resolve'));
+      xhr.addEventListener('loadend', uploadPromise.resolve.bind(uploadPromise));
       // Overwrite the original send function to 'wait' for the previous upload to end.
       var originalSend = xhr.send;
       xhr.send = function() {

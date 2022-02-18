@@ -42,12 +42,12 @@
 
     init: function(editor) {
       this.editors.push(editor);
-      editor.on('destroy', $.proxy(function(event) {
+      editor.on('destroy', (function(event) {
         var index = this.editors.indexOf(editor);
         if (index >= 0) {
           this.editors.splice(index, 1);
         }
-      }, this));
+      }).bind(this));
 
       // Keyboard shortcuts for the edit form.
       this.addEditFormShortcutKey(editor, 'cancel', CKEDITOR.ALT + 67 /*C*/);
@@ -58,7 +58,7 @@
 
     onLoad: function() {
       // We need to update the form fields before the form is validated (for Preview, Save and Save & Continue).
-      $(document).on('xwiki:actions:beforePreview xwiki:actions:beforeSave', $.proxy(function(event, data) {
+      $(document).on('xwiki:actions:beforePreview xwiki:actions:beforeSave', (function(event, data) {
         if (!this.updateFormFields()) {
           event.preventDefault();
           // This is for older versions of XWiki (<10.8.1) where we had to stop the original event.
@@ -66,12 +66,12 @@
             data.originalEvent.stop();
           }
         }
-      }, this));
+      }).bind(this));
 
       var submitInProgress = false;
       // Disable the leave confirmation when the form action buttons are used.
       $(document).on('xwiki:actions:cancel xwiki:actions:preview xwiki:actions:save xwiki:document:saved',
-        $.proxy(function(event, data) {
+        (function(event, data) {
           // We reset the dirty field on 'xwiki:actions:save' only if it's not a Save & Continue. Otherwise we wait for
           // 'xwiki:document:saved' to be sure the document was saved.
           if (!data || !data['continue']) {
@@ -80,9 +80,9 @@
               editor.resetDirty();
             });
           }
-        }, this));
+        }).bind(this));
 
-      $(window).on('beforeunload', $.proxy(function(event) {
+      $(window).on('beforeunload', (function(event) {
         // Update the form fields before the page is unloaded in order to allow the browser to cache their values
         // (Back-Forward and Soft Reload cache). The form fields have already been updated (for validation) if a submit
         // is currently in progress.
@@ -98,7 +98,7 @@
           event.returnValue = dirtyEditor.localization.get('xwiki-save.leaveConfirmationMessage');
           return event.returnValue;
         }
-      }, this));
+      }).bind(this));
     },
 
     updateFormFields: function(fullData) {

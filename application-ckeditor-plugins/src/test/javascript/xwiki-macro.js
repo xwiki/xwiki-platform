@@ -339,7 +339,7 @@ describe('XWiki Macro Plugin for CKEditor', function() {
     $.when.apply($, [
       // CKEDITOR-48: Wiki Page source gets into bad state when macro that produces no output is used with CKEditor
       '<!--startmacro:html|-||-|--><!--stopmacro--><p>text</p>'
-    ].map($.proxy(testUtils.assertNoChangeAfterDataRoundTrip, testUtils, editor))).then(done);
+    ].map(testUtils.assertNoChangeAfterDataRoundTrip.bind(testUtils, editor))).then(done);
   });
 
   it('protects empty elements in macro output', function(done) {

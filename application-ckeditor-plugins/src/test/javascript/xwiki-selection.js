@@ -50,7 +50,7 @@ define(['jquery', 'ckeditor', 'testUtils', 'xwiki-macro'], function($, CKEDITOR,
         '<p>after</p>', {
         callback: function() {
           assertWidgetRemainsSelected('macro:info')
-            .then($.proxy(assertWidgetRemainsSelected, null, 'macro:warning'))
+            .then(assertWidgetRemainsSelected.bind(null, 'macro:warning'))
             .done(done);
         }
       });

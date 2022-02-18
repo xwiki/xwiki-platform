@@ -462,8 +462,8 @@
           // We don't add the event listener onLoad because the resource reference field is initialized later.
           this.resourceReferenceField = this.getDialog().getContentElement('info', 'resourceReference');
           // Update the wiki generated link content whenever a new resource is selected.
-          $(this.resourceReferenceField.getElement().$).on('selectResource', $.proxy(this,
-            'maybeUpdateWikiGeneratedLinkContent'));
+          $(this.resourceReferenceField.getElement().$).on('selectResource',
+            this.maybeUpdateWikiGeneratedLinkContent.bind(this));
         }
         this.wikiGeneratedLinkContent = data.wikiGeneratedLinkContent;
         delete this.validationRequest;
@@ -471,12 +471,12 @@
       validate: function() {
         if (!this.validationRequest) {
           // Trigger a new validation.
-          this.validationRequest = this.validateAsync().always($.proxy(function() {
+          this.validationRequest = this.validateAsync().always((function() {
             // Re-submit the dialog after the current event is handled.
-            setTimeout($.proxy(function() {
+            setTimeout((function() {
               this.getDialog().click('ok');
-            }, this), 0);
-          }, this));
+            }).bind(this), 0);
+          }).bind(this));
           return false;
         } else if (this.validationRequest.state() === 'pending') {
           // Block the submit while the validation takes place.
@@ -513,16 +513,16 @@
       maybeUpdateWikiGeneratedLinkContent: function(event, resource) {
         var value = this.getValue();
         if (value === '' || value === this.wikiGeneratedLinkContent) {
-          return this.maybeGetWikiGeneratedLinkContent(resource).done($.proxy(function(wikiGeneratedLinkContent) {
+          return this.maybeGetWikiGeneratedLinkContent(resource).done((function(wikiGeneratedLinkContent) {
             this.setValue(wikiGeneratedLinkContent);
             this.wikiGeneratedLinkContent = wikiGeneratedLinkContent;
-          }, this)).fail($.proxy(function() {
+          }).bind(this)).fail((function() {
             if (value === '') {
               // Fall-back on the resource label.
               this.setValue(this.getResourceLabel(resource));
             }
             delete this.wikiGeneratedLinkContent;
-          }, this));
+          }).bind(this));
         } else {
           return $.Deferred().resolve();
         }
@@ -544,17 +544,17 @@
         }
       },
       getWikiGeneratedLinkContent: function(resource) {
-        var sendRequest = $.proxy(function() {
+        var sendRequest = (function() {
           this.getDialog().setState(CKEDITOR.DIALOG_STATE_BUSY);
           var resourceReference = (resource && resource.reference) || {};
           var config = this.getDialog().getParentEditor().config['xwiki-link'] || {};
           return $.get(config.labelGenerator, resourceReference).then(function(html) {
             // Extract the wiki generated link content from the HTML.
             return $(html).find('.wikigeneratedlinkcontent').text();
-          }).always($.proxy(function() {
+          }).always((function() {
             this.getDialog().setState(CKEDITOR.DIALOG_STATE_IDLE);
-          }, this));
-        }, this);
+          }).bind(this));
+        }).bind(this);
         // Wait until the previous request is handled, by chaining the requests.
         this.wikiGeneratedLinkContentRequest = (this.wikiGeneratedLinkContentRequest || $.Deferred().resolve())
           .then(sendRequest, sendRequest);

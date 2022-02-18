@@ -55,9 +55,9 @@
       // The source command is not registered if the editor is loaded in-line.
       var sourceCommand = editor.getCommand('source');
       if (sourceCommand) {
-        editor.on('beforeSetMode', jQuery.proxy(this.onBeforeSetMode, this));
-        editor.on('beforeModeUnload', jQuery.proxy(this.onBeforeModeUnload, this));
-        editor.on('mode', jQuery.proxy(this.onMode, this));
+        editor.on('beforeSetMode', this.onBeforeSetMode.bind(this));
+        editor.on('beforeModeUnload', this.onBeforeModeUnload.bind(this));
+        editor.on('mode', this.onMode.bind(this));
 
         // The default source command is not asynchronous so it becomes (re)enabled right after the editing mode is
         // changed. In our case switching between WYSIWYG and Source mode is asynchronous because we need to convert the
@@ -115,7 +115,7 @@
         promise = jQuery.Deferred().resolve(editor);
       }
       if (promise) {
-        promise.always(jQuery.proxy(this, 'endLoading')).done(jQuery.proxy(editor, 'fire', 'modeReady'));
+        promise.always(this.endLoading.bind(this)).done(editor.fire.bind(editor, 'modeReady'));
       }
     },
 
@@ -127,7 +127,7 @@
       } else {
         var deferred = jQuery.Deferred();
         editor.setData(newMode.data, {
-          callback: jQuery.proxy(deferred, 'resolve', editor)
+          callback: deferred.resolve.bind(deferred, editor)
         });
         return deferred.promise();
       }

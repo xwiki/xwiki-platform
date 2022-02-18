@@ -708,8 +708,8 @@ define(
           .attr('data-macroId', macroId)
           .prop('requestNumber', requestNumber);
         macroService.getMacroDescriptor(macroId)
-          .done($.proxy(maybeCreateMacroEditor, macroEditor, requestNumber, macroCall))
-          .fail($.proxy(maybeShowError, macroEditor, requestNumber));
+          .done(maybeCreateMacroEditor.bind(macroEditor, requestNumber, macroCall))
+          .fail(maybeShowError.bind(macroEditor, requestNumber));
       }
     };
   },

@@ -59,7 +59,7 @@
 
   var maybeConvertSyntaxAndReload = function(editor, data) {
     editor.element.setAttribute('data-sourceDocumentSyntax', data.syntax.id);
-    return maybeConvertSyntax(editor, data).then($.proxy(reloadEditor, null, editor, data.syntax));
+    return maybeConvertSyntax(editor, data).then(reloadEditor.bind(null, editor, data.syntax));
   };
 
   var maybeConvertSyntax = function(editor, data) {
@@ -75,7 +75,7 @@
         text: editor.getData()
 
       // 2. Syntax conversion
-      }).then($.proxy(data.syntaxConverter, 'convert', data.syntax, data.previousSyntax))
+      }).then(data.syntaxConverter.convert.bind(data.syntaxConverter, data.syntax, data.previousSyntax))
 
       // 3. Wiki syntax to annotated XHTML
       .then(function(source) {
@@ -118,8 +118,8 @@
     editor.destroy(/* noUpdate: */ true);
     // Restore the previous edit mode and set the updated content after the editor is reloaded.
     data.promise = data.promise
-      .then($.proxy(maybeSetEditMode, null, mode, content))
-      .then($.proxy(setEditedContent, null, content))
+      .then(maybeSetEditMode.bind(null, mode, content))
+      .then(setEditedContent.bind(null, content))
       .done(function(editor) {
         if (!syntax.renderer) {
           // Disable the edit mode switch if the new syntax doesn't support the WYSIWYG edit mode..

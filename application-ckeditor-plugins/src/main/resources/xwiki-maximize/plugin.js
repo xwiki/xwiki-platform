@@ -152,19 +152,19 @@
 
     var enterFullScreenMode = function(editor) {
       // Remove the marker from the old editing area before switching modes (e.g. WYSIWYG to Source).
-      beforeModeUnloadListener = editor.on('beforeModeUnload', $.proxy(updateEditingArea, null, editor, true));
+      beforeModeUnloadListener = editor.on('beforeModeUnload', updateEditingArea.bind(null, editor, true));
 
       // Mark the new editing area after switching modes (e.g. WYSIWYG to Source). We register this listener with a
       // higher priority in order to make sure it is executed before the listener that restores the selection after the
       // editing mode changed.
-      modeListener = editor.on('mode', $.proxy(updateEditingArea, null, editor), null, null, 5);
+      modeListener = editor.on('mode', updateEditingArea.bind(null, editor), null, null, 5);
 
       // Leave the full-screen mode before destroying the editor in order to clean the full-screen markers.
       // Otherwise, the next editing session might start directly in full-screen mode.
-      beforeDestroyListener = editor.once('beforeDestroy', $.proxy(editor, 'execCommand', 'maximize'));
+      beforeDestroyListener = editor.once('beforeDestroy', editor.execCommand.bind(editor, 'maximize'));
 
       // Update the position and height of the editing area when the browser window is resized.
-      $(window).on('resize.maximize', $.proxy(updateEditingArea, null, editor));
+      $(window).on('resize.maximize', updateEditingArea.bind(null, editor));
 
       // Use a backdrop to hide the rest of the page content while the editor is maximized. This is needed especially
       // when switching editing modes while the editor is maximized because removing the current editable reveals the

@@ -217,7 +217,8 @@
           // after another. If we don't do this we may slow down the deletion of the characters on the screen.
           clearTimeout(thisPlugin.nbspTimeout);
           // Schedule the fix for the non-breaking space after the text node is split.
-          thisPlugin.nbspTimeout = setTimeout($.proxy(thisPlugin, 'maybeFixNonBreakingSpaceAfterDelete', editor), 0);
+          thisPlugin.nbspTimeout = setTimeout(thisPlugin.maybeFixNonBreakingSpaceAfterDelete.bind(thisPlugin, editor),
+            0);
         }
       });
     },

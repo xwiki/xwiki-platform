@@ -164,7 +164,7 @@
       'data-syntax': 'syntax' in config ? config['syntax'] : 'annotatedxhtml/1.0'
     }).each(function() {
       try {
-        createEditor(ckeditor, this, config).done($.proxy(config.deferred, 'resolve', config.document));
+        createEditor(ckeditor, this, config).done(config.deferred.resolve.bind(config.deferred, config.document));
       } catch (e) {
         console.log(e);
         new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
@@ -197,7 +197,7 @@
     });
     editor.once('reload', function(event) {
       $(document).off(['xwiki:actions:view.contentEditor', 'xwiki:actions:beforeSave.contentEditor'].join(' '));
-      event.data.promise = event.data.promise.then($.proxy(createEditor, null, ckeditor, element, config));
+      event.data.promise = event.data.promise.then(createEditor.bind(null, ckeditor, element, config));
     });
     $(document).on('xwiki:actions:beforeSave.contentEditor', function(event) {
       config.document[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();

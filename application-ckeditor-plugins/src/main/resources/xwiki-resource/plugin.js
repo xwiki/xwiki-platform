@@ -103,12 +103,12 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
           // before creating the resource picker because we need to catch the first changeResourceType event in order to
           // update the label (it won't be fired again when we set the value of the resource input unless the resource
           // type is different).
-          $(this.getElement().$).on('changeResourceType', $.proxy(this, 'onResourceTypeChange'))
+          $(this.getElement().$).on('changeResourceType', this.onResourceTypeChange.bind(this))
             .find('input').resourcePicker({resourceTypes: this.resourceTypes});
           // We register the selectResource event listener after creating the resource picker because we don't care
           // about the first selectResource event since we're going to trigger another one anyway by setting the value
           // of the resource input when the dialog is shown.
-          $(this.getElement().$).on('selectResource', $.proxy(this, 'onSelectResource'));
+          $(this.getElement().$).on('selectResource', this.onSelectResource.bind(this));
           // Fix the tab-key navigation.
           var resourceTypeDropDownToggle = this.getElement().findOne('.dropdown-toggle');
           var resourceTypeButton = this.getElement().findOne('button.resourceType');

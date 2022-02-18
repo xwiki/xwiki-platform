@@ -235,12 +235,12 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
 
   addMacroSelectorBehaviour = function(macroSelector) {
     macroSelector.on('click', '.macro-categories a', changeMacroCategory);
-    macroSelector.on('change', '.macro-categories', $.proxy(filterMacros, macroSelector));
+    macroSelector.on('change', '.macro-categories', filterMacros.bind(macroSelector));
 
     var timeoutId;
     macroSelector.on('input', '.macro-textFilter', function() {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout($.proxy(filterMacros, macroSelector), 500);
+      timeoutId = setTimeout(filterMacros.bind(macroSelector), 500);
     });
 
     macroSelector.on('click', '.macro-list > li', function() {
@@ -305,8 +305,8 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
         macroSelector.empty().addClass('loading')
           .attr('data-syntaxId', syntaxId)
           .prop('requestNumber', requestNumber);
-        getMacros(syntaxId).done($.proxy(maybeDisplayMacros, macroSelector, requestNumber))
-          .fail($.proxy(maybeShowError, macroSelector, requestNumber));
+        getMacros(syntaxId).done(maybeDisplayMacros.bind(macroSelector, requestNumber))
+          .fail(maybeShowError.bind(macroSelector, requestNumber));
       }
     };
   },

@@ -814,9 +814,9 @@ require(['jquery'], function($) {
   var createEditor = function(ckeditor, textArea, instanceConfig) {
     var deferred = $.Deferred();
     var editor = ckeditor.replace(textArea, instanceConfig);
-    editor.once('instanceReady', $.proxy(deferred, 'resolve', editor));
+    editor.once('instanceReady', deferred.resolve.bind(deferred, editor));
     editor.once('reload', function(event) {
-      event.data.promise = event.data.promise.then($.proxy(createEditor, null, ckeditor, textArea));
+      event.data.promise = event.data.promise.then(createEditor.bind(null, ckeditor, textArea));
     });
     return deferred.promise();
   };

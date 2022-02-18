@@ -90,12 +90,12 @@
             refresh: function() {
               // Disable the menu button if all the menu items are disabled. We do this with a short delay in order to
               // make sure that the state of the menu items has been updated.
-              setTimeout($.proxy(function() {
+              setTimeout((function() {
                 var enabled = activeMenuItems.some(function(item) {
                   return editor.commands[item.command].state;
                 });
                 this.setState(enabled ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_DISABLED);
-              }, this), 0);
+              }).bind(this), 0);
             }
           });
         }

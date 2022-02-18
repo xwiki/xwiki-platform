@@ -181,7 +181,7 @@ define('resourcePicker', [
         reference: resourcePicker.find('input.resourceReference').val()
       };
     }
-    $resource.pickers[resourceReference.type](resourceReference).done($.proxy(selectResource, resourcePicker));
+    $resource.pickers[resourceReference.type](resourceReference).done(selectResource.bind(resourcePicker));
   };
 
   var selectResource = function(resource) {
@@ -290,7 +290,7 @@ define('resourcePicker', [
     var suggester = $resource.suggesters[data.newValue];
     if (suggester) {
       resourceReferenceInput.on('keydown', stopPropagationIfShowingSuggestions).typeahead({
-        afterSelect: $.proxy(selectResource, resourcePicker),
+        afterSelect: selectResource.bind(resourcePicker),
         delay: 500,
         displayText: function(resource) {
           // HACK: The string returned by this function is passed to the highlighter where we need to access all the

@@ -103,7 +103,7 @@ public class DefaultHTMLConverterTest
         assertEquals("", this.converter.fromHTML(html, syntaxId));
 
         // Verify the HTML is converted to the specified syntax.
-        StreamParser xhtmlStreamParser = this.componentManager.getInstance(StreamParser.class, "html/5.0");
+        StreamParser xhtmlStreamParser = this.componentManager.getInstance(StreamParser.class, "xhtml/5");
         verify(xhtmlStreamParser).parse(any(StringReader.class), same(printRenderer));
     }
 
@@ -155,7 +155,7 @@ public class DefaultHTMLConverterTest
 
         // Verify the HTML is parsed into XDOM.
         XDOM xdom = new XDOM(Collections.emptyList());
-        Parser xhtmlParser = this.componentManager.getInstance(Parser.class, "html/5.0");
+        Parser xhtmlParser = this.componentManager.getInstance(Parser.class, "xhtml/5");
         when(xhtmlParser.parse(any(StringReader.class))).thenReturn(xdom);
 
         assertEquals("", this.converter.parseAndRender(html, syntaxId));

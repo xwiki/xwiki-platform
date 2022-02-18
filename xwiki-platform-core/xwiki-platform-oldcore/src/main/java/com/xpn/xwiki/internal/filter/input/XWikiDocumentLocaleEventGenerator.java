@@ -185,7 +185,7 @@ public class XWikiDocumentLocaleEventGenerator
         revisionParameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, document.isHidden());
 
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR, toString(document.getAuthors().getEffectiveMetadataAuthor()));
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR, toString(document.getAuthors().getEffectiveMetadataAuthor()));
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR, toString(document.getAuthors().getOriginalMetadataAuthor()));
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, document.getComment());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_DATE, document.getDate());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_MINOR, document.isMinorEdit());

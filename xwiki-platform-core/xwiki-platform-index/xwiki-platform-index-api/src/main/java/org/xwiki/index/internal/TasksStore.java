@@ -30,7 +30,6 @@ import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -54,9 +53,6 @@ public class TasksStore extends XWikiHibernateBaseStore
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     /**
      * Retrieve the list of all the tasks queued for a given wiki for the current instance.
@@ -164,14 +160,18 @@ public class TasksStore extends XWikiHibernateBaseStore
 
     private <T> T initWikiContext(Lambda<T> r, String wikiId) throws XWikiException
     {
+        ExecutionContext executionContext = new ExecutionContext();
         try {
-            this.contextManager.initialize(new ExecutionContext());
+            this.contextManager.pushContext(executionContext, false);
+            this.contextManager.initialize(executionContext);
 
             XWikiContext xWikiContext = this.xcontextProvider.get();
             xWikiContext.setWikiId(wikiId);
             return r.call(xWikiContext);
         } catch (Exception e) {
             throw new XWikiException("Failed to executed the task in the context", e);
+        } finally {
+            this.contextManager.popContext();
         }
     }
 

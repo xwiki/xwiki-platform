@@ -36,6 +36,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.index.TaskManager;
 import org.xwiki.index.internal.jmx.JMXTasks;
 import org.xwiki.management.JMXBeanRegistration;
@@ -43,6 +44,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
+import com.xpn.xwiki.XWikiContextInitializer;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTaskId;
@@ -78,6 +80,9 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
 
     @Inject
     private TaskExecutor taskExecutor;
+
+    @Inject
+    private XWikiContextInitializer xWikiContextInitializer;
 
     @Inject
     private Logger logger;
@@ -218,12 +223,15 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
     private void initQueue() throws InitializationException
     {
         try {
+            this.xWikiContextInitializer.initialize(new ExecutionContext());
             // Load the tasks for all wikis.
             for (String wikiId : this.wikiDescriptorManager.getAllIds()) {
                 loadWiki(wikiId);
             }
         } catch (WikiManagerException e) {
             throw new InitializationException("Failed to list the wiki IDs.", e);
+        } catch (XWikiException e) {
+            throw new InitializationException("Error when initializing XWikiContext", e);
         }
     }
 

@@ -22,7 +22,6 @@ package org.xwiki.image.lightbox.test.po;
 import static org.openqa.selenium.support.ui.ExpectedConditions.attributeToBe;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -41,6 +40,11 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class Lightbox extends BaseElement
 {
+    public Lightbox()
+    {
+        waitUntilReady();
+    }
+
     public boolean isDisplayed()
     {
         try {
@@ -135,10 +139,9 @@ public class Lightbox extends BaseElement
         waitForSlide(nextSlideIndex);
     }
 
-    public Optional<WebElement> toggleFullscreen()
+    public boolean toggleFullscreen()
     {
-        WebElement fullscreen = getFullscreenElement();
-        boolean wasFullscreenOn = fullscreen != null && fullscreen.isDisplayed();
+        boolean waitForFullscreenOff = isFullscreenOn();
 
         By fullscreenSelector = By.cssSelector("#blueimp-gallery .fullscreen");
         getDriver().findElement(fullscreenSelector).click();
@@ -148,21 +151,21 @@ public class Lightbox extends BaseElement
             @Override
             public Boolean apply(WebDriver driver)
             {
-                WebElement fullscreen = getFullscreenElement();
-                return wasFullscreenOn ? fullscreen == null : (fullscreen != null && fullscreen.isDisplayed());
+                return waitForFullscreenOff ? !isFullscreenOn() : isFullscreenOn();
             }
 
         });
 
-        return Optional.ofNullable(getFullscreenElement());
+        return isFullscreenOn();
     }
 
-    private WebElement getFullscreenElement()
+    private boolean isFullscreenOn()
     {
         JavascriptExecutor js = ((JavascriptExecutor) getDriver());
         WebElement fullscreen =
             (WebElement) js.executeScript("var element = document.fullscreenElement; return element");
-        return fullscreen;
+
+        return fullscreen != null && fullscreen.isDisplayed();
     }
 
     public void clickThumbnail(int index)
@@ -179,4 +182,10 @@ public class Lightbox extends BaseElement
         getDriver().findElement(slideshowSelector).click();
     }
 
+    private Lightbox waitUntilReady()
+    {
+        getDriver().waitUntilElementIsVisible(By.className("blueimp-gallery-display"));
+
+        return this;
+    }
 }

@@ -19,11 +19,8 @@
  */
 package org.xwiki.image.lightbox.test.po;
 
-import java.util.Optional;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -35,18 +32,16 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class ImagePopover extends BaseElement
 {
-    public Optional<Lightbox> openLightbox(int index)
+    public ImagePopover()
     {
-        try {
-            By lightboxButtonSelector = By.cssSelector(".popover .openLightbox");
-            getDriver().waitUntilElementIsVisible(lightboxButtonSelector);
-            getDriver().findElementWithoutWaiting(lightboxButtonSelector).click();
-            getDriver().waitUntilElementIsVisible(By.className("blueimp-gallery-display"));
+        waitUntilReady();
+    }
 
-            return Optional.of(new Lightbox());
-        } catch (TimeoutException e) {
-            return Optional.empty();
-        }
+    public Lightbox openLightbox(int index)
+    {
+        getDriver().findElementWithoutWaiting(By.cssSelector(".popover .openLightbox")).click();
+
+        return new Lightbox();
     }
 
     public boolean isImagePopoverDisplayed()
@@ -63,5 +58,14 @@ public class ImagePopover extends BaseElement
     {
         By downloadSelector = By.cssSelector(".popover .imageDownload");
         return getDriver().findElement(downloadSelector);
+    }
+
+    private ImagePopover waitUntilReady()
+    {
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".popover .imageDownload"));
+        // This attribute is set when the show transition of the popover is complete.
+        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.cssSelector(".popover .imageDownload"), "download");
+
+        return this;
     }
 }

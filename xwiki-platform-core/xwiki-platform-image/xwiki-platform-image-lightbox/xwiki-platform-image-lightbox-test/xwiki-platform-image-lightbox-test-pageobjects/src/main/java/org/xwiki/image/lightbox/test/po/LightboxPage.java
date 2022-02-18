@@ -54,11 +54,6 @@ public class LightboxPage extends ViewPage
             // mouse is moved over the image.
             showPopup(image);
 
-            getDriver().waitUntilElementIsVisible(By.cssSelector(".popover .imageDownload"));
-            // This attribute is set when the show transition of the popover is complete.
-            getDriver().waitUntilElementHasNonEmptyAttributeValue(By.cssSelector(".popover .imageDownload"),
-                "download");
-
             return Optional.of(new ImagePopover());
         } catch (TimeoutException e) {
             return Optional.empty();
@@ -78,16 +73,9 @@ public class LightboxPage extends ViewPage
         return images.get(index);
     }
 
-    public Optional<Lightbox> openLightboxAtImage(int index)
+    public Lightbox openLightboxAtImage(int index)
     {
-        Optional<ImagePopover> imagePopover = hoverImage(index);
-
-        if (imagePopover.isPresent()) {
-            return imagePopover.get().openLightbox(index);
-        } else {
-            return Optional.empty();
-        }
-
+        return hoverImage(index).get().openLightbox(index);
     }
 
     private File getFileToUpload(String testResourcePath, String filename)

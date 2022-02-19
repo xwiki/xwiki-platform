@@ -24,15 +24,38 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-image-lightbox</artifactId>
     <version>14.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-image</artifactId>
-  <name>XWiki Platform - Image - Parent POM</name>
-  <description>XWiki Platform - Image - Parent POM</description>
-  <packaging>pom</packaging>
-  <modules>
-    <module>xwiki-platform-image-lightbox</module>
-    <module>xwiki-platform-image-processing</module>
-  </modules>
+  <packaging>webjar</packaging>
+  <artifactId>xwiki-platform-image-lightbox-webjar</artifactId>
+  <name>XWiki Platform - Image - Lightbox - WebJar</name>
+  <description>JavaScript resources required by the lightbox image module.</description>
+  <properties>
+    <!-- Name to display in the Extension Manager -->
+    <xwiki.extension.name>Image Lightbox WebJar</xwiki.extension.name>
+    <gallery.version>3.4.0</gallery.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>webjar-blueimp-gallery</artifactId>
+      <version>${gallery.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

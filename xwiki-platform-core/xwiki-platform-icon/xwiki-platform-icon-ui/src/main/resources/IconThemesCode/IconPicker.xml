@@ -308,7 +308,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   var createIconThemeSelector = function() {
     iconThemeSelector = $(document.createElement('select'));
     // Change the current icon theme where the selector is used
-    iconThemeSelector.on('change, function() {
+    iconThemeSelector.on('change', function() {
       currentIconTheme = iconThemeSelector.val();
       // Remove all the displayed icons
       $('.xwikiIconPickerIcon').remove();

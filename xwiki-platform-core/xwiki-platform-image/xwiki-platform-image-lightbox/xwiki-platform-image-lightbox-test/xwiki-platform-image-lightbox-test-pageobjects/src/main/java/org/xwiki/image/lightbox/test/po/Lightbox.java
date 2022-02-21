@@ -57,8 +57,15 @@ public class Lightbox extends BaseElement
     public boolean waitForSlide(int index)
     {
         try {
+            int thumbnailIndex = index + 1;
+            By thumbnailSelector = By.xpath(
+                ".//div[@id=\"blueimp-gallery\"]/ol[contains(@class, \"indicator\")]/li[" + thumbnailIndex + " ]");
+            getDriver().waitUntilElementIsVisible(thumbnailSelector);
+            getDriver().waitUntilElementHasAttributeValue(thumbnailSelector, "class", "active");
+
             By slideSelector = By.cssSelector("#blueimp-gallery .slide-active");
             getDriver().waitUntilCondition(attributeToBe(slideSelector, "data-index", String.valueOf(index)));
+
             return getDriver().findElement(slideSelector).isDisplayed();
         } catch (TimeoutException e) {
             return false;

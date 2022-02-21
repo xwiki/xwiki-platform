@@ -37,6 +37,8 @@ import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.index.TaskManager;
 import org.xwiki.index.internal.jmx.JMXTasks;
 import org.xwiki.management.JMXBeanRegistration;
@@ -44,7 +46,6 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
-import com.xpn.xwiki.XWikiContextInitializer;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTaskId;
@@ -82,7 +83,7 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
     private TaskExecutor taskExecutor;
 
     @Inject
-    private XWikiContextInitializer xWikiContextInitializer;
+    private ExecutionContextManager executionContextManager;
 
     @Inject
     private Logger logger;
@@ -213,7 +214,7 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
                     task.setTimestamp(System.currentTimeMillis());
                     this.queue.put(task);
                 } else {
-                    this.logger.error("[{}] abandoned because it has failed to many times.", task);
+                    this.logger.error("[{}] abandoned because it has failed too many times.", task);
                     task.getFuture().cancel(false);
                 }
             }
@@ -223,15 +224,15 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
     private void initQueue() throws InitializationException
     {
         try {
-            this.xWikiContextInitializer.initialize(new ExecutionContext());
+            this.executionContextManager.initialize(new ExecutionContext());
             // Load the tasks for all wikis.
             for (String wikiId : this.wikiDescriptorManager.getAllIds()) {
                 loadWiki(wikiId);
             }
         } catch (WikiManagerException e) {
             throw new InitializationException("Failed to list the wiki IDs.", e);
-        } catch (XWikiException e) {
-            throw new InitializationException("Error when initializing XWikiContext", e);
+        } catch (ExecutionContextException e) {
+            throw new InitializationException("Error when initializing the execution context.", e);
         }
     }
 

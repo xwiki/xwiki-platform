@@ -55,6 +55,15 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- The JavaScript code used in the Navigation panel configuration and the Applications panel configuration needs
+      to display localized messages and for this it needs to fetch them through REST so we need an implementation of the
+      localization REST API. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-rest-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

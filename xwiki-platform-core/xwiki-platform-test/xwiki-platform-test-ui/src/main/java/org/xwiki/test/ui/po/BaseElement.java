@@ -153,21 +153,21 @@ public class BaseElement
         // machine, etc).
         try {
             getDriver().waitUntilJavascriptCondition(
-                "return typeof window !== 'undefined' && window != null && typeof window.jQuery !== 'undefined' "
-                    + "&& window.jQuery != null && window.jQuery().dropdown != null");
+                "return typeof window === 'object' && window !== null && typeof window.jQuery === 'function' "
+                    + "&& typeof window.jQuery().dropdown === 'function'");
         } catch (TimeoutException e) {
             LOGGER.error("Wait for JQuery took more than [{}] seconds", getDriver().getTimeout(), e);
             getDriver().waitUntilJavascriptCondition(
-                "return typeof window !== 'undefined' && window != null && typeof window.jQuery !== 'undefined' "
-                    + "&& window.jQuery != null && window.jQuery().dropdown != null");
+                "return typeof window === 'object' && window !== null && typeof window.jQuery === 'function' "
+                    + "&& typeof window.jQuery().dropdown === 'function'");
         }
 
         // Make sure all asynchronous elements have been executed
         // Note: document.getElementsByClassName() always return a non-null array so we don't need to test for null.
-        getDriver().waitUntilJavascriptCondition("return typeof document !== 'undefined' && document != null "
+        getDriver().waitUntilJavascriptCondition("return typeof document === 'object' && document !== null "
             + "&& !document.getElementsByClassName('xwiki-async').length");
 
         // Make sure the shortcuts are loaded
-        getDriver().waitUntilJavascriptCondition("return typeof shortcut !== 'undefined' && shortcut != null");
+        getDriver().waitUntilJavascriptCondition("return typeof shortcut === 'object' && shortcut !== null");
     }
 }

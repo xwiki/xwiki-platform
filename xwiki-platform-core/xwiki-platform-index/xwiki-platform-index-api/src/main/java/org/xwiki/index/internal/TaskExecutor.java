@@ -26,6 +26,9 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.index.IndexException;
 import org.xwiki.index.TaskConsumer;
 
@@ -45,7 +48,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class TaskExecutor
 {
     @Inject
-    private Provider<XWikiContext> contextProvider;
+    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     private Provider<TasksStore> tasksStore;
@@ -56,6 +59,9 @@ public class TaskExecutor
     @Inject
     private Provider<ComponentManager> componentManager;
 
+    @Inject
+    private ExecutionContextManager contextManager;
+
     /**
      * Execute a task by initializing its context, and resolving the task consumer according to the task type.
      *
@@ -64,22 +70,30 @@ public class TaskExecutor
      */
     public void execute(TaskData task) throws IndexException
     {
-        XWikiContext context = this.contextProvider.get();
-        String oldWikId = context.getWikiId();
+        ExecutionContext executionContext = new ExecutionContext();
         try {
-            context.setWikiId(task.getWikiId());
-            XWikiDocument document = this.tasksStore.get().getDocument(task.getWikiId(), task.getDocId());
-            XWikiDocument doc = this.documentRevisionProvider.getRevision(document, task.getVersion());
-            this.componentManager.get().<TaskConsumer>getInstance(TaskConsumer.class, task.getType())
-                .consume(doc.getDocumentReference(), doc.getVersion());
-            task.getFuture().complete(task);
-            this.tasksStore.get().deleteTask(task.getWikiId(), task.getDocId(), task.getVersion(), task.getType());
+            this.contextManager.pushContext(executionContext, false);
+            this.contextManager.initialize(executionContext);
+
+            XWikiContext xWikiContext = this.xcontextProvider.get();
+            xWikiContext.setWikiId(task.getWikiId());
+            internalExecute(task);
         } catch (ComponentLookupException e) {
             throw new IndexException(String.format("Failed to find a task consumer for task [%s]", task), e);
-        } catch (XWikiException e) {
+        } catch (ExecutionContextException | XWikiException e) {
             throw new IndexException(String.format("Error during the execution of task [%s]", task), e);
         } finally {
-            context.setWikiId(oldWikId);
+            this.contextManager.popContext();
         }
+    }
+
+    private void internalExecute(TaskData task) throws XWikiException, IndexException, ComponentLookupException
+    {
+        XWikiDocument document = this.tasksStore.get().getDocument(task.getWikiId(), task.getDocId());
+        XWikiDocument doc = this.documentRevisionProvider.getRevision(document, task.getVersion());
+        this.componentManager.get().<TaskConsumer>getInstance(TaskConsumer.class, task.getType())
+            .consume(doc.getDocumentReference(), doc.getVersion());
+        task.getFuture().complete(task);
+        this.tasksStore.get().deleteTask(task.getWikiId(), task.getDocId(), task.getVersion(), task.getType());
     }
 }

@@ -22,7 +22,6 @@ package org.xwiki.mentions.internal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.context.Execution;
 import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.events.NewMentionsEvent;
@@ -68,9 +67,6 @@ class DefaultMentionsDataConsumerTest
     private DefaultMentionsDataConsumer dataConsumer;
 
     @MockComponent
-    private Execution execution;
-
-    @MockComponent
     private DocumentRevisionProvider documentRevisionProvider;
 
     @MockComponent
@@ -107,7 +103,6 @@ class DefaultMentionsDataConsumerTest
         this.dataConsumer.consume(DOCUMENT_REFERENCE, "1.1");
 
         verifyNoInteractions(this.observationManager);
-        verify(this.execution).removeContext();
     }
 
     @Test
@@ -124,7 +119,6 @@ class DefaultMentionsDataConsumerTest
         verifyNoInteractions(this.updatedDocumentMentionsAnalyzer);
         verify(this.createdDocumentMentionsAnalyzer).analyze(this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE);
         verifyNoInteractions(this.observationManager);
-        verify(this.execution).removeContext();
     }
 
     @Test
@@ -149,7 +143,6 @@ class DefaultMentionsDataConsumerTest
             .analyze(this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE);
         verify(this.observationManager)
             .notify(isA(NewMentionsEvent.class), eq(AUTHOR_REFERENCE), eq(mentionNotificationParameters));
-        verify(this.execution).removeContext();
     }
 
     @Test
@@ -171,7 +164,6 @@ class DefaultMentionsDataConsumerTest
         verify(this.updatedDocumentMentionsAnalyzer).analyze(oldDoc, this.doc, DOCUMENT_REFERENCE, "1.1",
             AUTHOR_REFERENCE);
         verifyNoInteractions(this.observationManager);
-        verify(this.execution).removeContext();
     }
 
     @Test
@@ -198,6 +190,5 @@ class DefaultMentionsDataConsumerTest
             .analyze(oldDoc, this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE);
         verify(this.observationManager)
             .notify(isA(NewMentionsEvent.class), eq(AUTHOR_REFERENCE), eq(mentionNotificationParameters));
-        verify(this.execution).removeContext();
     }
 }

@@ -28,7 +28,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.index.IndexException;
 import org.xwiki.index.TaskConsumer;
 import org.xwiki.mentions.MentionsConfiguration;
@@ -63,9 +62,6 @@ import com.xpn.xwiki.objects.LargeStringProperty;
 @Named(MentionsConfiguration.MENTION_TASK_ID)
 public class DefaultMentionsDataConsumer implements TaskConsumer
 {
-    @Inject
-    private Execution execution;
-
     @Inject
     private DocumentRevisionProvider documentRevisionProvider;
 
@@ -105,8 +101,6 @@ public class DefaultMentionsDataConsumer implements TaskConsumer
             }
         } catch (XWikiException e) {
             throw new IndexException("Failed during the mention task execution", e);
-        } finally {
-            this.execution.removeContext();
         }
     }
 

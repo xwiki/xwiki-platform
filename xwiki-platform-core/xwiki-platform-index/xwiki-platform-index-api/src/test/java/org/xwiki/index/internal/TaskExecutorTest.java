@@ -26,6 +26,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.index.TaskConsumer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -39,6 +41,8 @@ import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +71,9 @@ class TaskExecutorTest
 
     @MockComponent
     private Provider<ComponentManager> componentManagerProvider;
+
+    @MockComponent
+    private ExecutionContextManager contextManager;
 
     @Mock
     private XWikiContext context;
@@ -111,7 +118,9 @@ class TaskExecutorTest
         this.taskExecutor.execute(task);
 
         verify(this.context).setWikiId("wikiId");
-        verify(this.context).setWikiId("oldWikiId");
+        verify(this.contextManager).pushContext(any(ExecutionContext.class), eq(false));
+        verify(this.contextManager).initialize(any(ExecutionContext.class));
+        verify(this.contextManager).popContext();
         verify(this.testTaskConsumer).consume(DOCUMENT_REFERENCE, "1.5");
         assertNotNull(task.getFuture().get());
         verify(this.tasksStore).deleteTask("wikiId", 42, "1.5", "testtask");

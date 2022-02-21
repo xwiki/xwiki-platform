@@ -33,7 +33,9 @@
   <description>Generic API for all WYSIWYG content editors.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
-    </properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>WYSIWYG Editor Module</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

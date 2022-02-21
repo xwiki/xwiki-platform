@@ -80,6 +80,7 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
+        lightboxPage = new LightboxPage();
 
         Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
         assertFalse(imagePopover.isPresent());
@@ -101,6 +102,7 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
+        lightboxPage = new LightboxPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -128,6 +130,7 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
+        lightboxPage = new LightboxPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -155,6 +158,7 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
+        lightboxPage = new LightboxPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -199,6 +203,7 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
+        lightboxPage = new LightboxPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -222,6 +227,7 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
+        lightboxPage = new LightboxPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -255,6 +261,7 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
+        lightboxPage = new LightboxPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -282,6 +289,7 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
+        lightboxPage = new LightboxPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -308,6 +316,7 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
+        lightboxPage = new LightboxPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -331,6 +340,7 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         testUtils.getDriver().navigate().refresh();
+        lightboxPage = new LightboxPage();
 
         // Verify the image popover download action.
         Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);

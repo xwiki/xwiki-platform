@@ -79,8 +79,7 @@ class LightboxIT
         lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
 
         // Make sure that the images are displayed.
-        testUtils.getDriver().navigate().refresh();
-        lightboxPage = new LightboxPage();
+        lightboxPage.reloadPage();
 
         Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
         assertFalse(imagePopover.isPresent());
@@ -101,8 +100,7 @@ class LightboxIT
             lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
 
         // Make sure that the images are displayed.
-        testUtils.getDriver().navigate().refresh();
-        lightboxPage = new LightboxPage();
+        lightboxPage.reloadPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -129,8 +127,7 @@ class LightboxIT
             lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
 
         // Make sure that the images are displayed.
-        testUtils.getDriver().navigate().refresh();
-        lightboxPage = new LightboxPage();
+        lightboxPage.reloadPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -157,8 +154,7 @@ class LightboxIT
             lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
 
         // Make sure that the images are displayed.
-        testUtils.getDriver().navigate().refresh();
-        lightboxPage = new LightboxPage();
+        lightboxPage.reloadPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -202,8 +198,7 @@ class LightboxIT
         lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
 
         // Make sure that the images are displayed.
-        testUtils.getDriver().navigate().refresh();
-        lightboxPage = new LightboxPage();
+        lightboxPage.reloadPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -226,8 +221,7 @@ class LightboxIT
         lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(1));
 
         // Make sure that the images are displayed.
-        testUtils.getDriver().navigate().refresh();
-        lightboxPage = new LightboxPage();
+        lightboxPage.reloadPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -260,8 +254,7 @@ class LightboxIT
         lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(1));
 
         // Make sure that the images are displayed.
-        testUtils.getDriver().navigate().refresh();
-        lightboxPage = new LightboxPage();
+        lightboxPage.reloadPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -288,8 +281,7 @@ class LightboxIT
         lightboxPage = new LightboxPage();
 
         // Make sure that the images are displayed.
-        testUtils.getDriver().navigate().refresh();
-        lightboxPage = new LightboxPage();
+        lightboxPage.reloadPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -315,8 +307,7 @@ class LightboxIT
         lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
 
         // Make sure that the images are displayed.
-        testUtils.getDriver().navigate().refresh();
-        lightboxPage = new LightboxPage();
+        lightboxPage.reloadPage();
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -339,8 +330,7 @@ class LightboxIT
         lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
 
         // Make sure that the images are displayed.
-        testUtils.getDriver().navigate().refresh();
-        lightboxPage = new LightboxPage();
+        lightboxPage.reloadPage();
 
         // Verify the image popover download action.
         Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);

@@ -41,6 +41,12 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class LightboxPage extends ViewPage
 {
+    public void reloadPage()
+    {
+        getDriver().navigate().refresh();
+        waitUntilPageJSIsLoaded();
+    }
+
     public Optional<ImagePopover> hoverImage(int index)
     {
         try {

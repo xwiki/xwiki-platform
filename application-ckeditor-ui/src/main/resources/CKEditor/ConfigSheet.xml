@@ -162,7 +162,7 @@
 });
 
 require(['jquery', 'xwiki-ckeditor', 'bootstrap-select'], function($, ckeditorPromise) {
-  $('.btn-default[data-confirmation]').on('click, function(event) {
+  $('.btn-default[data-confirmation]').on('click', function(event) {
     if (!window.confirm($(this).attr('data-confirmation'))) {
       event.preventDefault();
     }

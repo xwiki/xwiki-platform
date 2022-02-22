@@ -35,14 +35,14 @@ import org.xwiki.component.util.DefaultParameterizedType;
 public interface EntityReferenceSerializer<T>
 {
     /**
-     * Type instance for {@code EntityReferenceResolver<String>}.
+     * Type instance for {@code EntityReferenceSerializer<String>}.
      * 
      * @since 4.0M1
      */
     ParameterizedType TYPE_STRING = new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class);
 
     /**
-     * Type instance for {@code EntityReferenceResolver<EntityReference>}.
+     * Type instance for {@code EntityReferenceSerializer<EntityReference>}.
      * 
      * @since 4.0M1
      */

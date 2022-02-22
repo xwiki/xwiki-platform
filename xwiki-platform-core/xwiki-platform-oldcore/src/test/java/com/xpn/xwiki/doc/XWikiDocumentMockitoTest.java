@@ -52,6 +52,7 @@ import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserConfiguration;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
@@ -118,6 +119,13 @@ public class XWikiDocumentMockitoTest
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceDocumentReferenceResolver;
 
+    @MockComponent
+    private UserConfiguration userConfiguration;
+
+    @MockComponent
+    @Named("compactwiki/document")
+    private UserReferenceSerializer<String> compactWikiUserReferenceSerializer;
+
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
@@ -180,6 +188,8 @@ public class XWikiDocumentMockitoTest
         // Reset the cached (static) MetaClass instance because it may have been initialized during the execution of the
         // previous test classes, so before the StaticListMetaClass component needed by this test class was loaded.
         MetaClass.setMetaClass(null);
+
+        when(this.userConfiguration.getStoreHint()).thenReturn("document");
     }
 
     @Test
@@ -1741,5 +1751,31 @@ public class XWikiDocumentMockitoTest
         assertSame(attachment, this.document.getAttachmentList().get(0));
         assertNull(this.document.getAttachment("attachment"));
         assertSame(attachment, this.document.getAttachment("attachment2"));
+    }
+
+    @Test
+    void getMetaDataDiff() throws Exception
+    {
+        XWikiDocument prevDoc = new XWikiDocument(DOCUMENT_REFERENCE);
+        XWikiDocument nextDoc = new XWikiDocument(DOCUMENT_REFERENCE);
+        XWikiDocument thisDoc = new XWikiDocument(DOCUMENT_REFERENCE);
+
+        List<MetaDataDiff> diff = thisDoc.getMetaDataDiff(prevDoc, nextDoc, this.oldcore.getXWikiContext());
+        assertEquals(0, diff.size());
+
+        UserReference alice = mock(UserReference.class, "alice");
+        prevDoc.getAuthors().setOriginalMetadataAuthor(alice);
+
+        UserReference bob = mock(UserReference.class, "bob");
+        nextDoc.getAuthors().setOriginalMetadataAuthor(bob);
+
+        when(this.compactWikiUserReferenceSerializer.serialize(alice, DOCUMENT_REFERENCE)).thenReturn("XWiki.alice");
+        when(this.compactWikiUserReferenceSerializer.serialize(bob, DOCUMENT_REFERENCE)).thenReturn("XWiki.bob");
+
+        diff = thisDoc.getMetaDataDiff(prevDoc, nextDoc, this.oldcore.getXWikiContext());
+        assertEquals(1, diff.size());
+        assertEquals("author", diff.get(0).getField());
+        assertEquals("XWiki.alice", diff.get(0).getPrevValue());
+        assertEquals("XWiki.bob", diff.get(0).getNewValue());
     }
 }

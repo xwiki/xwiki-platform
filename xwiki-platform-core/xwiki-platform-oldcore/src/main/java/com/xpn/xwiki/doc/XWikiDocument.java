@@ -153,6 +153,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.UserConfiguration;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
@@ -404,6 +405,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private static LinkParser getLinkParser() {
         return Utils.getComponent(LinkParser.class);
+    }
+
+    /**
+     * @return the user module configuration, used for instance to determine where users are stored
+     */
+    private static UserConfiguration getUserConfiguration()
+    {
+        return Utils.getComponent(UserConfiguration.class);
     }
 
     private String title;
@@ -824,24 +833,27 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private UserReferenceSerializer<DocumentReference> getUserReferenceDocumentReferenceSerializer()
     {
-        return Utils.getComponent(
-            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
+        return Utils.getComponent(UserReferenceSerializer.TYPE_DOCUMENT_REFERENCE, "document");
     }
 
     private UserReferenceResolver<DocumentReference> getUserReferenceDocumentReferenceResolver()
     {
-        return Utils.getComponent(
-            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
+        return Utils.getComponent(UserReferenceResolver.TYPE_DOCUMENT_REFERENCE, "document");
     }
 
     private UserReferenceSerializer<String> getUserReferenceStringSerializer()
     {
-        return Utils.getComponent(new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
+        return Utils.getComponent(UserReferenceSerializer.TYPE_STRING);
     }
 
     private UserReferenceResolver<String> getUserReferenceStringResolver()
     {
-        return Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class, String.class));
+        return Utils.getComponent(UserReferenceResolver.TYPE_STRING);
+    }
+
+    private UserReferenceSerializer<String> getUserReferenceCompactWikiSerializer()
+    {
+        return Utils.getComponent(UserReferenceSerializer.TYPE_STRING, "compactwiki/document");
     }
 
     public XWikiStoreInterface getStore(XWikiContext context)
@@ -1878,6 +1890,41 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return userString;
+    }
+
+    /**
+     * @param userReference the user {@link DocumentReference} to convert to {@link String}
+     * @return the user as String
+     */
+    private String userReferenceToString(UserReference userReference)
+    {
+        // The user API is missing the concept of relative user references ATM so we're forced to check where the users
+        // are stored in order to make sure user references stored in the database are relative.
+        // See also XWIKI-19442: APIs to generate various String references from a UserReference
+        if ("document".equals(getUserConfiguration().getStoreHint())) {
+            // Users are stored as documents. We want the user references that are stored in the database to be relative
+            // as much as possible (because it makes the content portable). For this we omit the wiki reference when the
+            // user (profile document) reference is from the same wiki as this document.
+            return getUserReferenceCompactWikiSerializer().serialize(userReference, getDocumentReference());
+        } else {
+            return getUserReferenceStringSerializer().serialize(userReference);
+        }
+    }
+
+    /**
+     * @param userString the user {@link String} to convert to {@link UserReference}
+     * @return the user as {@link UserReference}
+     */
+    private UserReference userStringToUserReference(String userString)
+    {
+        // The user API is missing the concept of relative user references ATM so if we want to resolve (partial) user
+        // references that were stored in the database relative to this document then we need to check where the users
+        // are stored. See also XWIKI-19442: APIs to generate various String references from a UserReference
+        if ("document".equals(getUserConfiguration().getStoreHint())) {
+            return getUserReferenceStringResolver().resolve(userString, getDocumentReference().getWikiReference());
+        } else {
+            return getUserReferenceStringResolver().resolve(userString);
+        }
     }
 
     /**
@@ -6750,8 +6797,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         UserReference fromDocOriginalAuthor = fromDoc.getAuthors().getOriginalMetadataAuthor();
         UserReference toDocOriginalAuthor = toDoc.getAuthors().getOriginalMetadataAuthor();
         if (ObjectUtils.notEqual(fromDocOriginalAuthor, toDocOriginalAuthor)) {
-            list.add(new MetaDataDiff("author", getUserReferenceStringSerializer().serialize(fromDocOriginalAuthor),
-                getUserReferenceStringSerializer().serialize(toDocOriginalAuthor)));
+            list.add(new MetaDataDiff("author", userReferenceToString(fromDocOriginalAuthor),
+                userReferenceToString(toDocOriginalAuthor)));
         }
 
         if (ObjectUtils.notEqual(fromDoc.getDocumentReference(), toDoc.getDocumentReference())) {
@@ -9237,7 +9284,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             || this.getAuthors().getOriginalMetadataAuthor() == GuestUserReference.INSTANCE) {
             return "";
         } else {
-            return getUserReferenceStringSerializer().serialize(this.getAuthors().getOriginalMetadataAuthor());
+            return userReferenceToString(this.getAuthors().getOriginalMetadataAuthor());
         }
     }
 
@@ -9250,7 +9297,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private void setOriginalMetadataAuthorReference(String serializedUserReference)
     {
         if (!StringUtils.isEmpty(serializedUserReference)) {
-            UserReference userReference = getUserReferenceStringResolver().resolve(serializedUserReference);
+            UserReference userReference = userStringToUserReference(serializedUserReference);
             this.authors.setOriginalMetadataAuthor(userReference);
         }
     }

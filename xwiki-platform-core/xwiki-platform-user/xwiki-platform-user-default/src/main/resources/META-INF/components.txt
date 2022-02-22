@@ -21,6 +21,7 @@ org.xwiki.user.internal.document.DocumentStringUserReferenceSerializer
 org.xwiki.user.internal.document.NormalUserPreferencesConfigurationSource
 org.xwiki.user.internal.document.UserPreferencesConfigurationSource
 org.xwiki.user.internal.document.AllDocumentUserPropertiesResolver
+org.xwiki.user.internal.document.CompactWikiDocumentStringUserReferenceSerializer
 org.xwiki.user.internal.document.SecureAllDocumentUserPropertiesResolver
 org.xwiki.user.internal.document.CurrentUserReferenceResolver
 org.xwiki.user.internal.document.UserDocumentUserPropertiesResolver

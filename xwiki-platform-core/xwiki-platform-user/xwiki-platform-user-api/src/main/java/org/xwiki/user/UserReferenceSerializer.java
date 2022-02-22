@@ -19,7 +19,11 @@
  */
 package org.xwiki.user;
 
+import java.lang.reflect.ParameterizedType;
+
 import org.xwiki.component.annotation.Role;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Converts a {@link UserReference} into a serialized form (e.g. into a String representation).
@@ -32,8 +36,36 @@ import org.xwiki.component.annotation.Role;
 public interface UserReferenceSerializer<T>
 {
     /**
+     * Type instance for {@code UserReferenceSerializer<String>}.
+     * 
+     * @since 14.1RC1
+     */
+    ParameterizedType TYPE_STRING = new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class);
+
+    /**
+     * Type instance for {@code UserReferenceSerializer<DocumentReference>}.
+     * 
+     * @since 14.1RC1
+     */
+    ParameterizedType TYPE_DOCUMENT_REFERENCE =
+        new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class);
+
+    /**
      * @param userReference the user reference to serialize
      * @return the serialized representation
      */
     T serialize(UserReference userReference);
+
+    /**
+     * @param userReference the user reference to serialize
+     * @param parameters optional parameters that have a meaning only for the specific serializer implementation used
+     *            (for example a Document User Reference serializer might want to serialize the user reference relative
+     *            to another entity reference passed as parameter)
+     * @return the serialized representation
+     * @since 14.1RC1
+     */
+    default T serialize(UserReference userReference, Object... parameters)
+    {
+        return serialize(userReference);
+    }
 }

@@ -33,6 +33,11 @@
 }
 
 /* Dropdown styles */
+/* Override width: 100% defined in selectize.bootstrap3.css, see XWIKI-19453. */
+.selectize-dropdown {
+  width: auto;
+}
+
 .selectize-dropdown-left,
 .selectize-dropdown-right {
   margin-top: -3px;

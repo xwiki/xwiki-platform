@@ -602,7 +602,8 @@ public class DocumentSolrMetadataExtractorTest
     @Test
     public void testAttachmentExtractFromOpenDocument() throws Exception
     {
-        assertAttachmentExtract("OpenDocument content\n", "opendocument.odt");
+        // TODO: See XWIKI-19447 to decide if we should index the embedded content of OpenDocument files.
+        assertAttachmentExtract("OpenDocument content\nThumbnails/thumbnail.png\n\n", "opendocument.odt");
     }
 
     @Test

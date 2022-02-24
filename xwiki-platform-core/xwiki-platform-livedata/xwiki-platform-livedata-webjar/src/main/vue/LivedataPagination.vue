@@ -314,7 +314,6 @@ export default {
 
 .livedata-pagination {
   color: #777777;
-  margin-left: 1rem;
   font-size: 0.9em;
 }
 

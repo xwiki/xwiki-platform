@@ -558,6 +558,8 @@ viewers.Comments = Class.create({
       $('#openCommentForm').show();
       this.form["XWiki.XWikiComments_replyto"].value = "";
       this.cancelPreview(this.form);
+      // Cancel the edit mode so that leaving the page does not require confirmation.
+      $(document).trigger('xwiki:actions:cancel');
     }.bind(this));
   },
   /**

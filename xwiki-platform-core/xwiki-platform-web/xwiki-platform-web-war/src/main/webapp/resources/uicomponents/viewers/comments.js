@@ -232,7 +232,7 @@ viewers.Comments = Class.create({
     editActivator._x_editForm.hide();
     const commentNbr = this.extractCommentNumber(comment);
     const name = "XWiki.XWikiComments_" + commentNbr + "_comment";
-    this.destroyEditor("[name='" + name + "']", name);
+    this.destroyEditor("[name='" + name + "']");
     comment.show();
     this.resetForm();
     this.cancelPreview(editActivator._x_editForm);
@@ -350,7 +350,7 @@ viewers.Comments = Class.create({
                   name = "XWiki.XWikiComments_" + commentNbr + "_comment";
                 }
               }
-              this.destroyEditor("[name='" + name + "']", name);
+              this.destroyEditor("[name='" + name + "']");
 
               if (this.requestSucceeded) {
                 this.container.update(response.responseText);
@@ -555,7 +555,7 @@ viewers.Comments = Class.create({
    * Registers a listener that watches for the insertion of the Comments tab and triggers the enhancements.
    * After that, the listener removes itself, since it is no longer needed.
    */
-  addTabLoadListener: function (event) {
+  addTabLoadListener: function () {
     var listener = function (event) {
       if (event.memo.id == 'Comments') {
         this.startup();
@@ -563,7 +563,7 @@ viewers.Comments = Class.create({
     }.bindAsEventListener(this);
     document.observe("xwiki:docextra:loaded", listener);
   },
-  destroyEditor: function (selector, name) {
+  destroyEditor: function (selector) {
     require(['jquery', 'xwiki-events-bridge'], function ($) {
       $(document).trigger('xwiki:actions:cancel');
       if ($(selector).length) {
@@ -585,7 +585,7 @@ viewers.Comments = Class.create({
 
     var content = options.content || {};
 
-    this.destroyEditor("[name='" + name + "']", name);
+    this.destroyEditor("[name='" + name + "']");
 
     require(['jquery', 'xwiki-events-bridge'], function ($) {
       if ($(".commenteditor").length) {

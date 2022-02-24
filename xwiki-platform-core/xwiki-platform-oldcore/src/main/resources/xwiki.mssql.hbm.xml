@@ -158,17 +158,16 @@
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiLink" table="xwikilinks">
-        <composite-id unsaved-value="undefined">
-            <key-property name="docId" column="XWL_DOC_ID" type="long" />
-            <key-property name="link" type="string" length="255">
-                <column name="XWL_LINK" index="XWLNK_LINK" />
-            </key-property>
-            <key-property name="type" type="string" >
-                <column name="XWL_TYPE" default="'document'" length="255" />
-            </key-property>
-        </composite-id>
-        <property name="fullName" type="string" column="XWL_FULLNAME" length="255" />
-        <property name="attachmentName" type="string" column="XWL_ATTACHMENT_NAME" length="768" />
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWL_ID" not-null="true" default="0"/>
+            <generator class="assigned"/>
+        </id>
+        <property name="docId" column="XWL_DOC_ID" type="long" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="link" type="string" column="XWL_LINK" length="255" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="type" type="string" column="XWL_TYPE" length="255" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="fullName" type="string" column="XWL_FULLNAME" length="255" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="attachmentName" type="string" column="XWL_ATTACHMENT_NAME" length="255"
+          unique-key="XWL_UNIQUE_CONSTRAINT"/>
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">

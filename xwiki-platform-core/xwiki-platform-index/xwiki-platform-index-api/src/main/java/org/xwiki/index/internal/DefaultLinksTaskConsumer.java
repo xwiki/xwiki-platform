@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.index.IndexException;
 import org.xwiki.index.TaskConsumer;
@@ -57,6 +58,9 @@ public class DefaultLinksTaskConsumer implements TaskConsumer
     @Inject
     private DocumentRevisionProvider documentRevisionProvider;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public void consume(DocumentReference documentReference, String version) throws IndexException
     {
@@ -66,16 +70,33 @@ public class DefaultLinksTaskConsumer implements TaskConsumer
         if (context.getWiki().hasBacklinks(context)) {
             try {
                 XWikiDocument doc = this.documentRevisionProvider.getRevision(documentReference, version);
-
-                XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
-                hibernateStore.beginTransaction(context);
-                hibernateStore.saveLinks(doc, context, false);
-                hibernateStore.endTransaction(context, true);
+                // Verify that the document has not been removed in the meantime.
+                if (doc != null) {
+                    XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+                    hibernateStore.beginTransaction(context);
+                    try {
+                        hibernateStore.saveLinks(doc, context, false);
+                    } finally {
+                        endTransaction(context, hibernateStore);
+                    }
+                }
             } catch (XWikiException e) {
                 throw new IndexException(
                     String.format("Failed to updated links for document [%s] version [%s].", documentReference,
                         version), e);
             }
+        } else {
+            this.logger.warn(
+                "Skipping for document [{}] version [{}] because backlinks are not supported in this wiki.",
+                documentReference, version);
+        }
+    }
+
+    private void endTransaction(XWikiContext context, XWikiHibernateStore hibernateStore)
+    {
+        try {
+            hibernateStore.endTransaction(context, true);
+        } catch (Exception e) {
         }
     }
 }

@@ -31,8 +31,6 @@ import org.xwiki.index.TaskManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.migration.DataMigrationException;
@@ -50,16 +48,13 @@ import static org.xwiki.index.internal.DefaultLinksTaskConsumer.LINKS_TASK_TYPE;
 // TODO: Implement DataMigration once XWIKI-19399 is fixed.
 @Component
 @Singleton
-@Named(R14010XWIKI19352DataMigration.HINT)
-public class R14010XWIKI19352DataMigration implements HibernateDataMigration
+@Named(R1402000XWIKI19352DataMigration.HINT)
+public class R1402000XWIKI19352DataMigration implements HibernateDataMigration
 {
     /**
      * The hint for this component.
      */
-    public static final String HINT = "R14010XWIKI19352";
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    public static final String HINT = "R1402000XWIKI19352";
 
     @Inject
     private QueryManager queryManager;
@@ -85,39 +80,27 @@ public class R14010XWIKI19352DataMigration implements HibernateDataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(140100000);
+        return new XWikiDBVersion(140200000);
     }
 
     @Override
     public void migrate() throws DataMigrationException
     {
         XWikiContext context = this.contextProvider.get();
-
-        try {
-            for (String wikiId : this.wikiDescriptorManager.getAllIds()) {
-                context.setWikiId(wikiId);
-                // No need to migrate if the wiki does not support backlinks.
-                if (context.getWiki().hasBacklinks(context)) {
-                    migrateWiki(wikiId);
+        // No need to migrate if the wiki does not support backlinks.
+        if (context.getWiki().hasBacklinks(context)) {
+            String wikiId = context.getWikiId();
+            try {
+                List<Object[]> rows =
+                    this.queryManager.createQuery("SELECT doc.id, doc.version FROM XWikiDocument doc",
+                        Query.HQL).setWiki(wikiId).execute();
+                for (Object[] row : rows) {
+                    this.taskManager.replaceTask(wikiId, (long) row[0], (String) row[1], LINKS_TASK_TYPE);
                 }
+            } catch (QueryException e) {
+                throw new DataMigrationException(
+                    String.format("Failed retrieve the list of all the documents for wiki [%s].", wikiId), e);
             }
-        } catch (WikiManagerException e) {
-            throw new DataMigrationException("Failed retrieve the list of wiki identifiers.", e);
-        }
-    }
-
-    private void migrateWiki(String wikiId) throws DataMigrationException
-    {
-        try {
-            List<Object[]> rows =
-                this.queryManager.createQuery("SELECT doc.id, doc.version FROM XWikiDocument doc",
-                    Query.HQL).setWiki(wikiId).execute();
-            for (Object[] row : rows) {
-                this.taskManager.replaceTask(wikiId, (long) row[0], (String) row[1], LINKS_TASK_TYPE);
-            }
-        } catch (QueryException e) {
-            throw new DataMigrationException(
-                String.format("Failed retrieve the list of all the documents for wiki [%s].", wikiId), e);
         }
     }
 

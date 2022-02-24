@@ -23,9 +23,12 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.index.IndexException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -36,6 +39,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+
+import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -79,6 +84,9 @@ class DefaultLinksTaskConsumerTest
     @Mock
     private XWikiHibernateStore hibernateStore;
 
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @BeforeEach
     void setUp() throws Exception
     {
@@ -96,6 +104,10 @@ class DefaultLinksTaskConsumerTest
         this.defaultLinksTaskConsumer.consume(DOCUMENT_REFERENCE, VERSION);
         verifyNoInteractions(this.documentRevisionProvider);
         verify(this.wiki, never()).getHibernateStore();
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Skipping for document [wiki:space.page] version [2.5] "
+            + "because backlinks are not supported in this wiki.", this.logCapture.getMessage(0));
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
     }
 
     @Test

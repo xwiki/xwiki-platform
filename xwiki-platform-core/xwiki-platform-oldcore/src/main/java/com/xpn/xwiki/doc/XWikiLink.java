@@ -20,8 +20,9 @@
 package com.xpn.xwiki.doc;
 
 import java.io.Serializable;
-import java.util.Objects;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
@@ -82,13 +83,36 @@ public class XWikiLink implements Serializable
      * @param link the link of the used entity
      * @param fullName the full name of the document using the entity
      * @param type the type of the used entity
+     * @since 14.2RC1
      */
+    @Unstable
     public XWikiLink(long docId, String link, String fullName, String type)
     {
         this.setDocId(docId);
         this.setLink(link);
         this.setFullName(fullName);
         this.setType(type);
+    }
+
+    /**
+     * @return the unique auto-generated id of the link
+     * @since 14.2RC1
+     */
+    @Unstable
+    public long getId()
+    {
+        return hashCode();
+    }
+
+    /**
+     * Does nothing, the id is derived from the object values.
+     *
+     * @param id the unique auto-generated id of the link
+     * @since 14.2RC1
+     */
+    @Unstable
+    public void setId(Long id)
+    {
     }
 
     /**
@@ -162,7 +186,6 @@ public class XWikiLink implements Serializable
     }
 
     /**
-     * 
      * @return the name of the attachment if the link is an attachment, {@code null} otherwise
      * @since 14.2RC1
      */
@@ -171,28 +194,39 @@ public class XWikiLink implements Serializable
     {
         return this.attachmentName;
     }
-
+    
     @Override
     public boolean equals(Object o)
     {
         if (this == o) {
             return true;
         }
+
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+
         XWikiLink xWikiLink = (XWikiLink) o;
-        return this.docId == xWikiLink.docId
-            && this.link.equals(xWikiLink.link)
-            && this.fullName.equals(xWikiLink.fullName)
-            && Objects.equals(this.type, xWikiLink.type)
-            && Objects.equals(this.attachmentName, xWikiLink.attachmentName);
+
+        return new EqualsBuilder()
+            .append(this.docId, xWikiLink.docId)
+            .append(this.link, xWikiLink.link)
+            .append(this.fullName, xWikiLink.fullName)
+            .append(this.type, xWikiLink.type)
+            .append(this.attachmentName, xWikiLink.attachmentName)
+            .isEquals();
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(this.docId, this.link, this.fullName, this.type, this.attachmentName);
+        return new HashCodeBuilder(17, 37)
+            .append(this.docId)
+            .append(this.link)
+            .append(this.fullName)
+            .append(this.type)
+            .append(this.attachmentName)
+            .toHashCode();
     }
 
     @Override

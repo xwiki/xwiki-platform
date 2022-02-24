@@ -76,11 +76,11 @@ public class LinkParser
     private Logger logger;
 
     /**
-     * Extract all the references of an XDOM and return them as {@link ResourceReference}. This method specifically
-     * checks for references in {@link LinkBlock}, {@link ImageBlock} and {@link MacroBlock}. For {@link MacroBlock} it
-     * checks if there's a dedicated {@link MacroRefactoring} component associated with the block id to perform the
-     * extraction, else it's using the default component implementation. Note that this method logs any exception that
-     * it might occur as a warning, so it doesn't throw any of them.
+     * Extract all the references of an XDOM and return them as {@link ResourceReference}.
+     * This method specifically checks for references in {@link LinkBlock}, {@link ImageBlock} and {@link MacroBlock}.
+     * For {@link MacroBlock} it checks if there's a dedicated {@link MacroRefactoring} component associated with the
+     * block id to perform the extraction, else it's using the default component implementation.
+     * Note that this method logs any exception that it might occur as a warning, so it doesn't throw any of them.
      *
      * @param dom an XDOM that might contain references.
      * @return a set of {@link ResourceReference} contained in that XDOM.
@@ -129,7 +129,6 @@ public class LinkParser
      *
      * @param dom the XDOM for which to retrieve links.
      * @param entityTypes mapping of the types of references to return (and their corresponding resource types)
-     *     references
      * @param currentReference the current document reference for making a relative resolution.
      * @return a set of references contained in the XDOM.
      */

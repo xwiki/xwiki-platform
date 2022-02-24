@@ -33,7 +33,6 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -42,23 +41,22 @@ import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of {@link R14010XWIKI19352DataMigration}.
+ * Test of {@link R1402000XWIKI19352DataMigration}.
  *
  * @version $Id$
  * @since 14.2RC1
  */
 @ComponentTest
-class R14010XWIKI19352DataMigrationTest
+class R1402000XWIKI19352DataMigrationTest
 {
     @InjectMockComponents(role = HibernateDataMigration.class)
-    private R14010XWIKI19352DataMigration migration;
-
-    @MockComponent
-    private WikiDescriptorManager wikiDescriptorManager;
+    private R1402000XWIKI19352DataMigration migration;
 
     @MockComponent
     private QueryManager queryManager;
@@ -78,43 +76,57 @@ class R14010XWIKI19352DataMigrationTest
     @Mock
     private Query query;
 
-    @Mock
-    private Query queryFail;
-
     @BeforeEach
     void setUp() throws Exception
     {
         when(this.contextProvider.get()).thenReturn(this.context);
         when(this.context.getWiki()).thenReturn(this.wiki);
-        when(this.wiki.hasBacklinks(this.context)).thenReturn(true, false, true);
+        when(this.context.getWikiId()).thenReturn("wiki1");
         when(this.queryManager.createQuery("SELECT doc.id, doc.version FROM XWikiDocument doc",
             Query.HQL)).thenReturn(this.query);
+        when(this.query.setWiki(any())).thenReturn(this.query);
     }
 
     @Test
     void migrate() throws Exception
     {
-        when(this.wikiDescriptorManager.getAllIds()).thenReturn(List.of("wiki1", "wiki2", "wiki3"));
-        when(this.query.setWiki("wiki1")).thenReturn(this.query);
-        when(this.query.setWiki("wiki2")).thenReturn(this.query);
-        when(this.query.setWiki("wiki3")).thenReturn(this.queryFail);
-        when(this.queryFail.execute()).thenThrow(QueryException.class);
+        when(this.wiki.hasBacklinks(this.context)).thenReturn(true);
+
         when(this.query.execute()).thenReturn(List.of(
             new Object[] { 42L, "1.4" },
             new Object[] { 43L, "1.5" }
         ));
 
-        DataMigrationException dataMigrationException =
-            assertThrows(DataMigrationException.class, () -> this.migration.migrate());
+        this.migration.migrate();
 
-        assertEquals("Failed retrieve the list of all the documents for wiki [wiki3].",
-            dataMigrationException.getMessage());
-
+        verify(this.query).setWiki("wiki1");
         verify(this.taskManager).replaceTask("wiki1", 42L, "1.4", "links");
         verify(this.taskManager).replaceTask("wiki1", 43L, "1.5", "links");
+    }
 
-        verify(this.context).setWikiId("wiki1");
-        verify(this.context).setWikiId("wiki2");
-        verify(this.context).setWikiId("wiki3");
+    @Test
+    void migrateQueryException() throws Exception
+    {
+        when(this.wiki.hasBacklinks(this.context)).thenReturn(true);
+
+        when(this.query.execute()).thenThrow(QueryException.class);
+
+        DataMigrationException queryException =
+            assertThrows(DataMigrationException.class, () -> this.migration.migrate());
+
+        assertEquals("Failed retrieve the list of all the documents for wiki [wiki1].", queryException.getMessage());
+        assertEquals(QueryException.class, queryException.getCause().getClass());
+
+        verify(this.query).setWiki("wiki1");
+        verifyNoInteractions(this.taskManager);
+    }
+
+    @Test
+    void migrateNotHasBacklinks() throws Exception
+    {
+        when(this.wiki.hasBacklinks(this.context)).thenReturn(false);
+        this.migration.migrate();
+        verifyNoInteractions(this.queryManager);
+        verifyNoInteractions(this.taskManager);
     }
 }

@@ -21,7 +21,6 @@ package org.xwiki.index.internal.listener;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -54,9 +53,6 @@ public class LinksUpdateListener extends AbstractEventListener
     @Inject
     private TaskManager taskManager;
 
-    @Inject
-    private Provider<XWikiContext> contextProvider;
-
     /**
      * Default constructor.
      */
@@ -68,7 +64,7 @@ public class LinksUpdateListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        XWikiContext context = this.contextProvider.get();
+        XWikiContext context = (XWikiContext) data;
         if (!this.remoteObservationManagerContext.isRemoteState() && context.getWiki().hasBacklinks(context)) {
             XWikiDocument doc = (XWikiDocument) source;
             this.taskManager.replaceTask(doc.getDocumentReference().getWikiReference().getName(), doc.getId(),

@@ -19,8 +19,6 @@
  */
 package org.xwiki.index.internal.listener;
 
-import javax.inject.Provider;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -60,9 +58,6 @@ class LinksUpdateListenerTest
     @MockComponent
     private TaskManager taskManager;
 
-    @MockComponent
-    private Provider<XWikiContext> contextProvider;
-
     @Mock
     private XWikiContext context;
 
@@ -72,7 +67,6 @@ class LinksUpdateListenerTest
     @BeforeEach
     void setUp()
     {
-        when(this.contextProvider.get()).thenReturn(this.context);
         when(this.context.getWiki()).thenReturn(this.wiki);
     }
 
@@ -80,7 +74,7 @@ class LinksUpdateListenerTest
     void onEventIsRemote()
     {
         when(this.remoteObservationManagerContext.isRemoteState()).thenReturn(true);
-        this.linksUpdateListener.onEvent(new DocumentCreatedEvent(), null, null);
+        this.linksUpdateListener.onEvent(new DocumentCreatedEvent(), null, this.context);
         verifyNoInteractions(this.taskManager);
     }
 
@@ -89,7 +83,7 @@ class LinksUpdateListenerTest
     {
         when(this.remoteObservationManagerContext.isRemoteState()).thenReturn(false);
         when(this.wiki.hasBacklinks(this.context)).thenReturn(false);
-        this.linksUpdateListener.onEvent(new DocumentCreatedEvent(), null, null);
+        this.linksUpdateListener.onEvent(new DocumentCreatedEvent(), null, this.context);
         verifyNoInteractions(this.taskManager);
     }
 
@@ -103,7 +97,7 @@ class LinksUpdateListenerTest
         when(doc.getId()).thenReturn(42L);
         when(doc.getDocumentReference()).thenReturn(documentReference);
         when(doc.getVersion()).thenReturn("1.1");
-        this.linksUpdateListener.onEvent(new DocumentCreatedEvent(), doc, null);
+        this.linksUpdateListener.onEvent(new DocumentCreatedEvent(), doc, this.context);
         verify(this.taskManager).replaceTask("wiki", 42L, "1.1", LINKS_TASK_TYPE);
     }
 }

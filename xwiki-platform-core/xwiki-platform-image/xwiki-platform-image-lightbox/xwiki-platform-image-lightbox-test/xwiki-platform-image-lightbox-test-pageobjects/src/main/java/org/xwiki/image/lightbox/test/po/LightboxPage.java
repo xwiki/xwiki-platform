@@ -41,15 +41,6 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class LightboxPage extends ViewPage
 {
-    /**
-     * Make sure that the javascript is also loaded after page refresh since lightbox actions depend on it.
-     */
-    public void reloadPage()
-    {
-        getDriver().navigate().refresh();
-        waitUntilPageJSIsLoaded();
-    }
-
     public Optional<ImagePopover> hoverImage(int index)
     {
         try {

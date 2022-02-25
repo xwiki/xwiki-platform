@@ -21,9 +21,13 @@ package org.xwiki.index.internal;
 
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -93,50 +97,79 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
      */
     private boolean halt;
 
+    /**
+     * Lock used to ensure that no thread is in a state where a task has been added to the database but not to the
+     * queue.
+     */
+    private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
+    /**
+     * Read lock. Contrary to the name, this is used to protect operations that modify the state but do not need any
+     * consistency guarantees.
+     */
+    private final ReentrantReadWriteLock.ReadLock readLock = this.readWriteLock.readLock();
+
+    /**
+     * Write lock. Acquire this if no modification of the queue must be happening.
+     */
+    private final ReentrantReadWriteLock.WriteLock writeLock = this.readWriteLock.writeLock();
+
     @Override
     public CompletableFuture<TaskData> addTask(String wikiId, long docId, String version, String type)
     {
         XWikiDocumentIndexingTask xWikiTask = initTask(docId, type, version);
+        this.readLock.lock();
         try {
-            this.tasksStore.get().addTask(wikiId, xWikiTask);
-        } catch (XWikiException e) {
-            this.logger.warn(
-                "Failed to add a task for docId [{}], type [{}] and version [{}] in wiki [{}]. This task is queued but "
-                    + "will not be will not be restarted if not completed before the server stops. Cause: [{}].", docId,
-                type, version, wikiId, getRootCauseMessage(e));
-        }
+            try {
+                this.tasksStore.get().addTask(wikiId, xWikiTask);
+            } catch (XWikiException e) {
+                this.logger.warn(
+                    "Failed to add a task for docId [{}], type [{}] and version [{}] in wiki [{}]. This task is queued"
+                        + " but will not be will not be restarted if not completed before the server stops."
+                        + " Cause: [{}].",
+                    docId,
+                    type, version, wikiId, getRootCauseMessage(e));
+            }
 
-        TaskData taskData = convert(wikiId, xWikiTask);
-        this.queue.add(taskData);
-        return taskData.getFuture();
+            TaskData taskData = convert(wikiId, xWikiTask);
+            this.queue.add(taskData);
+            return taskData.getFuture();
+        } finally {
+            this.readLock.unlock();
+        }
     }
 
     @Override
     public CompletableFuture<TaskData> replaceTask(String wikiId, long docId, String version, String type)
     {
         XWikiDocumentIndexingTask xWikiTask = initTask(docId, type, version);
+        this.readLock.lock();
         try {
-            this.tasksStore.get().replaceTask(wikiId, xWikiTask);
-        } catch (XWikiException e) {
-            this.logger.warn("Failed to persist task with docId [{}], type [{}] and version [{}] in wiki [{}]. The "
-                + "tasks are replaced but will not be restarted if not completed before the server "
-                + "stops. Cause: [{}].", docId, type, version, wikiId, getRootCauseMessage(e));
-        }
-
-        Predicate<TaskData> filter = queuedTask -> Objects.equals(queuedTask.getWikiId(), wikiId)
-            && Objects.equals(queuedTask.getType(), type)
-            && Objects.equals(queuedTask.getDocId(), docId);
-
-        // Cancel, then remove, the tasks that need to be replaced.
-        this.queue.forEach(taskData -> {
-            if (filter.test(taskData)) {
-                taskData.getFuture().cancel(false);
+            try {
+                this.tasksStore.get().replaceTask(wikiId, xWikiTask);
+            } catch (XWikiException e) {
+                this.logger.warn("Failed to persist task with docId [{}], type [{}] and version [{}] in wiki [{}]. The "
+                    + "tasks are replaced but will not be restarted if not completed before the server "
+                    + "stops. Cause: [{}].", docId, type, version, wikiId, getRootCauseMessage(e));
             }
-        });
-        this.queue.removeIf(filter);
-        TaskData taskData = convert(wikiId, xWikiTask);
-        this.queue.add(taskData);
-        return taskData.getFuture();
+
+            Predicate<TaskData> filter = queuedTask -> Objects.equals(queuedTask.getWikiId(), wikiId)
+                && Objects.equals(queuedTask.getType(), type)
+                && Objects.equals(queuedTask.getDocId(), docId);
+
+            // Cancel, then remove, the tasks that need to be replaced.
+            this.queue.forEach(taskData -> {
+                if (filter.test(taskData)) {
+                    taskData.getFuture().cancel(false);
+                }
+            });
+            this.queue.removeIf(filter);
+            TaskData taskData = convert(wikiId, xWikiTask);
+            this.queue.add(taskData);
+            return taskData.getFuture();
+        } finally {
+            this.readLock.unlock();
+        }
     }
 
     @Override
@@ -239,11 +272,31 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
     private void loadWiki(String wikiId) throws InitializationException
     {
         try {
-            this.queue.addAll(
-                this.tasksStore.get().getAllTasks(wikiId, this.remoteObservationManagerConfiguration.getId())
-                    .stream()
-                    .map(task -> convert(wikiId, task))
-                    .collect(Collectors.toList()));
+            List<XWikiDocumentIndexingTask> tasksInDB = this.tasksStore.get().getAllTasks(wikiId,
+                this.remoteObservationManagerConfiguration.getId());
+
+            // Check for each task if it is already in the queue. This is necessary as tasks might
+            // have been added before this call, see XWIKI-19471.
+            // For this, get a snapshot of all existing tasks. This doesn't include insertions afterwards but that's
+            // not important as they are not in the tasks from the DB, either. For this property to hold it is
+            // important, though, to first get the tasks from the DB and then from the queue.
+            // Note that if this queried the queue for every task, the running time would be quadratic in the number of
+            // tasks, that's why there is this snapshot in a hash set.
+            Set<TaskData> existingTasks;
+            // Make sure no task is in the DB but not in the queue.
+            this.writeLock.lock();
+            try {
+                existingTasks = new HashSet<>(this.queue);
+            } finally {
+                this.writeLock.unlock();
+            }
+
+            for (XWikiDocumentIndexingTask task : tasksInDB) {
+                TaskData taskData = convert(wikiId, task);
+                if (!existingTasks.contains(taskData)) {
+                    this.queue.put(taskData);
+                }
+            }
         } catch (XWikiException e) {
             throw new InitializationException(String.format("Failed to get tasks for wiki [%s]", wikiId), e);
         }

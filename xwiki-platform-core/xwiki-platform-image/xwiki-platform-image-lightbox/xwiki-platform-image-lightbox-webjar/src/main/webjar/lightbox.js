@@ -166,7 +166,9 @@ define('xwiki-lightbox', [
   'blueimp-gallery-fullscreen',
   'blueimp-gallery-indicator'
 ], function($, lightboxDescription, gallery) {
-  var myOpenLightbox;
+  var _openedLightbox;
+  var _slidesData;
+  var _lightboxImages;
 
   /*
    * Make sure that the toolbar will remain open also while hovering it, not just the image.
@@ -188,9 +190,7 @@ define('xwiki-lightbox', [
    */
   var enableToolbarPopovers = function() {
     var timeout;
-    // Activate the lightbox for all images inside the xwikicontent.
-    // TODO: filter to consider only rendered images.
-    $('#xwikicontent img').popover({
+    _lightboxImages.popover({
       content: function() {
         return $('#imageToolbarTemplate').html();
       },
@@ -207,7 +207,7 @@ define('xwiki-lightbox', [
       $('#lightboxDownload').attr('href', img.src);
       $('#lightboxDownload').attr('download', getImageName(img.src));
       // Remember the index of the image to show first.
-      $('.openLightbox').data('index', [...$('#xwikicontent img')].indexOf(img));
+      $('.openLightbox').data('index', [..._lightboxImages].indexOf(img));
     }).on('shown.bs.popover', function(e) {
       $('.popover .imageDownload').attr('href', e.target.src);
       $('.popover .imageDownload').attr('download', getImageName(e.target.src));
@@ -266,14 +266,14 @@ define('xwiki-lightbox', [
   };
 
   /**
-   * Open Gallery lightbox at the current index.
+   * Compute the slides data by extracting information from the selected images.
    */
-  var openLightbox = function() {
-    var media = [];
-    $('#xwikicontent').find('img').each(function(index) {
+  var getSlidesData = function() {
+    var slidesData = [];
+    _lightboxImages.each(function() {
       var imageURL = removeResizeParams(this.src);
       var caption = getImageCaption($(this));
-      media.push({
+      slidesData.push({
         href: imageURL,
         thumbnail: createThumbnailURL(imageURL),
         caption: caption,
@@ -282,15 +282,19 @@ define('xwiki-lightbox', [
         title: $(this).attr('title')
       });
     });
+    return slidesData;
+  };
 
+  /**
+   * Open Gallery lightbox at the current index.
+   */
+  var openLightbox = function() {
     var options = {
       container: '#blueimp-gallery',
       index: parseInt($('.openLightbox').data('index')),
       // The class names are overridden since we changed the styles.
       closeClass: 'escape',
       playPauseClass: 'autoPlay',
-      // Avoid the hide done by the library on the default h3 title element.
-      titleElement: 'h4',
       onslide: function(index, slide) {
         var imageData = this.list[index];
         lightboxDescription.addSlideDescription(imageData);
@@ -301,13 +305,17 @@ define('xwiki-lightbox', [
         $('#lightboxDownload').attr('download', imageData.fileName);
       }
     };
-    myOpenLightbox = gallery(media, options);
+    _openedLightbox = gallery(_slidesData, options);
   };
 
   /**
    * Initialize the lightbox functionality for a set of images.
    */
   var initLightboxFunctionality = function() {
+    // The lightbox will be added to xwikicontent images that don't explicitly disable it.
+    _lightboxImages = $('#xwikicontent img')
+      .filter((i, img) => $(img.closest('[data-xwiki-lightbox]')).data('xwiki-lightbox') != false);
+    _slidesData = getSlidesData();
     lightboxDescription.invalidateCachedAttachments();
     enableToolbarPopovers();
   };
@@ -317,10 +325,10 @@ define('xwiki-lightbox', [
   $(document).on('click', '#lightboxFullscreen', function() {
     // Open lightbox in fullscreen mode, or close it if already open.
     if (!$('#lightboxFullscreen').data('open')) {
-      myOpenLightbox.requestFullScreen($('#blueimp-gallery')[0]);
+      _openedLightbox.requestFullScreen($('#blueimp-gallery')[0]);
       $('#lightboxFullscreen').data('open', true);
     } else {
-      myOpenLightbox.exitFullScreen();
+      _openedLightbox.exitFullScreen();
       $('#lightboxFullscreen').data('open', false);
     }
   });

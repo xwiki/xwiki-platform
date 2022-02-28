@@ -354,6 +354,24 @@ class LightboxIT
         assertEquals(images.get(0), lightboxDownload.getAttribute("download"));
     }
 
+    @Test
+    @Order(12)
+    void verifyPartiallyDisabledLightbox(TestUtils testUtils, TestReference testReference,
+        TestConfiguration testConfiguration)
+    {
+        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
+            "isLightboxEnabled", "1");
+
+        testUtils.createPage(testReference, this.getPartiallyDisabledLightboxContent());
+        lightboxPage = new LightboxPage();
+
+        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
+        assertFalse(imagePopover.isPresent());
+
+        imagePopover = lightboxPage.hoverImage(1);
+        assertTrue(imagePopover.isPresent());
+    }
+
     private String getSimpleImage(String image)
     {
         StringBuilder sb = new StringBuilder();
@@ -385,6 +403,18 @@ class LightboxIT
         sb.append("[[image:");
         sb.append(image);
         sb.append("||alt=\"Alternative text\" width=120 height=120]]\n\n");
+
+        return sb.toString();
+    }
+
+    private String getPartiallyDisabledLightboxContent()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("{{html}}\n");
+        sb.append("<div data-xwiki-lightbox=false><img src='/xwiki/resources/icons/silk/accept.png'></div>\n");
+        sb.append("<div><img src='/xwiki/resources/icons/silk/accept.png'></div>\n");
+        sb.append("{{/html}}");
 
         return sb.toString();
     }

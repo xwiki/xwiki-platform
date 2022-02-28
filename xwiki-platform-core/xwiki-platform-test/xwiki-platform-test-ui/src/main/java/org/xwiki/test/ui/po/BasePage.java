@@ -282,6 +282,18 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * Refresh the page and wait for the javascript to be also loaded.
+     *
+     * @since 14.1
+     */
+    public BasePage reloadPage()
+    {
+        getDriver().navigate().refresh();
+        waitUntilPageJSIsLoaded();
+        return this;
+    }
+
+    /**
      * @since 7.2M3
      */
     public void toggleDrawer()

@@ -99,7 +99,5 @@ public class TaskExecutor
         }
         this.componentManager.get().<TaskConsumer>getInstance(TaskConsumer.class, task.getType())
             .consume(doc.getDocumentReference(), doc.getVersion());
-        task.getFuture().complete(task);
-        this.tasksStore.get().deleteTask(task.getWikiId(), task.getDocId(), task.getVersion(), task.getType());
     }
 }

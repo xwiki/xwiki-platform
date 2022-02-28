@@ -177,6 +177,7 @@ public class TasksStore extends XWikiHibernateBaseStore
 
     private void innerAddTask(XWikiDocumentIndexingTask task, Session session)
     {
+        // In case of inconsistent data. But the timestamp is expected to be initialized by the caller.
         if (task.getTimestamp() == null) {
             task.setTimestamp(new Date());
         }

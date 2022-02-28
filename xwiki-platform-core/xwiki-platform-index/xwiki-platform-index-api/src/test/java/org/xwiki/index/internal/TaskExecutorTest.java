@@ -40,7 +40,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -122,7 +121,5 @@ class TaskExecutorTest
         verify(this.contextManager).initialize(any(ExecutionContext.class));
         verify(this.contextManager).popContext();
         verify(this.testTaskConsumer).consume(DOCUMENT_REFERENCE, "1.5");
-        assertNotNull(task.getFuture().get());
-        verify(this.tasksStore).deleteTask("wikiId", 42, "1.5", "testtask");
     }
 }

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -69,6 +70,12 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
     private static final String MBEAN_NAME = "name=index";
 
     private PriorityBlockingQueue<TaskData> queue;
+
+    /**
+     * Stores the latest timestamp for the tasks. If a task is queued with an outdated timestamp, it will be skipped and
+     * canceled.
+     */
+    private ConcurrentHashMap<TaskData, Long> latestTimestampTasksMap;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -118,7 +125,7 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
     {
         return addTask(wikiId, docId, "", type);
     }
-    
+
     @Override
     public CompletableFuture<TaskData> addTask(String wikiId, long docId, String version, String type)
     {
@@ -132,11 +139,11 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
                     "Failed to add a task for docId [{}], type [{}] and version [{}] in wiki [{}]. This task is queued"
                         + " but will not be will not be restarted if not completed before the server stops."
                         + " Cause: [{}].",
-                    docId,
-                    type, version, wikiId, getRootCauseMessage(e));
+                    docId, type, version, wikiId, getRootCauseMessage(e));
             }
 
             TaskData taskData = convert(wikiId, xWikiTask);
+            this.latestTimestampTasksMap.put(taskData, taskData.getTimestamp());
             this.queue.add(taskData);
             return taskData.getFuture();
         } finally {
@@ -151,6 +158,7 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
                 () -> this.queue.stream().collect(Collectors.groupingBy(TaskData::getType, Collectors.counting()))),
             MBEAN_NAME);
         this.queue = new PriorityBlockingQueue<>(11, Comparator.comparingLong(TaskData::getTimestamp));
+        this.latestTimestampTasksMap = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -204,8 +212,14 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
             task.increaseAttempts();
             if (task.isStop()) {
                 this.halt = true;
-            } else if (!task.isDeprecated()) {
-                this.taskExecutor.execute(task);
+            } else {
+                if (isTimestampValid(task)) {
+                    this.taskExecutor.execute(task);
+                    task.getFuture().complete(task);
+                } else {
+                    task.getFuture().cancel(false);
+                }
+                deleteTask(task);
             }
         } catch (InterruptedException e) {
             this.logger.warn("The task manager consumer thread was interrupted. Cause: [{}].",
@@ -213,17 +227,22 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
             Thread.currentThread().interrupt();
         } catch (Exception e) {
             this.logger.warn("Error during the execution of task [{}]. Cause: [{}].", task, getRootCauseMessage(e));
-            if (task != null) {
+            if (task != null && isTimestampValid(task)) {
                 if (!task.tooManyAttempts()) {
                     // Push back the failed task at the beginning of the queue by resetting its timestamp.
-                    task.setTimestamp(System.currentTimeMillis());
+                    long newTimestamp = System.currentTimeMillis();
+                    this.latestTimestampTasksMap.put(task, newTimestamp);
+                    task.setTimestamp(newTimestamp);
                     this.queue.put(task);
                 } else {
                     this.logger.error("[{}] abandoned because it has failed too many times.", task);
+                    deleteTask(task);
                     task.getFuture().cancel(false);
                 }
+            } else if (task != null) {
+                task.getFuture().cancel(false);
             }
-        }
+        } 
     }
 
     private void initQueue() throws InitializationException
@@ -266,6 +285,7 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
             for (XWikiDocumentIndexingTask task : tasksInDB) {
                 TaskData taskData = convert(wikiId, task);
                 if (!existingTasks.contains(taskData)) {
+                    this.latestTimestampTasksMap.computeIfAbsent(taskData, TaskData::getTimestamp);
                     this.queue.put(taskData);
                 }
             }
@@ -296,5 +316,34 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
         xWikiTask.setId(id);
         xWikiTask.setTimestamp(new Date());
         return xWikiTask;
+    }
+
+    /**
+     * @param task a task
+     * @return {@code true} if the timestamp of the task matches the latest timestamp for the same tasks in the queue,
+     *     {@code false} otherwise
+     */
+    private boolean isTimestampValid(TaskData task)
+    {
+        return task.getTimestamp() == this.latestTimestampTasksMap.getOrDefault(task, 0L);
+    }
+
+    private void deleteTask(TaskData task)
+    {
+        this.writeLock.lock();
+        try {
+            if (isTimestampValid(task)) {
+                try {
+                    this.tasksStore.get()
+                        .deleteTask(task.getWikiId(), task.getDocId(), task.getVersion(), task.getType());
+                } catch (XWikiException e) {
+                    this.logger.error("Failed to delete task [{}] from the queue. It will be reloaded on restart.",
+                        task, e);
+                }
+                this.latestTimestampTasksMap.remove(task);
+            }
+        } finally {
+            this.writeLock.unlock();
+        }
     }
 }

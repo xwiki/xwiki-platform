@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.doc;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.stability.Unstable;
@@ -29,7 +27,7 @@ import org.xwiki.text.XWikiToStringBuilder;
 /**
  * Represent the relation between a document using a link to an entity, and the used entity.
  */
-public class XWikiLink implements Serializable
+public class XWikiLink
 {
     private long docId;
 

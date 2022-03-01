@@ -422,8 +422,11 @@ public interface XWikiStoreInterface
      * @since 14.2RC1
      */
     @Unstable
-    List<DocumentReference> loadBacklinks(AttachmentReference documentReference, boolean bTransaction,
-        XWikiContext context) throws XWikiException;
+    default List<DocumentReference> loadBacklinks(AttachmentReference documentReference, boolean bTransaction,
+        XWikiContext context) throws XWikiException
+    {
+        return List.of();
+    }
 
     /**
      * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}

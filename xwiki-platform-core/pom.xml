@@ -161,6 +161,15 @@
                   <justification>Young API</justification>
                   <criticality>allowed</criticality>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.noLongerImplementsInterface</code>
+                  <old>class com.xpn.xwiki.doc.XWikiLink</old>
+                  <new>class com.xpn.xwiki.doc.XWikiLink</new>
+                  <interface>java.io.Serializable</interface>
+                  <justification>Removed since the class does not need to be serializable.</justification>
+                  <criticality>highlight</criticality>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

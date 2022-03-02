@@ -24,16 +24,25 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-image</artifactId>
     <version>14.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-image</artifactId>
-  <name>XWiki Platform - Image - Parent POM</name>
-  <description>XWiki Platform - Image - Parent POM</description>
+  <artifactId>xwiki-platform-image-style</artifactId>
+  <name>XWiki Platform - Image - Style - Parent POM</name>
+  <description>Code relate to image styles configuration.</description>
   <packaging>pom</packaging>
   <modules>
-    <module>xwiki-platform-image-lightbox</module>
-    <module>xwiki-platform-image-processing</module>
-    <module>xwiki-platform-image-style</module>
+    <module>xwiki-platform-image-style-api</module>
+    <module>xwiki-platform-image-style-model</module>
+    <module>xwiki-platform-image-style-rest</module>
+    <module>xwiki-platform-image-style-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-image-style-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

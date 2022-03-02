@@ -28,6 +28,7 @@ import org.xwiki.attachment.test.po.AttachmentPane;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -105,7 +106,6 @@ class MoveAttachmentIT
         assertNotNull(object);
 
         // Verify that the refactoring is properly applied.
-        ViewPage viewPage = setup.gotoPage(targetPage);
-        assertEquals("[[attach:newname.txt]]", viewPage.getContent());
+        assertEquals("[[attach:newname.txt]]", setup.rest().<Page>get(targetPage).getContent());
     }
 }

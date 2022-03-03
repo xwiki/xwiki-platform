@@ -105,12 +105,13 @@ public class XWikiLink
     /**
      * Does nothing, the id is derived from the object values.
      *
-     * @param id the unique auto-generated id of the link
+     * @param id unused parameter, the id is derived from the object values
      * @since 14.2RC1
      */
     @Unstable
     public void setId(Long id)
     {
+        // The id is derived from the object values.
     }
 
     /**

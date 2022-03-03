@@ -29,6 +29,8 @@ import org.xwiki.text.XWikiToStringBuilder;
  */
 public class XWikiLink
 {
+    private long id;
+    
     private long docId;
 
     private String link;
@@ -93,25 +95,26 @@ public class XWikiLink
     }
 
     /**
-     * @return the unique auto-generated id of the link
+     * Getter for {@link #id}.
+     *
+     * @return the synthetic id of this deleted attachment. Uniquely identifies a link
      * @since 14.2RC1
      */
     @Unstable
     public long getId()
     {
-        return hashCode();
+        return this.id;
     }
 
     /**
-     * Does nothing, the id is derived from the object values.
+     * Setter for {@link #id}.
      *
-     * @param id unused parameter, the id is derived from the object values
-     * @since 14.2RC1
+     * @param id the synthetic id to set. Used only by hibernate
      */
-    @Unstable
-    public void setId(Long id)
+    // This method is private because it is only used reflexively by Hibernate.
+    private void setId(long id)
     {
-        // The id is derived from the object values.
+        this.id = id;
     }
 
     /**

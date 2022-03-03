@@ -124,7 +124,6 @@ public class DownloadActionTest
     @BeforeEach
     public void before() throws Exception
     {
-        this.oldcore.registerMockEnvironment();
         this.oldcore.getXWikiContext().setRequest(this.request);
         this.oldcore.getXWikiContext().setResponse(this.response);
         this.oldcore.getXWikiContext().setEngineContext(this.engineContext);

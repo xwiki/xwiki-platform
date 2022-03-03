@@ -71,6 +71,7 @@ import org.xwiki.script.internal.CloneableSimpleScriptContext;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.test.XWikiTempDirUtil;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManager;
@@ -316,21 +317,25 @@ public class MockitoOldcore
 
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
-        if (getMocker().hasComponent(Environment.class)
-            && getMocker().getInstance(Environment.class) instanceof ServletEnvironment) {
-            ServletEnvironment servletEnvironment = getMocker().getInstance(Environment.class);
+        if (getMocker().hasComponent(Environment.class)) {
+            if (getMocker().getInstance(Environment.class) instanceof ServletEnvironment) {
+                ServletEnvironment servletEnvironment = getMocker().getInstance(Environment.class);
 
-            ServletContext servletContextMock = mock(ServletContext.class);
-            servletEnvironment.setServletContext(servletContextMock);
-            when(servletContextMock.getAttribute("javax.servlet.context.tempdir"))
-                .thenReturn(new File(System.getProperty("java.io.tmpdir")));
+                ServletContext servletContextMock = mock(ServletContext.class);
+                servletEnvironment.setServletContext(servletContextMock);
+                when(servletContextMock.getAttribute("javax.servlet.context.tempdir"))
+                    .thenReturn(new File(System.getProperty("java.io.tmpdir")));
 
-            initEnvironmentDirectories();
+                initEnvironmentDirectories();
 
-            servletEnvironment.setTemporaryDirectory(this.temporaryDirectory);
-            servletEnvironment.setPermanentDirectory(this.permanentDirectory);
+                servletEnvironment.setTemporaryDirectory(this.temporaryDirectory);
+                servletEnvironment.setPermanentDirectory(this.permanentDirectory);
 
-            this.environment = servletEnvironment;
+                this.environment = servletEnvironment;
+            }
+        } else {
+            // Automatically register an Environment when none is available since it's a very common need
+            registerMockEnvironment();
         }
 
         // Initialize the Execution Context
@@ -1171,7 +1176,7 @@ public class MockitoOldcore
 
     private void initEnvironmentDirectories()
     {
-        File testDirectory = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
+        File testDirectory = XWikiTempDirUtil.createTemporaryDirectory();
 
         this.temporaryDirectory = new File(testDirectory, "temporary");
         this.permanentDirectory = new File(testDirectory, "permanent-dir");

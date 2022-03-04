@@ -111,9 +111,9 @@ public class XWikiLink
      *
      * @param id the synthetic id to set. Used only by hibernate
      */
-    // This method is protected because it is only used reflexively by Hibernate, technically it could be private but 
-    // this would be considered as dead code.
-    protected void setId(long id)
+    // This method is private because it is only used reflexively by Hibernate.
+    @SuppressWarnings("java:S1144")
+    private void setId(long id)
     {
         this.id = id;
     }

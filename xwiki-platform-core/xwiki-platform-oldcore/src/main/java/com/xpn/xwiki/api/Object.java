@@ -80,27 +80,15 @@ public class Object extends Collection
         }
     }
 
-    /**
-     * Display the property with the passed name in the context of its own document.
-     * 
-     * @param name the name of the property
-     * @param mode the edit mode in which the property should be displayed ("view", "edit", etc.)
-     * @return the result of the display, generally HTML
-     */
-    public String display(String name, String mode)
+    public java.lang.Object display(String name, String mode)
     {
         return display(name, mode, true);
     }
 
     /**
-     * Display the property with the passed name in the context of the current document or its own document.
-     * 
-     * @param name the name of the property
-     * @param mode the edit mode in which the property should be displayed ("view", "edit", etc.)
-     * @param isolated true if the property should be displayed in it's own document context
      * @since 13.0
      */
-    public String display(String name, String mode, boolean isolated)
+    public java.lang.Object display(String name, String mode, boolean isolate)
     {
         try {
             XWikiDocument doc = getBaseObject().getOwnerDocument();
@@ -109,7 +97,7 @@ public class Object extends Collection
                     getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(), getXWikiContext());
             }
 
-            return doc.display(name, mode, getBaseObject(), isolated, getXWikiContext());
+            return doc.display(name, mode, this.getBaseObject(), isolate, getXWikiContext());
         } catch (XWikiException e) {
             return null;
         }

@@ -3617,8 +3617,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Display the property with the passed name in the context of its own document.
-     * 
      * @param fieldname the name of the field to display
      * @param type the type of the field to display
      * @param obj the object containing the field to display
@@ -3631,8 +3629,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Display the property with the passed name in the context of the current document or its own document.
-     * 
      * @param fieldname the name of the field to display
      * @param type the type of the field to display
      * @param obj the object containing the field to display

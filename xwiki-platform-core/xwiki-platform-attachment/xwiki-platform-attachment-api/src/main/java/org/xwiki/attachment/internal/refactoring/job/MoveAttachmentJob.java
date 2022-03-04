@@ -20,15 +20,12 @@
 package org.xwiki.attachment.internal.refactoring.job;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer;
 import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
@@ -48,9 +45,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.doc.ListAttachmentArchive;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
@@ -228,41 +223,7 @@ public class MoveAttachmentJob
     private void addAttachment(XWikiDocument targetDocument, XWikiAttachment oldAttachment, String newName)
         throws IOException, XWikiException
     {
-        XWikiContext context = this.xcontextProvider.get();
-        // Copy the attachment to the new document.
-        XWikiAttachment newAttachment =
-            targetDocument.setAttachment(newName, oldAttachment.getContentInputStream(context), context);
-        // Update the new attachment with the most recent version of the moved attachment.
-        newAttachment.setVersion(oldAttachment.getVersion());
-        // Copy the attachment history to the new attachment.
-        XWikiAttachmentArchive oldArchive = oldAttachment.getAttachmentArchive(context);
-
-        // Duplicate the history of the moved attachment.
-        ListAttachmentArchive newArchive = new ListAttachmentArchive(Arrays.stream(oldArchive.getVersions())
-            .map(ToString::toString)
-            .map(version -> {
-                try {
-                    XWikiAttachment newRevision = oldArchive.getRevision(oldAttachment, version, context);
-                    // Update the revision with the new attachment information.
-                    newRevision.setFilename(newName);
-                    newRevision.setDoc(targetDocument);
-                    // The context needs to be copied, otherwise the location is not found on the storage. 
-                    newRevision.setContent(newRevision.getContentInputStream(context));
-                    return newRevision;
-                } catch (XWikiException e) {
-                    this.logger.warn("Failed access revision [{}] for attachment [{}]. Cause: [{}].", version,
-                        oldAttachment, getRootCauseMessage(e));
-                    return null;
-                } catch (IOException e) {
-                    this.logger.warn(
-                        "Failed to copy to copy the content of attachment [{}] in revision [{}]. Cause: [{}].",
-                        oldAttachment, version, getRootCauseMessage(e));
-                    return null;
-                }
-            })
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList()));
-        newArchive.setAttachment(newAttachment);
-        newAttachment.setAttachment_archive(newArchive);
+        // Clone the attachment and its history to the new document, with the new name.
+        targetDocument.setAttachment(oldAttachment.clone(newName, targetDocument, this.xcontextProvider.get()));
     }
 }

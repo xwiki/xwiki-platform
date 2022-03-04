@@ -249,6 +249,25 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
+     * Clone the attachment and its history to a new name, and attach it to a new document.
+     *
+     * @param name the name of the attachment after the clone
+     * @param doc the document to attach the clone to
+     * @param context the current context
+     * @return the clone attachment with its updated history
+     * @throws XWikiException in case of error when accessing the attachments content
+     * @throws IOException in case of error when writing the attachments content
+     */
+    public XWikiAttachment clone(String name, XWikiDocument doc, XWikiContext context)
+        throws XWikiException, IOException
+    {
+        XWikiAttachment clone = doc.setAttachment(name, this.getContentInputStream(context), context);
+        clone.setVersion(this.getVersion());
+        clone.setAttachment_archive(this.getAttachmentArchive(context).clone(clone, context));
+        return clone;
+    }
+
+    /**
      * @return the number of bytes in this attachment content
      * @deprecated since 9.0RC1, use {@link #getLongSize()} instead
      */

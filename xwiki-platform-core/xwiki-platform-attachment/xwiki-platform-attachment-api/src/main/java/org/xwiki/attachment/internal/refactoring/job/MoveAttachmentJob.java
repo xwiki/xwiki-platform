@@ -224,6 +224,8 @@ public class MoveAttachmentJob
         throws IOException, XWikiException
     {
         // Clone the attachment and its history to the new document, with the new name.
-        targetDocument.setAttachment(oldAttachment.clone(newName, targetDocument, this.xcontextProvider.get()));
+        XWikiAttachment newAttachment = oldAttachment.clone(newName, this.xcontextProvider.get());
+        newAttachment.setDoc(targetDocument);
+        targetDocument.setAttachment(newAttachment);
     }
 }

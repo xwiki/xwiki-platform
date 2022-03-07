@@ -33,8 +33,8 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.AttachmentHistoryPage;
 import org.xwiki.test.ui.po.AttachmentsPane;
-import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,6 +53,10 @@ import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentIniti
 })
 class MoveAttachmentIT
 {
+    private static final String SOURCE_FILENAME = "moveme.txt";
+
+    private static final String TARGET_FILENAME = "newname.txt";
+
     @Test
     @Order(1)
     void moveAttachment(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
@@ -68,38 +72,53 @@ class MoveAttachmentIT
         // Create the pages and upload a document with a first user U1.
         setup.createUserAndLogin("U1", "pU1");
         setup.createPage(sourcePage, "");
-        AttachmentReference sourceAttachmentReference = new AttachmentReference("moveme.txt", sourcePage);
+        AttachmentReference sourceAttachmentReference = new AttachmentReference(SOURCE_FILENAME, sourcePage);
         String serializedSourceAttachmentReference = setup.serializeReference(sourceAttachmentReference);
         setup.createPage(targetPage, String.format("[[attach:%s]]", serializedSourceAttachmentReference));
 
         ViewPage viewSourcePage = setup.gotoPage(sourcePage);
         AttachmentsPane sourceAttachmentsPane = viewSourcePage.openAttachmentsDocExtraPane();
-        sourceAttachmentsPane.setFileToUpload(
-            new File(testConfiguration.getBrowser().getTestResourcesPath(), "moveme.txt").getAbsolutePath());
-        sourceAttachmentsPane.waitForUploadToFinish("moveme.txt");
+        sourceAttachmentsPane.setFileToUpload(buildMovemePath(testConfiguration, "v0"));
+        sourceAttachmentsPane.waitForUploadToFinish(SOURCE_FILENAME);
+        sourceAttachmentsPane.setFileToUpload(buildMovemePath(testConfiguration, "v1"));
+        sourceAttachmentsPane.waitForUploadToFinish(SOURCE_FILENAME);
 
         // Switch to a second user U2 and come back to the attachment pane of the source page.
-        setup.createUserAndLogin("U2", "pU2");
+        setup.createUserAndLogin("U1", "pU2");
         setup.gotoPage(sourcePage).openAttachmentsDocExtraPane();
 
-        AttachmentPane attachmentsPane = AttachmentPane.moveAttachment("moveme.txt");
+        AttachmentPane attachmentsPane = AttachmentPane.moveAttachment(SOURCE_FILENAME);
 
-        attachmentsPane.setName("newname.txt");
+        attachmentsPane.setName(TARGET_FILENAME);
         attachmentsPane.setRedirect(true);
         attachmentsPane.setLocation(setup.serializeReference(targetPage));
         attachmentsPane.submit();
         attachmentsPane.waitForJobDone();
 
         ViewPage viewTargetPage = setup.gotoPage(targetPage);
+
+        // Validate the history pane first because we'll move to the attachment history page when validating the 
+        // attachment pane.
+        // Verify that the author is correct in the history.
+        assertEquals("U1", viewTargetPage.openHistoryDocExtraPane().getCurrentAuthor());
+
+        // Validate the attachments pane.
         AttachmentsPane attachmentsPaneTarget = viewTargetPage.openAttachmentsDocExtraPane();
-        WebElement attachmentLink = attachmentsPaneTarget.getAttachmentLink("newname.txt");
+        WebElement attachmentLink = attachmentsPaneTarget.getAttachmentLink(TARGET_FILENAME);
         assertNotNull(attachmentLink);
         // Verify that the author is correct in the attachments pane.
-        assertEquals("U2", attachmentsPaneTarget.getUploaderOfAttachment("newname.txt"));
-
-        // Verify that the author is correct in the history.
-        HistoryPane historyPane = viewTargetPage.openHistoryDocExtraPane();
-        assertEquals("U2", historyPane.getCurrentAuthor());
+        assertEquals("U1", attachmentsPaneTarget.getUploaderOfAttachment(TARGET_FILENAME));
+        assertEquals("1.2", attachmentsPaneTarget.getLatestVersionOfAttachment(TARGET_FILENAME));
+        // Validate that the attachment history is still right after the move.
+        AttachmentHistoryPage attachmentHistoryPage = attachmentsPaneTarget.goToAttachmentHistory(TARGET_FILENAME);
+        assertEquals("1.1", attachmentHistoryPage.getVersion(1));
+        assertEquals("1.2", attachmentHistoryPage.getVersion(2));
+        assertEquals(13, attachmentHistoryPage.getSize(1));
+        assertEquals(44, attachmentHistoryPage.getSize(2));
+        assertEquals("U1", attachmentHistoryPage.getAuthor(1));
+        assertEquals("U1", attachmentHistoryPage.getAuthor(2));
+        assertEquals("Move me (v0).", attachmentHistoryPage.geAttachmentContent(1));
+        assertEquals("Another content with a different size (v1).", attachmentHistoryPage.geAttachmentContent(2));
 
         // Verify that the redirection object has been created on the source page.
         Object object = setup.rest().object(sourcePage, setup.serializeReference(REFERENCE));
@@ -107,5 +126,11 @@ class MoveAttachmentIT
 
         // Verify that the refactoring is properly applied.
         assertEquals("[[attach:newname.txt]]", setup.rest().<Page>get(targetPage).getContent());
+    }
+
+    private String buildMovemePath(TestConfiguration testConfiguration, String dirName)
+    {
+        return new File(new File(testConfiguration.getBrowser().getTestResourcesPath(), dirName), SOURCE_FILENAME)
+            .getAbsolutePath();
     }
 }

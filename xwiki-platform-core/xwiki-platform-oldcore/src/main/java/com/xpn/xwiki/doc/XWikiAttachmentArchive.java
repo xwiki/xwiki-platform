@@ -108,7 +108,7 @@ public class XWikiAttachmentArchive implements Cloneable
             .map(ToString::toString)
             .map(version -> {
                 try {
-                    XWikiAttachment newRevision = this.getRevision(this.attachment, version, context);
+                    XWikiAttachment newRevision = this.getRevision(this.getAttachment(), version, context);
                     // Update the revision with the new attachment information.
                     newRevision.setFilename(attachment.getFilename());
                     newRevision.setDoc(attachment.getDoc());

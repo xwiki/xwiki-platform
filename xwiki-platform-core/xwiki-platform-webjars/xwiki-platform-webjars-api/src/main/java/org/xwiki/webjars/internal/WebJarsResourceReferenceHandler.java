@@ -28,11 +28,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.tika.mime.MediaType;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.servlet.AbstractServletResourceReferenceHandler;
+import org.xwiki.tika.internal.TikaUtils;
 import org.xwiki.webjars.internal.filter.WebJarsResourceFilter;
 
 /**
@@ -129,7 +131,15 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
         {
             mimeType = "text/css";
         } else {
-            mimeType = super.getContentType(resourceStream, resourceReference);
+            // Tika is doing some content analysis even for text files and will tend to give priority to that over the
+            // file extension. But content based detection is much less accurate than file name based detection for most
+            // cases of text files.
+            mimeType = TikaUtils.detect(getResourceName(resourceReference));
+
+            // If file name did not help try the content
+            if (mimeType.equals(MediaType.OCTET_STREAM.toString())) {
+                mimeType = TikaUtils.detect(resourceStream);
+            }
         }
         return mimeType;
     }

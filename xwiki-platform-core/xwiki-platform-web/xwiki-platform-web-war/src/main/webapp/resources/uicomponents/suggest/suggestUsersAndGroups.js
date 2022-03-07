@@ -81,6 +81,7 @@ define('xwiki-suggestUsers', ['jquery', 'xwiki-selectize-utils', 'xwiki-selectiz
       loadSelected: function(text, callback) {
         loadUsers(select.attr('data-userScope'), {
           'input': text,
+          'limit': 1,
           'exactMatch': true
         }).done(callback).fail(callback);
       }

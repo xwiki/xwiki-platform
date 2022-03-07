@@ -35,9 +35,9 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * @since 14.0RC1
  */
 @Component
-@Named("R130407000XWIKI19207")
+@Named("R140200010XWIKI19207")
 @Singleton
-public class R130407000XWIKI19207DataMigration extends AbstractResizeMigration
+public class R140200010XWIKI19207DataMigration extends AbstractResizeMigration
 {
     @Override
     public String getDescription()
@@ -48,6 +48,6 @@ public class R130407000XWIKI19207DataMigration extends AbstractResizeMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(130406000);
+        return new XWikiDBVersion(140200010);
     }
 }

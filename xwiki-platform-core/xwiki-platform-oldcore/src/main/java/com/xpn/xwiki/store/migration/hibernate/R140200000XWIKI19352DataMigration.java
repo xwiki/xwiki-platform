@@ -69,7 +69,7 @@ public class R140200000XWIKI19352DataMigration extends AbstractHibernateDataMigr
     public String getPreHibernateLiquibaseChangeLog() throws DataMigrationException
     {
         return "<changeSet author=\"xwikiorg\" id=\"" + HINT + "\">\n"
-            + "  <preConditions onFail=\"CONTINUE\">\n"
+            + "  <preConditions onFail=\"MARK_RAN\">\n"
             + "    <tableExists tableName=\"xwikilinks\"/>\n"
             + "  </preConditions>"
             + "  <dropTable tableName=\"xwikilinks\"/>\n"

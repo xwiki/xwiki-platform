@@ -170,6 +170,13 @@
                   <justification>Removed since the class does not need to be serializable.</justification>
                   <criticality>highlight</criticality>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.store.migration.hibernate.R130407000XWIKI19207DataMigration</old>
+                  <justification>Still executed but associated to a more recent version.</justification>
+                  <criticality>allowed</criticality>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

@@ -36,6 +36,7 @@ import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.rcs.impl.Node;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -101,7 +102,9 @@ public class XWikiAttachmentArchive implements Cloneable
      * @param attachment the attachment to use for the new name and location of
      * @param context the current context
      * @return the cloned attachment archive
+     * @since 14.2RC1
      */
+    @Unstable
     public XWikiAttachmentArchive clone(XWikiAttachment attachment, XWikiContext context)
     {
         ListAttachmentArchive newArchive = new ListAttachmentArchive(Arrays.stream(this.getVersions())

@@ -165,8 +165,6 @@ if [ -n "$YOURKIT_PATH" ]; then
   export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:${YOURKIT_PATH}"
 fi
 
-echo Starting Jetty on port ${JETTY_PORT}, please wait...
-
 # Location where XWiki stores generated data and where database files are.
 XWIKI_DATA_DIR=${xwikiDataDir}
 XWIKI_OPTS="$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR"

@@ -182,10 +182,9 @@ export default {
     },
 
     resizeColumnInit (e) {
-      const th = e.currentTarget.closest("th");
-      e.data.leftColumn = th.querySelector(".column-name");
+      e.data.leftColumn = e.currentTarget.closest("th");
       e.data.leftColumnBaseWidth = e.data.leftColumn.getBoundingClientRect()?.width;
-      e.data.rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
+      e.data.rightColumn = this.getNextVisibleProperty(e.data.leftColumn);
       e.data.rightColumnBaseWidth = e.data.rightColumn.getBoundingClientRect()?.width;
     },
 
@@ -204,8 +203,7 @@ export default {
 
     resetColumnSize (e) {
       const th = e.currentTarget.closest("th");
-      const column = th.querySelector(".column-name");
-      column.style.width = "unset";
+      th.style.width = "unset";
     },
 
   },

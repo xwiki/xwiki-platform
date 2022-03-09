@@ -328,7 +328,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         this.utils.setString(Event.FIELD_USER, event.getUser(), document);
         this.utils.setString(Event.FIELD_WIKI, event.getWiki(), document);
 
-        this.utils.setMap(EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES, event.getParameters(), document);
+        this.utils.setMap(EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES, event.getCustom(), document);
 
         // Support various relative forms of the reference fields
         if (event.getDocument() != null) {
@@ -627,16 +627,33 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         return builder.toString();
     }
 
-    private String getMapFieldName(String key)
+    private String getMapFieldName(String key, Type type)
     {
-        return this.utils.getMapFieldName(key, EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES, String.class);
+        return this.utils.getMapFieldName(key, EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES,
+            type != null ? type : String.class);
     }
 
     private String toSolrFieldName(AbstractPropertyQueryCondition condition)
     {
-        if (condition.isParameter()) {
+        if (condition.isCustom()) {
+            Type customType = condition.getCustomType();
+            if (customType == null) {
+                Object value = null;
+                if (condition instanceof CompareQueryCondition) {
+                    value = ((CompareQueryCondition) condition).getValue();
+                } else if (condition instanceof InQueryCondition) {
+                    List<Object> values = ((InQueryCondition) condition).getValues();
+                    if (values != null && !values.isEmpty()) {
+                        value = values.get(0);
+                    }
+                }
+                if (value != null) {
+                    customType = value.getClass();
+                }
+            }
+
             // It's a custom parameter
-            return getMapFieldName(condition.getProperty());
+            return getMapFieldName(condition.getProperty(), customType);
         } else {
             return condition.getProperty();
         }
@@ -644,9 +661,9 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
     private String toSolrFieldName(SortClause sort)
     {
-        if (sort.isParameter()) {
+        if (sort.isCustom()) {
             // It's a custom parameter
-            return getMapFieldName(sort.getProperty());
+            return getMapFieldName(sort.getProperty(), sort.getCustomType());
         } else {
             return sort.getProperty();
         }

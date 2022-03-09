@@ -22,6 +22,7 @@ package org.xwiki.eventstream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -449,14 +450,55 @@ public interface Event
 
     /**
      * @return the named parameters associated with this event as key/value pairs.
+     * @deprecated use {@link #getCustom()} instead
      */
+    @Deprecated(since = "14.2RC1")
     Map<String, String> getParameters();
 
     /**
      * @param parameters the parameters to associate to the event.
      * @see #getParameters()
+     * @deprecated use {@link #setCustom(Map)} instead
      */
+    @Deprecated(since = "14.2RC1")
     void setParameters(Map<String, String> parameters);
+
+    /**
+     * @return the custom properties associated with this event
+     * @since 14.2RC1
+     */
+    default Map<String, Object> getCustom()
+    {
+        return (Map) getParameters();
+    }
+
+    /**
+     * Associate the event with custom named values.
+     * <p>
+     * The exactly list of supported types can vary depending on the {@link EventStore} implementation but it's expected
+     * that at least the following are supported:
+     * <ul>
+     * <li>String</li>
+     * <li>All standard primitive wrappers (Boolean, Integer, etc)</li>
+     * <li>java.util.Date</li>
+     * <li>Iterable and arrays of other supported types</li>
+     * </ul>
+     * 
+     * @param custom the custom properties associated with this event
+     * @since 14.2RC1
+     */
+    default void setCustom(Map<String, ?> custom)
+    {
+        Map<String, String> parameters;
+        if (custom == null) {
+            parameters = null;
+        } else {
+            parameters = new HashMap<>(custom.size());
+            custom.forEach((k, v) -> parameters.put(k, v != null ? v.toString() : null));
+        }
+
+        setParameters(parameters);
+    }
 
     /**
      * @param target a list of entities (users, groups) that are interested by this event

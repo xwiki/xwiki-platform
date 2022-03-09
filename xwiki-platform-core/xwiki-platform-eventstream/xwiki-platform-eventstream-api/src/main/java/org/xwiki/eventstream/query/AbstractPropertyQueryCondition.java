@@ -19,6 +19,9 @@
  */
 package org.xwiki.eventstream.query;
 
+import java.lang.reflect.Type;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.text.XWikiToStringBuilder;
@@ -33,7 +36,9 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
 {
     private final String property;
 
-    private final boolean parameter;
+    private final boolean custom;
+
+    private final Type customType;
 
     /**
      * @param reversed true if the condition should be reversed
@@ -47,15 +52,29 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
     /**
      * @param reversed true if the condition should be reversed
      * @param property the name of the property
-     * @param parameter true if it's a custom event parameter
+     * @param custom true if it's a custom event property
      * @since 13.9RC1
      */
-    public AbstractPropertyQueryCondition(boolean reversed, String property, boolean parameter)
+    public AbstractPropertyQueryCondition(boolean reversed, String property, boolean custom)
+    {
+        this(reversed, property, custom, null);
+    }
+
+    /**
+     * @param reversed true if the condition should be reversed
+     * @param property the name of the property
+     * @param custom true if it's a custom event reversed
+     * @param customType the type in which that property was stored
+     * @since 14.2RC1
+     */
+    public AbstractPropertyQueryCondition(boolean reversed, String property, boolean custom, Type customType)
     {
         super(reversed);
 
         this.property = property;
-        this.parameter = parameter;
+
+        this.custom = custom;
+        this.customType = customType;
     }
 
     /**
@@ -69,10 +88,30 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
     /**
      * @return true if it's a custom event parameter
      * @since 13.9RC1
+     * @deprecated use {@link #isCustom()} instead
      */
+    @Deprecated(since = "14.2RC1")
     public boolean isParameter()
     {
-        return this.parameter;
+        return isCustom();
+    }
+
+    /**
+     * @return true if it's a custom event property
+     * @since 14.2RC1
+     */
+    public boolean isCustom()
+    {
+        return this.custom;
+    }
+
+    /**
+     * @return the type in which that property was stored
+     * @since 14.2RC1
+     */
+    public Type getCustomType()
+    {
+        return this.customType;
     }
 
     @Override
@@ -82,7 +121,8 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
 
         builder.appendSuper(super.hashCode());
         builder.append(getProperty());
-        builder.append(isParameter());
+        builder.append(isCustom());
+        builder.append(getCustomType());
 
         return builder.build();
     }
@@ -95,8 +135,15 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
         }
 
         if (super.equals(obj) && obj instanceof AbstractPropertyQueryCondition) {
-            return getProperty().equals(((AbstractPropertyQueryCondition) obj).getProperty())
-                && isParameter() == ((AbstractPropertyQueryCondition) obj).isParameter();
+            AbstractPropertyQueryCondition otherContition = (AbstractPropertyQueryCondition) obj;
+
+            EqualsBuilder builder = new EqualsBuilder();
+
+            builder.append(getProperty(), otherContition.getProperty());
+            builder.append(isCustom(), otherContition.isCustom());
+            builder.append(getCustomType(), otherContition.getCustomType());
+
+            return builder.isEquals();
         }
 
         return false;
@@ -109,7 +156,8 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
 
         builder.appendSuper(super.toString());
         builder.append("property", getProperty());
-        builder.append("custom", isParameter());
+        builder.append("custom", isCustom());
+        builder.append("customType", getCustomType());
 
         return builder.build();
     }

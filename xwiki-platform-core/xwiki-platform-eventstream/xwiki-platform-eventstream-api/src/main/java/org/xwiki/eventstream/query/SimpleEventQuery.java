@@ -19,6 +19,7 @@
  */
 package org.xwiki.eventstream.query;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -53,7 +54,9 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
 
     private boolean nextReversed;
 
-    private boolean nextParameter;
+    private boolean nextCustom;
+
+    private Type nextCustomType;
 
     private Deque<GroupQueryCondition> groupStack = new LinkedList<>();
 
@@ -203,10 +206,38 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      * 
      * @return this {@link SimpleEventQuery}
      * @since 13.9RC1
+     * @deprecated use {@link #custom()} instead
      */
+    @Deprecated(since = "14.2RC1")
     public SimpleEventQuery parameter()
     {
-        this.nextParameter = true;
+        return custom();
+    }
+
+    /**
+     * Next call will be about custom event parameters.
+     * 
+     * @return this {@link SimpleEventQuery}
+     * @since 14.2RC1
+     */
+    public SimpleEventQuery custom()
+    {
+        this.nextCustom = true;
+
+        return this;
+    }
+
+    /**
+     * Next call will be about custom event parameters.
+     * 
+     * @param type the type in which that property was stored
+     * @return this {@link SimpleEventQuery}
+     * @since 14.2RC1
+     */
+    public SimpleEventQuery custom(Type type)
+    {
+        this.nextCustom = true;
+        this.nextCustomType = type;
 
         return this;
     }
@@ -266,7 +297,8 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
 
     private void addCompareCondition(String property, Object value, CompareType type)
     {
-        addCondition(new CompareQueryCondition(property, this.nextParameter, value, type, this.nextReversed));
+        addCondition(
+            new CompareQueryCondition(property, this.nextCustom, this.nextCustomType, value, type, this.nextReversed));
     }
 
     private void addCondition(QueryCondition newCondition)
@@ -279,7 +311,8 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
 
         // Reset flags
         this.nextReversed = false;
-        this.nextParameter = false;
+        this.nextCustom = false;
+        this.nextCustomType = null;
     }
 
     /**
@@ -404,7 +437,8 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery in(String property, List<?> values)
     {
-        addCondition(new InQueryCondition(this.nextReversed, property, this.nextParameter, (List) values));
+        addCondition(
+            new InQueryCondition(this.nextReversed, property, this.nextCustom, this.nextCustomType, (List) values));
 
         return this;
     }
@@ -493,10 +527,11 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery addSort(String property, Order order)
     {
-        this.sorts.add(new SortClause(property, this.nextParameter, order));
+        this.sorts.add(new SortClause(property, this.nextCustom, this.nextCustomType, order));
 
         // Reset flag
-        this.nextParameter = false;
+        this.nextCustom = false;
+        this.nextCustomType = null;
 
         return this;
     }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.eventstream.query;
 
+import java.lang.reflect.Type;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -118,6 +120,24 @@ public class CompareQueryCondition extends AbstractPropertyQueryCondition
     public CompareQueryCondition(String property, boolean custom, Object value, CompareType type, boolean reversed)
     {
         super(reversed, property, custom);
+
+        this.value = value;
+        this.type = type;
+    }
+
+    /**
+     * @param property the name of the property
+     * @param custom true if it's a custom event reversed
+     * @param customType the type in which that property was stored
+     * @param value the value the property should be equal to
+     * @param type the type of comparison
+     * @param reversed true if the condition should be reversed
+     * @since 14.2RC1
+     */
+    public CompareQueryCondition(String property, boolean custom, Type customType, Object value, CompareType type,
+        boolean reversed)
+    {
+        super(reversed, property, custom, customType);
 
         this.value = value;
         this.type = type;

@@ -49,8 +49,8 @@ public class MentionsLegacyEventConverter extends AbstractLegacyEventConverter
     {
         // This code is called once when the event is saved in database
         LegacyEvent event = super.convertEventToLegacyActivity(e);
-        if (e.getParameters().containsKey(MentionsRecordableEventConverter.MENTIONS_PARAMETER_KEY)) {
-            event.setParam3(e.getParameters().get(MentionsRecordableEventConverter.MENTIONS_PARAMETER_KEY));
+        if (e.getCustom().containsKey(MentionsRecordableEventConverter.MENTIONS_PARAMETER_KEY)) {
+            event.setParam3((String) e.getCustom().get(MentionsRecordableEventConverter.MENTIONS_PARAMETER_KEY));
         }
         return event;
     }
@@ -61,7 +61,7 @@ public class MentionsLegacyEventConverter extends AbstractLegacyEventConverter
         // this code is called everytime an event is loaded from database
         Event event = super.convertLegacyActivityToEvent(e);
         if (!StringUtils.isEmpty(e.getParam3())) {
-            event.setParameters(singletonMap(MentionsRecordableEventConverter.MENTIONS_PARAMETER_KEY, e.getParam3()));
+            event.setCustom(singletonMap(MentionsRecordableEventConverter.MENTIONS_PARAMETER_KEY, e.getParam3()));
         }
         return event;
     }

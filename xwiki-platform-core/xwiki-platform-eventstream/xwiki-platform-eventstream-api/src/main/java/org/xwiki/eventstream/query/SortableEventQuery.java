@@ -19,8 +19,10 @@
  */
 package org.xwiki.eventstream.query;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.eventstream.EventQuery;
@@ -61,7 +63,9 @@ public interface SortableEventQuery extends EventQuery
 
         private final String property;
 
-        private final boolean parameter;
+        private final boolean custom;
+
+        private final Type customType;
 
         private final Order order;
 
@@ -76,14 +80,27 @@ public interface SortableEventQuery extends EventQuery
 
         /**
          * @param property see {@link #getProperty()}
-         * @param parameter see {@link #isParameter()}
+         * @param custom see {@link #isCustom()}
          * @param order see {@link #getOrder()}
          * @since 13.9RC1
          */
-        public SortClause(String property, boolean parameter, Order order)
+        public SortClause(String property, boolean custom, Order order)
+        {
+            this(property, custom, null, order);
+        }
+
+        /**
+         * @param property see {@link #getProperty()}
+         * @param custom see {@link #isCustom()}
+         * @param customType see {@link #getCustomType()}
+         * @param order see {@link #getOrder()}
+         * @since 14.2RC1
+         */
+        public SortClause(String property, boolean custom, Type customType, Order order)
         {
             this.property = property;
-            this.parameter = parameter;
+            this.custom = custom;
+            this.customType = customType;
             this.order = order;
         }
 
@@ -97,10 +114,31 @@ public interface SortableEventQuery extends EventQuery
 
         /**
          * @return true if it's a custom event parameter
+         * @since 13.9RC1
+         * @deprecated use {@link #isCustom()} instead
          */
+        @Deprecated(since = "13.9RC1")
         public boolean isParameter()
         {
-            return this.parameter;
+            return isCustom();
+        }
+
+        /**
+         * @return true if it's a custom event parameter
+         * @since 14.2RC1
+         */
+        public boolean isCustom()
+        {
+            return this.custom;
+        }
+
+        /**
+         * @return the type in which that property was stored
+         * @since 14.2RC1
+         */
+        public Type getCustomType()
+        {
+            return this.customType;
         }
 
         /**
@@ -117,7 +155,8 @@ public interface SortableEventQuery extends EventQuery
             HashCodeBuilder builder = new HashCodeBuilder();
 
             builder.append(getProperty());
-            builder.append(isParameter());
+            builder.append(isCustom());
+            builder.append(getCustomType());
             builder.append(getOrder());
 
             return builder.build();
@@ -130,8 +169,20 @@ public interface SortableEventQuery extends EventQuery
                 return true;
             }
 
-            return obj instanceof SortClause && ((SortClause) obj).getProperty().equals(getProperty())
-                && ((SortClause) obj).isParameter() == isParameter() && ((SortClause) obj).getOrder() == getOrder();
+            if (obj instanceof SortClause) {
+                SortClause otherSortClause = (SortClause) obj;
+
+                EqualsBuilder builder = new EqualsBuilder();
+
+                builder.append(getProperty(), otherSortClause.getProperty());
+                builder.append(isCustom(), otherSortClause.isCustom());
+                builder.append(getCustomType(), otherSortClause.getCustomType());
+                builder.append(getOrder(), otherSortClause.getOrder());
+
+                return builder.isEquals();
+            }
+
+            return false;
         }
 
         @Override
@@ -140,7 +191,8 @@ public interface SortableEventQuery extends EventQuery
             ToStringBuilder builder = new XWikiToStringBuilder(this);
 
             builder.append("property", getProperty());
-            builder.append("parameter", isParameter());
+            builder.append("custom", isCustom());
+            builder.append("customType", getCustomType());
             builder.append("order", getOrder());
 
             return builder.build();

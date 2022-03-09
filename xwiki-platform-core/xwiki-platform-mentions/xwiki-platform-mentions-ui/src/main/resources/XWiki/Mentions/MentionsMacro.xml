@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Mentions.MentionsMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Mentions.MentionsMacro" locale="">
   <web>XWiki.Mentions</web>
   <name>MentionsMacro</name>
   <language/>
@@ -29,6 +29,7 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>XWiki.Mentions.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>MentionsMacro</title>
@@ -187,7 +188,7 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
   }
 
   ckeditorPromise.then(ckeditor =&gt; {
-    function confMentions(name) {
+    function getUserMentionsConfig(editor) {
       return {
         feed: function (opts, callback) {
           search(opts.query, callback);
@@ -195,18 +196,18 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
         marker: '@',
         minChars: 0,
         itemsLimit: 6,
-        itemTemplate: '&lt;li data-id="{id}" class="ckeditor-autocomplete-item"&gt;'+
-              '&lt;div&gt;'+
-                '&lt;span class="ckeditor-autocomplete-item-icon-wrapper"&gt;'+
-                  '&lt;span class="{cssClass}"&gt;&lt;/span&gt;'+
-                  '&lt;img src="{imgUrl}" class="{imgClass}"/&gt;'+
-                '&lt;/span&gt;'+
-                '&lt;span class="ckeditor-autocomplete-item-label"&gt;{label}&lt;/span&gt;'+
-              '&lt;/div&gt;'+
-            '&lt;/li&gt;',
+        itemTemplate:
+         `&lt;li data-id="{id}" class="ckeditor-autocomplete-item"&gt;
+            &lt;div&gt;
+              &lt;span class="ckeditor-autocomplete-item-icon-wrapper"&gt;
+                &lt;span class="{cssClass}"&gt;&lt;/span&gt;
+                &lt;img src="{imgUrl}" class="{imgClass}"/&gt;
+              &lt;/span&gt;
+              &lt;span class="ckeditor-autocomplete-item-label"&gt;{label}&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/li&gt;`,
         outputTemplate: function (param) {
-          var editor = ckeditor.instances[name];
-          editor.once('afterInsertHtml', function () {
+          editor.once('afterInsertHtml', function() {
             editor.execCommand('xwiki-macro-insert', {
               name: 'mention',
               inline: 'enforce',
@@ -224,22 +225,20 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
       };
     }
 
-    function updateConf(config, name) {
-      const newConf = config || {};
-      newConf.mentions = newConf.mentions || [];
-      newConf.mentions.push(confMentions(name));
-      return newConf;
+    function updateConfig(editor) {
+      editor.config.mentions = editor.config.mentions || [];
+      editor.config.mentions.push(getUserMentionsConfig(editor));
     }
 
-    var oldReplace = ckeditor.replace;
-    ckeditor.replace = function (element, config) {
-      return oldReplace.call(this, element, updateConf(config, element.id));
-    };
-
-    var oldInline = ckeditor.inline;
-    ckeditor.inline = function (element, config) {
-      return oldInline.call(this, element, updateConf(config, element.id));
-    };
+    ckeditor.on('instanceCreated', function(event) {
+      // The editor instance was created but it not yet initialized. Unfortunately the configuration object passed when
+      // the instance was created has not been merged with the global configuration yet.
+      event.editor.once('configLoaded', function(event) {
+        // The editor configuration has been loaded (the instance configuration has been merged with the global
+        // configuration) but the editor has not been fully initialized yet so we can modify the configuration.
+        updateConfig(event.editor);
+      });
+    });
   });
 });</code>
     </property>
@@ -409,7 +408,7 @@ blockquote.mention-quote {
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>12</number>
+        <number>13</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -422,14 +421,14 @@ blockquote.mention-quote {
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>13</number>
+        <number>14</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -438,7 +437,7 @@ blockquote.mention-quote {
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>11</number>
+        <number>12</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -543,6 +542,16 @@ blockquote.mention-quote {
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -619,6 +628,9 @@ blockquote.mention-quote {
     </property>
     <property>
       <name>User Mention</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>1</supportsInlineMode>

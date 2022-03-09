@@ -1001,10 +1001,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
+    public XWikiDocument loadXWikiDoc(XWikiDocument defaultDocument, XWikiContext inputxcontext) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
+        XWikiDocument doc = defaultDocument;
         try {
             boolean bTransaction = true;
             MonitorPlugin monitor = Util.getMonitorPlugin(context);
@@ -1013,31 +1014,33 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 if (monitor != null) {
                     monitor.startTimer(HINT);
                 }
-                doc.setStore(this);
                 checkHibernate(context);
 
-                SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
+                SessionFactory sfactory = injectCustomMappingsInSessionFactory(defaultDocument, context);
                 bTransaction = bTransaction && beginTransaction(sfactory, context);
                 Session session = getSession(context);
                 session.setHibernateFlushMode(FlushMode.MANUAL);
 
-                try {
-                    session.load(doc, Long.valueOf(doc.getId()));
-                    doc.setNew(false);
-                    doc.setMostRecent(true);
-                    // Fix for XWIKI-1651
-                    doc.setDate(new Date(doc.getDate().getTime()));
-                    doc.setCreationDate(new Date(doc.getCreationDate().getTime()));
-                    doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
-                } catch (ObjectNotFoundException e) { // No document
-                    doc.setNew(true);
+                doc = session.get(XWikiDocument.class, doc.getId());
+                if (doc == null) {
+                    defaultDocument.setNew(true);
 
                     // Make sure to always return a document with an original version, even for one that does not exist.
                     // Allow writing more generic code.
-                    doc.setOriginalDocument(new XWikiDocument(doc.getDocumentReference(), doc.getLocale()));
+                    defaultDocument
+                        .setOriginalDocument(
+                            new XWikiDocument(defaultDocument.getDocumentReference(), defaultDocument.getLocale()));
 
-                    return doc;
+                    return defaultDocument;                    
                 }
+
+                doc.setStore(this);
+                doc.setNew(false);
+                doc.setMostRecent(true);
+                // Fix for XWIKI-1651
+                doc.setDate(new Date(doc.getDate().getTime()));
+                doc.setCreationDate(new Date(doc.getCreationDate().getTime()));
+                doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
 
                 // Loading the attachment list
                 if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
@@ -1146,7 +1149,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
-                Object[] args = { doc.getDocumentReference() };
+                Object[] args = { defaultDocument.getDocumentReferenceWithLocale() };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Exception while reading document [{0}]", e,
                     args);
@@ -1164,7 +1167,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
-            this.logger.debug("Loaded XWikiDocument: [{}]", doc.getDocumentReference());
+            this.logger.debug("Loaded XWikiDocument: [{}]", doc.getDocumentReferenceWithLocale());
 
             return doc;
         } finally {

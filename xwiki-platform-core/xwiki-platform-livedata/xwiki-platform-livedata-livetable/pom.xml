@@ -32,7 +32,7 @@
   <name>XWiki Platform - Live Data - Live Table Connector</name>
   <description>Adds support for reusing existing Live Table results as a Live Data source.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.94</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.95</xwiki.jacoco.instructionRatio>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data - Live Table Connector</xwiki.extension.name>
@@ -56,6 +56,17 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <!-- Runtime dependencies -->
+    <!-- Included by default since it provides the default result page, XWiki.LiveTableResults. It is also marked as 
+         optional to let admins uninstall it if it happens to be unused in practice. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livetable-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

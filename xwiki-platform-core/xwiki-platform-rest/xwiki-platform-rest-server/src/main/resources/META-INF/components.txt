@@ -83,3 +83,4 @@ org.xwiki.rest.internal.url.resources.DocumentRestURLGenerator
 org.xwiki.rest.internal.url.resources.JobStatusRestURLGenerator
 org.xwiki.rest.internal.url.resources.SpaceRestURLGenerator
 org.xwiki.rest.script.RESTScriptService
+org.xwiki.rest.internal.exceptions.ExceptionExceptionMapper

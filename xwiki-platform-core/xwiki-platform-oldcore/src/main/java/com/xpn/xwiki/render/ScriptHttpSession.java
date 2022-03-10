@@ -30,7 +30,6 @@ import javax.servlet.http.HttpSessionContext;
 
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * A wrapper around {@link HttpSession} with security related checks.
@@ -39,7 +38,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.4RC1
  * @since 11.10.5
  */
-@Unstable
 public class ScriptHttpSession implements HttpSession, HttpSessionContext
 {
     private static final String KEY_SAFESESSION = ScriptHttpSession.class.getName();

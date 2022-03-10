@@ -36,6 +36,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.reference.SolrEntityReferenceResolver;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -44,9 +45,17 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for the {@link org.xwiki.search.solr.script.SolrIndexScriptService}.
@@ -97,14 +106,12 @@ public class SolrIndexScriptServiceTest
 
         // RightService
         this.mockAuthorization = this.mocker.getInstance(AuthorizationManager.class);
-        // By default, we have the rights.
-        when(mockAuthorization.hasAccess(any(), any(), any())).thenReturn(true);
 
         this.service = mocker.getComponentUnderTest();
 
         // Rights check success. By default we are allowed (no error is thrown)
         this.logger = mocker.getMockedLogger();
-        verify(this.logger, never()).error(any(), any(IllegalAccessException.class));
+        verify(this.logger, never()).error(any(), any(AccessDeniedException.class));
     }
 
     @Test
@@ -118,8 +125,8 @@ public class SolrIndexScriptServiceTest
         // Assert and verify
 
         // Actual rights check
-        verify(this.mockAuthorization).hasAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
     }
 
     @Test
@@ -136,8 +143,8 @@ public class SolrIndexScriptServiceTest
         // Assert and verify
 
         // Actual rights check
-        verify(this.mockAuthorization).hasAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
     }
 
     @Test
@@ -151,8 +158,8 @@ public class SolrIndexScriptServiceTest
         // Assert and verify
 
         // Actual rights check
-        verify(this.mockAuthorization).hasAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
     }
 
     @Test
@@ -169,8 +176,8 @@ public class SolrIndexScriptServiceTest
         // Assert and verify
 
         // Actual rights check
-        verify(this.mockAuthorization).hasAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
     }
 
     @Test
@@ -185,8 +192,8 @@ public class SolrIndexScriptServiceTest
 
         // Actual rights check
         EntityReference wikiReference = documentReference.extractReference(EntityType.WIKI);
-        verify(this.mockAuthorization).hasAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
     }
 
     @Test
@@ -195,8 +202,8 @@ public class SolrIndexScriptServiceTest
         EntityReference wikiReference = new WikiReference("someWiki");
 
         // Mock
-        when(this.mockAuthorization.hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference)).thenReturn(
-            false);
+        doThrow(AccessDeniedException.class).when(this.mockAuthorization).checkAccess(Right.PROGRAM,
+            this.contentAuthorReference, null);
 
         // Call
         this.service.index(wikiReference);
@@ -204,16 +211,13 @@ public class SolrIndexScriptServiceTest
         // Assert and verify
 
         // Actual rights check
-        verify(this.mockAuthorization).hasAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
 
         // Rights check failure
-        String errorMessage =
-            String.format("The user '%s' is not allowed to alter the index for the entity '%s'", userReference,
-                wikiReference);
-        verify(this.logger).error(eq(errorMessage), any(IllegalAccessException.class));
+        verify(this.logger).error(isNull(), any(AccessDeniedException.class));
         verify(this.mockContext).put(eq(SolrIndexScriptService.CONTEXT_LASTEXCEPTION),
-            any(IllegalAccessException.class));
+            any(AccessDeniedException.class));
     }
 
     @Test
@@ -222,7 +226,8 @@ public class SolrIndexScriptServiceTest
         EntityReference wikiReference = new WikiReference("someWiki");
 
         // Mock
-        when(this.mockAuthorization.hasAccess(Right.ADMIN, this.userReference, wikiReference)).thenReturn(false);
+        doThrow(AccessDeniedException.class).when(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference,
+            wikiReference);
 
         // Call
         this.service.index(wikiReference);
@@ -230,18 +235,15 @@ public class SolrIndexScriptServiceTest
         // Assert and verify
 
         // Actual rights check
-        verify(this.mockAuthorization).hasAccess(Right.ADMIN, this.userReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
         // hasProgrammingRights does not really get to be called, since hasWikiAdminRights already failed at this point
-        verify(this.mockAuthorization, times(0)).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference);
+        verify(this.mockAuthorization, times(0)).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
 
         // Rights check failure.
-        String errorMessage =
-            String.format("The user '%s' is not allowed to alter the index for the entity '%s'", userReference,
-                wikiReference);
-        verify(this.logger).error(eq(errorMessage), any(IllegalAccessException.class));
+        verify(this.logger).error(isNull(), any(AccessDeniedException.class));
         verify(this.mockContext).remove(eq(SolrIndexScriptService.CONTEXT_LASTEXCEPTION));
         verify(this.mockContext).put(eq(SolrIndexScriptService.CONTEXT_LASTEXCEPTION),
-            any(IllegalAccessException.class));
+            any(AccessDeniedException.class));
     }
 
     @Test
@@ -259,8 +261,8 @@ public class SolrIndexScriptServiceTest
         // Assert and verify
 
         // Actual rights check
-        verify(this.mockAuthorization).hasAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
+        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
     }
 
     @Test
@@ -275,18 +277,16 @@ public class SolrIndexScriptServiceTest
         DocumentReference documentReference2 = new DocumentReference("wiki3", "space", "name2");
 
         // Call
-        this.service.index(Arrays.asList(wikiReference1, spaceReference, wikiReference2, documentReference,
-            documentReference2));
+        this.service.index(
+            Arrays.asList(wikiReference1, spaceReference, wikiReference2, documentReference, documentReference2));
 
         // Assert and verify
 
         // Actual rights check, once for each wiki.
-        verify(this.mockAuthorization).hasAccess(Right.ADMIN, this.userReference, wikiReference1);
-        verify(this.mockAuthorization).hasAccess(Right.ADMIN, this.userReference, wikiReference2);
-        verify(this.mockAuthorization).hasAccess(Right.ADMIN, this.userReference, wikiReference3);
-        verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference1);
-        verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference2);
-        verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference3);
+        verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference1);
+        verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference2);
+        verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference3);
+        verify(this.mockAuthorization, times(3)).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
     }
 
     @Test

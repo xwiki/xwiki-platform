@@ -33,11 +33,14 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
+import org.xwiki.classloader.ClassLoaderManager;
+import org.xwiki.classloader.NamespaceURLClassLoader;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -46,6 +49,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
 import org.xwiki.url.URLConfiguration;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -93,6 +97,12 @@ public class InternalSkinManager implements Initializable
     @Inject
     private URLConfiguration urlConfiguration;
 
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private ClassLoaderManager classLoaderManager;
+
     private Cache<Skin> cache;
 
     @Override
@@ -134,6 +144,8 @@ public class InternalSkinManager implements Initializable
 
         if (skin == null) {
             skin = createSkin(id);
+
+            this.cache.set(id, skin);
         }
 
         return skin;
@@ -146,8 +158,21 @@ public class InternalSkinManager implements Initializable
         if (this.wikiSkinUtils.isWikiSkin(id)) {
             skin = new WikiSkin(id, this, this.skinConfiguration, this.wikiSkinUtils, this.logger);
         } else {
-            skin = new EnvironmentSkin(id, this, this.skinConfiguration, this.logger, this.environment,
-                this.xcontextProvider, this.urlConfiguration);
+            EnvironmentSkin environmentSkin =
+                new EnvironmentSkin(id, this, this.skinConfiguration, this.logger, this.environment,
+                    this.xcontextProvider, this.urlConfiguration);
+            // Check if the environment skin actually exists on the environment before returning it.
+            // Other fallbacks to a classloader skin.
+            if (environmentSkin.exists()) {
+                skin = environmentSkin;
+            } else {
+                // Resolve the current wiki namespace and use it to find its classloader.
+                WikiNamespace wikiNamespace = new WikiNamespace(this.wikiDescriptorManager.getCurrentWikiId());
+                NamespaceURLClassLoader wikiClassLoader =
+                    this.classLoaderManager.getURLClassLoader(wikiNamespace.serialize(), false);
+                skin = new ClassLoaderSkin(id, this, this.skinConfiguration, this.logger, this.xcontextProvider,
+                    this.urlConfiguration, wikiClassLoader);
+            }
         }
 
         return skin;

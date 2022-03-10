@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.objects;
 
-public class LongProperty extends NumberProperty
+public class LongProperty extends NumberProperty<Long>
 {
     private static final long serialVersionUID = 1L;
 }

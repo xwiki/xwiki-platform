@@ -52,7 +52,7 @@ import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
  * </code></pre>
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 12.4RC1
  */
 @Component
 @Named("mail.sender")

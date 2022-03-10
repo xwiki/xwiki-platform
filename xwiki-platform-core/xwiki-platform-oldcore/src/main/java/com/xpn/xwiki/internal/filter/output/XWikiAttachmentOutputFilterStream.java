@@ -23,7 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -47,6 +50,9 @@ import com.xpn.xwiki.internal.doc.ListAttachmentArchive;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilterStream<XWikiAttachment>
 {
+    @Inject
+    private Logger logger;
+
     // Events
 
     private void setVersion(XWikiAttachment attachment, FilterEventParameters parameters)
@@ -136,8 +142,8 @@ public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilte
 
         // Author
 
-        attachment
-            .setAuthorReference(getUserReference(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
+        attachment.setAuthorReference(
+            getUserDocumentReference(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
 
         // Revision
 
@@ -151,7 +157,9 @@ public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilte
                 try {
                     attachment.setArchive(revisions);
                 } catch (XWikiException e) {
-                    throw new FilterException("Failed to set attachment archive", e);
+                    this.logger.error(
+                        "Failed to set the archive for attachment [{}]. This attachment won't have any history.", name,
+                        e);
                 }
             }
 

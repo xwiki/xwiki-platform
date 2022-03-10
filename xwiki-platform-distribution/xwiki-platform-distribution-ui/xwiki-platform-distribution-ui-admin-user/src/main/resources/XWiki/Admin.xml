@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Admin" locale="">
+<xwikidoc version="1.4" reference="XWiki.Admin" locale="">
   <web>XWiki</web>
   <name>Admin</name>
   <language/>
@@ -40,10 +40,10 @@
   <object>
     <name>XWiki.Admin</name>
     <number>0</number>
-    <className>XWiki.WatchListClass</className>
-    <guid>1bc13824-268d-46f2-8cad-cfb2cc5a0617</guid>
+    <className>XWiki.Notifications.Code.AutomaticWatchModeClass</className>
+    <guid>0eef7512-d86e-4796-b0aa-b3036eca456d</guid>
     <class>
-      <name>XWiki.WatchListClass</name>
+      <name>XWiki.Notifications.Code.AutomaticWatchModeClass</name>
       <customClass/>
       <customMapping/>
       <defaultViewSheet/>
@@ -51,104 +51,27 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
-      <automaticwatch>
+      <automaticWatchMode>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
-        <name>automaticwatch</name>
-        <number>6</number>
-        <prettyName>Automatic Watching</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>default|NONE|ALL|MAJOR|NEW</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </automaticwatch>
-      <documents>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <multiSelect>1</multiSelect>
-        <name>documents</name>
-        <number>4</number>
-        <prettyName>Document List</prettyName>
-        <relationalStorage>1</relationalStorage>
-        <separator> </separator>
-        <size>80</size>
-        <sql/>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-      </documents>
-      <interval>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>interval</name>
+        <name>automaticWatchMode</name>
         <number>1</number>
-        <prettyName>Email Notifications Interval</prettyName>
+        <prettyName>Automatic Watch Mode</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
+        <separator>|</separator>
+        <separators>|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>Scheduler.WatchListDailyNotifier|Scheduler.WatchListHourlyNotifier|Scheduler.WatchListWeeklyNotifier</values>
+        <values>NONE|ALL|MAJOR|NEW</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </interval>
-      <spaces>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <multiSelect>1</multiSelect>
-        <name>spaces</name>
-        <number>3</number>
-        <prettyName>Space List</prettyName>
-        <relationalStorage>1</relationalStorage>
-        <separator> </separator>
-        <size>80</size>
-        <sql/>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-      </spaces>
-      <users>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <multiSelect>1</multiSelect>
-        <name>users</name>
-        <number>5</number>
-        <prettyName>User List</prettyName>
-        <relationalStorage>1</relationalStorage>
-        <separator> </separator>
-        <size>80</size>
-        <sql/>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-      </users>
-      <wikis>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <multiSelect>1</multiSelect>
-        <name>wikis</name>
-        <number>2</number>
-        <prettyName>Wiki List</prettyName>
-        <relationalStorage>1</relationalStorage>
-        <separator> </separator>
-        <size>80</size>
-        <sql/>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-      </wikis>
+      </automaticWatchMode>
     </class>
     <property>
-      <automaticwatch>NONE</automaticwatch>
-    </property>
-    <property>
-      <interval/>
+      <automaticWatchMode>NONE</automaticWatchMode>
     </property>
   </object>
   <object>

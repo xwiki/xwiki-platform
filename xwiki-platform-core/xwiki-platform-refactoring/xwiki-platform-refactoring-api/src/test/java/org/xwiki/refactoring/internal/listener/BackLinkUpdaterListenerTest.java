@@ -126,7 +126,7 @@ public class BackLinkUpdaterListenerTest
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
         verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(), any());
+        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
@@ -143,7 +143,7 @@ public class BackLinkUpdaterListenerTest
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
         verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(), any());
+        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
     }
@@ -156,7 +156,7 @@ public class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.linkRefactoring, never()).renameLinks(any(), any(), any());
+        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
     }
 
     @Test
@@ -182,7 +182,7 @@ public class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, null, null);
 
-        verify(this.linkRefactoring, never()).renameLinks(eq(carolReference), any(), any());
+        verify(this.linkRefactoring, never()).renameLinks(eq(carolReference), any(DocumentReference.class), any());
         verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
@@ -194,6 +194,6 @@ public class BackLinkUpdaterListenerTest
     {
         this.listener.onEvent(null, null, null);
 
-        verify(this.linkRefactoring, never()).renameLinks(any(), any(), any());
+        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
     }
 }

@@ -22,8 +22,6 @@ package org.xwiki.query;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * This is a Query interface, representing all queries in various languages for various stores.
  *
@@ -117,7 +115,6 @@ public interface Query
      * @see #bindValue(String, Object)
      * @since 11.5RC1
      */
-    @Unstable
     default Query bindValues(Map<String, ?> values)
     {
         values.forEach(this::bindValue);

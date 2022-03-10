@@ -26,7 +26,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.security.authentication.api.AuthenticationConfiguration;
+import org.xwiki.security.authentication.AuthenticationConfiguration;
 
 /**
  * Default implementation for {@link AuthenticationConfiguration}.

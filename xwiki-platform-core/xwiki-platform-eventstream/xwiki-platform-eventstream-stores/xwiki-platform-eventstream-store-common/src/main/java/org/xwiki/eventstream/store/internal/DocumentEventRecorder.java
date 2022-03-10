@@ -19,6 +19,8 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.util.concurrent.ExecutionException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -32,12 +34,13 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStore;
-import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -69,14 +72,20 @@ public class DocumentEventRecorder
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
+
     /**
      * Record the given event.
      * 
      * @param event the event to record
      * @param source the source that has triggered the event
      * @throws EventStreamException when failing to record the passed event
+     * @throws ExecutionException if this future completed exceptionally
+     * @throws InterruptedException if the current thread was interrupted
      */
-    public void recordEvent(Event event, Object source) throws EventStreamException
+    public void recordEvent(Event event, Object source) throws EventStreamException, InterruptedException, ExecutionException
     {
         XWikiDocument currentDoc = (XWikiDocument) source;
         XWikiDocument originalDoc = currentDoc.getOriginalDocument();
@@ -127,7 +136,6 @@ public class DocumentEventRecorder
     }
 
     private void recordEvent(String streamName, XWikiDocument doc, String type, String title)
-        throws EventStreamException
     {
         final String msgPrefix = "activitystream.event.";
 
@@ -141,7 +149,9 @@ public class DocumentEventRecorder
         event.setBody(msgPrefix + title);
         event.setDocumentVersion(doc.getVersion());
         // This might be wrong once non-altering events will be logged.
-        event.setUser(doc.getAuthorReference());
+        DocumentReference originalAuthor =
+            this.userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());
+        event.setUser(originalAuthor);
         event.setHidden(doc.isHidden());
         event.setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, contextProvider.get()));
 

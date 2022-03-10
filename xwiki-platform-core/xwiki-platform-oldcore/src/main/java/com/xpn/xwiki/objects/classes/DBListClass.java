@@ -181,8 +181,8 @@ public class DBListClass extends ListClass
     /**
      * <p>
      * Computes the query corresponding to the current XProperty. The query is either manually specified by the XClass
-     * creator in the <tt>sql</tt> field, or, if the query field is blank, constructed using the <tt>classname</tt>,
-     * <tt>idField</tt> and <tt>valueField</tt> properties. The query is constructed according to the following rules:
+     * creator in the {@code sql} field, or, if the query field is blank, constructed using the {@code classname},
+     * {@code idField} and {@code valueField} properties. The query is constructed according to the following rules:
      * </p>
      * <ul>
      * <li>If no classname, id or value fields are selected, return a query that return no rows.</li>

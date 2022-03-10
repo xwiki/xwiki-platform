@@ -56,6 +56,19 @@ public class AnnotationsLabel extends BaseElement
         hoverOnAnnotationById(idText);
     }
 
+    /**
+     * Shows the annotation associated to the specified text.
+     * 
+     * @param text the annotated text
+     * @since 12.10.9
+     * @since 13.4.1
+     * @since 13.5RC1
+     */
+    public void showAnnotationByText(String text)
+    {
+        hoverOnAnnotationByText(text);
+    }
+
     public void deleteAnnotationByText(String searchText)
     {
         this.deleteAnnotationById(this.getAnnotationIdByText(searchText));
@@ -66,7 +79,7 @@ public class AnnotationsLabel extends BaseElement
         this.showAnnotationById(idText);
         // The id format is "ID<index>".
         String index = idText.substring(2);
-        getDriver().findElementByCssSelector("#annotation_view_" + index + " a.delete").click();
+        getDriver().findElement(By.cssSelector("#annotation_view_" + index + " a.delete")).click();
         getDriver().waitUntilElementIsVisible(By.xpath("//input[@value='Yes']"));
         getDriver().findElement(By.xpath("//input[@value='Yes']")).click();
     }

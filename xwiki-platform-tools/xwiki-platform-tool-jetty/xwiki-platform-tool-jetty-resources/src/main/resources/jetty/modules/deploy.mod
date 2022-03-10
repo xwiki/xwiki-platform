@@ -21,16 +21,13 @@
 DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
-Enables webapplication deployment from the webapps directory.
+Enables web application deployment from the webapps directory.
 
 [depend]
 webapp
 
 [lib]
 lib/jetty-deploy-${jetty.version}.jar
-
-[files]
-webapps/
 
 [xml]
 etc/jetty-deploy.xml

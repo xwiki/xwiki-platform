@@ -57,8 +57,6 @@ if not defined JETTY_STOP_PORT (
   set JETTY_STOP_PORT=8079
 )
 
-echo Starting Jetty on port %JETTY_PORT%, please wait...
-
 REM For enabling YourKit Profiling.
 REM %3 must the path where Yourkit can find the agent.
 REM For example: "C:\PROGRA~1\YOURKI~1.11\bin\win32"
@@ -90,16 +88,11 @@ if not exist "%XWIKI_DATA_DIR%" mkdir "%XWIKI_DATA_DIR%"
 REM Ensure the logs directory exists as otherwise Jetty reports an error
 if not exist "%XWIKI_DATA_DIR%\logs" mkdir "%XWIKI_DATA_DIR%\logs"
 
-REM Set up the Jetty Base directory (used for custom Jetty configuration) to point to the Data Directory
-REM Also created some Jetty directorie that Jetty would otherwise create at first startup. We do this to avoid
-REM cryptic messages in the logs such as: "MKDIR: ${jetty.base}/lib"
-set JETTY_BASE=%XWIKI_DATA_DIR%\jetty
-if not exist "%JETTY_BASE%" mkdir "%JETTY_BASE%"
-if not exist "%JETTY_BASE%\lib" mkdir "%JETTY_BASE%\lib"
-if not exist "%JETTY_BASE%\lib\ext" mkdir "%JETTY_BASE%\lib\ext"
+REM Set up the Jetty Base directory (used for custom Jetty configuration) to be the current directory where this file
+REM is.
+REM Also make sure the log directory exists since Jetty won't create it.
+set JETTY_BASE=.
 if not exist "%JETTY_BASE%\logs" mkdir "%JETTY_BASE%\logs"
-if not exist "%JETTY_BASE%\resources" mkdir "%JETTY_BASE%\resources"
-if not exist "%JETTY_BASE%\webapps" mkdir "%JETTY_BASE%\webapps"
 
 REM Specify Jetty's home and base directories
 set JETTY_HOME=jetty

@@ -49,7 +49,10 @@
   #set ($extra = "${extra} AND doc.space = :doc_space")
   #set ($discard = $params.put('doc_space', $request.space))
 #end
-#addLivetableLocationFilter($extra, $params, $!request.location)
+## Use filterLocation since addLivetableLocationFilter is buggy when called several times (it'll add the
+## same HQL binding name every time it's called! See https://jira.xwiki.org/browse/XWIKI-17463).
+## Also note that we don't call addLocationFilter since we use a Map for $params.
+#filterLocation($extra, $params, $!request.location, 'locationFilterValue1')
 #if ("$!request.parent" != '')
   #set ($extra = "${extra} and doc.parent = :doc_parent")
   #set ($discard = $params.put('doc_parent', $request.parent))

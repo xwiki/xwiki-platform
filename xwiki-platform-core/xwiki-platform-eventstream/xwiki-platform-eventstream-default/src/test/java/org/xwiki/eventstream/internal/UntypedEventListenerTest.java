@@ -109,7 +109,7 @@ public class UntypedEventListenerTest
     @Before
     public void setUp() throws Exception
     {
-        componentManager = mocker.registerMockComponent(ComponentManager.class, "wiki");
+        componentManager = mocker.registerMockComponent(ComponentManager.class, "context");
         modelBridge = mocker.registerMockComponent(ModelBridge.class);
         renderer = mocker.getInstance(BlockRenderer.class, "html/5.0");
 

@@ -1,8 +1,0 @@
-/* Fix a rendering bug with the breadcrumb on IE 8 (see: http://jira.xwiki.org/browse/XWIKI-10940). */
-.breadcrumb > li {
-  display: inline;
-}
-
-.buttonwrapper a.attachment-picker-start {
-  filter: none;
-}

@@ -32,7 +32,6 @@ import javax.inject.Provider;
 
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to a document (wiki, space and document names).
@@ -205,7 +204,6 @@ public class DocumentReference extends AbstractLocalizedEntityReference
      * @param parameters parameters for this reference, may be null
      * @since 10.6RC1
      */
-    @Unstable
     public DocumentReference(String pageName, EntityReference parent, Map<String, Serializable> parameters)
     {
         super(pageName, EntityType.DOCUMENT, parent, parameters);
@@ -368,6 +366,16 @@ public class DocumentReference extends AbstractLocalizedEntityReference
         }
 
         return this.localDocumentReference;
+    }
+
+    /**
+     * @return this document reference but without the locale if it contains any
+     * @since 13.4RC1
+     * @since 12.10.8
+     */
+    public DocumentReference withoutLocale()
+    {
+        return getLocale() != null ? new DocumentReference(this, (Locale) null) : this;
     }
 
     @Override

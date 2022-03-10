@@ -36,10 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  * @since 2.2M1
  */
-public class DocumentReferenceTest
+class DocumentReferenceTest
 {
     @Test
-    public void testConstructors()
+    void testConstructors()
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
         assertEquals(reference, new DocumentReference(new EntityReference("page", EntityType.DOCUMENT,
@@ -49,7 +49,7 @@ public class DocumentReferenceTest
     }
 
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
             () -> new DocumentReference(new EntityReference("page", EntityType.SPACE)));
@@ -58,7 +58,7 @@ public class DocumentReferenceTest
     }
 
     @Test
-    public void testInvalidNullParent()
+    void testInvalidNullParent()
     {
         IllegalArgumentException e =
             assertThrows(IllegalArgumentException.class, () -> new DocumentReference("page", null));
@@ -67,7 +67,7 @@ public class DocumentReferenceTest
     }
 
     @Test
-    public void testInvalidParentType()
+    void testInvalidParentType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
             () -> new DocumentReference(new EntityReference("page", EntityType.DOCUMENT, new WikiReference("wiki"))));
@@ -76,14 +76,14 @@ public class DocumentReferenceTest
     }
 
     @Test
-    public void testGetWikiReference()
+    void testGetWikiReference()
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
         assertEquals(new WikiReference("wiki"), reference.getWikiReference());
     }
 
     @Test
-    public void testGetLastSpaceReferenceWhenOneSpace()
+    void testGetLastSpaceReferenceWhenOneSpace()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         SpaceReference spaceReference = documentReference.getLastSpaceReference();
@@ -91,7 +91,7 @@ public class DocumentReferenceTest
     }
 
     @Test
-    public void testGetLastSpaceReferenceWhenMultipleSpaces()
+    void testGetLastSpaceReferenceWhenMultipleSpaces()
     {
         DocumentReference reference = new DocumentReference("wiki", Arrays.asList("space1", "space2"), "page");
         assertEquals(new SpaceReference("space2", new SpaceReference("space1", new WikiReference("wiki"))),
@@ -99,7 +99,7 @@ public class DocumentReferenceTest
     }
 
     @Test
-    public void testSpaceReferences()
+    void testSpaceReferences()
     {
         DocumentReference reference1 = new DocumentReference("wiki", "space", "page");
         List<SpaceReference> spaceRefs = reference1.getSpaceReferences();
@@ -115,7 +115,7 @@ public class DocumentReferenceTest
     }
 
     @Test
-    public void testToString()
+    void testToString()
     {
         DocumentReference reference1 = new DocumentReference("wiki", "space", "page");
         assertEquals("wiki:space.page", reference1.toString());
@@ -128,14 +128,14 @@ public class DocumentReferenceTest
     }
 
     @Test
-    public void testCreateDocumentReferenceFromLocalDocumentReference()
+    void testCreateDocumentReferenceFromLocalDocumentReference()
     {
         assertEquals("wiki:space.page",
             new DocumentReference(new LocalDocumentReference("space", "page"), new WikiReference("wiki")).toString());
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page").replaceParent(
             new EntityReference("space2", EntityType.SPACE, new EntityReference("wiki2", EntityType.WIKI)));
@@ -143,5 +143,16 @@ public class DocumentReferenceTest
         assertEquals(new DocumentReference("wiki2", "space2", "page"), reference);
 
         assertSame(reference, reference.replaceParent(reference.getParent()));
+    }
+
+    @Test
+    void withoutLocale()
+    {
+        assertEquals(new DocumentReference("wiki", "space", "page"),
+            new DocumentReference("wiki", "space", "page", Locale.ENGLISH).withoutLocale());
+        assertEquals(new DocumentReference("wiki", "space", "page"),
+            new DocumentReference("wiki", "space", "page", Locale.ROOT).withoutLocale());
+        assertEquals(new DocumentReference("wiki", "space", "page"),
+            new DocumentReference("wiki", "space", "page").withoutLocale());
     }
 }

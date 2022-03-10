@@ -150,7 +150,7 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
      * files with the same form field name you should use {@link #getFileItemNames()}
      *
      * @param formfieldName The name of the form field.
-     * @return The file name, or <tt>null</tt> if no file was uploaded for that form field.
+     * @return The file name, or {@code null} if no file was uploaded for that form field.
      */
     public String getFileName(String formfieldName)
     {

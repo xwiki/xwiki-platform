@@ -26,8 +26,10 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -141,7 +143,8 @@ public class TreeElement extends BaseElement
      */
     public TreeElement waitForNodeSelected(String nodeId)
     {
-        String selectedNodeXPath = String.format(".//*[@id = '%s' and @aria-selected = 'true']", nodeId);
+        String selectedNodeXPath =
+            String.format(".//*[@id = '%s_anchor' and contains(@class, 'jstree-clicked')]", nodeId);
         getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));
         return this;
     }
@@ -154,6 +157,7 @@ public class TreeElement extends BaseElement
     /**
      * @return the list of selected node IDs.
      */
+    @SuppressWarnings("unchecked")
     public List<String> getSelectedNodeIDs()
     {
         if (getDriver() instanceof JavascriptExecutor) {
@@ -186,13 +190,36 @@ public class TreeElement extends BaseElement
     }
 
     /**
+     * Allow to select multiple nodes at once by maintaining ctrl key pressed while clicking on nodes.
+     * 
+     * @param nodes the nodes to select.
+     * @since 13.3RC1
+     */
+    public void selectNodes(TreeNodeElement... nodes)
+    {
+        this.clearSelection();
+        List<WebElement> webElements = new ArrayList<>();
+        for (TreeNodeElement node : nodes) {
+            if (!node.isSelected()) {
+                webElements.add(node.getLabelElement());
+            }
+        }
+
+        Actions actions = getDriver().createActions().keyDown(Keys.CONTROL);
+        for (WebElement webElement : webElements) {
+            actions = actions.click(webElement);
+        }
+        actions.keyUp(Keys.CONTROL).build().perform();
+    }
+
+    /**
      * @return the list of top level nodes
      */
     public List<TreeNodeElement> getTopLevelNodes()
     {
         return getDriver()
             .findElementsWithoutWaiting(this.element,
-                By.cssSelector(".jstree-node[aria-level=\"1\"]:not(.jstree-hidden)"))
+                By.cssSelector(".jstree-container-ul > .jstree-node:not(.jstree-hidden)"))
             .stream().map(nodeElement -> By.id(nodeElement.getAttribute("id")))
             .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).collect(Collectors.toList());
     }

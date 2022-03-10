@@ -25,16 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-notifiers</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>14.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-notifiers-api</artifactId>
   <name>XWiki Platform - Notifications - Notifiers - API</name>
   <description>Handle how notifications are transmitted to a user</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
-    <!-- TODO: Fix the threading aspect and ensure that the threads are stopped corretly before moving to the next
-        test -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -78,6 +75,11 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-html5</artifactId>
       <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -63,10 +63,10 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @AllComponents
-public class SyndEntryDocumentSourceTest
+class SyndEntryDocumentSourceTest
 {
     @InjectMockitoOldcore
-    MockitoOldcore oldcore;
+    private MockitoOldcore oldcore;
 
     public static final String INCONSISTENCY = "Inconsistency!";
 
@@ -138,7 +138,7 @@ public class SyndEntryDocumentSourceTest
 
     private void mockUp() throws Exception
     {
-        final XWikiContext context = this.oldcore.getXWikiContext();
+        XWikiContext context = this.oldcore.getXWikiContext();
 
         // Set URL/Request
         context.setRequest(new XWikiServletRequestStub());

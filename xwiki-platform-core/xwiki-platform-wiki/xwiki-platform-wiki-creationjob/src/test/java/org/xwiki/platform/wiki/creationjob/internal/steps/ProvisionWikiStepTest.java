@@ -45,7 +45,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -94,7 +94,7 @@ public class ProvisionWikiStepTest
         verify(extensionInstaller).installExtension(eq("wikiId"), eq(extensionId));
         verify(observationManager).notify(eq(new WikiProvisioningEvent("wikiId")), eq("wikiId"), eq(xcontext));
         verify(observationManager).notify(eq(new WikiProvisionedEvent("wikiId")), eq("wikiId"), eq(xcontext));
-        verifyZeroInteractions(wikiCopier);
+        verifyNoInteractions(wikiCopier);
     }
 
     @Test
@@ -113,7 +113,7 @@ public class ProvisionWikiStepTest
         verify(observationManager).notify(eq(new WikiProvisioningEvent("wikiId")), eq("wikiId"), eq(xcontext));
         verify(observationManager).notify(eq(new WikiCopiedEvent("template", "wikiId")), eq("template"), eq(xcontext));
         verify(observationManager).notify(eq(new WikiProvisionedEvent("wikiId")), eq("wikiId"), eq(xcontext));
-        verifyZeroInteractions(extensionInstaller);
+        verifyNoInteractions(extensionInstaller);
     }
 
     @Test

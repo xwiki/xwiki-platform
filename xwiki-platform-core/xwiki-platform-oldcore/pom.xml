@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>14.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -41,10 +41,13 @@
     </xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.35</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.37</xwiki.jacoco.instructionRatio>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+
+    <!-- Workaround a limitation in Eclipse M2E which prevent using classes from OldCore test-jar in other module's main classes -->
+    <m2e.disableTestClasspathFlag>true</m2e.disableTestClasspathFlag>
   </properties>
   <dependencies>
     <dependency>
@@ -64,19 +67,21 @@
       <version>${commons.version}</version>
     </dependency>
 
-    <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
-
-    <!-- Remove once the CSS4J project uploads its artifacts to Maven Central, see http://bit.ly/2rbTJoc -->
+    <!-- CSS4J (used for PDF export) -->
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j</artifactId>
-      <version>2.0.2</version>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
-      <version>2.0.2</version>
     </dependency>
+    <dependency>
+      <groupId>io.sf.carte</groupId>
+      <artifactId>xml-dtd</artifactId>
+    </dependency>
+
+    <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
 
     <!-- Standard dependencies found in the central repository -->
     <!-- Apache Commons -->
@@ -131,10 +136,6 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.struts</groupId>
-      <artifactId>struts-core</artifactId>
-    </dependency>
 
     <!-- Used by parse groovy from page -->
     <!-- Note: We only depend on the miniumum required to compile oldcore since the distributions will depend on
@@ -166,14 +167,13 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.hibernate</groupId>
+      <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
-      <version>3.6.3</version>
     </dependency>
     <dependency>
       <groupId>com.github.jsqlparser</groupId>
@@ -188,10 +188,6 @@
     </dependency>
 
     <!-- XML processing -->
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-    </dependency>
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
@@ -275,7 +271,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-job</artifactId>
+      <artifactId>xwiki-commons-job-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -307,7 +303,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-api</artifactId>
+      <artifactId>xwiki-platform-image-processing-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -339,11 +335,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-url-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-scheme-standard</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -441,7 +432,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-api</artifactId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -610,6 +601,11 @@
       <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
       <version>1.6</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava-testlib</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -833,6 +829,7 @@
                 **/store/migration/hibernate/R6079XWIKI1878DataMigration.java,
                 **/store/migration/hibernate/R7350XWIKI2079DataMigration.java,
                 **/store/migration/hibernate/R40000XWIKI6990DataMigration.java,
+                **/store/migration/hibernate/AbstractResizeMigration.java,
                 **/store/XWikiAttachmentStoreInterface.java,
                 **/store/XWikiBatcherFactory.java,
                 **/store/XWikiBatcher.java,
@@ -922,6 +919,7 @@
                 **/web/ViewrevAction.java,
                 **/web/XWikiAction.java,
                 **/web/XWikiConfigurationService.java,
+                **/web/XWikiContextInitializationFilter.java,
                 **/web/XWikiDefaultURLFactory.java,
                 **/web/XWikiEngineContext.java,
                 **/web/XWikiForm.java,
@@ -940,7 +938,8 @@
                 **/web/XWikiURLFactoryServiceImpl.java,
                 **/web/XWikiURLFactoryService.java,
                 <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
-                **/stats/impl/xwiki/XWikiStatsReader.java
+                **/stats/impl/xwiki/XWikiStatsReader.java,
+                **/com/xpn/xwiki/internal/filter/output/AbstractEntityOutputFilterStream.java
               </excludes>
               <resourceExcludes>
                 ApplicationResources*.properties

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -185,12 +185,7 @@ XWiki.MessageStream = Class.create({
               document.fire('xwiki:activity:newActivity', msForm);
             },
             onFailure: function(response) {
-              var failureReason = '';
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              } else {
-                failureReason = response.statusText;
-              }
+              var failureReason = response.statusText || 'Server not responding';
               if (msForm) {
                 msForm._disabled = false
                 if (msForm._notification) {
@@ -198,9 +193,6 @@ XWiki.MessageStream = Class.create({
                 }
                 msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.failed'): " + failureReason, 'error');
               }
-            },
-            on1223 : function(response) { /*SUCCESS*/
-              response.request.options.onSuccess(response);
             },
             on0 : function(response) {  /*FAILURE*/
               response.request.options.onFailure(response);
@@ -943,7 +935,7 @@ Valid values are: 'everyone', 'followers', 'group' or 'user'. </description>
     <property>
       <description>Comma separated list of visibility options that the macro should allow the user to choose from.
 
-This list should be a sublist of the defualt ones: 'everyone', 'followers', 'group', 'user'.</description>
+This list should be a sublist of the default ones: 'everyone', 'followers', 'group', 'user'.</description>
     </property>
     <property>
       <mandatory/>

@@ -20,9 +20,10 @@
 package com.xpn.xwiki.internal.velocity;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiException;
-import org.xwiki.component.annotation.Role;
 
 /**
  * Evaluate content with Velocity.
@@ -44,4 +45,14 @@ public interface VelocityEvaluator
      * @throws XWikiException if an error occurs
      */
     String evaluateVelocity(String content, String namespace, VelocityContext vcontext) throws XWikiException;
+
+    /**
+     * Evaluate a template with Velocity.
+     *
+     * @param content the Velocity content to evaluate
+     * @param namespaceDocument the namespace under which to evaluate it (used for isolation)
+     * @return the evaluated content
+     * @throws XWikiException if an error occurs
+     */
+    String evaluateVelocityNoException(String content, DocumentReference namespaceDocument);
 }

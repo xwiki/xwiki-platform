@@ -55,7 +55,10 @@
   </resultset>
 
   <!-- Note that we use 0 and 1 instead of false and true because Oracle doesn't support the boolean constants. The
-    returned value is boolean though because we specify the type in the result set meta-data. -->
+    returned value is boolean though because we specify the type in the result set meta-data.
+    The double check on doc.XWD_LANGUAGE being the empty string or null to find out the original language page is needed
+    because Oracle stores empty strings as nulls unless a not-null constraint is present, which is not the case for the
+    language field. -->
   <!-- This query follows the SQL-2013 ANSI standard, but it uses a non-core feature F591 "Derived tables" which is
     implemented by most of the databases (HSQLDB, MySql, Oracle, PostgreSQL) -->
   <sql-query name="nestedPagesOrderedByTitle" resultset-ref="XWikiPageReference" read-only="true">
@@ -72,7 +75,7 @@
             left outer join xwikidoc doc on (
                 doc.XWD_WEB = XWS_REFERENCE and
                 doc.XWD_NAME = 'WebHome' and
-                doc.XWD_LANGUAGE = '')
+                (doc.XWD_LANGUAGE = '' OR doc.XWD_LANGUAGE is NULL))
             left outer join xwikidoc tdoc on (
                 tdoc.XWD_WEB = XWS_REFERENCE and
                 tdoc.XWD_NAME = 'WebHome' and
@@ -123,7 +126,8 @@
 
   <!-- We have to duplicate the title fall-back expression in the order by clause because PostgreSQL doesn't support the
     usage of column aliases in order by expressions (e.g. for lower(columnAlias) it throws "column 'columnAlias' does
-    not exist"). See https://www.postgresql.org/docs/9.4/static/sql-select.html#SQL-ORDERBY -->
+    not exist"). See https://www.postgresql.org/docs/9.4/static/sql-select.html#SQL-ORDERBY
+    For the double check on doc.XWD_LANGUAGE see comment in query "nestedPagesOrderedByTitle" above -->
   <!-- This query conforms to Core SQL-2003 ANSI standard. -->
   <sql-query name="nonTerminalPagesOrderedByTitle" resultset-ref="XWikiPageReference" read-only="true">
     <synchronize table="xwikidoc" />
@@ -134,7 +138,7 @@
         left outer join xwikidoc doc on (
             doc.XWD_WEB = XWS_REFERENCE and
             doc.XWD_NAME = 'WebHome' and
-            doc.XWD_LANGUAGE = '')
+            (doc.XWD_LANGUAGE = '' OR doc.XWD_LANGUAGE is NULL))
         left outer join xwikidoc tdoc on (
             tdoc.XWD_WEB = XWS_REFERENCE and
             tdoc.XWD_NAME = 'WebHome' and

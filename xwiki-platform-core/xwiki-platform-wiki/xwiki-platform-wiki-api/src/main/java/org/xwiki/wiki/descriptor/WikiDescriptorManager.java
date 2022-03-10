@@ -22,6 +22,7 @@ package org.xwiki.wiki.descriptor;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
@@ -83,6 +84,15 @@ public interface WikiDescriptorManager
      * @return the Id of the current wiki
      */
     String getCurrentWikiId();
+
+    /**
+     * @return the reference of the current wiki.
+     * @since 12.7RC1
+     */
+    default WikiReference getCurrentWikiReference()
+    {
+        return (getCurrentWikiId() != null) ? new WikiReference(getCurrentWikiId()) : null;
+    }
 
     /**
      * @return the descriptor of the current wiki

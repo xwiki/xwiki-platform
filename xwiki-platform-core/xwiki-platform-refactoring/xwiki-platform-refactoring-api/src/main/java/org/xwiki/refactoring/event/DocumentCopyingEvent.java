@@ -23,7 +23,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.refactoring.internal.event.AbstractEntityCopyOrRenameEvent;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event fired when a document is about to be copied.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 11.1RC1
  */
-@Unstable
 public class DocumentCopyingEvent extends AbstractEntityCopyOrRenameEvent<DocumentReference>
     implements BeginFoldEvent, CancelableEvent
 {

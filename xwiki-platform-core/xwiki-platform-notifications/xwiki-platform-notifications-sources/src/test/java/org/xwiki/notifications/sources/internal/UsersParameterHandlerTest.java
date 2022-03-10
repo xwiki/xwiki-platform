@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -50,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class UsersParameterHandlerTest
+class UsersParameterHandlerTest
 {
     @InjectMockComponents
     private UsersParameterHandler usersParameterHandler;
@@ -69,7 +68,7 @@ public class UsersParameterHandlerTest
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Test
-    public void handlerUsersParameter()
+    void handlerUsersParameter()
     {
         NotificationParameters notificationParameters = new NotificationParameters();
         this.usersParameterHandler.handleUsersParameter(null, notificationParameters);

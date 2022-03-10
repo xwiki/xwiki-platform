@@ -27,6 +27,8 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.po.LoginPage;
 
 /**
@@ -66,7 +68,20 @@ public class WikiEditPage extends PreviewableEditPage
      */
     public static WikiEditPage gotoPage(String space, String page)
     {
-        getUtil().gotoPage(space, page, "edit", "editor=wiki");
+        return gotoPage(new LocalDocumentReference(space, page));
+    }
+
+    /**
+     * Open the specified page in Wiki edit mode.
+     * 
+     * @param pageReference the page to open
+     * @since 12.10.9
+     * @since 13.4.1
+     * @since 13.5RC1
+     */
+    public static WikiEditPage gotoPage(EntityReference pageReference)
+    {
+        getUtil().gotoPage(pageReference, "edit", "editor=wiki");
         return new WikiEditPage();
     }
 
@@ -189,7 +204,7 @@ public class WikiEditPage extends PreviewableEditPage
     public void clickToolbarButton(String buttonTitle)
     {
         String buttonLocator = "//img[@title = '" + buttonTitle + "']";
-        getDriver().findElementByXPath(buttonLocator).click();
+        getDriver().findElement(By.xpath(buttonLocator)).click();
     }
 
     public void clearContent()

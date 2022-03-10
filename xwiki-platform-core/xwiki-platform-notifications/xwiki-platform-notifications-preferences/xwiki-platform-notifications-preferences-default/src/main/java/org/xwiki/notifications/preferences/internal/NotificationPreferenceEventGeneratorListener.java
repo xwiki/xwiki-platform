@@ -24,6 +24,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceAddedEvent;
 import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceDeletedEvent;
@@ -32,6 +34,7 @@ import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
@@ -73,11 +76,23 @@ public class NotificationPreferenceEventGeneratorListener extends AbstractEventL
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof XObjectAddedEvent) {
-            this.observation.notify(new NotificationPreferenceAddedEvent(), null);
+            this.observation.notify(new NotificationPreferenceAddedEvent(),
+                getEntityReference(((XWikiDocument) source).getDocumentReference()));
         } else if (event instanceof XObjectUpdatedEvent) {
-            this.observation.notify(new NotificationPreferenceUpdatedEvent(), null);
+            this.observation.notify(new NotificationPreferenceUpdatedEvent(),
+                getEntityReference(((XWikiDocument) source).getDocumentReference()));
         } else if (event instanceof XObjectDeletedEvent) {
-            this.observation.notify(new NotificationPreferenceDeletedEvent(), null);
+            this.observation.notify(new NotificationPreferenceDeletedEvent(),
+                getEntityReference(((XWikiDocument) source).getDocumentReference()));
+        }
+    }
+
+    private EntityReference getEntityReference(DocumentReference source)
+    {
+        if (source.getLocalDocumentReference().equals(DefaultModelBridge.GLOBAL_PREFERENCES)) {
+            return source.getWikiReference();
+        } else {
+            return source;
         }
     }
 }

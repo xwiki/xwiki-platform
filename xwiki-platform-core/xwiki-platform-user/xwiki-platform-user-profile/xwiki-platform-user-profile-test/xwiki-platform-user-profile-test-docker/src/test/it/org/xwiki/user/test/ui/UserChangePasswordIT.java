@@ -40,10 +40,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 11.10
  * @version $Id$
  */
-// Extra JARs needed for the hibernate mapping (since right now we don't support hibernate mappings contributed at
-// runtime by extensions.
-@UITest(extraJARs = { "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate" })
-public class UserChangePasswordIT
+@UITest(properties = {
+    // We need the notifications feature because the User Profile UI draws the Notifications Macro used in the user
+    // profile for the user's activity stream. As a consequence, when a user is created in the test, the
+    // UserAddedEventListener is called and global default user notifications filters are copied for the new user,
+    // requiring the notifications HBM mapping file.
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+    },
+    extraJARs = {
+    // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+    // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+    "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+    // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+    // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+    // In addition this jar cannot currently be installed as an extension (e.g. the CM won't find the
+    "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+    // The Solr store is not ready yet to be installed as an extension so we need to add it to WEB-INF/lib manually
+    "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+})
+class UserChangePasswordIT
 {
     private static final String DEFAULT_PASSWORD = "testtest";
 
@@ -74,7 +89,7 @@ public class UserChangePasswordIT
     /** Functionality check: changing the password. */
     @Test
     @Order(1)
-    public void changePassword(TestUtils setup, TestReference testReference)
+    void changePassword(TestUtils setup, TestReference testReference)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         // Change the password
@@ -99,35 +114,35 @@ public class UserChangePasswordIT
         preferencesPage = userProfilePage.switchToPreferences();
         changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePasswordAsAdmin(DEFAULT_PASSWORD, DEFAULT_PASSWORD);
-        changePasswordPage.submit();
+        changePasswordPage = changePasswordPage.submit();
         assertEquals("Your password has been successfully changed.", changePasswordPage.getSuccessMessage());
     }
 
     @Test
     @Order(2)
-    public void changePasswordWithTwoDifferentPasswords()
+    void changePasswordWithTwoDifferentPasswords()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePassword(DEFAULT_PASSWORD, PASSWORD_1, PASSWORD_2);
-        changePasswordPage.submit();
+        changePasswordPage = changePasswordPage.submit();
         assertEquals("The two passwords do not match.", changePasswordPage.getValidationErrorMessage());
     }
 
     @Test
     @Order(3)
-    public void changePasswordWithoutEnteringPasswords()
+    void changePasswordWithoutEnteringPasswords()
     {
         ChangePasswordPage changePasswordPage = ProfileUserProfilePage.gotoPage(this.userName)
             .switchToPreferences().changePassword();
-        changePasswordPage.submit();
+        changePasswordPage = changePasswordPage.submit();
         assertEquals("This field is required.", changePasswordPage.getValidationErrorMessage());
     }
 
     @Test
     @Order(4)
-    public void changePasswordOfAnotherUserWithTwoDifferentPasswords(TestUtils setup)
+    void changePasswordOfAnotherUserWithTwoDifferentPasswords(TestUtils setup)
     {
         // Login as superadmin (to have Admin rights) and change the password of another user.
         setup.loginAsSuperAdmin();
@@ -136,25 +151,25 @@ public class UserChangePasswordIT
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePasswordAsAdmin(PASSWORD_1, PASSWORD_2);
-        changePasswordPage.submit();
+        changePasswordPage = changePasswordPage.submit();
         assertEquals("The two passwords do not match.", changePasswordPage.getValidationErrorMessage());
     }
 
     @Test
     @Order(5)
-    public void changePasswordWithWrongOriginalPassword()
+    void changePasswordWithWrongOriginalPassword()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePassword("badPassword", PASSWORD_1, PASSWORD_1);
-        changePasswordPage.submit();
+        changePasswordPage = changePasswordPage.submit();
         assertEquals("Current password is invalid.", changePasswordPage.getErrorMessage());
     }
 
     @Test
     @Order(6)
-    public void changePasswordWhenPolicyIsLength8AndNumberMandatory(TestUtils setup)
+    void changePasswordWhenPolicyIsLength8AndNumberMandatory(TestUtils setup)
     {
         // Update password policy to enforce password with 8 characters and a mandatory number in it
         setup.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0,

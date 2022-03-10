@@ -71,6 +71,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+// @formatter:off
 @ComponentList({
     DefaultResourceReferenceEntityReferenceResolver.class,
     AttachmentResourceReferenceEntityReferenceResolver.class,
@@ -87,6 +88,7 @@ import static org.mockito.Mockito.when;
     ContextComponentManagerProvider.class,
     DefaultSymbolScheme.class
 })
+// @formatter:on
 public class DefaultResourceReferenceEntityReferenceResolverTest
 {
     private static final String DEFAULT_PAGE = "defaultpage";

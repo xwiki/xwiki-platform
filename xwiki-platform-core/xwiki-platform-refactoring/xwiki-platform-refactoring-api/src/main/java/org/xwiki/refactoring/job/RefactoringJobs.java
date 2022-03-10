@@ -19,8 +19,6 @@
  */
 package org.xwiki.refactoring.job;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Known refactoring job types.
  *
@@ -81,7 +79,6 @@ public interface RefactoringJobs
      * 
      * @since 11.8RC1
      */
-    @Unstable
     String REPLACE_USER = GROUP_PREFIX + "replaceUser";
 
     /**

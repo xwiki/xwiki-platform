@@ -32,7 +32,10 @@ public abstract class AbstractEventStreamEvent implements org.xwiki.observation.
     /**
      * Used to provide a key to a property in the current execution context that avoids stepping into a loop when
      * triggering new events.
+     * 
+     * @deprecated not set anymore
      */
+    @Deprecated
     public static final String EVENT_LOOP_CONTEXT_LOCK_PROPERTY = "eventLoopContextLockProperty";
 
     private static final long serialVersionUID = 1L;

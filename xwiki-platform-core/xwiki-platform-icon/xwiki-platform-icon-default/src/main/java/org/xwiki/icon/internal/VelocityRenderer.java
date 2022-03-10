@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.IconException;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
@@ -44,6 +45,9 @@ public class VelocityRenderer
 {
     @Inject
     private VelocityManager velocityManager;
+
+    @Inject
+    private LoggerConfiguration loggerConfiguration;
 
     /**
      * Render a velocity code without messing with the document context and namespace.
@@ -72,7 +76,8 @@ public class VelocityRenderer
             // See https://jira.xwiki.org/browse/XWIKI-11400.
             // We set the current context as inner context of the new one to be able to read existing variables.
             // See https://jira.xwiki.org/browse/XWIKI-11426.
-            VelocityContext context = new XWikiVelocityContext(velocityManager.getVelocityContext());
+            VelocityContext context = new XWikiVelocityContext(velocityManager.getVelocityContext(),
+                this.loggerConfiguration.isDeprecatedLogEnabled());
 
             // Render the code
             if (engine.evaluate(context, output, "DefaultIconRenderer", code)) {

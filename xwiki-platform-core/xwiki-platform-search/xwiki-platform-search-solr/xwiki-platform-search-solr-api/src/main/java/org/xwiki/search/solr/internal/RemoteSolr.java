@@ -19,8 +19,6 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -31,6 +29,7 @@ import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
@@ -52,8 +51,16 @@ public class RemoteSolr extends AbstractSolr implements Initializable
 
     /**
      * Default URL to use when none is specified.
+     * 
+     * @since 13.3RC1
+     * @since 12.10.7
      */
-    public static final String DEFAULT_REMOTE_URL = "http://localhost:8983/solr/";
+    public static final String DEFAULT_BASE_URL = "http://localhost:8983/solr";
+
+    /**
+     * The name of the core containing the XWiki search index.
+     */
+    public static final String DEFAULT_CORE_PREFIX = "xwiki";
 
     @Inject
     private SolrConfiguration configuration;
@@ -63,29 +70,57 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        String baseURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", DEFAULT_REMOTE_URL);
-
-        this.rootClient = new HttpSolrClient.Builder(baseURL).build();
+        String baseURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", null);
 
         // RETRO COMPATIBILITY: the seach core used to be configured using "solr.remote.url" property
         String searchCoreURL = this.configuration.getInstanceConfiguration(TYPE, "url", null);
         if (searchCoreURL != null) {
-            this.clients.put("search", new HttpSolrClient.Builder(searchCoreURL).build());
+            this.clients.put(SolrClientInstance.CORE_NAME, new HttpSolrClient.Builder(searchCoreURL).build());
+
+            // If the base URL is not provided try to guess it from the search core URL
+            if (baseURL == null) {
+                baseURL = searchCoreURL.substring(0, searchCoreURL.lastIndexOf('/'));
+
+                this.logger.warn("[solr.remote.url] property in xwiki.properties file is deprecated, "
+                    + "use [solr.remote.baseURL] instead");
+            }
         }
+
+        // Fallback on the default base URL
+        if (baseURL == null) {
+            baseURL = DEFAULT_BASE_URL;
+        }
+
+        this.rootClient = new HttpSolrClient.Builder(baseURL).build();
+    }
+
+    HttpSolrClient getRootClient()
+    {
+        return this.rootClient;
     }
 
     @Override
     protected SolrClient getInternalSolrClient(String coreName)
     {
-        return new HttpSolrClient.Builder(this.rootClient.getBaseURL() + '/' + coreName).build();
+        // Prefix Solr cores to avoid collision with other non-xwiki cores
+
+        StringBuilder corePath =
+            new StringBuilder(this.configuration.getInstanceConfiguration(TYPE, "corePrefix", DEFAULT_CORE_PREFIX));
+
+        if (!coreName.equals(SolrClientInstance.CORE_NAME)) {
+            corePath.append('_');
+            corePath.append(coreName);
+        }
+
+        return new HttpSolrClient.Builder(this.rootClient.getBaseURL() + '/' + corePath).build();
     }
 
     @Override
-    protected SolrClient createCore(String coreName, Map<String, String> parameters) throws SolrException
+    protected SolrClient createCore(SolrCoreInitializer initializer) throws SolrException
     {
         CoreAdminRequest coreAdminRequest = new CoreAdminRequest.Create();
 
-        coreAdminRequest.setCoreName(coreName);
+        coreAdminRequest.setCoreName(initializer.getCoreName());
 
         try {
             coreAdminRequest.process(this.rootClient);
@@ -93,6 +128,6 @@ public class RemoteSolr extends AbstractSolr implements Initializable
             throw new SolrException("Failed to create a new core", e);
         }
 
-        return getInternalSolrClient(coreName);
+        return getInternalSolrClient(initializer.getCoreName());
     }
 }

@@ -22,15 +22,17 @@ package org.xwiki.user.internal;
 import java.lang.reflect.Type;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
- * Converts a String to {@link UserReference}. Useful from Velocity scripts for example when resolving a user.
+ * Converts a String to a {@link UserReference}. Useful from Velocity scripts for example when resolving a user.
  *
  * @version $Id$
  * @since 12.2
@@ -40,7 +42,11 @@ import org.xwiki.user.UserReferenceResolver;
 public class UserReferenceConverter extends AbstractConverter<UserReference>
 {
     @Inject
+    @Named("current")
     private UserReferenceResolver<String> userReferenceResolver;
+
+    @Inject
+    private UserReferenceSerializer<String> userReferenceSerializer;
 
     @Override
     protected UserReference convertToType(Type targetType, Object value)
@@ -50,5 +56,11 @@ public class UserReferenceConverter extends AbstractConverter<UserReference>
         }
 
         return this.userReferenceResolver.resolve(value.toString());
+    }
+
+    @Override
+    protected String convertToString(UserReference value)
+    {
+        return this.userReferenceSerializer.serialize(value);
     }
 }

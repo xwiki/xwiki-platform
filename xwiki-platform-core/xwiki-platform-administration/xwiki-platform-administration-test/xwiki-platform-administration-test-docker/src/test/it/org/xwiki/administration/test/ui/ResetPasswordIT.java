@@ -70,7 +70,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib -->
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
         "org.xwiki.platform:xwiki-platform-mail-send-storage"
     }
 )
@@ -117,17 +117,19 @@ public class ResetPasswordIT
         // Try to reset the password of a non existent user
         resetPasswordPage.setUserName("SomeUserThatDoesNotExist");
         resetPasswordPage = resetPasswordPage.clickResetPassword();
-        assertFalse(resetPasswordPage.isResetPasswordSent());
-        assertTrue(resetPasswordPage.getMessage().contains("user does not exist"));
+
+        // there should not have any indication if the user exists or not.
+        assertTrue(resetPasswordPage.isFormSubmitted());
 
         // Try again
-        resetPasswordPage = resetPasswordPage.clickRetry();
+        resetPasswordPage = ResetPasswordPage.gotoPage();
 
         // Try to reset the password of our user, when he has no email set
         resetPasswordPage.setUserName(userName);
         resetPasswordPage.clickResetPassword();
-        assertFalse(resetPasswordPage.isResetPasswordSent());
-        assertTrue(resetPasswordPage.getMessage().contains("email address not provided"));
+
+        // there should not have any indication if an email address is provided or not.
+        assertTrue(resetPasswordPage.isFormSubmitted());
 
         // Try again. This time, set the user's email address in the profile
         setup.loginAsSuperAdmin();
@@ -138,10 +140,14 @@ public class ResetPasswordIT
         // Actually reset the user's password
         resetPasswordPage = ResetPasswordPage.gotoPage();
         resetPasswordPage.setUserName(userName);
-        resetPasswordPage.clickResetPassword();
+        ResetPasswordPage newResetPasswordPage = resetPasswordPage.clickResetPassword();
+        assertTrue(newResetPasswordPage.getMessage().contains("An e-mail was sent"),
+            "Actual message: " + newResetPasswordPage.getMessage());
+        assertFalse(newResetPasswordPage.getMessage().contains("foo@bar.com"),
+            "Actual message: " + newResetPasswordPage.getMessage());
 
         // Check the result
-        assertTrue(resetPasswordPage.isResetPasswordSent());
+        assertTrue(resetPasswordPage.isFormSubmitted());
         // Check the emails received by the user
         assertTrue(this.mail.waitForIncomingEmail(1));
         MimeMessage[] receivedEmails = this.mail.getReceivedMessages();
@@ -221,7 +227,7 @@ public class ResetPasswordIT
         String result = null;
 
         // Use a regex to extract the password reset link
-        Pattern resetLinkPattern = Pattern.compile("http[^\\s]+?ResetPasswordComplete\\?u=" + userName + "\\&v=\\w+");
+        Pattern resetLinkPattern = Pattern.compile("http[^\\s]+?authenticate/reset\\?u=" + userName + "\\&v=\\w+");
         Matcher matcher = resetLinkPattern.matcher(emailContent);
         if (matcher.find()) {
             result = matcher.group();

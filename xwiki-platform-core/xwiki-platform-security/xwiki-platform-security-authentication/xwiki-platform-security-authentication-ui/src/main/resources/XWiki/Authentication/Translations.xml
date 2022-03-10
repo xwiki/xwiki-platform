@@ -47,7 +47,8 @@ authentication.admin.timeWindow.hint=The time window in seconds during which to 
 authentication.admin.isAuthenticationSecurityEnabled.label=Enable or disable the authentication security mechanism
 authentication.admin.isAuthenticationSecurityEnabled.hint=Disabling the authentication security mechanism will also reset the authentication failure records.
 authentication.admin.isAuthenticationSecurityEnabled.disabled=Disabled
-authentication.admin.isAuthenticationSecurityEnabled.enabled=Enabled</content>
+authentication.admin.isAuthenticationSecurityEnabled.enabled=Enabled
+authentication.admin.heading=Authentication Security</content>
   <object>
     <name>XWiki.Authentication.Translations</name>
     <number>0</number>

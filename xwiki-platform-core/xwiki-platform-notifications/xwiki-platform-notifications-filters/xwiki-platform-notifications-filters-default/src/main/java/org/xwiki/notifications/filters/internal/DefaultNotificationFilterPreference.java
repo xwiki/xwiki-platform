@@ -85,7 +85,20 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
      */
     public DefaultNotificationFilterPreference(NotificationFilterPreference notificationFilterPreference)
     {
-        if (notificationFilterPreference instanceof DefaultNotificationFilterPreference) {
+        this(notificationFilterPreference, true);
+    }
+
+    /**
+     * Construct a DefaultNotificationFilterPreference which is a copy of the given notificationFilterPreference.
+     * @param notificationFilterPreference object to copy
+     * @param keepId if {@code true} and the object to copy is of type {@link DefaultNotificationFilterPreference} then
+     *              the {@link #internalId} and {@link #owner} are preserved.
+     * @since 13.4RC1
+     */
+    public DefaultNotificationFilterPreference(NotificationFilterPreference notificationFilterPreference,
+        boolean keepId)
+    {
+        if (keepId && notificationFilterPreference instanceof DefaultNotificationFilterPreference) {
             this.internalId = ((DefaultNotificationFilterPreference) notificationFilterPreference).internalId;
             this.owner = ((DefaultNotificationFilterPreference) notificationFilterPreference).owner;
         }

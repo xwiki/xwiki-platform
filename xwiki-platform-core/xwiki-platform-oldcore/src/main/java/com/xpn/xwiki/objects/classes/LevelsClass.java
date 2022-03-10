@@ -130,7 +130,8 @@ public class LevelsClass extends ListClass
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         select select = new select(prefix + name, 1);
         select.setAttributeFilter(new XMLAttributeValueFilter());
@@ -155,7 +156,9 @@ public class LevelsClass extends ListClass
             if (!list.contains(value)) {
                 list.add(value);
             }
-            if (selectlist.contains(value)) {
+            // The right mechanism does not care about the case used for the rights
+            // so we rely on an equals ignoring case here to know if we should mark it selected or not.
+            if (selectlist.stream().anyMatch(value::equalsIgnoreCase)) {
                 option.setSelected(true);
             }
             select.addElement(option);

@@ -29,10 +29,10 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -46,17 +46,18 @@ public class EditForm extends XWikiForm
 
     /**
      * Format for passing xproperties references in URLs. General format:
-     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_&lt;propertyName&gt;} (e.g.
+     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_<propertyName>} (e.g.
      * {@code XWiki.XWikiRights_0_member}).
      */
-    private static final Pattern XPROPERTY_REFERENCE_PATTERN = Pattern.compile("^((?:\\w+\\.)+\\w+?)_([0-9]+)_(.+)$");
+    private static final Pattern XPROPERTY_REFERENCE_PATTERN =
+        Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)_(.+)$");
 
     /**
      * Format for passing xobjects references in URLs. General format:
-     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;} (e.g.
+     * {@code &lt;space&gt;.&lt;pageClass&gt;_<number>} (e.g.
      * {@code XWiki.XWikiRights_0}).
      */
-    private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:\\w+\\.)+\\w+?)_([0-9]+)$");
+    private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)$");
 
     private static final String OBJECTS_CLASS_DELIMITER = "_";
 
@@ -91,6 +92,8 @@ public class EditForm extends XWikiForm
 
     private String syntaxId;
 
+    private boolean convertSyntax;
+
     private String hidden;
     
     private ObjectPolicyType objectPolicy;
@@ -120,6 +123,7 @@ public class EditForm extends XWikiForm
         setLockForce("1".equals(request.getParameter("force")));
         setMinorEdit(request.getParameter("minorEdit") != null);
         setSyntaxId(request.getParameter("syntaxId"));
+        setConvertSyntax(Boolean.valueOf(request.getParameter("convertSyntax")));
         setHidden(request.getParameter("xhidden"));
         setObjectPolicy(request.getParameter("objectPolicy"));
         setUpdateOrCreateMap(request);
@@ -313,6 +317,31 @@ public class EditForm extends XWikiForm
         this.syntaxId = syntaxId;
     }
 
+    /**
+     * @return {@code true} if the document content and meta data should be converted to the new syntax specified on the
+     *         edit form, {@code false} otherwise
+     * @see #syntaxId
+     * @since 12.6.3
+     * @since 12.9RC1
+     */
+    public boolean isConvertSyntax()
+    {
+        return this.convertSyntax;
+    }
+
+    /**
+     * Sets whether to convert the document content and meta data to the new syntax specified on the edit form.
+     * 
+     * @param convertSyntax {@code true} to convert the document content and meta data to the new syntax, {@code false}
+     *            to only change the syntax identifier
+     * @since 12.6.3
+     * @since 12.9RC1
+     */
+    public void setConvertSyntax(boolean convertSyntax)
+    {
+        this.convertSyntax = convertSyntax;
+    }
+
     public String getHidden()
     {
         return this.hidden;
@@ -470,10 +499,10 @@ public class EditForm extends XWikiForm
 
     /**
      * If current objectPolicyType is {@link ObjectPolicyType#UPDATE_OR_CREATE}, retrieve a map from the request
-     * parameters of the form {@code &lt;spacename&gt;.&lt;classname&gt;_&lt;number&gt;_&lt;propertyname&gt;'}
-     * Keys of this map will be the reference {@code &lt;spacename&gt;.&lt;classname&gt;} to the Class
+     * parameters of the form {@code &lt;spacename&gt;.&lt;classname&gt;_&lt;number&gt;_<propertyname>'}
+     * Keys of this map will be the reference {@code &lt;spacename&gt;.<classname>} to the Class
      * (for example, 'XWiki.XWikiRights'), the content is a list where each element describe property for the
-     * object {@code &lt;number&gt;}. Element of the list is a map where key is {@code &lt;propertyname&gt;} and
+     * object {@code &lt;number&gt;}. Element of the list is a map where key is {@code <propertyname>} and
      * content is the array of corresponding values.
      *
      * Example with a list of HTTP parameters:

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.doc;
 
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,6 +66,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -551,10 +554,25 @@ public class XWikiDocumentTest
 
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
-        assertEquals("string", this.document.display("string", "view", this.oldcore.getXWikiContext()));
         assertEquals(
             "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
             this.document.display("string", "edit", this.oldcore.getXWikiContext()));
+
+        assertEquals("string", this.document.display("string", "view", this.oldcore.getXWikiContext()));
+
+        this.baseObject.setStringValue("string", "1 & 2");
+
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}1 &#38; 2{{/html}}",
+            this.document.display("string", "view", this.oldcore.getXWikiContext()));
+
+        this.baseObject.setStringValue("string", "1 < 2");
+
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}1 &#60; 2{{/html}}",
+            this.document.display("string", "view", this.oldcore.getXWikiContext()));
+
+        this.baseObject.setStringValue("string", "1 > 2");
+
+        assertEquals("1 > 2", this.document.display("string", "view", this.oldcore.getXWikiContext()));
 
         assertEquals("{{html clean=\"false\" wiki=\"false\"}}<p>area</p>{{/html}}",
             this.document.display("area", "view", this.oldcore.getXWikiContext()));
@@ -745,5 +763,61 @@ public class XWikiDocumentTest
 
         assertEquals(0, this.document.getIntValue(new DocumentReference("foo", "bar", "bla"), "foo"));
         assertEquals(99, this.document.getIntValue(new DocumentReference("foo", "bar", "bla"), "foo", 99));
+    }
+
+    @Test
+    void getAttachment() throws Exception
+    {
+        this.document.setAttachment("file.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        this.document.setAttachment("file2.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        assertNotNull(this.document.getAttachment("file.txt"));
+    }
+    
+    @Test
+    void getAttachmentWithExtension() throws Exception
+    {
+        this.document.setAttachment("file2.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        this.document.setAttachment("file.txt.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        assertNotNull(this.document.getAttachment("file.txt"));
+    }
+
+    @Test
+    void getExactAttachment() throws Exception
+    {
+        this.document.setAttachment("file.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        this.document.setAttachment("file2.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        assertNotNull(this.document.getExactAttachment("file.txt"));
+    }
+
+    @Test
+    void getExactAttachmentWithExtension() throws Exception
+    {
+        this.document.setAttachment("file2.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        this.document.setAttachment("file.txt.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        assertNull(this.document.getExactAttachment("file.txt"));
+    }
+
+    /**
+     * Validate that an attachment with the same name less the extension as an existing attachment does not override it.
+     */
+    @Test
+    void setAttachment() throws Exception
+    {
+        this.document.setAttachment("file.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        this.document.setAttachment("file", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        List<XWikiAttachment> attachmentList = this.document.getAttachmentList();
+        assertEquals(2, attachmentList.size());
+        assertEquals("file.txt", attachmentList.get(1).getFilename());
+        assertEquals("file", attachmentList.get(0).getFilename());
     }
 }

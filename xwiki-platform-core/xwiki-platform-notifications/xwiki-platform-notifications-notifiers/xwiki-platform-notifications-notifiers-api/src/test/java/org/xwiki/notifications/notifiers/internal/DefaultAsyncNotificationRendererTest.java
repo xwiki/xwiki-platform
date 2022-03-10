@@ -20,19 +20,19 @@
 package org.xwiki.notifications.notifiers.internal;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.job.GroupedJobInitializer;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
-import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.rendering.async.internal.AsyncRendererResult;
@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
  * Tests for {@link DefaultAsyncNotificationRenderer}.
  */
 @ComponentTest
-public class DefaultAsyncNotificationRendererTest
+class DefaultAsyncNotificationRendererTest
 {
     private static final String CACHE_KEY = "mykey";
     private static final DocumentReference USER_DOC_REFERENCE = new DocumentReference("xwiki", "XWiki", "Foo");
@@ -75,6 +75,10 @@ public class DefaultAsyncNotificationRendererTest
     @MockComponent
     private EntityReferenceSerializer<String> documentReferenceSerializer;
 
+    @MockComponent
+    @Named("AsyncNotificationRenderer")
+    private GroupedJobInitializer jobInitializer;
+
     private NotificationParameters notificationParameters;
 
     @BeforeEach
@@ -87,7 +91,7 @@ public class DefaultAsyncNotificationRendererTest
     }
 
     @Test
-    public void initialize()
+    void initialize()
     {
         this.asyncNotificationRenderer.initialize(
             new NotificationAsyncRendererConfiguration(notificationParameters, false));
@@ -95,7 +99,7 @@ public class DefaultAsyncNotificationRendererTest
     }
 
     @Test
-    public void getId()
+    void getId()
     {
         this.asyncNotificationRenderer.initialize(
             new NotificationAsyncRendererConfiguration(notificationParameters, false));
@@ -107,7 +111,7 @@ public class DefaultAsyncNotificationRendererTest
     }
 
     @Test
-    public void render() throws Exception
+    void render() throws Exception
     {
         List<CompositeEvent> compositeEventList = Arrays.asList(
             mock(CompositeEvent.class),
@@ -171,7 +175,7 @@ public class DefaultAsyncNotificationRendererTest
     }
 
     @Test
-    public void renderUserNull() throws Exception
+    void renderUserNull() throws Exception
     {
         notificationParameters.user = null;
         List<CompositeEvent> compositeEventList = Arrays.asList(
@@ -188,5 +192,13 @@ public class DefaultAsyncNotificationRendererTest
         verify(this.notificationCacheManager).getFromCache(CACHE_KEY, false);
         verify(this.notificationCacheManager).setInCache(CACHE_KEY, compositeEventList, false);
         verify(this.compositeEventStatusManager, never()).getCompositeEventStatuses(any(), any());
+    }
+
+    @Test
+    void getJobGroupPath()
+    {
+        JobGroupPath jobGroupPath = new JobGroupPath(Arrays.asList("Something", "Foo", "Bar"));
+        when(this.jobInitializer.getId()).thenReturn(jobGroupPath);
+        assertEquals(jobGroupPath, this.asyncNotificationRenderer.getJobGroupPath());
     }
 }

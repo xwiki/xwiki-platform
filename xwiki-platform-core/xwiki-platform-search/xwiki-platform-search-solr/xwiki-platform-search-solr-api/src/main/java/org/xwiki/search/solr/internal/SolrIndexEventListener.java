@@ -177,7 +177,7 @@ public class SolrIndexEventListener implements EventListener
                 this.solrIndexer.get().delete(wikiReference, false);
             }
         } catch (Exception e) {
-            this.logger.error("Failed to handle event [{}] with source [{}]", event, source, e);
+            this.logger.error("Failed to handle event [{}] with source [{}]", event, source.toString(), e);
         }
     }
 

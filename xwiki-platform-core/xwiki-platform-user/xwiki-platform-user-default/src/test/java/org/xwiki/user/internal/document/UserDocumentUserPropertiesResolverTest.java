@@ -46,7 +46,7 @@ public class UserDocumentUserPropertiesResolverTest
     void resolve()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        UserProperties userProperties = this.resolver.resolve(new DocumentUserReference(documentReference, null));
+        UserProperties userProperties = this.resolver.resolve(new DocumentUserReference(documentReference, true));
         assertNotNull(userProperties);
     }
 

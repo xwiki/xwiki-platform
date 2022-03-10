@@ -47,5 +47,6 @@ authentication.admin.timeWindow.hint=Das Zeitfenster in Sekunden, in dem die Ber
 authentication.admin.isAuthenticationSecurityEnabled.label=Aktivieren oder Deaktivieren des Sicherheitsmechanismus für die Authentifizierung
 authentication.admin.isAuthenticationSecurityEnabled.hint=Das Deaktivieren des Authentifizierungssicherheitsmechanismus setzt auch die Authentifizierungsfehlersätze zurück.
 authentication.admin.isAuthenticationSecurityEnabled.disabled=Deaktiviert
-authentication.admin.isAuthenticationSecurityEnabled.enabled=Aktiviert</content>
+authentication.admin.isAuthenticationSecurityEnabled.enabled=Aktiviert
+### Missing: authentication.admin.heading=Authentication Security</content>
 </xwikidoc>

@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.DocumentVersionRangeDeletedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
@@ -41,6 +42,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
@@ -49,7 +51,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.query.QueryManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -157,7 +158,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     public List<Event> getEvents()
     {
         return Arrays.<Event>asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent(),
-            new WikiDeletedEvent());
+            new WikiDeletedEvent(), new DocumentVersionRangeDeletedEvent());
     }
 
     private void initListener()
@@ -237,7 +238,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
             if (!newReference.getWikiReference().equals(originalWikiReference)) {
                 context.setWikiReference(newReference.getWikiReference());
             }
-            XWikiDocument newDoc = new XWikiDocument(newReference);
+            XWikiDocument newDoc = new XWikiDocument(newReference, newReference.getLocale());
             key = getKey(newDoc, context);
             getCache().remove(key);
             getPageExistCache().remove(key);
@@ -360,13 +361,13 @@ public class XWikiCacheStore extends AbstractXWikiStore
             // Calculate the cache key
             String key = getKey(doc, context);
 
-            LOGGER.debug("Cache: Trying to get doc {} from cache", key);
+            LOGGER.debug("Starting checking for Document [{}] in cache", key);
 
             XWikiDocument cachedoc;
             try {
                 cachedoc = getCache().get(key);
             } catch (Exception e) {
-                LOGGER.error("Failed to get document from the cache", e);
+                LOGGER.error("Failed to get document [{}] from cache", key, e);
 
                 cachedoc = null;
             }
@@ -374,12 +375,12 @@ public class XWikiCacheStore extends AbstractXWikiStore
             if (cachedoc != null) {
                 cachedoc.setFromCache(true);
 
-                LOGGER.debug("Cache: got doc {} from cache", key);
+                LOGGER.debug("Document [{}] was retrieved from cache", key);
             } else {
                 Boolean result = getPageExistCache().get(key);
 
                 if (result == Boolean.FALSE) {
-                    LOGGER.debug("Cache: The document {} does not exist, return an empty one", key);
+                    LOGGER.debug("Document [{}] doesn't exist in cache, returning an empty one", key);
 
                     cachedoc = doc;
                     cachedoc.setNew(true);
@@ -389,11 +390,11 @@ public class XWikiCacheStore extends AbstractXWikiStore
                     cachedoc
                         .setOriginalDocument(new XWikiDocument(cachedoc.getDocumentReference(), cachedoc.getLocale()));
                 } else {
-                    LOGGER.debug("Cache: Trying to get doc {} from persistent storage", key);
+                    LOGGER.debug("Trying to get Document [{}] from persistent storage", key);
 
                     cachedoc = this.store.loadXWikiDoc(doc, context);
 
-                    LOGGER.debug("Cache: Got doc {} from storage", key);
+                    LOGGER.debug("Document [{}] was retrieved from persistent storage", key);
 
                     if (cachedoc.isNew()) {
                         getPageExistCache().set(key, Boolean.FALSE);
@@ -404,12 +405,12 @@ public class XWikiCacheStore extends AbstractXWikiStore
                         getPageExistCache().set(key, Boolean.TRUE);
                     }
 
-                    LOGGER.debug("Cache: put doc {} in cache", key);
+                    LOGGER.debug("Document [{}] was put in cache", key);
                 }
             }
 
             cachedoc.setStore(this);
-            LOGGER.debug("Cache: end for doc {} in cache", key);
+            LOGGER.debug("Ending checking for Document [{}] in cache", key);
 
             return cachedoc;
         } finally {
@@ -660,6 +661,13 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
+    public List<DocumentReference> loadBacklinks(AttachmentReference attachmentReference, boolean bTransaction,
+        XWikiContext context) throws XWikiException
+    {
+        return this.store.loadBacklinks(attachmentReference, bTransaction, context);
+    }
+
+    @Override
     public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         return this.store.loadBacklinks(fullName, context, bTransaction);
@@ -787,7 +795,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
      * @return the cache that handle the limit size properties.
      * @since 11.4RC1
      */
-    @Unstable
     public Cache<Integer> getLimitSizePropertyCache()
     {
         return this.limitSizePropertyCache;

@@ -77,4 +77,34 @@ public class ExtensionAdministrationPage extends ViewPage
     {
         return new SearchResultsPane();
     }
+
+    /**
+     * Enabled/disable recommended extensions filtering.
+     * 
+     * @return the extension manager administration page
+     * @since 12.10
+     */
+    public ExtensionAdministrationPage setRecommended(boolean enabled)
+    {
+        SimpleSearchPane simpleSearchPane = getSearchBar();
+        simpleSearchPane.setRecommended(enabled);
+        simpleSearchPane.clickButton();
+
+        return new ExtensionAdministrationPage();
+    }
+
+    /**
+     * Enabled/disable extensions index.
+     * 
+     * @return the extension manager administration page
+     * @since 12.10
+     */
+    public ExtensionAdministrationPage setIndexed(boolean enabled)
+    {
+        SimpleSearchPane simpleSearchPane = getSearchBar();
+        simpleSearchPane.setIndexed(enabled);
+        simpleSearchPane.clickButton();
+
+        return new ExtensionAdministrationPage();
+    }
 }

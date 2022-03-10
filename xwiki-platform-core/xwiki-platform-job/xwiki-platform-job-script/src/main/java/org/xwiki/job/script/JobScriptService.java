@@ -39,7 +39,6 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides job-specific scripting APIs.
@@ -113,7 +112,6 @@ public class JobScriptService implements ScriptService
      * @throws AccessDeniedException when the author does not have the right to use this API
      * @since 11.10
      */
-    @Unstable
     public Job getJob(List<String> jobId) throws AccessDeniedException
     {
         this.authorization.checkAccess(Right.PROGRAM);

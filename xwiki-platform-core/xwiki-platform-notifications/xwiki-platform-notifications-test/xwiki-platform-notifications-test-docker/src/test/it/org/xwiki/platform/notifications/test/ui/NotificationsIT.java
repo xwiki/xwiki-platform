@@ -27,10 +27,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.notifications.test.po.NotificationsRSS;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
-import org.xwiki.platform.notifications.test.po.preferences.filters.NotificationFilterPreference;
+import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotificationFilterPreference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -40,6 +41,7 @@ import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,7 +59,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
-        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as extension
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }
 )
 public class NotificationsIT
@@ -84,46 +93,54 @@ public class NotificationsIT
     private static final String UPDATE = "update";
 
     @BeforeEach
-    public void setup(TestUtils testUtils) throws Exception
+    public void setup(TestUtils setup) throws Exception
     {
         // Create the two users we will be using
-        testUtils.createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
-        testUtils.createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD, "", "");
+        setup.createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
+        setup.createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD, "", "");
 
         NotificationsUserProfilePage p;
 
-        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        // Make sure to wait until notifications are empty (in case of leftovers bing cleaned from a previous test)
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 0);
+        // The page should have been refreshed but we want to be sure to not have stale elements.
+        p = new NotificationsUserProfilePage();
         p.disableAllParameters();
         // Enable own filter
-        p.getNotificationFilterPreferences().get(2).setEnabled(true);
+        p.getSystemNotificationFilterPreferences().get(2).setEnabled(true);
 
-        testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
+        // Make sure to wait until notifications are empty (in case of leftovers bing cleaned from a previous test)
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 0);
+        // The page should have been refreshed but we want to be sure to not have stale elements.
+        p = new NotificationsUserProfilePage();
         p.disableAllParameters();
     }
 
     @AfterEach
-    public void tearDown(TestUtils testUtils)
+    public void tearDown(TestUtils setup)
     {
-        testUtils.deletePage("XWiki", FIRST_USER_NAME);
-        testUtils.deletePage("XWiki", SECOND_USER_NAME);
+        setup.deletePage("XWiki", FIRST_USER_NAME);
+        setup.deletePage("XWiki", SECOND_USER_NAME);
     }
 
     @Test
     @Order(1)
-    public void simpleNotifications(TestUtils testUtils, TestReference testReference) throws Exception
+    public void simpleNotifications(TestUtils setup, TestReference testReference) throws Exception
     {
         NotificationsUserProfilePage p;
         NotificationsTrayPage tray;
 
         // The user 1 creates a new page, the user 2 shouldn’t receive any notification
-        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        testUtils.createPage(testReference.getLastSpaceReference().getName(), 
-            "WebHome", "Content from " + FIRST_USER_NAME, "Page title");
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        String space = testReference.getLastSpaceReference().getName();
+        setup.createPage(space, "WebHome", "Content from " + FIRST_USER_NAME, "Page title");
 
-        testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        setup.gotoPage(space, "WebHome");
 
         tray = new NotificationsTrayPage();
         assertFalse(tray.areNotificationsAvailable());
@@ -133,22 +150,19 @@ public class NotificationsIT
         p.getApplication(SYSTEM).setCollapsed(false);
         p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
-        // Yes we wait on a timer, but it is to be sure the following events will be stored AFTER the settings have been
-        // changed.
-        Thread.sleep(1000);
-
         // We create a lot of pages in order to test the notification badge
-        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         for (int i = 1; i < PAGES_TOP_CREATION_COUNT; i++) {
-            testUtils.createPage(testReference.getLastSpaceReference().getName(), 
-                "Page" + i, "Simple content", "Simple title");
+            setup.deletePage(space, "Page" + i);
+            setup.createPage(space, "Page" + i, "Simple content", "Simple title");
         }
-        testUtils.createPage(testReference.getLastSpaceReference().getName(), 
-            "DTP", "Deletion test page", "Deletion test content");
+        setup.createPage(space, "DTP", "Deletion test page", "Deletion test content");
 
         // Check that the badge is showing «20+»
-        testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        setup.gotoPage(space, "WebHome");
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki",
+            PAGES_TOP_CREATION_COUNT);
         tray = new NotificationsTrayPage();
         assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
 
@@ -161,7 +175,9 @@ public class NotificationsIT
         assertEquals(1, tray.getReadNotificationsCount());
 
         // Make sure it's still OK after a refresh (change the page so we are sure it refreshes)
-        testUtils.gotoPage("Main", "WebHome");
+        setup.gotoPage("Main", "WebHome");
+        // Marking the notification as read is done async, so we need to wait to be sure it has been taken into account.
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 20);
         tray = new NotificationsTrayPage();
         assertEquals(20, tray.getNotificationsCount());
         assertEquals(9, tray.getUnreadNotificationsCount());
@@ -172,6 +188,9 @@ public class NotificationsIT
 
         // Reset the notifications count of the user 2
         tray.clearAllNotifications();
+        // Clearing the notifications is done async, so we need to wait to be sure it has been taken into account.
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 0);
+        tray = new NotificationsTrayPage();
         assertEquals(0, tray.getNotificationsCount());
         assertFalse(tray.areNotificationsAvailable());
 
@@ -181,29 +200,27 @@ public class NotificationsIT
         p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.OFF);
         p.setEventTypeState(SYSTEM, DELETE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
-        // Yes we wait on a timer, but it is to be sure the following events will be stored AFTER the settings have been
-        // changed.
-        Thread.sleep(1000);
-
         // Delete the "Deletion test page" and test the notification
-        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        testUtils.deletePage(testReference.getLastSpaceReference().getName(), "DTP");
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        setup.deletePage(space, "DTP");
 
-        testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        setup.gotoPage(space, "WebHome");
+        // Ensure the notification has been received.
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 1);
         tray = new NotificationsTrayPage();
         assertEquals(1, tray.getNotificationsCount());
     }
 
     @Test
     @Order(2)
-    public void compositeNotifications(TestUtils testUtils, TestReference testReference,
+    public void compositeNotifications(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
     {
         NotificationsUserProfilePage p;
         NotificationsTrayPage tray;
         // Now we enable "create", "update" and "comment" for user 2
-        testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
         p.getApplication(SYSTEM).setCollapsed(false);
         assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
@@ -212,15 +229,15 @@ public class NotificationsIT
 
         assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
         p.setEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT, BootstrapSwitch.State.ON);
-        testUtils.gotoPage("Main", "WebHome");
+        setup.gotoPage("Main", "WebHome");
         tray = new NotificationsTrayPage();
         tray.clearAllNotifications();
 
         // Create a page, edit it twice, and finally add a comment
-        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        testUtils.createPage(testReference.getLastSpaceReference().getName(), 
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        setup.createPage(testReference.getLastSpaceReference().getName(),
             "Linux", "Simple content", "Linux as a title");
-        ViewPage page = testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "Linux");
+        ViewPage page = setup.gotoPage(testReference.getLastSpaceReference().getName(), "Linux");
         page.edit();
         WikiEditPage edit = new WikiEditPage();
         edit.setContent("Linux is a part of GNU/Linux");
@@ -230,20 +247,27 @@ public class NotificationsIT
         edit = new WikiEditPage();
         edit.setContent("Linux is a part of GNU/Linux - it's the kernel");
         edit.clickSaveAndView(true);
-        page = testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "Linux");
+        page = setup.gotoPage(testReference.getLastSpaceReference().getName(), "Linux");
         CommentsTab commentsTab = page.openCommentsDocExtraPane();
         commentsTab.postComment("Linux is a great OS", true);
 
         // Check that events have been grouped together (see: https://jira.xwiki.org/browse/XWIKI-14114)
-        testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        setup.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 2);
         tray = new NotificationsTrayPage();
         assertEquals(2, tray.getNotificationsCount());
         assertEquals("Linux as a title", tray.getNotificationPage(0));
-        assertTrue(tray.getNotificationDescription(0).startsWith(String.format("commented by %s", FIRST_USER_NAME)));
+        String expectedComment = String.format("commented by %s", FIRST_USER_NAME);
+        String obtainedComment = tray.getNotificationDescription(0);
+        assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
+            + "Actual description: [%s]", expectedComment, obtainedComment));
         assertEquals("Linux as a title", tray.getNotificationPage(1));
         assertEquals("update", tray.getNotificationType(1));
-        assertTrue(tray.getNotificationDescription(1).startsWith(String.format("edited by %s", FIRST_USER_NAME)));
+        expectedComment = String.format("edited by %s", FIRST_USER_NAME);
+        obtainedComment = tray.getNotificationDescription(1);
+        assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
+            + "Actual description: [%s]", expectedComment, obtainedComment));
 
         NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         ServletEngine servletEngine = testConfiguration.getServletEngine();
@@ -263,17 +287,17 @@ public class NotificationsIT
 
     @Test
     @Order(3)
-    public void notificationDisplayerClass(TestUtils testUtils, TestReference testReference) throws Exception
+    public void notificationDisplayerClass(TestUtils setup, TestReference testReference) throws Exception
     {
         try {
             // Create the pages and a custom displayer for "update" events
-            testUtils.loginAsSuperAdmin();
+            setup.loginAsSuperAdmin();
 
-            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
-            testUtils.createPage(testReference.getLastSpaceReference().getName(), "ARandomPageThatShouldBeModified",
+            setup.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+            setup.createPage(testReference.getLastSpaceReference().getName(), "ARandomPageThatShouldBeModified",
                 "Page used for the tests of the NotificationDisplayerClass XObject.", "Test page");
 
-            testUtils.createPage(testReference.getLastSpaceReference().getName(), "NotificationDisplayerClassTest",
+            setup.createPage(testReference.getLastSpaceReference().getName(), "NotificationDisplayerClassTest",
                 "Page used for the tests of the NotificationDisplayerClass XObject.", "Test page 2");
 
             Map<String, String> notificationDisplayerParameters = new HashMap<String, String>()
@@ -283,61 +307,66 @@ public class NotificationsIT
                     "This is a test template");
             }};
 
-            ObjectEditPage editObjects = testUtils.editObjects(testReference.getLastSpaceReference().getName(),
+            ObjectEditPage editObjects = setup.editObjects(testReference.getLastSpaceReference().getName(),
                 "NotificationDisplayerClassTest");
             editObjects.addObject("XWiki.Notifications.Code.NotificationDisplayerClass");
-            editObjects.getObjectsOfClass("XWiki.Notifications.Code.NotificationDisplayerClass")
-                .get(0).fillFieldsByName(notificationDisplayerParameters);
+            ObjectEditPane objectEditPane =
+                editObjects.getObjectsOfClass("XWiki.Notifications.Code.NotificationDisplayerClass").get(0);
+            objectEditPane.displayObject();
+            objectEditPane.fillFieldsByName(notificationDisplayerParameters);
             editObjects.clickSaveAndContinue(true);
 
             // Login as first user, and enable notifications on document updates
-            testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+            setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
 
             NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             p.getApplication(SYSTEM).setCollapsed(false);
             p.setEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
             // Login as second user and modify ARandomPageThatShouldBeModified
-            testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+            setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
 
             ViewPage viewPage =
-                testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "ARandomPageThatShouldBeModified");
+                setup.gotoPage(testReference.getLastSpaceReference().getName(), "ARandomPageThatShouldBeModified");
             viewPage.edit();
             WikiEditPage editPage = new WikiEditPage();
             editPage.setContent("Something");
             editPage.clickSaveAndView(true);
 
             // Login as the first user, ensure that the notification is displayed with a custom template
-            testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+            setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+            setup.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
 
+            // Ensure the notification has been received.
+            NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 1);
             NotificationsTrayPage tray = new NotificationsTrayPage();
             assertEquals("This is a test template", tray.getNotificationRawContent(0));
         } finally {
-            testUtils.loginAsSuperAdmin();
-            testUtils.deletePage(testReference.getLastSpaceReference().getName(), "NotificationDisplayerClassTest");
-            testUtils.deletePage(testReference.getLastSpaceReference().getName(), "ARandomPageThatShouldBeModified");
+            setup.loginAsSuperAdmin();
+            setup.deletePage(testReference.getLastSpaceReference().getName(), "NotificationDisplayerClassTest");
+            setup.deletePage(testReference.getLastSpaceReference().getName(), "ARandomPageThatShouldBeModified");
         }
     }
 
 
     @Test
     @Order(4)
-    public void ownEventNotifications(TestUtils testUtils, TestReference testReference) throws Exception
+    public void ownEventNotifications(TestUtils setup, TestReference testReference) throws Exception
     {
-        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
 
+        DocumentReference page2 = new DocumentReference("page2", testReference.getLastSpaceReference());
         try {
             NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            List<NotificationFilterPreference> preferences = p.getNotificationFilterPreferences();
+            List<SystemNotificationFilterPreference> preferences = p.getSystemNotificationFilterPreferences();
 
             // Now let's do some changes (own even filter)
             p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
             assertEquals("Own Events Filter", preferences.get(2).getFilterName());
             preferences.get(2).setEnabled(false);
-            testUtils.createPage(testReference, "", "");
-            // Refresh that page
-            testUtils.gotoPage(testReference);
+            setup.createPage(testReference, "", "");
+            // Ensure the notification has been received.
+            NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 1);
             NotificationsTrayPage notificationsTrayPage = new NotificationsTrayPage();
             assertEquals(1, notificationsTrayPage.getNotificationsCount());
             assertEquals(String.format("created by %s\n" + "moments ago", FIRST_USER_NAME),
@@ -346,16 +375,36 @@ public class NotificationsIT
 
             // Go back to enable the own even filter
             p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            preferences = p.getNotificationFilterPreferences();
+            preferences = p.getSystemNotificationFilterPreferences();
             assertEquals("Own Events Filter", preferences.get(2).getFilterName());
             assertFalse(preferences.get(2).isEnabled());
             preferences.get(2).setEnabled(true);
-            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            setup.createPage(page2, "", "Page 2");
+            setup.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
             notificationsTrayPage = new NotificationsTrayPage();
-            assertEquals(0, notificationsTrayPage.getNotificationsCount());
+
+            // Ensure we only have the previous notification.
+            assertEquals(1, notificationsTrayPage.getNotificationsCount());
+            assertEquals(String.format("created by %s\n" + "moments ago", FIRST_USER_NAME),
+                notificationsTrayPage.getNotificationDescription(0));
+            assertEquals(testReference.getLastSpaceReference().getName(), notificationsTrayPage.getNotificationPage(0));
         } finally {
             // Clean up
-            testUtils.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            setup.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            setup.rest().deletePage(testReference.getLastSpaceReference().getName(), "page2");
         }
+    }
+
+    @Test
+    @Order(5)
+    public void guestUsersDontSeeNotificationMenu(TestUtils setup)
+    {
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        // Move to any page in view mode so that the notification menu is visible. Note that we use a non-existing page
+        // for improved test performance.
+        setup.gotoPage("NotExistingSpace", "NotExistingPage");
+        assertTrue(new NotificationsTrayPage().isNotificationMenuVisible());
+        setup.forceGuestUser();
+        assertFalse(new NotificationsTrayPage().isNotificationMenuVisible());
     }
 }

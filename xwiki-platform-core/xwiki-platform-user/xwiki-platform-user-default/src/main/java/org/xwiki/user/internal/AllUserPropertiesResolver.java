@@ -19,6 +19,7 @@
  */
 package org.xwiki.user.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -36,10 +37,29 @@ import org.xwiki.configuration.ConfigurationSource;
 @Singleton
 public class AllUserPropertiesResolver extends AbstractUserPropertiesResolver
 {
+    @Inject
+    @Named("allsuperadminuser")
+    private ConfigurationSource superAdminConfigurationSource;
+
+    @Inject
+    @Named("allguestuser")
+    private ConfigurationSource guestConfigurationSource;
+
     @Override
     protected String getUnderlyingConfigurationSourceHint()
     {
         return "all";
     }
 
+    @Override
+    protected ConfigurationSource getSuperAdminConfigurationSource()
+    {
+        return this.superAdminConfigurationSource;
+    }
+
+    @Override
+    protected ConfigurationSource getGuestConfigurationSource()
+    {
+        return this.guestConfigurationSource;
+    }
 }

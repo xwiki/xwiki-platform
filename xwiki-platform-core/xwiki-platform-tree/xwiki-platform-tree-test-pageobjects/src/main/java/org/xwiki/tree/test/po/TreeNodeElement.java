@@ -20,6 +20,7 @@
 package org.xwiki.tree.test.po;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -95,10 +96,13 @@ public class TreeNodeElement extends BaseElement
         return getLabelElement().getText();
     }
 
-    private WebElement getLabelElement()
+    /**
+     * @return the label element to allow performing actions on it.
+     * @since 13.3RC1
+     */
+    public WebElement getLabelElement()
     {
-        String labelId = getElement().getAttribute("aria-labelledby");
-        return getElement().findElement(By.id(labelId));
+        return getElement().findElement(By.xpath("./*[@role = 'treeitem']"));
     }
 
     /**
@@ -107,7 +111,7 @@ public class TreeNodeElement extends BaseElement
     public List<TreeNodeElement> getChildren()
     {
         List<TreeNodeElement> children = new ArrayList<>();
-        for (WebElement childElement : getElement().findElements(By.xpath("./ul/li"))) {
+        for (WebElement childElement : getElement().findElements(By.xpath("./ul[@role = 'group']/li"))) {
             children.add(new TreeNodeElement(this.treeElement, By.id(childElement.getAttribute(ID))));
         }
         return children;
@@ -126,7 +130,7 @@ public class TreeNodeElement extends BaseElement
      */
     public boolean isOpen()
     {
-        return Boolean.valueOf(getElement().getAttribute("aria-expanded"));
+        return Boolean.valueOf(getLabelElement().getAttribute("aria-expanded"));
     }
 
     /**
@@ -134,7 +138,9 @@ public class TreeNodeElement extends BaseElement
      */
     public boolean isSelected()
     {
-        return Boolean.valueOf(getElement().getAttribute("aria-selected"));
+        // We can't rely on the 'aria-selected' attribute because of https://github.com/vakata/jstree/issues/2596
+        // (aria-selected is not updated when using parent checkbox to check/uncheck child elements)
+        return Arrays.asList(getLabelElement().getAttribute(CLASS).split("\\s+")).contains("jstree-clicked");
     }
 
     /**

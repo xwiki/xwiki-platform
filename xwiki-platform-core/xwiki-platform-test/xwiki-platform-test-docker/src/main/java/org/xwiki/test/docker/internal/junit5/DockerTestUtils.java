@@ -44,8 +44,6 @@ import org.testcontainers.utility.DockerLoggerFactory;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 
 import com.github.dockerjava.api.command.LogContainerCmd;
-import com.github.dockerjava.api.command.PullImageCmd;
-import com.github.dockerjava.api.command.PullImageResultCallback;
 
 import ch.qos.logback.classic.Level;
 
@@ -69,6 +67,8 @@ public final class DockerTestUtils
     private static final char DASH = '-';
 
     private static final Pattern REPETITION_PATTERN = Pattern.compile("\\[test-template-invocation:#(.*)\\]");
+
+    private static final long DAY = 1000L * 60L * 60L * 24L;
 
     private static List<String> pulledImages = new ArrayList<>();
 
@@ -147,11 +147,8 @@ public final class DockerTestUtils
         if (!testConfiguration.isOffline() && !pulledImages.contains(dockerImageName)
             && !(container instanceof XWikiLocalGenericContainer))
         {
-            LOGGER.info("Pulling image [{}]", dockerImageName);
-            PullImageCmd command = container.getDockerClient().pullImageCmd(dockerImageName);
-            PullImageResultCallback response = new PullImageResultCallback();
-            response = command.exec(response);
-            response.awaitCompletion();
+            // Pull images once every day (to avoid the 200 pull rate limit of dockerhub when authenticated).
+            container.withImagePullPolicy(new DurationImagePullPolicy(DAY));
             pulledImages.add(dockerImageName);
         }
 
@@ -167,17 +164,44 @@ public final class DockerTestUtils
 
         // Try to work around the following issue: https://github.com/testcontainers/testcontainers-java/issues/2208
         try {
-            container.start();
+            startContainerInternal(container, testConfiguration);
         } catch (Exception e) {
             if (ExceptionUtils.getRootCause(e) instanceof EOFException) {
                 // Retry once after waiting 5 seconds to increase the odds ;)
                 LOGGER.info("Error starting docker container [{}]. Retrying once", container.getDockerImageName(), e);
                 Thread.sleep(5000L);
-                container.start();
+                startContainerInternal(container, testConfiguration);
             } else {
-                throw e;
+                throw new Exception(String.format("Failed to start container from image [%s], on agent [%s]",
+                    dockerImageName, getAgentName()), e);
             }
         }
+    }
+
+    private static void startContainerInternal(GenericContainer<?> container, TestConfiguration testConfiguration)
+    {
+        // Try to debug a timeout error starting BrowserWebDriverContainer:
+        //   ...
+        //   Caused by: org.testcontainers.containers.ContainerLaunchException: Container startup failed
+        //   ...
+        //   Caused by: org.rnorth.ducttape.RetryCountExceededException: Retry limit hit with exception
+        //   ...
+        //   Caused by: org.testcontainers.containers.ContainerLaunchException: Could not create/start container
+        //   ...
+        //   Caused by: org.rnorth.ducttape.TimeoutException: org.rnorth.ducttape.TimeoutException: java.util
+        //     .concurrent.TimeoutException
+        //   ...
+        //   Caused by: org.rnorth.ducttape.TimeoutException: java.util.concurrent.TimeoutException
+        //   ...
+        //   Caused by: java.util.concurrent.TimeoutException
+        //   ...
+        // We noticed that several BrowserWebDriverContainer are started when it fails and we need to find out which
+        // code starts them.
+        if (testConfiguration.isVerbose()) {
+            LOGGER.info("XWiki starting container type/image: [{}]/[{}]", container.getClass().getName(),
+                container.getDockerImageName());
+        }
+        container.start();
     }
 
     /**
@@ -299,4 +323,12 @@ public final class DockerTestUtils
         return hostname;
     }
 
+    /**
+     * @return the CI agent on which the test is executing
+     * @since 12.5RC1
+     */
+    public static String getAgentName()
+    {
+        return System.getProperty("jenkinsAgentName");
+    }
 }

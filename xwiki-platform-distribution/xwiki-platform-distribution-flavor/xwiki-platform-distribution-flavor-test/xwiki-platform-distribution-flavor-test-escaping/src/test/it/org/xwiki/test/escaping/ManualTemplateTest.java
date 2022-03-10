@@ -89,7 +89,7 @@ public class ManualTemplateTest extends AbstractManualTest
     public void testErrorTraceEscaping()
     {
         skipIfIgnored("templates/exceptioninline.vm");
-        checkUnderEscaping(createUrl("viewrev", "Main", "WebHome", params(test("rev"))), "XWIKI-5170 error trace");
+        checkUnderEscaping(createUrl("view", "Main", "WebHome", params(test("rev"))), "XWIKI-5170 error trace");
     }
 
     @Test

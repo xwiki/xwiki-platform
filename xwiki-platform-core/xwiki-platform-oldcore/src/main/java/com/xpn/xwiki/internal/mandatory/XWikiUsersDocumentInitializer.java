@@ -51,6 +51,15 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiUsers");
 
     /**
+     * The local reference of the XWikiUsers class document as String.
+     * 
+     * @since 12.7RC1
+     * @since 12.6.1
+     */
+    public static final String CLASS_REFERENCE_STRING =
+        XWiki.SYSTEM_SPACE + '.' + XWIKI_USERS_DOCUMENT_REFERENCE.getName();
+
+    /**
      * The name of the field containing the user email.
      */
     private static final String EMAIL_FIELD = "email";

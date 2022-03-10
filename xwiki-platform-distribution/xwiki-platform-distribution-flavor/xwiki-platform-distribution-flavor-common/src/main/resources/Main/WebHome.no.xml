@@ -65,7 +65,7 @@ Bruk {{velocity}}$services.icon.render('add'){{/velocity}} knappen over for å /
 
 Bruk {{velocity}}$services.icon.render('home'){{/velocity}} brødsmulene som ligger over tittelen for å //navigere// inne på sidene dine. Det er lett å gå seg vill i en stor wiki uten dem.
 
-Du kan også bruke [[Sandbox &gt;&gt; Sandbox.WebHome]] for mer demoinnhold og generelt et sted å eksperimentere med wikifunksjonene.
+Du kan også bruke [[Sandbox &gt;&gt;Sandbox.WebHome]] for mer demoinnhold og generelt et sted å eksperimentere med wikifunksjonene.
 
  {{box}}
 Lær mer om hvordan du bruker XWiki med {{velocity}}[[Komme i gang guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.
@@ -87,5 +87,4 @@ Gå utover de tilgjengelige utvidelsene og definer //strukturen// av dataene bas
 AWM vil ta seg av å gjøre det enkelt for deg og brukerne dine å opprette og administrere dataene.
 )))
 )))</content>
-  
 </xwikidoc>

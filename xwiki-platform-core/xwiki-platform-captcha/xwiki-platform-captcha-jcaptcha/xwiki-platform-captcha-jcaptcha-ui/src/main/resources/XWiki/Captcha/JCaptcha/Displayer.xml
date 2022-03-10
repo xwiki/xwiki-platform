@@ -66,7 +66,7 @@
   ## Use an explicit empty value="" to avoid caching.
   &lt;input type="text" autocomplete="off" class="captcha captcha-answer" name="captchaAnswer" value="" placeholder="Answer" /&gt;
 #end
-&lt;script type="text/javascript" src="$services.webjars.url('org.xwiki.platform:xwiki-platform-captcha-jcaptcha-webjar','captcha.js')"&gt;&lt;/script&gt;
+&lt;script src="$services.webjars.url('org.xwiki.platform:xwiki-platform-captcha-jcaptcha-webjar','captcha.js')"&gt;&lt;/script&gt;
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

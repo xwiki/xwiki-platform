@@ -21,23 +21,23 @@ package org.xwiki.xar.internal;
 
 import java.util.Locale;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.XarException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Validate {@link XarUtils}.
  * 
  * @version $Id$
  */
-public class XarUtilsTest
+class XarUtilsTest
 {
     @Test
-    public void getReference() throws XarException
+    void getReference() throws XarException
     {
         LocalDocumentReference documentReference =
             new LocalDocumentReference("space.nestedspace", "page", Locale.ENGLISH);

@@ -123,6 +123,16 @@ public class WysiwygEditorScriptService implements ScriptService
     }
 
     /**
+     * @return The syntax identifier of the rendered HTML.
+     * @since 14.1RC1
+     */
+    @Unstable
+    public Syntax getHTMLSyntax()
+    {
+        return Syntax.ANNOTATED_HTML_5_0;
+    }
+
+    /**
      * Parses the given HTML fragment and renders the result in annotated XHTML syntax.
      * <p>
      * This method is currently used in {@code wysiwyginput.vm} and its purpose is to refresh the content of the WYSIWYG
@@ -151,7 +161,6 @@ public class WysiwygEditorScriptService implements ScriptService
      * @return the XHTML result of rendering the given HTML fragment
      * @since 11.9RC1
      */
-    @Unstable
     public String parseAndRender(String html, Syntax syntax, EntityReference sourceReference)
     {
         XWikiDocument securityDocument = createSecurityDocument();
@@ -249,7 +258,6 @@ public class WysiwygEditorScriptService implements ScriptService
      * @return the annotated XHTML result of the conversion
      * @since 11.9RC1
      */
-    @Unstable
     public String toAnnotatedXHTML(String source, Syntax syntax, EntityReference sourceReference)
     {
         XWikiDocument securityDocument = createSecurityDocument();

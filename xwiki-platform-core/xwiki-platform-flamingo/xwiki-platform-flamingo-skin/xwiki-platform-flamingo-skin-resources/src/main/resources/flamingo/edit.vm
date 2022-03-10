@@ -100,6 +100,7 @@
     <div class="hidden">
     ## CSRF prevention
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+
     ## Pass the section number when the form is submitted in order to affect only the specified section.
     ## We need to test if the section number is present to prevent a NumberFormatException for the empty string.
     #if("$!{request.section}" != '')
@@ -159,9 +160,28 @@
   </div> ## row
   #template("edit${editor}.vm")
   ## This javascript must be placed here since it uses velocity variables set in the template above.
-  <script type="text/javascript">
+  <script>
     //<![CDATA[
     if ($('tmEditWysiwyg')) {
+      var switchEditor = function(editor, event) {
+        // We switch the editor by submitting the edit form to the new editor (in order to preserve the unsaved changes
+        // made to the edited content). We don't submit the edit form using one of the existing action buttons (e.g.
+        // Preview) because it would trigger the form validation which can prevent the switch (e.g. if the page title is
+        // mandatory and it's not filled). We submit instead directly the edit form but this has the disadvantage that it
+        // doesn't trigger the submit event so we may have form fields that are not up to date (e.g. because they use
+        // widgets that update their value on submit). This is the case with the WYSIWYG editor that updates its hidden
+        // fields for syntax conversion before the form is submitted. In order to overcome this we trigger an event to
+        // let the form fields know that their values are about to be submitted. It makes sense to use the preview action
+        // events because we don't want to save the content, we want to preview it in a different editor.
+        var form = document.forms.${formname};
+        form.fire('xwiki:actions:beforePreview');
+        // This is needed in order to silence the leave confirmation (we're not going to loose unsaved changes).
+        form.fire('xwiki:actions:preview');
+        form.action = XWiki.currentDocument.getURL('edit', 'editor=' + editor + '&$languageparams');
+        form.submit();
+        Event.stop(event);
+      };
+
       // Manage switch from wiki to wysiwyg, content must be preserved between those editors.
       Event.observe($('tmEditWysiwyg'), "click", function(event) {
         #if($doc.syntax.toIdString() == "xwiki/1.0")
@@ -170,17 +190,11 @@
           return;
         }
         #end
-        document.forms.${formname}.action='$doc.getURL("edit", "editor=wysiwyg&$languageparams")';
-        document.forms.${formname}.submit();
-        Event.stop(event);
+        switchEditor('wysiwyg', event);
       });
 
       // Manage switch from wysiwyg to wiki, content must be preserved between those editors.
-      Event.observe($('tmEditWiki'), "click", function(event) {
-        document.forms.${formname}.action='$doc.getURL("edit", "editor=wiki&$languageparams")';
-        document.forms.${formname}.submit();
-        Event.stop(event);
-      });
+      Event.observe($('tmEditWiki'), "click", switchEditor.curry('wiki'));
     }
     //]]>
   </script>

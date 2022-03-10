@@ -31,14 +31,26 @@ import org.securityfilter.authenticator.BasicAuthenticator;
 import org.securityfilter.filter.SecurityFilter;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
-import org.xwiki.security.authentication.api.AuthenticationFailureManager;
+import org.xwiki.security.authentication.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier;
 import com.xpn.xwiki.web.Utils;
 
 public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAuthenticator
 {
+
+    private UserAuthenticatedEventNotifier userAuthenticatedEventNotifier;
+
+    private UserAuthenticatedEventNotifier getUserAuthenticatedEventNotifier()
+    {
+        if ( this.userAuthenticatedEventNotifier == null ) {
+            this.userAuthenticatedEventNotifier = Utils.getComponent(UserAuthenticatedEventNotifier.class);
+        }
+        return this.userAuthenticatedEventNotifier;
+    }
+
     @Override
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception
     {
@@ -76,6 +88,9 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
             }
 
             request.setUserPrincipal(principal);
+
+            this.getUserAuthenticatedEventNotifier().notify(principal.getName());
+
             return false;
         } else {
             // login failed
@@ -117,9 +132,15 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
 
                 request.setUserPrincipal(principal);
 
+
+                // Since this scope is static, no UserAuthenticatedEventNotifier is available
+                // So we create one here
+                UserAuthenticatedEventNotifier notifier = Utils.getComponent(UserAuthenticatedEventNotifier.class);
+                notifier.notify(principal.getName());
+
                 return principal;
             } else {
-                authenticationFailureManager.recordAuthenticationFailure(username);
+                authenticationFailureManager.recordAuthenticationFailure(username, request);
             }
         }
 
@@ -219,4 +240,6 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
     {
         showLogin(request, response, this.realmName);
     }
+
 }
+

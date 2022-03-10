@@ -23,13 +23,13 @@ import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.servlet.http.Cookie;
 
@@ -50,11 +50,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryExecutor;
+import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
@@ -107,6 +107,9 @@ public class XWikiTest
 
     @MockComponent
     private XWikiRecycleBinStoreInterface recycleBinStoreInterface;
+
+    @MockComponent
+    private ReferenceRenamer referenceRenamer;
 
     private static final String DOCWIKI = "Wiki";
 
@@ -368,6 +371,44 @@ public class XWikiTest
     }
 
     /**
+     * We only verify here that the renameDocument API calls the Observation component.
+     */
+    @Test
+    public void testRenameDocumentSendsObservationEvents() throws Exception
+    {
+        DocumentReference sourceReference = new DocumentReference("xwikitest", "Some", "Source");
+        DocumentReference targetReference = new DocumentReference("xwikitest", "Some", "Target");
+
+        XWikiDocument sourceDocument = new XWikiDocument(sourceReference);
+        sourceDocument.setSyntax(Syntax.PLAIN_1_0);
+        this.xwiki.saveDocument(sourceDocument, this.oldcore.getXWikiContext());
+
+        EventListener mockListener = mock(EventListener.class);
+        when(mockListener.getName()).thenReturn("testlistener");
+        when(mockListener.getEvents()).thenReturn(
+            Arrays.asList(new DocumentCreatedEvent(targetReference), new DocumentCreatingEvent(targetReference),
+                new DocumentDeletingEvent(sourceReference), new DocumentDeletedEvent(sourceReference)));
+
+        ObservationManager om = this.oldcore.getMocker().getInstance(ObservationManager.class);
+        om.addListener(mockListener);
+
+        verify(mockListener).getEvents();
+
+        this.xwiki.renameDocument(sourceReference, targetReference, false, Collections.emptyList(), null,
+            this.oldcore.getXWikiContext());
+
+        // Ensure that the onEvent method has been called before and after the rename
+        verify(mockListener).onEvent(any(DocumentCreatingEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+        verify(mockListener).onEvent(any(DocumentCreatedEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+        verify(mockListener).onEvent(any(DocumentDeletingEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+        verify(mockListener).onEvent(any(DocumentDeletedEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+    }
+
+    /**
      * We only verify here that the deleteDocument API calls the Observation component.
      */
     @Test
@@ -541,6 +582,8 @@ public class XWikiTest
         this.xwiki.saveDocument(testUser, context);
 
         assertEquals(0, this.xwiki.validateUser(false, this.oldcore.getXWikiContext()));
+        XWikiDocument reloadedDocument = this.xwiki.getDocument(testUser, context);
+        assertEquals("", reloadedDocument.getObject("XWiki.XWikiUsers").getStringValue("validkey"));
 
         // Check with an incorrect plaintext key
         validationKey.setValue("wrong key");
@@ -967,23 +1010,25 @@ public class XWikiTest
         this.xwiki.saveDocument(doc5, this.oldcore.getXWikiContext());
 
         DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
-        this.xwiki.renameDocument(this.document.getDocumentReference(),
+        DocumentReference sourceReference = this.document.getDocumentReference();
+
+        this.xwiki.renameDocument(sourceReference,
             targetReference, true,
             Arrays.asList(reference1, reference2, reference3), Arrays.asList(reference4, reference5),
             this.oldcore.getXWikiContext());
 
         // Test links
-        assertEquals("[[doc:Wiki:MilkyWay.pageinsamespace]]",
-            this.xwiki.getDocument(targetReference, this.oldcore.getXWikiContext()).getContent());
+        verify(this.referenceRenamer).renameReferences(any(), eq(targetReference), eq(sourceReference),
+            eq(targetReference), eq(false));
+        verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
+            targetReference, false);
+        verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,
+            targetReference, false);
+        verify(this.referenceRenamer).renameReferences(doc3.getXDOM(), reference3, sourceReference,
+            targetReference, false);
+
         assertTrue(this.xwiki
             .getDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME), this.oldcore.getXWikiContext()).isNew());
-        assertEquals("[[doc:newwikiname:newspace.newpage]] " + "[[someName>>doc:newwikiname:newspace.newpage]] "
-            + "[[doc:newwikiname:newspace.newpage]]",
-            this.xwiki.getDocument(reference1, this.oldcore.getXWikiContext()).getContent());
-        assertEquals("[[doc:newspace.newpage]]",
-            this.xwiki.getDocument(reference2, this.oldcore.getXWikiContext()).getContent());
-        assertEquals("[[doc:newpage]]",
-            this.xwiki.getDocument(reference3, this.oldcore.getXWikiContext()).getContent());
 
         // Test parents
         assertEquals("newwikiname:newspace.newpage",
@@ -995,6 +1040,7 @@ public class XWikiTest
     @Test
     public void atomicRename() throws Exception
     {
+        XWikiContext xWikiContext = this.oldcore.getXWikiContext();
         doAnswer(invocationOnMock -> {
             XWikiDocument sourceDoc = invocationOnMock.getArgument(0);
             DocumentReference targetReference = invocationOnMock.getArgument(1);
@@ -1006,56 +1052,72 @@ public class XWikiTest
         }).when(this.oldcore.getMockStore()).renameXWikiDoc(any(), any(), any());
         this.document.setContent("[[doc:pageinsamespace]]");
         this.document.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(this.document, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(this.document, xWikiContext);
+
+        DocumentReference sourceReference = this.document.getDocumentReference();
+        XWikiDocument frenchTranslation =
+            new XWikiDocument(sourceReference, Locale.FRENCH);
+        this.xwiki.saveDocument(frenchTranslation, xWikiContext);
+
+        XWikiDocument germanTranslation =
+            new XWikiDocument(sourceReference, Locale.GERMAN);
+        this.xwiki.saveDocument(germanTranslation, xWikiContext);
 
         DocumentReference reference1 = new DocumentReference(DOCWIKI, DOCSPACE, "Page1");
         XWikiDocument doc1 = new XWikiDocument(reference1);
         doc1.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>doc:" + DOCSPACE + "."
             + DOCNAME + "]] [[doc:" + DOCNAME + "]]");
         doc1.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(doc1, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(doc1, xWikiContext);
 
         DocumentReference reference2 = new DocumentReference("newwikiname", DOCSPACE, "Page2");
         XWikiDocument doc2 = new XWikiDocument(reference2);
         doc2.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
         doc2.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(doc2, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(doc2, xWikiContext);
 
         DocumentReference reference3 = new DocumentReference("newwikiname", "newspace", "Page3");
         XWikiDocument doc3 = new XWikiDocument(reference3);
         doc3.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
         doc3.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(doc3, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(doc3, xWikiContext);
 
         // Test to make sure it also drags children along.
         DocumentReference reference4 = new DocumentReference(DOCWIKI, DOCSPACE, "Page4");
         XWikiDocument doc4 = new XWikiDocument(reference4);
         doc4.setParent(DOCSPACE + "." + DOCNAME);
-        this.xwiki.saveDocument(doc4, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(doc4, xWikiContext);
 
         DocumentReference reference5 = new DocumentReference("newwikiname", "newspace", "Page5");
         XWikiDocument doc5 = new XWikiDocument(reference5);
         doc5.setParent(DOCWIKI + ":" + DOCSPACE + "." + DOCNAME);
-        this.xwiki.saveDocument(doc5, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(doc5, xWikiContext);
 
         DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
-        this.xwiki.renameDocument(this.document.getDocumentReference(),
+        this.xwiki.renameDocument(sourceReference,
             targetReference, true,
             Arrays.asList(reference1, reference2, reference3), Arrays.asList(reference4, reference5),
-            this.oldcore.getXWikiContext());
+            xWikiContext);
+
+        // ensure document and translations are renamed
+        verify(this.oldcore.getMockStore()).renameXWikiDoc(this.document, targetReference, xWikiContext);
+        verify(this.oldcore.getMockStore()).renameXWikiDoc(frenchTranslation,
+            new DocumentReference(targetReference, Locale.FRENCH), xWikiContext);
+        verify(this.oldcore.getMockStore()).renameXWikiDoc(germanTranslation,
+            new DocumentReference(targetReference, Locale.GERMAN), xWikiContext);
 
         // Test links
-        assertEquals("[[doc:Wiki:MilkyWay.pageinsamespace]]",
-            this.xwiki.getDocument(targetReference, this.oldcore.getXWikiContext()).getContent());
+        verify(this.referenceRenamer).renameReferences(any(), eq(targetReference), eq(sourceReference),
+            eq(targetReference), eq(false));
+        verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
+            targetReference, false);
+        verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,
+            targetReference, false);
+        verify(this.referenceRenamer).renameReferences(doc3.getXDOM(), reference3, sourceReference,
+            targetReference, false);
+
         assertTrue(this.xwiki
             .getDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME), this.oldcore.getXWikiContext()).isNew());
-        assertEquals("[[doc:newwikiname:newspace.newpage]] " + "[[someName>>doc:newwikiname:newspace.newpage]] "
-                + "[[doc:newwikiname:newspace.newpage]]",
-            this.xwiki.getDocument(reference1, this.oldcore.getXWikiContext()).getContent());
-        assertEquals("[[doc:newspace.newpage]]",
-            this.xwiki.getDocument(reference2, this.oldcore.getXWikiContext()).getContent());
-        assertEquals("[[doc:newpage]]",
-            this.xwiki.getDocument(reference3, this.oldcore.getXWikiContext()).getContent());
 
         // Test parents
         assertEquals("newwikiname:newspace.newpage",

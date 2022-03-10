@@ -201,17 +201,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public Map<String, Integer> getTagCount(String spaceReference, XWikiContext context) throws XWikiException
     {
         if (!StringUtils.isBlank(spaceReference)) {
-            StringBuilder where = new StringBuilder();
-            where.append('(');
-            where.append("doc.space = ?1");
-            where.append(" OR ");
-            where.append("doc.space LIKE ?2");
-            where.append(')');
-
             // Make sure to escape the LIKE syntax
             String escapedSpaceReference = LIKE_ESCAPE.matcher(spaceReference).replaceAll(LIKE_REPLACEMENT);
 
-            return getTagCountForQuery("", where.toString(),
+            return getTagCountForQuery("", "(doc.space = ?1 OR doc.space LIKE ?2)",
                 Arrays.asList(spaceReference, escapedSpaceReference + LIKE_APPEND), context);
         }
 
@@ -235,15 +228,21 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         List<Object> queryParameters = new ArrayList<>();
         StringBuilder where = new StringBuilder();
         boolean first = true;
+        int parameterIndex = 1;
         for (String spaceReference : spaceRefList) {
             if (first) {
-                where.append("(doc.space = ?1 ");
+                where.append("(");
                 first = false;
             } else {
-                where.append(" OR doc.space = ?1 ");
+                where.append(" OR ");
             }
+            where.append("doc.space = ?");
+            where.append(parameterIndex++);
+            where.append(' ');
             queryParameters.add(spaceReference);
-            where.append("OR doc.space LIKE ?2");
+
+            where.append("OR doc.space LIKE ?");
+            where.append(parameterIndex++);
             String escapedSpaceReference = LIKE_ESCAPE.matcher(spaceReference).replaceAll(LIKE_REPLACEMENT);
             queryParameters.add(escapedSpaceReference + LIKE_APPEND);
         }

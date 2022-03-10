@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.ui.po;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -49,6 +48,8 @@ public class CreatePagePage extends ViewPage
 
     private DocumentPicker documentPicker;
 
+    private PageTypePicker pageTypePicker = new PageTypePicker();
+
     @FindBy(id = "terminal")
     private WebElement isTerminalCheckbox;
 
@@ -70,67 +71,27 @@ public class CreatePagePage extends ViewPage
         return this.documentPicker;
     }
 
-    private List<WebElement> getAvailableTemplateInputs()
-    {
-        return getDriver().findElementsWithoutWaiting(By.xpath("//input[@name = 'type' and @data-type = 'template']"));
-    }
-
-    private List<WebElement> getAvailableTypeInputs()
-    {
-        return getDriver().findElementsWithoutWaiting(By.xpath("//input[@name = 'type']"));
-    }
-
     /**
      * @since 3.2M3
      */
     public int getAvailableTemplateSize()
     {
-        return getAvailableTemplateInputs().size();
+        return this.pageTypePicker.countAvailableTemplates();
     }
 
     public List<String> getAvailableTemplates()
     {
-        List<String> availableTemplates = new ArrayList<String>();
-        List<WebElement> templateInputs = getAvailableTemplateInputs();
-        for (WebElement input : templateInputs) {
-            if (input.getAttribute("value").length() > 0) {
-                availableTemplates.add(input.getAttribute("value"));
-            }
-        }
-
-        return availableTemplates;
+        return this.pageTypePicker.getAvailableTemplates();
     }
 
     public void setTemplate(String template)
     {
-        List<WebElement> templates = getAvailableTemplateInputs();
-        for (WebElement templateInput : templates) {
-            if (templateInput.getAttribute("value").equals(template)) {
-                // Get the label corresponding to the input so we can click on it
-                WebElement label =
-                    getDriver().findElementWithoutWaiting(
-                        By.xpath("//label[@for = '" + templateInput.getAttribute("id") + "']"));
-                label.click();
-                return;
-            }
-        }
-        throw new RuntimeException("Failed to find template [" + template + "]");
+        this.pageTypePicker.selectTemplateByValue(template);
     }
 
     public void setType(String type)
     {
-        List<WebElement> types = getAvailableTypeInputs();
-        for (WebElement typeInput : types) {
-            if (typeInput.getAttribute("value").equals(type)) {
-                // Get the label corresponding to the input so we can click on it
-                WebElement label =
-                    getDriver().findElementWithoutWaiting(
-                        By.xpath("//label[@for = '" + typeInput.getAttribute("id") + "']"));
-                label.click();
-                return;
-            }
-        }
-        throw new RuntimeException("Failed to find type [" + type + "]");
+        this.pageTypePicker.selectTypeByValue(type);
     }
 
     public void clickCreate()
@@ -318,8 +279,8 @@ public class CreatePagePage extends ViewPage
             });
         } catch (WebDriverException e) {
             // Display a nicer error message than would be displayed otherwise
-            throw new WebDriverException(String.format("Found [%s], was expecting [%s]", currentValue.toString(),
-                expectedPathString), e);
+            throw new WebDriverException(
+                String.format("Found [%s], was expecting [%s]", currentValue.toString(), expectedPathString), e);
         }
     }
 }

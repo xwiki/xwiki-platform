@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,8 +41,10 @@ import org.xwiki.configuration.internal.test.AbstractTestDocumentConfigurationSo
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -57,10 +58,13 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
  * @version $Id: 31e2e0d488d6f5dbc1fcec1211d30dc30000b5eb
  */
 @OldcoreTest
-public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
+class WikiPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
     @InjectMockComponents
     private WikiPreferencesConfigurationSource source;
+
+    @MockComponent
+    private ConverterManager converterManager;
 
     @Override
     protected ConfigurationSource getConfigurationSource()
@@ -195,11 +199,19 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
         XWikiDocument document = this.oldcore.getXWikiContext().getWiki().getDocument(reference,
             this.oldcore.getXWikiContext());
         BaseClass baseClass = document.getXClass();
-        baseClass.addTextField("key", "Some Key", 30);
+        baseClass.addTextField("textKey", "Text Key", 30);
+        baseClass.addBooleanField("booleanKey", "Boolean Key");
 
-        this.source.setProperties(Collections.singletonMap("key", "value"));
+        Map<String, Object> properties =new HashMap<>();
+        properties.put("textKey", "value");
+        properties.put("booleanKey", true);
+        this.source.setProperties(properties);
 
-        assertEquals("value", this.source.getProperty("key"));
+        assertEquals("value", this.source.getProperty("textKey"));
+
+        // Simulate the conversion from Integer to Boolean
+        when(this.converterManager.convert(Boolean.class, new Integer(1))).thenReturn(true);
+        assertEquals(true, this.source.getProperty("booleanKey", Boolean.class));
     }
 
     @Test

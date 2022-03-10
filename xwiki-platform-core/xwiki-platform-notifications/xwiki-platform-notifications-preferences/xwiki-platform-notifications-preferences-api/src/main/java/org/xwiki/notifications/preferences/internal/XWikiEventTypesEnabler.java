@@ -105,16 +105,17 @@ public class XWikiEventTypesEnabler
     private TargetableNotificationPreference createNotificationPreference(DocumentReference user,
             TargetableNotificationPreferenceBuilder builder, String eventType, NotificationFormat format, Date date)
     {
-        builder.prepare();
-        builder.setCategory(NotificationPreferenceCategory.DEFAULT);
-        builder.setEnabled(true);
-        builder.setFormat(format);
         Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
         properties.put(NotificationPreferenceProperty.EVENT_TYPE, eventType);
-        builder.setProperties(properties);
-        builder.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
-        builder.setStartDate(date);
-        builder.setTarget(user);
-        return builder.build();
+
+        return builder.prepare()
+            .setCategory(NotificationPreferenceCategory.DEFAULT)
+            .setEnabled(true)
+            .setFormat(format)
+            .setProperties(properties)
+            .setProviderHint(UserProfileNotificationPreferenceProvider.NAME)
+            .setStartDate(date)
+            .setTarget(user)
+            .build();
     }
 }

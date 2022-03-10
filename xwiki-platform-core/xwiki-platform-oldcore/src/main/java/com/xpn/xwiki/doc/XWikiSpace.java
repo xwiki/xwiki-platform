@@ -26,7 +26,6 @@ import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.util.Util;
@@ -119,7 +118,6 @@ public class XWikiSpace
      * @param store the store to set.
      * @since 12.5RC1
      */
-    @Unstable
     public void setStore(XWikiStoreInterface store)
     {
         this.store = store;
@@ -132,7 +130,6 @@ public class XWikiSpace
      * @return an ID that can be used to retrieve the space in DB.
      * @since 12.5RC1
      */
-    @Unstable
     public static long getId(SpaceReference spaceReference)
     {
         return Util.getHash(LocalUidStringEntityReferenceSerializer.INSTANCE.serialize(spaceReference));

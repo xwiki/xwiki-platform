@@ -22,8 +22,8 @@ package org.xwiki.bridge.event;
 import org.xwiki.observation.event.EndEvent;
 
 /**
- * An event triggered whenever a client request (action) is processed, like <tt>/upload/</tt> or <tt>/view/</tt>. A
- * specific event corresponds to only one {@link #actionName action type}.
+ * An event triggered whenever a client request (action) is processed, like {@code /upload/} or {@code /view/}. A
+ * specific event corresponds to only one {@link #getActionName()} action type.
  * <p>
  * The event also send the following parameters:
  * </p>

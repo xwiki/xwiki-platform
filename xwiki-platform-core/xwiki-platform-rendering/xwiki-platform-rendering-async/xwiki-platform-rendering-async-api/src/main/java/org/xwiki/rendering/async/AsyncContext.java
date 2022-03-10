@@ -25,7 +25,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Contextual information related to asynchronous rendering.
@@ -91,10 +90,8 @@ public interface AsyncContext
      * @param allowed the result of the evaluation
      * @since 11.8RC1
      */
-    @Unstable
     default void useRight(Right right, DocumentReference userReference, EntityReference entityReference,
         boolean allowed)
     {
-
     }
 }

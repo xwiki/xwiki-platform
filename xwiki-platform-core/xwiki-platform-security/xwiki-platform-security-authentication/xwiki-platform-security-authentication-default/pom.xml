@@ -20,19 +20,21 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>xwiki-platform-security-authentication</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>12.5-SNAPSHOT</version>
+    <artifactId>xwiki-platform-security-authentication</artifactId>
+    <version>14.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-
   <artifactId>xwiki-platform-security-authentication-default</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - Security - Authentication - Default</name>
-  <description>XWiki Platform - Security - Authentication - Default contains the default implementations related to authentication</description>
+  <description>Default implementation of the Authentication API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
-    </properties>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Authentication API Implementation</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -48,10 +50,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-captcha-api</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -74,6 +72,14 @@
       <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
   </dependencies>
-
 </project>

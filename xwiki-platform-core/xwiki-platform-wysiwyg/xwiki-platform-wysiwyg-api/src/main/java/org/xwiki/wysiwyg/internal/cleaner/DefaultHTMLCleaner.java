@@ -21,9 +21,10 @@ package org.xwiki.wysiwyg.internal.cleaner;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -59,14 +60,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner
     public String clean(String dirtyHTML)
     {
         // Sort the list of specific filters based on their priority.
-        Collections.sort(specificFilters, new Comparator<HTMLFilter>()
-        {
-            @Override
-            public int compare(HTMLFilter alice, HTMLFilter bob)
-            {
-                return alice.getPriority() - bob.getPriority();
-            }
-        });
+        specificFilters.sort(Comparator.comparingInt(HTMLFilter::getPriority));
 
         // We have to remove or replace the HTML elements that were added by the WYSIWYG editor only for internal
         // reasons, before any cleaning filter is applied. Otherwise cleaning filters might transform these
@@ -74,10 +68,13 @@ public class DefaultHTMLCleaner implements HTMLCleaner
         // client side because the editor is a widget that can be used independently inside or outside an HTML form and
         // thus it doesn't know when its current value is submitted.
         HTMLCleanerConfiguration config = cleaner.getDefaultConfiguration();
-        List<org.xwiki.xml.html.filter.HTMLFilter> filters = new ArrayList<org.xwiki.xml.html.filter.HTMLFilter>();
+        List<org.xwiki.xml.html.filter.HTMLFilter> filters = new ArrayList<>();
         filters.addAll(specificFilters);
         filters.addAll(config.getFilters());
         config.setFilters(filters);
+        Map<String, String> parameters = new HashMap<>(config.getParameters());
+        parameters.put(HTMLCleanerConfiguration.HTML_VERSION, "5");
+        config.setParameters(parameters);
 
         Document document = cleaner.clean(new StringReader(dirtyHTML), config);
         return HTMLUtils.toString(document);

@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 11.3RC1
  */
 @UITest
-public class ConfigurableClassIT
+class ConfigurableClassIT
 {
     @BeforeEach
     public void setUp(TestUtils setup)
@@ -59,19 +59,19 @@ public class ConfigurableClassIT
         setup.loginAsSuperAdmin();
     }
 
-    /*
+    /**
      * Verify that if a value is specified for the {@code linkPrefix} xproperty, then a link is generated with
      * linkPrefix + prettyName of the property from the configuration class.
      */
     @Test
     @Order(1)
-    public void labelLinkGeneration(TestUtils setup, TestReference testReference)
+    void labelLinkGeneration(TestUtils setup, TestReference testReference)
     {
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", testReference.getLastSpaceReference().getName(),
             "heading", "Some Heading",
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "configurationClass", setup.serializeReference(testReference),
             "linkPrefix", "TheLinkPrefix");
 
@@ -85,7 +85,7 @@ public class ConfigurableClassIT
         assertTrue(asp.hasLink("TheLinkPrefixSelect"));
     }
 
-    /*
+    /**
      * Creates a document with 2 configurable objects, one gets configured globally in one section and displays
      * 2 configuration fields, the other is configured in the space in another section and displays the other 2
      * fields. Fails if they are not displayed as they should be.
@@ -94,21 +94,21 @@ public class ConfigurableClassIT
      */
     @Test
     @Order(2)
-    public void testApplicationConfiguredInMultipleSections(TestUtils setup, TestReference testReference)
+    void testApplicationConfiguredInMultipleSections(TestUtils setup, TestReference testReference)
     {
         String app1Section = testReference.getLastSpaceReference().getName() + "_1";
         String app2Section = testReference.getLastSpaceReference().getName() + "_2";
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", app1Section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean");
 
         setup.addObject(testReference, "XWiki.ConfigurableClass",
             "displayInSection", app2Section,
-            "configureGlobally", "false",
+            "scope", "SPACE",
             "heading", "Some Other Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "TextArea, Select");
@@ -164,26 +164,26 @@ public class ConfigurableClassIT
         assertFalse(formContainerElement.hasField(By.name(fullName + "_0_Boolean")));
     }
 
-    /*
+    /**
      * If CodeToExecute is defined in a configurable app, then it should be evaluated.
      * Also header should be evaluated and not just printed.
      * If XWiki.ConfigurableClass is saved with programming rights, it should resave itself so that it doesn't have them.
      */
     @Test
     @Order(3)
-    public void testCodeToExecutionAndAutoSandboxing(TestUtils setup, TestReference testReference) throws Exception
+    void testCodeToExecutionAndAutoSandboxing(TestUtils setup, TestReference testReference) throws Exception
     {
         // fixture
         String codeToExecute = "#set($code = 's sh')"
             + "Thi${code}ould be displayed."
             + "#if($xcontext.hasProgrammingRights())"
-            + "This should not be displayed."
+            + "This should be displayed too."
             + "#end";
         String heading = "#set($code = 'his sho')"
             + "T${code}uld also be displayed.";
         setupConfigurableApplication(setup, testReference,
             "displayInSection", testReference.getLastSpaceReference().getName(),
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "codeToExecute", codeToExecute,
             "heading", heading
             );
@@ -205,7 +205,8 @@ public class ConfigurableClassIT
             String content = viewPage.getContent();
             assertTrue(content.contains("This should be displayed."));
             assertTrue(content.contains("This should also be displayed."));
-            assertFalse(content.contains("This should not be displayed."));
+            assertTrue(content.contains("This should be displayed too."));
+            // It's false because of the dropPermission in ConfigurableClass (but supposed to be fixed at some point)
             assertTrue(content.contains("Has Programming permission: false"));
             // Make sure javascript has not added a Save button.
             assertFalse(setup.getDriver().hasElementWithoutWaiting(
@@ -225,13 +226,13 @@ public class ConfigurableClassIT
      */
     @Test
     @Order(4)
-    public void testAddConfigurableApplicationInExistingSection(TestUtils setup, TestReference testReference)
+    void testAddConfigurableApplicationInExistingSection(TestUtils setup, TestReference testReference)
     {
         String section = "presentation";
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -259,7 +260,7 @@ public class ConfigurableClassIT
         assertFalse(asp.hasHeading(2, "HSomeHeading"));
 
         // Switch application to non-global
-        setup.updateObject(testReference, "XWiki.ConfigurableClass", 0, "configureGlobally", false);
+        setup.updateObject(testReference, "XWiki.ConfigurableClass", 0, "scope", "SPACE");
 
         // Check that it is available in space section.
         asp = AdministrationSectionPage.gotoSpaceAdministration(testReference.getLastSpaceReference(), section);
@@ -295,7 +296,7 @@ public class ConfigurableClassIT
      */
     @Test
     @Order(5)
-    public void testAddConfigurableApplicationInNonexistantSection(TestUtils setup, TestReference testReference)
+    void testAddConfigurableApplicationInNonexistantSection(TestUtils setup, TestReference testReference)
     {
         String section = testReference.getLastSpaceReference().getName();
 
@@ -306,7 +307,7 @@ public class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -342,7 +343,7 @@ public class ConfigurableClassIT
      */
     @Test
     @Order(6)
-    public void testConfigurableCreatedByUnauthorizedWillNotExecute(TestUtils setup, TestReference testReference)
+    void testConfigurableCreatedByUnauthorizedWillNotExecute(TestUtils setup, TestReference testReference)
     {
         // Make sure the configurable page doesn't exist because otherwise we may fail to overwrite it with a
         // non-administrator user.
@@ -353,7 +354,7 @@ public class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -368,13 +369,13 @@ public class ConfigurableClassIT
         assertFalse(asp.hasHeading(2, "HSomeHeading"));
     }
 
-    /*
+    /**
      * Proves that ConfigurationClass#codeToExecute is not rendered inline even if there is no
      * custom configuration class and the only content is custom content.
      */
     @Test
     @Order(7)
-    public void testCodeToExecuteNotInlineIfNoConfigurationClass(TestUtils setup, TestReference testReference)
+    void testCodeToExecuteNotInlineIfNoConfigurationClass(TestUtils setup, TestReference testReference)
     {
         String fullName = setup.serializeReference(testReference).split(":")[1];
         String helloDiv = String.format("%s_%s", fullName, "hello");
@@ -383,24 +384,24 @@ public class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "codeToExecute", test);
 
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section);
         asp.waitUntilActionButtonIsLoaded();
-        assertFalse(setup.getDriver().hasElementWithoutWaiting(By.className("xwikirenderingerror")));
+        assertFalse(asp.hasRenderingError());
         assertTrue(setup.getDriver().hasElementWithoutWaiting(By.id(helloDiv)));
     }
 
-    /*
+    /**
      * Proves that ConfigurationClass#codeToExecute is not rendered inline whether it's at the top of the
      * form or inside of the form.
      */
     @Test
     @Order(8)
-    public void testCodeToExecuteNotInline(TestUtils setup, TestReference testReference)
+    void testCodeToExecuteNotInline(TestUtils setup, TestReference testReference)
     {
         String fullName = setup.serializeReference(testReference).split(":")[1];
         String helloDiv = String.format("%s_%s", fullName, "hello");
@@ -409,7 +410,7 @@ public class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "codeToExecute", test,
@@ -417,24 +418,24 @@ public class ConfigurableClassIT
 
         setup.addObject(testReference, "XWiki.ConfigurableClass",
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Other Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "TextArea, Select");
 
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section);
         asp.waitUntilActionButtonIsLoaded();
-        assertFalse(setup.getDriver().hasElement(By.className("xwikirenderingerror")));
+        assertFalse(asp.hasRenderingError());
         assertTrue(setup.getDriver().hasElementWithoutWaiting(By.id(helloDiv)));
     }
 
-    /*
+    /**
      * Make sure html macros and pre tags are not being stripped
-     * @see: https://jira.xwiki.org/browse/XAADMINISTRATION-141
+     * @see <a href="https://jira.xwiki.org/browse/XAADMINISTRATION-141">XAADMINISTRATION-141</a>
      */
     @Test
     @Order(9)
-    public void testNotStrippingHtmlMacros(TestUtils setup, TestReference testReference)
+    void testNotStrippingHtmlMacros(TestUtils setup, TestReference testReference)
     {
         String test = "{{html}} <pre> {{html clean=\"false\"}} </pre> {{/html}}";
         String section = testReference.getLastSpaceReference().getName();
@@ -443,7 +444,7 @@ public class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -459,13 +460,13 @@ public class ConfigurableClassIT
         assertEquals(test, formContainerElement.getFieldValue(By.name(fullName + "_0_String")));
     }
 
-    /*
+    /**
      * Fails unless XWiki.ConfigurableClass locks each page on view and unlocks any other configurable page.
      * Also fails if codeToExecute is not being evaluated.
      */
     @Test
     @Order(10)
-    public void testLockingAndUnlocking(TestUtils setup, TestReference testReference)
+    void testLockingAndUnlocking(TestUtils setup, TestReference testReference)
     {
         // Fixture
         DocumentReference page1 = new DocumentReference("TestConfigurable1", testReference.getLastSpaceReference());
@@ -488,14 +489,14 @@ public class ConfigurableClassIT
 
         setupConfigurableApplication(false, setup, page1,
             "displayInSection", section1,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(page1),
             "propertiesToShow", "String, Boolean, TextArea, Select");
 
         setupConfigurableApplication(false, setup, page2,
             "displayInSection", section2,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(page2),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -507,7 +508,7 @@ public class ConfigurableClassIT
 
         // We have to switch user context without logging out, logging out removes all locks.
         // We have to open a new window because otherwise the lock is removed when we leave the administration page.
-        setup.getDriver().findElementByLinkText(testPageName).sendKeys(Keys.chord(Keys.CONTROL, Keys.RETURN));
+        setup.getDriver().findElement(By.linkText(testPageName)).sendKeys(Keys.chord(Keys.CONTROL, Keys.RETURN));
         String firstTab = setup.getDriver().getWindowHandle();
 
         // It might take a bit of time for the driver to know there's another window.

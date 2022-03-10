@@ -19,6 +19,9 @@
  */
 package org.xwiki.query.internal;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -37,6 +40,8 @@ public abstract class AbstractWhereQueryFilter implements QueryFilter
      * SQL where token.
      */
     private static final String WHERE = " where ";
+    
+    private static final Pattern WHERE_PATTERN = Pattern.compile("\\s+where\\s+", Pattern.CASE_INSENSITIVE);
 
     /**
      * Used to log debug information.
@@ -70,7 +75,7 @@ public abstract class AbstractWhereQueryFilter implements QueryFilter
 
         if (Query.HQL.equals(language) && isFilterable(lowerStatement)) {
 
-            int whereIdx = lowerStatement.indexOf(WHERE);
+            Matcher whereMatcher = WHERE_PATTERN.matcher(lowerStatement);
             int orderByIdx = Math.min(lowerStatement.indexOf(" order by "), Integer.MAX_VALUE);
             int groupByIdx = Math.min(lowerStatement.indexOf(" group by "), Integer.MAX_VALUE);
             // We need to handle the case where there's only one of them and not both (ie. avoid -1)
@@ -79,14 +84,13 @@ public abstract class AbstractWhereQueryFilter implements QueryFilter
             // Get the index of the first or only one
             int orderOrGroupByIdx = Math.min(orderByIdx, groupByIdx);
 
-            if (whereIdx >= 0) {
+            if (whereMatcher.find()) {
                 // With 'WHERE'
                 // We need the index at the end of the " where " part
-                whereIdx = whereIdx + WHERE.length();
                 int whereEndIdx = Math.min(orderOrGroupByIdx, lowerStatement.length());
                 result = result.substring(0, whereEndIdx) + ")" + result.substring(whereEndIdx);
-                result =
-                    result.substring(0, whereIdx) + whereClause + " and (" + result.substring(whereIdx);
+                result = result.substring(0, whereMatcher.end()) + whereClause + " and ("
+                    + result.substring(whereMatcher.end());
             } else {
                 // Without 'WHERE', look for 'ORDER BY' or 'GROUP BY'
                 if (orderOrGroupByIdx > 0 && orderOrGroupByIdx < Integer.MAX_VALUE) {

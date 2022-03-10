@@ -20,7 +20,6 @@
 package org.xwiki.user;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * CRUD operations on users. Note that for retrieving a user's prooperties you should use a
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 @Role
 public interface UserManager
 {

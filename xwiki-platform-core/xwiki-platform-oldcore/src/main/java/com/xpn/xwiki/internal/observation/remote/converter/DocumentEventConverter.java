@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.DocumentVersionRangeDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
@@ -67,6 +68,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
             add(DocumentDeletedEvent.class);
             add(DocumentCreatedEvent.class);
             add(DocumentUpdatedEvent.class);
+            add(DocumentVersionRangeDeletedEvent.class);
         }
     };
 

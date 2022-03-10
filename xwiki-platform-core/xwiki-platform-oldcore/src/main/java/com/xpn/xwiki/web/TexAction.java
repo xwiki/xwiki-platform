@@ -21,8 +21,12 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.formula.ImageData;
 import org.xwiki.formula.ImageStorage;
 
@@ -37,6 +41,9 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  * @since 2.0M3
  */
+@Component
+@Named("tex")
+@Singleton
 public class TexAction extends XWikiAction
 {
     /** Logging helper object */

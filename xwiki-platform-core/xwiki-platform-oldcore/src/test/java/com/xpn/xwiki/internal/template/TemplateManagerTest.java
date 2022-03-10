@@ -49,13 +49,16 @@ import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.test.mockito.StringReaderMatcher;
+import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -70,7 +73,7 @@ import static org.mockito.Mockito.when;
  */
 @AllComponents
 @ComponentTest
-public class TemplateManagerTest
+class TemplateManagerTest
 {
     private AuthorizationManager authorizationMock;
 
@@ -84,13 +87,17 @@ public class TemplateManagerTest
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
+    @MockComponent
+    private URLConfiguration urlConfiguration;
+
     @AfterComponent
-    public void afterComponent() throws Exception
+    void afterComponent() throws Exception
     {
         this.componentManager.registerMockComponent(ConfigurationSource.class);
         this.componentManager.registerMockComponent(TransformationManager.class);
         this.componentManager.registerMockComponent(ObservationManager.class);
         this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        this.componentManager.registerMockComponent(WikiDescriptorManager.class);
 
         this.authorizationMock = this.componentManager.registerMockComponent(AuthorizationManager.class);
         this.environmentMock = this.componentManager.registerMockComponent(Environment.class);
@@ -101,7 +108,7 @@ public class TemplateManagerTest
     }
 
     @BeforeEach
-    public void before() throws Exception
+    void before() throws Exception
     {
         when(this.velocityManagerMock.getVelocityEngine()).thenReturn(mock(VelocityEngine.class));
         when(this.velocityManagerMock.getVelocityContext()).thenReturn(new VelocityContext());
@@ -133,10 +140,8 @@ public class TemplateManagerTest
             });
     }
 
-    // Tests
-
     @Test
-    public void testRenderVelocity() throws Exception
+    void renderVelocity() throws Exception
     {
         mockVelocity("source", "OK");
 
@@ -146,7 +151,7 @@ public class TemplateManagerTest
     }
 
     @Test
-    public void testTemplateWithoutScriptRight() throws Exception
+    void templateWithoutScriptRight() throws Exception
     {
         DocumentReference author = new DocumentReference("wiki", "space", "user");
 
@@ -158,7 +163,7 @@ public class TemplateManagerTest
     }
 
     @Test
-    public void testTemplateCheatingProtection() throws Exception
+    void templateCheatingProtection() throws Exception
     {
         when(this.environmentMock.getResource("/templates/../secure[]")).thenReturn(new URL("file://secure[]"));
         when(this.environmentMock.getResourceAsStream("/templates/../template[]"))
@@ -170,7 +175,7 @@ public class TemplateManagerTest
     }
 
     @Test
-    public void testRenderWiki() throws Exception
+    void renderWiki() throws Exception
     {
         setTemplateContent("##!source.syntax=xwiki/2.1\nfirst line\\\\second line");
 
@@ -178,7 +183,7 @@ public class TemplateManagerTest
     }
 
     @Test
-    public void testRenderClassloaderTemplate() throws Exception
+    void renderClassloaderTemplate() throws Exception
     {
         mockVelocity("classloader template content", "OK");
 

@@ -29,7 +29,18 @@ def builds = [
     build(
       name: 'Main',
       profiles: 'legacy,integration-tests,snapshot',
-      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
+      properties:
+        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -DskipITs',
+      daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
+    )
+  },
+  // Can be used to manually trigger the main build with integration tests on the CI.
+  'Main with Integration Tests' : {
+    build(
+      name: 'Main with Integration Tests',
+      profiles: 'legacy,integration-tests,snapshot',
+      properties:
+        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
       daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
     )
   },
@@ -96,25 +107,24 @@ def builds = [
       name: 'TestRelease',
       goals: 'clean install',
       profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
-      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true -Ddoclint=all'
+      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddoclint=all'
     )
   },
   'Quality' : {
+    // Run the quality checks.
+    // Sonar notes:
+    // - we need sonar:sonar to perform the analysis
+    // - we need sonar = true to push the analysis to Sonarcloud
+    // - we need jacoco:report to execute jacoco and compute test coverage
+    // - we need -Pcoverage and -Dxwiki.jacoco.itDestFile to tell Jacoco to compute a single global Jacoco
+    //   coverage for the full reactor (so that the coverage percentage computed takes into account module tests
+    //   which cover code in other modules)
     build(
       name: 'Quality',
-      goals: 'clean install jacoco:report',
-      profiles: 'quality,legacy'
-    )
-  },
-  'Sonar' : {
-    // Note: ideally, this should be part of the 'Quality' build but last time we tried it was using too much memory
-    // so until we make it work, we're testing Sonar in a separate build to not fail the 'Quality' one.
-    build(
-      name: 'Sonar',
       goals: 'clean install jacoco:report sonar:sonar',
-      profiles: 'legacy',
-      properties: '-Dxwiki.revapi.skip=true -Dxwiki.spoon.skip=true -Dxwiki.checkstyle.skip=true',
-      sonar: true
+      profiles: 'quality,legacy,coverage',
+      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec',
+      sonar: true,
     )
   }
 ]
@@ -140,7 +150,41 @@ if (!params.type || params.type == 'standard') {
     }
   }
 } else {
-  buildDocker(params.type)
+  // If the build is docker-latest, only build if the previous build was triggered by some source code changes, 
+  // to save agent build time and save the planet! (We don't need to re-run docker tests if there's been no
+  // source changes).	
+  // Also always build if triggered manually by a user.
+  if (params.type == 'docker-latest' && (!currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause'))) {
+    // We trigger the build under two conditions:
+    // - The previous build has been triggered by a SCM change or a Branch Event (not sure what this is about but it
+    //   seems we need that too since it happens when we push changes to master)
+    // - The previous build was triggered by an upstream job (like rendering triggering platform)
+    def shouldExecute = false
+    currentBuild.rawBuild.getPreviousBuild().getCauses().each() {
+      echoXWiki "Build trigger cause: [${it.toString()}]"
+      if (it.toString().contains('SCMTriggerCause')) {
+        echoXWiki 'Executing docker-latest because it was triggered by a SCM commit - ${it.getShortDescription()}'
+        shouldExecute = true
+      }
+      if (it.toString().contains('BranchEventCause')) {
+        echoXWiki 'Executing docker-latest because it was triggered by a Branch Event - ${it.getShortDescription()}'
+        shouldExecute = true
+      }
+      if (it.toString().contains('UpstreamCause')) {
+        echoXWiki 'Executing docker-latest because it was triggered by an upstream job - ${it.getShortDescription()}'
+        shouldExecute = true
+      }
+    }
+    if (shouldExecute) {
+      buildDocker(params.type)
+    } else {
+      echoXWiki "No SCM trigger nor upstream job trigger, thus not executing the docker latest tests (since there's been no source changes; this saves agent build time and help save humanity!). Aborting."
+      // Aborting so that the build isn't displayed as successful without doing anything.
+      currentBuild.result = 'ABORTED'
+    }
+  } else {
+    buildDocker(params.type)
+  }
 }
 
 private void buildStandardSingle(build)
@@ -152,60 +196,71 @@ private void buildStandardAll(builds)
 {
   parallel(
     'main': {
-      // Build, skipping quality checks so that the result of the build can be sent as fast as possible to the devs.
+      // Build, skipping quality checks and integration tests (but execute unit tests) so that the result of the build
+      // can be sent as fast as possible to the devs. Note that we skip integration tests by using the FailSafe plugin
+      // property "DskipITs".
       // In addition, we want the generated artifacts to be deployed to our remote Maven repository so that developers
-      // can benefit from them even though some quality checks have not yet passed. In // we start a build with the
-      // quality profile that executes various quality checks.
+      // can benefit from them even though some quality checks have not yet passed.
+      // In // we start a build with the quality profile that executes various quality checks, and we run all the
+      // integration tests just after this build.
       //
       // Note: We configure the snapshot extension repository in XWiki (-Psnapshots) in the generated
       // distributions to make it easy for developers to install snapshot extensions when they do manual tests.
       builds['Main'].call()
 
-      // Note: We want the following behavior:
-      // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will
-      //   happen since Jenkins will throw an exception and we don't catch it.
-      // - if the previous build has failures (e.g. test execution failures), we want subsequent builds to execute
-      //   since failures can be test flickers for ex, and it could still be interesting to get a distribution to test
-      // xwiki manually.
-
-      // Build the distributions
-      builds['Distribution'].call()
-
-      // Building the various functional tests, after the distribution has been built successfully.
-
-      // Build the Flavor Test POM, required for the pageobjects module below.
-      builds['Flavor Test - POM'].call()
-
-      // Build the Flavor Test PageObjects required by the functional test below that need an XWiki UI
-      builds['Flavor Test - PageObjects'].call()
-
-      // Now run all tests in parallel
       parallel(
-        'flavor-test-ui': {
-          // Run the Flavor UI tests
-          builds['Flavor Test - UI'].call()
+        'integration-tests' : {
+          // Run all integration tests, with each module in its own node to parallelize the work.
+          runIntegrationTests()
         },
-        'flavor-test-misc': {
-          // Run the Flavor Misc tests
-          builds['Flavor Test - Misc'].call()
-        },
-        'flavor-test-storage': {
-          // Run the Flavor Storage tests
-          builds['Flavor Test - Storage'].call()
-        },
-        'flavor-test-escaping': {
-          // Run the Flavor Escaping tests
-          builds['Flavor Test - Escaping'].call()
-        },
-        'flavor-test-webstandards': {
-          // Run the Flavor Webstandards tests
-          // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
-          // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
-          builds['Flavor Test - Webstandards'].call()
-        },
-        'flavor-test-upgrade': {
-          // Run the Flavor Upgrade tests
-          builds['Flavor Test - Upgrade'].call()
+        'distribution' : {
+          // Note: We want the following behavior:
+          // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will
+          //   happen since Jenkins will throw an exception and we don't catch it.
+          // - if the previous build has failures (e.g. test execution failures), we want subsequent builds to execute
+          //   since failures can be test flickers for ex, and it could still be interesting to get a distribution to
+          //   test xwiki manually.
+
+          // Build the distributions
+          builds['Distribution'].call()
+
+          // Building the various functional tests, after the distribution has been built successfully.
+
+          // Build the Flavor Test POM, required for the pageobjects module below.
+          builds['Flavor Test - POM'].call()
+
+          // Build the Flavor Test PageObjects required by the functional test below that need an XWiki UI
+          builds['Flavor Test - PageObjects'].call()
+
+          // Now run all tests in parallel
+          parallel(
+            'flavor-test-ui': {
+              // Run the Flavor UI tests
+              builds['Flavor Test - UI'].call()
+            },
+            'flavor-test-misc': {
+              // Run the Flavor Misc tests
+              builds['Flavor Test - Misc'].call()
+            },
+            'flavor-test-storage': {
+              // Run the Flavor Storage tests
+              builds['Flavor Test - Storage'].call()
+            },
+            'flavor-test-escaping': {
+              // Run the Flavor Escaping tests
+              builds['Flavor Test - Escaping'].call()
+            },
+            'flavor-test-webstandards': {
+              // Run the Flavor Webstandards tests
+              // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
+              // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
+              builds['Flavor Test - Webstandards'].call()
+            },
+            'flavor-test-upgrade': {
+              // Run the Flavor Upgrade tests
+              builds['Flavor Test - Upgrade'].call()
+            }
+          )
         }
       )
     },
@@ -217,15 +272,25 @@ private void buildStandardAll(builds)
       // Run the quality checks
       builds['Quality'].call()
     }
-    /* TODO: 27/4/2020: Disable sonar build to check the hypothesis that it's causing kills on agents by using too
-       much memory.
-    ,
-    'sonar': {
-      // Sonar analysis + push to Sonarcloud.io
-      builds['Sonar'].call()
-    }
-    */
   )
+}
+
+private void runIntegrationTests()
+{
+  def itModuleList
+  def customJobProperties
+  node() {
+    // Checkout platform to find all IT modules so that we can then parallelize executions across Jenkins agents.
+    checkout skipChangeLog: true, scm: scm
+    itModuleList = itModules()
+    customJobProperties = getCustomJobProperties()
+  }
+
+  xwikiITBuild {
+    modules = itModuleList
+    // Make sure that we don't reset the job properties!
+    jobProperties = customJobProperties
+  }
 }
 
 private void buildDocker(type)
@@ -312,6 +377,9 @@ private void buildInsideNode(map)
       // Avoid duplicate changelogs in jenkins job execution UI page
       if (map.name != 'Main') {
         skipChangeLog = true
+      }
+      if (map.javaTool != null) {
+        javaTool = map.javaTool
       }
     }
 }

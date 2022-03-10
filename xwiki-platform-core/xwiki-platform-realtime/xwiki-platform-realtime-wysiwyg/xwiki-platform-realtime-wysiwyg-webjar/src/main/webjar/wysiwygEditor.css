@@ -1,0 +1,35 @@
+div.rt-toolbar {
+  /* We need to increase the line height because the user names have more padding and border. */
+  line-height: 28px;
+  /* Add some space between the real-time toolbar and the standard CKEditor toolbar. */
+  margin-bottom: 5px;
+}
+
+
+div.rt-toolbar * {
+  /* Be consistent with the CKEditor toolbar. */
+  color: #484848;
+  /* Overcome the CKEditor CSS reset. */
+  line-height: inherit;
+}
+
+div.rt-toolbar .rt-user-list a {
+  /* Make it look and behave like the other toolbar buttons. */
+  color: #484848;
+  border: 1px transparent solid;
+  display: inline-block;
+  line-height: auto;
+  padding: 3px 4px;
+}
+
+div.rt-toolbar .rt-user-list a:hover {
+  background: #e5e5e5;
+  border-color: #bcbcbc;
+}
+
+div.rt-toolbar .rt-user-avatar,
+div.rt-toolbar .rt-user-fake-avatar {
+  border-radius: 4px;
+  margin: 0 3px 0 0;
+  vertical-align: middle;
+}

@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-panels-test</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>12.5-SNAPSHOT</version>
+    <version>14.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-platform-panels-test-docker</artifactId>
@@ -38,13 +38,14 @@
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
-    <!-- ================================
-         Dependencies for tested features
-         ================================ -->
+    <!-- =========================================
+         Runtime Dependencies for tested features.
+         ========================================= -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-panels-ui</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
       <type>xar</type>
     </dependency>
     <!-- Some content for the NavigationPanelAdministrationIT tests -->
@@ -52,6 +53,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-panels-test-content</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
       <type>xar</type>
     </dependency>
     <dependency>
@@ -67,6 +69,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-ui</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
       <type>xar</type>
     </dependency>
     <!-- We depend on the App Within Minutes because we want to test the integration with the Navigation Panel. -->
@@ -74,7 +77,17 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
       <type>xar</type>
+    </dependency>
+    <!-- The JavaScript code used in the Navigation panel configuration and the Applications panel configuration needs
+      to display localized messages and for this it needs to fetch them through REST so we need an implementation of the
+      localization REST API. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-rest-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- ================================
          Test only dependencies
@@ -107,14 +120,10 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllIT.java</include>
-          </includes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

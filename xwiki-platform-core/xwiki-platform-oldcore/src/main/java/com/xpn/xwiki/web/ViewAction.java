@@ -19,7 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -31,6 +35,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  *
  * @version $Id$
  */
+@Component
+@Named("view")
+@Singleton
 public class ViewAction extends XWikiAction
 {
     /**
@@ -44,44 +51,36 @@ public class ViewAction extends XWikiAction
     public ViewAction()
     {
         this.waitForXWikiInitialization = false;
-        this.handleRedirectObject = true;
-    }
-
-    @Override
-    public boolean action(XWikiContext context) throws XWikiException
-    {
-        boolean shouldRender = true;
-
-        context.put("action", VIEW_ACTION);
-
-        // Redirect to the ViewrevAction is the URL has a rev parameter (when the user asks to
-        // view a specific revision of a document).
-        XWikiRequest request = context.getRequest();
-        String rev = request.getParameter("rev");
-        if (rev != null) {
-            String url = context.getDoc().getURL("viewrev", request.getQueryString(), context);
-            try {
-                context.getResponse().sendRedirect(url);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            shouldRender = false;
-        }
-
-        return shouldRender;
     }
 
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        handleRevision(context);
-        XWikiDocument doc = (XWikiDocument) context.get("doc");
+        try {
+            handleRevision(context);
+        } catch (XWikiException e) {
+            if (e.getCode() == XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION) {
+                context.put("message", "revisiondoesnotexist");
+
+                return "exception";
+            } else {
+                throw e;
+            }
+        }
+
+        XWikiDocument doc = context.getDoc();
 
         String defaultTemplate = doc.getDefaultTemplate();
-        if ((defaultTemplate != null) && (!defaultTemplate.equals(""))) {
+        if (StringUtils.isNotEmpty(defaultTemplate)) {
             return defaultTemplate;
         } else {
             return VIEW_ACTION;
         }
+    }
+
+    @Override
+    protected boolean supportRedirections()
+    {
+        return true;
     }
 }

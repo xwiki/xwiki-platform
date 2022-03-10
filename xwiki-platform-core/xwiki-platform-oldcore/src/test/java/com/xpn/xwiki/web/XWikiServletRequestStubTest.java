@@ -34,10 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * 
  * @version $Id$
  */
-public class XWikiServletRequestStubTest
+class XWikiServletRequestStubTest
 {
     @Test
-    public void copy() throws MalformedURLException
+    void copy() throws MalformedURLException
     {
         URL requestURL = new URL("http://host:42/contextPath/path");
         String contextPath = "contextPath";
@@ -53,5 +53,15 @@ public class XWikiServletRequestStubTest
         assertEquals(requestURL.toString(), copiedRequest.getRequestURL().toString());
         assertEquals(contextPath, copiedRequest.getContextPath());
         assertFalse(copiedRequest.isDaemon());
+    }
+
+    @Test
+    void constructorWithParameters() throws Exception
+    {
+        Map<String, String[]> parameters = new HashMap<>();
+        parameters.put("key", new String[] { "value" });
+        XWikiServletRequestStub request =
+            new XWikiServletRequestStub(new URL("https://xwiki.org"), parameters);
+        assertEquals("value", request.getParameter("key"));
     }
 }

@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.mail.MailListener;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -47,4 +48,9 @@ public interface PeriodicMimeMessageIterator extends Iterator<MimeMessage>, Iter
      */
     void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
             Date lastTrigger, DocumentReference templateReference);
+
+    /**
+     * @return the listener to notify about prepared mail
+     */
+    MailListener getMailListener();
 }

@@ -7,23 +7,13 @@ set -e
 # Rights
 #########################
 
-## Make sure tomcat is able to write in the data folder
-chown -R tomcat8.tomcat8 /var/lib/xwiki/data
+## Make sure Tomcat is able to write in the data folder
+if [ ! 'tomcat8' = `stat -c '%U' /var/lib/xwiki/data` ]; then
+  chown -R tomcat8.tomcat8 /var/lib/xwiki/data
+fi
 
 #########################
 # Configuration
 #########################
 
 . /usr/share/debconf/confmodule
-
-#########################
-# Restart Tomcat
-#########################
-
-invoke-rc.d --quiet tomcat8 restart || {
-    RESULT=$?
-    # Ignore if tomcat7 init script does not exist (yet)
-    if [ $RESULT != 100 ]; then
-    exit $RESULT
-    fi
-}

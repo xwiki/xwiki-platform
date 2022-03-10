@@ -27,11 +27,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.concurrent.ContextStoreManager;
-import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
  * Base class to initialize xclass for various implementations of UI extensions.
@@ -60,7 +61,7 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
     private ContextStoreManager contextStore;
 
     @Inject
-    private ContextualLocalizationManager localization;
+    private LocalizationManager localization;
 
     @Inject
     private Logger logger;
@@ -96,12 +97,19 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
             }
             entriesString.append(entry);
 
-            String translation = this.localization.getTranslationPlain("rendering.async.context.entry." + entry);
+            String translation = this.localization.getTranslationPlain("rendering.async.context.entry." + entry,
+                this.localization.getDefaultLocale());
             if (translation != null) {
                 entriesString.append('=');
                 entriesString.append(translation);
             }
         }
-        xclass.addStaticListField(XPROPERTY_ASYNC_CONTEXT, "Context elements", 5, true, entriesString.toString());
+
+        StaticListClass asyncClass = xclass.addStaticListField(XPROPERTY_ASYNC_CONTEXT);
+        asyncClass.setPrettyName("Context elements");
+        asyncClass.setSize(5);
+        asyncClass.setMultiSelect(true);
+        asyncClass.setValues(entriesString.toString());
+        asyncClass.setSeparator(", ");
     }
 }

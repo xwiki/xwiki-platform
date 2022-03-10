@@ -24,13 +24,13 @@ import java.io.File;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.test.po.TableLayoutElement;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
-import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.user.test.po.ChangeAvatarPage;
 import org.xwiki.user.test.po.GroupsUserProfilePage;
@@ -41,7 +41,6 @@ import org.xwiki.user.test.po.ProfileUserProfilePage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -50,10 +49,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.10
  */
-// Extra JARs needed for the hibernate mapping (since right now we don't support hibernate mappings contributed at
-// runtime by extensions.
-@UITest(extraJARs = { "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate" })
-public class UserProfileIT
+@UITest(properties = {
+    // We need the notifications feature because the User Profile UI draws the Notifications Macro used in the user
+    // profile for the user's activity stream. As a consequence, when a user is created in the test, the
+    // UserAddedEventListener is called and global default user notifications filters are copied for the new user,
+    // requiring the notifications HBM mapping file.
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // In addition this jar cannot currently be installed as an extension (e.g. the CM won't find the
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as an extension so we need to add it to WEB-INF/lib manually
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+    })
+class UserProfileIT
 {
     private static final String IMAGE_NAME = "avatar.png";
 
@@ -109,7 +123,7 @@ public class UserProfileIT
     /** Functionality check: changing profile information. */
     @Test
     @Order(1)
-    public void editProfile()
+    void editProfile()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         ProfileEditPage profileEditPage = userProfilePage.editProfile();
@@ -140,7 +154,7 @@ public class UserProfileIT
     /** Functionality check: changing the profile picture. */
     @Test
     @Order(2)
-    public void changeAvatarImage(TestConfiguration testConfiguration)
+    void changeAvatarImage(TestConfiguration testConfiguration)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         ChangeAvatarPage changeAvatarImage = userProfilePage.changeAvatarImage();
@@ -153,7 +167,7 @@ public class UserProfileIT
     /** Functionality check: changing the user type. */
     @Test
     @Order(3)
-    public void changeUserProfile()
+    void changeUserProfile()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
@@ -183,7 +197,7 @@ public class UserProfileIT
     /** Functionality check: changing the default editor. */
     @Test
     @Order(4)
-    public void changeDefaultEditor()
+    void changeDefaultEditor()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
@@ -226,7 +240,7 @@ public class UserProfileIT
      */
     @Test
     @Order(5)
-    public void commentDoesntOverrideAboutInformation(TestUtils setup)
+    void commentDoesntOverrideAboutInformation(TestUtils setup)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         String commentContent = "this is from a comment";
@@ -243,7 +257,7 @@ public class UserProfileIT
 
     @Test
     @Order(6)
-    public void ensureDashboardUIAddAnObjectAtFirstEdit()
+    void ensureDashboardUIAddAnObjectAtFirstEdit()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         HistoryPane historyPane = userProfilePage.openHistoryDocExtraPane();
@@ -253,20 +267,21 @@ public class UserProfileIT
 
     @Test
     @Order(7)
-    public void verifyGroupTab()
+    void verifyGroupTab(TestUtils setup)
     {
         GroupsUserProfilePage preferencesPage = GroupsUserProfilePage.gotoPage(this.userName);
 
         assertEquals("Groups", preferencesPage.getPreferencesTitle());
-        LiveTableElement groupsPaneLiveTable = preferencesPage.getGroupsPaneLiveTable();
+        TableLayoutElement tableLayout = preferencesPage.getGroupsPaneLiveData().getTableLayout();
 
-        assertEquals(1, groupsPaneLiveTable.getRowCount());
-        assertEquals("XWikiAllGroup", groupsPaneLiveTable.getCell(1, 1).getText());
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertCellWithLink("Group", "XWikiAllGroup",
+            setup.getURL(new DocumentReference("xwiki", "XWiki", "XWikiAllGroup")));
     }
 
     @Test
     @Order(8)
-    public void toggleEnableDisable(TestUtils setup)
+    void toggleEnableDisable(TestUtils setup)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         // We are already logged in with this user, so we shouldn't be able to change the status

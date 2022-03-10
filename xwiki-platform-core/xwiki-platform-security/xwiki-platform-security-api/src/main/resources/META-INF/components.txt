@@ -1,8 +1,2 @@
-org.xwiki.security.DefaultSecurityReferenceFactory
-org.xwiki.security.authorization.cache.internal.DefaultSecurityCache
-org.xwiki.security.authorization.cache.internal.DefaultSecurityCacheLoader
-org.xwiki.security.authorization.internal.AuthorizationSettlerProvider
-org.xwiki.security.authorization.DefaultAuthorizationManager
-org.xwiki.security.authorization.internal.DefaultAuthorizationManagerConfiguration
-org.xwiki.security.authorization.internal.DefaultAuthorizationSettler
-org.xwiki.security.authorization.internal.PrioritizingAuthorizationSettler
+org.xwiki.security.internal.DefaultSecurityConfiguration
+org.xwiki.security.script.SecurityScriptService

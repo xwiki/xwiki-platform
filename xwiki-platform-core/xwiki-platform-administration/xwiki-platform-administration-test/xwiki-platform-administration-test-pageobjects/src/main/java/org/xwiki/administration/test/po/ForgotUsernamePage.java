@@ -34,12 +34,12 @@ public class ForgotUsernamePage extends ViewPage
     @FindBy(id = "e")
     private WebElement emailField;
 
-    @FindBy(css = ".xcontent form input[type='submit']")
+    @FindBy(css = "#forgotUsernameForm input[type='submit']")
     private WebElement submitButton;
 
     public static ForgotUsernamePage gotoPage()
     {
-        getUtil().gotoPage("XWiki", "ForgotUsername");
+        getUtil().gotoPage(getUtil().getBaseURL() + "authenticate/forgot");
         return new ForgotUsernamePage();
     }
 

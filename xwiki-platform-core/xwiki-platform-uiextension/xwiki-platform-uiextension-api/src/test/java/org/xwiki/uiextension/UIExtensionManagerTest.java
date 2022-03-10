@@ -19,41 +19,65 @@
  */
 package org.xwiki.uiextension;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.uiextension.internal.DefaultUIExtensionManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+@ComponentTest
 @ComponentList(ContextComponentManagerProvider.class)
-public class UIExtensionManagerTest
+class UIExtensionManagerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<UIExtensionManager> mocker =
-        new MockitoComponentMockingRule<UIExtensionManager>(DefaultUIExtensionManager.class);
+    @MockComponent
+    @Named("uix1")
+    private UIExtension uix1;
+
+    @MockComponent
+    @Named("uix2")
+    private UIExtension uix2;
+
+    @InjectMockComponents
+    private DefaultUIExtensionManager manager;
+
+    @MockComponent
+    @Named("notuix")
+    private UIExtension notuix;
 
     @Test
-    public void testGet() throws Exception
+    void get() throws Exception
     {
-        assertEquals(Arrays.asList(), this.mocker.getComponentUnderTest().get("extensionpoint"));
+        assertEquals(Arrays.asList(), this.manager.get("extensionpoint"));
 
-        UIExtension uix1 = mocker.registerMockComponent(UIExtension.class, "uix1");
-        when(uix1.getExtensionPointId()).thenReturn("extensionpoint");
+        when(this.uix1.getExtensionPointId()).thenReturn("extensionpoint");
+        when(this.uix2.getExtensionPointId()).thenReturn("extensionpoint");
+        when(this.notuix.getExtensionPointId()).thenReturn("notuix");
 
-        UIExtension uix2 = mocker.registerMockComponent(UIExtension.class, "uix2");
-        when(uix2.getExtensionPointId()).thenReturn("extensionpoint");
+        assertEquals(new HashSet<>(Arrays.asList(this.uix1, this.uix2)),
+            new HashSet<>(this.manager.get("extensionpoint")));
+    }
 
-        UIExtension notuix = mocker.registerMockComponent(UIExtension.class, "notuix");
-        when(notuix.getExtensionPointId()).thenReturn("notuix");
+    @Test
+    void getWithSpecificUIExtensionManager(MockitoComponentManager componentManager) throws Exception
+    {
+        assertEquals(Arrays.asList(), this.manager.get("extensionpoint"));
 
-        assertEquals(new HashSet<UIExtension>(Arrays.asList(uix1, uix2)), new HashSet<UIExtension>(this.mocker
-            .getComponentUnderTest().get("extensionpoint")));
+        UIExtensionManager specificManager =
+            componentManager.registerMockComponent(UIExtensionManager.class, "extensionpoint");
+        when(specificManager.get("extensionpoint")).thenReturn(Arrays.asList(this.uix1, this.uix2));
+
+        assertEquals(new HashSet<>(Arrays.asList(this.uix1, this.uix2)),
+            new HashSet<>(this.manager.get("extensionpoint")));
     }
 }

@@ -62,7 +62,7 @@ public class SortByIdFilter implements UIExtensionFilter
     @Override
     public List<UIExtension> filter(List<UIExtension> extensions, String... ignored)
     {
-        List<UIExtension> results = new ArrayList<UIExtension>();
+        List<UIExtension> results = new ArrayList<>();
         results.addAll(extensions);
         Collections.sort(results, new UIExtensionIdComparator());
 

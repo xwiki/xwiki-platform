@@ -38,10 +38,12 @@ usage() {
   echo "-ld, --lockdir: The directory where the executing process id is stored to verify that that only one instance"
   echo "    is started. Defaults to /var/tmp."
   echo "-j, --jmx: Allows monitoring/managing Jetty through JMX."
+  echo "-ni, --noninteractive: Don't ask questions to the user. Useful when called in an automated script."
   echo "-yp, --yourkitpath: The path where Yourkit can find the agent. If not passed then YourKit won't be enabled."
   echo "    For example: \"/Applications/YourKit Java Profiler 7.0.11.app/bin/mac\""
   echo "    or \"/home/User/yjp-11.0.8/bin/linux-x86-64/\""
   echo "--suspend: if defined then debug is in suspend mode (i.e. wait for a debugger to connect before progressing)."
+  echo "-dp, --debugPort: The Jetty JVM port to use for remote debugging. Defaults to 5005."
   echo ""
   echo "Example: start_xwiki_debug.sh -yp \"/Applications/YourKit Java Profiler 7.0.11.app/bin/mac\""
 }
@@ -101,6 +103,11 @@ while [[ $# > 0 ]]; do
       ;;
     -j|--jmx)
       JETTY_OPTS="$JETTY_OPTS --module=jmx"
+      shift
+      ;;
+    -ni|--noninteractive)
+      XWIKI_NONINTERACTIVE=true
+      shift
       ;;
     -yp|--yourkitpath)
       YOURKIT_PATH="$1"
@@ -108,6 +115,10 @@ while [[ $# > 0 ]]; do
       ;;
     --suspend)
       SUSPEND="y"
+      shift
+      ;;
+    -dp|--debugPort)
+      JETTY_DEBUG_PORT="$1"
       shift
       ;;
     -h|--help)
@@ -154,8 +165,6 @@ if [ -n "$YOURKIT_PATH" ]; then
   export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:${YOURKIT_PATH}"
 fi
 
-echo Starting Jetty on port ${JETTY_PORT}, please wait...
-
 # Location where XWiki stores generated data and where database files are.
 XWIKI_DATA_DIR=${xwikiDataDir}
 XWIKI_OPTS="$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR"
@@ -169,14 +178,10 @@ mkdir -p $XWIKI_DATA_DIR 2>/dev/null
 # Ensure the logs directory exists as otherwise Jetty reports an error
 mkdir -p $XWIKI_DATA_DIR/logs 2>/dev/null
 
-# Set up the Jetty Base directory (used for custom Jetty configuration) to point to the Data Directory
-# Also created some Jetty directorie that Jetty would otherwise create at first startup. We do this to avoid
-# cryptic messages in the logs such as: "MKDIR: ${jetty.base}/lib"
-JETTY_BASE=$XWIKI_DATA_DIR/jetty
-mkdir -p $JETTY_BASE/lib/ext 2>/dev/null
+# Set up the Jetty Base directory (used for custom Jetty configuration) to be the current directory where this file is.
+# Also make sure the log directory exists since Jetty won't create it.
+JETTY_BASE=.
 mkdir -p $JETTY_BASE/logs 2>/dev/null
-mkdir -p $JETTY_BASE/resources 2>/dev/null
-mkdir -p $JETTY_BASE/webapps 2>/dev/null
 
 # Specify Jetty's home and base directories
 JETTY_HOME=jetty
@@ -193,8 +198,6 @@ XWIKI_OPTS="$XWIKI_OPTS -Djetty.http.port=$JETTY_PORT"
 
 # Specify port and key to stop a running Jetty instance
 JETTY_OPTS="$JETTY_OPTS STOP.KEY=xwiki STOP.PORT=$JETTY_STOP_PORT"
-
-# Check version of Java
 
 # Returns the Java version.
 # 8 for 1.8.0_nn, 9 for 9-ea etc, and "no_java" for undetected
@@ -226,20 +229,34 @@ java_version() {
   fi
   echo "$result"
 }
+
+# Check version of Java (when in non-interactive mode)
 JAVA_VERSION="$(java_version)"
-if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
-  echo "No Java found. You need Java installed for XWiki to work."
-  exit 0
-fi
-if [ "$JAVA_VERSION" -lt 8 ]; then
-  echo This version of XWiki requires Java 8 or greater.
-  exit 0
-fi
-if [ "$JAVA_VERSION" -gt 11 ]; then
-  read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue (y/N)? " -n 1 -r
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
+  if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
+    echo "No Java found. You need Java installed for XWiki to work."
     exit 0
   fi
+  if [ "$JAVA_VERSION" -lt 8 ]; then
+    echo This version of XWiki requires Java 8 or greater.
+    exit 0
+  fi
+  if [ "$JAVA_VERSION" -gt 11 ]; then
+    read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue (y/N)? " -n 1 -r
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      exit 0
+    fi
+  fi
+fi
+
+# TODO: Remove once https://jira.xwiki.org/browse/XRENDERING-616 and https://jira.xwiki.org/browse/XWIKI-19034 are
+# fixed. In summary we need this to allow the XWiki code or 3rd party code to use reflection to access private
+# variables (setAccessible() calls). See https://tinyurl.com/tdhkn6mp
+if [ "$JAVA_VERSION" -gt 11 ]; then
+  XWIKI_OPENS_LANG="--add-opens java.base/java.lang=ALL-UNNAMED"
+  XWIKI_OPENS_UTIL="--add-opens java.base/java.util=ALL-UNNAMED"
+  XWIKI_OPENS_CONCURRENT="--add-opens java.base/java.concurrent=ALL-UNNAMED"
+  XWIKI_OPTS="$XWIKI_OPENS_LANG $XWIKI_OPENS_UTIL $XWIKI_OPENS_CONCURRENT $XWIKI_OPTS"
 fi
 
 # We save the shell PID here because we do an exec below and exec will replace the shell with the executed command

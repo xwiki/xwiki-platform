@@ -35,6 +35,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.context.Execution;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.velocity.VelocityEngine;
@@ -89,6 +90,8 @@ public class WikiUIExtensionParameters
      */
     private ModelContext modelContext;
 
+    private LoggerConfiguration loggerConfiguration;
+
     /**
      * The execution context.
      */
@@ -112,6 +115,7 @@ public class WikiUIExtensionParameters
             this.execution = cm.getInstance(Execution.class);
             this.velocityManager = cm.getInstance(VelocityManager.class);
             this.modelContext = cm.getInstance(ModelContext.class);
+            this.loggerConfiguration = cm.getInstance(LoggerConfiguration.class);
         } catch (ComponentLookupException e) {
             throw new WikiComponentException(
                 "Failed to get an instance for a component role required by Wiki Components.", e);
@@ -171,8 +175,10 @@ public class WikiUIExtensionParameters
                             StringWriter writer = new StringWriter();
                             try {
                                 String namespace = this.id + ':' + propertyKey;
-                                velocityEngine.evaluate(new XWikiVelocityContext(velocityContext), writer, namespace,
-                                    propertyValue);
+                                velocityEngine.evaluate(
+                                    new XWikiVelocityContext(velocityContext,
+                                        this.loggerConfiguration.isDeprecatedLogEnabled()),
+                                    writer, namespace, propertyValue);
                                 this.evaluatedParameters.put(propertyKey, writer.toString());
                             } catch (XWikiVelocityException e) {
                                 LOGGER.warn(String.format(

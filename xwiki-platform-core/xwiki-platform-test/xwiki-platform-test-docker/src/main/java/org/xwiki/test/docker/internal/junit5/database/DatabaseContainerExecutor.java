@@ -149,7 +149,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             databaseContainer.execInContainer("sh", "-c",
                 String.format("echo '[client]\nuser = root\npassword = %s' > credentials.cnf", DBPASSWORD));
             Container.ExecResult result = databaseContainer.execInContainer("mysql",
-                "--defaults-extra-file=credentials.cnf", "--verbose", "--debug", "-e",
+                "--defaults-extra-file=credentials.cnf", "--verbose", "-e",
                 String.format("grant all privileges on *.* to '%s'@'%%'", DBUSERNAME));
             if (result.getExitCode() == 0) {
                 break;
@@ -264,10 +264,17 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     private void startDatabaseContainer(JdbcDatabaseContainer<?> databaseContainer, int port,
         TestConfiguration testConfiguration) throws Exception
     {
+        // Note: default startup and connect timeout are at 120s (2mn) but we've noticed cases when it was taking
+        // a lot longer than that and thus our SQL code in grantMySQLPrivileges() is failing because after the timeout
+        // is reached, TC considers that the DB container is started and thus our SQL code is executed even though the
+        // DB is not started, and this, it fails. We've increased the timeouts to 15mn which is a lot and we might need
+        // to debug to find out why MySQL is taking so long to start in these cases.
         databaseContainer
             .withExposedPorts(port)
             .withNetwork(Network.SHARED)
-            .withNetworkAliases("xwikidb");
+            .withNetworkAliases("xwikidb")
+            .withStartupTimeoutSeconds(900)
+            .withConnectTimeoutSeconds(900);
 
         start(databaseContainer, testConfiguration);
 

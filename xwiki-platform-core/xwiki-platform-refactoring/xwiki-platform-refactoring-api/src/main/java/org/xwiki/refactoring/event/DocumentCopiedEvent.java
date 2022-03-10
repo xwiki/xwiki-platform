@@ -22,7 +22,6 @@ package org.xwiki.refactoring.event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.refactoring.internal.event.AbstractEntityCopyOrRenameEvent;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event fired after a document has been copied.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 11.1RC1
  */
-@Unstable
 public class DocumentCopiedEvent extends AbstractEntityCopyOrRenameEvent<DocumentReference> implements EndFoldEvent
 {
     /**

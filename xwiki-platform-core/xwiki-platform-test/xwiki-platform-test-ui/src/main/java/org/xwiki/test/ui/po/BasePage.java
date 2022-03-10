@@ -29,12 +29,10 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
@@ -50,10 +48,6 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  */
 public class BasePage extends BaseElement
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
-
-    private static final By DRAWER_MATCHER = By.id("tmDrawer");
-
     /**
      * Used for sending keyboard shortcuts to.
      */
@@ -81,7 +75,7 @@ public class BasePage extends BaseElement
     @FindBy(id = "tmPage")
     private WebElement pageMenu;
 
-    @FindBys({ @FindBy(id = "tmRegister"), @FindBy(tagName = "a") })
+    @FindBys({@FindBy(id = "tmRegister"), @FindBy(tagName = "a")})
     private WebElement registerLink;
 
     @FindBy(xpath = "//a[@id='tmLogin']")
@@ -288,18 +282,26 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * Refresh the page and wait for the javascript to be also loaded.
+     *
+     * @since 14.1
+     */
+    public BasePage reloadPage()
+    {
+        getDriver().navigate().refresh();
+        waitUntilPageJSIsLoaded();
+        return this;
+    }
+
+    /**
      * @since 7.2M3
      */
     public void toggleDrawer()
     {
-        if (isElementVisible(DRAWER_MATCHER)) {
-            // The drawer is visible, so we close it by clicking outside the drawer
-            this.mainContainerDiv.click();
-            getDriver().waitUntilElementDisappears(DRAWER_MATCHER);
+        if (isDrawerVisible()) {
+            hideDrawer();
         } else {
-            // The drawer is not visible, so we open it
-            this.drawerActivator.click();
-            getDriver().waitUntilElementIsVisible(DRAWER_MATCHER);
+            showDrawer();
         }
     }
 
@@ -310,10 +312,10 @@ public class BasePage extends BaseElement
      */
     public boolean showDrawer()
     {
-        if (!isElementVisible(DRAWER_MATCHER)) {
-            // The drawer is not visible, so we open it
+        if (!isDrawerVisible()) {
+            // Open the drawer.
             this.drawerActivator.click();
-            getDriver().waitUntilElementIsVisible(DRAWER_MATCHER);
+            waitForDrawer(true);
 
             return true;
         }
@@ -328,18 +330,24 @@ public class BasePage extends BaseElement
      */
     public boolean hideDrawer()
     {
-        if (isElementVisible(DRAWER_MATCHER)) {
-            // The drawer is visible, so we close it by clicking outside the drawer
+        if (isDrawerVisible()) {
+            // Close the drawer by clicking outside.
             // We don't perform directly a click since it could lead to a
-            // org.openqa.selenium.ElementClickInterceptedException because of a drawer-overlay-upper above it.
+            // org.openqa.selenium.ElementClickInterceptedException because of a drawer-overlay above it.
             // The click through action is performed with a move and click, which is what we really want.
             getDriver().createActions().click(this.mainContainerDiv).perform();
-            getDriver().waitUntilElementDisappears(DRAWER_MATCHER);
+            waitForDrawer(false);
 
             return true;
         }
 
         return false;
+    }
+
+    private void waitForDrawer(boolean visible)
+    {
+        getDriver().waitUntilCondition(
+            ExpectedConditions.attributeToBe(this.drawerActivator, "aria-expanded", String.valueOf(visible)));
     }
 
     /**
@@ -348,7 +356,7 @@ public class BasePage extends BaseElement
      */
     public boolean isDrawerVisible()
     {
-        return isElementVisible(DRAWER_MATCHER);
+        return "true".equals(this.drawerActivator.getAttribute("aria-expanded"));
     }
 
     /**
@@ -369,10 +377,12 @@ public class BasePage extends BaseElement
 
     /**
      * @since 7.3M2
+     * @deprecated use {@link #clickMoreActionsSubMenuEntry(String)} instead which has a better name
      */
+    @Deprecated
     public void clickAdminActionsSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmMoreActions']/a[contains(@role, 'button')]"), id);
+        clickMoreActionsSubMenuEntry(id);
     }
 
     /**
@@ -402,13 +412,13 @@ public class BasePage extends BaseElement
      */
     public CopyPage copy()
     {
-        clickAdminActionsSubMenuEntry("tmActionCopy");
+        clickMoreActionsSubMenuEntry("tmActionCopy");
         return new CopyPage();
     }
 
     public RenamePage rename()
     {
-        clickAdminActionsSubMenuEntry("tmActionRename");
+        clickMoreActionsSubMenuEntry("tmActionRename");
         return new RenamePage();
     }
 
@@ -417,8 +427,20 @@ public class BasePage extends BaseElement
      */
     public ConfirmationPage delete()
     {
-        clickAdminActionsSubMenuEntry("tmActionDelete");
+        clickMoreActionsSubMenuEntry("tmActionDelete");
         return new ConfirmationPage();
+    }
+
+    /**
+     * Specific delete action when the delete action is performed on a page.
+     *
+     * @return a specialized confirmation page for page deletion
+     * @since 12.8RC1
+     */
+    public DeletePageConfirmationPage deletePage()
+    {
+        clickMoreActionsSubMenuEntry("tmActionDelete");
+        return new DeletePageConfirmationPage();
     }
 
     /**
@@ -515,10 +537,8 @@ public class BasePage extends BaseElement
         languagesElement.click();
 
         // Wait for the languages submenu to be open
-        getDriver().waitUntilCondition(webDriver ->
-                getDriver().findElementWithoutWaiting(By.id("tmLanguages_menu")).getAttribute("class")
-                        .contains("collapse in")
-        );
+        getDriver().waitUntilCondition(webDriver -> getDriver().findElementWithoutWaiting(By.id("tmLanguages_menu"))
+            .getAttribute("class").contains("collapse in"));
 
         // Click passed locale
         WebElement localeElement = getDriver().findElementWithoutWaiting(
@@ -577,42 +597,6 @@ public class BasePage extends BaseElement
         toggleNotificationsMenu();
         this.watchWikiLink.click();
         toggleNotificationsMenu();
-    }
-
-    /**
-     * Waits for the javascript libraries and their plugins that need to load before the UI's elements can be used
-     * safely.
-     * <p>
-     * Subclassed should override this method and add additional checks needed by their logic.
-     * 
-     * @since 6.2
-     */
-    public void waitUntilPageJSIsLoaded()
-    {
-        // Prototype
-        getDriver().waitUntilJavascriptCondition("return window.Prototype != null && window.Prototype.Version != null");
-
-        // JQuery and dependencies
-        // JQuery dropdown plugin needed for the edit button's dropdown menu.
-        // TODO: We seem to have a flicker possibly caused by this check taking more than the default 10s timeout from
-        // time to time, see https://jira.xwiki.org/browse/XCOMMONS-1865. Testing this hypothesis by waiting a first
-        // time and if it fails waiting again and logging some message. Remove if the increased timeout doesn't help.
-        // If it helps, then we might need to dive deeper and understand why it can take more than 10s (underpowered
-        // machine, etc).
-        try {
-            getDriver()
-                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
-        } catch (TimeoutException e) {
-            LOGGER.error("Wait for JQuery took more than [{}] seconds", getDriver().getTimeout(), e);
-            getDriver()
-                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
-        }
-
-        // Make sure all asynchronous elements have been executed
-        getDriver().waitUntilJavascriptCondition("return !document.getElementsByClassName('xwiki-async').length");
-
-        // Make sure the shortcuts are loaded
-        getDriver().waitUntilJavascriptCondition("return shortcut != null && shortcut != undefined");
     }
 
     /**
@@ -682,8 +666,8 @@ public class BasePage extends BaseElement
      */
     public boolean hasLeftPanel(String panelTitle)
     {
-        return getDriver().hasElementWithoutWaiting(By.xpath(
-            "//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle +"']"));
+        return getDriver().hasElementWithoutWaiting(
+            By.xpath("//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle + "']"));
     }
 
     public boolean isForbidden()
@@ -698,8 +682,9 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Use the following keyboard shortcut and wait for a new page to load.
-     * This should be only used for shortcuts that indeed loads a new page.
+     * Use the following keyboard shortcut and wait for a new page to load. This should be only used for shortcuts that
+     * indeed loads a new page.
+     * 
      * @param shortcut the keyboard key combination to perform.
      */
     private void useShortcutKeyAndLoads(CharSequence... shortcut)
@@ -711,6 +696,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to edit page.
+     * 
      * @return a new {@link EditPage}
      * @since 11.9RC1
      */
@@ -722,6 +708,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to wiki edit page.
+     * 
      * @return a new {@link WikiEditPage}
      * @since 11.9RC1
      */
@@ -733,6 +720,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to WYSIWYG edit page.
+     * 
      * @return a new {@link WYSIWYGEditPage}
      * @since 11.9RC1
      */
@@ -744,6 +732,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to Inline Form edit page.
+     * 
      * @return a new {@link InlinePage}
      * @since 11.9RC1
      */
@@ -755,8 +744,9 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to rights edit page.
+     * 
      * @return a new {@link BasePage}: it can be actually either a {@link RightsEditPage} or an AdministrationPage
-     *          depending if the page is terminal or not.
+     *         depending if the page is terminal or not.
      * @since 11.9RC1
      */
     public BasePage useShortcutKeyForRightsEditing()
@@ -767,6 +757,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to object edit page.
+     * 
      * @return a new {@link ObjectEditPage}
      * @since 11.9RC1
      */
@@ -778,6 +769,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to class edit page.
+     * 
      * @return a new {@link ClassEditPage}
      * @since 11.9RC1
      */
@@ -789,6 +781,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to delete page.
+     * 
      * @return a new {@link ConfirmationPage}
      * @since 11.9RC1
      */
@@ -800,6 +793,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to rename page.
+     * 
      * @return a new {@link RenamePage}
      * @since 11.9RC1
      */
@@ -811,6 +805,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to the source view of a page.
+     * 
      * @return a new {@link ViewPage}
      * @since 11.9RC1
      */
@@ -818,5 +813,15 @@ public class BasePage extends BaseElement
     {
         useShortcutKeyAndLoads("d");
         return new ViewPage();
+    }
+
+    /**
+     * @return true if there's a rendering error on the page (i.e. an element with the class
+     *         {@code xwikirenderingerror})
+     * @since 13.3RC1
+     */
+    public boolean hasRenderingError()
+    {
+        return getDriver().hasElementWithoutWaiting(By.className("xwikirenderingerror"));
     }
 }

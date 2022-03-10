@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -114,6 +115,26 @@ public class ViewPage extends BasePage
     }
 
     /**
+     * @return the "Translate" page button; use this only if you expect the button to be present
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    public WebElement getTranslateButton()
+    {
+        return getDriver().findElement(By.cssSelector("#tmTranslate > a[role='button']"));
+    }
+
+    /**
+     * @return {@code true} if the "Translate" page button is present, {@code false} otherwise
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    public boolean hasTranslateButton()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id("#tmTranslate"));
+    }
+
+    /**
      * Clicks on a wanted link in the page.
      */
     public void clickWantedLink(String spaceName, String pageName, boolean waitForTemplateDisplay)
@@ -197,17 +218,25 @@ public class ViewPage extends BasePage
      */
     public void waitUntilContent(final String expectedValue)
     {
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            private Pattern pattern = Pattern.compile(expectedValue, Pattern.DOTALL);
+        // Using an array to have an effectively final variable.
+        final String[] lastContent = new String[1];
+        try {
+            getDriver().waitUntilCondition(new ExpectedCondition<Boolean>() {
+                private Pattern pattern = Pattern.compile(expectedValue, Pattern.DOTALL);
 
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                driver.navigate().refresh();
-                return Boolean.valueOf(pattern.matcher(getContent()).matches());
-            }
-        });
+                @Override
+                public Boolean apply(WebDriver driver)
+                {
+                    // Note: don't refresh the page here since that would fail use cases (imagine some async process
+                    // executing, the refresh will just start over that async process!). In addition users don't need
+                    // to click refresh so the tests shouldn't do that either.
+                    lastContent[0] = getContent();
+                    return Boolean.valueOf(pattern.matcher(lastContent[0]).matches());
+                }
+            });
+        } catch (TimeoutException e) {
+            throw new TimeoutException(String.format("Got [%s]\nExpected [%s]", lastContent[0], expectedValue), e);
+        }
     }
 
     /**
@@ -218,6 +247,21 @@ public class ViewPage extends BasePage
     public boolean contentContainsElement(By elementLocator)
     {
         return getDriver().hasElementWithoutWaiting(this.content, elementLocator);
+    }
+
+    /**
+     * Instantaneously scrolls to the top of the screen.
+     *
+     * @since 13.3RC1
+     * @since 12.10.7
+     */
+    public void scrollToTop()
+    {
+        // scrollTo allows to move the view to the top of the page instantaneously, allowing to safely continue the
+        // browser interactions without risks of seeing the screen moving up during the following test steps.
+        // Note: this action was previously performed by sending a home key pressed event, which was not synchronous on 
+        // Chrome, leading to flickering tests, notably when the scroll was followed by a drag and drop action.
+        getDriver().scrollTo(0, 0);
     }
 
     private void useShortcutForDocExtraPane(String shortcut, String pane)
@@ -248,5 +292,25 @@ public class ViewPage extends BasePage
     {
         useShortcutForDocExtraPane("i", "information");
         return new InformationPane();
+    }
+
+    public String getTitleColor()
+    {
+        return getElementCSSValue(By.id("document-title"), "color");
+    }
+
+    public String getPageBackgroundColor()
+    {
+        return getElementCSSValue(By.id("mainContentArea"), "background-color");
+    }
+
+    public String getTitleFontFamily()
+    {
+        return getElementCSSValue(By.id("document-title"), "font-family");
+    }
+
+    private String getElementCSSValue(By locator, String attribute)
+    {
+        return getDriver().findElement(locator).getCssValue(attribute);
     }
 }

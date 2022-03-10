@@ -90,9 +90,10 @@ public class DocumentMergeImporter
             XarEntryType configuredType = this.typeResolver.resolve(xarEntry, false);
 
             // Try a merger specific to the type name
-            if (type != null && componentManager.hasComponent(XWikiDocumentMerger.class, type.getName())) {
-                // Try a merger specific to the document reference
-                merger = componentManager.getInstance(XWikiDocumentMerger.class, type.getName());
+            if (configuredType != null
+                && componentManager.hasComponent(XWikiDocumentMerger.class, configuredType.getName())) {
+                // Try a merger specific to the XAR entry type
+                merger = componentManager.getInstance(XWikiDocumentMerger.class, configuredType.getName());
             } else if (componentManager.hasComponent(XWikiDocumentMerger.class, reference)) {
                 // Try a merger specific to the document reference
                 merger = componentManager.getInstance(XWikiDocumentMerger.class, reference);

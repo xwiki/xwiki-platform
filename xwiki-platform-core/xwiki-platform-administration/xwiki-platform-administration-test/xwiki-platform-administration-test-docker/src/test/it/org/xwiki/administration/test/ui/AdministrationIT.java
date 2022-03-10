@@ -20,7 +20,6 @@
 package org.xwiki.administration.test.ui;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
@@ -38,56 +37,56 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 4.3M1
  */
 @UITest
-public class AdministrationIT
+class AdministrationIT
 {
     /**
-     * This method makes the following tests :
-     *
-     * <ul>
-     * <li>Validate presence of default sections for global and space sections.</li>
-     * <li>Validate presence of application administration sections at global level only.</li>
-     * </ul>
+     * Validate presence of default sections for Administration UIs (Global, Page).
      */
     @Test
-    public void verifyGlobalAndSpaceSections(TestUtils setup)
+    void verifyAdministrationSections(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
 
         // Navigate to a (non existent for test performance reasons) page in view mode.
         setup.gotoPage("NonExistentSpace", "NonExistentPage");
 
-        // Verify that pages have an Admin menu and navigate to the admin UI.
+        // Verify that pages have an Admin menu and navigate to the wiki admin UI (which happens to be the global
+        // admin UI too since we're on the main wiki).
+        // Note that this test is currently lacking checking the wiki administration UI when the wiki is not the main
+        // wiki.
         AdministrablePage page = new AdministrablePage();
-        AdministrationPage administrationPage = page.clickAdministerWiki();
+        AdministrationPage wikiAdministrationPage = page.clickAdministerWiki();
 
-        assertEquals("Global Administration: Home", administrationPage.getDocumentTitle());
-        assertTrue(administrationPage.getBreadcrumbContent().endsWith("/Global Administration"));
+        assertEquals("Global Administration: Home", wikiAdministrationPage.getDocumentTitle());
+        assertTrue(wikiAdministrationPage.getBreadcrumbContent().endsWith("/Global Administration"));
 
         // TODO: Move these tests in their own modules, i.e. the modules that brought the Administration UI extension.
         Arrays.asList("Users", "Groups", "Rights", "Registration", "Themes", "Presentation", "Templates",
             "Localization", "Import", "Export", "Editing", "emailSend", "emailStatus", "emailGeneral", "analytics")
-            .stream().forEach(sectionId -> assertTrue(administrationPage.hasSection(sectionId),
+            .stream().forEach(sectionId -> assertTrue(wikiAdministrationPage.hasSection(sectionId),
                 String.format("Menu section [%s] is missing.", sectionId)));
 
         // These are page-only sections.
-        assertTrue(administrationPage.hasNotSection("PageAndChildrenRights"));
-        assertTrue(administrationPage.hasNotSection("PageRights"));
+        assertTrue(wikiAdministrationPage.hasNotSection("PageAndChildrenRights"));
+        assertTrue(wikiAdministrationPage.hasNotSection("PageRights"));
 
-        // Select XWiki space administration.
-        AdministrationPage spaceAdministrationPage = AdministrationPage.gotoSpaceAdministrationPage("XWiki");
+        // Select XWiki page administration.
+        setup.gotoPage("NonExistentSpace", "WebHome");
+        page = new AdministrablePage();
+        AdministrationPage pageAdministrationPage = page.clickAdministerPage();
 
-        assertEquals("Page Administration: XWiki", spaceAdministrationPage.getDocumentTitle());
-        assertTrue(spaceAdministrationPage.getBreadcrumbContent().endsWith("/Page Administration"));
+        assertEquals("Page Administration: NonExistentSpace", pageAdministrationPage.getDocumentTitle());
+        assertTrue(pageAdministrationPage.getBreadcrumbContent().endsWith("/Page Administration"));
 
-        assertTrue(spaceAdministrationPage.hasSection("Themes"));
-        assertTrue(spaceAdministrationPage.hasSection("Presentation"));
-        assertTrue(spaceAdministrationPage.hasSection("PageAndChildrenRights"));
-        assertTrue(spaceAdministrationPage.hasSection("PageRights"));
+        assertTrue(pageAdministrationPage.hasSection("Themes"));
+        assertTrue(pageAdministrationPage.hasSection("Presentation"));
+        assertTrue(pageAdministrationPage.hasSection("PageAndChildrenRights"));
+        assertTrue(pageAdministrationPage.hasSection("PageRights"));
 
-        // All these sections should not be present (they provide global configuration).
+        // All these sections should not be present (they provide wiki-wide configuration).
         Arrays.asList("Users", "Groups", "Rights", "Registration", "Templates", "Localization", "Import", "Export",
             "Editing", "emailSend", "emailStatus", "emailGeneral", "analytics")
-            .stream().forEach(sectionId -> assertTrue(administrationPage.hasNotSection(sectionId),
+            .stream().forEach(sectionId -> assertTrue(pageAdministrationPage.hasNotSection(sectionId),
                 String.format("Menu section [%s] shouldn't be present.", sectionId)));
     }
 }

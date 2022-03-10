@@ -19,6 +19,7 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +29,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
@@ -51,6 +53,9 @@ public class EventStreamStoreInitializer implements EventListener
     @Inject
     private HibernateSessionFactory sessionFactory;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public List<Event> getEvents()
     {
@@ -72,9 +77,18 @@ public class EventStreamStoreInitializer implements EventListener
             this.sessionFactory.getConfiguration().getProperty("hibernate.connection.driver_class"),
             this.sessionFactory.getConfiguration().getProperty("connection.driver_class"));
         if (StringUtils.containsIgnoreCase(driverClass, "oracle")) {
-            this.sessionFactory.getConfiguration().addInputStream(getMappingFile("eventstream.oracle.hbm.xml"));
+            addResource("eventstream.oracle.hbm.xml");
         } else {
-            this.sessionFactory.getConfiguration().addInputStream(getMappingFile("eventstream.hbm.xml"));
+            addResource("eventstream.hbm.xml");
+        }
+    }
+
+    private void addResource(String resource)
+    {
+        try (InputStream stream = getMappingFile(resource)) {
+            this.sessionFactory.getConfiguration().addInputStream(stream);
+        } catch (IOException e) {
+            this.logger.error("Failed to close the resource", e);
         }
     }
 

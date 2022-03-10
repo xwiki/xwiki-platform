@@ -19,14 +19,18 @@
  */
 package org.xwiki.panels.test.po;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the Panels administration section.
- * 
+ *
  * @version $Id$
  * @since 9.2RC1
  */
@@ -47,9 +51,34 @@ public class PanelsAdministrationPage extends ViewPage
     @FindBy(xpath = "//a[normalize-space() = 'Go to Panels']")
     private WebElement gotoPanelsLink;
 
-    public static PanelsAdministrationPage gotoPage()
+    /**
+     * Navigates to the panels administration page using the administration menu.
+     *
+     * @return an panels administration page object
+     */
+    public static PanelsAdministrationPage navigate()
     {
         AdministrationPage.gotoPage().clickSection("Look & Feel", "Panels");
+        return new PanelsAdministrationPage();
+    }
+
+    /**
+     * Goes to the panels administration page, with the {@code force} and {@code forceEdit} url parameters 
+     * set to {@code true}.
+     *
+     * @return a panels administration page object
+     */
+    public static PanelsAdministrationPage gotoPage()
+    {
+        Map<String, Object> queryParameters = new HashMap<>();
+        queryParameters.put("editor", "globaladmin");
+        queryParameters.put("section", "Panels.PanelWizard");
+        // Forces the access to the administration when XWikiPreferences is locked (admin.vm)
+        queryParameters.put("force", true);
+        // Forces the access to the administration when XWiki preferences is locked (ConfigurableClass)
+        queryParameters.put("forceEdit", true);
+        getUtil()
+            .gotoPage(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"), "admin", queryParameters);
         return new PanelsAdministrationPage();
     }
 

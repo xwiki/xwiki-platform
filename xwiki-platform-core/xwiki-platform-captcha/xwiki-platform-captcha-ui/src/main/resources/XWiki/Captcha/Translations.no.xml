@@ -39,5 +39,4 @@
   <content>admin.captcha=CAPTCHA
 captcha.admin.defaultCaptchaName.label=Standard CAPTCHA
 captcha.admin.defaultCaptchaName.hint=Standard CAPTCHA implementering som brukes. Bruk utvidelsesbehandler for å søke etter andre implementeringer du kan installere og bruke.</content>
-  
 </xwikidoc>

@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -75,7 +74,7 @@ public class User extends Api
     /**
      * Expose the wrapped XWikiUser object. Requires programming rights.
      *
-     * @return The wrapped XWikiUser object, or <tt>null</tt> if the user does not have programming rights.
+     * @return The wrapped XWikiUser object, or {@code null} if the user does not have programming rights.
      */
     @Programming
     public XWikiUser getUser()
@@ -91,7 +90,6 @@ public class User extends Api
      * @param disabledStatus true to disable an user, false to enable it back.
      * @since 11.7RC1
      */
-    @Unstable
     public void setDisabledStatus(boolean disabledStatus)
     {
         this.user.setDisabled(disabledStatus, getXWikiContext());
@@ -101,7 +99,6 @@ public class User extends Api
      * @return {@code true} if the user is disabled, false if it is enabled.
      * @since 11.8RC1
      */
-    @Unstable
     public boolean isDisabled()
     {
         return this.user.isDisabled(getXWikiContext());
@@ -112,7 +109,7 @@ public class User extends Api
      * the current wiki.
      *
      * @param groupName The group to check.
-     * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if an exception occurs.
+     * @return {@code true} if the user does belong to the specified group, false otherwise or if an exception occurs.
      */
     public boolean isUserInGroup(String groupName)
     {
@@ -138,7 +135,7 @@ public class User extends Api
      * This method is not public, as the underlying implementation is not fully functional
      * </p>
      *
-     * @return <tt>true</tt> if the user is global, false otherwise or if an exception occurs.
+     * @return {@code true} if the user is global, false otherwise or if an exception occurs.
      */
     protected boolean isMain()
     {
@@ -149,7 +146,7 @@ public class User extends Api
      * API to retrieve the e-mail address of this user. This e-mail address is taken from the user profile. If the user
      * hasn't changed his profile, then this is the e-mail address he filled in the registration form.
      *
-     * @return The e-mail address from the user profile, or <tt>null</tt> if there is an error retrieving the email.
+     * @return The e-mail address from the user profile, or {@code null} if there is an error retrieving the email.
      * @since 1.1.3
      * @since 1.2.2
      * @since 1.3M2

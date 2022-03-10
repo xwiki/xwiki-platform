@@ -24,28 +24,32 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.job.Job;
-import org.xwiki.localization.LocaleUtils;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
@@ -53,6 +57,8 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -72,7 +78,10 @@ import com.xpn.xwiki.objects.ObjectDiff;
  *
  * @version $Id$
  */
-public class SaveAction extends PreviewAction
+@Component
+@Named("save")
+@Singleton
+public class SaveAction extends EditAction
 {
     /** The identifier of the save action. */
     public static final String ACTION_NAME = "save";
@@ -168,29 +177,39 @@ public class SaveAction extends PreviewAction
                 tdoc = new XWikiDocument(doc.getDocumentReference());
                 tdoc.setLanguage(language);
                 tdoc.setStore(doc.getStore());
+                // In that specific case, we want the original doc to be the translation document so that we
+                // never raised a conflict.
+                originalDoc = tdoc;
             } else if (tdoc != doc) {
                 // Saving an existing document translation (but not the default one).
                 // Same as above, clone the object retrieved from the store cache.
-                tdoc = tdoc.clone();
                 originalDoc = tdoc;
+                tdoc = tdoc.clone();
             }
         }
 
         if (doc.isNew()) {
             doc.setLocale(Locale.ROOT);
             if (doc.getDefaultLocale() == Locale.ROOT) {
-                doc.setDefaultLocale(
-                    LocaleUtils.toLocale(context.getWiki().getLanguagePreference(context), Locale.ROOT));
+                doc.setDefaultLocale(xwiki.getLocalePreference(context));
             }
         }
 
         try {
-            tdoc.readFromTemplate(form.getTemplate(), context);
+            readFromTemplate(tdoc, form.getTemplate(), context);
         } catch (XWikiException e) {
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
                 context.put("exception", e);
                 return true;
             }
+        }
+
+        // Convert the content and the meta data of the edited document and its translations if the syntax has changed
+        // and the request is asking for a syntax conversion. We do this after applying the template because the
+        // template may have content in the previous syntax that needs to be converted. We do this before applying the
+        // changes from the submitted form because it may contain content that was already converted.
+        if (form.isConvertSyntax() && !tdoc.getSyntax().toIdString().equals(form.getSyntaxId())) {
+            convertSyntax(tdoc, form.getSyntaxId(), context);
         }
 
         if (sectionNumber != 0) {
@@ -205,11 +224,18 @@ public class SaveAction extends PreviewAction
             tdoc.readFromForm(form, context);
         }
 
-        // TODO: handle Author
-        String username = context.getUser();
-        tdoc.setAuthor(username);
+        // TODO: entirely rely on UserReference from the context
+        DocumentReference docUserReference = context.getUserReference();
+        UserReferenceResolver<DocumentReference> userReferenceResolver =
+            Utils.getComponent(
+                new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
+        UserReference userReference = userReferenceResolver.resolve(docUserReference);
+        DocumentAuthors authors = tdoc.getAuthors();
+        authors.setEffectiveMetadataAuthor(userReference);
+        authors.setOriginalMetadataAuthor(userReference);
+
         if (tdoc.isNew()) {
-            tdoc.setCreator(username);
+            authors.setCreator(userReference);
         }
 
         // Make sure we have at least the meta data dirty status
@@ -253,8 +279,7 @@ public class SaveAction extends PreviewAction
         }
 
         // Make sure the user is allowed to make this modification
-        context.getWiki().checkSavingDocument(context.getUserReference(), tdoc, tdoc.getComment(), tdoc.isMinorEdit(),
-            context);
+        xwiki.checkSavingDocument(context.getUserReference(), tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
 
         // We get the comment to be used from the document
         // It was read using readFromForm
@@ -405,17 +430,20 @@ public class SaveAction extends PreviewAction
         Version previousVersion = new Version(request.getParameter("previousVersion"));
         Version latestVersion = originalDoc.getRCSVersion();
 
-        DateTime editingVersionDate = new DateTime(request.getParameter("editingVersionDate"));
-        DateTime latestVersionDate = new DateTime(originalDoc.getDate());
+        Date editingVersionDate = new Date(Long.parseLong(request.getParameter("editingVersionDate")));
+        Date latestVersionDate = originalDoc.getDate();
 
         // we ensure that nobody edited the document between the moment the user started to edit and now
-        if (!latestVersion.equals(previousVersion) || latestVersionDate.isAfter(editingVersionDate)) {
+        if (!latestVersion.equals(previousVersion) || latestVersionDate.after(editingVersionDate)) {
             try {
                 XWikiDocument previousDoc =
                     getDocumentRevisionProvider().getRevision(originalDoc, previousVersion.toString());
 
-                // if doc is new and we're here: it's a conflict, we can skip the diff check
-                // we also check that the previousDoc revision exists to avoid an exception if it has been deleted
+                // We also check that the previousDoc revision exists to avoid an exception if it has been deleted
+                // Note that if we're here and the request says that the document is new, it's not necessarily a
+                // conflict: we might be in the case where the doc has been created during the edition because of
+                // an image added to it, without updating the client. So it's still accurate to check that the diff
+                // hasn't changed.
                 if (!originalDoc.isNew() && previousDoc != null) {
                     // if changes between previousVersion and latestVersion didn't change the content, it means it's ok
                     // to save the current changes.
@@ -551,7 +579,9 @@ public class SaveAction extends PreviewAction
 
     private Job startCreateJob(EntityReference entityReference, EditForm editForm) throws XWikiException
     {
-        if (StringUtils.isBlank(editForm.getTemplate())) {
+        DocumentReference templateReference = resolveTemplate(editForm.getTemplate());
+
+        if (templateReference == null) {
             // No template specified, nothing more to do.
             return null;
         }
@@ -567,9 +597,6 @@ public class SaveAction extends PreviewAction
         // Set the target document.
         request.setEntityReferences(Arrays.asList(entityReference));
         // Set the template to use.
-        DocumentReferenceResolver<String> resolver =
-            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        EntityReference templateReference = resolver.resolve(editForm.getTemplate());
         request.setTemplateReference(templateReference);
         // We`ve already created and populated the fields of the target document, focus only on the remaining children
         // specified in the template.
@@ -587,5 +614,27 @@ public class SaveAction extends PreviewAction
     private String serializeJobId(List<String> jobId)
     {
         return StringUtils.join(jobId, "/");
+    }
+
+    private void convertSyntax(XWikiDocument doc, String targetSyntaxId, XWikiContext xcontext) throws XWikiException
+    {
+        // Convert the syntax without saving. The syntax conversion will be saved later along with the other changes.
+        doc.convertSyntax(targetSyntaxId, xcontext);
+
+        for (Locale locale : doc.getTranslationLocales(xcontext)) {
+            // Skip the edited translation because we handle it separately.
+            if (!Objects.equals(locale, doc.getLocale())) {
+                XWikiDocument tdoc = doc.getTranslatedDocument(locale, xcontext);
+                // Double check if the syntax has changed because each document translation can have a different syntax.
+                if (!tdoc.getSyntax().toIdString().equals(targetSyntaxId)) {
+                    // Convert the syntax and save the changes.
+                    tdoc.convertSyntax(targetSyntaxId, xcontext);
+                    xcontext.getWiki().saveDocument(tdoc,
+                        String.format("Document converted from syntax %s to syntax %s", tdoc.getSyntax().toIdString(),
+                            targetSyntaxId),
+                        xcontext);
+                }
+            }
+        }
     }
 }

@@ -37,6 +37,17 @@
     ## This allows the preview form to redirect back to the correct editor when pressing "Back to edit":
     <span class="meta-versionSummary metamodifs">
       <input type="hidden" name="xeditaction" value="$!xcontext.action" />
+      ## The three following fields are not declared as type="hidden" since we want them to be cached in the browser.
+      ## Current version of the document for the conflict check
+      ## Note that the labels should never be displayed: we provide them to ensure our webstandards tests are passing.
+      <label class="hidden" for="previousVersion">Previous version</label>
+      <input type="text" class="hidden" id="previousVersion" name="previousVersion" value="$tdoc.version" />
+      ## If the document is new or not when the user started the edition, for the conflict check too.
+      <label class="hidden" for="isNew">Is new document?</label>
+      <input type="text" class="hidden" id="isNew" name="isNew" value="$tdoc.isNew()" />
+      ## We store the date of the beginning of the edition for the conflict check mechanism.
+      <label class="hidden" for="editingVersionDate">Date of latest edition</label>
+      <input type="text" class="hidden" id="editingVersionDate" name="editingVersionDate" value="$datetool.date.getTime()" />
       #if ((!$commentFieldAdded) && $xwiki.hasEditComment())
         #set ($commentFieldAdded = 1)
         #if ($xwiki.isEditCommentFieldHidden())

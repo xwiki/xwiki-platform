@@ -20,7 +20,6 @@
 package org.xwiki.search.solr.internal;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -89,7 +88,7 @@ public abstract class AbstractSolr implements Solr, Disposable
 
                 // If no core already exist create a new core
                 if (solrClient == null) {
-                    solrClient = createCore(coreName, Collections.emptyMap());
+                    solrClient = createCore(initializer);
                 }
 
                 // Custom initialization of the core
@@ -111,5 +110,8 @@ public abstract class AbstractSolr implements Solr, Disposable
      */
     protected abstract SolrClient getInternalSolrClient(String coreName) throws SolrException;
 
-    protected abstract SolrClient createCore(String coreName, Map<String, String> parameters) throws SolrException;
+    /**
+     * @since 12.10
+     */
+    protected abstract SolrClient createCore(SolrCoreInitializer initializer) throws SolrException;
 }

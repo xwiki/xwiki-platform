@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -31,20 +36,15 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  */
+@Component
+@Named("get")
+@Singleton
 public class GetAction extends XWikiAction
 {
     /**
      * The identifier of the view action.
      */
     public static final String GET_ACTION = "get";
-
-    /**
-     * Default constructor.
-     */
-    public GetAction()
-    {
-        this.handleRedirectObject = true;
-    }
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -66,5 +66,11 @@ public class GetAction extends XWikiAction
         context.getResponse().setHeader("Content-Location", context.getDoc().getURL("view", context));
 
         return GET_ACTION;
+    }
+
+    @Override
+    protected boolean supportRedirections()
+    {
+        return true;
     }
 }

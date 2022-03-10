@@ -67,7 +67,6 @@ platform.flamingo.themes.category.panels=Panely
 platform.flamingo.themes.category.advanced=Pokročilý
 platform.flamingo.themes.defaultvalue=Preddefinovaný
 ### Missing: platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code which will be added into the skin.
-### Missing: platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a newer browser.
 ### Missing: platform.flamingo.themes.local=Local
 ### Missing: platform.flamingo.themes.global=Global
 
@@ -83,6 +82,11 @@ platform.flamingo.themes.defaultvalue=Preddefinovaný
 ## until 7.3M1
 #######################################
 ### Missing: platform.flamingo.themes.lessCode.warning=Unfortunately, this field is not taken into account in the live preview.
+
+#######################################
+## until 12.9RC1
+#######################################
+### Missing: platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a newer browser.
 
 #@deprecatedend</content>
 </xwikidoc>

@@ -19,46 +19,50 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.DefaultStringSpaceReferenceResolver}.
  * 
  * @version $Id$
  */
+@ComponentTest
+// @formatter:off
 @ComponentList({
     DefaultSymbolScheme.class
 })
-public class DefaultStringSpaceReferenceResolverTest
+// @formatter:on
+class DefaultStringSpaceReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultStringEntityReferenceResolver> mocker =
-        new MockitoComponentMockingRule<>(DefaultStringEntityReferenceResolver.class);
+    @InjectMockComponents
+    private DefaultStringEntityReferenceResolver resolver;
 
-    private SpaceReferenceResolver<String> resolver;
+    private SpaceReferenceResolver<String> spaceResolver;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        this.resolver = new DefaultStringSpaceReferenceResolver();
-        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver", this.mocker.getComponentUnderTest());
+        this.spaceResolver = new DefaultStringSpaceReferenceResolver();
+        ReflectionUtils.setFieldValue(this.spaceResolver, "entityReferenceResolver", this.resolver);
     }
 
     @Test
-    public void resolveWithExplicitSpaceReference()
+    void resolveWithExplicitSpaceReference()
     {
-        SpaceReference reference = this.resolver.resolve("", new SpaceReference("space", new WikiReference("wiki")));
+        SpaceReference reference =
+            this.spaceResolver.resolve("", new SpaceReference("space", new WikiReference("wiki")));
 
-        Assert.assertEquals("space", reference.getName());
-        Assert.assertEquals("wiki", reference.getWikiReference().getName());
+        assertEquals("space", reference.getName());
+        assertEquals("wiki", reference.getWikiReference().getName());
     }
 }

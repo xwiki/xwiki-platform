@@ -56,7 +56,6 @@ public class DocumentReferenceConverter extends AbstractConverter<DocumentRefere
     private DocumentReferenceResolver<EntityReference> referenceResolver;
 
     @Inject
-    @Named("compact")
     private EntityReferenceSerializer<String> serializer;
 
     @Inject
@@ -73,7 +72,7 @@ public class DocumentReferenceConverter extends AbstractConverter<DocumentRefere
             result = null;
         } else if (value instanceof EntityReference) {
             result = this.referenceResolver.resolve((EntityReference) value);
-        }  else {
+        } else {
             Converter<Object> converter = this.converterManager.getConverter(value.getClass());
 
             if (converter != null) {

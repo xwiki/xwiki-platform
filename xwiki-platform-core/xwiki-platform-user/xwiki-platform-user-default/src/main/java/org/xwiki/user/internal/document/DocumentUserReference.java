@@ -21,9 +21,7 @@ package org.xwiki.user.internal.document;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.text.XWikiToStringBuilder;
 import org.xwiki.user.UserReference;
 
@@ -38,18 +36,17 @@ import org.xwiki.user.UserReference;
  */
 public class DocumentUserReference implements UserReference
 {
-    private EntityReferenceProvider entityReferenceProvider;
-
     private DocumentReference reference;
+    private boolean isGlobal;
 
     /**
      * @param reference the reference to the wiki page storing the user
-     * @param entityReferenceProvider the component to check if the current wiki is the main wiki
+     * @param isGlobal {@code true} if the user belongs to the main wiki
      */
-    public DocumentUserReference(DocumentReference reference, EntityReferenceProvider entityReferenceProvider)
+    public DocumentUserReference(DocumentReference reference, boolean isGlobal)
     {
         this.reference = reference;
-        this.entityReferenceProvider = entityReferenceProvider;
+        this.isGlobal = isGlobal;
     }
 
     /**
@@ -63,14 +60,13 @@ public class DocumentUserReference implements UserReference
     @Override
     public boolean isGlobal()
     {
-        return this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).equals(
-            getReference().getWikiReference());
+        return this.isGlobal;
     }
 
     @Override
     public int hashCode()
     {
-        return this.reference.hashCode();
+        return getReference().hashCode();
     }
 
     @Override
@@ -95,7 +91,6 @@ public class DocumentUserReference implements UserReference
     public String toString()
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
-        builder.append("reference", getReference());
-        return builder.toString();
+        return builder.append("reference", getReference()).toString();
     }
 }

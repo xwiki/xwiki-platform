@@ -26,7 +26,6 @@ import javax.script.Bindings;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.stability.Unstable;
 
 /**
  * Binding representation for the wikimacros.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 11.3.2
  * @since 10.11.9
  */
-@Unstable
 public class WikiMacroBinding extends HashMap<String, Object> implements Bindings
 {
     private static final String PARAMETERS = "parameters";

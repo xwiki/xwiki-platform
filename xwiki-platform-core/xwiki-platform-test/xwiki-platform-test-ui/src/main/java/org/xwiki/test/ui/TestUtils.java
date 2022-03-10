@@ -37,6 +37,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -99,8 +100,8 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Helper methods for testing, not related to a specific Page Object. Also made available to tests classes.
@@ -394,7 +395,10 @@ public class TestUtils
 
             if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
                 throw new RuntimeException(
-                    String.format("Login failed with credentials: %s / %s.", username, password));
+                    String.format("Login failed with credentials: [%s] / [%s]. Was expecting to be on URL [%s] but "
+                        + "was on [%s]. Page source is [%s]", username, password, destUrl,
+                        getDriver().getCurrentUrl(), getDriver().getPageSource()));
+
             }
             recacheSecretTokenWhenOnRegisterPage();
             if (pageURL != null) {
@@ -703,10 +707,7 @@ public class TestUtils
 
     public void gotoPage(String url)
     {
-        // Only navigate if the current URL is different from the one to go to, in order to improve performances.
-        if (!getDriver().getCurrentUrl().equals(url)) {
-            getDriver().get(url);
-        }
+        getDriver().get(url);
     }
 
     public String getURLToDeletePage(String space, String page)
@@ -719,7 +720,19 @@ public class TestUtils
      */
     public String getURLToDeletePage(EntityReference reference)
     {
-        return getURL(reference, "delete", "confirm=1");
+        return getURLToDeletePage(reference, false);
+    }
+
+    /**
+     * @since 12.9RC1
+     */
+    public String getURLToDeletePage(EntityReference reference, boolean affectChildren)
+    {
+        String queryString = "confirm=1&async=false";
+        if (affectChildren) {
+            queryString += "&affectChildren=true";
+        }
+        return getURL(reference, "delete", queryString);
     }
 
     /**
@@ -728,6 +741,16 @@ public class TestUtils
      * @since 4.5
      */
     public String getURLToDeleteSpace(String space)
+    {
+        return getURL(space, "WebHome", "deletespace", "confirm=1&async=false&affectChidlren=on");
+    }
+
+    /**
+     * @param space the reference of the space to delete
+     * @return the URL that can be used to delete the specified pace
+     * @since 14.1RC1
+     */
+    public String getURLToDeleteSpace(EntityReference space)
     {
         return getURL(space, "WebHome", "deletespace", "confirm=1&async=false&affectChidlren=on");
     }
@@ -918,7 +941,15 @@ public class TestUtils
      */
     public void deletePage(EntityReference reference)
     {
-        getDriver().get(getURLToDeletePage(reference));
+        deletePage(reference, false);
+    }
+
+    /**
+     * @since 12.9RC1
+     */
+    public void deletePage(EntityReference reference, boolean affectChildren)
+    {
+        getDriver().get(getURLToDeletePage(reference, affectChildren));
     }
 
     /**
@@ -952,6 +983,17 @@ public class TestUtils
      * @since 4.5
      */
     public void deleteSpace(String space)
+    {
+        getDriver().get(getURLToDeleteSpace(space));
+    }
+
+    /**
+     * Accesses the URL to delete the specified space.
+     *
+     * @param space the reference of the space to delete
+     * @since 14.1RC1
+     */
+    public void deleteSpace(EntityReference space)
     {
         getDriver().get(getURLToDeleteSpace(space));
     }
@@ -1628,6 +1670,19 @@ public class TestUtils
         return new ClassEditPage();
     }
 
+    /**
+     * Goes to a page in edit class mode.
+     *
+     * @param reference a document reference
+     * @return the {@link ClassEditPage} Page Object for the page
+     * @since 14.0RC1
+     */
+    public ClassEditPage editClass(DocumentReference reference)
+    {
+        gotoPage(reference, "edit", "editor=class");
+        return new ClassEditPage();
+    }
+
     public String getVersion() throws Exception
     {
         Xwiki xwiki = rest().getResource("", null);
@@ -1896,9 +1951,10 @@ public class TestUtils
      *
      * @param propertyName name of the property to set
      * @param value value to set to the property
+     * @return the previous value, if the property was set, {@code null} otherwise
      * @since 9.7RC1
      */
-    public void setWikiPreference(String propertyName, String value) throws Exception
+    public String setWikiPreference(String propertyName, String value) throws Exception
     {
         DocumentReference documentReference = new DocumentReference(getCurrentWiki(), "XWiki", "XWikiPreferences");
         ObjectReference objectReference = new ObjectReference("XWiki.XWikiPreferences[0]", documentReference);
@@ -1906,6 +1962,7 @@ public class TestUtils
         Property property = RestTestUtils.property(propertyName, value);
 
         org.xwiki.rest.model.jaxb.Object preferenceObject = rest().get(objectReference, false);
+        String previousValue = null;
 
         if (preferenceObject == null) {
             // The object does not exist, create it
@@ -1923,7 +1980,14 @@ public class TestUtils
             TestUtils.assertStatusCodes(
                 rest().executePut(ObjectPropertyResource.class, property, rest().toElements(propertyReference)), true,
                 STATUS_ACCEPTED);
+
+            Property unsetProperty = RestTestUtils.property(propertyName, null);
+            previousValue =
+                preferenceObject.getProperties().stream().filter(prop -> Objects.equals(propertyName, prop.getName()))
+                    .findFirst().orElse(unsetProperty).getValue();
         }
+
+        return previousValue;
     }
 
     /**

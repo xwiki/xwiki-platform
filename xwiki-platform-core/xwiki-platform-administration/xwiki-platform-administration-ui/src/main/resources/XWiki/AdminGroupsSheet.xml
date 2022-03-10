@@ -329,12 +329,12 @@ require(['jquery', 'bootstrap-form-validation'], function($, validation) {
       groupNameTimeout = setTimeout(function() {
         var groupName = groupNameInput.val();
         var groupURL = new XWiki.Document(groupName, 'XWiki').getRestURL();
-        $.get(groupURL).done(function() {
+        $.get(groupURL).then(() =&gt; {
           // A document with the specified name already exists.
           var message = $jsontool.serialize($services.localization.render('rightsmanager.groupexist'))
             .replace('__name__', groupName);
           validation.setError(groupNameInput, message);
-        }).fail(function(response) {
+        }).catch(response =&gt; {
           if (response.status === 404) {
             // The document does not exist, so we can use it.
             validation.setSuccess(groupNameInput);
@@ -350,7 +350,7 @@ require(['jquery', 'bootstrap-form-validation'], function($, validation) {
     }
   });
 
-  createGroupModal.submit(function(event) {
+  createGroupModal.on('submit', function(event) {
     event.preventDefault();
     var data = createGroupModal.find('form').serializeArray();
     data.push({name: 'ajax', value: 1});
@@ -362,7 +362,7 @@ require(['jquery', 'bootstrap-form-validation'], function($, validation) {
       $jsontool.serialize($services.localization.render('xe.admin.groups.create.inProgress')),
       'inprogress'
     );
-    $.post(createGroupURL, data).done(function() {
+    Promise.resolve($.post(createGroupURL, data)).then(function() {
       // Close the modal and refresh the groups live table.
       createGroupModal.modal('hide');
       window.livetable_groupstable.refresh();
@@ -370,12 +370,12 @@ require(['jquery', 'bootstrap-form-validation'], function($, validation) {
         $jsontool.serialize($services.localization.render('xe.admin.groups.create.done')),
         'done'
       ));
-    }).fail(function() {
+    }).catch(function() {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.groups.create.failed')),
         'error'
       ));
-    }).always(function() {
+    }).finally(function() {
       // Re-enable the form.
       createGroupModal.find(':input').prop('disabled', false);
     });
@@ -458,7 +458,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal'], function($, xm) {
       groupReference = XWiki.Model.serialize(groupReference);
     }
     deleteGroupModal.find('.groupName').text(groupReference);
-  }).find('.btn-danger').click(function() {
+  }).find('.btn-danger').on('click', function() {
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('xe.admin.groups.delete.inProgress')),
       'inprogress'
@@ -467,13 +467,13 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal'], function($, xm) {
       xpage: 'deleteuorg',
       docname: deleteGroupModal.find('.groupName').text(),
       form_token: xm.form_token
-    }).done(function() {
+    }).then(() =&gt; {
       deleteGroupModal.data('liveTable').deleteRow(deleteGroupModal.data('rowIndex'));
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.groups.delete.done')),
         'done'
       ));
-    }).fail(function() {
+    }).catch(() =&gt; {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.groups.delete.failed')),
         'error'

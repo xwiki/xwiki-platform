@@ -64,6 +64,9 @@
   #set ($macro.options = {})
   #set ($discard = $macro.options.putAll($defaultTreeOptions))
   #set ($discard = $macro.options.putAll($options))
+  #if ($macro.options.id)
+    #set ($discard = $attributes.put('id', $macro.options.id))
+  #end
   #set ($classes = ["$!macro.options.get('class')"])
   #set ($noLinks = $macro.options.links != 'true')
   #if ($noLinks)
@@ -93,7 +96,12 @@
       #set ($resourceParams.outputSyntax = 'plain')
       #set ($resourceURL = $xwiki.getURL($reference, 'get', $escapetool.url($resourceParams)))
     #end
+    ## The tree data is retrieved asynchronously from the specified URL.
     #set ($discard = $attributes.put('data-url', $resourceURL))
+  #end
+  ## Feed the tree data as JSON. See https://www.jstree.com/docs/json/ .
+  #if ($macro.options.data)
+    #set ($discard = $attributes.put('data-json', $jsontool.serialize($macro.options.data)))
   #end
   ## If the root node is shown then the root data is retrieved using data-url. Otherwise, the root data can be specified
   ## using the rootData option which translates into the data-root attribute.
@@ -113,6 +121,10 @@
   #set ($discard = $attributes.put('data-openTo', $macro.options.openTo))
   #set ($finder = $macro.options.finder == 'true')
   #set ($discard = $attributes.put('data-finder', $finder))
+  ## Custom jsTree configuration. See https://www.jstree.com/docs/config/ .
+  #if ($macro.options.config)
+    #set ($discard = $attributes.put('data-config', $jsontool.serialize($macro.options.config)))
+  #end
 #end
 
 #macro (prepareTreeOptions $options)

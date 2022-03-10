@@ -28,9 +28,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReference;
@@ -45,10 +47,13 @@ import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Hierarchy;
 import org.xwiki.rest.model.jaxb.HierarchyItem;
 import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.model.jaxb.Translations;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -75,7 +80,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @OldcoreTest
-public class ModelFactoryTest
+class ModelFactoryTest
 {
     private static final String TEST_STRING_FIELD = "textValue";
 
@@ -84,6 +89,9 @@ public class ModelFactoryTest
     private static final String TEST_PASSWORD_FIELD = "passwordValue";
 
     private static final String TEST_PASSWORD_VALUE = "secret";
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectComponentManager
     private ComponentManager componentManager;
@@ -113,24 +121,27 @@ public class ModelFactoryTest
 
     private URI baseURI;
 
+    @Mock
     private Document testDocument;
 
+    @Mock
+    private XWikiDocument testXWikiDocument;
+
     @BeforeEach
-    public void mockUpTestDocument() throws Exception
+    void mockUpTestDocument() throws Exception
     {
         baseURI = new URI("https://localhost/");
-        testDocument = mock(Document.class);
-        WikiReference wikiRef = new WikiReference("wiki");
-        SpaceReference spaceRef = new SpaceReference("Space", wikiRef);
-        when(testDocument.getPrefixedFullName()).thenReturn("wiki:Space.Page");
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        when(testDocument.getPrefixedFullName()).thenReturn("wiki:Path.To.Page");
         when(testDocument.getWiki()).thenReturn("wiki");
-        when(testDocument.getSpace()).thenReturn("Space");
+        when(testDocument.getSpace()).thenReturn("Path.To");
         when(testDocument.getName()).thenReturn("Page");
-        when(testDocument.getDocumentReference()).thenReturn(new DocumentReference("Page", spaceRef));
+        when(testDocument.getDocumentReference()).thenReturn(documentReference);
 
         this.xcontext = this.oldCore.getXWikiContext();
-        this.xcontext.setWikiReference(wikiRef);
+        this.xcontext.setWikiReference(documentReference.getWikiReference());
         this.xcontext.setWiki(this.xwiki);
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.testXWikiDocument);
     }
 
     /**
@@ -215,7 +226,7 @@ public class ModelFactoryTest
     }
 
     @Test
-    public void toRestHierarchyFromSpaceWithoutPrettyNames()
+    void toRestHierarchyFromSpaceWithoutPrettyNames()
     {
         SpaceReference spaceReference = new SpaceReference("dev", "API");
         when(this.xwiki.getURL(spaceReference.getParent(), this.xcontext)).thenReturn("wiki URL");
@@ -239,7 +250,7 @@ public class ModelFactoryTest
     }
 
     @Test
-    public void toRestHierarchyFromDocumentWithPrettyNames() throws Exception
+    void toRestHierarchyFromDocumentWithPrettyNames() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("dev", "API", "WebHome");
         XWikiDocument document = mock(XWikiDocument.class, "en");
@@ -275,7 +286,7 @@ public class ModelFactoryTest
     }
 
     @Test
-    public void toRestAttachment()
+    void toRestAttachment()
     {
         com.xpn.xwiki.api.Attachment xwikiAttachment = mock(com.xpn.xwiki.api.Attachment.class);
         when(xwikiAttachment.getLongSize()).thenReturn(123L);
@@ -322,17 +333,12 @@ public class ModelFactoryTest
     }
 
     @Test
-    public void toRestTranslations() throws XWikiException
+    void toRestTranslations() throws XWikiException
     {
-        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
-        Document document = mock(Document.class);
-        when(document.getDocumentReference()).thenReturn(documentReference);
-        when(document.getWiki()).thenReturn("wiki");
-        when(document.getSpace()).thenReturn("Path.To");
-        when(document.getDefaultLocale()).thenReturn(Locale.FRENCH);
-        when(document.getTranslationLocales()).thenReturn(Arrays.asList(Locale.ENGLISH, Locale.GERMAN));
+        when(this.testDocument.getRealLocale()).thenReturn(Locale.FRENCH);
+        when(this.testDocument.getTranslationLocales()).thenReturn(Arrays.asList(Locale.ENGLISH, Locale.GERMAN));
 
-        Translations translations = this.modelFactory.toRestTranslations(this.baseURI, document);
+        Translations translations = this.modelFactory.toRestTranslations(this.baseURI, this.testDocument);
 
         assertEquals("fr", translations.getDefault());
         // We include the default (original) translation.
@@ -343,26 +349,57 @@ public class ModelFactoryTest
     }
 
     @Test
-    public void toRestTranslationsWhenNoTranslation() throws XWikiException
+    void toRestTranslationsWhenNoTranslation() throws XWikiException
     {
-        Document document = mock(Document.class);
-        when(document.getDefaultLocale()).thenReturn(new Locale("foo", "bar", "test"));
+        when(this.testDocument.isTranslation()).thenReturn(true);
+        when(this.testDocument.getDefaultLocale()).thenReturn(Locale.ROOT);
+        when(this.testXWikiDocument.getRealLocale()).thenReturn(new Locale("foo", "bar", "test"));
 
-        Translations translations = this.modelFactory.toRestTranslations(this.baseURI, document);
+        Translations translations = this.modelFactory.toRestTranslations(this.baseURI, this.testDocument);
 
         assertEquals("foo_BAR_test", translations.getDefault());
         assertTrue(translations.getTranslations().isEmpty());
     }
 
     @Test
-    public void toRestTranslationsForRootLocale() throws XWikiException
+    void toRestTranslationsForRootLocale() throws XWikiException
     {
-        Document document = mock(Document.class);
-        when(document.getDefaultLocale()).thenReturn(Locale.ROOT);
+        when(this.testDocument.getRealLocale()).thenReturn(Locale.ROOT);
 
-        Translations translations = this.modelFactory.toRestTranslations(this.baseURI, document);
+        Translations translations = this.modelFactory.toRestTranslations(this.baseURI, this.testDocument);
 
         assertEquals("", translations.getDefault());
         assertTrue(translations.getTranslations().isEmpty());
+    }
+
+    @Test
+    void toRestTranslationsFailsToLoadDefaultLocale() throws XWikiException
+    {
+        when(this.testDocument.isTranslation()).thenReturn(true);
+        when(this.xwiki.getDocument(this.testDocument.getDocumentReference(), this.xcontext))
+            .thenThrow(new XWikiException(0, 0, "test"));
+        when(this.testDocument.getDefaultLocale()).thenReturn(Locale.CANADA_FRENCH);
+
+        Translations translations = this.modelFactory.toRestTranslations(this.baseURI, this.testDocument);
+
+        assertEquals("Failed to get the default locale from [wiki:Path.To.Page]. "
+            + "Root cause is [XWikiException: Error number 0 in 0: test].", this.logCapture.getMessage(0));
+        assertEquals("fr_CA", translations.getDefault());
+        assertTrue(translations.getTranslations().isEmpty());
+    }
+
+    @Test
+    void toRestPageSummary() throws Exception
+    {
+        when(this.testDocument.getTitle()).thenReturn("Some > title");
+        when(this.testDocument.getDisplayTitle()).thenReturn("Some &gt; title");
+        when(this.testDocument.getRealLocale()).thenReturn(Locale.ITALIAN);
+        when(this.testDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.testDocument.getComments()).thenReturn(new Vector<>());
+
+        PageSummary pageSummary = this.modelFactory.toRestPageSummary(this.baseURI, this.testDocument, true);
+
+        assertEquals(this.testDocument.getDisplayTitle(), pageSummary.getTitle());
+        assertEquals(this.testDocument.getTitle(), pageSummary.getRawTitle());
     }
 }

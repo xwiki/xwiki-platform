@@ -19,6 +19,7 @@
  */
 package org.xwiki.user.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -37,9 +38,29 @@ import org.xwiki.configuration.ConfigurationSource;
 @Singleton
 public class SecureUserPropertiesResolver extends AbstractUserPropertiesResolver
 {
+    @Inject
+    @Named("superadminuser")
+    private ConfigurationSource superAdminConfigurationSource;
+
+    @Inject
+    @Named("guestuser")
+    private ConfigurationSource guestConfigurationSource;
+
     @Override
     protected String getUnderlyingConfigurationSourceHint()
     {
         return "secure/user";
+    }
+
+    @Override
+    protected ConfigurationSource getSuperAdminConfigurationSource()
+    {
+        return this.superAdminConfigurationSource;
+    }
+
+    @Override
+    protected ConfigurationSource getGuestConfigurationSource()
+    {
+        return this.guestConfigurationSource;
     }
 }

@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rendering.macro.documentTree.name=Dokument Træ
-rendering.macro.documentTree.description=Træ-visning af XWiki-dokumenter
+rendering.macro.documentTree.description=Træ-visning af XWiki-dokumenter.
 rendering.macro.documentTree.parameter.readOnly.name=Kun visning
 rendering.macro.documentTree.parameter.readOnly.description=Skal brugeren kunne modificere træ-strukturen hvis vedkommende har rettighederne?
 rendering.macro.documentTree.parameter.showWikis.name=Vis wikier
@@ -55,15 +55,15 @@ rendering.macro.documentTree.parameter.showAttachments.description=Om bilag til 
 rendering.macro.documentTree.parameter.showObjects.name=Vis objekter
 rendering.macro.documentTree.parameter.showObjects.description=Om dokument-objekter skal vises eller ej.
 rendering.macro.documentTree.parameter.showClassProperties.name=Vis klasse-egenskaber
-rendering.macro.documentTree.parameter.showClassProperties.description=Om klasse-egenskaber skal vises for dokumenter, som definerer klasser
+rendering.macro.documentTree.parameter.showClassProperties.description=Om klasse-egenskaber skal vises for dokumenter, som definerer klasser.
 rendering.macro.documentTree.parameter.root.name=Rod-ID
-rendering.macro.documentTree.parameter.root.description=Rodens ID Anvendes, hvis du kun vil vise undertræet for en given gren (som så er roden). Træet vises med undertræets gren på først niveau, så roden vises ikke. Hele træet vises, hvis rod-ID ikke angives. Formatet for rod-ID er entitetstype\:entitetsreference, hvor entitetstype kan f.eks. være wiki, område, dokument, dvs.\: wiki\:xwiki, space\:xwiki\:Main eller document\:xwiki\:WebHome
-### Missing: rendering.macro.documentTree.parameter.showRoot.name=Show Root
-### Missing: rendering.macro.documentTree.parameter.showRoot.description=Whether to show the root node or not. The root node is not shown by default because it is usually implied from the context where the tree is displayed (e.g. a label before the tree). There are some cases though when you may want to display the root node: to be able to create a new node under the root.
+rendering.macro.documentTree.parameter.root.description=Rodens ID Anvendes, hvis du kun vil vise undertræet for en given gren (som så er roden). Træet vises med undertræets gren på først niveau, så roden vises ikke. Hele træet vises, hvis rod-ID ikke angives. Formatet for rod-ID er entitetstype:entitetsreference, hvor entitetstype kan f.eks. være wiki, område, dokument, dvs.: wiki:xwiki, space:xwiki:Main eller document:xwiki:WebHome
+rendering.macro.documentTree.parameter.showRoot.name=Vis roden
+rendering.macro.documentTree.parameter.showRoot.description=Om roden skal vises eller ej. Roden vises ikke som standard, fordi det som regel er givet ud fra dokument-træets visning (f.eks. en etiket foran træet). Der er dog situationer hvor du har brug for at oprette en ny knude direkte under roden.
 rendering.macro.documentTree.parameter.compact.name=Komprimér
 rendering.macro.documentTree.parameter.compact.description=Hvis du har begrænset plads vandret, bør du sætte denne. Det betyder at træets gren-ikoner og grene ikke vises. Desuden anves special styling, som sikrer mindst mulig pladsforbrug vandret - samtidig med at gren-ikonerne er fuldt synlige.
 rendering.macro.documentTree.parameter.links.name=Henvisninger
-rendering.macro.documentTree.parameter.links.description=Angiver om grenene i træet skal opføre sig som henvisninger (ankre)
+rendering.macro.documentTree.parameter.links.description=Angiver om grenene i træet skal opføre sig som henvisninger (ankre).
 rendering.macro.documentTree.parameter.checkboxes.name=Check-bokse
 rendering.macro.documentTree.parameter.checkboxes.description=Om der skal sættes en check-boks ved gren i træet så man kan vælge flere dokumenter samtidig.
 rendering.macro.documentTree.parameter.openTo.name=Åben
@@ -76,15 +76,15 @@ rendering.macro.documentTree.parameter.finder.name=Vælger
 rendering.macro.documentTree.parameter.finder.description=Vis tekstfelt, der kan bruges til at søge efter dokumenter i træet. Feltet vises over træet, og foreslår søgninger baseret på indholdet i træet. Når et foreslag vælges, åbnes træet til det tilsvarende dokument.
 rendering.macro.documentTree.parameter.hierarchyMode.name=Dokumenthieraki
 rendering.macro.documentTree.parameter.hierarchyMode.description=Angiver hvilket hieraki, der skal bruges mellem dokumenter. Mulige værdier er "reference" (standard) og "parentchild". "reference" betyder sortering efter område-angivelse i dokumentet, mens "parentchild" bruger "parent"-attributten på dokumentet.
-### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filter Hidden Documents
-### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Set this parameter to false if you want to include the hidden documents in the tree. Otherwise, if the value is true, the hidden documents are excluded or included based on current user's preferences.
-### Missing: rendering.macro.documentTree.parameter.limit.name=Limit
-### Missing: rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
-### Missing: rendering.macro.documentTree.parameter.exclusions.name=Exclusions
-### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
+rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filter for skjulte dokumenter
+rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Sæt til falsk hvis du vil inkludere de skjulte dokumenter i træet. Ellers, hvis værdien er Sand udelukkes de skjulte dokumenter eller afhængig af brugerens preferencer for skjulte dokumenter er.
+rendering.macro.documentTree.parameter.limit.name=Grænse
+rendering.macro.documentTree.parameter.limit.description=Grænsen for antal delknuder der vises, når en knude udvides for første gang. Resten af delknuderne findes under en "Mere..." henvisning. Grænsen bruges til at opdele delknuderne og hjælper når træet vokser og antallet af delknuder er højt.
+rendering.macro.documentTree.parameter.exclusions.name=Ekskluderinger
+rendering.macro.documentTree.parameter.exclusions.description=Liste af knuder, der er udelukket fra træet. Knuderne angives med deres id, adskildt af komma.
 
-### Missing: index.documentTree.empty=No pages found
-### Missing: index.documentTree.more={0} more ...
+index.documentTree.empty=Ingen sider fundet
+index.documentTree.more=[0] mere ...
 
 ## Deprecated translation keys
 

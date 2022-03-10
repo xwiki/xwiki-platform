@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 require(['jquery', 'bootstrap'], function($) {
-  $(document).ready(function() {
+  $(function() {
 
     // Fix the bad location of the dropdown menu when the trigger is close to the end of the screen.
     // See: http://jira.xwiki.org/browse/XWIKI-12609
@@ -46,5 +46,8 @@ require(['jquery', 'bootstrap'], function($) {
       $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
     });
 
+    // Activate the popover when hovering the Translate button.
+    var translateButton = $('#tmTranslate [data-toggle="popover"]');
+    translateButton.attr('title', translateButton.attr('data-title')).popover();
   });
 });

@@ -19,12 +19,15 @@
  */
 package org.xwiki.wiki.test.ui;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.test.po.TableLayoutElement;
+import org.xwiki.test.docker.junit5.ExtensionOverride;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+import org.xwiki.wiki.test.po.AdminWikiTemplatesPage;
 import org.xwiki.wiki.test.po.CreateWikiPage;
 import org.xwiki.wiki.test.po.CreateWikiPageStepUser;
 import org.xwiki.wiki.test.po.DeleteWikiPage;
@@ -33,58 +36,116 @@ import org.xwiki.wiki.test.po.WikiHomePage;
 import org.xwiki.wiki.test.po.WikiIndexPage;
 import org.xwiki.wiki.test.po.WikiLink;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.wiki.test.po.WikiIndexPage.WIKI_NAME_COLUMN_LABEL;
 
 /**
  * UI tests for the wiki templates feature of the Wiki application.
  *
  * @version $Id$
  */
-@UITest
-public class WikiTemplateIT
+@UITest(
+    properties = {
+        // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml.
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+        // Prevent the DW from starting. This is needed because xwiki-platform-extension-distribution is provisioned
+        // transitively by org.xwiki.platform:xwiki-platform-wiki-creationjob and will cause a ClassNotFoundException
+        // since Struts is in the webapp CL and will not see the DistributionAction located in the extension CL. And
+        // even if the class was found the DW would start which is not something we want.
+        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as an extension. We need it since the Tag UI requires
+        // Notifications, as otherwise even streams won't have a store.
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
+        // Required by components located in a core extensions
+        "org.xwiki.platform:xwiki-platform-wiki-template-default",
+        // These extensions are needed when creating the subwiki or it'll fail with some NPE.
+        // TODO: improve the docker test framework to indicate xwiki-platform-wiki-ui-wiki instead of all those jars one
+        // by one
+        "org.xwiki.platform:xwiki-platform-wiki-script",
+        "org.xwiki.platform:xwiki-platform-wiki-user-default",
+        "org.xwiki.platform:xwiki-platform-wiki-user-script"
+    },
+    extensionOverrides = {
+        @ExtensionOverride(
+            extensionId = "org.xwiki.platform:xwiki-platform-web-war",
+            overrides = {
+                // We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension
+                // to install on a subwiki by default (which is something we test)
+                // Otherwise the wiki creation form will display the flavor picker and the functional tests do not
+                // handle it.
+                "properties=xwiki.extension.distribution.wikiui=org.xwiki.platform:xwiki-platform-wiki-ui-wiki"
+            }
+        )
+    }
+)
+class WikiTemplateIT
 {
     private static final String TEMPLATE_WIKI_ID = "mynewtemplate";
 
     private static final String TEMPLATE_CONTENT = "Content of the template";
 
-    @BeforeAll
-    public void setup(TestUtils setup)
+    @Test
+    @Order(1)
+    void createWikiFromTemplateTest(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
+
+        // Create the template.
+        createTemplateWiki(setup);
+
+        // Create the wiki from the template
+        createWikiFromTemplate();
+        // Do it twice to check if we can create a wiki with the name of a deleted one.
+        createWikiFromTemplate();
+
+        // Delete the template wiki.
+        deleteTemplateWiki();
+
+        logCaptureConfiguration.registerExcludes(
+            "CSRFToken: Secret token verification failed");
     }
 
-    private void createTemplateWiki() throws Exception
+    private void createTemplateWiki(TestUtils setup) throws Exception
     {
-        // Go to the wiki creation wizard
+        // Go to the wiki creation wizard.
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         CreateWikiPage createWikiPage = wikiIndexPage.createWiki();
 
-        // Full the first step
+        // Full the first step.
         createWikiPage.setPrettyName("My new template");
         String wikiName = createWikiPage.getComputedName();
         assertEquals(TEMPLATE_WIKI_ID, wikiName);
         createWikiPage.setDescription("This is the template I do for the tests");
         createWikiPage.setIsTemplate(true);
-        assertTrue(createWikiPage.isNextStepEnabled());
 
-        // Second step
+        // Second step.
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
 
-        // Creation step
-        // Creation step + click Finalize button
+        // Creation step.
+        // Creation step + click Finalize button.
         WikiHomePage wikiHomePage = executeCreationStepAndFinalize(createWikiPageStepUser);
 
-        // Go to the created subwiki, and modify the home page content
+        // Go to the created subwiki, and modify the home page content.
         wikiHomePage.edit();
         WikiEditPage wikiEditPage = new WikiEditPage();
         wikiEditPage.setContent(TEMPLATE_CONTENT);
         wikiEditPage.clickSaveAndView();
         wikiEditPage.waitUntilPageIsLoaded();
 
-        // Go back to the wiki creation wizard, and verify the template is in the list of templates in the wizard
+        // Go back to the wiki creation wizard, and verify the template is in the list of templates in the wizard.
         createWikiPage = wikiHomePage.createWiki();
         assertTrue(createWikiPage.getTemplateList().contains("mynewtemplate"));
 
@@ -94,32 +155,40 @@ public class WikiTemplateIT
         if (wikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
         }
-        assertTrue(wikiLink.getURL().endsWith("/xwiki/wiki/mynewtemplate/view/Main/"));
+        assertThat(wikiLink.getURL(), endsWith("/xwiki/wiki/mynewtemplate/view/Main/"));
 
+        // Verify the wiki template is displayed in the admin wiki templates list.
+        TableLayoutElement tableLayout = AdminWikiTemplatesPage.goToPage().getLiveData().getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertCellWithLink(WIKI_NAME_COLUMN_LABEL, "My new template",
+            setup.getBaseURL() + "wiki/mynewtemplate/view/Main/");
+        tableLayout.assertRow("Description", "This is the template I do for the tests");
+        tableLayout.assertRow("Owner", "superadmin");
+        tableLayout.assertRow("Membership Type", "Open for any user to join");
     }
 
     private void deleteTemplateWiki() throws Exception
     {
-        // Go to the template wiki
+        // Go to the template wiki.
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         WikiLink templateWikiLink = wikiIndexPage.getWikiLink("My new template");
         if (templateWikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
         }
-        DeleteWikiPage deleteWikiPage = wikiIndexPage.deleteWiki(TEMPLATE_WIKI_ID).confirm(TEMPLATE_WIKI_ID);
+        DeleteWikiPage deleteWikiPage = wikiIndexPage.deleteWiki("My new template").confirm(TEMPLATE_WIKI_ID);
         assertTrue(deleteWikiPage.hasSuccessMessage());
-        // Verify the wiki has been deleted
+        // Verify the wiki has been deleted.
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
-        assertNull(wikiIndexPage.getWikiLink("My new template"));
+        assertNull(wikiIndexPage.getWikiLink("My new template", false));
     }
 
     private void createWikiFromTemplate()
     {
-        // Go to the wiki creation wizard
+        // Go to the wiki creation wizard.
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         CreateWikiPage createWikiPage = wikiIndexPage.createWiki();
 
-        // First step
+        // First step.
         createWikiPage.setPrettyName("My new wiki");
         String wikiName = createWikiPage.getComputedName();
         assertEquals("mynewwiki", wikiName);
@@ -127,17 +196,17 @@ public class WikiTemplateIT
         createWikiPage.setIsTemplate(false);
         createWikiPage.setDescription("My first wiki");
 
-        // Second step
+        // Second step.
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
 
-        // Creation step + click Finalize button
+        // Creation step + click Finalize button.
         WikiHomePage wikiHomePage = executeCreationStepAndFinalize(createWikiPageStepUser);
 
-        // Go the created subwiki and verify the content of the main page is the same than in the template
+        // Go the created subwiki and verify the content of the main page is the same than in the template.
         assertEquals(TEMPLATE_CONTENT, wikiHomePage.getContent());
 
         // Delete the wiki
-        DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki();
+        DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki("My new wiki");
         deleteWikiPage = deleteWikiPage.confirm("");
         assertTrue(deleteWikiPage.hasUserErrorMessage());
         assertTrue(deleteWikiPage.hasWikiDeleteConfirmationInput(""));
@@ -149,9 +218,9 @@ public class WikiTemplateIT
         deleteWikiPage = deleteWikiPage.confirm("mynewwiki");
         assertTrue(deleteWikiPage.hasSuccessMessage());
 
-        // Verify the wiki has been deleted
+        // Verify the wiki has been deleted.
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
-        assertNull(wikiIndexPage.getWikiLink("My new wiki"));
+        assertNull(wikiIndexPage.getWikiLink("My new wiki", false));
     }
 
     private WikiHomePage executeCreationStepAndFinalize(CreateWikiPageStepUser createWikiPageStepUser)
@@ -164,29 +233,10 @@ public class WikiTemplateIT
         // be copied and that's a lot of pages (over 800+), and this takes time. If the CI agent is busy with other
         // jobs running in parallel it'll take even more time. Thus we put a large value to be safe.
         wikiCreationPage.waitForFinalizeButton(60 * 5);
-        // Ensure there is no error in the log
+        // Ensure there is no error in the log.
         assertFalse(wikiCreationPage.hasLogError());
 
-        // Finalization
-        WikiHomePage wikiHomePage = wikiCreationPage.finalizeCreation();
-        return wikiHomePage;
-    }
-
-    @Test
-    public void createWikiFromTemplateTest(LogCaptureConfiguration logCaptureConfiguration) throws Exception
-    {
-        // Create the template
-        createTemplateWiki();
-
-        // Create the wiki from the template
-        createWikiFromTemplate();
-        // Do it twice to check if we can create a wiki with the name of a deleted one
-        createWikiFromTemplate();
-
-        // Delete the template wiki
-        deleteTemplateWiki();
-
-        logCaptureConfiguration.registerExcludes(
-            "CSRFToken: Secret token verification failed");
+        // Finalization.
+        return wikiCreationPage.finalizeCreation();
     }
 }

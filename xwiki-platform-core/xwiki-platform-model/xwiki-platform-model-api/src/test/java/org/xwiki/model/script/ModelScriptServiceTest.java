@@ -35,6 +35,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
@@ -328,5 +330,14 @@ public class ModelScriptServiceTest
 
         assertEquals(reference,
             this.service.resolveClassProperty("Class^property", "custom", parameters[0], parameters[1]));
+    }
+
+    @Test
+    void createObjectPropertyReference()
+    {
+        ObjectReference objectReference =
+            new ObjectReference("objectName", new DocumentReference("test", "Some", "Page"));
+        assertEquals(new ObjectPropertyReference("test", objectReference),
+            this.service.createObjectPropertyReference("test", objectReference));
     }
 }

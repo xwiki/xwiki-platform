@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.LogRule;
@@ -76,6 +77,7 @@ public class WikiUIExtensionParametersTest
         VelocityManager velocityManager = componentManager.registerMockComponent(VelocityManager.class);
         execution = componentManager.registerMockComponent(Execution.class);
         modelContext = componentManager.registerMockComponent(ModelContext.class);
+        componentManager.registerMockComponent(LoggerConfiguration.class);
         velocityEngine = mock(VelocityEngine.class);
         velocityContext = new VelocityContext();
         ExecutionContext executionContext = mock(ExecutionContext.class);

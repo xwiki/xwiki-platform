@@ -22,7 +22,6 @@ package org.xwiki.refactoring.event;
 import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.refactoring.internal.event.AbstractEvent;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event fired when multiple entities are about to be copied.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 11.1RC1
  */
-@Unstable
 public class EntitiesCopyingEvent extends AbstractEvent implements BeginFoldEvent, CancelableEvent
 {
 }

@@ -19,13 +19,22 @@
  */
 package org.xwiki.officeimporter.internal.builder;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,6 +42,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -42,6 +52,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverterException;
+import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
@@ -64,6 +75,8 @@ import org.xwiki.xml.html.HTMLUtils;
 @Singleton
 public class DefaultPresentationBuilder implements PresentationBuilder
 {
+    private static final Pattern SLIDE_FORMAT = Pattern.compile("img(?<number>[0-9]+)\\.jpg");
+
     /**
      * Provides the component manager used by {@link XDOMOfficeDocument}.
      */
@@ -112,18 +125,25 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         String cleanedOfficeFileName = StringUtils.stripAccents(officeFileName);
 
         // Invoke the office document converter.
-        Map<String, byte[]> artifacts = importPresentation(officeFileStream, cleanedOfficeFileName);
+        OfficeConverterResult officeConverterResult = importPresentation(officeFileStream, cleanedOfficeFileName);
 
+        Pair<String, Set<File>> htmlPresentationResult = null;
         // Create presentation HTML.
-        String html = buildPresentationHTML(artifacts, StringUtils.substringBeforeLast(cleanedOfficeFileName, "."));
+        try {
+            htmlPresentationResult = buildPresentationHTML(officeConverterResult,
+                StringUtils.substringBeforeLast(cleanedOfficeFileName, "."));
+        } catch (IOException e) {
+            throw new OfficeImporterException("Error while preparing the presentation artifacts.", e);
+        }
 
         // Clear and adjust presentation HTML (slide image URLs are updated to point to the corresponding attachments).
-        html = cleanPresentationHTML(html, documentReference);
+        String html = cleanPresentationHTML(htmlPresentationResult.getLeft(), documentReference);
 
         // Create the XDOM.
         XDOM xdom = buildPresentationXDOM(html, documentReference);
 
-        return new XDOMOfficeDocument(xdom, artifacts, this.contextComponentManagerProvider.get());
+        return new XDOMOfficeDocument(xdom, htmlPresentationResult.getRight(),
+            this.contextComponentManagerProvider.get(), officeConverterResult);
     }
 
     /**
@@ -135,7 +155,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      * @return the map of artifacts created by the Office Server
      * @throws OfficeImporterException if converting the office presentation fails
      */
-    protected Map<String, byte[]> importPresentation(InputStream officeFileStream, String officeFileName)
+    protected OfficeConverterResult importPresentation(InputStream officeFileStream, String officeFileName)
         throws OfficeImporterException
     {
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
@@ -146,7 +166,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
             // display the corresponding slide screen shot) and textX.html (HTML page that display the text extracted
             // from the corresponding slide). We use "img0.html" as the output file name because the corresponding
             // artifact displays a screen shot of the first presentation slide.
-            return this.officeServer.getConverter().convert(inputStreams, officeFileName, "img0.html");
+            return this.officeServer.getConverter().convertDocument(inputStreams, officeFileName, "img0.html");
         } catch (OfficeConverterException e) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), e);
@@ -159,53 +179,51 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      * All artifacts except slide images are removed from {@code presentationArtifacts}. Slide images names are prefixed
      * with the given {@code nameSpace} to avoid name conflicts.
      * 
-     * @param presentationArtifacts the map of presentation artifacts; this method removes some of the presentation
+     * @param officeConverterResult the map of presentation artifacts; this method removes some of the presentation
      *            artifacts and renames others so be aware of the side effects
      * @param nameSpace the prefix to add in front of all slide image names to prevent name conflicts
      * @return the presentation HTML
      */
-    protected String buildPresentationHTML(Map<String, byte[]> presentationArtifacts, String nameSpace)
+    protected Pair<String, Set<File>> buildPresentationHTML(OfficeConverterResult officeConverterResult, String nameSpace)
+        throws IOException
     {
         StringBuilder presentationHTML = new StringBuilder();
 
+        Set<File> artifactFiles = new HashSet<>();
         // Iterate all the slides.
-        int i = 0;
-        String slideImageKeyFormat = "img%s.jpg";
-        byte[] slideImage = presentationArtifacts.remove(String.format(slideImageKeyFormat, i));
-        while (slideImage != null) {
-            // Remove unused artifacts.
-            // imgX.html is an HTML page that displays the corresponding slide image.
-            presentationArtifacts.remove(String.format("img%s.html", i));
-            // textX.html is an HTML page that displays the text extracted from the corresponding slide.
-            presentationArtifacts.remove(String.format("text%s.html", i));
+        Set<File> conversionOutputFiles = officeConverterResult.getAllFiles();
+        File outputDirectory = officeConverterResult.getOutputDirectory();
+        List<String> filenames = new ArrayList<>();
+        for (File conversionOutputFile : conversionOutputFiles) {
+            Matcher matcher = SLIDE_FORMAT.matcher(conversionOutputFile.getName());
+            if (matcher.matches()) {
+                String number = matcher.group("number");
+                String slideImageName = String.format("%s-slide%s.jpg", nameSpace, number);
+                File artifact = new File(outputDirectory, slideImageName);
+                artifactFiles.add(artifact);
+                Files.copy(conversionOutputFile.toPath(), artifact.toPath());
+                // Append slide image to the presentation HTML.
+                String slideImageURL = null;
+                try {
+                    // We need to encode the slide image name in case it contains special URL characters.
+                    slideImageURL = URLEncoder.encode(slideImageName, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    // This should never happen.
+                }
+                // We do not want to encode the spaces in '+' since '+' will be then reencoded in
+                // ImageFilter to keep it and not consider it as a space when decoding it.
+                // This is link to a bug in libreoffice that does not convert properly the '+', so we cannot distinguish
+                // them from spaces in filenames. This should be removed once
+                // https://github.com/sbraconnier/jodconverter/issues/125 is fixed.
+                slideImageURL = slideImageURL.replace('+', ' ');
 
-            // Rename slide image to prevent name conflicts when it will be attached to the target document.
-            String slideImageName = String.format("%s-slide%s.jpg", nameSpace, i);
-            presentationArtifacts.put(slideImageName, slideImage);
-
-            // Append slide image to the presentation HTML.
-            String slideImageURL = null;
-            try {
-                // We need to encode the slide image name in case it contains special URL characters.
-                slideImageURL = URLEncoder.encode(slideImageName, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                // This should never happen.
+                filenames.add(slideImageURL);
             }
-
-            // We do not want to encode the spaces in '+' since '+' will be then reencoded in
-            // ImageFilter to keep it and not consider it as a space when decoding it.
-            // This is link to a bug in libreoffice that does not convert properly the '+', so we cannot distinguish
-            // them from spaces in filenames. This should be removed once
-            // https://github.com/sbraconnier/jodconverter/issues/125 is fixed.
-            slideImageURL = slideImageURL.replace('+', ' ');
-
-            presentationHTML.append(String.format("<p><img src=\"%s\"/></p>", slideImageURL));
-
-            // Move to the next slide.
-            slideImage = presentationArtifacts.remove(String.format(slideImageKeyFormat, ++i));
         }
-
-        return presentationHTML.toString();
+        // We sort the filenames so that the numbers are ordered.
+        Collections.sort(filenames);
+        filenames.forEach(name -> presentationHTML.append(String.format("<p><img src=\"%s\"/></p>", name)));
+        return Pair.of(presentationHTML.toString(), artifactFiles);
     }
 
     /**

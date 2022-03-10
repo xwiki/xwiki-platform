@@ -21,7 +21,6 @@ package org.xwiki.search.solr;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * An extension point used to inject mandatory Solr cores.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.2
  */
 @Role
-@Unstable
 public interface SolrCoreInitializer
 {
     /**
@@ -45,4 +43,17 @@ public interface SolrCoreInitializer
      * @throws SolrException when failing to initialize the core
      */
     void initialize(SolrClient client) throws SolrException;
+
+    /**
+     * Indicate if the the core content is considered to be caching (it's possible to recreate it if the core is lost).
+     * In practice it's mostly used to decide where to store the core data to make clear what it is when looking at the
+     * permanent directory in case of embedded Solr.
+     * 
+     * @return true if the content of the core is considered to be cache
+     * @since 12.10
+     */
+    default boolean isCache()
+    {
+        return false;
+    }
 }

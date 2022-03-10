@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>### Home page
 platform.appwithinminutes.homePageTitle=Minut-app
-platform.appwithinminutes.description=Skab en fælles anvendelse på få minutter med XWikis avancerede håndtering af datastrukturer (AppWithinMinutes).
+platform.appwithinminutes.description=Skab et nyt værktøj på få minutter med XWikis avancerede håndtering af datastrukturer (AppWithinMinutes).
 platform.appwithinminutes.createAppButtonLabel=Opret Minut-app
 platform.appwithinminutes.appsLiveTableHeading=Minut-apps
 ### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
@@ -48,7 +48,7 @@ platform.appwithinminutes.appsLiveTable._actions=Handlinger
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Giv rettighed til at opdatere området.
 
 ### AWM Applications panel entry
-platform.appwithinminutes.appPanelCreateEntry=Opret din egen\!
+platform.appwithinminutes.appPanelCreateEntry=Opret din egen!
 
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=Trin {0} — {1}
@@ -56,8 +56,8 @@ appWithinMinutes.wizardStep.name.name=Navn
 appWithinMinutes.wizardStep.name.title=Navngiv din Minut-app
 appWithinMinutes.wizardStep.name.description=Angiv et navn til denne Minut-app.
 appWithinMinutes.wizardStep.structure.name=Struktur
-appWithinMinutes.wizardStep.structure.title=Definér struktur for dine data
-appWithinMinutes.wizardStep.structure.description=Specificér strukturen for din Minut-app ved at angive hvilke datafelter den skal indeholde.
+appWithinMinutes.wizardStep.structure.title=Strukturér dine data
+appWithinMinutes.wizardStep.structure.description=Bestem strukturen for din Minut-app ved at angive hvilke datafelter den skal indeholde.
 ### Missing: appWithinMinutes.wizardStep.entries.name=Entries
 ### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
 ### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
@@ -71,7 +71,7 @@ platform.appwithinminutes.wizardStepFinishButtonTip=Gå til startsiden nu
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Forrige trin
 platform.appwithinminutes.wizardStepPreviousButtonTip=Forrige
 platform.appwithinminutes.wizardStepHelpTitle=Trin
-platform.appwithinminutes.wizardStepHelpDescription=Denne guide vil føre dig frem til din egen Minut-app. Trinene vil bestemme hvordan anvendelsen skal se ud og hvilken form for information, der skal være i den\:
+platform.appwithinminutes.wizardStepHelpDescription=Denne guide vil føre dig frem til din egen Minut-app. Hvert trin fastlægger hvordan anvendelsen skal se ud og hvilken form for information, der skal være i den:
 
 ### Wizard Step 1: Application Name
 ### Missing: appWithinMinutes.createApp.location.label=Location
@@ -82,13 +82,13 @@ platform.appwithinminutes.wizardStepHelpDescription=Denne guide vil føre dig fr
 ### Missing: appWithinMinutes.codeSpace.title=Code
 ### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
 ### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
-platform.appwithinminutes.appNamePageTitle=Opret Minut-app
-platform.appwithinminutes.appNameLabel=Navn på Minut-app
-platform.appwithinminutes.appNameHint=Navnet på Minut-app fastlægger hvilken URL startsiden for App'en får, hvilket område data gemmes i såvel som den klasse, der fastlægger Minut-app'ens struktur.
-platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Startside for Minut-app
+platform.appwithinminutes.appNamePageTitle=Opret værktøj
+platform.appwithinminutes.appNameLabel=Navn på værktøjet
+platform.appwithinminutes.appNameHint=Navnet på værktøjet bestemmer hvilken URL startsiden får, hvilket område data gemmes i såvel som klassenavnet, hvori strukturen defineres.
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Startside for værktøj
 ### Missing: platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
-platform.appwithinminutes.appNameIsUsedWarning=Minut-app findes allerede. Hvis du fortsætter ændrer du på den eksisterende klasse.
-platform.appwithinminutes.appNameEmptyError=Giv Minut-app'en et navn
+platform.appwithinminutes.appNameIsUsedWarning=Denne Minut-app findes allerede. Hvis du fortsætter ændrer du på den eksisterende klasse.
+platform.appwithinminutes.appNameEmptyError=Giv værktøjet et navn
 
 ### Wizard Step 2: Application Structure
 platform.appwithinminutes.classEditorPaletteTitle=Felt-palette
@@ -103,7 +103,7 @@ platform.appwithinminutes.classEditorUpdateTranslationsLabel=Opdatér samlinger 
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Opdatér oversættelse af feltnavne og listeværdier ({0}).
 
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Denne klasse har flere formularer.
-platform.appwithinminutes.classEditorDuplicateFieldNameError=Klassen har to felter med det samme navn\: {0}
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Klassen har to felter med det samme navn: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Opdaterer standard værdier
 platform.appwithinminutes.classEditorBindSheetSaveComment=Bind klasse-formular
 platform.appwithinminutes.classEditorSheetSaveComment=Opdater klasse-formular
@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Opdatér Live-tabeller
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Træk og slip for at ændre rækkefølge
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Slet
 platform.appwithinminutes.liveTableEditorAddColumnHint=Tilføj
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Nogle kolonner er forældede, måske fordi de tilsvarende felter i klassen er blevet slettet. Ønsker du at slette disse kolonner? &lt;a href\=""&gt;Yes&lt;/a&gt; / &lt;a href\=""&gt;No&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Nogle kolonner er forældede, måske fordi de tilsvarende felter i klassen er blevet slettet. Ønsker du at slette disse kolonner? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Ikon
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 
@@ -204,7 +204,7 @@ platform.appwithinminutes.appLiveTableDeleteEntryActionName=Slet
 platform.appwithinminutes.appHomePageActionsHeading=Handlinger
 platform.appwithinminutes.appHomePageAddEntryLabel=Tilføj
 platform.appwithinminutes.appHomePageAddEntryHint=Tilføj nyt element
-platform.appwithinminutes.appHomePageEntryNameLabel=Elementnavn\:
+platform.appwithinminutes.appHomePageEntryNameLabel=Elementnavn:
 ### Missing: platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
 platform.appwithinminutes.appHomePageEditAppLabel=Ret elementets navn
 platform.appwithinminutes.appHomePageTranslateAppLabel=Oversæt minut-app

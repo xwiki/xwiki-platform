@@ -22,7 +22,7 @@ package org.xwiki.notifications.filters.internal.status;
 import org.xwiki.notifications.NotificationFormat;
 
 /**
- * Filter event targeting only a specific user.
+ * Filter which select events which have been associated with a specific user by a pre filtering process.
  * 
  * @version $Id$
  * @since 12.1RC1

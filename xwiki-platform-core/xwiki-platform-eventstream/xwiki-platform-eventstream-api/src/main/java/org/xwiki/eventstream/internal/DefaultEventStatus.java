@@ -28,12 +28,8 @@ import org.xwiki.eventstream.EventStatus;
  * @version $Id$
  * @since 9.2RC1
  */
-public class DefaultEventStatus implements EventStatus
+public class DefaultEventStatus extends DefaultEntityEvent implements EventStatus
 {
-    private Event event;
-
-    private String entityId;
-
     private boolean isRead;
 
     /**
@@ -45,43 +41,15 @@ public class DefaultEventStatus implements EventStatus
      */
     public DefaultEventStatus(Event event, String entityId, boolean isRead)
     {
-        this.event = event;
-        this.entityId = entityId;
+        super(event, entityId);
+
         this.isRead = isRead;
-    }
-
-    @Override
-    public Event getEvent()
-    {
-        return event;
-    }
-
-    @Override
-    public String getEntityId()
-    {
-        return entityId;
     }
 
     @Override
     public boolean isRead()
     {
-        return isRead;
-    }
-
-    /**
-     * @param event the event concerned by the status
-     */
-    public void setEvent(Event event)
-    {
-        this.event = event;
-    }
-
-    /**
-     * @param entityId the id of the entity concerned by the status
-     */
-    public void setEntityId(String entityId)
-    {
-        this.entityId = entityId;
+        return this.isRead;
     }
 
     /**
@@ -89,6 +57,6 @@ public class DefaultEventStatus implements EventStatus
      */
     public void setRead(boolean read)
     {
-        isRead = read;
+        this.isRead = read;
     }
 }

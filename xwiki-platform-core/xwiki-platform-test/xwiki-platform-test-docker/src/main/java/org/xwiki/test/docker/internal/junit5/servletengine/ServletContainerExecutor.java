@@ -28,7 +28,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
@@ -95,6 +97,24 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     }
 
     /**
+     * @return the directory where the exploded XWiki WAR will be created
+     */
+    public File getWARDirectory()
+    {
+        File warDirectory;
+        if (ServletEngine.JETTY_STANDALONE.equals(this.testConfiguration.getServletEngine())) {
+            warDirectory = this.jettyStandaloneExecutor.getWARDirectory();
+        } else {
+            warDirectory =
+                new File(String.format("%s/xwiki", this.testConfiguration.getOutputDirectory())).getAbsoluteFile();
+        }
+        // Note: We compute the absolute file because otherwise there can be ".." elements in the file path and
+        // some containers (such as Jetty) have a protection against directory attacks and would refuse to load
+        // resources located in a path having ".." in it.
+        return warDirectory.getAbsoluteFile();
+    }
+
+    /**
      * @param sourceWARDirectory the location where the built WAR is located
      * @throws Exception if an error occurred during the build or start
      */
@@ -153,6 +173,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
             "/var/lib/jetty/webapps/xwiki");
 
+        // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
+        // have been fixed.
+        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
+            List<String> javaOpts = new ArrayList<>();
+            addJava17AddOpens(javaOpts);
+            this.servletContainer.withEnv("JAVA_OPTS", StringUtils.join(javaOpts, ' '));
+        }
+
         // When executing on the Oracle database, we get the following timezone error unless we pass a system
         // property to the Oracle JDBC driver:
         //   java.sql.SQLException: Cannot create PoolableConnectionFactory (ORA-00604: error occurred at
@@ -164,6 +192,11 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             commandPartList.add(ORACLE_TZ_WORKAROUND);
             this.servletContainer.setCommandParts(commandPartList.toArray(new String[0]));
         }
+
+        // Jetty 10.0.3+ has now added a protection in URLs so that encoded characters such as % are
+        // prohibited by default. Since XWiki uses them, we need to configure Jetty to allow for it. See
+        // https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance
+        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance=RFC3986");
     }
 
     private void configureTomcat(File sourceWARDirectory) throws Exception
@@ -171,7 +204,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // Configure Tomcat logging for debugging. Create a logging.properties file
         File logFile = new File(sourceWARDirectory, "WEB-INF/classes/logging.properties");
         if (!logFile.createNewFile()) {
-            throw new Exception(String.format("Failed to create logging configuration file at [%s]", logFile));
+            throw new Exception(String.format("Logging configuration file already exists at [%s]. Maybe more than one"
+                + " IT test have executed, leading to several Docker setups?", logFile.getAbsoluteFile()));
         }
         try (FileWriter writer = new FileWriter(logFile)) {
             IOUtils.write("org.apache.catalina.core.ContainerBase.[Catalina].level = FINE\n"
@@ -187,6 +221,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         catalinaOpts.add("-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true");
         catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
         catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");
+
+        // Note: Tomcat 9.x automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
+        // need to add them as we do for Jetty.
+        // see https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
 
         // If we're on debug mode, start XWiki in debug mode too so that we can attach a remote debugger to it
         // in order to debug.
@@ -219,7 +257,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             .withNetwork(Network.SHARED)
             .withNetworkAliases(this.testConfiguration.getServletEngine().getInternalIP())
             .waitingFor(
-                Wait.forHttp("/xwiki/bin/get/Main/WebHome")
+                Wait.forHttp("/xwiki/rest")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
         List<Integer> exposedPorts = new ArrayList<>();
@@ -259,7 +297,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private String getDockerImageTag(TestConfiguration testConfiguration)
     {
-        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag() : LATEST;
+        // TODO: We currently cannot use Tomcat 10.x as it corresponds to a package change for JakartaEE and we'll need
+        // XWiki to move to the new packages first. This is why we force an older version for Tomcat.
+        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag()
+            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9" : LATEST);
     }
 
     private GenericContainer createServletContainer() throws Exception
@@ -299,7 +340,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             // JODConverter: https://bit.ly/2w8B82Q
                             .run("apt-get update && "
                                 + "apt-get --no-install-recommends -y install curl unzip procps libxinerama1 "
-                                    + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 && "
+                                    + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 && "
                                 + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
                                 + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
@@ -346,5 +387,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         {
             this.servletContainer.copyFileFromContainer(CLOVER_DATABASE, CLOVER_DATABASE);
         }
+    }
+
+    private void addJava17AddOpens(List<String> list)
+    {
+        list.add("--add-opens java.base/java.lang=ALL-UNNAMED");
+        list.add("--add-opens java.base/java.util=ALL-UNNAMED");
+        list.add("--add-opens java.base/java.concurrent=ALL-UNNAMED");
     }
 }

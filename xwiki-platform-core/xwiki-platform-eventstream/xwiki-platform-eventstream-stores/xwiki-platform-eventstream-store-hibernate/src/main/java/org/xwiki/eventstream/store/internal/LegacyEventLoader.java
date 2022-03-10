@@ -164,6 +164,23 @@ public class LegacyEventLoader
     {
         LegacyEvent legacyEvent = getLegacyEvent(eventId);
 
-        return eventConverter.convertLegacyActivityToEvent(legacyEvent);
+        if (legacyEvent != null) {
+            return eventConverter.convertLegacyActivityToEvent(legacyEvent);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return the total number of events in the legacy store
+     * @throws QueryException when failing to query the events
+     * @since 12.6.1
+     * @since 12.7RC1
+     */
+    public long countEvents() throws QueryException
+    {
+        Query query = this.queryManager.createQuery("select count(*) from LegacyEvent", Query.HQL);
+
+        return (Long) query.execute().get(0);
     }
 }

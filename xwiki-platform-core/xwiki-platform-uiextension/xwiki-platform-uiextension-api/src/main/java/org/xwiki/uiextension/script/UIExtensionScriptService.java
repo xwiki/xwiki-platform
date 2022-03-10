@@ -88,19 +88,7 @@ public class UIExtensionScriptService implements ScriptService
      */
     public List<UIExtension> getExtensions(String extensionPointId)
     {
-        UIExtensionManager manager = this.uiExtensionManager;
-
-        ComponentManager componentManager = contextComponentManagerProvider.get();
-        if (componentManager.hasComponent(UIExtensionManager.class, extensionPointId)) {
-            try {
-                // Look for a specific UI extension manager for the given extension point
-                manager = componentManager.getInstance(UIExtensionManager.class, extensionPointId);
-            } catch (ComponentLookupException e) {
-                this.logger.error("Failed to initialize UI extension manager", e);
-            }
-        }
-
-        return manager.get(extensionPointId);
+        return this.uiExtensionManager.get(extensionPointId);
     }
 
     /**

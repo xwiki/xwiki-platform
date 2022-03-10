@@ -139,6 +139,16 @@ public class LocalizationScriptService implements ScriptService
     }
 
     /**
+     * @return the {@link Locale} configured as the default
+     * @since 14.1RC1
+     * @since 13.10.3
+     */
+    public Locale getDefaultLocale()
+    {
+        return this.localization.getDefaultLocale();
+    }
+
+    /**
      * Converts the given string to a locale. E.g. the string "pt_BR" is converted to a locale with the language set to
      * Portuguese and the country set to Brazil.
      * 

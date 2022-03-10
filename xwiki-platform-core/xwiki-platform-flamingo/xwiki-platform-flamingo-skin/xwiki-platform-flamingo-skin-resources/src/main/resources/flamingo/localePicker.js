@@ -17,27 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'bootstrap-select': '$services.webjars.url("bootstrap-select", "js/bootstrap-select.min")'
+/*!
+#set ($paths = {
+  'js': {
+    'bootstrap-select': $services.webjars.url('bootstrap-select', 'js/bootstrap-select.min')
   },
+  'css': [
+    $services.webjars.url('bootstrap-select', 'css/bootstrap-select.min.css')
+  ]
+})
+#set ($locales = [])
+#set ($currentLocale = $services.localization.currentLocale)
+#foreach ($locale in $collectiontool.sort($services.localization.availableLocales, 'displayName'))
+  #if ("$!locale" != '')
+    #set ($localeName = $escapetool.xml($stringtool.capitalize($locale.getDisplayName($locale)) +
+      ' (' + $stringtool.capitalize($locale.getDisplayName($currentLocale)) + ')'))
+    #set ($discard = $locales.add({'code': $locale.toString(), 'name': $localeName}))
+  #end
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(paths, locales) {
+  'use strict';
+
+require.config({
+  paths: paths.js,
   shim: {
     'bootstrap-select' : ['jquery', 'bootstrap']
   }
 });
 
 define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
-  'use strict';
-
   // Load the required CSS.
-  [
-    $jsontool.serialize($services.webjars.url('bootstrap-select', 'css/bootstrap-select.min.css'))
-  ].forEach(function(url) {
+  paths.css.forEach(function(url) {
     $('<link rel="stylesheet"/>').attr('href', url).appendTo('head');
   });
 
   $.fn.localePicker = function(settings) {
-    return this.each($.proxy(init, null, settings));
+    return this.each((index, input) => init($(input), settings));
   };
 
   var defaultSettings = {
@@ -45,11 +62,10 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
     multiple: false
   };
 
-  var init = function(settings) {
-    var input = $(this);
+  var init = function(input, settings) {
     settings = $.extend({}, defaultSettings, input.data('settings'), settings);
     var selectedLocales = getLocalesFromInput(input);
-    var select = $('<select/>');
+    var select = $('<select></select>');
     if (settings.multiple) {
       // Hide the input and insert the select after.
       input.hide().after(select.attr('multiple', 'multiple'));
@@ -65,7 +81,7 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
       }));
     }
     if (settings.allowEmpty) {
-      $('<option/>').attr('value', '').text('None').appendTo(select);
+      $('<option></option>').attr('value', '').text('None').appendTo(select);
     }
     select.append(locales.map(function(locale) {
       var index = selectedLocales.indexOf(locale.code);
@@ -73,27 +89,14 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
         // Remove it from the list of selected locales so that we can add the remaining ones at the end.
         selectedLocales.splice(index, 1);
       }
-      return $('<option/>').attr('value', locale.code).html(locale.name).prop('selected', index >= 0);
+      return $('<option></option>').attr('value', locale.code).html(locale.name).prop('selected', index >= 0);
     }));
     // Add selected locales that are unknown.
     select.append(selectedLocales.map(function(locale) {
-      return $('<option/>').attr('value', locale).text(locale).prop('selected', true);
+      return $('<option></option>').attr('value', locale).text(locale).prop('selected', true);
     }));
     select.bootstrapSelect();
   };
-
-  /*!
-  #set ($locales = [])
-  #set ($currentLocale = $services.localization.currentLocale)
-  #foreach ($locale in $collectiontool.sort($services.localization.availableLocales, 'displayName'))
-    #if ("$!locale" != '')
-      #set ($localeName = $escapetool.xml($stringtool.capitalize($locale.getDisplayName($locale))) +
-        ' <small class="text-muted">(' + $stringtool.capitalize($locale.getDisplayName($currentLocale)) + ')</small>')
-      #set ($discard = $locales.add({'code': $locale.toString(), 'name': $localeName}))
-    #end
-  #end
-  */
-  var locales = $jsontool.serialize($locales);
 
   /**
    * Get the initial values of the input
@@ -129,3 +132,6 @@ require(['jquery', 'xwiki-locale-picker', 'xwiki-events-bridge'], function($) {
   $(document).on('xwiki:dom:updated', init);
   return XWiki.domIsLoaded && init();
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$paths, $locales]));

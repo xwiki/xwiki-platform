@@ -123,6 +123,9 @@ $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
     #foreach ($line in $lines)
       #set ($lineNumber = $foreach.count)
       <tr class="line" id="$lineNumber">
+        ## Even though empty we still need the first 2 TD to make the HTML valid
+        <td class="author avatar_16 hidden"></td>
+        <td class="version hidden"></td>
         <td class="line-number unselectable"><a href="$doc.getURL('view', "viewer=code#${lineNumber}")">$lineNumber</a></td>
         <td class="content">$escapetool.xml($line)</td>
       </tr>

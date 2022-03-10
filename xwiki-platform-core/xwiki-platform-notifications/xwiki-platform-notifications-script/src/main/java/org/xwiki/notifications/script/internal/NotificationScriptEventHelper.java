@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStatusManager;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -52,6 +53,9 @@ public class NotificationScriptEventHelper
 {
     @Inject
     private EventStatusManager eventStatusManager;
+
+    @Inject
+    private EventStore eventStore;
 
     @Inject
     private CompositeEventStatusManager compositeEventStatusManager;
@@ -105,7 +109,7 @@ public class NotificationScriptEventHelper
         DefaultEvent event = new DefaultEvent();
         event.setId(eventId);
         String userId = entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference());
-        eventStatusManager.saveEventStatus(new DefaultEventStatus(event, userId, isRead));
+        this.eventStore.saveEventStatus(new DefaultEventStatus(event, userId, isRead));
     }
 
     /**
@@ -118,6 +122,6 @@ public class NotificationScriptEventHelper
     public void clearAllStatus(Date startDate) throws Exception
     {
         String userId = this.entityReferenceSerializer.serialize(this.documentAccessBridge.getCurrentUserReference());
-        this.eventStatusManager.deleteAllForEntity(startDate, userId);
+        this.eventStore.deleteEventStatuses(userId, startDate);
     }
 }

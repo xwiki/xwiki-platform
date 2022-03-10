@@ -415,7 +415,7 @@ require(['jquery', 'bootstrap'], function($) {
   }
   // Hijack the rename page action.
   var renameAppModal = $('#renameAppModal');
-  $('#tmActionRename').click(function(event) {
+  $('#tmActionRename').on('click', function(event) {
     event.preventDefault();
     renameAppModal.modal();
   });
@@ -455,18 +455,15 @@ require(['jquery', 'bootstrap'], function($) {
         $.ajax({
           type: 'HEAD',
           url: newAppHomePage.getURL()
-        }).done(function() {
-          endValidation(pageExistsError);
-        }).fail(function(response) {
+        }).then(endValidation.bind(null, pageExistsError), response =&gt; {
           if (response.status === 404) {
             $.ajax({
               type: 'HEAD',
               url: newAppHomePage.getURL('edit')
-            }).done(function() {
-              endValidation();
-            }).fail(function() {
-              endValidation(locationForbiddenError);
-            });
+            }).then(
+              () =&gt; endValidation(),
+              () =&gt; endValidation(locationForbiddenError)
+            );
           } else if (response.status === 403) {
             endValidation(locationForbiddenError);
           } else {
@@ -513,7 +510,7 @@ require(['jquery', 'bootstrap'], function($) {
     renameAppModal.modal('show');
   });
 
-  renameAppModal.find('form').submit(function(event) {
+  renameAppModal.find('form').on('submit', function(event) {
     event.preventDefault();
     renameApp(getRenameData($(this)));
   });
@@ -546,7 +543,7 @@ require(['jquery', 'bootstrap'], function($) {
       'inprogress'
     );
     var renameAppURL = new XWiki.Document('RenameApplication', 'AppWithinMinutes').getURL('get');
-    $.post(renameAppURL, data).then(updateAppHomePage).done(function() {
+    $.post(renameAppURL, data).then(updateAppHomePage).then(function() {
       renameAppModal.modal('hide');
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('appWithinMinutes.renameApp.done')),
@@ -556,34 +553,30 @@ require(['jquery', 'bootstrap'], function($) {
       setTimeout(function() {
         window.location.href = getNewAppHomePage().getURL();
       }, 0);
-    }).fail(function() {
+    }).catch(function() {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('appWithinMinutes.renameApp.failed')),
         'error'
       ));
-    }).always(function() {
+    }).finally(function() {
       // Re-enable the form.
       renameAppModal.find(':input').prop('disabled', false);
     });
   };
 
   var updateAppHomePage = function() {
-    var deferred = $.Deferred();
-    var newAppHomePageEditURL = getNewAppHomePage().getURL('edit');
-    $('&lt;div/&gt;').load(newAppHomePageEditURL + ' #inline', function() {
-      var formData = $(this).children('form#inline').serializeArray();
-      if (formData.length &gt; 0) {
-        formData.push({name: 'xaction_save', value: true});
-        $.post(newAppHomePageEditURL, formData).done(function() {
-          deferred.resolve();
-        }).fail(function() {
-          deferred.reject();
-        });
-      } else {
-        deferred.reject();
-      }
+    return new Promise((resolve, reject) =&gt; {
+      var newAppHomePageEditURL = getNewAppHomePage().getURL('edit');
+      $('&lt;div/&gt;').load(newAppHomePageEditURL + ' #inline', function() {
+        var formData = $(this).children('form#inline').serializeArray();
+        if (formData.length) {
+          formData.push({name: 'xaction_save', value: true});
+          $.post(newAppHomePageEditURL, formData).then(resolve, reject);
+        } else {
+          reject();
+        }
+      });
     });
-    return deferred.promise();
   }
 });</code>
     </property>

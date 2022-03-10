@@ -19,13 +19,12 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
  * Internal helper to get some configuration about the Legacy Event Store.
@@ -42,9 +41,6 @@ public class LegacyEventStreamStoreConfiguration
     private static final String PREFERENCE_PREFIX = "eventstream.";
 
     private static final String DAYS_TO_KEEP_EVENTS = "daystokeepevents";
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     @Named("xwikicfg")

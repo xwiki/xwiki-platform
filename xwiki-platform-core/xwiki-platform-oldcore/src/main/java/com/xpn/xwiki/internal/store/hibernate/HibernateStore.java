@@ -21,7 +21,9 @@ package com.xpn.xwiki.internal.store.hibernate;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -29,9 +31,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -58,12 +61,16 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.Column;
+import org.hibernate.mapping.KeyValue;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Property;
+import org.hibernate.mapping.Table;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
@@ -115,20 +122,10 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     private static final String PROPERTY_PERMANENTDIRECTORY = "environment.permanentDirectory";
 
-    private static final Map<String, DatabaseProduct> DRIVER_MAPPING = new HashMap<>();
-
     /**
-     * Recognize the database used based on the JDBC driver class used.
+     * The name of the property for configuring the current timezone.
      */
-    static {
-        DRIVER_MAPPING.put("org.postgresql.Driver", DatabaseProduct.POSTGRESQL);
-        DRIVER_MAPPING.put("oracle.jdbc.driver.OracleDriver", DatabaseProduct.ORACLE);
-        DRIVER_MAPPING.put("org.hsqldb.jdbcDriver", DatabaseProduct.HSQLDB);
-        // MySQL has 2 possible driver classes that can be used. The "com.mysql.jdbc.Driver" one is deprecated but we
-        // must still recognize the DB as MySQL.
-        DRIVER_MAPPING.put("com.mysql.jdbc.Driver", DatabaseProduct.MYSQL);
-        DRIVER_MAPPING.put("com.mysql.cj.jdbc.Driver", DatabaseProduct.MYSQL);
-    }
+    private static final String PROPERTY_TIMEZONE_VARIABLE = "${timezone}";
 
     @Inject
     private Logger logger;
@@ -157,12 +154,11 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
     private DataMigrationManager dataMigrationManager;
 
-    private final BootstrapServiceRegistry bootstrapServiceRegistry =
-        new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
+    private BootstrapServiceRegistry bootstrapServiceRegistry;
 
-    private final MetadataSources metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
+    private MetadataSources metadataSources;
 
-    private final Configuration configuration = new Configuration(this.metadataSources);
+    private HibernateStoreConfiguration configuration;
 
     private StandardServiceRegistry standardServiceRegistry;
 
@@ -175,6 +171,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     private Metadata configurationMetadata;
 
     private String configurationCatalog;
+
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private DataMigrationManager getDataMigrationManager()
     {
@@ -221,9 +219,18 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         return url;
     }
 
+    private void createConfiguration()
+    {
+        this.bootstrapServiceRegistry = new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
+        this.metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
+        this.configuration = new HibernateStoreConfiguration(this.metadataSources, this.configuration);
+    }
+
     @Override
     public void initialize() throws InitializationException
     {
+        createConfiguration();
+
         URL url = getHibernateConfigurationURL();
         if (url != null) {
             this.configuration.configure(url);
@@ -258,6 +265,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry)
     {
         this.configurationMetadata = null;
+        this.databaseProductCache = DatabaseProduct.UNKNOWN;
+        this.dialect = null;
     }
 
     /**
@@ -279,6 +288,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
                 this.environment.getPermanentDirectory().getAbsolutePath());
 
+            try {
+                newURL = StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
+                    URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                this.logger.error("Failedd to encode the current timezone id", e);
+            }
+
             // Set the new URL
             hibernateConfiguration.setProperty(org.hibernate.cfg.Environment.URL, newURL);
             this.logger.debug("Resolved Hibernate URL [{}] to [{}]", url, newURL);
@@ -286,18 +302,34 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     }
 
     /**
+     * Reload the Hibernate setup.
+     * <p>
+     * This method is synchronized to make sure that it's only executed once at a time.
+     * 
      * @since 11.5RC1
      */
     public void build()
     {
-        // Get rid of existing session factory
-        disposeInternal();
+        this.lock.writeLock().lock();
 
-        this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
-        this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
+        try {
+            // Check if it's a rebuild
+            if (this.sessionFactory != null) {
+                // Get rid of existing session factory
+                disposeInternal();
 
-        // Create a new session factory
-        this.sessionFactory = this.configuration.buildSessionFactory(standardServiceRegistry);
+                // Recreate the configuration
+                createConfiguration();
+            }
+
+            this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
+            this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
+
+            // Create a new session factory
+            this.sessionFactory = this.configuration.buildSessionFactory(this.standardServiceRegistry);
+        } finally {
+            this.lock.writeLock().unlock();
+        }
     }
 
     private void disposeInternal()
@@ -424,14 +456,12 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public DatabaseProduct getDatabaseProductName()
     {
-        DatabaseProduct product = this.databaseProductCache;
-
-        if (product == DatabaseProduct.UNKNOWN) {
-            if (this.sessionFactory != null) {
+        if (this.databaseProductCache == DatabaseProduct.UNKNOWN) {
+            if (getSessionFactory() != null) {
                 DatabaseMetaData metaData = getDatabaseMetaData();
                 if (metaData != null) {
                     try {
-                        product = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
+                        this.databaseProductCache = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
                     } catch (SQLException ignored) {
                         // do not care, return UNKNOWN
                     }
@@ -441,15 +471,21 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             } else {
                 // Not initialized yet so we can't use the actual database product, try to deduce it from the configured
                 // driver
-                String driverClassName = this.configuration.getProperty("hibernate.connection.driver_class");
-                if (driverClassName == null) {
-                    driverClassName = this.configuration.getProperty("connection.driver_class");
+                String connectionURL = this.configuration.getProperty("hibernate.connection.url");
+                if (connectionURL == null) {
+                    connectionURL = this.configuration.getProperty("connection.url");
                 }
-                product = DRIVER_MAPPING.getOrDefault(driverClassName, DatabaseProduct.UNKNOWN);
+                this.databaseProductCache = DatabaseProduct.toProduct(extractJDBCConnectionURLScheme(connectionURL));
             }
         }
 
-        return product;
+        return this.databaseProductCache;
+    }
+
+    private String extractJDBCConnectionURLScheme(String fullConnectionURL)
+    {
+        // Format of a JDBC URL is always: "jdbc:<db scheme>:..."
+        return StringUtils.split(fullConnectionURL, ':')[1];
     }
 
     /**
@@ -607,12 +643,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public Dialect getDialect()
     {
         if (this.dialect == null) {
-            if (this.sessionFactory instanceof SessionFactoryImplementor) {
-                this.dialect = ((SessionFactoryImplementor) this.sessionFactory).getJdbcServices().getDialect();
-            } else {
-                // TODO: there is probably a better fallback
-                this.dialect = Dialect.getDialect(getConfiguration().getProperties());
-            }
+            JdbcServices jdbcServices = this.standardServiceRegistry.getService(JdbcServices.class);
+            this.dialect = jdbcServices.getDialect();
         }
 
         return this.dialect;
@@ -670,7 +702,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             // close session with rollback to avoid further usage
             endTransaction(false);
 
-            Object[] args = { wikiId };
+            Object[] args = {wikiId};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while switching to database {0}",
                 e, args);
@@ -791,8 +823,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
         // Put back legacy feature to the Hibernate session
         if (session instanceof SessionImplementor) {
-            session = new LegacySessionImplementor((SessionImplementor) session,
-                this.loggerConfiguration);
+            session = new LegacySessionImplementor((SessionImplementor) session, this.loggerConfiguration);
         }
 
         setCurrentSession(session);
@@ -814,7 +845,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public SessionFactory getSessionFactory()
     {
-        return this.sessionFactory;
+        this.lock.readLock().lock();
+
+        try {
+            return this.sessionFactory;
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     /**
@@ -1069,7 +1106,21 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public void updateDatabase(Metadata metadata)
     {
-        new SchemaUpdate().execute(EnumSet.of(TargetType.DATABASE), metadata);
+        SchemaUpdate updater = new SchemaUpdate();
+        updater.execute(EnumSet.of(TargetType.DATABASE), metadata);
+
+        List<Exception> exceptions = updater.getExceptions();
+
+        if (exceptions.isEmpty()) {
+            return;
+        }
+
+        // Print the errors
+        for (Exception exception : exceptions) {
+            this.logger.error(exception.getMessage(), exception);
+        }
+
+        throw new HibernateException("Failed to update the database. See the log for all errors", exceptions.get(0));
     }
 
     /**
@@ -1104,12 +1155,47 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         String columnName = null;
 
         if (propertyName != null) {
-            Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
-            columnName = column.getName();
+            // FIXME: remove when https://hibernate.atlassian.net/browse/HHH-14627
+            // (org.hibernate.mapping.PersistentClass#getProperty does not support composite ids) is fixed
+            KeyValue identifier = persistentClass.getIdentifier();
+            if (identifier instanceof org.hibernate.mapping.Component) {
+                Iterator<Property> it = ((org.hibernate.mapping.Component) identifier).getPropertyIterator();
 
-            if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
-                columnName = columnName.toLowerCase();
+                while (it.hasNext()) {
+                    Property property = it.next();
+
+                    if (property.getName().equals(propertyName)) {
+                        return getConfiguredColumnName(property);
+                    }
+                }
             }
+
+            return getConfiguredColumnName(persistentClass.getProperty(propertyName));
+        }
+
+        return columnName;
+    }
+
+    /**
+     * @since 13.4
+     * @since 12.10.8
+     */
+    public String getConfiguredColumnName(Property property)
+    {
+        Column column = (Column) property.getColumnIterator().next();
+
+        return getConfiguredColumnName(column);
+    }
+
+    /**
+     * @since 13.2RC1
+     */
+    public String getConfiguredColumnName(Column column)
+    {
+        String columnName = column.getName();
+
+        if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
+            columnName = columnName.toLowerCase();
         }
 
         return columnName;
@@ -1120,7 +1206,15 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public String getConfiguredTableName(PersistentClass persistentClass)
     {
-        String tableName = persistentClass.getTable().getName();
+        return getConfiguredTableName(persistentClass.getTable());
+    }
+
+    /**
+     * @since 13.2
+     */
+    public String getConfiguredTableName(Table table)
+    {
+        String tableName = table.getName();
         // HSQLDB and Oracle needs to use uppercase table name to retrieve the value.
         if (getDatabaseProductName() == DatabaseProduct.HSQLDB || getDatabaseProductName() == DatabaseProduct.ORACLE) {
             tableName = tableName.toUpperCase();

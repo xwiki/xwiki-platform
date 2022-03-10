@@ -133,7 +133,10 @@ public class JCaptchaResourceReferenceHandlerTest
 
         AudioInputStream audioInputStream = mock(AudioInputStream.class);
         when(soundCaptchaService.getSoundChallengeForID(SESSION_ID, LOCALE)).thenReturn(audioInputStream);
-        when(audioInputStream.getFormat()).thenReturn(mock(AudioFormat.class));
+        AudioFormat audioFormat = mock(AudioFormat.class);
+        // Specifying a random encoding format as we don't care what encoding is used.
+        when(audioFormat.getEncoding()).thenReturn(AudioFormat.Encoding.PCM_SIGNED);
+        when(audioInputStream.getFormat()).thenReturn(audioFormat);
 
         JCaptchaResourceReference jCaptchaResourceReference =
             new JCaptchaResourceReference("sound", "customSoundEngine");

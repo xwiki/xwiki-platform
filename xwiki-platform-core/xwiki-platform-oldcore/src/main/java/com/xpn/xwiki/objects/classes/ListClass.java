@@ -35,6 +35,7 @@ import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 import org.xwiki.xml.XMLUtils;
 
@@ -341,6 +342,8 @@ public abstract class ListClass extends PropertyClass
         // flag to know if previous character was a separator, since we skip values when separators are concatenated:
         // e.g. a|b <=> a||b <=> a|||b
         boolean previousWasSeparator = false;
+
+        Character previousSeparator = null;
         StringBuilder currentValue = new StringBuilder();
         for (int i = 0; i < value.length(); i++) {
             char currentChar = value.charAt(i);
@@ -365,6 +368,13 @@ public abstract class ListClass extends PropertyClass
             // if the current character is a separator and previous value was already a separator then we are in a case
             // of separator concatenation: we just skip them.
             } else if (StringUtils.containsAny(separators, currentChar) && previousWasSeparator) {
+                // in case of two consecutive identical characters different than a whitespace, then it means
+                // we want to record an empty value.
+                if (!inEscape && currentChar == previousSeparator && !StringUtils.isWhitespace(currentChar + "")) {
+                    list.add("");
+                    previousWasSeparator = false;
+                }
+                previousSeparator = currentChar;
                 continue;
             // if we are finding a separator and we are not in escape mode, then we finished to parse one value
             // we are adding the value to the result, and start a new value to parse
@@ -373,11 +383,13 @@ public abstract class ListClass extends PropertyClass
                 currentValue = new StringBuilder();
                 inMapValue = false;
                 previousWasSeparator = true;
+                previousSeparator = currentChar;
             // then if we are finding a separator we need to output the separator and leave the escape mode
             } else if (StringUtils.containsAny(separators, currentChar)) {
                 currentValue.append(currentChar);
                 inEscape = false;
                 previousWasSeparator = false;
+                previousSeparator = currentChar;
             // finally if we are still in escape mode: we are actually escaping a normal character,
             // we still output the escape for backward compatibility reason, and leave the escape mode
             } else if (inEscape) {
@@ -628,8 +640,10 @@ public abstract class ListClass extends PropertyClass
      * @param map The value=name mapping specified in the "values" parameter of the property.
      * @param context The request context.
      * @return The text that should be displayed, representing a human-understandable name for the internal value.
+     * @since 13.10RC1
      */
-    protected String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
+    @Unstable
+    public String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
     {
         return getDisplayValue(value, name, map, value, context);
     }
@@ -724,25 +738,24 @@ public abstract class ListClass extends PropertyClass
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        List<String> selectlist;
-        String separator = getSeparator();
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        Map<String, ListItem> map = getMap(context);
 
         // Skip unset values.
         if (prop == null) {
             return;
         }
 
+        Map<String, ListItem> map = getMap(context);
         if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+            String separator = getSeparator();
+            List<String> selectlist = ((ListProperty) prop).getList();
             List<String> newlist = new ArrayList<>();
             for (String value : selectlist) {
-                newlist.add(getDisplayValue(value, name, map, context));
+                newlist.add(XMLUtils.escapeElementText(getDisplayValue(value, name, map, context)));
             }
             buffer.append(StringUtils.join(newlist, separator));
         } else {
-            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
+            buffer.append(XMLUtils.escapeElementText(getDisplayValue(prop.getValue(), name, map, context)));
         }
     }
 

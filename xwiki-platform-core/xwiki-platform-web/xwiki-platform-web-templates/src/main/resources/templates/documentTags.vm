@@ -1,0 +1,139 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#template("xwikivars.vm")
+#set($tagsId = 'xdocTags')
+#set($tagErrorMessage = '')
+#set($xredirect = $escapetool.url($doc.getURL('view', "#${tagsId}")))
+##
+##
+##
+#macro(displayTag $tag)
+<span class="tag-wrapper"><span class="tag"><a href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;tag=$!{escapetool.url($tag)}")">$!{escapetool.xml($tag)}</a></span>#if($hasedit)<span class="separator">[</span><a href="$doc.getURL('view', "xpage=documentTags&amp;xaction=delete&amp;tag=$!{escapetool.url($tag)}&amp;xredirect=${xredirect}")" class="tag-tool tag-delete" title="$services.localization.render('core.tags.remove.tooltip')">X</a><span class="separator">]</span>#end</span>
+#end
+##
+#macro(removeTag $tag)
+    #if($xwiki.tag)
+        #set($result = $xwiki.tag.removeTagFromDocument($tag, $doc.fullName))
+        #if($result == 'OK' && "$!{request.ajax}" != '')
+            $response.setStatus(200)
+            #set($responseMessage = 'OK')
+        #elseif($result == 'NO_EFFECT')
+            $response.setStatus(409)
+            #set($responseMessage = $services.localization.render('core.tags.remove.error.notFound', [$tag]))
+        #elseif($result == 'NOT_ALLOWED')
+            $response.setStatus(403)
+            #set($responseMessage = $services.localization.render('core.tags.remove.error.notAllowed', [$tag]))
+        #elseif($result == 'FAILED')
+            $response.setStatus(500)
+            #set($responseMessage = $services.localization.render('core.tags.remove.error.failed', [$tag]))
+        #end
+        #if("$!{request.ajax}" != '')
+            $!responseMessage
+        #elseif("$!{request.xredirect}" != '')
+            $response.sendRedirect($request.xredirect)
+        #end
+    #else
+        ## TODO
+    #end
+#end
+##
+#macro(addTag $tag)
+    #if($xwiki.tag)
+        #set($oldTags = $xwiki.tag.getTagsFromDocument($doc.fullName))
+        #set($result = $xwiki.tag.addTagsToDocument($tag, $doc.fullName))
+        #if($result == 'OK' && "$!{request.ajax}" != '')
+            #set($newTags = $xwiki.tag.getTagsFromDocument($doc.fullName))
+            #set($discard = $newTags.removeAll($oldTags))
+            #foreach($t in $newTags)
+                #if($t != '' && !$oldTags.contains($t))
+                    #displayTag($t)
+                #end
+            #end
+        #elseif($result == 'NO_EFFECT')
+            $response.setStatus(409)
+            #set($tagErrorMessage = $services.localization.render('core.tags.add.error.alreadySet', [$tag]))
+        #elseif($result == 'NOT_ALLOWED')
+            $response.setStatus(403)
+            #set($tagErrorMessage = $services.localization.render('core.tags.add.error.notAllowed', [$tag]))
+        #elseif($result == 'FAILED')
+            $response.setStatus(500)
+            #set($tagErrorMessage = $services.localization.render('core.tags.add.error.failed', [$tag]))
+        #end
+        #if("$!{request.ajax}" != '')
+            $tagErrorMessage
+        #elseif("$!{request.xredirect}" != '')
+            $response.sendRedirect($request.xredirect)
+        #end
+    #else
+        ## TODO
+    #end
+#end
+##
+#macro(displayAddForm)
+<form action="$doc.getURL('view', "xpage=documentTags&amp;xaction=add&amp;xredirect=${xredirect}")" method="post" class="tag-add-form">
+  <div>
+      ## CSRF prevention
+    <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
+    <label for="tag">$services.localization.render('core.tags.add.label')<br/>
+      <input class="input-tag" type="text" id="tag" name="tag" autocomplete="off"/></label><br/>
+    <span class="buttonwrapper"><input class="button button-add-tag" type="submit" value="$services.localization.render('core.tags.add.submit')"/></span>
+    <span class="buttonwrapper"><a class="button button-add-tag-cancel" href="$doc.getURL('view', "#${tagsId}")">$services.localization.render('core.tags.add.cancel')</a></span>
+  </div>
+</form>
+#end
+##
+#set($xaction = "$!{request.xaction}")
+#if("$!{request.showTagAddForm}" == 'true' && "$!{request.ajax}" == '1')
+    #displayAddForm()
+#elseif($xaction == 'delete')
+    #removeTag($request.tag)
+#elseif($xaction == 'add')
+    #addTag($request.tag)
+#else ## display
+    $xwiki.ssfx.use('uicomponents/viewers/tags.css', {'forceSkinAction': true, 'colorTheme': "$!{themeDocFullName}"})##
+    $xwiki.jsfx.use('uicomponents/viewers/tags.js', true)##
+<div class="doc-tags" id="${tagsId}">
+    #if($xwiki.tag)
+        #set($hasTagsPlugin = true)
+        #set($tags = $xwiki.tag.getTagsFromDocument($doc.fullName))
+    #else
+        #set($hasTagsPlugin = false)
+        #set($tags = $doc.getTagList())
+    #end
+    ##   #if($!tags.size() == 0)
+    ##     No tags
+    ##   #else
+    $services.localization.render('core.tags.list.label')
+    #foreach($tag in $tags)
+        #displayTag($tag)
+    #end
+    ##   #end
+    #if($hasedit)
+        #if($xwiki.tag)
+          <div class="tag-tool tag-add">#if("$!{request.showTagAddForm}" == '')<a href="$doc.getURL('view', "showTagAddForm=true&amp;$!{escapetool.url(${request.queryString})}#${tagsId}")" title="$services.localization.render('core.tags.add.tooltip')" rel="nofollow">[+]</a>#else #displayAddForm()#end</div>
+        #else
+            ## TODO
+        #end
+    #end
+</div>
+    #if($tagErrorMessage != '')
+        #error($tagErrorMessage)
+    #end
+#end

@@ -407,6 +407,15 @@ public class WikiManagerScriptService implements ScriptService
     }
 
     /**
+     * @return the reference of the current wiki.
+     * @since 12.7RC1
+     */
+    public WikiReference getCurrentWikiReference()
+    {
+        return wikiDescriptorManager.getCurrentWikiReference();
+    }
+
+    /**
      * @return the descriptor of the current wiki
      */
     public WikiDescriptor getCurrentWikiDescriptor()

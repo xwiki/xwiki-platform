@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -40,5 +40,4 @@
 admin.syntaxes.description=기본 페이지 구문을 선택하고 사용 가능한 마크업 구문을 구성하십시오.
 Rendering.RenderingConfigClass_disabledSyntaxes=사용할 수 없는 구문
 Rendering.RenderingConfigClass_disabledSyntaxes.hint=페이지를 쓸 수 없는 마크업 구문 목록</content>
-  
 </xwikidoc>

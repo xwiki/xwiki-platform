@@ -25,7 +25,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.jodconverter.office.LocalOfficeUtils;
+import org.jodconverter.local.office.LocalOfficeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -70,7 +70,7 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     /**
      * @see OfficeServerConfiguration#getTaskExecutionTimeout()
      */
-    private static final long DEFAULT_TASK_EXECUTION_TIMEOUT = 30000L;
+    private static final long DEFAULT_TASK_EXECUTION_TIMEOUT = 60000L;
 
     /**
      * @see OfficeServerConfiguration#getHomePath()

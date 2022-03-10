@@ -116,7 +116,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
             <input type="radio" name="rev2" id="rev2_$version" value="$version"/>
           </td>
         #end
-        #set ($_versionURL = $tdoc.getURL('viewrev', $escapetool.url({'rev' : $version})))
+        #set ($_versionURL = $tdoc.getURL('view', $escapetool.url({'rev' : $version})))
         <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))" colspan="4">$services.localization.render('core.viewers.history.extension.label', ["<a href='$_versionURL'>", '</a>', "<strong>", $escapetool.xml($documentExtension.name), $escapetool.xml($documentExtension.id.version), '</strong>'])</td>
         #if ($hasEdit || $hasAdmin)
           #set ($_rollbackURL = $tdoc.getURL('rollback', "form_token=$!{services.csrf.getToken()}&amp;rev=${escapetool.url($version)}$lang"))
@@ -145,7 +145,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
         <input type="radio" name="rev2" id="rev2_$version" value="$version" #if ($foreach.count==1) checked="checked" #end/>
       </td>
     #end
-    <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))"><a href="$tdoc.getURL('viewrev',"rev=$version")">$version</a></td>
+    <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))"><a href="$tdoc.getURL('view',"rev=$version")">$version</a></td>
     <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.author'))">$xwiki.getUserName($revinfo.author)</td>
     <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.date'))">$xwiki.formatDate($revinfo.date)</td>
     #if ($xwiki.hasEditComment())

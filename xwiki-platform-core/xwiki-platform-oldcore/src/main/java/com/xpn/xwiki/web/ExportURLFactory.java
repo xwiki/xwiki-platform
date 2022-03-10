@@ -55,6 +55,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.LegacySpaceResolver;
+import com.xpn.xwiki.internal.web.LegacyAction;
 
 /**
  * Handle URL generation in rendered wiki pages. This implementation makes sure that generated URLs will be file URLs
@@ -69,8 +70,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * Logging tool.
      */
     protected static final Logger LOGGER = LoggerFactory.getLogger(ExportURLFactory.class);
-
-    private static final SkinAction SKINACTION = new SkinAction();
 
     // TODO: use real css parser
     private static Pattern CSSIMPORT = Pattern.compile("^\\s*@import\\s*\"(.*)\"\\s*;$", Pattern.MULTILINE);
@@ -361,7 +360,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
         XWikiDocument.backupContext(backup, context);
         try {
             dummyDocument.setAsContextDoc(context);
-            SKINACTION.render(path, context);
+            SkinAction skinAction = (SkinAction) Utils.getComponent(LegacyAction.class, "skin");
+            skinAction.render(path, context);
         } finally {
             XWikiDocument.restoreContext(backup, context);
         }

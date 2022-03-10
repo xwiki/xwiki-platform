@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>14.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-ui</artifactId>
   <name>XWiki Platform - Test - UI Tests Framework</name>
@@ -44,6 +44,10 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-integration</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
@@ -67,7 +71,7 @@
     <dependency>
       <groupId>io.github.bonigarcia</groupId>
       <artifactId>webdrivermanager</artifactId>
-      <version>3.7.1</version>
+      <version>5.0.3</version>
     </dependency>
     <!-- Used to build support for phantomjs -->
     <dependency>
@@ -75,6 +79,11 @@
       <artifactId>arquillian-phantom-driver</artifactId>
       <version>1.1.3.Final</version>
       <optional>true</optional>
+    </dependency>
+    <!-- Used by the REST calls -->
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
     </dependency>
   </dependencies>
   <build>

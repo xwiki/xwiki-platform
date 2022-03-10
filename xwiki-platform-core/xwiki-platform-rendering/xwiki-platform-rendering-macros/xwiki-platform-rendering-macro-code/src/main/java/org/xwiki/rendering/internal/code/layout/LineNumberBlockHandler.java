@@ -58,7 +58,7 @@ public class LineNumberBlockHandler implements CodeLayoutHandler
             lineCount++;
         }
 
-        List<Block> lineBlocks = new ArrayList<Block>(lineCount * 2);
+        List<Block> lineBlocks = new ArrayList<>(lineCount * 2);
         for (int i = 0; i < lineCount; i++) {
             lineBlocks.add(new WordBlock(Integer.toString(i + 1)));
             lineBlocks.add(new NewLineBlock());
@@ -70,7 +70,7 @@ public class LineNumberBlockHandler implements CodeLayoutHandler
         GroupBlock wrapper = new GroupBlock(Arrays.asList(lineNumbers, codeBlocks));
         setClassParameter(wrapper, "linenoswrapper");
 
-        return Arrays.<Block>asList(wrapper);
+        return Arrays.asList(wrapper);
     }
     
     private void setClassParameter(Block block, String value)

@@ -72,19 +72,21 @@ public class NormalUserConfigurationSourceAuthorization extends AbstractDocument
     {
         boolean hasAccess;
 
-        // Check: Verify that the last author of the current document has the permissions. This is to protect against
-        // some "honeypot" attack where you'd have someone without the proper permission (but still having edit rights
-        // on a page) to write a script that calls the configuration API and then waiting for someone with the proper
-        // permissions to view the page, thus making the configuration calls work.
         XWikiContext xcontext = this.contextProvider.get();
+
+        // Check: Verify that the last author did not create some "honeypot" attack where you'd have someone without
+        // the proper permission (but still having edit rights on a page) to write a script that calls the configuration
+        // API and then waiting for someone with the proper permissions to view the page, thus making the configuration
+        // calls work.
         XWikiDocument currentDocument = xcontext.getDoc();
         if (currentDocument != null) {
-            DocumentReference lastAuthorDocumentReference = currentDocument.getAuthorReference();
+            DocumentReference lastAuthorDocumentReference = xcontext.getAuthorReference();
             DocumentReference originalUserReference = this.documentAccessBridge.getCurrentUserReference();
             try {
                 // Note: The userReference passed is the reference to the user for which we're retrieving or setting
                 // the configuration properties. Thus we set it as the current user so that the call to
-                // super.hasAccess() checks the permissions of the last author of current doc on that user's document.
+                // super.hasAccess() checks the permissions of the last author of current doc on that user's
+                // document.
                 xcontext.setUserReference(((DocumentUserReference) userReference).getReference());
                 hasAccess = super.hasAccess(key, this.documentResolver.resolve(lastAuthorDocumentReference), right);
             } finally {

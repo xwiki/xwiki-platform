@@ -59,7 +59,7 @@ public class DocumentStringUserReferenceSerializerTest
     void serialize()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "user");
-        DocumentUserReference documentUserReference = new DocumentUserReference(documentReference, null);
+        DocumentUserReference documentUserReference = new DocumentUserReference(documentReference, true);
 
         this.serializer.serialize(documentUserReference);
 
@@ -93,7 +93,7 @@ public class DocumentStringUserReferenceSerializerTest
     }
 
     @Test
-    void serializeCurrentUserReference()
+    void serializeCurrentUserReferenceWhenCurrentUserExists()
     {
         DocumentUserReference userReference = mock(DocumentUserReference.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "user");
@@ -102,5 +102,13 @@ public class DocumentStringUserReferenceSerializerTest
         when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:space.user");
 
         assertEquals("wiki:space.user", this.serializer.serialize(CurrentUserReference.INSTANCE));
+    }
+
+    @Test
+    void serializeCurrentUserReferenceWhenNoCurrentUser()
+    {
+        when(this.currentUserReferenceUserReferenceResolver.resolve(null)).thenReturn(GuestUserReference.INSTANCE);
+
+        assertEquals("XWiki.XWikiGuest", this.serializer.serialize(CurrentUserReference.INSTANCE));
     }
 }

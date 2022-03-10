@@ -19,25 +19,25 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
 /**
@@ -46,17 +46,18 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @AllComponents
-public class WikiMacrosTest
+@OldcoreTest
+class WikiMacrosTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private XWikiDocument macroDocument;
 
     private BaseObject macroObject;
 
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    void before() throws Exception
     {
         this.macroDocument = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
         this.macroDocument.setSyntax(Syntax.XWIKI_2_0);
@@ -85,7 +86,7 @@ public class WikiMacrosTest
     }
 
     @Test
-    public void testSaveWikiMacro() throws Exception
+    void saveWikiMacro() throws Exception
     {
         when(this.oldcore.getMockAuthorizationManager().hasAccess(any(), any(), any())).thenReturn(true);
 
@@ -96,18 +97,18 @@ public class WikiMacrosTest
 
         Macro testMacro = getWikiComponentManager().getInstance(Macro.class, "macroid");
 
-        Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
+        assertEquals("macroid", testMacro.getDescriptor().getId().getId());
 
-        try {
-            testMacro = this.oldcore.getMocker().getInstance(Macro.class, "macroid");
-
-            Assert.fail("Found macro with wiki visibility in global componenet manager");
-        } catch (ComponentLookupException expected) {
-        }
+        // Verify that the macro is not in the global component manager (only in the wiki one).
+        Throwable exception = assertThrows(ComponentLookupException.class, () -> {
+            this.oldcore.getMocker().getInstance(Macro.class, "macroid");
+        });
+        assertEquals("Can't find descriptor for the component with type [interface org.xwiki.rendering.macro.Macro] "
+            + "and hint [macroid]", exception.getMessage());
     }
 
     @Test
-    public void testUnRegisterWikiMacroWithDifferentVisibilityKeys() throws Exception
+    void unRegisterWikiMacroWithDifferentVisibilityKeys() throws Exception
     {
         when(this.oldcore.getMockRightService().hasAccessLevel(any(String.class), any(String.class), any(String.class), any(XWikiContext.class))).thenReturn(true);
 
@@ -124,7 +125,7 @@ public class WikiMacrosTest
         this.oldcore.getXWikiContext().setUserReference(user1);
         Macro testMacro = getUserComponentManager().getInstance(Macro.class, "macroid");
 
-        Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
+        assertEquals("macroid", testMacro.getDescriptor().getId().getId());
 
         // register with another user
 
@@ -139,16 +140,16 @@ public class WikiMacrosTest
         this.oldcore.getXWikiContext().setUserReference(user2);
         testMacro = getUserComponentManager().getInstance(Macro.class, "macroid");
 
-        Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
+        assertEquals("macroid", testMacro.getDescriptor().getId().getId());
 
         // validate that the macro as been properly unregistered for former user
         this.oldcore.getXWikiContext().setUserReference(user1);
 
-        try {
-            testMacro = getUserComponentManager().getInstance(Macro.class, "macroid");
-
-            Assert.fail("The macro has not been properly unregistered");
-        } catch (ComponentLookupException expected) {
-        }
+        // Verify that the macro has been properly unregistered from the user CM
+        Throwable exception = assertThrows(ComponentLookupException.class, () -> {
+            getUserComponentManager().getInstance(Macro.class, "macroid");
+        });
+        assertEquals("Can't find descriptor for the component with type [interface org.xwiki.rendering.macro.Macro] "
+            + "and hint [macroid]", exception.getMessage());
     }
 }

@@ -26,6 +26,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.ScriptXWikiServletRequest;
 import com.xpn.xwiki.util.Programming;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -40,6 +41,11 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 public class Context extends Api
 {
+    /**
+     * The key used to store the display mode on the context.
+     */
+    private static final String DISPLAY_MODE = "display";
+
     /**
      * The Constructor.
      *
@@ -58,7 +64,7 @@ public class Context extends Api
      */
     public XWikiRequest getRequest()
     {
-        return getXWikiContext().getRequest();
+        return new ScriptXWikiServletRequest(getXWikiContext().getRequest(), getContextualAuthorizationManager());
     }
 
     /**
@@ -75,7 +81,8 @@ public class Context extends Api
     /**
      * Specifies the container or environment in which XWiki is currently running. See the following table for possible
      * values it can return:
-     * <table summary="Return values">
+     * <table>
+     * <caption>Return values</caption>
      * <thead>
      * <tr>
      * <th>Return</th>
@@ -586,7 +593,21 @@ public class Context extends Api
      */
     public void setDisplayMode(String mode)
     {
-        getXWikiContext().put("display", mode);
+        getXWikiContext().put(DISPLAY_MODE, mode);
+    }
+
+    /**
+     * Returns the default field display mode, when using {@link Document#display(String)} or
+     * {@link Document#display(String, Object)}.
+     *
+     * @return the display mode, one of "view", "edit", "hidden", "search" or "rendered"
+     * @since 13.4.7
+     * @since 13.10.3
+     * @since 14.0-rc-1
+     */
+    public String getDisplayMode()
+    {
+        return (String) getXWikiContext().get(DISPLAY_MODE);
     }
 
     /**

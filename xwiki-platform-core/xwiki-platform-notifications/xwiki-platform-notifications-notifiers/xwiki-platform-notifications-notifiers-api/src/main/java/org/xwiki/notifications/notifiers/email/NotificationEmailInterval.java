@@ -19,15 +19,14 @@
  */
 package org.xwiki.notifications.notifiers.email;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Several intervals to get notified by emails.
  *
  * @version $Id$
  * @since 9.5RC1
+ * @deprecated since 12.6, use {@link org.xwiki.notifications.preferences.NotificationEmailInterval} instead
  */
-@Unstable
+@Deprecated
 public enum NotificationEmailInterval
 {
     /**
@@ -46,6 +45,7 @@ public enum NotificationEmailInterval
     WEEKLY,
     /**
      * Receive an e-mail when a notification is triggered in the wiki.
+     * 
      * @since 9.6RC1
      */
     LIVE

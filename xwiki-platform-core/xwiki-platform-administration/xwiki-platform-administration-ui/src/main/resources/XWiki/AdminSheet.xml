@@ -274,7 +274,9 @@
     &lt;div class="panel xform"&gt;
       &lt;label for="adminsearchmenu" class="hidden"&gt;$services.localization.render('search')&lt;/label&gt;
       &lt;input type="text" class="form-control panel-group-filter" autocomplete="off" id="adminsearchmenu"
-        placeholder="$escapetool.xml($services.localization.render('administration.menu.search.hint'))" /&gt;
+        placeholder="$escapetool.xml($services.localization.render('administration.menu.search.hint'))"
+        ## Disable the search input initially until the JavaScript code that handles the search is ready.
+        disabled="disabled" /&gt;
     &lt;/div&gt;
     #foreach ($item in $menu)
       #verticalNavigationItem($item $options)
@@ -689,6 +691,8 @@
   $(document).on('click', '.admin-menu a.panel-heading', function(event) {
     event.preventDefault();
   });
+  // Mark the administration menu as ready for user interaction.
+  $('.admin-menu').attr('data-ready', true);
 });
 
 /**
@@ -710,7 +714,7 @@ require(['jquery'], function($) {
     // Filter the categories.
     panelGroup.find('a.panel-heading').each(function() {
       var panel = $(this).closest('.panel');
-      var hasVisibleSections = panel.find('.list-group-item').not('.hidden').size() &gt; 0;
+      var hasVisibleSections = panel.find('.list-group-item').not('.hidden').length &gt; 0;
       var matchesFilterQuery = !filterItem.call($(this), text);
       panel.toggle(hasVisibleSections || matchesFilterQuery);
       if (!hasVisibleSections &amp;&amp; matchesFilterQuery) {
@@ -734,7 +738,7 @@ require(['jquery'], function($) {
         .next('.panel-collapse').addClass('in').css('height', '');
     }
     // Show/Hide the "No results." message.
-    var hasVisibleCategories = panelGroup.find('a.panel-heading').filter(':visible').size() &gt; 0;
+    var hasVisibleCategories = panelGroup.find('a.panel-heading').filter(':visible').length &gt; 0;
     panelGroup.find('.noitems').toggleClass('hidden', hasVisibleCategories);
   };
 
@@ -745,8 +749,10 @@ require(['jquery'], function($) {
     var panelGroup = $(this).closest('.panel-group');
     var text = $(this).val().toLowerCase();
     // Schedule a new filter operation.
-    timeoutId = setTimeout($.proxy(filterPanelGroup, panelGroup, text), 500);
-  });
+    timeoutId = setTimeout(filterPanelGroup.bind(panelGroup, text), 500);
+
+  // Finally, enable the search input.
+  }).prop('disabled', false);
 });</code>
     </property>
     <property>

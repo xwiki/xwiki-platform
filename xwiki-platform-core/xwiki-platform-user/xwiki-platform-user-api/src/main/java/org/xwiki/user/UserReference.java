@@ -19,7 +19,7 @@
  */
 package org.xwiki.user;
 
-import org.xwiki.stability.Unstable;
+import java.io.Serializable;
 
 /**
  * Abstracts the concept of User reference. This allows to support several store implementations for users.
@@ -30,8 +30,7 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
-public interface UserReference
+public interface UserReference extends Serializable
 {
     /**
      * @return true if this reference points to a global user

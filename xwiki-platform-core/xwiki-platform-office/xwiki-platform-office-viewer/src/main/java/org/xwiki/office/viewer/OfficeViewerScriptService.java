@@ -46,7 +46,7 @@ public interface OfficeViewerScriptService extends ScriptService
      * Builds a XHTML representation of the specified office attachment.
      * 
      * @param attachmentReference reference to the office attachment to be viewed
-     * @param parameters view parameters specific to the underlying {@link OfficeViewer} implementation
+     * @param parameters view parameters specific to the underlying {@link OfficeResourceViewer} implementation
      * @return a XHTML representation of the specified office attachment or {@code null} if an error occurs
      */
     String view(AttachmentReference attachmentReference, Map<String, String> parameters);

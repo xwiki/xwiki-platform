@@ -19,12 +19,10 @@
  */
 package org.xwiki.test.ui;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.logging.Level;
 
 import org.openqa.selenium.By;
@@ -50,8 +48,6 @@ import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Wraps a {@link org.openqa.selenium.WebDriver} instance and adds new APIs useful for XWiki tests.
@@ -61,8 +57,6 @@ import org.slf4j.LoggerFactory;
  */
 public class XWikiWebDriver extends RemoteWebDriver
 {
-    private final static Logger LOGGER = LoggerFactory.getLogger(XWikiWebDriver.class);
-
     private RemoteWebDriver wrappedDriver;
 
     /**
@@ -230,31 +224,7 @@ public class XWikiWebDriver extends RemoteWebDriver
         manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         Wait<WebDriver> wait = new WebDriverWait(this, getTimeout());
         try {
-            // Handle both Selenium 2 and Selenium 3
-            try {
-                Method method = WebDriverWait.class.getMethod("until", Function.class);
-                // We're in Selenium3, it requires a java Function passed to the wait
-                try {
-                    method.invoke(wait, new Function<WebDriver, T>()
-                    {
-                        @Override public T apply(WebDriver webDriver)
-                        {
-                            return condition.apply(webDriver);
-                        }
-                    });
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException("Error converting to selenium3", e);
-                } catch (InvocationTargetException e) {
-                    if (e.getCause() instanceof RuntimeException) {
-                        throw (RuntimeException) e.getCause();
-                    } else {
-                        throw new RuntimeException("Failed to invoke 'until' method for Selenium3", e);
-                    }
-                }
-            } catch (NoSuchMethodException e) {
-                // We're in Selenium 2!
-                wait.until(condition);
-            }
+            wait.until(condition::apply);
         } finally {
             // Reset timeout
             setDriverImplicitWait();
@@ -356,49 +326,44 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementsAreVisible(final WebElement parentElement, final By[] locators, final boolean all)
     {
-        waitUntilCondition(new ExpectedCondition<WebElement>()
-        {
-            @Override
-            public WebElement apply(WebDriver driver)
-            {
-                WebElement element = null;
-                for (By locator : locators) {
-                    try {
-                        if (parentElement != null) {
-                            // Use the locator from the passed parent element.
-                            element = parentElement.findElement(locator);
-                        } else {
-                            // Use the locator from the root.
-                            element = driver.findElement(locator);
-                        }
-                    // We might obtain a StaleElementReferenceException in some edge cases when looking
-                    // for the same notifications several times for example.
-                    } catch (NotFoundException|StaleElementReferenceException e) {
-                        // This exception is caught by WebDriverWait
-                        // but it returns null which is not necessarily what we want.
-                        if (all) {
-                            return null;
-                        }
-                        continue;
+        waitUntilCondition(driver -> {
+            WebElement element = null;
+            for (By locator : locators) {
+                try {
+                    if (parentElement != null) {
+                        // Use the locator from the passed parent element.
+                        element = parentElement.findElement(locator);
+                    } else {
+                        // Use the locator from the root.
+                        element = driver.findElement(locator);
                     }
-                    // At this stage it's possible the element is no longer valid (for example if the DOM has
-                    // changed). If it's no longer attached to the DOM then consider we haven't found the element
-                    // yet.
-                    try {
-                        if (element.isDisplayed()) {
-                            if (!all) {
-                                return element;
-                            }
-                        } else if (all) {
-                            return null;
-                        }
-                    } catch (StaleElementReferenceException e) {
-                        // Consider we haven't found the element yet
+                // We might obtain a StaleElementReferenceException in some edge cases when looking
+                // for the same notifications several times for example.
+                } catch (NotFoundException|StaleElementReferenceException e) {
+                    // This exception is caught by WebDriverWait
+                    // but it returns null which is not necessarily what we want.
+                    if (all) {
                         return null;
                     }
+                    continue;
                 }
-                return element;
+                // At this stage it's possible the element is no longer valid (for example if the DOM has
+                // changed). If it's no longer attached to the DOM then consider we haven't found the element
+                // yet.
+                try {
+                    if (element.isDisplayed()) {
+                        if (!all) {
+                            return element;
+                        }
+                    } else if (all) {
+                        return null;
+                    }
+                } catch (StaleElementReferenceException e) {
+                    // Consider we haven't found the element yet
+                    return null;
+                }
             }
+            return element;
         });
     }
 
@@ -420,29 +385,24 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementDisappears(final WebElement parentElement, final By locator)
     {
-        waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                try {
-                    WebElement element = null;
-                    // Note: Make sure to perform the find operation without waiting, since if the element is already
-                    // gone (what we really want here) there is no point to wait for it.
-                    if (parentElement != null) {
-                        // Use the locator from the passed parent element.
-                        element = findElementWithoutWaiting(parentElement, locator);
-                    } else {
-                        // Use the locator from the root.
-                        element = findElementWithoutWaiting(locator);
-                    }
-                    return !element.isDisplayed();
-                } catch (NotFoundException e) {
-                    return Boolean.TRUE;
-                } catch (StaleElementReferenceException e) {
-                    // The element was removed from DOM in the meantime
-                    return Boolean.TRUE;
+        waitUntilCondition(driver -> {
+            try {
+                WebElement element = null;
+                // Note: Make sure to perform the find operation without waiting, since if the element is already
+                // gone (what we really want here) there is no point to wait for it.
+                if (parentElement != null) {
+                    // Use the locator from the passed parent element.
+                    element = findElementWithoutWaiting(parentElement, locator);
+                } else {
+                    // Use the locator from the root.
+                    element = findElementWithoutWaiting(locator);
                 }
+                return !element.isDisplayed();
+            } catch (NotFoundException e) {
+                return Boolean.TRUE;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return Boolean.TRUE;
             }
         });
     }
@@ -472,20 +432,35 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementHasNonEmptyAttributeValue(final By locator, final String attributeName)
     {
-        waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                try {
-                    WebElement element = driver.findElement(locator);
-                    return !element.getAttribute(attributeName).isEmpty();
-                } catch (NotFoundException e) {
-                    return false;
-                } catch (StaleElementReferenceException e) {
-                    // The element was removed from DOM in the meantime
-                    return false;
-                }
+        waitUntilCondition(driver -> {
+            try {
+                WebElement element = driver.findElement(locator);
+                return !element.getAttribute(attributeName).isEmpty();
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Waits until the given element is enabled.
+     *
+     * @param element the element to wait on
+     * @since 12.9RC1
+     */
+    public void waitUntilElementIsEnabled(WebElement element)
+    {
+        waitUntilCondition(driver -> {
+            try {
+                return element.isEnabled();
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
             }
         });
     }
@@ -500,20 +475,15 @@ public class XWikiWebDriver extends RemoteWebDriver
     public void waitUntilElementHasAttributeValue(final By locator, final String attributeName,
         final String expectedValue)
     {
-        waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                try {
-                    WebElement element = driver.findElement(locator);
-                    return expectedValue.equals(element.getAttribute(attributeName));
-                } catch (NotFoundException e) {
-                    return false;
-                } catch (StaleElementReferenceException e) {
-                    // The element was removed from DOM in the meantime
-                    return false;
-                }
+        waitUntilCondition(driver -> {
+            try {
+                WebElement element = driver.findElement(locator);
+                return expectedValue.equals(element.getAttribute(attributeName));
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
             }
         });
     }
@@ -528,20 +498,15 @@ public class XWikiWebDriver extends RemoteWebDriver
     public void waitUntilElementEndsWithAttributeValue(final By locator, final String attributeName,
         final String expectedValue)
     {
-        waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                try {
-                    WebElement element = driver.findElement(locator);
-                    return element.getAttribute(attributeName).endsWith(expectedValue);
-                } catch (NotFoundException e) {
-                    return false;
-                } catch (StaleElementReferenceException e) {
-                    // The element was removed from DOM in the meantime
-                    return false;
-                }
+        waitUntilCondition(driver -> {
+            try {
+                WebElement element = driver.findElement(locator);
+                return element.getAttribute(attributeName).endsWith(expectedValue);
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
             }
         });
     }
@@ -578,14 +543,9 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementHasTextContent(final By locator, final String expectedValue)
     {
-        waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                WebElement element = driver.findElement(locator);
-                return Boolean.valueOf(expectedValue.equals(element.getText()));
-            }
+        waitUntilCondition(driver -> {
+            WebElement element = driver.findElement(locator);
+            return Boolean.valueOf(expectedValue.equals(element.getText()));
         });
     }
 
@@ -635,29 +595,27 @@ public class XWikiWebDriver extends RemoteWebDriver
     public void waitUntilJavascriptCondition(final String booleanExpression, final Object... arguments)
         throws IllegalArgumentException
     {
-        waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                boolean result = false;
+        waitUntilCondition(driver -> {
+            boolean result = false;
 
-                try {
-                    Object rawResult = executeJavascript(booleanExpression, arguments);
-                    if (rawResult instanceof Boolean) {
-                        result = (Boolean) rawResult;
-                    } else {
-                        throw new IllegalArgumentException("The executed javascript does not return a boolean value");
-                    }
-                } catch (JavascriptException e) {
-                    // We might obtain reference error when checking the presence of some properties during a wait.
-                    if (!e.getMessage().contains("ReferenceError")) {
-                        throw e;
-                    }
+            try {
+                Object rawResult = executeJavascript(booleanExpression, arguments);
+                if (rawResult instanceof Boolean) {
+                    result = (Boolean) rawResult;
+                } else {
+                    throw new IllegalArgumentException(String.format(
+                        "The executed javascript expression [%s] called with the arguments [%s] does not return a"
+                            + " boolean value [%s]",
+                        booleanExpression, Arrays.toString(arguments), rawResult));
                 }
-
-                return result;
+            } catch (JavascriptException e) {
+                // We might obtain reference error when checking the presence of some properties during a wait.
+                if (!e.getMessage().contains("ReferenceError")) {
+                    throw e;
+                }
             }
+
+            return result;
         });
     }
 
@@ -693,6 +651,26 @@ public class XWikiWebDriver extends RemoteWebDriver
     {
         executeScript("arguments[0].scrollIntoView();", element);
         return element;
+    }
+
+    /**
+     * Instantaneously scrolls to the given coordinates inside the web page. If you want to scroll to a specific {@link
+     * WebElement}, see {@link #scrollTo(WebElement)}.
+     *
+     * @param xCoord is the pixel along the horizontal axis of the web page that you want displayed in the upper
+     *     left
+     * @param yCoord is the pixel along the vertical axis of the web page that you want displayed in the upper left
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTo">MDN Web Docs -
+     *     Element.scrollTo()</a>
+     * @see #scrollTo(WebElement)
+     * @since 13.3RC1
+     * @since 12.10.7
+     */
+    public void scrollTo(int xCoord, int yCoord)
+    {
+        // This action is instantaneous, allowing to continue testing while knowing precisely the browser's view of the 
+        // web page.
+        executeScript(String.format("window.scrollTo(%d, %d)", xCoord, yCoord));
     }
 
     @Override
@@ -797,97 +775,97 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementById(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementById(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsById(String using)
     {
-        return this.wrappedDriver.findElementsById(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByLinkText(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByLinkText(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByLinkText(String using)
     {
-        return this.wrappedDriver.findElementsByLinkText(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByPartialLinkText(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByPartialLinkText(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByPartialLinkText(String using)
     {
-        return this.wrappedDriver.findElementsByPartialLinkText(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByTagName(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByTagName(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByTagName(String using)
     {
-        return this.wrappedDriver.findElementsByTagName(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByName(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByName(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByName(String using)
     {
-        return this.wrappedDriver.findElementsByName(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByClassName(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByClassName(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByClassName(String using)
     {
-        return this.wrappedDriver.findElementsByClassName(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByCssSelector(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByCssSelector(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByCssSelector(String using)
     {
-        return this.wrappedDriver.findElementsByCssSelector(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByXPath(String using)
     {
-        return this.scrollTo(this.wrappedDriver.findElementByXPath(using));
+        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByXPath(String using)
     {
-        return this.wrappedDriver.findElementsByXPath(using);
+        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
     }
 
     @Override
@@ -980,15 +958,10 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilPageIsReloaded()
     {
-        waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver input)
-            {
-                // Note: make sure we don't scroll since we're looking for an element that's not here anymore and
-                // thus it would produce a StaleElementException!
-                return !hasElementWithoutWaitingWithoutScrolling(By.id("pageNotYetReloadedMarker"));
-            }
+        waitUntilCondition(input -> {
+            // Note: make sure we don't scroll since we're looking for an element that's not here anymore and
+            // thus it would produce a StaleElementException!
+            return !hasElementWithoutWaitingWithoutScrolling(By.id("pageNotYetReloadedMarker"));
         });
     }
 

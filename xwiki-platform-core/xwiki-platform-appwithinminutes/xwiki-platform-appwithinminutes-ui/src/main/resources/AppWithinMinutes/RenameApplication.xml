@@ -101,6 +101,7 @@
     #renameAppPage($entry.value $newApp.codePages.get($entry.key) true)
   #end
   #updateAppClass($oldApp $newApp)
+  #updateAppSheet($oldApp $newApp)
   #updateAppTemplateProvider($oldApp $newApp)
   #updateAppTranslations($oldApp $newApp)
 #end
@@ -128,6 +129,18 @@
       #set ($discard = $metaData.set('dataSpaceName', $services.model.serialize($newApp.reference, 'local')))
     #end
     #set ($discard = $newClass.save('Update class after renaming app'))
+  #end
+#end
+
+#macro (updateAppSheet $oldApp $newApp)
+  #if ($xwiki.exists($newApp.codePages.sheetReference) &amp;&amp;
+      $services.security.authorization.hasAccess('edit', $newApp.codePages.sheetReference))
+    #set ($newSheet = $xwiki.getDocument($newApp.codePages.sheetReference))
+    ## Update the class reference used within the sheet content.
+    #set ($oldClassReference = $services.model.serialize($oldApp.codePages.classReference, 'local'))
+    #set ($newClassReference = $services.model.serialize($newApp.codePages.classReference, 'local'))
+    #set ($discard = $newSheet.setContent($newSheet.content.replace($oldClassReference, $newClassReference)))
+    #set ($discard = $newSheet.save('Update sheet after renaming app'))
   #end
 #end
 

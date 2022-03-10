@@ -32,6 +32,7 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -85,6 +86,9 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
 
     @MockComponent
     private ContentParser contentParser;
+
+    @MockComponent
+    private LoggerConfiguration loggerConfiguration;
 
     @InjectMockComponents
     private WikiUIExtensionComponentBuilder builder;

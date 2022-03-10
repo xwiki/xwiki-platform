@@ -1,5 +1,6 @@
 500:org.xwiki.rendering.internal.renderer.XWikiAttachmentURILabelGenerator
 500:org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator
+500:org.xwiki.rendering.internal.util.XWikiErrorBlockGenerator
 500:org.xwiki.rendering.internal.wiki.XWikiWikiModel
 org.xwiki.rendering.internal.resolver.AttachmentResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver
@@ -7,3 +8,4 @@ org.xwiki.rendering.internal.resolver.DocumentResourceReferenceEntityReferenceRe
 org.xwiki.rendering.internal.resolver.PageResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.internal.resolver.SpaceResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.script.RenderingScriptService
+org.xwiki.rendering.internal.parser.LinkParser

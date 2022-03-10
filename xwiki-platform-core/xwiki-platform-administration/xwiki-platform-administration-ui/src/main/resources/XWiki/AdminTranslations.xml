@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.AdminTranslations" locale="">
+<xwikidoc version="1.4" reference="XWiki.AdminTranslations" locale="">
   <web>XWiki</web>
   <name>AdminTranslations</name>
   <language/>
@@ -140,12 +140,36 @@ administration.section.users.deleteUser.newAuthor.hint=Select an user that has {
 administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
 administration.section.users.deleteUser.newAuthor.programming=programming
 administration.section.users.deleteUser.newAuthor.script=script
+admin.usersgroups.extensionrights=Extension Rights
 
 # Other Category
 admin.other=Other
 admin.other.description=Various configurations for extensions.
 administration.section.analytics.status=Status
 administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not
+
+# Social category
+admin.social=Social
+admin.social.description=Configuration for social features.
+
+# Configurable Class
+XWiki.ConfigurableClass_displayInSection=Display in section
+XWiki.ConfigurableClass_heading=Heading
+XWiki.ConfigurableClass_configurationClass=Configuration class
+XWiki.ConfigurableClass_linkPrefix=Link prefix
+XWiki.ConfigurableClass_propertiesToShow=Properties to show
+XWiki.ConfigurableClass_codeToExecute=Code to execute
+XWiki.ConfigurableClass_iconAttachment=Icon attachment
+XWiki.ConfigurableClass_displayInCategory=Display in category
+XWiki.ConfigurableClass_displayBeforeCategory=Display before category
+XWiki.ConfigurableClass_categoryIcon=Category icon
+XWiki.ConfigurableClass_scope=Scope
+XWiki.ConfigurableClass_scope_WIKI=Wiki
+XWiki.ConfigurableClass_scope_SPACE=Current space
+XWiki.ConfigurableClass_scope_ALL_SPACES=All spaces
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki and all spaces
+XWiki.ConfigurableClass_sectionOrder=Section order
+
 
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
@@ -178,6 +202,7 @@ administration.section.users.deleteUser.markDisabledMessage=Instead of deleting 
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

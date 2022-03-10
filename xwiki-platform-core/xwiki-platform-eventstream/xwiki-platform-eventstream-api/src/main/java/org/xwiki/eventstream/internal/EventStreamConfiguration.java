@@ -52,6 +52,6 @@ public class EventStreamConfiguration
      */
     public boolean isEventStoreEnabled()
     {
-        return this.configuration.getProperty("eventstream.store.enabled", false);
+        return this.configuration.getProperty("eventstream.store.enabled", true);
     }
 }

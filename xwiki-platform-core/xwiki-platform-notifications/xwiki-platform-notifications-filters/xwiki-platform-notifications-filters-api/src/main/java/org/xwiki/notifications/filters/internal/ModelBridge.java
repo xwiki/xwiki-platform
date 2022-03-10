@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +29,12 @@ import java.util.Set;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.stability.Unstable;
 
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
@@ -50,6 +53,21 @@ public interface ModelBridge
      * @throws NotificationException if an error happens
      */
     Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException;
+
+    /**
+     * Get all the notification preferences that corresponds to the given user.
+     *
+     * @param wikiReference the wiki from which we need to extract the preference
+     * @return a set of available filter preferences
+     * @throws NotificationException if an error happens
+     * @since 13.3RC1
+     */
+    @Unstable
+    default Set<NotificationFilterPreference> getFilterPreferences(WikiReference wikiReference)
+        throws NotificationException
+    {
+        return Collections.emptySet();
+    }
 
     /**
      * For all toggeable notification filters, get if the filter is enabled regarding the user profile.
@@ -72,6 +90,16 @@ public interface ModelBridge
     void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
 
     /**
+     * Delete a filter preference.
+     * @param wikiReference reference of the wiki concerned by the filter preference
+     * @param filterPreferenceId name of the filter preference
+     * @throws NotificationException if an error happens
+     *
+     * @since 13.3RC1
+     */
+    void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId) throws NotificationException;
+
+    /**
      * Enable or disable a filter preference.
      * @param user reference of the user concerned by the filter preference
      * @param filterPreferenceId name of the filter preference
@@ -84,6 +112,18 @@ public interface ModelBridge
             throws NotificationException;
 
     /**
+     * Enable or disable a filter preference.
+     * @param wikiReference reference of the wiki concerned by the filter preference
+     * @param filterPreferenceId name of the filter preference
+     * @param enabled either or not the filter preference should be enabled
+     * @throws NotificationException if an error happens
+     *
+     * @since 13.3RC1
+     */
+    void setFilterPreferenceEnabled(WikiReference wikiReference, String filterPreferenceId, boolean enabled)
+        throws NotificationException;
+
+    /**
      * Save a collection of NotificationFilterPreferences.
      * @param user reference of the user concerned by the filter preference
      * @param filterPreferences a list of NotificationFilterPreference
@@ -92,6 +132,17 @@ public interface ModelBridge
      * @since 9.8RC1
      */
     void saveFilterPreferences(DocumentReference user, Collection<NotificationFilterPreference> filterPreferences)
+        throws NotificationException;
+
+    /**
+     * Save a collection of NotificationFilterPreferences.
+     * @param wikiReference reference of the wiki concerned by the filter preference
+     * @param filterPreferences a list of NotificationFilterPreference
+     * @throws NotificationException if an error happens
+     *
+     * @since 13.3RC1
+     */
+    void saveFilterPreferences(WikiReference wikiReference, Collection<NotificationFilterPreference> filterPreferences)
         throws NotificationException;
 
     /**
@@ -123,4 +174,20 @@ public interface ModelBridge
     void createScopeFilterPreference(DocumentReference user, NotificationFilterType type,
             Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
             throws NotificationException;
+
+    /**
+     * Create a scope notification filter preference for the current user.
+     *
+     * @param wikiReference the wiki for which the preference will be created
+     * @param type type of the filter preference to create
+     * @param formats formats concerned by the preference
+     * @param eventTypes the event types concerned by the preference
+     * @param reference the reference of the wiki, the space or the page concerned by the preference
+     * @throws NotificationException if an error occurs
+     *
+     * @since 13.3RC1
+     */
+    void createScopeFilterPreference(WikiReference wikiReference, NotificationFilterType type,
+        Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
+        throws NotificationException;
 }

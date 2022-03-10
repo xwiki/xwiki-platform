@@ -124,9 +124,9 @@ platform.wiki.users.leave.confirmation.no=Нет
 platform.wiki.users.leave.success=Пользователь {0} {1} {2} успешно покинул вики {3} {4} {5}.
 platform.wiki.users.join.title=Присоединиться к Вики
 platform.wiki.users.leave.title=Покинуть Вики "{0}"
-platform.wiki.users.leave.empty=
+platform.wiki.users.leave.empty=Покинуть Вики
 platform.wiki.users.delete.title=Удалить Вики "{0}"
-platform.wiki.users.delete.empty=
+platform.wiki.users.delete.empty=Удалить Вики
 platform.wiki.users.invitation.reply.hint=Ответное сообщение для отправки, которое может просмотреть администратор вики, в котором вы можете мотивировать свое решение.
 platform.wiki.users.join.request.hint=Чтобы присоединиться к вики {0} {1} {2}, вы должны сначала отправить запрос на присоединение. После этого администратор вики рассмотрит и рассмотрит ваш запрос.
 platform.wiki.users.join.request.message.hint=Чтобы присоединиться к вики {0} {1} {2}, вы должны сначала отправить запрос на присоединение. После этого администратор вики рассмотрит и рассмотрит ваш запрос.
@@ -226,7 +226,6 @@ platform.wiki.create.wizard.step.dw=После нажатия на кнопку 
 platform.wiki.create.wizard.step.previous=Предыдущий шаг
 platform.wiki.create.wizard.step.next=Следующий шаг
 platform.wiki.create.wizard.step.create=Создать
-
 platform.wiki.create.wizard.step.creation=Создание вики
 platform.wiki.create.wizard.step.creation.wait=Пожалуйста, подождите, пока создается вики.
 platform.wiki.create.wizard.step.creation.complete=Вики {0} успешно создана. Теперь вы можете войти.
@@ -279,29 +278,30 @@ platform.wiki.sheet.aliases=Псевдоним - это другое назва�
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+platform.wiki.dependencies.applicationmanager.missing=Подключаемый модуль {0}Application Manager Plugin{1} не установлен. Пожалуйста, установите его и попробуйте еще раз.
 
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
+admin.wikis=Вики
 ### Missing: admin.wikis.template=Wiki Template
 
 #######################################
 ## until 7.0M2
 #######################################
-### Missing: platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
-### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+platform.wiki.create.wizard.step.provisioning=Система подготавливает вики.
+platform.wiki.create.wizard.step.provisioning.wait=Подождите, пока система инициализирует вики.
+platform.wiki.create.wizard.step.provisioning.complete=Вики почти готова. Пожалуйста, нажмите «Завершить», чтобы выполнить последнюю операцию.
+platform.wiki.create.wizard.step.provisioning.error=Вики {0} была создана, но некоторые страницы, содержащиеся в шаблоне, не были скопированы. Вам, вероятно, следует удалить их.
+platform.wiki.create.wizard.step.provisioning.finalize=Завершить
 
 #######################################
 ## until 9.5-rc-1
 #######################################
 platform.wiki.delete.confirmation.yes=Да, пожалуйста, удалите эту Вики!
-### Missing: platform.wiki.delete.confirmation.no=No, take me back!
+platform.wiki.delete.confirmation.no=Нет, верни назад!
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

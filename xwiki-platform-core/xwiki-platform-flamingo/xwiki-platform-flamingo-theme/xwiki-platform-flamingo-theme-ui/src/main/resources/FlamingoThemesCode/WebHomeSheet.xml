@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -287,7 +287,7 @@
       &lt;form action="$doc.getURL()" method="post"&gt;
         &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
         &lt;input type="hidden" name="action" value="create"/&gt;
-        &lt;input type="hidden" name="newThemeName" id="newThemeName" value="$request.newThemeName" /&gt;
+        &lt;input type="hidden" name="newThemeName" id="newThemeName" value="$escapetool.xml($request.newThemeName)" /&gt;
         &lt;input type="submit" value="$services.localization.render('platform.flamingo.themes.home.create.confirm')" class="button"/&gt;
       &lt;/form&gt;
     {{/html}}

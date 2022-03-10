@@ -33,7 +33,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
@@ -42,6 +41,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -164,15 +164,6 @@ public class XWiki extends Api
         }
 
         return this.documentRevisionProvider;
-    }
-
-    private ContextualAuthorizationManager getContextualAuthorizationManager()
-    {
-        if (this.contextualAuthorizationManager == null) {
-            this.contextualAuthorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
-        }
-
-        return this.contextualAuthorizationManager;
     }
 
     /**
@@ -574,6 +565,20 @@ public class XWiki extends Api
      * @since 2.3M2
      */
     public boolean exists(DocumentReference reference) throws XWikiException
+    {
+        return this.xwiki.exists(reference, getXWikiContext());
+    }
+
+    /**
+     * Returns whether a page exists or not.
+     *
+     * @param reference the reference of the page to check for its existence
+     * @return true if the page exists, false if not
+     * @since 13.3RC1
+     * @since 12.10.7
+     */
+    @Unstable
+    public boolean exists(PageReference reference)
     {
         return this.xwiki.exists(reference, getXWikiContext());
     }
@@ -1006,18 +1011,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
-     * RequestDispatcher, buffering the output, then returning it as a string.
-     *
-     * @param url URL of the servlet
-     * @return text result of the servlet
-     */
-    public String invokeServletAndReturnAsString(String url)
-    {
-        return this.xwiki.invokeServletAndReturnAsString(url, getXWikiContext());
-    }
-
-    /**
      * Return the URL of the static file provided by the current skin The file is first looked in the skin active for
      * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the "parent
      * skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.
@@ -1402,7 +1395,6 @@ public class XWiki extends Api
      * @return the list of available locales
      * @since 12.4RC1
      */
-    @Unstable
     public List<Locale> getAvailableLocales()
     {
         return this.xwiki.getAvailableLocales(getXWikiContext());
@@ -1608,6 +1600,12 @@ public class XWiki extends Api
      * Note that the list of backlinks can be retrieved with {@link Document#getBackLinkedReferences()}
      * and the list of children with {@link Document#getChildrenReferences()}.
      *
+     * <strong>Warning:</strong> Be aware that this method never triggers any event related to the rename
+     * of the document. If you want the right events to be sent for the event, please use the dedicated Refactoring
+     * Module API (see
+     * {@link org.xwiki.refactoring.script.RequestFactory#createRenameRequest(EntityReference, EntityReference)}
+     * and {@link org.xwiki.refactoring.job.MoveRequest}).
+     *
      * @param sourceDocumentReference the source document to rename.
      * @param targetDocumentReference the target reference to rename the document to.
      * @param overwrite if {@code true} the target document reference will be overwritten if it exists
@@ -1621,7 +1619,6 @@ public class XWiki extends Api
      * @throws XWikiException if the document cannot be renamed properly.
      * @since 12.5RC1
      */
-    @Unstable
     public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
         List<DocumentReference> childDocumentReferences) throws XWikiException
@@ -2286,7 +2283,6 @@ public class XWiki extends Api
      * @return the user corresponding to the reference.
      * @since 11.8RC1
      */
-    @Unstable
     public User getUser(DocumentReference userReference)
     {
         return this.xwiki.getUser(userReference, getXWikiContext());
@@ -2954,19 +2950,8 @@ public class XWiki extends Api
     }
 
     /**
-     * @return the ids of configured syntaxes for this wiki (eg "xwiki/1.0", "xwiki/2.0", "mediawiki/1.0", etc)
-     * @deprecated since 8.2M1, use the XWiki Rendering Configuration component or the Rendering Script Service one
-     *             instead
-     */
-    @Deprecated
-    public List<String> getConfiguredSyntaxes()
-    {
-        return this.xwiki.getConfiguredSyntaxes();
-    }
-
-    /**
      * API to get the Servlet path for a given wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
-     * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
+     * {@code xwiki.virtual.usepath} is enabled in xwiki.cfg, it is "wiki/wikiname/".
      *
      * @param wikiName wiki for which to get the path
      * @return The servlet path
@@ -2978,7 +2963,7 @@ public class XWiki extends Api
 
     /**
      * API to get the Servlet path for the current wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
-     * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
+     * {@code xwiki.virtual.usepath} is enabled in xwiki.cfg, it is "wiki/wikiname/".
      *
      * @return The servlet path
      */
@@ -2989,7 +2974,7 @@ public class XWiki extends Api
 
     /**
      * API to get the webapp path for the current wiki. This usually is "xwiki/". It can be configured in xwiki.cfg with
-     * the config <tt>xwiki.webapppath</tt>.
+     * the config {@code xwiki.webapppath}.
      *
      * @return The servlet path
      */

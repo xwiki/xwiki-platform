@@ -42,7 +42,8 @@ import org.xwiki.notifications.NotificationConfiguration;
 @Singleton
 public class AsyncNotificationRendererJobInitializer implements GroupedJobInitializer
 {
-    static final JobGroupPath NOTIFICATION_JOBGROUPPATH = new JobGroupPath(Collections.singletonList("notifications"));
+    private static final JobGroupPath NOTIFICATION_JOBGROUPPATH =
+        new JobGroupPath(Collections.singletonList("notifications"));
 
     @Inject
     private NotificationConfiguration notificationConfiguration;

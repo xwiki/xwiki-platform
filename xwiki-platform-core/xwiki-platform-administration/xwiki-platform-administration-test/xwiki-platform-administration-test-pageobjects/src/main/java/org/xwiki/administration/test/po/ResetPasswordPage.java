@@ -35,18 +35,19 @@ public class ResetPasswordPage extends ViewPage
     @FindBy(id = "u")
     private WebElement userNameInput;
 
-    @FindBy(css = ".xcontent form input[type='submit']")
+    @FindBy(css = "#resetPasswordForm input[type='submit']")
     private WebElement resetPasswordButton;
 
-    @FindBy(css = ".xcontent .box")
+    @FindBy(css = ".xwikimessage")
     private WebElement messageBox;
 
-    @FindBy(xpath = "//*[@class='xcontent']//a[contains(text(), 'Retry')]")
+    @FindBy(xpath = "//*[@class='panel-body']//a[contains(text(), 'Retry')]")
     private WebElement retryUserNameButton;
 
     public static ResetPasswordPage gotoPage()
     {
-        getUtil().gotoPage("XWiki", "ResetPassword");
+
+        getUtil().gotoPage(getUtil().getBaseURL() + "authenticate/reset");
         return new ResetPasswordPage();
     }
 
@@ -66,11 +67,17 @@ public class ResetPasswordPage extends ViewPage
         return new ResetPasswordPage();
     }
 
-    public boolean isResetPasswordSent()
+    /**
+     * This method only checks if the form was properly submitted and didn't return an error.
+     * It does not mean that an email was necessarily sent.
+     *
+     * @return {@code true} if the form is properly submitted.
+     */
+    public boolean isFormSubmitted()
     {
         // If there is no form and we see an info box, then the request was sent.
-        return !getDriver().hasElementWithoutWaiting(By.cssSelector(".xcontent form"))
-            && messageBox.getAttribute("class").contains("infomessage");
+        return !getDriver().hasElementWithoutWaiting(By.cssSelector("#resetPasswordForm"))
+            && messageBox.getText().contains("An e-mail was sent to");
     }
 
     public String getMessage()

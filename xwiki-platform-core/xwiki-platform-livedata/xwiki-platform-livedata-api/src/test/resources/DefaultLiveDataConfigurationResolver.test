@@ -1,0 +1,175 @@
+##
+## Merge default configuration
+##
+{
+  "id":"defaultConfigResolverTest",
+  "query":{
+    "source":"test"
+  },
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "id":"title",
+        "name":"Book Title",
+        "sortable":false,
+        "displayer":{
+          "propertyHref":"bar"
+        },
+        "filter":{
+          "id":"text",
+          "defaultOperator":"equals"
+        },
+        "styleName":"foo"
+      }
+    ],
+    "propertyTypes":[
+      {
+        "id":"String",
+        "name":"Small Text",
+        "displayer":"html",
+        "filter":{
+          "id":"text",
+          "defaultOperator":"prefix",
+          "foo":"bar"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "id":"defaultConfigResolverTest",
+  "query":{
+    "properties":[],
+    "source":{"id":"test"},
+    "filters":[],
+    "sort":[],
+    "offset":0,
+    "limit":15
+  },
+  "data":{
+    "count":0,
+    "entries":[]
+  },
+  "meta":{
+    "layouts":[
+      {"id":"table","name":"Table","icon":{"cssClass":"fa fa-table"}},
+      {"id":"cards","name":"cards","icon":{}}
+    ],
+    "defaultLayout":"table",
+    "propertyDescriptors":[
+      {
+        "id":"title",
+        "name":"Book Title",
+        "description":"The title of the book",
+        "icon":{
+          "iconSetName":"Font Awesome",
+          "cssClass":"fa fa-file-o",
+          "iconSetType":"font"
+        },
+        "type":"String",
+        "sortable":false,
+        "visible":true,
+        "displayer":{
+          "id":"link",
+          "propertyHref":"bar"
+        },
+        "filter":{
+          "id":"text",
+          "defaultOperator":"equals"
+        },
+        "styleName":"foo"
+      }
+    ],
+    "propertyTypes":[
+      {
+        "id":"String",
+        "name":"Small Text",
+        "description":"A string property",
+        "icon":{
+          "iconSetName":"Font Awesome",
+          "cssClass":"fa fa-file-o",
+          "iconSetType":"font"
+        },
+        "sortable":true,
+        "visible":true,
+        "displayer":{"id":"html"},
+        "filter":{
+          "id":"text",
+          "defaultOperator":"prefix",
+          "foo":"bar"
+        }
+      }
+    ],
+    "filters":[
+      {
+        "id":"text",
+        "operators":[
+          {"id":"contains","name":"contains"},
+          {"id":"startsWith","name":"startsWith"},
+          {"id":"equals","name":"Equals"}
+        ]
+      },
+      {
+        "id":"number",
+        "operators":[
+          {"id":"equals","name":"="},
+          {"id":"less","name":"<"},
+          {"id":"greater","name":">"}
+        ]
+      },
+      {
+        "id":"boolean",
+        "operators":[
+          {"id":"equals","name":"Equals"}
+        ]
+      },
+      {
+        "id":"date",
+        "operators":[
+          {"id":"between","name":"between"},
+          {"id":"before","name":"before"},
+          {"id":"after","name":"after"},
+          {"id":"contains","name":"contains"}
+        ],
+        "dateFormat":"yyyy/MM/dd HH:mm"
+      },
+      {
+        "id":"list",
+        "operators":[
+          {"id":"equals","name":"Equals"},
+          {"id":"startsWith","name":"startsWith"},
+          {"id":"contains","name":"contains"},
+          {"id":"empty","name":"empty"}
+        ]
+      }
+    ],
+    "defaultFilter":"text",
+    "displayers":[
+      {"id":"text"},
+      {"id":"link"},
+      {"id":"html"},
+      {"id":"actions"},
+      {"id":"boolean"}
+    ],
+    "defaultDisplayer":"text",
+    "pagination":{
+      "maxShownPages":10,
+      "pageSizes":[15,25,50,100],
+      "showEntryRange":true,
+      "showNextPrevious":true
+    },
+    "entryDescriptor":{
+      "idProperty":"entryId"
+    },
+    "actions":[
+      {"id":"view","name":"view","icon":{"cssClass":"fa fa-eye"}},
+      {"id":"edit","name":"Edit","description":"Edit entry","icon":{}},
+      {"id":"delete","name":"delete","icon":{}},
+      {"id":"copy","name":"copy","icon":{}},
+      {"id":"rename","name":"rename","icon":{}},
+      {"id":"rights","name":"rights","icon":{}}
+    ],
+    "selection":{"enabled":false}
+  }
+}

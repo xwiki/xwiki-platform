@@ -39,6 +39,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
@@ -50,7 +51,6 @@ import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides refactoring-specific scripting APIs.
@@ -79,6 +79,9 @@ public class RefactoringScriptService implements ScriptService
      */
     @Inject
     private JobExecutor jobExecutor;
+
+    @Inject
+    private RefactoringConfiguration configuration;
 
     /**
      * Used to check user rights.
@@ -519,7 +522,6 @@ public class RefactoringScriptService implements ScriptService
      *         {@code null} in case of failure
      * @since 11.8RC1
      */
-    @Unstable
     public Job changeDocumentAuthor(DocumentReference oldAuthorReference, DocumentReference newAuthorReference)
     {
         ReplaceUserRequest request =
@@ -531,15 +533,24 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Schedules an asynchronous job to perform the given request.
-     * 
+     *
      * @param request the request to perform (specifies the old user reference and the new user reference)
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *         {@code null} in case of failure
      * @since 11.8RC1
      */
-    @Unstable
     public Job replaceUser(ReplaceUserRequest request)
     {
         return this.execute(RefactoringJobs.REPLACE_USER, request);
+    }
+
+    /**
+     * @return {@code true} if the current user can be given the option to choose between sending a document to the
+     * recycle bin or deleting it permanently. {@code false} otherwise.
+     * @since 12.8RC1
+     */
+    public boolean isRecycleBinSkippingAllowed()
+    {
+        return this.configuration.isRecycleBinSkippingActivated() && this.documentAccessBridge.isAdvancedUser();
     }
 }

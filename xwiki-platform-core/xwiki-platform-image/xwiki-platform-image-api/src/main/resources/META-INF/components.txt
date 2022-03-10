@@ -1,2 +1,0 @@
-com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
-com.xpn.xwiki.internal.plugin.image.ThumbnailatorImageProcessor

@@ -1,0 +1,9 @@
+.rt-toolbar {
+  /* Add some space between the real-time toolbar and the standard Wiki Editor toolbar. */
+  margin-bottom: 2px;
+}
+
+.rt-toolbar-leftside {
+  /* Align the text from the real-time toolbar with the letter from the first Wiki Editor toolbar button. */
+  padding: 0 1em 0 4px;
+}

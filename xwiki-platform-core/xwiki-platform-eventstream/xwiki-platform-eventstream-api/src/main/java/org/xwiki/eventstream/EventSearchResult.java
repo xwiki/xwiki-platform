@@ -22,7 +22,6 @@ package org.xwiki.eventstream;
 import java.util.stream.Stream;
 
 import org.xwiki.eventstream.internal.EmptyEventSearchResult;
-import org.xwiki.stability.Unstable;
 
 /**
  * The result of a search in the {@link EventStore}.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.4RC1
  */
-@Unstable
 public interface EventSearchResult extends AutoCloseable
 {
     /**

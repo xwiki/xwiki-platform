@@ -34,8 +34,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.Assert.assertSame;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-public class DocumentConverterTest
+class DocumentConverterTest
 {
     @InjectMockComponents
     private DocumentConverter documentConverter;
@@ -63,7 +63,7 @@ public class DocumentConverterTest
     private DocumentReference documentReference;
 
     @BeforeEach
-    public void setup(MockitoOldcore mockitoOldcore)
+    void setup(MockitoOldcore mockitoOldcore)
     {
         this.documentReference = new DocumentReference("xwiki", "Foo", "WebHome");
         when(document.getDocumentReference()).thenReturn(this.documentReference);
@@ -73,32 +73,32 @@ public class DocumentConverterTest
     }
 
     @Test
-    public void convertToEntityReference()
+    void convertToEntityReference()
     {
         assertEquals(this.documentReference, documentConverter.convert(EntityReference.class, document));
     }
 
     @Test
-    public void convertToDocumentReference()
+    void convertToDocumentReference()
     {
         assertEquals(this.documentReference, documentConverter.convert(DocumentReference.class, document));
     }
 
     @Test
-    public void convertToXWikiDocument()
+    void convertToXWikiDocument()
     {
         assertSame(this.xWikiDocument, documentConverter.convert(XWikiDocument.class, document));
     }
 
     @Test
-    public void convertFromXWikiDocument()
+    void convertFromXWikiDocument()
     {
         Document convertedDocument = documentConverter.convert(Document.class, this.xWikiDocument);
         assertSame(this.xWikiDocument, convertedDocument.getDocument());
     }
 
     @Test
-    public void convertToString()
+    void convertToString()
     {
         when(serializer.serialize(document.getDocumentReference())).thenReturn("reference");
 
@@ -106,7 +106,7 @@ public class DocumentConverterTest
     }
 
     @Test
-    public void convertFromUnsupportedType()
+    void convertFromUnsupportedType()
     {
         ConversionException conversionException = assertThrows(ConversionException.class, () -> {
             documentConverter.convert(Document.class, this.documentReference);
@@ -117,13 +117,12 @@ public class DocumentConverterTest
     }
 
     @Test
-    public void convertToUnsupportedType()
+    void convertToUnsupportedType()
     {
         ConversionException conversionException = assertThrows(ConversionException.class, () -> {
             documentConverter.convert(Integer.class, this.document);
         });
 
-        assertEquals("Unsupported target type [class java.lang.Integer]",
-            conversionException.getMessage());
+        assertEquals("Unsupported target type [class java.lang.Integer]", conversionException.getMessage());
     }
 }

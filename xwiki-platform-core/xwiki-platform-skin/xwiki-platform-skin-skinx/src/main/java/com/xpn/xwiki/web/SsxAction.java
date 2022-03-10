@@ -19,8 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.web.sx.AbstractSxAction;
 import com.xpn.xwiki.web.sx.CssExtension;
@@ -34,6 +38,9 @@ import com.xpn.xwiki.web.sx.Extension;
  * @version $Id$
  * @since 1.4M2
  */
+@Component
+@Named("ssx")
+@Singleton
 public class SsxAction extends AbstractSxAction
 {
     /** The extension type of this action. */

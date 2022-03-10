@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.content.AlteredContent;
 import org.xwiki.annotation.content.ContentAlterer;
+import org.xwiki.annotation.content.TextExtractor;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
@@ -45,6 +46,11 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
     private ContentAlterer textCleaner;
 
     /**
+     * Helper for extracting the plain text depending on the syntax.
+     */
+    private TextExtractor textExtractor;
+
+    /**
      * Flag to signal that the renderer is currently rendering whitespaces (has rendered the first one) and should not
      * append more. Starting true because we don't want to print beginning spaces.
      */
@@ -60,11 +66,14 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
      * Builds an abstract plain text normalizing renderer with the passed text cleaner.
      *
      * @param textCleaner the text cleaner used to normalize the texts produced by the events
+     * @param textExtractor plain text content extractor, depending on a given syntax
      * @param listenerChain the listeners chain this listener is part of
      */
-    public PlainTextNormalizingChainingRenderer(ContentAlterer textCleaner, ListenerChain listenerChain)
+    public PlainTextNormalizingChainingRenderer(ContentAlterer textCleaner, TextExtractor textExtractor,
+        ListenerChain listenerChain)
     {
         this.textCleaner = textCleaner;
+        this.textExtractor = textExtractor;
         setListenerChain(listenerChain);
     }
 
@@ -110,7 +119,9 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
                 printSpace();
             }
 
-            AlteredContent cleanedContent = textCleaner.alter(text);
+            // Handle text depending on the syntax and, if possible, extract the plain text content, as the users see
+            // it when they add the annotation.
+            AlteredContent cleanedContent = textCleaner.alter(textExtractor.extractText(text, syntax));
             printText(cleanedContent.getContent().toString());
 
             if (Character.isWhitespace(text.charAt(text.length() - 1))) {

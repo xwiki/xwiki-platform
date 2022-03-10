@@ -20,3 +20,4 @@ com.xpn.xwiki.internal.model.reference.DeprecatedXClassRelativeStringEntityRefer
 com.xpn.xwiki.internal.query.DeprecatedConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.script.DeprecatedScriptContextInitializer
 com.xpn.xwiki.internal.template.SUExecutor
+com.xpn.xwiki.web.ViewrevAction

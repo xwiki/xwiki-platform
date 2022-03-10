@@ -34,7 +34,6 @@ import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
 import org.xwiki.officeimporter.server.OfficeServerException;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes the office manager APIs to server-side scripts.
@@ -163,7 +162,6 @@ public class OfficeServerScriptService implements ScriptService
      * @since 12.3
      * @since 11.10.5
      */
-    @Unstable
     public boolean isConnected()
     {
         this.officeServer.refreshState();
@@ -179,7 +177,6 @@ public class OfficeServerScriptService implements ScriptService
      * @since 12.3
      * @since 11.10.5
      */
-    @Unstable
     public String displayServerState()
     {
         this.officeServer.refreshState();

@@ -37,9 +37,12 @@ import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -50,6 +53,9 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -132,6 +138,8 @@ public class Document extends Api
 
     private DocumentRevisionProvider documentRevisionProvider;
 
+    private ConfigurationSource configuration;
+
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
     {
         if (this.currentMixedDocumentReferenceResolver == null) {
@@ -177,6 +185,15 @@ public class Document extends Api
         }
 
         return this.documentRevisionProvider;
+    }
+
+    private ConfigurationSource getConfiguration()
+    {
+        if (this.configuration == null) {
+            this.configuration = Utils.getComponent(ConfigurationSource.class);
+        }
+
+        return this.configuration;
     }
 
     /**
@@ -700,7 +717,6 @@ public class Document extends Api
      * @throws XWikiException if retrieving the document translations from the database fails
      * @since 12.4RC1
      */
-    @Unstable
     public List<Locale> getTranslationLocales() throws XWikiException
     {
         return this.doc.getTranslationLocales(getXWikiContext());
@@ -747,7 +763,6 @@ public class Document extends Api
      * @return the content of the current document rendered.
      * @since 11.3RC1
      */
-    @Unstable
     public String displayDocument(Syntax targetSyntax) throws XWikiException
     {
         return this.doc.displayDocument(targetSyntax, getXWikiContext());
@@ -759,7 +774,6 @@ public class Document extends Api
      * @return the content of the current document rendered.
      * @since 11.5RC1
      */
-    @Unstable
     public String displayDocument(Syntax targetSyntax, boolean restricted) throws XWikiException
     {
         return this.doc.displayDocument(targetSyntax, restricted, getXWikiContext());
@@ -769,7 +783,6 @@ public class Document extends Api
      * @return the content of the current document rendered.
      * @since 11.3RC1
      */
-    @Unstable
     public String displayDocument() throws XWikiException
     {
         return this.doc.displayDocument(getXWikiContext());
@@ -780,7 +793,6 @@ public class Document extends Api
      * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @since 11.5RC1
      */
-    @Unstable
     public String displayDocument(boolean restricted) throws XWikiException
     {
         return this.doc.displayDocument(restricted, getXWikiContext());
@@ -1361,6 +1373,23 @@ public class Document extends Api
     {
         try {
             BaseObject obj = this.getDoc().getXObject(objectReference);
+            return obj == null ? null : newObjectApi(obj, getXWikiContext());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param objectReference the object reference
+     * @param create if true, the object will be created when missing
+     * @return the XWiki object from this document that matches the specified object reference
+     * @since 14.0RC1
+     */
+    @Unstable
+    public Object getObject(ObjectReference objectReference, boolean create)
+    {
+        try {
+            BaseObject obj = this.getDoc().getXObject(objectReference, create, getXWikiContext());
             return obj == null ? null : newObjectApi(obj, getXWikiContext());
         } catch (Exception e) {
             return null;
@@ -2296,7 +2325,6 @@ public class Document extends Api
      * @throws XWikiException in case of problem to perform the query.
      * @since 12.5RC1
      */
-    @Unstable
     public List<DocumentReference> getBackLinkedReferences() throws XWikiException
     {
         return this.doc.getBackLinkedReferences(getXWikiContext());
@@ -2337,7 +2365,6 @@ public class Document extends Api
      * @throws XWikiException in case of problem to query the children.
      * @since 12.5RC1
      */
-    @Unstable
     public List<DocumentReference> getChildrenReferences() throws XWikiException
     {
         return this.doc.getChildrenReferences(getXWikiContext());
@@ -2536,12 +2563,27 @@ public class Document extends Api
         save(comment, false);
     }
 
+    private UserReferenceResolver<CurrentUserReference> getCurrentUserReferenceResolver()
+    {
+        return Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class,
+                CurrentUserReference.class));
+    }
+
     public void save(String comment, boolean minorEdit) throws XWikiException
     {
         if (hasAccessLevel("edit")) {
-            saveDocument(comment, minorEdit);
+
+            DocumentAuthors authors = this.getAuthors();
+            authors.setOriginalMetadataAuthor(getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
+            // If the current author does not have PR don't let it set current user as author of the saved document
+            // since it can lead to right escalation
+            if (hasProgrammingRights() || !getConfiguration().getProperty("security.script.save.checkAuthor", true)) {
+                saveDocument(comment, minorEdit);
+            } else {
+                saveAsAuthor(comment, minorEdit);
+            }
         } else {
-            java.lang.Object[] args = { getDefaultEntityReferenceSerializer().serialize(getDocumentReference()) };
+            java.lang.Object[] args = {getDefaultEntityReferenceSerializer().serialize(getDocumentReference())};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
         }
@@ -2590,8 +2632,8 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
-     * permission to do so. The author of this document is also set to the said content author.
+     * Save the document if the current author of the script calling this method has permission to do so. The author of
+     * this document is also set to the said author.
      *
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
      * @since 2.3M2
@@ -2602,8 +2644,8 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
-     * permission to do so. The author of this document is also set to the said content author.
+     * Save the document if the current author of the script calling this method has permission to do so. The author of
+     * this document is also set to the said author.
      *
      * @param comment The comment to display in document history (what did you change in the document)
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
@@ -2615,8 +2657,8 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
-     * permission to do so. The author of this document is also set to the said content author.
+     * Save the document if the current author of the script calling this method has permission to do so. The author of
+     * this document is also set to the said author.
      *
      * @param comment The comment to display in document history (what did you change in the document)
      * @param minorEdit Set true to advance the document version number by 0.1 or false to advance version to the next
@@ -2628,6 +2670,8 @@ public class Document extends Api
     {
         XWikiContext xcontext = getXWikiContext();
 
+        getAuthors()
+            .setOriginalMetadataAuthor(getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
         DocumentReference author = getEffectiveAuthorReference();
         if (hasAccess(Right.EDIT, author)) {
             DocumentReference currentUser = xcontext.getUserReference();
@@ -2654,12 +2698,11 @@ public class Document extends Api
     {
         XWikiDocument doc = getDoc();
 
-        DocumentReference currentUserReference = getXWikiContext().getUserReference();
-
-        doc.setAuthorReference(currentUserReference);
+        UserReference currentUserReference = getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE);
+        doc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
 
         if (doc.isNew()) {
-            doc.setCreatorReference(currentUserReference);
+            doc.getAuthors().setCreator(currentUserReference);
         }
 
         if (checkSaving) {
@@ -3233,9 +3276,18 @@ public class Document extends Api
      * @return the maximum authorized length for a document full name (see {@link #getFullName()}).
      * @since 11.4RC1
      */
-    @Unstable
     public int getLocalReferenceMaxLength()
     {
         return this.doc.getLocalReferenceMaxLength();
+    }
+
+    /**
+     * @return the authors of the document.
+     * @since 14.0RC1
+     */
+    @Unstable
+    public DocumentAuthors getAuthors()
+    {
+        return doc.getAuthors();
     }
 }

@@ -1,0 +1,1 @@
+org.xwiki.office.viewer.internal.DefaultOfficeViewer

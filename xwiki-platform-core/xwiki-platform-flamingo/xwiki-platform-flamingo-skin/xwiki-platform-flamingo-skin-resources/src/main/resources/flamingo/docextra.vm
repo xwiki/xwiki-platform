@@ -68,6 +68,17 @@
     #set ($discard = $docextras.add(['Information', 'information', $services.localization.render('docextra.information'), -1, 'informationinline.vm', $services.localization.render('core.shortcuts.view.information')]))
   #end
 #end
+
+#set ($docExtraExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.template.docextra', {'sortByParameter' : 'order'}))
+#foreach($docExtraExtension in $docExtraExtensions)
+  #set ($params = $docExtraExtension.parameters)
+  #set ($template = "loaddocextrauix.vm&uix=$docExtraExtension.id")
+  #if ($params.show)
+    #set ($newDocExtra = [$docExtraExtension.id, $params.name, $params.title, $params.itemnumber, $template, $params.shortcut])
+    #set ($discard = $docextras.add($newDocExtra))
+  #end
+#end
+
 ##
 ## Put anchors before the footer, otherwise the top of each section would be hidden by the floating topmenu
 ##
@@ -84,7 +95,7 @@
     <div class="floatcontainer" id="docExtraTabs">
       <ul class="xwikitabbar" id="docExtrasTabsUl">
         #foreach($docextra in $docextras)
-          <li id="${docextra.get(0)}tab">
+          <li id="${docextra.get(0)}tab" data-template="$escapetool.xml($docextra.get(4))">
             ## Note: Add rel='nofollow' to prevent search crawler from navigating the links and indexing them in search results
             <a id="${docextra.get(0)}link" href="$doc.getURL('view', "viewer=${docextra.get(1)}")" rel="nofollow">
               $docextra.get(2) #if($docextra.get(3) >= 0) <span class="itemCount">$services.localization.render('docextra.extranb', [$docextra.get(3)])</span> #end
@@ -104,7 +115,7 @@
     ##
     ## JavaScript code generation
     ##
-    <script type="text/javascript">
+    <script>
       var hashviewer = self.document.location.hash.substring(1);
       #foreach($docextra in $docextras)
         #set ($extraAnchor = $docextra[0])

@@ -42,6 +42,9 @@ public class SendMailConfigClassDocumentConfigurationSource
     @Override
     protected String getCacheId()
     {
+        // Note: we use a single cache id because this module is installed on the root namespace and thus there's
+        // only a single SendMailConfigClassDocumentConfigurationSource component in the farm (and thus a single
+        // cache).
         return "configuration.document.mail.send";
     }
 

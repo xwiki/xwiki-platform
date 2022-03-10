@@ -190,16 +190,20 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public void addField(String name, PropertyInterface element)
     {
-        Set<String> properties = getPropertyList();
-        if (!properties.contains(name)) {
-            if (((BaseCollection) element).getNumber() == 0) {
-                ((BaseCollection) element).setNumber(properties.size() + 1);
+        if (element != null) {
+            Set<String> properties = getPropertyList();
+            if (!properties.contains(name)) {
+                if (((BaseCollection) element).getNumber() == 0) {
+                    ((BaseCollection) element).setNumber(properties.size() + 1);
+                }
             }
+
+            super.addField(name, element);
+
+            setDirty(true);
+        } else {
+            LOGGER.warn("Cannot add null field with name [{}] in [{}].", name, this);
         }
-
-        super.addField(name, element);
-
-        setDirty(true);
     }
 
     /**
@@ -361,11 +365,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (safeget(property.getName()) == null) {
                 deprecatedObjectProperties.add(property);
             } else {
-                String propertyClass = ((PropertyClass) safeget(property.getName())).newProperty().getClassType();
-                String objectPropertyClass = property.getClassType();
+                BaseProperty emptyProperty = ((PropertyClass) safeget(property.getName())).newProperty();
+                if (emptyProperty != null) {
+                    String propertyClass = emptyProperty.getClassType();
+                    String objectPropertyClass = property.getClassType();
 
-                if (!propertyClass.equals(objectPropertyClass)) {
-                    deprecatedObjectProperties.add(property);
+                    if (!propertyClass.equals(objectPropertyClass)) {
+                        deprecatedObjectProperties.add(property);
+                    }
                 }
             }
         }
@@ -930,6 +937,33 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return false;
     }
 
+    /**
+     * Adds a new Static List xproperty to this xclass. This allows calling the various methods on
+     * the returned {@link StaticListClass}.
+     *
+     * @param fieldName the id of the Static List xproperty to add
+     * @return the added Static List xproperty or the existing xproperty if it was already existing
+     * @since 12.8RC1
+     */
+    public StaticListClass addStaticListField(String fieldName)
+    {
+        // Return the existing class if it exists, otherwise create a new one.
+        StaticListClass result = (StaticListClass) get(fieldName);
+        if (result == null) {
+            result = new StaticListClass();
+            result.setName(fieldName);
+            // Set default values which can be overridden by the caller
+            result.setSize(1);
+            result.setMultiSelect(false);
+            result.setRelationalStorage(false);
+            result.setFreeText(ListClass.FREE_TEXT_FORBIDDEN);
+            result.setLargeStorage(false);
+            result.setObject(this);
+            put(fieldName, result);
+        }
+        return result;
+    }
+
     public boolean addNumberField(String fieldName, String fieldPrettyName, int size, String type)
     {
         if (get(fieldName) == null) {
@@ -1241,7 +1275,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             }
         } catch (Exception e) {
             if (fallback) {
-                LOGGER.warn("Failed to create a nex sutom class instance ([{}]). Fallbacking on BaseObject.",
+                LOGGER.warn("Failed to create a new custom class instance ([{}]). Fallbacking on BaseObject.",
                     ExceptionUtils.getRootCauseMessage(e));
 
                 return new BaseObject();
@@ -1562,14 +1596,16 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        super.setOwnerDocument(ownerDocument);
+        if (this.ownerDocument != ownerDocument) {
+            super.setOwnerDocument(ownerDocument);
 
-        if (this.ownerDocument != null) {
-            setDocumentReference(this.ownerDocument.getDocumentReference());
-        }
+            if (this.ownerDocument != null) {
+                setDocumentReference(this.ownerDocument.getDocumentReference());
+            }
 
-        if (ownerDocument != null && this.isDirty) {
-            ownerDocument.setMetaDataDirty(true);
+            if (ownerDocument != null && this.isDirty) {
+                ownerDocument.setMetaDataDirty(true);
+            }
         }
     }
 

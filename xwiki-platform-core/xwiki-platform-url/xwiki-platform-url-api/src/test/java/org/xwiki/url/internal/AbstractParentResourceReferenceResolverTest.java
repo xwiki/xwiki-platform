@@ -26,6 +26,7 @@ import java.util.Arrays;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.CreateResourceReferenceException;
@@ -35,7 +36,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.url.ExtendedURL;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
@@ -65,11 +65,11 @@ class AbstractParentResourceReferenceResolverTest
         ParentResourceReference reference = this.resolver.resolve(extendedURL, type, null);
 
         assertSame(type, reference.getType());
-        assertEquals("child", reference.getChild());
-        assertEquals("child/1/2/3", reference.getRootPath());
-        assertEquals(Arrays.asList("1", "2", "3"), reference.getPathSegments());
-        assertEquals(2, reference.getParameters().size());
-        assertEquals(Arrays.asList("value11", "value12"), reference.getParameters().get("key1"));
-        assertEquals(Arrays.asList("value2"), reference.getParameters().get("key2"));
+        Assertions.assertEquals("child", reference.getChild());
+        Assertions.assertEquals("child/1/2/3", reference.getRootPath());
+        Assertions.assertEquals(Arrays.asList("1", "2", "3"), reference.getPathSegments());
+        Assertions.assertEquals(2, reference.getParameters().size());
+        Assertions.assertEquals(Arrays.asList("value11", "value12"), reference.getParameters().get("key1"));
+        Assertions.assertEquals(Arrays.asList("value2"), reference.getParameters().get("key2"));
     }
 }

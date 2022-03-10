@@ -22,8 +22,11 @@ package org.xwiki.test.docker.internal.junit5;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.test.docker.internal.junit5.configuration.PropertiesMerger;
+import org.xwiki.test.docker.junit5.DockerTestException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link PropertiesMerger}.
@@ -34,7 +37,61 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class PropertiesMergerTest
 {
     @Test
-    public void mergeWhenXWikiCfgPlugins()
+    public void mergeWhenXWikiCfgPlugins() throws Exception
+    {
+        PropertiesMerger merger = new PropertiesMerger();
+
+        Properties original = new Properties();
+        original.setProperty("xwikiCfgVirtualUsepath", "1");
+        original.setProperty("xwikiCfgPlugins", "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
+        original.setProperty("xwikiCfgVirtualUsepath2", "1");
+
+        Properties override = new Properties();
+        override.setProperty("xwikiCfgPlugins", "com.xpn.xwiki.plugin.fileupload.FileUploadPlugin");
+        override.setProperty("xwikiCfgEditCommentMandatory", "0");
+        override.setProperty("xwikiCfgVirtualUsepath2", "0");
+
+        Properties merge = merger.merge(original, override, true);
+
+        assertEquals(4, merge.size());
+        assertEquals("1", merge.getProperty("xwikiCfgVirtualUsepath"));
+        assertEquals("0", merge.getProperty("xwikiCfgVirtualUsepath2"));
+        assertEquals("0", merge.getProperty("xwikiCfgEditCommentMandatory"));
+        assertEquals("com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.fileupload.FileUploadPlugin", merge.getProperty("xwikiCfgPlugins"));
+    }
+
+    @Test
+    public void mergeWhenXWikiCfgPluginsButWithOverrideListProperty() throws DockerTestException
+    {
+        PropertiesMerger merger = new PropertiesMerger();
+
+        Properties original = new Properties();
+        original.setProperty("xwikiCfgPlugins", "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,"
+            + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
+
+        Properties override = new Properties();
+        override.setProperty("xwikiCfgPlugins", "^com.xpn.xwiki.plugin.fileupload.FileUploadPlugin");
+
+        Properties merge = merger.merge(original, override, true);
+
+        assertEquals(1, merge.size());
+        assertEquals("com.xpn.xwiki.plugin.fileupload.FileUploadPlugin", merge.getProperty("xwikiCfgPlugins"));
+    }
+
+    @Test
+    public void mergeWhenXWikiCfgPluginsAndNoOverride() throws Exception
     {
         PropertiesMerger merger = new PropertiesMerger();
 
@@ -50,7 +107,7 @@ public class PropertiesMergerTest
         override.setProperty("xwikiCfgPlugins", "com.xpn.xwiki.plugin.fileupload.FileUploadPlugin");
         override.setProperty("xwikiCfgEditCommentMandatory", "0");
 
-        Properties merge = merger.merge(original, override);
+        Properties merge = merger.merge(original, override, false);
 
         assertEquals(3, merge.size());
         assertEquals("1", merge.getProperty("xwikiCfgVirtualUsepath"));
@@ -64,23 +121,18 @@ public class PropertiesMergerTest
     }
 
     @Test
-    public void overrideWhenXWikiCfgPlugins()
+    public void mergeWhenXWikiCfgPluginsAndNoOverrideAndConflict()
     {
         PropertiesMerger merger = new PropertiesMerger();
 
         Properties original = new Properties();
-        original.setProperty("xwikiCfgPlugins", "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
+        original.setProperty("xwikiCfgVirtualUsepath", "0");
 
         Properties override = new Properties();
-        override.setProperty("xwikiCfgPlugins", "^com.xpn.xwiki.plugin.fileupload.FileUploadPlugin");
+        override.setProperty("xwikiCfgVirtualUsepath", "1");
 
-        Properties merge = merger.merge(original, override);
-
-        assertEquals(1, merge.size());
-        assertEquals("com.xpn.xwiki.plugin.fileupload.FileUploadPlugin", merge.getProperty("xwikiCfgPlugins"));
+        Throwable exception = assertThrows(DockerTestException.class, () -> merger.merge(original, override, false));
+        assertEquals("Cannot merge property [xwikiCfgVirtualUsepath] = [1] since it was already specified with value "
+            + "[0]", exception.getMessage());
     }
 }

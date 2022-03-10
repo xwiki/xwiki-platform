@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -348,10 +348,10 @@
 
   var requestQueueSizeUpdate = function() {
     var queueSizeContainer = this;
-    $.ajax({
-      url: "$xwiki.getURL('XWiki.SolrSearchAdmin', 'get', 'outputSyntax=plain')",
-      data: {action: 'getQueueSize'}
-    }).done(function(data) {
+    $.get(new XWiki.Document('SolrSearchAdmin', 'XWiki').getURL('get'), {
+      outputSyntax: 'plain',
+      action: 'getQueueSize'
+    }).then(data =&gt; {
       updateQueueSize.call(queueSizeContainer, data);
     });
   };

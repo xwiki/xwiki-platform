@@ -125,14 +125,20 @@
     </property>
     <property>
       <code>'use strict';
-require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotificationsMacro) {
-  $(document).ready(function() {
-    $('.notifications-macro').each(function () {
+require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], function ($, XWikiAsyncNotificationsMacro) {
+  var init = function(event, data) {
+    var container = $((data &amp;&amp; data.elements) || document);
+    container.find('.notifications-macro').each(function () {
       new XWikiAsyncNotificationsMacro(this);
     });
-  });
-});
-</code>
+  };
+
+  // Initialize the notification macros inserted after this code is loaded.
+  $(document).on('xwiki:dom:updated', init);
+
+  // Initialize the notification macros found initially when this code is loaded.
+  $(init);
+});</code>
     </property>
     <property>
       <name>JS</name>
@@ -260,7 +266,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
    * @param users (optional) list of users, comma-separated, to include in the notifications (and only them)
    * @param tags (optional) list of tags, comma-separated, to include in the notifications (and only them)
    */
-  return function(macro, userId, count, displayReadStatus, blackList, useUserPreferences,
+  var factory = function(macro, userId, count, displayReadStatus, blackList, useUserPreferences,
       displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, wikis, spaces, pages, users, tags) {
     var self = this;
     self.macro = $(macro);
@@ -312,16 +318,17 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
       };
       if (untilDate) {
         params.untilDate = untilDate;
+        params.untilDateIncluded = false;
         params.blackList = self.blackList.join(',');
       }
       var promise = $.Deferred();
       self.doLoad(params, untilDate, promise);
       return promise;
     };
-    
+
     self.doLoad = function(params, untilDate, promise) {
       var restURL = '$!{escapetool.javascript($request.contextPath)}/rest/notifications?media=json';
-      $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function (data, textStatus, jqXHR) {
+      $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function(data, textStatus, jqXHR) {
         switch (jqXHR.status) {
             case 200:
               // 200 means that the search is done, we displayer the received notifications
@@ -333,11 +340,11 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
               setTimeout(self.doLoad, 1000, params, untilDate, promise);
               break;
         }
-      }).fail(function () {
+      }).catch(() =&gt; {
         self.displayNoNotification();
       });
     };
-    
+
     self.showNotifications = function(data, untilDate, promise) {
       // Display the "nothing!" message if there is no notification
       if (data.notifications.length == 0 &amp;&amp; !untilDate) {
@@ -361,7 +368,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
         btn.addClass('btn').addClass('btn-default').addClass('btn-block');
         loadMore.append(btn);
         self.insertElementInMacroContainer(loadMore);
-        btn.click(function(event) {
+        btn.on('click', function(event) {
           loadMore.text('').addClass('loading').css('height', '50px');
           // We use the date of the last displayed event as an offset to display those that come next
           self.load(lastEventDate);
@@ -372,7 +379,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
       // Call the listeners
       promise.resolve(data.notifications);
     };
-    
+
     /**
      * Add the given DOM element into the macro container (could be before the RSS link if there is one).
      */
@@ -415,10 +422,13 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
       if (!entry.read) {
         // Style the read button
         readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
-        // Insert the cross icon
-        readButton.html('$services.icon.renderHTML("check")');
+        // Insert the cross icon and an accessible label
+        var readButtonIcon = $("$escapetool.javascript($services.icon.renderHTML('check'))");
+        var readButtonLabel= $('&lt;span class="sr-only"/&gt;');
+        readButtonLabel.text("$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
+        readButton.append(readButtonIcon).append(readButtonLabel);
         // On click
-        readButton.click(function() {
+        readButton.on('click', function() {
           var notif = $(this).parents('div.notification-event');
           notif.removeClass('notification-event-unread');
           var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
@@ -436,7 +446,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
       var details = notif.find('.notification-event-details');
       details.hide();
       var arrow = notif.find('.notification-event-arrow');
-      notif.find('.toggle-notification-event-details').click(function() {
+      notif.find('.toggle-notification-event-details').on('click', function() {
         details.toggle();
         arrow.text(arrow.text() == '▸' ? '▾' : '▸');
       });
@@ -450,6 +460,8 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
         .text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
     };
   };
+
+  return factory;
 });
 </code>
     </property>
@@ -556,7 +568,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
    *
    * @param macro DOM element that will be uses as container for the notifications.
    */
-  return function(macro) {
+  var factory = function(macro) {
     var self = this;
     self.macro = $(macro);
     self.displayReadStatus = self.macro.attr('data-displayReadStatus').toLowerCase() == 'true';
@@ -570,7 +582,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
         btn.text("$escapetool.javascript($services.localization.render('notifications.menu.more'))");
         btn.addClass('btn').addClass('btn-default').addClass('btn-block');
         loadMore.append(btn);
-        btn.click(function(event) {
+        btn.on('click', function(event) {
           loadMore.text('').addClass('loading').css('height', '50px');
           // We use the date of the last displayed event as an offset to display those that come next
           var lastEventDate = self.macro.find('.notification-event').last().attr('data-eventdate');
@@ -578,7 +590,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
         });
       }
     };
-    
+
     self.augmentEntry = function (entry) {
       if (!entry.data('augmented')) {
         // Ensure to not call twice this method.
@@ -590,10 +602,13 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
           entry.find('.notification-content').prepend(readButton);
           // Style the read button
           readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
-          // Insert the cross icon
-          readButton.html('$services.icon.renderHTML("check")');
+          // Insert the cross icon and an accessible label
+          var readButtonIcon = $("$escapetool.javascript($services.icon.renderHTML('check'))");
+          var readButtonLabel= $('&lt;span class="sr-only"/&gt;');
+          readButtonLabel.text("$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
+          readButton.append(readButtonIcon).append(readButtonLabel);
           // On click
-          readButton.click(function() {
+          readButton.on('click', function() {
             var notif = $(this).parents('div.notification-event');
             notif.removeClass('notification-event-unread');
             var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
@@ -611,7 +626,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
         var details = entry.find('.notification-event-details');
         details.hide();
         var arrow = entry.find('.notification-event-arrow');
-        entry.find('.toggle-notification-event-details').click(function() {
+        entry.find('.toggle-notification-event-details').on('click', function() {
           details.toggle();
           arrow.text(arrow.text() == '▸' ? '▾' : '▸');
         });
@@ -650,6 +665,8 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
     var observer = new MutationObserver(self.processEvents);
     observer.observe(document, { childList: true, subtree : true});
   };
+
+  return factory;
 });
 </code>
     </property>
@@ -1146,7 +1163,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
   #set($discard = $dataParameters.add("data-$key=""$parameters.get($key)"""))
 #end
 #set($notifParameters = $services.notification.sources.getNotificationParameters($parameters))
-#set($notifs = $services.notification.notifiers.getNotifications($notifParameters))
+#set($notifs = $services.notification.notifiers.getNotifications($notifParameters, true))
 {{html clean="false"}}
 &lt;div class="notifications-macro" data-displayReadStatus="$!escapetool.xml($xcontext.macro.params.displayReadStatus)" $stringtool.join($dataParameters, " ")&gt;
 #if ('true' == $xcontext.macro.params.displayRSSLink)

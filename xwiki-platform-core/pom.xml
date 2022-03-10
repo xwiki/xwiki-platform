@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,13 +18,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>14.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -52,16 +50,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <systemProperties combine.children="append">
-              <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
-              <!-- TODO: Remove this property once all functional tests have been moved to use the failsafe plugin -->
-              <property>
-                <name>screenshotDirectory</name>
-                <value>${basedir}/target/screenshots</value>
-              </property>
-            </systemProperties>
-          </configuration>
           <dependencies>
             <dependency>
               <groupId>org.xwiki.commons</groupId>
@@ -69,48 +57,6 @@
               <version>${commons.version}</version>
             </dependency>
           </dependencies>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <configuration>
-            <systemProperties combine.children="append">
-              <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
-              <property>
-                <name>screenshotDirectory</name>
-                <value>${basedir}/target/screenshots</value>
-              </property>
-            </systemProperties>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>net.alchim31.maven</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <configuration>
-            <skip>${xwiki.minification.skip}</skip>
-            <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
-            <jswarn>false</jswarn>
-            <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
-              currently more widely used in the JavaScript world. -->
-            <suffix>.min</suffix>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>com.cj.jshintmojo</groupId>
-          <artifactId>jshint-maven-plugin</artifactId>
-          <version>1.6.0</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>lint</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <globals>require,define</globals>
-            <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
-            <options>camelcase,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,maxlen:120</options>
-          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -144,53 +90,103 @@
                 </exclude>
               </archives>
             </revapi.filter>
-            <!-- Add ignores here using the following syntax. You can use a single <revapi.ignore> entry but it
-                 cannot be empty.
+            <!-- Add ignores here using the following syntax. You can use a single <revapi.differences> entry but it
+                 cannot be empty. You can also use different <revapi.differences> entries if you wish to use a common
+                 justification for example (see example below).
+
+                 By default criticality is set to "error" if not specified.
+                 See https://revapi.org/revapi/configuration.html#_criticality for more.
 
                  Note: you can use regexes by using the syntax: <regex>true</regex>
                  Don't forget to '\'-escape dots and other special characters in this case ;)
-            <revapi.ignore>
-              <item>
-                <code>java.class.removed</code>
-                <old>class org.xwiki.velocity.tools.CollectionsTool</old>
-                <justification>Not a Breakage. Moved to Legacy</justification>
-              </item>
-            </revapi.ignore>
-            -->
-            <revapi.ignore>
-              <item>
-                <code>java.annotation.added</code>
-                <old>method void org.xwiki.rendering.macro.useravatar.UserAvatarMacroParameters::setUsername(java.lang.String)</old>
-                <new>method void org.xwiki.rendering.macro.useravatar.UserAvatarMacroParameters::setUsername(java.lang.String)</new>
-                <annotation>@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.user.UserReference.class})</annotation>
-                <justification>Not a breakage for using the User Avatar macro.</justification>
-              </item>
-              <item>
-                <code>java.method.removed</code>
-                <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(java.lang.String, java.util.List&lt;java.lang.String&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                <justification>Not a breakage. Old deprecated method that has been moved to legacy.</justification>
-              </item>
-              <item>
-                <code>java.method.removed</code>
-                <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(java.lang.String, java.util.List&lt;java.lang.String&gt;, java.util.List&lt;java.lang.String&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                <justification>Not a breakage. Old deprecated method that has been moved to legacy.</justification>
-              </item>
-              <item>
-                <code>java.method.removed</code>
-                <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(java.lang.String, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                <justification>Not a breakage. Old deprecated method that has been moved to legacy.</justification>
-              </item>
 
-            </revapi.ignore>
-            </analysisConfiguration>
-          </configuration>
-        </plugin>
-      </plugins>
-    </build>
-    <modules>
+                 Common justification example:
+
+            <revapi.differences>
+              <justification>This change is necessary to fix bug #1234</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <code>java.method.addToInterface</code>
+                  <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
+                  <new>method void com.acme.ToolInterface::setup()</new>
+                </item>
+                <item>
+                  <code>java.method.removed</code>
+                  <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
+                  <old>method void com.acme.ToolInterface::initialize()</old>
+                  <justification>...</justification>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              ... other difference group here...
+            </revapi.differences>
+
+                 Single justification example:
+
+            <revapi.differences>
+              <differences>
+                <item>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.diff.xml.XMLDiff::xxx()</old>
+                  <justification>Unstable API added by mistake.</justification>
+                  <criticality>highlight</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
+            -->
+            <!-- Difference related to the Security refactoring. Start a new <revapi.differences> entry for other
+                 differences -->
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.util.Optional&lt;org.xwiki.rendering.block.MacroBlock&gt; org.xwiki.rendering.macro.MacroRefactoring::replaceReference(org.xwiki.rendering.block.MacroBlock, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.AttachmentReference, org.xwiki.model.reference.AttachmentReference, boolean) throws org.xwiki.rendering.macro.MacroRefactoringException</new>
+                  <justification>Young API</justification>
+                  <criticality>documented</criticality>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.util.concurrent.CompletableFuture&lt;org.xwiki.index.internal.TaskData&gt; org.xwiki.index.TaskManager::addTask(java.lang.String, long, java.lang.String)</new>
+                  <justification>Young API</justification>
+                  <criticality>documented</criticality>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.util.concurrent.CompletableFuture&lt;org.xwiki.index.internal.TaskData&gt; org.xwiki.index.TaskManager::replaceTask(java.lang.String, long, java.lang.String, java.lang.String)</old>
+                  <justification>Young API</justification>
+                  <criticality>documented</criticality>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.noLongerImplementsInterface</code>
+                  <old>class com.xpn.xwiki.doc.XWikiLink</old>
+                  <new>class com.xpn.xwiki.doc.XWikiLink</new>
+                  <interface>java.io.Serializable</interface>
+                  <justification>Removed since the class does not need to be serializable.</justification>
+                  <criticality>highlight</criticality>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.store.migration.hibernate.R130407000XWIKI19207DataMigration</old>
+                  <justification>Still executed but associated to a more recent version.</justification>
+                  <criticality>allowed</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
+          </analysisConfiguration>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <modules>
       <!-- Sorted Alphabetically -->
     <module>xwiki-platform-activeinstalls</module>
-    <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-alerts</module>
     <module>xwiki-platform-annotation</module>
@@ -231,16 +227,20 @@
     <module>xwiki-platform-job</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-lesscss</module>
+    <module>xwiki-platform-like</module>
     <module>xwiki-platform-linkchecker</module>
+    <module>xwiki-platform-livedata</module>
     <module>xwiki-platform-livetable</module>
     <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mail</module>
     <module>xwiki-platform-mailsender</module>
+    <module>xwiki-platform-mentions</module>
     <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>
     <module>xwiki-platform-model</module>
+    <module>xwiki-platform-netflux</module>
     <module>xwiki-platform-notifications</module>
     <module>xwiki-platform-observation</module>
     <module>xwiki-platform-office</module>
@@ -248,6 +248,7 @@
     <module>xwiki-platform-panels</module>
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-ratings</module>
+    <module>xwiki-platform-realtime</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>
@@ -274,9 +275,9 @@
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-velocity</module>
     <module>xwiki-platform-vfs</module>
-    <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webjars</module>
+    <module>xwiki-platform-websocket</module>
     <module>xwiki-platform-wiki</module>
     <module>xwiki-platform-wysiwyg</module>
     <module>xwiki-platform-xar</module>
@@ -312,6 +313,52 @@
                   <property>
                     <name>oracle.jdbc.timezoneAsRegion</name>
                     <value>false</value>
+                  </property>
+                </systemProperties>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <!-- Executed when the docker profile is not specified. This is because we want to define the
+           "screenshotDirectory" system property for Surefire/Failsafe plugins only when not executing docker-based
+           tests since it's not used for them (the screenshot directory is computed based on the "maven.build.dir"
+            system property for them). -->
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <systemProperties combine.children="append">
+                  <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is
+                       failing.
+                       TODO: Remove this property once all functional tests have been moved to use the failsafe plugin
+                  -->
+                  <property>
+                    <name>screenshotDirectory</name>
+                    <value>${project.build.directory}/screenshots</value>
+                  </property>
+                </systemProperties>
+              </configuration>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemProperties combine.children="append">
+                  <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is
+                       failing (only used by non-docker UI tests) -->
+                  <property>
+                    <name>screenshotDirectory</name>
+                    <value>${project.build.directory}/screenshots</value>
                   </property>
                 </systemProperties>
               </configuration>

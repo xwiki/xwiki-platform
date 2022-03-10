@@ -48,8 +48,8 @@ tour.homepageTour.breadcrumbs.contentB=你随时可以通过按{0}按钮的方�
 tour.homepageTour.pageContent.title=页面内容
 tour.homepageTour.pageContent.contentA=这是将显示当前页面内容。
 tour.homepageTour.pageContent.contentB=编辑这个页面可以向这个页面增加表格、列表、宏和文章结构来整理你的知识。
-tour.homepageTour.pageMenu.title=页面菜单tour.homepageTour.pageMenu.contentA\=这个菜单包括可以对这个页面进行的改动，若你有相应的权限，就可以编辑、创建、管理此页面。
-### Missing: tour.homepageTour.pageMenu.contentA=This menu contains page related actions. With the appropriate rights, you can edit, create, administer or delete pages.
+tour.homepageTour.pageMenu.title=页面菜单
+tour.homepageTour.pageMenu.contentA=此菜单包含与页面相关的操作。拥有适当的权限，您可以编辑，创建，管理或删除页面。
 tour.homepageTour.pageMenu.contentB=这个{0}按钮可以显示更多的行为，比如导出、打印、分享。
 tour.homepageTour.pageTabs.title=页面标签
 tour.homepageTour.pageTabs.contentA=你可以和其他用户一起对页面的内容进行评论。

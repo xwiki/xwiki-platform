@@ -45,7 +45,6 @@ import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.RegistrationPage;
 import org.xwiki.test.ui.po.TableElement;
-import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 import com.icegreen.greenmail.util.GreenMail;
 

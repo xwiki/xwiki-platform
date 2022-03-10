@@ -280,7 +280,7 @@
 .annotation-bubble {
   background: $theme.backgroundSecondaryColor;
   border: 1px dotted $theme.borderColor;
-  width: 280px;
+  width: 560px;
   position: absolute;
   z-index: 2;
   border-radius: 0 10px 10px 10px;
@@ -327,9 +327,6 @@
 .annotationAvatar img {
   max-width: 50px;
   max-height: 50px;
-}
-* html .annotationAvatar img {
-  width: 50px;
 }
 
 #allAnnotations .annotationAvatar  {

@@ -290,8 +290,10 @@ public class EditPage extends BasePage
 
         // // Actionbuttons javascript for saving the page.
         getDriver().waitUntilJavascriptCondition(
-            "return XWiki.actionButtons != undefined && " + "XWiki.actionButtons.EditActions != undefined && "
-                + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
+            "return typeof XWiki !== 'undefined' "
+                + "&& XWiki.actionButtons != undefined "
+                + "&& XWiki.actionButtons.EditActions != undefined "
+                + "&& XWiki.actionButtons.AjaxSaveAndContinue != undefined");
     }
 
     protected Set<Locale> getExistingLocales(List<WebElement> elements)
@@ -337,7 +339,7 @@ public class EditPage extends BasePage
     {
         WebElement element;
         if ("default".equals(locale)) {
-            element = getDriver().findElementByLinkText("default");
+            element = getDriver().findElement(By.linkText("default"));
         } else {
             element = getDriver().findElementWithoutWaiting(
                 By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a[text()='" + locale + "']"));

@@ -28,7 +28,6 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.query.Query;
@@ -112,5 +111,13 @@ public class TagNotificationFilterTest
 
         verify(query).bindValue("tagList", Arrays.asList("foo", "bar", "baz"));
         verify(query).setWiki("mywiki");
+
+        ExpressionNode emptyPages = value(EventProperty.PAGE).inStrings(Arrays.asList())
+            .and(value(EventProperty.WIKI).eq(value("mywiki")));
+
+        List pagesForUnusedTags = Collections.EMPTY_LIST;
+        when(query.execute()).thenReturn(pagesForUnusedTags);
+        assertEquals(emptyPages, tagNotificationFilter.filterExpression(null,
+            preferenceList, NotificationFilterType.EXCLUSIVE, null));
     }
 }

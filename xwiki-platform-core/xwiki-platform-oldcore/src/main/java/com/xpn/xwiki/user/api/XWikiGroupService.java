@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -91,7 +90,6 @@ public interface XWikiGroupService
      * @throws XWikiException in case of problem when doing the replacement
      * @since 11.9RC1
      */
-    @Unstable
     default void replaceMemberInAllGroups(DocumentReference memberSource, DocumentReference memberTarget,
         XWikiContext context) throws XWikiException
     {

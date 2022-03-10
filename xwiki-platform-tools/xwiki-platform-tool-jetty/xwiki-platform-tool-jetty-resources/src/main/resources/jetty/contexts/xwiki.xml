@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://www.eclipse.org/jetty/configure_10_0.dtd">
 
 <Configure class="org.eclipse.jetty.webapp.WebAppContext">
   <Set name="contextPath">/xwiki</Set>
-  <Set name="war"><SystemProperty name="jetty.home" default="."/>/../webapps/xwiki</Set>
+  <Set name="war"><SystemProperty name="jetty.base" default="."/>/webapps/xwiki</Set>
 </Configure>

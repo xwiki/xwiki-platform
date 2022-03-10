@@ -603,18 +603,12 @@ $xwiki.jsx.use($attachmentPickerDocName)
               this.dialog.closeDialog();
             }.bindAsEventListener(this),
             onFailure : function(response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
+              var failureReason = response.statusText || 'Server not responding';
               if (targetElement._x_notif) {
                 targetElement._x_notif.replace(new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.failed')" + failureReason, "error"));
               } else {
                 new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error");
               }
-            },
-            on1223 : function(response) {
-              response.request.options.onSuccess(response);
             },
             on0 : function(response) {
               response.request.options.onFailure(response);
@@ -1119,9 +1113,6 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
   ## Make this box twice as large as the others
   width: ${uploadBoxSize}px;
 }
-* html .gallery_upload {
-  width: ${mathtool.add($uploadBoxSize, 2)}px;
-}
 .gallery_upload, .gallery_upload:hover {
   background-color: $theme.backgroundSecondaryColor;
 }
@@ -1384,7 +1375,6 @@ $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
 $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', true)##
 $xwiki.jsx.use($xcontext.macro.doc.fullName)##
 $xwiki.ssx.use($xcontext.macro.doc.fullName)##
-$xwiki.jsfx.use('js/scriptaculous/builder.js')##
 ## Integrates the optional Lightbox widget (from http://extensions.xwiki.org/xwiki/bin/view/Extension/Lightbox+Application )
 #if ($xwiki.exists('XWiki.Lightbox'))
   $xwiki.jsx.use('XWiki.Lightbox')

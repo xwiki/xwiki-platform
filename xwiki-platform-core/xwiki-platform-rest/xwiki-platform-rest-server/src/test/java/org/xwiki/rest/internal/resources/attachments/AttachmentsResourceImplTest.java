@@ -32,7 +32,7 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.tika.io.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReference;
@@ -69,7 +69,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-public class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
+class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 {
     @InjectMockComponents
     AttachmentsResourceImpl attachmentsResource;
@@ -91,12 +91,11 @@ public class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         super.setUp();
 
         setUriInfo(this.attachmentsResource);
-        this.oldCore.registerMockEnvironment();
         this.xcontext.setRequest(mock(XWikiRequest.class));
     }
 
     @Test
-    public void getAttachments() throws Exception
+    void getAttachments() throws Exception
     {
         this.xcontext.setWikiId("other");
 
@@ -151,7 +150,7 @@ public class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
     }
 
     @Test
-    public void createAttachment() throws Exception
+    void createAttachment() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("test", Arrays.asList("Path", "To"), "Page");
         XWikiDocument cachedDocument = prepareXWikiDocument(documentReference, "test:Path.To.Page", true, true, false);
@@ -182,7 +181,7 @@ public class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
     }
 
     @Test
-    public void updateAttachment() throws Exception
+    void updateAttachment() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("test", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = prepareXWikiDocument(documentReference, "test:Path.To.Page", true, true, true);

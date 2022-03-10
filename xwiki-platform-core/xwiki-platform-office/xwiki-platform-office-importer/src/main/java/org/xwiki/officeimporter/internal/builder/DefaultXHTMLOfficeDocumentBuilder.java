@@ -19,19 +19,23 @@
  */
 package org.xwiki.officeimporter.internal.builder;
 
-import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.parser.html.HtmlEncodingDetector;
 import org.w3c.dom.Document;
@@ -41,6 +45,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverterException;
+import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -91,16 +96,27 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
         // Invoke the office document converter.
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
         inputStreams.put(cleanedOfficeFileName, officeFileStream);
-        Map<String, byte[]> artifacts;
         // The office converter uses the output file name extension to determine the output format/syntax.
         String outputFileName = StringUtils.substringBeforeLast(cleanedOfficeFileName, ".") + ".html";
+        OfficeConverterResult officeConverterResult;
         try {
-            artifacts = this.officeServer.getConverter().convert(inputStreams, cleanedOfficeFileName, outputFileName);
+            officeConverterResult =
+                this.officeServer.getConverter().convertDocument(inputStreams, cleanedOfficeFileName, outputFileName);
         } catch (OfficeConverterException ex) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), ex);
         }
 
+        Document xhtmlDoc = this.cleanAndCreateFile(reference, filterStyles, officeConverterResult);
+        Set<File> artifacts = this.handleArtifacts(xhtmlDoc, officeConverterResult);
+
+        // Return a new XHTMLOfficeDocument instance.
+        return new XHTMLOfficeDocument(xhtmlDoc, artifacts, officeConverterResult);
+    }
+
+    private Document cleanAndCreateFile(DocumentReference reference, boolean filterStyles,
+        OfficeConverterResult officeConverterResult) throws OfficeImporterException
+    {
         // Prepare the parameters for HTML cleaning.
         Map<String, String> params = new HashMap<String, String>();
         params.put("targetDocument", this.entityReferenceSerializer.serialize(reference));
@@ -114,37 +130,38 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
         // Parse and clean the HTML output.
         HTMLCleanerConfiguration configuration = this.officeHtmlCleaner.getDefaultConfiguration();
         configuration.setParameters(params);
-        Reader html = getReader(artifacts.remove(outputFileName));
-        Document xhtmlDoc = this.officeHtmlCleaner.clean(html, configuration);
+
+        Reader html = null;
+        try {
+            html = new FileReader(officeConverterResult.getOutputFile());
+        } catch (FileNotFoundException e) {
+            throw new OfficeImporterException(
+                String.format("The output file cannot be found: [%s].", officeConverterResult.getOutputFile()), e);
+        }
+        return this.officeHtmlCleaner.clean(html, configuration);
+    }
+
+    private Set<File> handleArtifacts(Document xhtmlDoc, OfficeConverterResult officeConverterResult)
+        throws OfficeImporterException
+    {
+        Set<File> artifacts = new HashSet<>(officeConverterResult.getAllFiles());
+        artifacts.remove(officeConverterResult.getOutputFile());
 
         @SuppressWarnings("unchecked")
         Map<String, byte[]> embeddedImages = (Map<String, byte[]>) xhtmlDoc.getUserData("embeddedImages");
         if (embeddedImages != null) {
-            artifacts.putAll(embeddedImages);
+            File outputDirectory = officeConverterResult.getOutputDirectory();
+            for (Map.Entry<String, byte[]> embeddedImage : embeddedImages.entrySet()) {
+                File outputFile = new File(outputDirectory, embeddedImage.getKey());
+                try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+                    IOUtils.write(embeddedImage.getValue(), fos);
+                } catch (IOException e) {
+                    throw new OfficeImporterException(
+                        String.format("Error when writing embedded image file [%s]", outputFile.getAbsolutePath()), e);
+                }
+                artifacts.add(outputFile);
+            }
         }
-
-        // Return a new XHTMLOfficeDocument instance.
-        return new XHTMLOfficeDocument(xhtmlDoc, artifacts);
-    }
-
-    /**
-     * Detects the proper encoding of the given byte array and returns a reader.
-     * 
-     * @param html HTML text as a byte array
-     * @return a reader for the given HTML byte array, that has the proper encoding
-     */
-    private Reader getReader(byte[] html)
-    {
-        InputStream htmlInputStream = new ByteArrayInputStream(html);
-        Charset charset = null;
-        try {
-            charset = htmlEncodingDetector.detect(htmlInputStream, null);
-        } catch (IOException e) {
-            // Shouldn't happen.
-        }
-        if (charset == null) {
-            charset = Charset.forName("UTF-8");
-        }
-        return new InputStreamReader(htmlInputStream, charset);
+        return artifacts;
     }
 }

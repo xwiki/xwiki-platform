@@ -24,6 +24,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -42,6 +43,9 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@ComponentList({
+    org.xwiki.xml.internal.DefaultXMLReaderFactory.class,
+})
 @OldcoreTest
 public class PdfExportImplTest
 {
@@ -110,22 +114,23 @@ public class PdfExportImplTest
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
                 + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
-                + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>\n"
+                + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>\n"
+            + "<title>\n"
             + "  Main.ttt - ttt\n"
-            + "</title>"
-            + "<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\"/>"
-            + "<meta content=\"en\" name=\"language\"/>"
-            + "</head><body class=\"exportbody\" id=\"body\" pdfcover=\"0\" pdftoc=\"0\">"
+            + "</title>\n"
+            + "<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\"/>\n"
+            + "<meta content=\"en\" name=\"language\"/>\n\n"
+            + "</head><body class=\"exportbody\" id=\"body\" pdfcover=\"0\" pdftoc=\"0\">\n\n"
             + "<div id=\"xwikimaincontainer\">\n"
             + "<div id=\"xwikimaincontainerinner\">\n\n"
             + "<div id=\"xwikicontent\">\n"
-            + "      <p><span style=\"color: #f00; background-color: #fff; background-image: none; "
+                + "      <p><span style=\"color: #f00; background-color: #fff; background-image: none; "
                 + "background-position: 0% 0%; background-size: auto auto; background-origin: padding-box; "
                 + "background-clip: border-box; background-repeat: repeat repeat; "
                 + "background-attachment: scroll; \">Hello Clément</span></p>\n"
             + "          </div>\n"
             + "</div>\n"
-            + "</div>"
+            + "</div>\n\n"
             + "</body></html>";
 
         assertEquals(expected, pdfExport.applyCSS(html, css, xcontext));

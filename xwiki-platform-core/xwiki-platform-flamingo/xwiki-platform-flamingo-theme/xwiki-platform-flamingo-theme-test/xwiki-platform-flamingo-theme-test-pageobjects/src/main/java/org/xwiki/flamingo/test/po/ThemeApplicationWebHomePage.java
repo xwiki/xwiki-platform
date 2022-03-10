@@ -25,8 +25,9 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.ViewPage;
 
-public class ThemeApplicationWebHomePage extends CSSGetterPage
+public class ThemeApplicationWebHomePage extends ViewPage
 {
     @FindBy(xpath = "//div[contains(@class, 'current-theme')]//div[@class='theme-info']//h3")
     private WebElement currentTheme;
@@ -82,12 +83,5 @@ public class ThemeApplicationWebHomePage extends CSSGetterPage
             + "//h3/span/span/a[contains(text(), '"+themeName+"')]"));
         elem.click();
         return new ViewThemePage();
-    }
-
-    @Override
-    protected String getElementCSSValue(final By locator, String attribute)
-    {
-        WebElement element = getDriver().findElement(locator);
-        return element.getCssValue(attribute);
     }
 }

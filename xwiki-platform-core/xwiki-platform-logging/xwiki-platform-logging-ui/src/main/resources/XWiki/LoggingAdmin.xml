@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.4" reference="XWiki.LoggingAdmin" locale="">
   <web>XWiki</web>
   <name>LoggingAdmin</name>
   <language/>
@@ -57,26 +57,32 @@
   #else
     {{error}}Failed to set log level: the logger "$request.logger_name" doesn't exist.{{/error}}
   #end
+
 #end
 ##
-## Livetable #
+## Live Data
 ##
-#set($columns = [ 'logger'  , 'level'])
-#set($columnsProperties = {
-    'logger' : { 'type' : 'text' },
-    'level' : { 'type' : 'text', 'size' : '3' }
+#set ($properties = ['logger', 'level'])
+#set ($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': []
+  }
 })
-#set($options = {
-    'resultPage': 'XWiki.LoggingAdminTableJson',
-    'translationPrefix' : 'logging.admin.livetable.'
-})
-##
-#if ($xwiki.hasAccessLevel('programming'))
-  #set($void = $columns.add('actions'))
-  #set($void = $columnsProperties.put('actions', { 'html' : true, 'sortable' : false }))
+#if ($services.security.authorization.hasAccess('programming'))
+  #set ($discard = $properties.add('actions'))
+  #set ($discard = $liveDataConfig.meta.propertyDescriptors.add({
+    'id': 'actions',
+    'displayer': 'html',
+    'sortable': false,
+    'filterable': false
+  }))
 #end
-##
-#livetable("logging" $columns $columnsProperties $options)
+{{liveData
+  id="logging"
+  properties="$stringtool.join($properties, ',')"
+  source="liveTable"
+  sourceParameters="resultPage=XWiki.LoggingAdminTableJson&amp;translationPrefix=logging.admin.livetable."
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>
   <object>
     <name>XWiki.LoggingAdmin</name>
@@ -95,6 +101,7 @@
       <categoryIcon>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>categoryIcon</name>
         <number>11</number>
         <picker>0</picker>
@@ -106,9 +113,11 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </categoryIcon>
       <codeToExecute>
+        <contenttype>VelocityWiki</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>---</editor>
+        <hint/>
         <name>codeToExecute</name>
         <number>7</number>
         <picker>0</picker>
@@ -124,19 +133,22 @@
         <cache>0</cache>
         <classname/>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
         <hint/>
         <idField/>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>configurationClass</name>
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -145,23 +157,10 @@
         <valueField/>
         <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </configurationClass>
-      <configureGlobally>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <name>configureGlobally</name>
-        <number>4</number>
-        <prettyName>configureGlobally</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </configureGlobally>
       <displayBeforeCategory>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayBeforeCategory</name>
         <number>10</number>
         <picker>0</picker>
@@ -175,6 +174,7 @@
       <displayInCategory>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayInCategory</name>
         <number>9</number>
         <picker>0</picker>
@@ -188,6 +188,7 @@
       <displayInSection>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayInSection</name>
         <number>1</number>
         <picker>0</picker>
@@ -201,6 +202,7 @@
       <heading>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>heading</name>
         <number>2</number>
         <picker>0</picker>
@@ -214,6 +216,7 @@
       <iconAttachment>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>iconAttachment</name>
         <number>8</number>
         <picker>0</picker>
@@ -227,6 +230,7 @@
       <linkPrefix>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>linkPrefix</name>
         <number>5</number>
         <picker>0</picker>
@@ -240,8 +244,12 @@
       <propertiesToShow>
         <cache>0</cache>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>propertiesToShow</name>
         <number>6</number>
@@ -258,9 +266,35 @@
         <values/>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </propertiesToShow>
+      <scope>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>12</number>
+        <picker>1</picker>
+        <prettyName>scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>WIKI|SPACE|ALL_SPACES|WIKI+ALL_SPACES</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
       <sectionOrder>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>sectionOrder</name>
         <number>12</number>
         <numberType>integer</numberType>
@@ -273,13 +307,19 @@
       </sectionOrder>
     </class>
     <property>
+      <categoryIcon/>
+    </property>
+    <property>
       <codeToExecute>{{display reference="XWiki.LoggingAdmin"/}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>
     </property>
     <property>
-      <configureGlobally>1</configureGlobally>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory/>
     </property>
     <property>
       <displayInSection>Logging</displayInSection>
@@ -295,6 +335,12 @@
     </property>
     <property>
       <propertiesToShow/>
+    </property>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+    <property>
+      <sectionOrder/>
     </property>
   </object>
 </xwikidoc>

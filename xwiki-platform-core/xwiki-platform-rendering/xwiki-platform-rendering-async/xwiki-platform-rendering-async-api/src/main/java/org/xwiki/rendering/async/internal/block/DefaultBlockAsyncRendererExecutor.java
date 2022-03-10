@@ -127,7 +127,7 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
         // Get result
         BlockAsyncRendererResult result = (BlockAsyncRendererResult) response.getStatus().getResult();
 
-        if (result != null) {
+        if (result != null && !configuration.isPlaceHolderForced()) {
             return result.getBlock();
         }
 
@@ -156,7 +156,7 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
         // Get result
         BlockAsyncRendererResult result = (BlockAsyncRendererResult) response.getStatus().getResult();
 
-        if (result != null) {
+        if (result != null && !configuration.isPlaceHolderForced()) {
             return result.getResult();
         }
 

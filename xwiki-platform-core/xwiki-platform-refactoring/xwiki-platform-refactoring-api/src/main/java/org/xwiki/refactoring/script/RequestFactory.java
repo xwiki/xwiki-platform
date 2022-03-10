@@ -32,7 +32,6 @@ import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.ReplaceUserRequest;
 import org.xwiki.refactoring.job.RestoreRequest;
-import org.xwiki.stability.Unstable;
 
 /**
  * Factory dedicated to the creation of the requests.
@@ -178,6 +177,5 @@ public interface RequestFactory
      * @return the request to replace the user reference
      * @since 11.8RC1
      */
-    @Unstable
     ReplaceUserRequest createReplaceUserRequest(DocumentReference oldUserReference, DocumentReference newUserReference);
 }

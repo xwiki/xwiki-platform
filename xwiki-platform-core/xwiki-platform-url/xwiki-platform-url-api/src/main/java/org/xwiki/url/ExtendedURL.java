@@ -267,6 +267,7 @@ public class ExtendedURL implements Cloneable
         return new HashCodeBuilder(7, 7)
             .append(getURI())
             .append(getSegments())
+            .append(getParameters())
             .toHashCode();
     }
 
@@ -286,6 +287,7 @@ public class ExtendedURL implements Cloneable
         return new EqualsBuilder()
             .append(getURI(), rhs.getURI())
             .append(getSegments(), rhs.getSegments())
+            .append(getParameters(), rhs.getParameters())
             .isEquals();
     }
 

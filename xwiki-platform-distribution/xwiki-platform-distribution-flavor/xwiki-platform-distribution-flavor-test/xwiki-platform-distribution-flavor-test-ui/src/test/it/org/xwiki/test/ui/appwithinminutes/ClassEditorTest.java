@@ -35,7 +35,10 @@ import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.xclass.test.po.ClassSheetPage;
+
+import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.EMPTY_CANVAS_HINT;
 
 /**
  * Tests the application class editor.
@@ -45,11 +48,6 @@ import org.xwiki.xclass.test.po.ClassSheetPage;
  */
 public class ClassEditorTest extends AbstractClassEditorTest
 {
-    /**
-     * The message displayed when the canvas is empty.
-     */
-    public static final String EMPTY_CANVAS_HINT = "Drag fields from the palette and drop them in this area.";
-
     /**
      * Tests that the hint is displayed only when the canvas is empty.
      */
@@ -114,6 +112,9 @@ public class ClassEditorTest extends AbstractClassEditorTest
         // Edit the class template and see if the deleted field is now deprecated.
         ObjectEditPage objectEditor = new ClassSheetPage().clickTemplateLink().editObjects();
         String className = String.format("%s.%s", getTestClassName(), getTestMethodName());
+        List<ObjectEditPane> objectsOfClass = objectEditor.getObjectsOfClass(className);
+        Assert.assertEquals(1, objectsOfClass.size());
+        objectsOfClass.get(0).displayObject();
         Assert.assertTrue(objectEditor.isPropertyDeprecated(className, "boolean1"));
         Assert.assertFalse(objectEditor.isPropertyDeprecated(className, "date1"));
     }

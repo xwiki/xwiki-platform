@@ -22,7 +22,11 @@ package com.xpn.xwiki.web;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
+
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -34,8 +38,17 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.util.Util;
 
+@Component
+@Named("propadd")
+@Singleton
 public class PropAddAction extends XWikiAction
 {
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return PropAddForm.class;
+    }
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -58,10 +71,9 @@ public class PropAddAction extends XWikiAction
         String propName = ((PropAddForm) form).getPropName();
 
         if (!Util.isValidXMLElementName(propName)) {
-            context.put("message", "action.addClassProperty.error.invalidName");
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST,
-                localizePlainOrKey("action.addClassProperty.error.invalidName"));
-            return true;
+            writeAjaxErrorResponse(HttpServletResponse.SC_BAD_REQUEST,
+                localizePlainOrKey("action.addClassProperty.error.invalidName"), context);
+            return false;
         }
 
         String propType = ((PropAddForm) form).getPropType();

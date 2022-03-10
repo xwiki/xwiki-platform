@@ -21,7 +21,6 @@ package com.xpn.xwiki.internal.model.reference;
 
 import javax.inject.Named;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
@@ -45,6 +44,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 /**
@@ -53,13 +53,15 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+// @formatter:off
 @ComponentList({
     DefaultConverterManager.class,
     ContextComponentManagerProvider.class,
     EnumConverter.class,
     ConvertUtilsConverter.class
 })
-public class DocumentReferenceConverterTest
+// @formatter:on
+class DocumentReferenceConverterTest
 {
     @InjectMockComponents
     private DocumentReferenceConverter documentReferenceConverter;
@@ -78,36 +80,35 @@ public class DocumentReferenceConverterTest
     private DocumentReferenceResolver<EntityReference> mockReferenceResolver;
 
     @MockComponent
-    @Named("compact")
     private EntityReferenceSerializer<String> mockSerialier;
 
     @BeforeEach
-    public void setup(MockitoComponentManager componentManager) throws ComponentLookupException
+    void setup(MockitoComponentManager componentManager) throws ComponentLookupException
     {
         this.converterManager = componentManager.getInstance(ConverterManager.class);
     }
 
     @Test
-    public void testConvertFromString()
+    void convertFromString()
     {
         when(this.mockStringResolver.resolve("wiki:space.page")).thenReturn(
             new DocumentReference("wiki", "space", "page"));
-        Assert.assertEquals(new DocumentReference("wiki", "space", "page"),
+        assertEquals(new DocumentReference("wiki", "space", "page"),
             this.converterManager.convert(DocumentReference.class, "wiki:space.page"));
 
         when(this.mockStringResolver.resolve("space.page")).thenReturn(
             new DocumentReference("currentwiki", "space", "page"));
-        Assert.assertEquals(new DocumentReference("currentwiki", "space", "page"),
+        assertEquals(new DocumentReference("currentwiki", "space", "page"),
             this.converterManager.convert(DocumentReference.class, "space.page"));
 
         when(this.mockStringResolver.resolve("page")).thenReturn(
             new DocumentReference("currentwiki", "currentspace", "page"));
-        Assert.assertEquals(new DocumentReference("currentwiki", "currentspace", "page"),
+        assertEquals(new DocumentReference("currentwiki", "currentspace", "page"),
             this.converterManager.convert(DocumentReference.class, "page"));
     }
 
     @Test
-    public void testConvertFromReference()
+    void convertFromReference()
     {
         EntityReference reference;
 
@@ -116,44 +117,44 @@ public class DocumentReferenceConverterTest
                 new EntityReference("wiki", EntityType.WIKI)));
         when(this.mockReferenceResolver.resolve(reference)).thenReturn(
             new DocumentReference("wiki", "space", "page"));
-        Assert.assertEquals(new DocumentReference("wiki", "space", "page"),
+        assertEquals(new DocumentReference("wiki", "space", "page"),
             this.converterManager.convert(DocumentReference.class, reference));
 
         reference = new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));
         when(this.mockReferenceResolver.resolve(reference)).thenReturn(
             new DocumentReference("currentwiki", "space", "page"));
-        Assert.assertEquals(new DocumentReference("currentwiki", "space", "page"),
+        assertEquals(new DocumentReference("currentwiki", "space", "page"),
             this.converterManager.convert(DocumentReference.class, reference));
 
         reference = new EntityReference("page", EntityType.DOCUMENT);
         when(this.mockReferenceResolver.resolve(reference)).thenReturn(
             new DocumentReference("currentwiki", "currentspace", "page"));
-        Assert.assertEquals(new DocumentReference("currentwiki", "currentspace", "page"),
+        assertEquals(new DocumentReference("currentwiki", "currentspace", "page"),
             this.converterManager.convert(DocumentReference.class, reference));
     }
 
     @Test
-    public void testConvertFromNull()
+    void convertFromNull()
     {
-        Assert.assertNull(this.converterManager.convert(DocumentReference.class, null));
+        assertNull(this.converterManager.convert(DocumentReference.class, null));
     }
 
     @Test
-    public void testConvertToString()
+    void convertToString()
     {
         when(this.mockSerialier.serialize(new DocumentReference("wiki", "space", "page"))).thenReturn(
             "wiki:space.page");
-        Assert.assertEquals("wiki:space.page",
+        assertEquals("wiki:space.page",
             this.converterManager.convert(String.class, new DocumentReference("wiki", "space", "page")));
 
         when(this.mockSerialier.serialize(new DocumentReference("wiki", "space", "page"))).thenReturn(
             "space.page");
-        Assert.assertEquals("space.page",
+        assertEquals("space.page",
             this.converterManager.convert(String.class, new DocumentReference("wiki", "space", "page")));
     }
 
     @Test
-    public void testConvertFromXWikiDocument()
+    void convertFromXWikiDocument()
     {
         DocumentReference documentReference = new DocumentReference("xwiki", "space", "page");
         XWikiDocument document = new XWikiDocument(documentReference);

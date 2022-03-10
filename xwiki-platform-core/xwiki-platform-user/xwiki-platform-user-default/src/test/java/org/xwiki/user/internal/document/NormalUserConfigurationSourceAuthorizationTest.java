@@ -55,8 +55,10 @@ import static org.mockito.Mockito.when;
  * @since 12.4RC1
  */
 @ComponentTest
-public class NormalUserConfigurationSourceAuthorizationTest
+class NormalUserConfigurationSourceAuthorizationTest
 {
+    private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
+
     @InjectMockComponents
     private NormalUserConfigurationSourceAuthorization authorization;
 
@@ -110,16 +112,16 @@ public class NormalUserConfigurationSourceAuthorizationTest
 
         // The user for which we're retrieving its configuration.
         this.userDocumentReference = new DocumentReference("wiki", "space", "user");
-        this.userReference = new DocumentUserReference(this.userDocumentReference, this.entityReferenceProvider);
+        this.userReference = new DocumentUserReference(this.userDocumentReference, true);
 
         // Current document and last author.
         this.lastAuthorDocumentReference = new DocumentReference("wiki", "space", "lastauthor");
-        when(this.currentDocument.getAuthorReference()).thenReturn(this.lastAuthorDocumentReference);
+        when(this.xcontext.getAuthorReference()).thenReturn(this.lastAuthorDocumentReference);
         when(this.xcontext.getDoc()).thenReturn(this.currentDocument);
         DocumentReference currentDocumentReference = new DocumentReference("wiki", "space", "currentdoc");
         when(this.currentDocument.getDocumentReference()).thenReturn(currentDocumentReference);
         DocumentUserReference lastAuthorReference =
-            new DocumentUserReference(this.lastAuthorDocumentReference, this.entityReferenceProvider);
+            new DocumentUserReference(this.lastAuthorDocumentReference, true);
         when(this.documentResolver.resolve(this.lastAuthorDocumentReference)).thenReturn(lastAuthorReference);
         when(this.bridgeSerializer.serialize(lastAuthorReference)).thenReturn(this.lastAuthorDocumentReference);
 

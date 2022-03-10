@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.Event;
@@ -44,7 +45,7 @@ public class DefaultEvent implements Event
 {
     /** The format of the {@link #toString()} result. */
     private static final MessageFormat STRING_FORMAT =
-        new MessageFormat("{0} at {1,time,yyyy-MM-dd HH:mm:ss} by {2} on {3}");
+        new MessageFormat("{0} at {1,time,yyyy-MM-dd HH:mm:ss} by {2} on {3} with id {4}");
 
     /** @see #getId() */
     private String id;
@@ -98,12 +99,17 @@ public class DefaultEvent implements Event
     private String body;
 
     /** @see #getParameters() */
-    private Map<String, String> parameters;
+    private Map<String, String> parametersCache;
+
+    /** @see #getCustom() */
+    private Map<String, Object> custom;
 
     /** @see #getTarget() */
     private Set<String> target;
 
     private boolean hidden;
+
+    private boolean prefiltered;
 
     @Override
     public String getId()
@@ -330,19 +336,50 @@ public class DefaultEvent implements Event
     @Override
     public Map<String, String> getParameters()
     {
-        return this.parameters == null ? Collections.<String, String>emptyMap()
-            : Collections.unmodifiableMap(this.parameters);
+        if (this.parametersCache == null) {
+            // Convert Map<String, Object> to Map<String, String> (as much as possible)
+            Map<String, String> parameters;
+            if (MapUtils.isEmpty(this.custom)) {
+                parameters = Collections.emptyMap();
+            } else {
+                parameters = new HashMap<>(this.custom.size());
+                this.custom.forEach((k, v) -> parameters.put(k, v != null ? v.toString() : null));
+            }
+
+            this.parametersCache = parameters;
+        }
+
+        return this.parametersCache;
+    }
+
+    @Override
+    public Map<String, Object> getCustom()
+    {
+        if (this.custom == null) {
+            this.custom = Collections.emptyMap();
+        }
+
+        return this.custom;
     }
 
     @Override
     public void setParameters(Map<String, String> parameters)
     {
-        if (parameters != null) {
-            this.parameters = new HashMap<String, String>(parameters);
+        setCustom(parameters);
+    }
+
+    @Override
+    public void setCustom(Map<String, ?> custom)
+    {
+        if (custom != null) {
+            this.custom = Collections.unmodifiableMap(new HashMap<>(custom));
         } else {
             // Fallback to empty parameters map.
-            this.parameters = new HashMap<String, String>();
+            this.custom = Collections.emptyMap();
         }
+
+        // Reset the String parameters cache
+        this.parametersCache = null;
     }
 
     @Override
@@ -360,7 +397,7 @@ public class DefaultEvent implements Event
     @Override
     public String toString()
     {
-        return STRING_FORMAT.format(new Object[] {getType(), getDate(), getUser(), getDocument()});
+        return STRING_FORMAT.format(new Object[] {getType(), getDate(), getUser(), getDocument(), getId()});
     }
 
     @Override
@@ -373,6 +410,18 @@ public class DefaultEvent implements Event
     public void setHidden(boolean isHidden)
     {
         this.hidden = isHidden;
+    }
+
+    @Override
+    public boolean isPrefiltered()
+    {
+        return this.prefiltered;
+    }
+
+    @Override
+    public void setPrefiltered(boolean prefiltered)
+    {
+        this.prefiltered = prefiltered;
     }
 
     /**
@@ -403,7 +452,7 @@ public class DefaultEvent implements Event
             builder.append(getHidden(), otherEvent.getHidden());
             builder.append(getId(), otherEvent.getId());
             builder.append(getImportance(), otherEvent.getImportance());
-            builder.append(getParameters(), otherEvent.getParameters());
+            builder.append(getCustom(), otherEvent.getCustom());
             builder.append(getRelatedEntity(), otherEvent.getRelatedEntity());
             builder.append(getSpace(), otherEvent.getSpace());
             builder.append(getStream(), otherEvent.getStream());
@@ -413,6 +462,7 @@ public class DefaultEvent implements Event
             builder.append(getUrl(), otherEvent.getUrl());
             builder.append(getUser(), otherEvent.getUser());
             builder.append(getWiki(), otherEvent.getWiki());
+            builder.append(isPrefiltered(), otherEvent.isPrefiltered());
 
             return builder.build();
         }
@@ -441,7 +491,7 @@ public class DefaultEvent implements Event
         builder.append(getHidden());
         builder.append(getId());
         builder.append(getImportance());
-        builder.append(getParameters());
+        builder.append(getCustom());
         builder.append(getRelatedEntity());
         builder.append(getSpace());
         builder.append(getStream());
@@ -451,6 +501,7 @@ public class DefaultEvent implements Event
         builder.append(getUrl());
         builder.append(getUser());
         builder.append(getWiki());
+        builder.append(isPrefiltered());
 
         return builder.build();
     }

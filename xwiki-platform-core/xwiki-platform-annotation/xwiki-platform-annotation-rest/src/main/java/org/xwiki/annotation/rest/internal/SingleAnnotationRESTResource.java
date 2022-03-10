@@ -19,6 +19,10 @@
  */
 package org.xwiki.annotation.rest.internal;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
@@ -126,10 +130,26 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
 
             // id from the url
             Annotation newAnnotation = new Annotation(id);
+
             // fields from the posted content
             for (AnnotationField field : updateRequest.getAnnotation().getFields()) {
                 newAnnotation.set(field.getName(), field.getValue());
             }
+            Map<String, Object> annotationMetaData = getMap(updateRequest.getAnnotation());
+
+            // skip these fields as we don't want to overwrite them with whatever is in this map. Setters should be used
+            // for these values or constructor
+            Collection<String> skippedFields =
+                Arrays.asList(new String[] {Annotation.SELECTION_FIELD, Annotation.SELECTION_LEFT_CONTEXT_FIELD,
+                    Annotation.SELECTION_RIGHT_CONTEXT_FIELD, Annotation.ORIGINAL_SELECTION_FIELD,
+                    Annotation.AUTHOR_FIELD, Annotation.STATE_FIELD});
+
+            for (Map.Entry<String, Object> field : annotationMetaData.entrySet()) {
+                if (!skippedFields.contains(field.getKey())) {
+                    newAnnotation.set(field.getKey(), field.getValue());
+                }
+            }
+
             // overwrite author if any was set because we know better who's logged in
             newAnnotation.setAuthor(getXWikiUser());
             // and update

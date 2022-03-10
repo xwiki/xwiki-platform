@@ -28,28 +28,31 @@ import java.util.Locale;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -64,13 +67,15 @@ import static org.mockito.Mockito.when;
  */
 @ComponentList
 @ReferenceComponentList
-public class CreateActionTest
+@OldcoreTest
+class CreateActionTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    MockitoOldcore oldcore;
 
     XWikiURLFactory mockURLFactory;
 
+    @InjectMockComponents
     CreateAction action;
 
     XWikiContext context;
@@ -81,44 +86,44 @@ public class CreateActionTest
 
     Query mockTemplateProvidersQuery;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
-        context = oldcore.getXWikiContext();
+        this.context = this.oldcore.getXWikiContext();
 
-        Utils.setComponentManager(oldcore.getMocker());
+        Utils.setComponentManager(this.oldcore.getMocker());
 
         QueryManager mockSecureQueryManager =
-            oldcore.getMocker().registerMockComponent((Type) QueryManager.class, "secure");
+            this.oldcore.getMocker().registerMockComponent((Type) QueryManager.class, "secure");
 
-        mockTemplateProvidersQuery = mock(Query.class);
-        when(mockSecureQueryManager.createQuery(any(), any())).thenReturn(mockTemplateProvidersQuery);
-        when(mockTemplateProvidersQuery.execute()).thenReturn(Collections.emptyList());
+        this.mockTemplateProvidersQuery = mock(Query.class);
+        when(mockSecureQueryManager.createQuery(any(), any())).thenReturn(this.mockTemplateProvidersQuery);
+        when(this.mockTemplateProvidersQuery.execute()).thenReturn(Collections.emptyList());
 
-        when(oldcore.getMockContextualAuthorizationManager().hasAccess(any(Right.class), any(EntityReference.class)))
-            .thenReturn(true);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(any(Right.class),
+            any(EntityReference.class))).thenReturn(true);
 
         Provider<DocumentReference> mockDocumentReferenceProvider =
-            oldcore.getMocker().registerMockComponent(DocumentReference.TYPE_PROVIDER);
+            this.oldcore.getMocker().registerMockComponent(DocumentReference.TYPE_PROVIDER);
         when(mockDocumentReferenceProvider.get())
             .thenReturn(new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome"));
 
-        mockURLFactory = mock(XWikiURLFactory.class);
-        context.setURLFactory(mockURLFactory);
+        this.mockURLFactory = mock(XWikiURLFactory.class);
+        this.context.setURLFactory(this.mockURLFactory);
 
-        action = new CreateAction();
+        this.mockRequest = mock(XWikiRequest.class);
+        this.context.setRequest(this.mockRequest);
 
-        mockRequest = mock(XWikiRequest.class);
-        context.setRequest(mockRequest);
+        this.mockResponse = mock(XWikiResponse.class);
+        this.context.setResponse(this.mockResponse);
 
-        mockResponse = mock(XWikiResponse.class);
-        context.setResponse(mockResponse);
+        when(this.mockRequest.get("type")).thenReturn("plain");
 
-        when(mockRequest.get("type")).thenReturn("plain");
+        this.oldcore.getMocker().registerMockComponent(ObservationManager.class);
     }
 
     @Test
-    public void newDocumentFromURL() throws Exception
+    void newDocumentFromURL() throws Exception
     {
         // new document = xwiki:X.Y
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X"), "Y");
@@ -141,7 +146,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void newDocumentButNonTerminalFromURL() throws Exception
+    void newDocumentButNonTerminalFromURL() throws Exception
     {
         // new document = xwiki:X.Y
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X"), "Y");
@@ -167,7 +172,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void newDocumentFromURLWhenNoType() throws Exception
+    void newDocumentFromURLWhenNoType() throws Exception
     {
         // No type has been set by the user
         when(mockRequest.get("type")).thenReturn(null);
@@ -190,7 +195,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void newDocumentWebHomeTopLevelFromURL() throws Exception
+    void newDocumentWebHomeTopLevelFromURL() throws Exception
     {
         // new document = xwiki:X.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X"), "WebHome");
@@ -214,7 +219,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void newDocumentWebHomeFromURL() throws Exception
+    void newDocumentWebHomeFromURL() throws Exception
     {
         // new document = xwiki:X.Y.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X", "Y"), "WebHome");
@@ -239,7 +244,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void newDocumentWebHomeButTerminalFromURL() throws Exception
+    void newDocumentWebHomeButTerminalFromURL() throws Exception
     {
         // new document = xwiki:X.Y.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X", "Y"), "WebHome");
@@ -266,7 +271,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void newDocumentWebHomeTopLevelSpaceButTerminalFromURL() throws Exception
+    void newDocumentWebHomeTopLevelSpaceButTerminalFromURL() throws Exception
     {
         // new document = xwiki:X.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X"), "WebHome");
@@ -291,12 +296,11 @@ public class CreateActionTest
         // none was able to be deducted from the given information. The user needs to specify more info in order to
         // continue.
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
-            any(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(), any(), any(XWikiContext.class));
     }
 
     @Test
-    public void existingDocumentFromUINoName() throws Exception
+    void existingDocumentFromUINoName() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -317,12 +321,11 @@ public class CreateActionTest
         assertEquals("create", result);
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
-            any(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(), any(), any(XWikiContext.class));
     }
 
     @Test
-    public void existingDocumentFromUI() throws Exception
+    void existingDocumentFromUI() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -350,7 +353,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUICheckEscaping() throws Exception
+    void existingDocumentFromUICheckEscaping() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -378,7 +381,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentTerminalFromUI() throws Exception
+    void existingDocumentTerminalFromUI() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -407,7 +410,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentTerminalFromUICheckEscaping() throws Exception
+    void existingDocumentTerminalFromUICheckEscaping() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -436,7 +439,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentTerminalFromUIButAlreadyExisting() throws Exception
+    void existingDocumentTerminalFromUIButAlreadyExisting() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -470,12 +473,11 @@ public class CreateActionTest
         assertEquals(XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY, exception.getCode());
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
-            any(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(), any(), any(XWikiContext.class));
     }
 
     @Test
-    public void notExistingDocumentFromUIButNameTooLong() throws Exception
+    void notExistingDocumentFromUIButNameTooLong() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -502,12 +504,11 @@ public class CreateActionTest
         assertEquals(XWikiException.ERROR_XWIKI_APP_DOCUMENT_PATH_TOO_LONG, exception.getCode());
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
-            any(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(), any(), any(XWikiContext.class));
     }
 
     @Test
-    public void notExistingDocumentFromUIButSpaceTooLong() throws Exception
+    void notExistingDocumentFromUIButSpaceTooLong() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -534,12 +535,11 @@ public class CreateActionTest
         assertEquals(XWikiException.ERROR_XWIKI_APP_DOCUMENT_PATH_TOO_LONG, exception.getCode());
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
-            any(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(), any(), any(XWikiContext.class));
     }
 
     @Test
-    public void existingDocumentFromUITopLevelDocument() throws Exception
+    void existingDocumentFromUITopLevelDocument() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -570,7 +570,7 @@ public class CreateActionTest
      */
 
     @Test
-    public void existingDocumentFromUIDeprecated() throws Exception
+    void existingDocumentFromUIDeprecated() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -598,7 +598,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUIDeprecatedCheckEscaping() throws Exception
+    void existingDocumentFromUIDeprecatedCheckEscaping() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -627,7 +627,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentNonTerminalFromUIDeprecated() throws Exception
+    void existingDocumentNonTerminalFromUIDeprecated() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -655,7 +655,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentNonTerminalFromUIDeprecatedIgnoringPage() throws Exception
+    void existingDocumentNonTerminalFromUIDeprecatedIgnoringPage() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -685,7 +685,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentNonTerminalFromUIDeprecatedCheckEscaping() throws Exception
+    void existingDocumentNonTerminalFromUIDeprecatedCheckEscaping() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -718,7 +718,7 @@ public class CreateActionTest
      */
 
     @Test
-    public void existingDocumentFromUITemplateProviderExistingButNoneSelected() throws Exception
+    void existingDocumentFromUITemplateProviderExistingButNoneSelected() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -734,7 +734,7 @@ public class CreateActionTest
 
         // Mock 1 existing template provider
         mockExistingTemplateProviders("XWiki.MyTemplateProvider",
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST);
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList());
 
         // Run the action
         String result = action.render(context);
@@ -745,8 +745,7 @@ public class CreateActionTest
         assertEquals("create", result);
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
-            any(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(), any(), any(XWikiContext.class));
     }
 
     /**
@@ -779,6 +778,17 @@ public class CreateActionTest
     private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,
         List<String> allowedSpaces, Boolean terminal, String type) throws Exception
     {
+        mockExistingTemplateProviders(fullName, resolvedDocumentReference, allowedSpaces, terminal, type, null);
+    }
+
+    /**
+     * Mocks 1 existing template provider.
+     * <p>
+     * Note: Calling it multiple times does not add multiple providers.
+     */
+    private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,
+        List<String> allowedSpaces, Boolean terminal, String type, String action) throws Exception
+    {
         DocumentReference templateProviderClassReference =
             new DocumentReference("xwiki", Arrays.asList("XWiki"), "TemplateProviderClass");
 
@@ -802,6 +812,9 @@ public class CreateActionTest
         }
         if (type != null) {
             when(templateProviderObject.getStringValue("type")).thenReturn(type);
+        }
+        if (action != null) {
+            when(templateProviderObject.getStringValue("action")).thenReturn(action);
         }
         when(templateProviderDocument.getXObject(templateProviderClassReference)).thenReturn(templateProviderObject);
 
@@ -828,7 +841,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUITemplateProviderSpecified() throws Exception
+    void existingDocumentFromUITemplateProviderSpecified() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -846,7 +859,7 @@ public class CreateActionTest
 
         // Mock 1 existing template provider
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST);
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList());
 
         // Run the action
         String result = action.render(context);
@@ -862,7 +875,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUITemplateProviderSpecifiedRestrictionExists() throws Exception
+    void existingDocumentFromUITemplateProviderSpecifiedRestrictionExists() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -898,7 +911,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUITemplateProviderSpecifiedRestrictionExistsOnParentSpace() throws Exception
+    void existingDocumentFromUITemplateProviderSpecifiedRestrictionExistsOnParentSpace() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -936,7 +949,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUITemplateProviderSpecifiedButNotAllowed() throws Exception
+    void existingDocumentFromUITemplateProviderSpecifiedButNotAllowed() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -971,12 +984,11 @@ public class CreateActionTest
         assertEquals(XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE, exception.getCode());
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
-            any(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(), any(), any(XWikiContext.class));
     }
 
     @Test
-    public void newDocumentFromURLTemplateProviderSpecifiedButNotAllowed() throws Exception
+    void newDocumentFromURLTemplateProviderSpecifiedButNotAllowed() throws Exception
     {
         // new document = xwiki:X.Y
         DocumentReference documentReference =
@@ -1010,12 +1022,11 @@ public class CreateActionTest
         assertEquals(XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE, exception.getCode());
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
-            any(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(), any(), any(XWikiContext.class));
     }
 
     @Test
-    public void newDocumentWebHomeFromURLTemplateProviderSpecifiedButNotAllowed() throws Exception
+    void newDocumentWebHomeFromURLTemplateProviderSpecifiedButNotAllowed() throws Exception
     {
         // new document = xwiki:X.Y.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X", "Y"), "WebHome");
@@ -1048,12 +1059,11 @@ public class CreateActionTest
         assertEquals(XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE, exception.getCode());
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
-            any(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(), any(), any(XWikiContext.class));
     }
 
     @Test
-    public void newDocumentWebHomeFromURLTemplateProviderSpecifiedTerminal() throws Exception
+    void newDocumentWebHomeFromURLTemplateProviderSpecifiedTerminal() throws Exception
     {
         // new document = xwiki:X.Y.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X", "Y"), "WebHome");
@@ -1069,7 +1079,8 @@ public class CreateActionTest
 
         // Mock 1 existing template provider
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, true);
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(),
+            true);
 
         // Run the action
         String result = action.render(context);
@@ -1086,8 +1097,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void newDocumentWebHomeFromURLTemplateProviderSpecifiedTerminalOverriddenFromUIToNonTerminal()
-        throws Exception
+    void newDocumentWebHomeFromURLTemplateProviderSpecifiedTerminalOverriddenFromUIToNonTerminal() throws Exception
     {
         // new document = xwiki:X.Y.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X", "Y"), "WebHome");
@@ -1104,7 +1114,8 @@ public class CreateActionTest
 
         // Mock 1 existing template provider
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, true);
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(),
+            true);
 
         // Run the action
         String result = action.render(context);
@@ -1121,7 +1132,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void newDocumentFromURLTemplateProviderSpecifiedNonTerminal() throws Exception
+    void newDocumentFromURLTemplateProviderSpecifiedNonTerminal() throws Exception
     {
         // new document = xwiki:X.Y
         DocumentReference documentReference = new DocumentReference("xwiki", "X", "Y");
@@ -1137,7 +1148,7 @@ public class CreateActionTest
 
         // Mock 1 existing template provider
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(),
             false);
 
         // Run the action
@@ -1155,7 +1166,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void newDocumentFromURLTemplateProviderSpecifiedNonTerminalButOverriddenFromUITerminal() throws Exception
+    void newDocumentFromURLTemplateProviderSpecifiedNonTerminalButOverriddenFromUITerminal() throws Exception
     {
         // new document = xwiki:X.Y
         DocumentReference documentReference = new DocumentReference("xwiki", "X", "Y");
@@ -1172,7 +1183,7 @@ public class CreateActionTest
 
         // Mock 1 existing template provider
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(),
             false);
 
         // Run the action
@@ -1190,7 +1201,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUITemplateSpecified() throws Exception
+    void existingDocumentFromUITemplateSpecified() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -1226,7 +1237,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUITemplateProviderSpecifiedTerminal() throws Exception
+    void existingDocumentFromUITemplateProviderSpecifiedTerminal() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -1245,7 +1256,8 @@ public class CreateActionTest
 
         // Mock 1 existing template provider that creates terminal documents.
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, true);
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(),
+            true);
 
         // Run the action
         String result = action.render(context);
@@ -1262,7 +1274,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUITemplateProviderSpecifiedTerminalOverridenFromUIToNonTerminal() throws Exception
+    void existingDocumentFromUITemplateProviderSpecifiedTerminalOverridenFromUIToNonTerminal() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -1282,7 +1294,8 @@ public class CreateActionTest
 
         // Mock 1 existing template provider that creates terminal documents.
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, true);
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(),
+            true);
 
         // Run the action
         String result = action.render(context);
@@ -1299,7 +1312,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUITemplateProviderSpecifiedNonTerminal() throws Exception
+    void existingDocumentFromUITemplateProviderSpecifiedNonTerminal() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -1318,7 +1331,7 @@ public class CreateActionTest
 
         // Mock 1 existing template provider that creates terminal documents.
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(),
             false);
 
         // Run the action
@@ -1336,7 +1349,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUITemplateProviderSpecifiedNonTerminalOverridenFromUIToTerminal() throws Exception
+    void existingDocumentFromUITemplateProviderSpecifiedNonTerminalOverridenFromUIToTerminal() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -1356,7 +1369,7 @@ public class CreateActionTest
 
         // Mock 1 existing template provider that creates terminal documents.
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(),
             false);
 
         // Run the action
@@ -1374,7 +1387,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void newDocumentWebHomeFromURLTemplateProviderSpecifiedButOldPageType() throws Exception
+    void newDocumentWebHomeFromURLTemplateProviderSpecifiedButOldPageType() throws Exception
     {
         // new document = xwiki:X.Y.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X", "Y"), "WebHome");
@@ -1390,7 +1403,7 @@ public class CreateActionTest
 
         // Mock 1 existing template provider
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, null,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(), null,
             "page");
 
         // Run the action
@@ -1409,7 +1422,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void newDocumentWebHomeFromURLTemplateProviderSpecifiedButOldPageTypeButOverriddenFromUIToNonTerminal()
+    void newDocumentWebHomeFromURLTemplateProviderSpecifiedButOldPageTypeButOverriddenFromUIToNonTerminal()
         throws Exception
     {
         // new document = xwiki:X.Y.WebHome
@@ -1427,7 +1440,7 @@ public class CreateActionTest
 
         // Mock 1 existing template provider
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, null,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(), null,
             "page");
 
         // Run the action
@@ -1446,7 +1459,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUITemplateProviderSpecifiedButOldSpaceType() throws Exception
+    void existingDocumentFromUITemplateProviderSpecifiedButOldSpaceType() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -1464,7 +1477,7 @@ public class CreateActionTest
 
         // Mock 1 existing template provider
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, null,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(), null,
             "space");
 
         // Run the action
@@ -1483,8 +1496,7 @@ public class CreateActionTest
     }
 
     @Test
-    public void existingDocumentFromUITemplateProviderSpecifiedButOldSpaceTypeButOverridenFromUIToTerminal()
-        throws Exception
+    void existingDocumentFromUITemplateProviderSpecifiedButOldSpaceTypeButOverridenFromUIToTerminal() throws Exception
     {
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
@@ -1503,7 +1515,7 @@ public class CreateActionTest
 
         // Mock 1 existing template provider
         mockExistingTemplateProviders(templateProviderFullName,
-            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, null,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(), null,
             "space");
 
         // Run the action
@@ -1518,5 +1530,50 @@ public class CreateActionTest
         // compatibility resolutions. Also using the template extracted from the template provider.
         verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
             null, "xwiki", context);
+    }
+
+    @Test
+    void newDocumentWebHomeFromURLTemplateProviderSpecifiedWithSaveAndEdit() throws Exception
+    {
+        // Mock the document to create.
+        DocumentReference documentReference = new DocumentReference("xwiki", "X", "Y");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getDocumentReferenceWithLocale()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(true);
+        when(document.getLocalReferenceMaxLength()).thenReturn(255);
+        when(document.getDefaultEditMode(this.context)).thenReturn("edit");
+        when(document.getDefaultLocale()).thenReturn(Locale.ROOT);
+        when(document.clone()).thenReturn(document);
+
+        // Mock the XWiki context.
+        when(this.context.getWiki().getLocalePreference(this.context)).thenReturn(Locale.FRENCH);
+        when(this.context.getWiki().getDocument(documentReference, this.context)).thenReturn(document);
+        this.context.setDoc(document);
+        DocumentReference userReference = new DocumentReference("xwiki", "Users", "Alice");
+        this.context.setUserReference(userReference);
+
+        // Mock the creation request.
+        when(this.mockRequest.getParameter("spaceReference")).thenReturn("X");
+        when(this.mockRequest.getParameter("name")).thenReturn("Y");
+        when(this.mockRequest.getParameter("title")).thenReturn("Yippee");
+        String templateProviderFullName = "XWiki.MyTemplateProvider";
+        when(this.mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
+
+        // Mock the template provider.
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(), null,
+            "page", "saveandedit");
+
+        // Run the create action.
+        assertNull(this.action.render(this.context));
+
+        verify(document).setLocale(Locale.ROOT);
+        verify(document).setDefaultLocale(Locale.FRENCH);
+        verify(document).readFromTemplate(new DocumentReference("xwiki", "XWiki", "MyTemplate"), this.context);
+        verify(document).setTitle("Yippee");
+        verify(document).setCreatorReference(userReference);
+        verify(document).setAuthorReference(userReference);
+        verify(this.context.getWiki()).saveDocument(document, this.context);
     }
 }

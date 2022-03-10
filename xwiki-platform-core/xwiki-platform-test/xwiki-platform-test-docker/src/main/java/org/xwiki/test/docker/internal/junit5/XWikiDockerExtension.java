@@ -22,16 +22,9 @@ package org.xwiki.test.docker.internal.junit5;
 import java.io.File;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
-import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
@@ -57,8 +50,8 @@ import com.google.common.primitives.Ints;
 import ch.qos.logback.classic.Level;
 
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.followOutput;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getAgentName;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getResultFileLocation;
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isLocal;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.setLogbackLoggerLevel;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreenshot;
@@ -95,14 +88,15 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreensh
  * @version $Id$
  * @since 10.6RC1
  */
-public class XWikiDockerExtension extends AbstractExtension implements BeforeAllCallback, AfterAllCallback,
-    BeforeEachCallback, AfterEachCallback, ParameterResolver, TestExecutionExceptionHandler, ExecutionCondition
+public class XWikiDockerExtension extends AbstractExtension
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
 
     private static final String SUPERADMIN = "superadmin";
 
     private boolean isVncStarted;
+
+    private TestConfigurationResolver testConfigurationMerger = new TestConfigurationResolver();
 
     @Override
     public void beforeAll(ExtensionContext extensionContext)
@@ -116,8 +110,10 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
     private void beforeAllInternal(ExtensionContext extensionContext) throws Exception
     {
-        // If the current tests has parents and one of them has the @UITest annotation, it means all containers are
-        // already started and we should not do anything.
+        // This method is going to be called for the top level test class but also for nested test classes. So if
+        // the currently executing test class has parents and one of them has the @UITest annotation, it means the
+        // test has already been setup (all Docker containers are already started, etc), and thus we should not do
+        // anything.
         if (hasParentTestContainingUITestAnnotation(extensionContext)) {
             return;
         }
@@ -129,6 +125,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         // of debugging information.
         if (testConfiguration.isVerbose()) {
             setLogbackLoggerLevel("org.testcontainers", Level.TRACE);
+            setLogbackLoggerLevel("org.rnorth", Level.TRACE);
+            setLogbackLoggerLevel("org.xwiki.test.docker.internal.junit5.browser", Level.TRACE);
             setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
             // Don't display the stack trace that TC displays when it cannot find a config file override
             // ("Testcontainers config override was found on file:/root/.testcontainers.properties but the file was not
@@ -167,7 +165,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
             // Build the XWiki WAR
             LOGGER.info("(*) Building custom XWiki WAR...");
-            File targetWARDirectory = new File(String.format("%s/xwiki", testConfiguration.getOutputDirectory()));
+            File targetWARDirectory = getServletContainerExecutor(testConfiguration, artifactResolver, mavenResolver,
+                repositoryResolver, extensionContext).getWARDirectory();
             WARBuilder builder = new WARBuilder(testConfiguration, targetWARDirectory, artifactResolver, mavenResolver,
                 repositoryResolver);
             builder.build();
@@ -244,12 +243,6 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     {
         LOGGER.info("(*) Stopping test [{}]", extensionContext.getTestMethod().get().getName());
 
-        // If running locally then save the screenshot and the video by default for easier debugging. For the moment
-        // we consider we're running locally if we're not running inside a Docker container. To be improved.
-        if (isLocal()) {
-            saveScreenshotAndVideo(extensionContext);
-        }
-
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc() && this.isVncStarted) {
             VncRecordingContainer vnc = loadVNC(extensionContext);
@@ -265,10 +258,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        // Only take screenshot & save video if not executing locally as otherwise they're always taken and saved!
-        if (!isLocal()) {
-            saveScreenshotAndVideo(extensionContext);
-        }
+        saveScreenshotAndVideo(extensionContext);
 
         // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
         displayAgentName();
@@ -328,14 +318,13 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext)
     {
-        // If the tests has parent tests and one of them has the @UITest annotation then it means all containers
-        // have already been started and thus the servlet engine is supported.
+        // This method is the first one called in the test lifecycle. It's called for the top level test class but
+        // also for nested test classes. So if the test class has parent tests and one of them has the @UITest
+        // annotation then it means all containers have already been started and the servlet engine is supported.
         if (!hasParentTestContainingUITestAnnotation(extensionContext)) {
-            UITest uiTest = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
-            TestConfiguration testConfiguration = new TestConfiguration(uiTest);
-            // Save the test configuration so that we can access it in afterAll()
+            // Create & save the test configuration so that we can access it in afterAll()
+            TestConfiguration testConfiguration = testConfigurationMerger.resolve(extensionContext);
             saveTestConfiguration(extensionContext, testConfiguration);
-
             // Skip the test if the Servlet Engine selected is in the forbidden list
             if (isServletEngineForbidden(testConfiguration)) {
                 return ConditionEvaluationResult.disabled(String.format("Servlet Engine [%s] is forbidden, skipping",
@@ -413,15 +402,26 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         executor.stop(testConfiguration);
     }
 
+    private ServletContainerExecutor getServletContainerExecutor(TestConfiguration testConfiguration,
+        ArtifactResolver artifactResolver, MavenResolver mavenResolver, RepositoryResolver repositoryResolver,
+        ExtensionContext extensionContext)
+    {
+        ServletContainerExecutor executor = loadServletContainerExecutor(extensionContext);
+        if (executor == null) {
+            executor = new ServletContainerExecutor(testConfiguration, artifactResolver, mavenResolver,
+                repositoryResolver);
+            saveServletContainerExecutor(extensionContext, executor);
+        }
+        return executor;
+    }
+
     private void startServletEngine(File sourceWARDirectory, TestConfiguration testConfiguration,
         ArtifactResolver artifactResolver, MavenResolver mavenResolver, RepositoryResolver repositoryResolver,
         ExtensionContext extensionContext) throws Exception
     {
-        ServletContainerExecutor executor =
-            new ServletContainerExecutor(testConfiguration, artifactResolver, mavenResolver, repositoryResolver);
-        saveServletContainerExecutor(extensionContext, executor);
+        ServletContainerExecutor executor = getServletContainerExecutor(testConfiguration, artifactResolver,
+            mavenResolver, repositoryResolver, extensionContext);
         executor.start(sourceWARDirectory);
-
         setXWikiURL(testConfiguration, extensionContext);
     }
 
@@ -492,11 +492,6 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         if (agentName != null) {
             LOGGER.info("Jenkins Agent: [{}]", agentName);
         }
-    }
-
-    private String getAgentName()
-    {
-        return System.getProperty("jenkinsAgentName");
     }
 
     private void raiseException(Exception e)

@@ -41,20 +41,19 @@ import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.ReplaceUserRequest;
 import org.xwiki.refactoring.job.RestoreRequest;
-import org.xwiki.refactoring.script.RequestFactory;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
-public class DefaultRequestFactoryTest
+class DefaultRequestFactoryTest
 {
     @InjectMockComponents
     private DefaultRequestFactory requestFactory;
@@ -70,7 +69,7 @@ public class DefaultRequestFactoryTest
     private WikiReference wikiReference = new WikiReference("wiki");
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         MockitoAnnotations.initMocks(this);
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(this.userReference);
@@ -79,7 +78,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createRestoreRequest() throws Exception
+    void createRestoreRequest()
     {
         List<Long> documentIds = Arrays.asList(1L, 2L, 3L);
         RestoreRequest restoreRequest =
@@ -92,7 +91,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createRestoreRequestBatchId() throws Exception
+    void createRestoreRequestBatchId()
     {
         String batchId = "batch-id";
         RestoreRequest restoreRequest =
@@ -105,7 +104,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createPermanentlyDeleteRequest() throws Exception
+    void createPermanentlyDeleteRequest()
     {
         List<Long> documentIds = Arrays.asList(1L, 2L, 3L);
         PermanentlyDeleteRequest permanentlyDeleteRequest =
@@ -118,7 +117,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createPermanentlyDeleteRequestBatch() throws Exception
+    void createPermanentlyDeleteRequestBatch()
     {
         String batchId = "batch-id";
         PermanentlyDeleteRequest permanentlyDeleteRequest =
@@ -131,7 +130,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createMoveRequest() throws Exception
+    void createMoveRequest()
     {
         DocumentReference source = new DocumentReference("code", "Model", "Entity");
         DocumentReference destination =
@@ -154,7 +153,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createRenameRequest() throws Exception
+    void createRenameRequest()
     {
         DocumentReference source = new DocumentReference("code", "Model", "Entity");
         DocumentReference destination =
@@ -176,7 +175,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createRenameRequestString() throws Exception
+    void createRenameRequestString()
     {
         DocumentReference source = new DocumentReference("code", "Model", "Entity");
         String newName = "Bob";
@@ -198,7 +197,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createCopyRequest() throws Exception
+    void createCopyRequest()
     {
         DocumentReference source = new DocumentReference("code", "Model", "Entity");
         DocumentReference destination =
@@ -216,7 +215,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createCopyAsRequest() throws Exception
+    void createCopyAsRequest()
     {
         DocumentReference source = new DocumentReference("code", "Model", "Entity");
         DocumentReference destination =
@@ -234,7 +233,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createCopyAsRequestString() throws Exception
+    void createCopyAsRequestString()
     {
         DocumentReference source = new DocumentReference("code", "Model", "Entity");
         String newPlace = "Bob";
@@ -253,7 +252,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createCreateRequest() throws Exception
+    void createCreateRequest()
     {
         DocumentReference source = new DocumentReference("code", "Model", "Entity");
         CreateRequest createRequest = requestFactory.createCreateRequest(Arrays.asList(source));
@@ -267,7 +266,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createDeleteRequest() throws Exception
+    void createDeleteRequest()
     {
         DocumentReference source = new DocumentReference("code", "Model", "Entity");
         EntityRequest deleteRequest = requestFactory.createDeleteRequest(Arrays.asList(source));
@@ -281,7 +280,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createReplaceUserRequestWithLocalUser()
+    void createReplaceUserRequestWithLocalUser()
     {
         DocumentReference alice = new DocumentReference("dev", "Users", "Alice");
         DocumentReference bob = new DocumentReference("test", "Users", "Bob");
@@ -302,7 +301,7 @@ public class DefaultRequestFactoryTest
     }
 
     @Test
-    public void createReplaceUserRequestWithGlobalUser() throws Exception
+    void createReplaceUserRequestWithGlobalUser() throws Exception
     {
         DocumentReference bob = new DocumentReference("test", "Users", "Bob");
         when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("test");

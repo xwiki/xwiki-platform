@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.resources.pages;
 
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -37,13 +38,13 @@ public interface PageTagsResource
 {
     @GET Tags getPageTags(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName
     ) throws XWikiRestException;
 
     @PUT Response setTags(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @QueryParam("minorRevision") Boolean minorRevision,
             Tags tags

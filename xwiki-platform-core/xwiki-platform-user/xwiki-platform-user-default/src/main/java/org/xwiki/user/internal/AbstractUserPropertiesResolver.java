@@ -47,14 +47,6 @@ public abstract class AbstractUserPropertiesResolver implements UserPropertiesRe
     private ComponentManager componentManager;
 
     @Inject
-    @Named("superadminuser")
-    private ConfigurationSource superAdminConfigurationSource;
-
-    @Inject
-    @Named("guestuser")
-    private ConfigurationSource guestConfigurationSource;
-
-    @Inject
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
 
     @Override
@@ -68,9 +60,9 @@ public abstract class AbstractUserPropertiesResolver implements UserPropertiesRe
             normalizedUserReference = this.currentUserReferenceUserReferenceResolver.resolve(null, parameters);
         }
         if (SuperAdminUserReference.INSTANCE == normalizedUserReference) {
-            userProperties = new DefaultUserProperties(this.superAdminConfigurationSource);
+            userProperties = new DefaultUserProperties(getSuperAdminConfigurationSource());
         } else if (GuestUserReference.INSTANCE == normalizedUserReference) {
-            userProperties = new DefaultUserProperties(this.guestConfigurationSource);
+            userProperties = new DefaultUserProperties(getGuestConfigurationSource());
         } else {
             userProperties =
                 findUserPropertiesResolver(normalizedUserReference).resolve(normalizedUserReference, parameters);
@@ -94,4 +86,8 @@ public abstract class AbstractUserPropertiesResolver implements UserPropertiesRe
     }
 
     protected abstract String getUnderlyingConfigurationSourceHint();
+
+    protected abstract ConfigurationSource getSuperAdminConfigurationSource();
+
+    protected abstract ConfigurationSource getGuestConfigurationSource();
 }

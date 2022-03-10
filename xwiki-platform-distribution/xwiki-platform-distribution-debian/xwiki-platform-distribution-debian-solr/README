@@ -1,0 +1,9 @@
+Debian/Ubuntu Package(s) of pre configured Solr cores for XWiki built using Apache Maven.
+
+= Deploy a patched version
+
+* `checkout` the tag to patch
+* apply the patch (generally by cherry-picking the fix from the branch)
+* add a `<version>` to `xwiki-platform-distribution-debian-solr`
+* update the version to reflect the patch: ```mvn versions:set -DnewVersion=11.10.2-1```
+* `mvn clean deploy`

@@ -100,7 +100,7 @@
   @panel-default-text:                  $theme.panelTextColor;
   @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
   @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
-  
+
   ##
   ## XWiki variables: LESS variables specific to XWiki
   ##
@@ -108,8 +108,8 @@
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
-  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
+  @xwiki-page-header-bg-image:          $stringtool.defaultString($theme.headerBackgroundImage, '""');
+  @xwiki-page-header-bg-position:       $stringtool.defaultString($theme.headerBackgroundPosition, '""');
 #end
 
 ##############################################
@@ -230,8 +230,8 @@
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
-  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
+  @xwiki-page-header-bg-image:          $stringtool.defaultString($theme.headerBackgroundImage, '""');
+  @xwiki-page-header-bg-position:       $stringtool.defaultString($theme.headerBackgroundPosition, '""');
 #end
 
 ##############################################
@@ -260,4 +260,5 @@
 @xwiki-icon-parent-edit:              "$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')";
 @xwiki-icon-edit-section:             "\f040";
 @xwiki-icon-spinner:                  "$xwiki.getSkinFile('icons/xwiki/spinner.gif')";
+@xwiki-icon-spinner-height:           16px;
 @xwiki-icon-link-external:            "$xwiki.getSkinFile('icons/xwiki/external-link.png')";

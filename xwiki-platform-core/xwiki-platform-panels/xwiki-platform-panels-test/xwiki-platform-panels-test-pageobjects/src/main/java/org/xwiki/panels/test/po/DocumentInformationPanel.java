@@ -19,11 +19,7 @@
  */
 package org.xwiki.panels.test.po;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.openqa.selenium.By;
-import org.xwiki.test.ui.po.Select;
+import org.xwiki.test.ui.po.DocumentSyntaxPicker;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -34,27 +30,10 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class DocumentInformationPanel extends ViewPage
 {
-    private Select syntaxSelect;
+    private DocumentSyntaxPicker syntaxPicker = new DocumentSyntaxPicker();
 
-    public DocumentInformationPanel()
+    public DocumentSyntaxPicker getSyntaxPicker()
     {
-        this.syntaxSelect = new Select(getDriver().findElement(By.id("xwikidocsyntaxinput2")));
-    }
-
-    public List<String> getAvailableSyntaxes()
-    {
-        return this.syntaxSelect.getOptions().stream()
-            .map(item -> item.getAttribute("value"))
-            .collect(Collectors.toList());
-    }
-
-    public String getSelectedSyntax()
-    {
-        return this.syntaxSelect.getFirstSelectedOption().getAttribute("value");
-    }
-
-    public void selectSyntax(String syntax)
-    {
-        this.syntaxSelect.selectByValue(syntax);
+        return this.syntaxPicker;
     }
 }

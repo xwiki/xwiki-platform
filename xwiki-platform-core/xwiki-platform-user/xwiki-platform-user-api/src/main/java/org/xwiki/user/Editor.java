@@ -20,7 +20,6 @@
 package org.xwiki.user;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.stability.Unstable;
 
 /**
  * The default editor that should be used for a user, when editing content.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 public enum Editor
 {
     /**

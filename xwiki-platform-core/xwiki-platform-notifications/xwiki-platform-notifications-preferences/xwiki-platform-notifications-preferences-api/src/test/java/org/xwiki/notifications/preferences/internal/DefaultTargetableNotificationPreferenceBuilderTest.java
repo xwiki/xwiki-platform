@@ -53,85 +53,87 @@ public class DefaultTargetableNotificationPreferenceBuilderTest
     @Test
     public void build()
     {
-        this.builder.prepare();
-        this.builder.setCategory(NotificationPreferenceCategory.DEFAULT);
-        this.builder.setEnabled(true);
-        this.builder.setFormat(NotificationFormat.ALERT);
-        this.builder.setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"));
-        this.builder.setStartDate(new Date(42));
-        this.builder.setProviderHint("MyHint");
-        this.builder.setTarget(new DocumentReference("xwiki", "Space", "Page"));
-        TargetableNotificationPreference preference1 = this.builder.build();
 
-        this.builder.prepare();
-        this.builder.setCategory(NotificationPreferenceCategory.DEFAULT);
-        this.builder.setEnabled(true);
-        this.builder.setFormat(NotificationFormat.ALERT);
-        this.builder.setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"));
-        this.builder.setStartDate(new Date(42));
-        this.builder.setProviderHint("MyHint");
-        this.builder.setTarget(new DocumentReference("xwiki", "Space", "Page"));
-        TargetableNotificationPreference preference2 = this.builder.build();
+        TargetableNotificationPreference preference1 = this.builder.prepare()
+            .setCategory(NotificationPreferenceCategory.DEFAULT)
+            .setEnabled(true)
+            .setFormat(NotificationFormat.ALERT)
+            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
+            .setStartDate(new Date(42))
+            .setProviderHint("MyHint")
+            .setTarget(new DocumentReference("xwiki", "Space", "Page"))
+            .build();
 
-        assertNotSame(preference1, preference2);
-        assertEquals(preference1, preference2);
-        assertEquals(preference1.hashCode(), preference2.hashCode());
-
-
-        this.builder.prepare();
-        this.builder.setCategory(NotificationPreferenceCategory.SYSTEM);
-        this.builder.setEnabled(false);
-        this.builder.setFormat(NotificationFormat.ALERT);
-        this.builder.setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"));
-        this.builder.setStartDate(new Date(88));
-        this.builder.setProviderHint("AnotherHint");
-        this.builder.setTarget(new DocumentReference("xwiki", "Space", "Page"));
-        preference2 = this.builder.build();
+        TargetableNotificationPreference preference2 = this.builder.prepare()
+            .setCategory(NotificationPreferenceCategory.DEFAULT)
+            .setEnabled(true)
+            .setFormat(NotificationFormat.ALERT)
+            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
+            .setStartDate(new Date(42))
+            .setProviderHint("MyHint")
+            .setTarget(new DocumentReference("xwiki", "Space", "Page"))
+            .build();
 
         assertNotSame(preference1, preference2);
         assertEquals(preference1, preference2);
         assertEquals(preference1.hashCode(), preference2.hashCode());
 
-        this.builder.prepare();
-        this.builder.setCategory(NotificationPreferenceCategory.DEFAULT);
-        this.builder.setEnabled(true);
-        this.builder.setFormat(NotificationFormat.EMAIL);
-        this.builder.setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"));
-        this.builder.setStartDate(new Date(42));
-        this.builder.setProviderHint("MyHint");
-        this.builder.setTarget(new DocumentReference("xwiki", "Space", "Page"));
-        preference2 = this.builder.build();
+        preference2 = this.builder.prepare()
+            .setCategory(NotificationPreferenceCategory.SYSTEM)
+            .setEnabled(false)
+            .setFormat(NotificationFormat.ALERT)
+            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
+            .setStartDate(new Date(88))
+            .setProviderHint("AnotherHint")
+            .setTarget(new DocumentReference("xwiki", "Space", "Page"))
+            .build();
+
+        assertNotSame(preference1, preference2);
+        assertEquals(preference1, preference2);
+        assertEquals(preference1.hashCode(), preference2.hashCode());
+
+        preference2 = this.builder.prepare()
+            .setCategory(NotificationPreferenceCategory.DEFAULT)
+            .setEnabled(true)
+            .setFormat(NotificationFormat.EMAIL)
+            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
+            .setStartDate(new Date(42))
+            .setProviderHint("MyHint")
+            .setTarget(new DocumentReference("xwiki", "Space", "Page"))
+            .build();
 
         assertNotSame(preference1, preference2);
         assertNotEquals(preference1, preference2);
         assertNotEquals(preference1.hashCode(), preference2.hashCode());
 
-        this.builder.prepare();
-        this.builder.setCategory(NotificationPreferenceCategory.DEFAULT);
-        this.builder.setEnabled(true);
-        this.builder.setFormat(NotificationFormat.ALERT);
-        this.builder.setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "bar"));
-        this.builder.setStartDate(new Date(42));
-        this.builder.setProviderHint("MyHint");
-        this.builder.setTarget(new DocumentReference("xwiki", "Space", "Page"));
-        preference2 = this.builder.build();
+        preference2 = this.builder.prepare()
+            .setCategory(NotificationPreferenceCategory.DEFAULT)
+            .setEnabled(true)
+            .setFormat(NotificationFormat.ALERT)
+            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "bar"))
+            .setStartDate(new Date(42))
+            .setProviderHint("MyHint")
+            .setTarget(new DocumentReference("xwiki", "Space", "Page"))
+            .build();
 
         assertNotSame(preference1, preference2);
         assertNotEquals(preference1, preference2);
         assertNotEquals(preference1.hashCode(), preference2.hashCode());
 
-        this.builder.prepare();
-        this.builder.setCategory(NotificationPreferenceCategory.DEFAULT);
-        this.builder.setEnabled(true);
-        this.builder.setFormat(NotificationFormat.ALERT);
-        this.builder.setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"));
-        this.builder.setStartDate(new Date(42));
-        this.builder.setProviderHint("MyHint");
-        this.builder.setTarget(new DocumentReference("xwiki", "Space", "Page2"));
-        preference2 = this.builder.build();
-
+        preference2 = this.builder.prepare()
+            .setCategory(NotificationPreferenceCategory.DEFAULT)
+            .setEnabled(true)
+            .setFormat(NotificationFormat.ALERT)
+            .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "foo"))
+            .setStartDate(new Date(42))
+            .setProviderHint("MyHint")
+            .setTarget(new DocumentReference("xwiki", "Space", "Page2"))
+            .build();
+        
         assertNotSame(preference1, preference2);
-        assertNotEquals(preference1, preference2);
-        assertNotEquals(preference1.hashCode(), preference2.hashCode());
+        // Those are expected to be equals: the target is not taken into account for checking equality of the
+        // preferences.
+        assertEquals(preference1, preference2);
+        assertEquals(preference1.hashCode(), preference2.hashCode());
     }
 }

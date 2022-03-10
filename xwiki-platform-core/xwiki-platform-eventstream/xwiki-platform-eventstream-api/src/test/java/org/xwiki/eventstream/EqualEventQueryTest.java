@@ -20,6 +20,8 @@
 package org.xwiki.eventstream;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.eventstream.query.CompareQueryCondition;
+import org.xwiki.eventstream.query.SimpleEventQuery;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,10 +45,10 @@ public class EqualEventQueryTest
 
         assertEquals(2, query.getConditions().size());
 
-        assertEquals("key1", query.getConditions().get(0).getProperty());
-        assertEquals("value1", query.getConditions().get(0).getValue());
-        assertEquals("key2", query.getConditions().get(1).getProperty());
-        assertEquals("value2", query.getConditions().get(1).getValue());
+        assertEquals("key1", ((CompareQueryCondition) query.getConditions().get(0)).getProperty());
+        assertEquals("value1", ((CompareQueryCondition) query.getConditions().get(0)).getValue());
+        assertEquals("key2", ((CompareQueryCondition) query.getConditions().get(1)).getProperty());
+        assertEquals("value2", ((CompareQueryCondition) query.getConditions().get(1)).getValue());
     }
 
     @Test
@@ -76,11 +78,11 @@ public class EqualEventQueryTest
     @Test
     void constructors()
     {
-        SimpleEventQuery query = new SimpleEventQuery("key", "value", 42, 43);
+        SimpleEventQuery query = new SimpleEventQuery(42, 43).eq("key", "value");
 
         assertEquals(1, query.getConditions().size());
-        assertEquals("key", query.getConditions().get(0).getProperty());
-        assertEquals("value", query.getConditions().get(0).getValue());
+        assertEquals("key", ((CompareQueryCondition) query.getConditions().get(0)).getProperty());
+        assertEquals("value", ((CompareQueryCondition) query.getConditions().get(0)).getValue());
         assertEquals(42, query.getOffset());
         assertEquals(43, query.getLimit());
     }

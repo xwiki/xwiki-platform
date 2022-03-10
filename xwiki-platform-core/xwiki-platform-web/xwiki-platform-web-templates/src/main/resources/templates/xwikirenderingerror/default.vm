@@ -1,0 +1,54 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+##!source.syntax=xwiki/2.1
+{{velocity}}
+  #macro(uiExtensions $extensionPoint)
+    #if (!$services.uix.getExtensions($extensionPoint).isEmpty())
+      #if (!$renderingerror.inline)
+        ## Make sure the UI extensions are standalone
+
+      #end
+      {{uiextensions extensionPoint="$extensionPoint"/}}
+    #end
+  #end
+  {{box cssClass="xwikirenderingerror"}}
+    #set($translatedMessage = $services.logging.translate($renderingerror.message))
+    $services.rendering.escape($translatedMessage.formattedMessage, 'xwiki/2.1')##
+    #if ($renderingerror.rootCause)
+      ~ $services.localization.render('rendering.error.causedBy', 'xwiki/2.1', [$renderingerror.rootCause.message.replaceAll('\n', ' ')])##
+    #end
+    ~ {{translation key="rendering.error.click"/}}
+  {{/box}}
+  #if (!$renderingerror.inline)
+    ## Make sure the boxes are standalone
+
+  #end
+  {{box cssClass="xwikirenderingerrordescription hidden"}}
+    #if ($renderingerror.description)
+      #set($translatedDescription = $services.logging.translate($renderingerror.description))
+      $services.rendering.escape($translatedDescription.formattedMessage, 'xwiki/2.1')
+    #end
+    #if ($renderingerror.stackTrace)
+      $services.rendering.escape($renderingerror.stackTrace, 'xwiki/2.1')
+    #end
+    #uiExtensions('org.xwiki.platform.rendering.error.afterDescription')
+    #uiExtensions("org.xwiki.platform.rendering.error.afterDescription.${renderingerror.messageId}")
+  {{/box}}
+{{/velocity}}

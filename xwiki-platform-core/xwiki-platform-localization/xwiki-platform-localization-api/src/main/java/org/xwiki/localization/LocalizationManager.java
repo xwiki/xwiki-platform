@@ -50,11 +50,29 @@ public interface LocalizationManager
     Translation getTranslation(String key, Locale locale);
 
     /**
+     * Find a translation in the current language.
+     * 
+     * @param key the key identifying the message to look for
+     * @param locale the {@link Locale} for which this translation is searched. The result might me associated to a
+     *            different {@link Locale} (for example getting the {@code fr} translation when asking for the
+     *            {@code fr_FR} one).
+     * @param parameters the parameters
+     * @return the translation in the current language rendered as plain text, null if no translation could be found
+     * @see #getTranslation(String, Locale)
+     * @since 14.1RC1
+     * @since 13.10.3
+     */
+    default String getTranslationPlain(String key, Locale locale, Object... parameters)
+    {
+        return null;
+    }
+
+    /**
      * Find a bundle.
      * 
      * @param bundleType a hint identifying the bundle type.
      * @param bundleId the identifier of the bundle, for example a wiki document name, or the URL to a
-     *            <tt>.properties</tt> file.
+     *            {@code .properties} file.
      * @return the {@link TranslationBundle} or null if none could be found
      * @throws TranslationBundleDoesNotExistsException when no bundle could be found for the passed identifier
      * @throws TranslationBundleFactoryDoesNotExistsException when no bundle factory could be found for the passed type
@@ -71,10 +89,20 @@ public interface LocalizationManager
      * 
      * @param bundleType a hint identifying the bundle type.
      * @param bundleId the identifier of the bindle, for example a wiki document name, or the URL to a
-     *            <tt>.properties</tt> file.
+     *            {@code .properties} file.
      * @throws TranslationBundleDoesNotExistsException when no bundle could be found for the passed identifier
      * @throws TranslationBundleFactoryDoesNotExistsException when no bundle factory could be found for the passed type
      */
     void use(String bundleType, String bundleId)
         throws TranslationBundleDoesNotExistsException, TranslationBundleFactoryDoesNotExistsException;
+
+    /**
+     * @return the {@link Locale} configured as the default
+     * @since 14.1RC1
+     * @since 13.10.3
+     */
+    default Locale getDefaultLocale()
+    {
+        return Locale.getDefault();
+    }
 }

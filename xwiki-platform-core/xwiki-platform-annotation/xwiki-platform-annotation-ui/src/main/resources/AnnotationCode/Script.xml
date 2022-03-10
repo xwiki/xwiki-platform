@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AnnotationCode.Script" locale="">
+<xwikidoc version="1.4" reference="AnnotationCode.Script" locale="">
   <web>AnnotationCode</web>
   <name>Script</name>
   <language/>
@@ -54,22 +54,27 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -101,13 +106,15 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
@@ -115,7 +122,7 @@
       </use>
     </class>
     <property>
-      <cache/>
+      <cache>long</cache>
     </property>
     <property>
       <code>var XWiki = (function (XWiki) {
@@ -129,30 +136,17 @@ XWiki.Selection = Class.create({
   range : false,
   // the list of elements that wrap the selection to make it colored, in FF
   highlightWrappers : false,
-  // the parent of the selection and the selection inner HTML to make it colored in IE and to be able to rollback this change
-  selectionParent : false,
-  selectionParentInnerHTML : false,
   // position of the last mouse up, to know where to display the dialog
   offsetX : false,
   offsetY : false,
   // how many characters to expand left &amp; right in standard impl
   step : 5,
-  // how may words to expand left &amp; right on IE
-  wordStep : 1,
 
   initialize : function (container) {
     if (!container) {
       return;
     }
     this.container = container;
-    // on IE we listen to the mousedown and remember the position of the mousedown of the selection to know where to display the dialog for annotation creation
-    if (!window.getSelection) {
-      this.container.observe('mousedown', function(event) {
-        // very ugly hack to get these values on body since the first positioned ancestor for the panel to be displayed is the body and we need this offsets
-        this.offsetX = event.pointerX();
-        this.offsetY = event.pointerY();
-      }.bindAsEventListener(this));
-    }
   },
 
   computeSelection : function () {
@@ -162,34 +156,19 @@ XWiki.Selection = Class.create({
     this.selectionContext = false;
     this.selectionOffset = false;
     this.highlightWrappers = false;
-    this.selectionParent = false;
-    this.selectionParentInnerHTML = false;
     // if there is no container to get selection in, selection is always false
     if (!this.container) {
       return;
     }
-    if (window.getSelection) {
-      // FF selection &amp; hopefully other browsers
-      if (window.getSelection().rangeCount == 0) {
-        return;
-      }
-      this.range = window.getSelection().getRangeAt(0);
-      // ignore if the selection is in the passed container
-      if (!this.isDescendantOrSelf(this.container, this.range.commonAncestorContainer)) {
-        return;
-      }
-      this.selectionText = this.range.toString();
-    } else {
-      // IE selection
-      if (document.selection.type == 'Text') {
-        this.range = document.selection.createRange();
-        // ignore if the selection is in the passed container
-        if (!this.isDescendantOrSelf(this.container, this.range.parentElement())) {
-          return;
-        }
-        this.selectionText = this.range.text;
-      }
+    if (!window.getSelection().rangeCount) {
+      return;
     }
+    this.range = window.getSelection().getRangeAt(0);
+    // ignore if the selection is in the passed container
+    if (!this.isDescendantOrSelf(this.container, this.range.commonAncestorContainer)) {
+      return;
+    }
+    this.selectionText = this.range.toString();
     if (this.selectionText.strip() == '') {
       this.selectionText = false;
     }
@@ -214,30 +193,20 @@ XWiki.Selection = Class.create({
       // there should be some selection at this point
       return;
     }
-    if (window.getSelection) {
-      // standard
-      // create an annotation highlight span around this content
-      var highlightWrapperTemplate = new Element('span', {'style': 'background-color: ' + color, 'class' : 'selection-highlight'});
-      // get all the text nodes of this range
-      var rangeTextNodes = this.getRangeTextNodes();
-      // and remove all the ranges in this selection, otherwise so messed up things will happen
-      window.getSelection().removeAllRanges();
-      this.highlightWrappers = new Array();
-      rangeTextNodes.each(function(text) {
-        // clone a highlightWrapper from the template
-        var highlightWrapper = highlightWrapperTemplate.clone();
-        highlightWrapper.update(text.textContent.escapeHTML());
-        text.parentNode.replaceChild(highlightWrapper, text);
-        this.highlightWrappers.push(highlightWrapper);
-      }.bind(this));
-    } else {
-      // IE
-      // get the selection parent and its inner HTML to be able to restore it after
-      this.selectionParent = this.range.parentElement();
-      this.selectionParentInnerHTML = this.selectionParent.innerHTML;
-      // and finally color it
-      this.range.execCommand("BackColor", false, color);
-    }
+    // create an annotation highlight span around this content
+    var highlightWrapperTemplate = new Element('span', {'style': 'background-color: ' + color, 'class' : 'selection-highlight'});
+    // get all the text nodes of this range
+    var rangeTextNodes = this.getRangeTextNodes();
+    // and remove all the ranges in this selection, otherwise so messed up things will happen
+    window.getSelection().removeAllRanges();
+    this.highlightWrappers = new Array();
+    rangeTextNodes.each(function(text) {
+      // clone a highlightWrapper from the template
+      var highlightWrapper = highlightWrapperTemplate.clone();
+      highlightWrapper.update(text.textContent.escapeHTML());
+      text.parentNode.replaceChild(highlightWrapper, text);
+      this.highlightWrappers.push(highlightWrapper);
+    }.bind(this));
   },
 
   /**
@@ -362,16 +331,10 @@ XWiki.Selection = Class.create({
   },
 
   removeSelectionHighlight : function() {
-    if (window.getSelection) {
-      // standard
-      // unwrap
-      this.highlightWrappers.each(function(wrapper) {
-        wrapper.replace(wrapper.innerHTML);
-      });
-    } else {
-      // IE
-      this.selectionParent.update(this.selectionParentInnerHTML);
-    }
+    // unwrap
+    this.highlightWrappers.each(function(wrapper) {
+      wrapper.replace(wrapper.innerHTML);
+    });
   },
 
   getPositionNextToSelection : function() {
@@ -524,22 +487,27 @@ return XWiki;
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -571,13 +539,15 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
@@ -585,7 +555,7 @@ return XWiki;
       </use>
     </class>
     <property>
-      <cache/>
+      <cache>long</cache>
     </property>
     <property>
       <code>## Retrieve the annotation settings from the configuration object
@@ -616,8 +586,6 @@ XWiki.Annotation = Class.create({
   displayingAnnotations : false,
   // the display annotations check box in the settings panel
   displayAnnotationsCheckbox : false,
-  // flag specifying if the annotations are displayed by default or not
-  displayedByDefault : false,
   // whether the annotations should be displayed as highlighted or only the icons
   displayHighlight : true,
   // add annotation shortcuts
@@ -637,12 +605,11 @@ XWiki.Annotation = Class.create({
   initialize : function (displayHighlighted, annotatedElt, displayedByDefault) {
     this.displayHighlight = displayHighlighted;
     this.annotatedElement = annotatedElt;
-    this.displayedByDefault = displayedByDefault;
 
     // if the annotated element does not exist, don't load anything
     if (!this.annotatedElement) {
       // and show a warning if the annotations should be shown by default
-      if (this.displayedByDefault) {
+      if (displayedByDefault) {
         new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.error.noannotatedelement')", 'warning');
       }
       return;
@@ -669,9 +636,17 @@ XWiki.Annotation = Class.create({
     // listen to the filter change events to re-fetch the annotations when it changes
     document.observe('xwiki:annotations:filter:changed', this.onFilterChange.bindAsEventListener(this));
 
-    // and get the annotations if they're loaded by default
-    if (this.displayedByDefault) {
+    // Disable the annotations while the annotated content is edited in-place.
+    this.annotatedElement.observe('xwiki:actions:edit', this.beforeInPlaceEdit.bindAsEventListener(this));
+    this.annotatedElement.observe('xwiki:actions:view', this.afterInPlaceEdit.bindAsEventListener(this));
+
+    if (window.location.hash === '#edit' || window.location.hash === '#translate') {
+      // The annotated content is being edited in-place so we need to postpone the display of the annotations (if asked)
+      // for when we leave the edit mode.
+      this.displayingAnnotations = displayedByDefault;
+    } else if (displayedByDefault) {
       if (XWiki.docsyntax != 'xwiki/1.0') {
+        // Fetch the annotations and display them.
         this.fetchAnnotations(true);
       } else {
         // if the document syntax is 1.0, and annotations should be displayed by default, display a warning, and not display annotations
@@ -680,10 +655,37 @@ XWiki.Annotation = Class.create({
     }
   },
 
+  beforeInPlaceEdit: function() {
+    // We need to restore the annotation visibility after the in-place edit is done.
+    this.shouldDisplayAnnotationsAfterInPlaceEdit = this.displayingAnnotations;
+    // Hide the annotations and close any annotation bubble that may be opened.
+    this.toggleAnnotations(false);
+    // Hide the settings panel.
+    this.settingsPanel?.addClassName('hidden');
+    // Disable the Annotate menu in order to prevent the users from accessing the settings panel while editing. Note
+    // that this also disables indirecly the shortcut keys for adding a new annotation and for showing the existing
+    // annotations (check their handlers).
+    $('tmAnnotationsTrigger')?.up('li')?.addClassName('disabled');
+  },
+
+  afterInPlaceEdit: function() {
+    // Re-enable the Annotate menu so that the users can access the settings panel. This also re-enables the shortcut
+    // keys for adding a new annotation and for showing the existing annotations (check their handlers).
+    $('tmAnnotationsTrigger')?.up('li')?.removeClassName('disabled');
+    // Force the reload of the annotations next time they are shown because the annotated content may have changed.
+    this.fetchedAnnotations = false;
+    // Show the annotations if they were displayed before the annotated content was edited.
+    if (this.shouldDisplayAnnotationsAfterInPlaceEdit) {
+      this.fetchAnnotations(true);
+    }
+  },
+
   hookMenuButton : function() {
     // Since 7.4M1, the annotations trigger is inserted via an UIX.
     var annotationsTrigger = $('tmAnnotationsTrigger');
-    annotationsTrigger.observe('click', this.toggleSettingsPanel.bind(this));
+    if (annotationsTrigger) {
+      annotationsTrigger.observe('click', this.toggleSettingsPanel.bind(this));
+    }
  },
 
   setAnnotationVisibility : function (visibility) {
@@ -697,8 +699,8 @@ XWiki.Annotation = Class.create({
     var menu = event.element();
     // prevent link
     event.stop();
-    // if another click handling is in progress
-    if (menu.disabled) {
+    // Ignore if another click handling is in progress or if the annotations are disabled (in-place edit in progress).
+    if (menu.disabled || menu.up('li')?.hasClassName('disabled')) {
       return;
     }
     if (window.document.body.hasClassName('skin-flamingo')) {
@@ -732,19 +734,13 @@ XWiki.Annotation = Class.create({
           menu._x_notification.hide();
           // store the displayed annotations checkbox
           this.displayAnnotationsCheckbox = $('annotationsdisplay');
-          // show this checkbox as checked if the annotations are displayed by default and were loaded successfully
-          if (this.displayedByDefault || this.displayingAnnotations) {
-            this.displayAnnotationsCheckbox.checked = true;
-          }
+          // Show this checkbox as checked if the annotations are currently displayed.
+          this.displayAnnotationsCheckbox.checked = this.displayingAnnotations;
           this.attachSettingsListeners();
-          $('tmAnnotations').toggleClassName('active');
         }.bind(this),
 
         onFailure: function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           // show the error message at the bottom
           menu._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('annotations.menu.loaderror')" + failureReason, 'error', {timeout : 5}));
         },
@@ -760,7 +756,6 @@ XWiki.Annotation = Class.create({
       });
     } else {
       this.settingsPanel.toggleClassName('hidden');
-      $('tmAnnotations').toggleClassName('active');
     }
   },
 
@@ -783,27 +778,23 @@ XWiki.Annotation = Class.create({
   },
 
   toggleAnnotations : function(visible) {
-    // don't standard toggle because we want to ensure it matches visible
     if (this.displayHighlight) {
-      this.annotatedElement.select('.annotation').invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
+      this.annotatedElement.select('.annotation').invoke('toggleClassName', 'annotation-highlight', !!visible);
     }
-    //and toggle all annotation markers
-    this.annotatedElement.select('.annotation-marker').invoke(visible ? 'removeClassName' : 'addClassName', 'hidden');
-    this.displayingAnnotations = visible;
+    // Toggle all annotation markers.
+    this.annotatedElement.select('.annotation-marker').invoke('toggleClassName', 'hidden', !visible);
+    this.setAnnotationVisibility(visible);
     if (!visible) {
-      // also close all open bubbles
-      this.bubbles.each(function(bubble){
-        // if it's the create panel, skip it
-        if (bubble != this.createPanel) {
-          bubble.remove();
-        }
-      }.bind(this));
-      this.bubbles.clear();
+      // Close all open bubbles.
+      while (this.bubbles.length) {
+        this.closeOpenBubble();
+      }
     }
   },
 
   toggleAnnotationHighlight : function(annotationId, visible) {
-    this.annotatedElement.select('.annotation.ID' + annotationId).invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
+    this.annotatedElement.select('.annotation.ID' + annotationId).invoke('toggleClassName', 'annotation-highlight',
+      !!visible);
   },
 
   /**
@@ -857,7 +848,7 @@ XWiki.Annotation = Class.create({
     }
     // get all the extra fields requested and add them to the request
     var extraFields = this.getExtraFields();
-    if (extraFields.size() &gt; 0) {
+    if (extraFields.length) {
       parametersHash.set('request_field', []);
     }
     for (var i = 0; i &lt; extraFields.length; i++) {
@@ -888,25 +879,18 @@ XWiki.Annotation = Class.create({
           }
           // hide message at page bottom
           this._x_notification.hide();
-          // load the received annotated content in the page, along with annotations and annotations markers.
-          this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow, false, force);
+          // Load the received annotations, along with annotations markers.
+          this.loadAnnotations(response.responseJSON.annotatedContent, andShow, false, force);
           // store the state of the annotations
           this.fetchedAnnotations = true;
-          if (this.displayAnnotationsCheckbox) {
-            this.displayAnnotationsCheckbox.checked = true;
-          }
+          this.setAnnotationVisibility(andShow);
         }.bind(this),
 
         onFailure: function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           // show the error message at the bottom
           this._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loaderror')" + failureReason, 'error', {timeout : 5}));
-          if (this.displayAnnotationsCheckbox) {
-            this.displayAnnotationsCheckbox.checked = false;
-          }
+          this.setAnnotationVisibility(false);
         }.bind(this),
 
         on0: function (response) {
@@ -943,27 +927,215 @@ XWiki.Annotation = Class.create({
     }
   },
 
+  addAnnotationsMarkup : function(annotations) {
+    annotations.each(function(item) {
+      this.addAnnotationMarkup(item);
+    }.bind(this));
+  },
+
+  addAnnotationMarkup : function(ann) {
+    // Check if the annotation was found.
+    var plainTextStartOffset = ann.fields.find(field =&gt; field.name == 'plainTextStartOffset');
+    var plainTextEndOffset = ann.fields.find(field =&gt; field.name == 'plainTextEndOffset');
+    if (plainTextStartOffset.value === null || plainTextEndOffset.value === null) {
+      return false;
+    }
+
+    var annDOMRange = this.getDOMRange(this.annotatedElement, plainTextStartOffset.value, plainTextEndOffset.value);
+    // Since the annotation could start at a specific offset, the node is splitted for not wrapping the whole text and
+    // a new range is created to recalculate the new ends.
+    var strictRange = this.fixRangeEndPoints(annDOMRange);
+
+    // Wrap each text node from this range inside an annotation markup SPAN.
+    this.getTextNodesInRange(strictRange).forEach(textNode =&gt; this.markAnnotation(textNode, ann));
+
+    // Add the marker span after the last span of this annotation.
+    var allSpans = this.annotatedElement.select('[class~=ID' + ann.annotationId + ']');
+    if (!allSpans.length) {
+      return;
+    }
+    var lastSpan = allSpans[allSpans.length - 1];
+    // Create the annotation markers hidden by default, since annotations are added on the document hidden by default.
+    var markerSpan = new Element('span', {'id': 'ID' + ann.annotationId, 'class' : 'hidden annotation-marker ' + ann.state});
+    lastSpan.insert({after: markerSpan});
+    // Annotations are displayed on mouseover.
+    markerSpan.observe('click', this.onMarkerClick.bindAsEventListener(this, ann.annotationId));
+  },
+
   /**
-   * Loads the annotated content in the annotated element content, if there are any annotations or if forced.
+   * Surround this node with a span corresponding to it's annotation.
    *
-   * @param annotatedContent object holding the annotated content to update the annotated element with (stores the annotations list and the annotated html)
-   * @param andShow whether the annotations should also be shown (highlighted) on the content
-   * @param navigateToPane if the document should be repositioned to the annotations tab in the document extra section. Useful when the changes on annotations are done from the tab, when the document position should still stay in the tab
-   * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful for deleting annotations, which should be reflected in the annotated element even if no annotations are still left to display)
+   * @param markedNode the node that corresponds to the current annotation
+   * @param ann object holding information about the annotation
    */
-  loadAnnotatedContent : function(annotatedContent, andShow, navigateToPane, force) {
-    // only load the annotated content if there are any annotations
-    if ((annotatedContent.annotations &amp;&amp; annotatedContent.annotations.size() &gt; 0) || force) {
-      this.annotatedElement.update(annotatedContent.content);
-      this.addAnnotationMarkers(annotatedContent.annotations);
-      // Notify the content change.
-      document.fire('xwiki:dom:updated', {elements: [this.annotatedElement]});
-      // and also handle the tab 'downstairs' when the annotations list changes
-      this.reloadTab(navigateToPane);
+  markAnnotation: function(markedNode, ann) {
+    var wrapper = document.createElement('span');
+    wrapper.addClassName('annotation');
+    wrapper.addClassName('ID' + ann.annotationId);
+
+    var parentNode = markedNode.parentElement;
+    parentNode.replaceChild(wrapper, markedNode);
+    wrapper.appendChild(markedNode);
+  },
+
+  /**
+   * For the first and last node, split the nodes at the known offset to not annotate the whole text. Create a new range
+   * with these new nodes.
+   *
+   * @param range the DOM range of the annotated text
+   */
+  fixRangeEndPoints: function(range) {
+    var strictRange = new Range();
+
+    // Because the range could start and end in the same text node, the end point is fixed first, since this will not
+    // alter the startOffset.
+    // The split is done only if the offset is not before first or after last character for not creating empty text nodes.
+    if (range.endOffset &gt; 0 &amp;&amp; range.endOffset &lt; range.endContainer.length) {
+      range.endContainer.splitText(range.endOffset);
     }
-    if (andShow) {
-      this.toggleAnnotations(true);
+    if (range.endOffset &gt; 0) {
+      strictRange.setEndAfter(range.endContainer);
+    } else {
+      strictRange.setEndBefore(range.endContainer);
     }
+
+    // The split is done only if the offset is not before first or after last character for not creating empty text nodes.
+    if (range.startOffset &gt; 0 &amp;&amp; range.startOffset &lt; range.startContainer.length) {
+      range.startContainer.splitText(range.startOffset);
+    }
+    if (range.startOffset &gt; 0) {
+      strictRange.setStartAfter(range.startContainer);
+    } else {
+      strictRange.setStartBefore(range.startContainer);
+    }
+
+    return strictRange;
+  },
+
+  /**
+   * Create a DOM Range by knowing the start and end index from inside the plain content of the element.
+   *
+   * @param annotatedElement the element from where the range is constructed
+   * @param startIndex start offset where the range begins
+   * @param endIndex end offset where the range ends
+   */
+  getDOMRange: function(annotatedElement, startIndex, endIndex) {
+    var startPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, startIndex, true);
+    var endPosition = this.getTextNodeAtPlainTextOffset(annotatedElement, endIndex, false);
+    var range = new Range();
+    range.setStart(startPosition.node, startPosition.offset);
+    range.setEnd(endPosition.node, endPosition.offset);
+    return range;
+  },
+
+  /**
+   * Knowing the offset relative to the full plain content of the root node, get the corresponding child node that
+   * contains it and the offset specific to the new node. The DOM is traversed recursively starting with the root node
+   * and the plain content length is computed to know when the wanted node is found.
+   *
+   * @param parentNode the node where the search is done
+   * @param plainTextOffset the offset relative to the full plain content
+   * @param isStart boolean specifying if a start or end offset is targeted
+   */
+  getTextNodeAtPlainTextOffset: function(parentNode, plainTextOffset, isStart) {
+    var childNodes = parentNode.childNodes;
+    var child;
+    var parentNodePlainTextLength = 0;
+    for (let i = 0; i &lt; childNodes.length; i++) {
+      child = childNodes[i];
+      if (child.nodeType == 3) {
+        var previousSiblingsLength = parentNodePlainTextLength;
+        // The spaces are ignored since they were removed as well on the server when the offset was computed.
+        parentNodePlainTextLength += child.textContent.replace(/\s/g, '').length;
+        // Consider that an end offset is exclusive.
+        if ((isStart &amp;&amp; plainTextOffset &lt; parentNodePlainTextLength) ||
+            (!isStart &amp;&amp; plainTextOffset &lt;= parentNodePlainTextLength)) {
+          // Because plainTextOffset doesn't consider spaces, the real offset of the node needs to be recomputed so that
+          // they are included.
+          return {
+            'node': child,
+            'offset': this.getNodeSpecificOffset(child, plainTextOffset - previousSiblingsLength, isStart)
+          };
+        }
+      } else if (child.childNodes.length &gt; 0) {
+        var maybeFoundNode = this.getTextNodeAtPlainTextOffset(child, plainTextOffset - parentNodePlainTextLength, isStart);
+        if (maybeFoundNode.node) {
+          return maybeFoundNode;
+        } else {
+          parentNodePlainTextLength += maybeFoundNode.offset;
+        }
+      }
+    }
+    return {'offset': parentNodePlainTextLength};
+  },
+
+  /**
+   * Knowing the offset computed ignoring the whitespaces of this node, compute the real offset by including all
+   * characters.
+   *
+   * @param node a DOM node
+   * @param offset the offset relative to the text without whitespaces
+   * @param isStart boolean specifying if a start or end offset is targeted
+   */
+  getNodeSpecificOffset: function(node, offset, isStart) {
+    var nonSpaceCharsLength = 0;
+    var chars = Array.from(node.textContent);
+    for (let i = 0; i &lt; chars.length; i++) {
+      // Because the end offset is exclusive, it can be a whitespace.
+      if (offset == 0 &amp;&amp; (!isStart || (isStart &amp;&amp; !/\s/.test(chars[i])))) {
+        return i;
+      }
+      if (!/\s/.test(chars[i])) {
+        offset--;
+      }
+    }
+    return chars.length;
+  },
+
+  /**
+   * Filter only the text nodes inside a DOM Range.
+   *
+   * @param range a DOM Range
+   */
+  getTextNodesInRange: function(range) {
+    var rangeIterator = document.createNodeIterator(
+      range.commonAncestorContainer,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: function (node) {
+          // Since an annotation cannot be added to a whitespace node, these are ignored.
+          if (/\S/.test(node.data)) {
+            return NodeFilter.FILTER_ACCEPT
+          }
+        }
+      }
+    );
+    var nodes = [];
+    var nodeRange = document.createRange();
+    while (rangeIterator.nextNode()) {
+      nodeRange.selectNode(rangeIterator.referenceNode);
+      // Don't consider nodes before the start of the range.
+      if (nodeRange.compareBoundaryPoints(Range.START_TO_START, range) === -1) {
+        continue;
+      }
+      nodes.push(rangeIterator.referenceNode);
+      // Stop if the current node is the end of the range.
+      if (nodeRange.compareBoundaryPoints(Range.END_TO_END, range) === 0) {
+        break;
+      }
+    }
+    return nodes;
+  },
+
+  /**
+   * Remove the wrapper and marker of annotations. The selection highlight is also removed in case the new annotation
+   * was deleted.
+   */
+  removeAnnotationsAndSelectionMarkups: function() {
+    document.querySelectorAll("span.annotation, span.selection-highlight")
+      .forEach(annotationNode =&gt; annotationNode.replaceWith(...annotationNode.childNodes));
+    document.querySelectorAll("span.annotation-marker").forEach(marker =&gt; marker.remove());
+    this.fetchedAnnotations = false;
   },
 
   reloadTab : function(navigateToPane) {
@@ -1034,8 +1206,9 @@ XWiki.Annotation = Class.create({
                 this.hideBubble(container);
               }
               this.fetchedAnnotations = true;
-              // reload the received annotated content forcing update so that deleting last annotation is reflected in the list of annotations, with scroll to tab if not in bubble
-              this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault, !inBubble, true);
+              // Reload the received annotations forcing update so that deleting last annotation is reflected in the
+              // list of annotations, with scroll to tab if not in bubble.
+              this.loadAnnotations(response.responseJSON.annotatedContent, this.displayingAnnotations, !inBubble, true);
             }.bind(this),
             onComplete : function() {
               // In the end: re-enable the button
@@ -1099,10 +1272,7 @@ XWiki.Annotation = Class.create({
               this.fillEditForm(container, response.responseText, id, inBubble);
             }.bind(this),
             onFailure: function(response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
+              var failureReason = response.statusText || 'Server not responding';
               // show the error message at the bottom
               this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.edit.form.loaderror')" + failureReason, 'error', {timeout : 5});
               // load the original content of the container
@@ -1119,22 +1289,6 @@ XWiki.Annotation = Class.create({
         }.bind(this));
       }
     }.bindAsEventListener(this));
-  },
-
-  addAnnotationMarkers : function(annotations) {
-    annotations.each(function(item){
-      // get the last span of this annotation
-      var allSpans = this.annotatedElement.select('[class~=ID' + item.annotationId + ']');
-      if (allSpans.size() == 0) {
-        return;
-      }
-      var lastSpan = allSpans[allSpans.size() - 1];
-      // create the annotation markers hidden by default, since annotations are added on the document hidden by default
-      var markerSpan = new Element('span', {'id': 'ID' + item.annotationId, 'class' : 'hidden annotation-marker ' + item.state});
-      lastSpan.insert({after: markerSpan});
-      // annotations are displayed on mouseover
-      markerSpan.observe('click', this.onMarkerClick.bindAsEventListener(this, item.annotationId));
-    }.bind(this));
   },
 
   // maybe this should be moved in a function to display a bubble from an address, to call for all dialogs for different parameters
@@ -1173,10 +1327,7 @@ XWiki.Annotation = Class.create({
         }.bind(this),
 
         onFailure: function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           // hide the loading bubble
           this.hideBubble(newBubble);
           // show the error message at the bottom
@@ -1224,6 +1375,8 @@ XWiki.Annotation = Class.create({
 
     // put the content in
     container.update(content);
+    // Initialize the widgets / editors used on the annotation popup.
+    document.fire('xwiki:dom:updated', {elements: [container]});
     return true;
   },
 
@@ -1263,6 +1416,9 @@ XWiki.Annotation = Class.create({
 
   onAnnotationEdit : function(event, container, annotationId, inBubble) {
     event.stop();
+    // Notify the others that we're about to submit the annotation, in order to give them the chance to update the form
+    // fields before the submit.
+    document.fire('xwiki:actions:beforeSave')
     var form = container.down('form');
     var formData = new Hash(form.serialize(true));
     // aaand update
@@ -1301,14 +1457,11 @@ XWiki.Annotation = Class.create({
           this.hideBubble(container);
         }
         this.fetchedAnnotations = true;
-        // reload the received annotated content, with scroll to tab
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault, !inBubble);
+        // Reload the received annotations, with scroll to tab.
+        this.loadAnnotations(response.responseJSON.annotatedContent, this.displayingAnnotations, !inBubble);
       }.bind(this),
       onFailure : function(response) {
-        var failureReason = response.statusText;
-        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-          failureReason = 'Server not responding';
-        }
+        var failureReason = response.statusText || 'Server not responding';
         this._x_notification.replace(new XWiki.widgets.Notification(messages.failureText + failureReason, 'error', {timeout : 5}));
         if (inBubble) {
           // and close the bubble on failure to update
@@ -1374,8 +1527,15 @@ XWiki.Annotation = Class.create({
           // The content of the Comments tab is reloaded when a comment is added so we can't cache the reference to the
           // reply button.
           replyButtonInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply')[0];
+          // Ensure to have the focus on the right button on which we click:
+          // it avoids to have CKEditor focusing again on the original button we clicked once loaded.
+          replyButtonInTab.focus();
           // Click the reply button from the comments tab button instead.
           replyButtonInTab.click();
+          // We want to be moved to the reply editor: we scroll to the reply button just above the editor
+          // it allows to see both the annotation + the editor. If we scrolled only in the editor, we'd have the
+          // original annotation hidden in case of many comments.
+          replyButtonInTab.scrollIntoView();
 
           // Lose the focus on the bubble so that it can go away.
           container.blur();
@@ -1392,6 +1552,10 @@ XWiki.Annotation = Class.create({
       // it's not attached anymore: either mouseout or escape
       return;
     }
+
+    // Cancel the edit otherwise the user will be asked for confirmation when leaving the page.
+    document.fire('xwiki:actions:cancel');
+
     bubble.remove();
     var bubbleIndex = this.bubbles.indexOf(bubble);
     if (bubbleIndex &gt;= 0) {
@@ -1401,12 +1565,12 @@ XWiki.Annotation = Class.create({
   },
 
   registerShortcuts : function(annotationShorcuts, method) {
-    for (var i = 0; i &lt; annotationShorcuts.size(); ++i) {
+    for (var i = 0; i &lt; annotationShorcuts.length; ++i) {
       shortcut.add(annotationShorcuts[i], method.bindAsEventListener(this));
     }
   },
   unregisterShortcuts : function(annotationShorcuts) {
-    for (var i = 0; i &lt; annotationShorcuts.size(); ++i) {
+    for (var i = 0; i &lt; annotationShorcuts.length; ++i) {
       shortcut.remove(annotationShorcuts[i]);
     }
   },
@@ -1427,9 +1591,15 @@ XWiki.Annotation = Class.create({
   },
 
   onToggleAnnotationsShortcut : function() {
-    if (this.fetchedAnnotations) {
+    if ($('tmAnnotationsTrigger')?.up('li')?.hasClassName('disabled')) {
+      // Annotations are disabled (probably because the annotated content is being edited in-place).
+      return;
+    } else if (this.fetchedAnnotations) {
       this.setAnnotationVisibility(!this.displayingAnnotations);
       this.toggleAnnotations(this.displayingAnnotations);
+      if (!this.displayingAnnotations) {
+        this.removeAnnotationsAndSelectionMarkups();
+      }
     } else {
       this.fetchAnnotations(true);
     }
@@ -1457,6 +1627,9 @@ XWiki.Annotation = Class.create({
     // if the document is in 1.0 syntax, prevent the create dialog to be displayed, display a warning and stop everything
     if (XWiki.docsyntax == 'xwiki/1.0') {
       new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.error.wrongsyntax')", 'warning');
+      return;
+    } else if ($('tmAnnotationsTrigger')?.up('li')?.hasClassName('disabled')) {
+      // Annotations are disabled (probably because the annotated content is being edited in-place).
       return;
     }
     // parse the selection
@@ -1488,10 +1661,7 @@ XWiki.Annotation = Class.create({
           }.bind(this),
 
           onFailure: function(response) {
-            var failureReason = response.statusText;
-            if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-              failureReason = 'Server not responding';
-            }
+            var failureReason = response.statusText || 'Server not responding';
             // show the error message at the bottom
             this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.form.loaderror')" + failureReason, 'error', {timeout : 5});
             // and hide the create form panel
@@ -1542,8 +1712,10 @@ XWiki.Annotation = Class.create({
   },
 
   onAnnotationAdd : function(event) {
-    // don't submit
     event.stop();
+    // Notify the others that we're about to submit the annotation, in order to give them the chance to update the form
+    // fields before the submit.
+    document.fire('xwiki:actions:beforeSave')
     var form = this.createPanel.down('form');
     var formData = new Hash(form.serialize(true));
     // aaand submit
@@ -1559,10 +1731,8 @@ XWiki.Annotation = Class.create({
         if (this.checkResponseCodeAndFail(response)) {
           return;
         }
-        if (this.displayAnnotationsCheckbox) {
-          this.displayAnnotationsCheckbox.checked = true;
-        }
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, true);
+        this.setAnnotationVisibility(true);
+        this.loadAnnotations(response.responseJSON.annotatedContent, true);
         this.fetchedAnnotations = true;
         form._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.success')", 'done');
         // and hide the create bubble, skipping selection highlight clear
@@ -1570,10 +1740,7 @@ XWiki.Annotation = Class.create({
       }.bind(this),
       onFailure : function(response) {
         this.hideAnnotationCreationForm();
-        var failureReason = response.statusText;
-        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-          failureReason = 'Server not responding';
-        }
+        var failureReason = response.statusText || 'Server not responding';
         this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.loaderror')" + failureReason, 'error', {timeout : 5});
       }.bind(this),
       on0 : function (response) {
@@ -1588,8 +1755,7 @@ XWiki.Annotation = Class.create({
    */
   refreshAnnotationsOnCommentDelete : function(event) {
     // if the annotations are currently visible, re-fetch the annotations and display them
-    var visible = this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault;
-    if (visible) {
+    if (this.displayingAnnotations) {
       // Force the reloading in case this annotation was the last one.
       this.fetchAnnotations(true, true);
     } else {
@@ -1602,42 +1768,158 @@ XWiki.Annotation = Class.create({
 return XWiki;
 }(XWiki || {}));
 
-document.observe('xwiki:dom:loaded', function() {
-  // Load the annotations only in view mode, if the document content is displayed
-  // (the document content is not displayed when viewer=history for instance).
-  if (XWiki.contextaction != 'view' || !$('xwikicontent')) {
-    return;
+require.config({
+  paths: {
+    'fast-diff': $jsontool.serialize($services.webjars.url('org.webjars.npm:fast-diff', 'diff'))
   }
+})
 
-  #if ($annotationHighlightByDefault &amp;&amp; $annotationHighlightByDefault != 0)
-    var displayHighlight = true;
-  #else
-    var displayHighlight = false;
-  #end
-  #if ($annotationsDisplayedByDefault &amp;&amp; $annotationsDisplayedByDefault != 0)
-    var displayed = true;
-  #else
-    var displayed = false;
-  #end
-  #if ($annotationsActivated &amp;&amp; $annotationsActivated != 0)
-    var activated = true;
-  #else
-    var activated = false;
-  #end
-
-  // parse the exception spaces and check where is the current space in that list
-  var exceptions = [];
-  #foreach($space in $exceptionSpaces)
-    exceptions.push('$space');
-  #end
-  var currentSpaceInExceptions = exceptions.indexOf(XWiki.currentSpace);
-  // if the annotations are activated and the current space is not an exception or the annotations are not activated but the current space is an exception
-  if ((activated &amp;&amp; currentSpaceInExceptions &lt; 0) || (!activated &amp;&amp; currentSpaceInExceptions &gt;= 0)) {
-    // initialize the annotations on the xwikicontent element which is the document content by default
-    new XWiki.Annotation(displayHighlight, $('xwikicontent'), displayed);
+define('node-module', ['jquery'], function($) {
+  return {
+    load: function(name, req, onLoad, config) {
+      $.get(req.toUrl(name + '.js'), function(text) {
+        onLoad.fromText(`define(function(require, exports, module) {${text}});`);
+      }, 'text');
+    }
   }
 });
-</code>
+
+define('xwiki-text-offset-updater', ['jquery', 'node-module!fast-diff'], function($, diff) {
+  /**
+   * Compute the changes between different versions of a text.
+   */
+  var getChanges = function(previousText, currentText) {
+    return diff(previousText, currentText);
+  };
+
+  /**
+   * Recompute the offset considering the changes of the text.
+   */
+  var findOffsetAfterChanges = function(changes, oldOffset) {
+    var count = 0, newOffset = oldOffset;
+    for (var i = 0; i &lt; changes.length &amp;&amp; count &lt; oldOffset; i++) {
+      var change = changes[i];
+      if (change[0] &lt; 0) {
+        // Delete: shift the offset to the left.
+        if (count + change[1].length &gt; oldOffset) {
+          // Shift the offset to the left with the number of deleted characters before the original offset.
+          newOffset -= oldOffset - count;
+        } else {
+          // Shift the offset to the left with the number of deleted characters.
+          newOffset -= change[1].length;
+        }
+        count += change[1].length;
+      } else if (change[0] &gt; 0) {
+        // Insert: shift the offset to the right with the number of inserted characters.
+        newOffset += change[1].length;
+      } else {
+        // Keep: don't change the offset.
+        count += change[1].length;
+      }
+    }
+    return newOffset;
+  };
+
+  return {
+    getChanges,
+    findOffsetAfterChanges
+  };
+});
+
+require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function($, offsetUpdater) {
+  $(function() {
+    // Load the annotations only in view mode, if the document content is displayed
+    // (the document content is not displayed when viewer=history for instance).
+    if (XWiki.contextaction != 'view' || !$('xwikicontent')) {
+      return;
+    }
+
+    #if ($annotationHighlightByDefault &amp;&amp; $annotationHighlightByDefault != 0)
+      var displayHighlight = true;
+    #else
+      var displayHighlight = false;
+    #end
+    #if ($annotationsDisplayedByDefault &amp;&amp; $annotationsDisplayedByDefault != 0)
+      var displayed = true;
+    #else
+      var displayed = false;
+    #end
+    #if ($annotationsActivated &amp;&amp; $annotationsActivated != 0)
+      var activated = true;
+    #else
+      var activated = false;
+    #end
+
+    $.extend(XWiki.Annotation.prototype, {
+      /**
+       * Mark the given annotations inside the content by using the start and end offset computed on the server.
+       * With these, a DOM Range will be created and each node inside it will be marked.
+       *
+       * @param annotatedContent object with information about the page annotations and the content already marked by
+       *        the server
+       * @param andShow whether the annotations should also be shown (highlighted) on the content
+       * @param navigateToPane if the document should be repositioned to the annotations tab in the document extra section.
+       *        Useful when the changes on annotations are done from the tab, when the document position should still stay
+       *        in the tab
+       * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful
+       *        for deleting annotations, which should be reflected in the annotated element even if no annotations are
+       *        still left to display)
+       */
+      loadAnnotations: function(annotatedContent, andShow, navigateToPane, force) {
+        if (!annotatedContent.annotations.length &amp;&amp; !force) {
+          return;
+        }
+        // For avoiding adding the same annotation twice, all the annotations markups are removed before adding them
+        // again.
+        this.removeAnnotationsAndSelectionMarkups();
+        this.updateAnnotationsOffsets(annotatedContent);
+        this.addAnnotationsMarkup(annotatedContent.annotations);
+        // Notify the content change.
+        $(document).trigger('xwiki:dom:updated', {'elements': [this.annotatedElement]});
+        // Also handle the tab 'downstairs' when the annotations list changes.
+        this.reloadTab(navigateToPane);
+        if (andShow) {
+          this.toggleAnnotations(true);
+        }
+      },
+
+      /**
+       * Since the offsets were computed based on the plain text before the JavaScript execution, these need to be
+       * updated to consider possible changes.
+       */
+      updateAnnotationsOffsets: function(annotatedContent) {
+        // Ignore spaces since they were not considered when the offsets were computed.
+        var contentBefore = $('&lt;div&gt;&lt;/div&gt;').html(annotatedContent.content).text().replace(/\s/g, '');
+        var contentAfter = $('#xwikicontent').text().replace(/\s/g, '');
+        var changes = offsetUpdater.getChanges(contentBefore, contentAfter);
+        annotatedContent.annotations.forEach(ann =&gt; this.updateAnnotationOffsets(ann, changes));
+      },
+
+      updateAnnotationOffsets: function(ann, changes) {
+        var plainTextStartOffset = ann.fields.find(field =&gt; field.name == 'plainTextStartOffset');
+        var plainTextEndOffset = ann.fields.find(field =&gt; field.name == 'plainTextEndOffset');
+        // Check if the annotation was found.
+        if (plainTextStartOffset.value === null || plainTextEndOffset.value === null) {
+          return;
+        }
+        plainTextStartOffset.value = offsetUpdater.findOffsetAfterChanges(changes, parseInt(plainTextStartOffset.value));
+        plainTextEndOffset.value = offsetUpdater.findOffsetAfterChanges(changes, parseInt(plainTextEndOffset.value));
+      }
+    });
+
+    // parse the exception spaces and check where is the current space in that list
+    var exceptions = [];
+    #foreach($space in $exceptionSpaces)
+    exceptions.push('$space');
+    #end
+    var currentSpaceInExceptions = exceptions.indexOf(XWiki.currentSpace);
+    // if the annotations are activated and the current space is not an exception or the annotations are not activated but the current space is an exception
+    if ((activated &amp;&amp; currentSpaceInExceptions &lt; 0) || (!activated &amp;&amp; currentSpaceInExceptions &gt;= 0)) {
+      // initialize the annotations on the xwikicontent element which is the document content by default
+      new XWiki.Annotation(displayHighlight, $('#xwikicontent')[0], displayed);
+    }
+  });
+});</code>
     </property>
     <property>
       <name>Annotation Javascript -- Annotation application</name>

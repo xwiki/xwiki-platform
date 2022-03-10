@@ -58,7 +58,7 @@ user.profile.network.unfollow=Отписаться
 user.profile.network.done=Готово
 user.profile.network.saving=Сохранение...
 user.profile.network.error=Ошибка сохранения настроек уведомления
-### Missing: user.profile.status.done=Done
-### Missing: user.profile.status.saving=Saving...
-### Missing: user.profile.status.error=Error saving the user status</content>
+user.profile.status.done=Готово
+user.profile.status.saving=Сохранение...
+user.profile.status.error=Ошибка сохранения пользовательского статуса</content>
 </xwikidoc>

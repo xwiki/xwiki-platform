@@ -36,6 +36,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.job.AbstractCopyOrMoveRequest;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
@@ -51,11 +52,11 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,7 +67,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class RefactoringScriptServiceTest
+class RefactoringScriptServiceTest
 {
     @InjectMockComponents
     private RefactoringScriptService refactoringScriptService;
@@ -89,10 +90,13 @@ public class RefactoringScriptServiceTest
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
-    private ExecutionContext executionContext = new ExecutionContext();
+    @MockComponent
+    private RefactoringConfiguration configuration;
+
+    private final ExecutionContext executionContext = new ExecutionContext();
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(
             new EntityReference("WebHome", EntityType.DOCUMENT));
@@ -111,7 +115,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void move() throws Exception
+    void move() throws Exception
     {
         SpaceReference source = new SpaceReference("Space", new WikiReference("math"));
         WikiReference destination = new WikiReference("code");
@@ -125,7 +129,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void moveWithoutPR() throws Exception
+    void moveWithoutPR()
     {
         MoveRequest request = new MoveRequest();
         request.setCheckRights(false);
@@ -144,7 +148,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void moveWithPR() throws Exception
+    void moveWithPR()
     {
         MoveRequest request = new MoveRequest();
         request.setCheckRights(false);
@@ -161,7 +165,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void moveWithException() throws Exception
+    void moveWithException() throws Exception
     {
         MoveRequest request = new MoveRequest();
         JobException exception = new JobException("Some error message");
@@ -172,7 +176,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void rename() throws Exception
+    void rename() throws Exception
     {
         SpaceReference spaceReference =
             new SpaceReference("Alice", new SpaceReference("Users", new WikiReference("dev")));
@@ -187,7 +191,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void copy() throws Exception
+    void copy() throws Exception
     {
         SpaceReference source = new SpaceReference("Space", new WikiReference("math"));
         WikiReference destination = new WikiReference("code");
@@ -201,7 +205,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void copyAs() throws Exception
+    void copyAs() throws Exception
     {
         SpaceReference spaceReference =
             new SpaceReference("Alice", new SpaceReference("Users", new WikiReference("dev")));
@@ -216,7 +220,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void delete() throws Exception
+    void delete() throws Exception
     {
         WikiReference source = new WikiReference("math");
 
@@ -230,7 +234,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void create() throws Exception
+    void create() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         CreateRequest createRequest = new CreateRequest();
@@ -243,7 +247,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void convertToNestedDocumentAlreadyNested() throws Exception
+    void convertToNestedDocumentAlreadyNested()
     {
         DocumentReference nestedDocumentReference =
             new DocumentReference("code", Arrays.asList("Model", "Entity"), "WebHome");
@@ -252,7 +256,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void convertToNestedDocument() throws Exception
+    void convertToNestedDocument() throws Exception
     {
         DocumentReference terminalDocumentReference = new DocumentReference("code", "Model", "Entity");
         DocumentReference nestedDocumentReference =
@@ -268,7 +272,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void convertToTerminalDocumentAlreadyTerminal() throws Exception
+    void convertToTerminalDocumentAlreadyTerminal()
     {
         DocumentReference terminalDocumentReference = new DocumentReference("code", "Model", "Entity");
         assertNull(this.refactoringScriptService.convertToTerminalDocument(terminalDocumentReference));
@@ -278,7 +282,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void convertToTerminalDocument() throws Exception
+    void convertToTerminalDocument() throws Exception
     {
         DocumentReference terminalDocumentReference = new DocumentReference("code", "Model", "Entity");
         DocumentReference nestedDocumentReference =
@@ -295,7 +299,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void restore() throws Exception
+    void restore() throws Exception
     {
         List<Long> documentIds = Arrays.asList(1L, 2L, 3L);
         RestoreRequest restoreRequest = new RestoreRequest();
@@ -308,7 +312,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void restoreBatch() throws Exception
+    void restoreBatch() throws Exception
     {
         String batchid = "mybatch-id";
         RestoreRequest restoreRequest = new RestoreRequest();
@@ -321,7 +325,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void permanentlyDelete() throws Exception
+    void permanentlyDelete() throws Exception
     {
         List<Long> documentIds = Arrays.asList(1L, 2L, 3L);
         PermanentlyDeleteRequest permanentlyDeleteRequest = new PermanentlyDeleteRequest();
@@ -334,7 +338,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void permanentlyDeleteBatch() throws Exception
+    void permanentlyDeleteBatch() throws Exception
     {
         String batchid = "mybatch-id";
         PermanentlyDeleteRequest permanentlyDeleteRequest = new PermanentlyDeleteRequest();
@@ -347,7 +351,7 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void changeDocumentAuthor() throws Exception
+    void changeDocumentAuthor() throws Exception
     {
         DocumentReference alice = new DocumentReference("dev", "Users", "Alice");
         DocumentReference bob = new DocumentReference("test", "Users", "Bob");
@@ -362,5 +366,40 @@ public class RefactoringScriptServiceTest
 
         verify(request).setReplaceDocumentAuthor(true);
         verify(request).setReplaceDocumentContentAuthor(true);
+    }
+
+    @Test
+    void isRecycleBinSkippingAllowedWhenAdvancedUserAndRecycleBinSkippingIsActivated()
+    {
+        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(true);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
+        assertTrue(actual);
+    }
+
+    @Test
+    void isRecycleBinSkippingAllowedWhenAdvancedUserAndRecycleBinSkippingDeactivated()
+    {
+        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(false);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
+        assertFalse(actual);
+    }
+
+    @Test
+    void isRecycleBinSkippingAllowedWhenSimpleUserAndRecycleBinSkippingDeactivated()
+    {
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(false);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
+        assertFalse(actual);
+    }
+
+    @Test
+    void isRecycleBinSkippingAllowedWhenSimpleUser()
+    {
+        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(false);
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(true);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
+        assertFalse(actual);
     }
 }

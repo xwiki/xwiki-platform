@@ -34,8 +34,10 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.test.docker.internal.junit5.configuration.ConfigurationFilesGenerator;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
@@ -143,12 +145,14 @@ public class WARBuilder
                 if (artifact.getExtension().equalsIgnoreCase("war")) {
                     warDependencies.add(artifact.getFile());
                     // Generate the XED file for the main WAR
-                    if (artifact.getArtifactId().equals("xwiki-platform-web")) {
+                    if (artifact.getArtifactId().equals("xwiki-platform-web-war")) {
                         File xedFile = new File(this.targetWARDirectory, "META-INF/extension.xed");
                         xedFile.getParentFile().mkdirs();
                         generateXED(artifact, xedFile, this.mavenResolver);
                     }
-                } else if (artifact.getExtension().equalsIgnoreCase("zip")) {
+                } else if (artifact.getArtifactId().equals("xwiki-platform-flamingo-skin-resources")
+                    && artifact.getExtension().equals("jar"))
+                {
                     skinDependencies.add(artifact.getFile());
                 } else if (artifact.getExtension().equalsIgnoreCase(JAR)) {
                     jarDependencies.add(artifact);
@@ -156,14 +160,19 @@ public class WARBuilder
             }
 
             // Step: Copy the JARs in WEB-INF/lib
-            File libDirectory = new File(webInfDirectory, "lib");
-            copyJARs(this.testConfiguration, jarDependencies, libDirectory);
+            File webInfLibDirectory = new File(webInfDirectory, "lib");
+            copyJARs(this.testConfiguration, jarDependencies, webInfLibDirectory);
+
+            // Step: Copy target/classes to WEB-INF/classes to allow docker tests to provide custom java code that is
+            // deployed in the custom WAR.
+            File webInfClassesDirectory = new File(webInfDirectory, "classes");
+            copyClasses(webInfClassesDirectory, this.testConfiguration);
 
             // Step: Add the webapp resources (web.xml, templates VM files, etc)
             copyWebappResources(this.testConfiguration, warDependencies, this.targetWARDirectory);
 
             // Step: Add the JDBC driver for the selected DB
-            copyJDBCDriver(libDirectory);
+            copyJDBCDriver(webInfLibDirectory);
 
             // Step: Unzip the Flamingo skin
             unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
@@ -175,6 +184,19 @@ public class WARBuilder
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
         this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
+    }
+
+    private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception
+    {
+        LOGGER.info("Copying resources to WEB-INF/classes ...");
+        // if we're building a jetty standalone it means we're using a standard maven build so the classes will be built
+        // in target/classes directly.
+        String outputDirectory = (testConfiguration.getServletEngine() != ServletEngine.JETTY_STANDALONE)
+            ? testConfiguration.getOutputDirectory() : "target";
+        File classesDirectory = new File(outputDirectory, "classes");
+        if (classesDirectory.exists()) {
+            copyDirectory(classesDirectory, webInfClassesDirectory);
+        }
     }
 
     private void copyJDBCDriver(File libDirectory) throws Exception
@@ -212,11 +234,11 @@ public class WARBuilder
         LOGGER.info("Copying JAR dependencies ...");
         createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
-            if (testConfiguration.isVerbose()) {
+            if (testConfiguration.isDebug()) {
                 LOGGER.info("... Copying JAR: {}", artifact.getFile());
             }
             copyFile(artifact.getFile(), libDirectory);
-            if (testConfiguration.isVerbose()) {
+            if (testConfiguration.isDebug()) {
                 LOGGER.info("... Generating XED file for: {}", artifact.getFile());
             }
             generateXEDForJAR(artifact, libDirectory, this.mavenResolver);

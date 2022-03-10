@@ -37,7 +37,7 @@ public class XMLErrorHandler implements ErrorHandler
     /**
      * List of validation errors.
      */
-    private List<ValidationError> errors = new ArrayList<ValidationError>();
+    private List<ValidationError> errors = new ArrayList<>();
 
     /**
      * Clear the list of validation errors.

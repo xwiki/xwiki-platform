@@ -21,39 +21,38 @@ package com.xpn.xwiki.doc;
 
 import java.util.Date;
 
-import org.jmock.Mock;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.annotation.AllComponents;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiRightService;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link XWikiDocumentArchive}.
  *
  * @version $Id$
  */
-public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest
+@AllComponents
+class XWikiDocumentArchiveTest
 {
     private XWikiContext context;
 
-    private Mock mockXWiki;
-
-    @Override
-    protected void setUp() throws Exception
+    @BeforeEach
+    void setUp(MockitoOldcore mockitoOldcore) throws Exception
     {
-        super.setUp();
-
-        this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("getEncoding").will(returnValue("iso-8859-1"));
-        this.mockXWiki.stubs().method("getConfig").will(returnValue(new XWikiConfig()));
-
-        this.context = new XWikiContext();
-        this.context.setWiki((XWiki) this.mockXWiki.proxy());
+        this.context = mockitoOldcore.getXWikiContext();
     }
     
     /**
@@ -63,7 +62,8 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
      *
      * @todo simplify this test. Not sure how to do it. I guess we could create a real document.
      */
-    public void testUpdateArchiveWhenSpaceInUsername() throws Exception
+    @Test
+    void updateArchiveWhenSpaceInUsername() throws Exception
     {
         String originalArchive = "head\t1.1;\n" +
             "access;\n" +
@@ -166,8 +166,9 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
         // with a space works.
         new XWikiDocumentArchive(123456789L).setArchive(archive.getArchive(context));
     }
-    
-    public void testUpdateLoad() throws XWikiException
+
+    @Test
+    void updateLoad() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         doc.setContent("content 1.1");
@@ -217,8 +218,9 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
         archive.updateArchive(doc, author, new Date(), "2.1", new Version(3,3), context);
         assertEquals(new Version(3,3), archive.getLatestVersion());
     }
-    
-    public void testRemoveVersions() throws XWikiException
+
+    @Test
+    void removeVersions() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
@@ -257,7 +259,8 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
      * modification date".
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-2029">XWIKI-2029</a>
      */
-    public void testVerifyCreationDateWhenLoadingDocumentFromArchive() throws Exception
+    @Test
+    void verifyCreationDateWhenLoadingDocumentFromArchive() throws Exception
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
@@ -280,7 +283,8 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
         assertEquals(creationDate, latest.getCreationDate());
     }
 
-    public void testVerifyDiffAndFullRevisionAlgorithm() throws Exception
+    @Test
+    void verifyDiffAndFullRevisionAlgorithm() throws Exception
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());

@@ -19,27 +19,44 @@
  */
 package org.xwiki.user;
 
+import java.lang.reflect.ParameterizedType;
+
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Convert a raw representation of a user reference into a {@link UserReference} object (for example converts
- * a String containing a user name into a Document User Reference).
+ * Convert a raw representation of a user reference into a {@link UserReference} object (for example converts a String
+ * containing a user name into a Document User Reference).
  *
  * @param <T> the type of the raw user reference
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 @Role
 public interface UserReferenceResolver<T>
 {
     /**
+     * Type instance for {@code UserReferenceResolver<String>}.
+     * 
+     * @since 14.1RC1
+     */
+    ParameterizedType TYPE_STRING = new DefaultParameterizedType(null, UserReferenceResolver.class, String.class);
+
+    /**
+     * Type instance for {@code UserReferenceResolver<DocumentReference>}.
+     * 
+     * @since 14.1RC1
+     */
+    ParameterizedType TYPE_DOCUMENT_REFERENCE =
+        new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class);
+
+    /**
      * @param rawReference the raw representation of a user reference to convert. If null then resolves to the current
-     *                     user reference
-     * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
-     *                   (for example a Document User Reference resolver accepting a user name as a string will also
-     *                   take as parameter a Wiki Reference defining in which wiki the user belongs to)
+     *            user reference
+     * @param parameters optional parameters that have a meaning only for the specific resolver implementation used (for
+     *            example a Document User Reference resolver accepting a user name as a string will also take as
+     *            parameter a Wiki Reference defining in which wiki the user belongs to)
      * @return the resulting User Reference object
      */
     UserReference resolve(T rawReference, Object... parameters);

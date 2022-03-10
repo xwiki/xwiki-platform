@@ -108,4 +108,14 @@ public interface RecordableEventDescriptor
     {
         return true;
     }
+
+    /**
+     * @return the title of the event to be used in notifications. The returned value should be preferably a translation
+     *          key.
+     * @since 12.9RC1
+     */
+    default String getEventTitle()
+    {
+        return "";
+    }
 }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -39,7 +39,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  
   <content>## Homepage Tour (by steps order)
 tour.homepageTour.welcome.title=Willkommen bei XWiki
 tour.homepageTour.welcome.content=In den nächsten Minuten werden Sie die Benutzeroberfläche und die grundlegenden Funktionalitäten Ihres Wikis entdecken.

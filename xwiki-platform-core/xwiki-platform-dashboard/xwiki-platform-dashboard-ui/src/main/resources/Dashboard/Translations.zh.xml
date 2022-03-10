@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -44,5 +44,4 @@ dashboard.gadgetEditor.changeGadget.label=更改小工具
 dashboard.gadgetEditor.gadgetTitle.label=小工具标题
 dashboard.gadgetEditor.gadgetTitle.hint=小工具标题将显示在控制面板上的小工具面板的顶部（可能包含快速编码）。
 dashboard.initialization.saveMessage=初始化控制面板的用户默认设置</content>
-  
 </xwikidoc>

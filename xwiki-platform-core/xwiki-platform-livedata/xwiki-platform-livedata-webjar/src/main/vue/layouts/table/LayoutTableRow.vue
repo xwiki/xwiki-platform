@@ -16,8 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+-->
 <!--
   LayoutCardsCard is a row component for the Table Layout.
   It format an entry as an html row, with an entry selector on the left

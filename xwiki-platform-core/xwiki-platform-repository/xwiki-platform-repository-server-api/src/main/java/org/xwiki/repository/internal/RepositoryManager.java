@@ -313,9 +313,9 @@ public class RepositoryManager implements Initializable, Disposable
         XWikiContext xcontext = this.xcontextProvider.get();
 
         // Update last version field
-        String lastVersion = findLastVersion(document);
+        String lastVersion = StringUtils.defaultString(findLastVersion(document));
 
-        if (lastVersion != null && !StringUtils.equals(lastVersion,
+        if (!StringUtils.equals(lastVersion,
             getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, (String) null))) {
             BaseObject extensionObjectToSave = document.getXObject(extensionObject.getReference());
             extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion, xcontext);
@@ -325,7 +325,12 @@ public class RepositoryManager implements Initializable, Disposable
 
         // Update valid extension field
 
-        boolean valid = isValid(document, extensionObject, xcontext);
+        boolean valid;
+        if (StringUtils.isEmpty(lastVersion)) {
+            valid = false;
+        } else {
+            valid = isValid(document, extensionObject, xcontext);
+        }
 
         if (valid) {
             this.logger.debug("The extension in the document [{}] is valid", document.getDocumentReference());

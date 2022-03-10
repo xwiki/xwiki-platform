@@ -39,6 +39,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -68,6 +69,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -995,10 +997,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
+    public XWikiDocument loadXWikiDoc(XWikiDocument defaultDocument, XWikiContext inputxcontext) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
+        XWikiDocument doc = defaultDocument;
         try {
             boolean bTransaction = true;
             MonitorPlugin monitor = Util.getMonitorPlugin(context);
@@ -1007,31 +1010,33 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 if (monitor != null) {
                     monitor.startTimer(HINT);
                 }
-                doc.setStore(this);
                 checkHibernate(context);
 
-                SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
+                SessionFactory sfactory = injectCustomMappingsInSessionFactory(defaultDocument, context);
                 bTransaction = bTransaction && beginTransaction(sfactory, context);
                 Session session = getSession(context);
                 session.setHibernateFlushMode(FlushMode.MANUAL);
 
-                try {
-                    session.load(doc, Long.valueOf(doc.getId()));
-                    doc.setNew(false);
-                    doc.setMostRecent(true);
-                    // Fix for XWIKI-1651
-                    doc.setDate(new Date(doc.getDate().getTime()));
-                    doc.setCreationDate(new Date(doc.getCreationDate().getTime()));
-                    doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
-                } catch (ObjectNotFoundException e) { // No document
-                    doc.setNew(true);
+                doc = session.get(XWikiDocument.class, doc.getId());
+                if (doc == null) {
+                    defaultDocument.setNew(true);
 
                     // Make sure to always return a document with an original version, even for one that does not exist.
                     // Allow writing more generic code.
-                    doc.setOriginalDocument(new XWikiDocument(doc.getDocumentReference(), doc.getLocale()));
+                    defaultDocument
+                        .setOriginalDocument(
+                            new XWikiDocument(defaultDocument.getDocumentReference(), defaultDocument.getLocale()));
 
-                    return doc;
+                    return defaultDocument;                    
                 }
+
+                doc.setStore(this);
+                doc.setNew(false);
+                doc.setMostRecent(true);
+                // Fix for XWIKI-1651
+                doc.setDate(new Date(doc.getDate().getTime()));
+                doc.setCreationDate(new Date(doc.getCreationDate().getTime()));
+                doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
 
                 // Loading the attachment list
                 if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
@@ -1140,7 +1145,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
-                Object[] args = { doc.getDocumentReference() };
+                Object[] args = { defaultDocument.getDocumentReferenceWithLocale() };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Exception while reading document [{0}]", e,
                     args);
@@ -1158,7 +1163,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
-            this.logger.debug("Loaded XWikiDocument: [{}]", doc.getDocumentReference());
+            this.logger.debug("Loaded XWikiDocument: [{}]", doc.getDocumentReferenceWithLocale());
 
             return doc;
         } finally {
@@ -2192,6 +2197,50 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext inputxcontext) throws XWikiException
     {
+        return innerLoadBacklinks(bTransaction, inputxcontext, (Session session) -> {
+            // the select clause is compulsory to reach the fullName i.e. the page pointed
+            Query<String> query = session.createQuery(
+                "select distinct backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink",
+                String.class);
+
+            // if we are in the same wiki context, we should only get the local reference
+            // but if we are not, then we have to check the full reference, containing the wiki part since
+            // it's how the link are recorded.
+            // This should be changed once the refactoring to support backlinks properly has been done.
+            // See: XWIKI-16192
+            query.setParameter("backlink", this.compactWikiEntityReferenceSerializer.serialize(documentReference));
+            return query;
+        });
+    }
+
+    @Override
+    public List<DocumentReference> loadBacklinks(AttachmentReference attachmentReference, boolean bTransaction,
+        XWikiContext inputxcontext) throws XWikiException
+    {
+        return innerLoadBacklinks(bTransaction, inputxcontext, (Session session) -> {
+            // the select clause is compulsory to reach the fullName i.e. the page pointed
+            Query<String> query = session.createQuery(
+                "select distinct backlink.fullName from XWikiLink as backlink "
+                    + "where backlink.id.link = :backlink "
+                    + "and backlink.id.type = :type "
+                    + "and backlink.attachmentName = :attachmentName", String.class);
+
+            // if we are in the same wiki context, we should only get the local reference
+            // but if we are not, then we have to check the full reference, containing the wiki part since
+            // it's how the link are recorded.
+            // This should be changed once the refactoring to support backlinks properly has been done.
+            // See: XWIKI-16192
+            query.setParameter("backlink",
+                this.compactWikiEntityReferenceSerializer.serialize(attachmentReference.getDocumentReference()));
+            query.setParameter("type", attachmentReference.getType().getLowerCase());
+            query.setParameter("attachmentName", attachmentReference.getName());
+            return query;
+        });
+    }
+
+    private List<DocumentReference> innerLoadBacklinks(boolean bTransaction, XWikiContext inputxcontext,
+        Function<Session, Query<String>> queryBuilder) throws XWikiException
+    {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         // Note: Ideally the method should return a Set but it would break the current API.
@@ -2207,21 +2256,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);
             }
-            Session session = getSession(context);
 
-            // the select clause is compulsory to reach the fullName i.e. the page pointed
-            Query<String> query = session.createQuery(
-                "select distinct backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink",
-                String.class);
-
-            // if we are in the same wiki context, we should only get the local reference
-            // but if we are not, then we have to check the full reference, containing the wiki part since
-            // it's how the link are recorded.
-            // This should be changed once the refactoring to support backlinks properly has been done.
-            // See: XWIKI-16192
-            query.setParameter("backlink", this.compactWikiEntityReferenceSerializer.serialize(documentReference));
-
-            List<String> backlinkNames = query.list();
+            Query<String> apply = queryBuilder.apply(getSession(context));
+            List<String> backlinkNames = apply.list();
 
             // Convert strings into references
             for (String backlinkName : backlinkNames) {
@@ -2274,8 +2311,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             Session session = getSession(context);
 
-            // need to delete existing links before saving the page's one
-            deleteLinks(doc.getId(), context, bTransaction);
+            // We delete the existing links before saving the newly analyzed ones. Unless non exists yet.
+            if (countLinks(doc.getId(), context, false) > 0) {
+                deleteLinks(doc.getId(), context, bTransaction);
+            }
 
             // necessary to blank links from doc
             context.remove("links");
@@ -2380,7 +2419,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             restoreExecutionXContext();
         }
     }
-
+    
     public void getContent(XWikiDocument doc, StringBuffer buf)
     {
         buf.append(doc.getContent());
@@ -3414,5 +3453,38 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public int getLimitSize(XWikiContext context, Class<?> entityType, String propertyName)
     {
         return this.store.getLimitSize(entityType, propertyName);
+    }
+    
+    private long countLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
+    {
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
+
+        long count;
+
+        try {
+            if (bTransaction) {
+                checkHibernate(context);
+                bTransaction = beginTransaction(context);
+            }
+            Session session = getSession(context);
+            Query<Long> query =
+                session.createQuery("select count(*) from XWikiLink as link where link.id.docId = :docId")
+                    .setParameter("docId", docId);
+            count = query.getSingleResult();
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_BACKLINKS, "Exception while count backlinks", e);
+        } finally {
+            try {
+                if (bTransaction) {
+                    endTransaction(context, false);
+                }
+            } catch (Exception e) {
+            }
+
+            restoreExecutionXContext();
+        }
+
+        return count;
     }
 }

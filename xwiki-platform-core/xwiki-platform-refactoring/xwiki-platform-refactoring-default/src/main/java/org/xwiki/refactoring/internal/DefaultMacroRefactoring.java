@@ -22,6 +22,7 @@ package org.xwiki.refactoring.internal;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.block.Block;
@@ -102,7 +104,7 @@ public class DefaultMacroRefactoring implements MacroRefactoring
             return this.macroManager.getMacro(macroId);
         } catch (MacroLookupException e) {
             // if the macro cannot be found or instantiated we shouldn't raise an exception, just ignore that macro.
-            logger.debug("Cannot get macro with id [{}]: [{}]", macroId, ExceptionUtils.getRootCauseMessage(e));
+            this.logger.debug("Cannot get macro with id [{}]: [{}]", macroId, ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }
@@ -150,13 +152,30 @@ public class DefaultMacroRefactoring implements MacroRefactoring
         DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
         throws MacroRefactoringException
     {
+        return innerReplaceReference(macroBlock,
+            xdom -> this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
+            sourceReference, targetReference, relative));
+    }
+
+    @Override
+    public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
+        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative)
+        throws MacroRefactoringException
+    {
+        return innerReplaceReference(macroBlock,
+            xdom -> this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
+            sourceReference, targetReference, relative));
+    }
+
+    private Optional<MacroBlock> innerReplaceReference(MacroBlock macroBlock, Predicate<Block> lambda)
+        throws MacroRefactoringException
+    {
         XDOM xdom = this.parseMacro(macroBlock);
         MacroTransformationContext transformationContext = this.getTransformationContext(macroBlock);
         Syntax renderingSyntax = this.macroContentParser.getCurrentSyntax(transformationContext);
         if (xdom != null) {
             try {
-                boolean updated = this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
-                    sourceReference, targetReference, relative);
+                boolean updated = lambda.test(xdom);
                 if (updated) {
                     return Optional.of(this.renderMacroBlock(macroBlock, xdom, renderingSyntax));
                 }

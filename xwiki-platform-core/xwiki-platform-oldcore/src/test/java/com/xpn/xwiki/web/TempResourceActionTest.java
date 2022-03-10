@@ -64,7 +64,6 @@ public class TempResourceActionTest
     @BeforeEach
     public void beforeEach() throws Exception
     {
-        this.oldcore.registerMockEnvironment();
         this.action = new TempResourceAction();
     }
 

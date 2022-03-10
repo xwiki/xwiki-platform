@@ -67,4 +67,10 @@ public class AllITs
     class NestedDocumentFieldsIT extends DocumentFieldsIT
     {
     }
+
+    @Nested
+    @DisplayName("Application name test")
+    class NestedApplicationNameIt extends ApplicationNameIt
+    {
+    }
 }

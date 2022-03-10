@@ -79,8 +79,8 @@ XWiki.Dashboard = Class.create( {
     this.addNewGadgetHandler();
     this.addNewContainerHandler();
 
-    // add save listener, to save the dashboard before submit of the form
-    document.observe("xwiki:actions:save", this.saveChanges.bindAsEventListener(this));
+    // Save the dashboard before the edit form is submitted.
+    document.observe("xwiki:actions:beforeSave", this.saveChanges.bindAsEventListener(this));
   },
 
   /**
@@ -642,10 +642,9 @@ XWiki.Dashboard = Class.create( {
 
     // stop the event, so that it doesn't actually send the request just yet, we'll send it when we're done with saving
     event.stop();
-    event.memo.originalEvent.stop();
 
     // get the element of the event
-    var eventElt = event.memo.originalEvent.element();
+    var eventElt = event.element();
 
     // start to submit the edit, notify
     this._x_edit_notification = new XWiki.widgets.Notification(l10n['dashboard.actions.save.loading'], "inprogress");

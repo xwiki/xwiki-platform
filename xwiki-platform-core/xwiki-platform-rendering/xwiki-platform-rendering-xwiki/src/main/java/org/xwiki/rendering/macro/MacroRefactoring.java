@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -56,6 +57,27 @@ public interface MacroRefactoring
      */
     Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
+        throws MacroRefactoringException;
+
+    /**
+     * Replace the given source reference by the given entity reference in the macro block. The method returns an
+     * optional containing a modified macro block if it needs to be updated, else it returns an empty optional.
+     * Depending on the macro implementation, this method might lead to parsing the macro
+     * content for finding the reference, or might just modify the macro parameters.
+     *
+     * @param macroBlock the macro block in which to replace the reference.
+     * @param currentDocumentReference the reference of the document in which the block is located
+     * @param sourceReference the reference to replace.
+     * @param targetReference the reference to use as replacement
+     * @param relative if {@code true} indicate that the reference should be resolved relatively to the current document
+     * @return an optional containing the new macro block with proper information if it needs to be updated, else
+     *         an empty optional.
+     * @throws MacroRefactoringException in case of problem to parse or render the macro content.
+     * @since 14.2RC1
+     */
+    @Unstable
+    Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
+        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative)
         throws MacroRefactoringException;
 
     /**

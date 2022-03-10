@@ -33,7 +33,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
@@ -88,9 +90,34 @@ public class DefaultLinkRefactoring implements LinkRefactoring
     @Inject
     private ReferenceRenamer renamer;
 
+    @FunctionalInterface
+    private interface RenameLambda
+    {
+        boolean call(XDOM xdom, DocumentReference currentDocumentReference, boolean relative);
+    }
+
     @Override
     public void renameLinks(DocumentReference documentReference, DocumentReference oldLinkTarget,
         DocumentReference newLinkTarget)
+    {
+        internalRenameLinks(documentReference, oldLinkTarget, newLinkTarget,
+            (xdom, currentDocumentReference, relative) -> this.renamer.renameReferences(xdom, currentDocumentReference,
+                oldLinkTarget,
+                newLinkTarget, relative));
+    }
+
+    @Override
+    public void renameLinks(DocumentReference documentReference, AttachmentReference oldLinkTarget,
+        AttachmentReference newLinkTarget)
+    {
+        internalRenameLinks(documentReference, oldLinkTarget, newLinkTarget,
+            (xdom, currentDocumentReference, relative) -> this.renamer.renameReferences(xdom, currentDocumentReference,
+                oldLinkTarget,
+                newLinkTarget, relative));
+    }
+
+    private void internalRenameLinks(DocumentReference documentReference, EntityReference oldLinkTarget,
+        EntityReference newLinkTarget, RenameLambda renameLambda)
     {
         boolean popLevelProgress = false;
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -105,14 +132,14 @@ public class DefaultLinkRefactoring implements LinkRefactoring
 
             // Update the default locale instance.
             this.progressManager.startStep(this);
-            renameLinks(document, oldLinkTarget, newLinkTarget, xcontext, false);
+            renameLinks(document, oldLinkTarget, newLinkTarget, xcontext, false, renameLambda);
             this.progressManager.endStep(this);
 
             // Update the translations.
             for (Locale locale : locales) {
                 this.progressManager.startStep(this);
                 renameLinks(document.getTranslatedDocument(locale, xcontext), oldLinkTarget, newLinkTarget, xcontext,
-                    false);
+                    false, renameLambda);
                 this.progressManager.endStep(this);
             }
         } catch (XWikiException e) {
@@ -126,8 +153,8 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         }
     }
 
-    private void renameLinks(XWikiDocument document, DocumentReference oldTarget, DocumentReference newTarget,
-        XWikiContext xcontext, boolean relative) throws XWikiException
+    private void renameLinks(XWikiDocument document, EntityReference oldTarget, EntityReference newTarget,
+        XWikiContext xcontext, boolean relative, RenameLambda renameLambda) throws XWikiException
     {
         DocumentReference currentDocumentReference = document.getDocumentReference();
 
@@ -155,13 +182,13 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         }
 
         // Document content
-        boolean modified = renameLinks(document, oldTarget, newTarget, relative);
+        boolean modified = renameLinks(document, relative, renameLambda);
 
         // XObjects properties
         for (List<BaseObject> xobjects : document.getXObjects().values()) {
             for (BaseObject xobject : xobjects) {
                 if (xobject != null) {
-                    modified |= renameLinks(xobject, document, oldTarget, newTarget, renderer, xcontext, relative);
+                    modified |= renameLinks(xobject, document, renderer, xcontext, relative, renameLambda);
                 }
             }
         }
@@ -186,12 +213,12 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         }
     }
 
-    private boolean renameLinks(XWikiDocument document, DocumentReference oldTarget, DocumentReference newTarget,
-        boolean relative) throws XWikiException
+    private boolean renameLinks(XWikiDocument document, boolean relative, RenameLambda renameLambda)
+        throws XWikiException
     {
         XDOM xdom = document.getXDOM();
 
-        if (renameLinks(xdom, document.getDocumentReference(), oldTarget, newTarget, relative)) {
+        if (renameLambda.call(xdom, document.getDocumentReference(), relative)) {
             document.setContent(xdom);
 
             return true;
@@ -200,14 +227,9 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         return false;
     }
 
-    private boolean renameLinks(XDOM xdom, DocumentReference currentDocumentReference, DocumentReference oldTarget,
-        DocumentReference newTarget, boolean relative)
-    {
-        return this.renamer.renameReferences(xdom, currentDocumentReference, oldTarget, newTarget, relative);
-    }
-
-    private boolean renameLinks(BaseObject xobject, XWikiDocument document, DocumentReference oldTarget,
-        DocumentReference newTarget, BlockRenderer renderer, XWikiContext xcontext, boolean relative)
+    private boolean renameLinks(BaseObject xobject, XWikiDocument document,
+        BlockRenderer renderer, XWikiContext xcontext, boolean relative,
+        RenameLambda renameLambda)
     {
         boolean modified = false;
 
@@ -229,7 +251,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
                             document.getDocumentReference());
 
                         // Rename references
-                        if (renameLinks(xdom, document.getDocumentReference(), oldTarget, newTarget, relative)) {
+                        if (renameLambda.call(xdom, document.getDocumentReference(), relative)) {
                             // Serialize property content
                             largeField.setValue(renderXDOM(xdom, renderer));
 
@@ -260,7 +282,9 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             XWikiDocument document = xcontext.getWiki().getDocument(newReference, xcontext);
-            renameLinks(document, oldReference, document.getDocumentReference(), xcontext, true);
+            renameLinks(document, oldReference, document.getDocumentReference(), xcontext, true,
+                (xdom, currentDocumentReference, relative) -> this.renamer.renameReferences(xdom,
+                    currentDocumentReference, oldReference, newReference, relative));
         } catch (XWikiException e) {
             this.logger.error("Failed to update the relative links from [{}].", newReference, e);
         }

@@ -41,7 +41,7 @@ public class TaskData implements Serializable
 
     private static final long serialVersionUID = -1288732853577861921L;
 
-    private Long timestamp;
+    private long timestamp;
 
     private String version;
 

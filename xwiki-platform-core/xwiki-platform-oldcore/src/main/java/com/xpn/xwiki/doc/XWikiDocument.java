@@ -510,6 +510,85 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private Map<DocumentReference, BaseObjects> xObjects = new ConcurrentSkipListMap<>();
 
+    /**
+     * The publicly exposed Map.
+     */
+    private Map<DocumentReference, List<BaseObject>> publicXObjects = new Map<DocumentReference, List<BaseObject>>()
+    {
+        @Override
+        public List<BaseObject> put(DocumentReference key, List<BaseObject> value)
+        {
+            // Makes sure to always insert BaseObjects
+            return xObjects.put(key, value instanceof BaseObjects ? (BaseObjects) value : new BaseObjects(value));
+        }
+
+        @Override
+        public void putAll(Map<? extends DocumentReference, ? extends List<BaseObject>> m)
+        {
+            m.forEach(this::put);
+        }
+
+        @Override
+        public int size()
+        {
+            return xObjects.size();
+        }
+
+        @Override
+        public boolean isEmpty()
+        {
+            return xObjects.isEmpty();
+        }
+
+        @Override
+        public boolean containsKey(Object key)
+        {
+            return xObjects.containsKey(key);
+        }
+
+        @Override
+        public boolean containsValue(Object value)
+        {
+            return xObjects.containsValue(value);
+        }
+
+        @Override
+        public List<BaseObject> get(Object key)
+        {
+            return xObjects.get(key);
+        }
+
+        @Override
+        public List<BaseObject> remove(Object key)
+        {
+            return xObjects.remove(key);
+        }
+
+        @Override
+        public void clear()
+        {
+            xObjects.clear();            
+        }
+
+        @Override
+        public Set<DocumentReference> keySet()
+        {
+            return xObjects.keySet();
+        }
+
+        @Override
+        public Collection<List<BaseObject>> values()
+        {
+            return (Collection) xObjects.values();
+        }
+
+        @Override
+        public Set<Entry<DocumentReference, List<BaseObject>>> entrySet()
+        {
+            return (Set) xObjects.entrySet();
+        }
+    };
+
     private final XWikiAttachmentList attachmentList = new XWikiAttachmentList(XWikiDocument.this);
 
     // Caching
@@ -2637,7 +2716,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public Map<DocumentReference, List<BaseObject>> getXObjects()
     {
-        return (Map) this.xObjects;
+        return (Map) this.publicXObjects;
     }
 
     /**
@@ -4137,7 +4216,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         for (DocumentReference reference : getXObjects().keySet()) {
             List<BaseObject> oldObjects = getXObjects(reference);
-            List<BaseObject> newObjects = new ArrayList<BaseObject>();
+            BaseObjects newObjects = new BaseObjects();
             while (newObjects.size() < oldObjects.size()) {
                 newObjects.add(null);
             }

@@ -285,7 +285,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             needsAuth =
-                context.getWiki().getXWikiPreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
+                "yes".equalsIgnoreCase(context.getWiki().getXWikiPreference("authenticate_" + right, "", context));
         } catch (Exception e) {
         }
 
@@ -296,7 +296,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             needsAuth |=
-                context.getWiki().getSpacePreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
+                "yes".equalsIgnoreCase(context.getWiki().getSpacePreference("authenticate_" + right, "", context));
         } catch (Exception e) {
         }
 

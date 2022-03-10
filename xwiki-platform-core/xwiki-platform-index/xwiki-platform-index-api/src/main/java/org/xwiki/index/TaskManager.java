@@ -36,7 +36,7 @@ import org.xwiki.stability.Unstable;
 public interface TaskManager
 {
     /**
-     * Add a task to the queue.
+     * Add a task to the queue for a given version of a document.
      *
      * @param wikiId the wiki containing the document
      * @param docId the document id
@@ -47,15 +47,15 @@ public interface TaskManager
     CompletableFuture<TaskData> addTask(String wikiId, long docId, String version, String type);
 
     /**
-     * Replace all the tasks of the queue with the same document and task type with the new task.
+     * Add a task to the queue for the latest version of the targeted document.
      *
      * @param wikiId the wiki containing the document
      * @param docId the document id
-     * @param version the document version
      * @param type the type of task to add
      * @return a completable future for this task
+     * @since 14.2RC1
      */
-    CompletableFuture<TaskData> replaceTask(String wikiId, long docId, String version, String type);
+    CompletableFuture<TaskData> addTask(String wikiId, long docId, String type);
 
     /**
      * @return the number of tasks in the queue

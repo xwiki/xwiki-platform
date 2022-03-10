@@ -20,7 +20,9 @@
 package org.xwiki.refactoring.internal;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Interface used to refactor document links.
@@ -40,6 +42,18 @@ public interface LinkRefactoring
      */
     void renameLinks(DocumentReference documentReference, DocumentReference oldLinkTarget,
         DocumentReference newLinkTarget);
+
+    /**
+     * Renames the links from the content of the specified document.
+     *
+     * @param documentReference the document whose content needs to be updated
+     * @param oldLinkTarget the link target that needs to be replaced
+     * @param newLinkTarget the new link target
+     * @since 14.2RC1
+     */
+    @Unstable
+    void renameLinks(DocumentReference documentReference, AttachmentReference oldLinkTarget,
+        AttachmentReference newLinkTarget);
 
     /**
      * Updates the relative links from the content of a document after it has been renamed or moved. This ensures that

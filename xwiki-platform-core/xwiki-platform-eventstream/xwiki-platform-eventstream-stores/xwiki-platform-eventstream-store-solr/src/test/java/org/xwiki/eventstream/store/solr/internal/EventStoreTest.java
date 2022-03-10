@@ -486,7 +486,7 @@ public class EventStoreTest
     }
 
     @Test
-    void searchParameter() throws EventStreamException, InterruptedException, ExecutionException
+    void searchCustom() throws EventStreamException, InterruptedException, ExecutionException
     {
         EVENT1.setParameters(Collections.singletonMap("param", "value1"));
         EVENT2.setParameters(Collections.singletonMap("param", "value2"));
@@ -495,8 +495,19 @@ public class EventStoreTest
         this.eventStore.saveEvent(EVENT2).get();
 
         assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery());
-        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().parameter().eq("param", "value1"));
-        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().parameter().eq("param", "value2"));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().custom().eq("param", "value1"));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().custom().eq("param", "value2"));
+
+        EVENT1.setCustom(Collections.singletonMap("param", 1));
+        EVENT2.setCustom(Collections.singletonMap("param", 2));
+
+        this.eventStore.saveEvent(EVENT1);
+        this.eventStore.saveEvent(EVENT2).get();
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery());
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().custom().eq("param", 1));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().custom().eq("param", 2));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().custom().greater("param", 0));
     }
 
     @Test

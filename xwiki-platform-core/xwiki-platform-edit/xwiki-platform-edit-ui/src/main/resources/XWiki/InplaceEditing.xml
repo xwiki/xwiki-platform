@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.InplaceEditing" locale="">
+<xwikidoc version="1.5" reference="XWiki.InplaceEditing" locale="">
   <web>XWiki</web>
   <name>InplaceEditing</name>
   <language/>
@@ -29,6 +29,7 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title/>
@@ -472,6 +473,11 @@ define('editInPlace', [
     var deferred, promise = new Promise((resolve, reject) =&gt; {
       deferred = {resolve, reject};
     });
+    // We need the catch() to prevent the "Uncaught (in promise)" error log in the console.
+    promise.catch(() =&gt; {}).finally(() =&gt; {
+      // This flag is used by the Force Lock modal to know whether the promise is settled when the modal is closing.
+      deferred.settled = true;
+    });
     // Reuse the confirmation modal once it is created.
     var modal = $('.force-edit-lock-modal');
     if (!modal.length) {
@@ -520,10 +526,10 @@ define('editInPlace', [
       modal.modal('hide');
     });
     modal.on('hide.bs.modal', function() {
-      // If the lock promise is not yet resolved when the modal is closing then it means the modal was canceled,
+      // If the lock promise is not yet settled when the modal is closing then it means the modal was canceled,
       // i.e. the user doesn't want to force the lock.
       var deferred = modal.data('deferred');
-      if (deferred.state() === 'pending') {
+      if (!deferred.settled) {
         deferred.reject();
       }
     });

@@ -39,18 +39,28 @@ public class NotifyListener extends AbstractLifeCycleListener
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NotifyListener.class);
 
+    private static final String JETTY_PORT = System.getProperty("jetty.http.port", "8080");
+
     /**
      * Delimiter to print to make the message stand out in the console/logs.
      */
     private static final String DELIMITER = "----------------------------------";
 
     @Override
+    public void lifeCycleStarting(LifeCycle event)
+    {
+        String jvmString = String.format("%s (%s)", System.getProperty("java.runtime.version"),
+            System.getProperty("java.runtime.name"));
+        LOGGER.info(Messages.getString("jetty.starting.notification"), JETTY_PORT, jvmString);
+    }
+
+    @Override
     public void lifeCycleStarted(LifeCycle event)
     {
         LOGGER.info(DELIMITER);
         try {
-            String serverUrl = "http://" + InetAddress.getLocalHost().getCanonicalHostName() + ":"
-                + System.getProperty("jetty.http.port", "8080") + "/";
+            String serverUrl =
+                String.format("http://%s:%s/", InetAddress.getLocalHost().getCanonicalHostName(), JETTY_PORT);
             LOGGER.info(Messages.getString("jetty.startup.notification"), serverUrl);
         } catch (UnknownHostException ex) {
             // Shouldn't happen, localhost should be available

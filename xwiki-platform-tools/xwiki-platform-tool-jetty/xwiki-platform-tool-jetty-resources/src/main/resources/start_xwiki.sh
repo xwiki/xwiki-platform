@@ -129,8 +129,6 @@ if [ -e $XWIKI_LOCK_FILE ]; then
   fi
 fi
 
-echo Starting Jetty on port ${JETTY_PORT}, please wait...
-
 # Location where XWiki stores generated data and where database files are.
 XWIKI_DATA_DIR=${xwikiDataDir}
 XWIKI_OPTS="$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR"

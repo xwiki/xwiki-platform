@@ -147,8 +147,6 @@ public class XWikiDocumentMockitoTest
     @BeforeEach
     void beforeEach() throws Exception
     {
-        this.oldcore.registerMockEnvironment();
-
         // Activate programming rights in order to be able to call com.xpn.xwiki.api.Document#getDocument().
         when(this.oldcore.getMockRightService().hasProgrammingRights(this.oldcore.getXWikiContext())).thenReturn(true);
 

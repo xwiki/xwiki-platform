@@ -23,13 +23,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.model.reference.DocumentReference;
@@ -56,10 +56,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -122,7 +123,6 @@ class DefaultTasksManagerTest
         // By default, tasks as consumer instantaneously. 
         doAnswer(invocation -> {
             TaskData task = invocation.getArgument(0);
-            task.getFuture().complete(task);
             return null;
         }).when(this.taskExecutor).execute(any());
     }
@@ -155,7 +155,6 @@ class DefaultTasksManagerTest
         // Fails the first time, then succeeds the second time execute is called.
         doThrow(new RuntimeException("Test")).doAnswer(invocation -> {
             TaskData taskData = invocation.getArgument(0);
-            taskData.getFuture().complete(taskData);
             return null;
         }).when(this.taskExecutor).execute(any());
 
@@ -190,94 +189,20 @@ class DefaultTasksManagerTest
         taskId.setDocId(42);
         taskId.setType("testtask");
         taskId.setInstanceId(INSTANCE_ID);
-        taskId.setVersion("1.3");
+        taskId.setVersion("");
         task.setId(taskId);
 
         doThrow(new XWikiException()).when(this.tasksStore).addTask("wikiId", task);
 
-        CompletableFuture<TaskData> taskFuture =
-            this.tasksManager.addTask("wikiId", 42, "1.3", "testtask");
+        CompletableFuture<TaskData> taskFuture = this.tasksManager.addTask("wikiId", 42, "testtask");
 
-        TaskData taskData = new TaskData(42, "1.3", "testtask", "wikiId");
+        TaskData taskData = new TaskData(42, "", "testtask", "wikiId");
         assertEquals(taskData, taskFuture.get());
         verify(this.taskExecutor).execute(taskData);
 
         assertEquals(1, this.logCapture.size());
-        assertEquals("Failed to add a task for docId [42], type [testtask] and version [1.3] in wiki [wikiId]."
+        assertEquals("Failed to add a task for docId [42], type [testtask] and version [] in wiki [wikiId]."
             + " This task is queued but will not be will not be restarted if not completed before the server stops."
-            + " Cause: [XWikiException: Error number 0 in 0].", this.logCapture.getMessage(0));
-        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
-    }
-
-    @Test
-    void replaceTask() throws Exception
-    {
-        this.tasksManager.startThread();
-        CompletableFuture<Void> blockTask = new CompletableFuture<>();
-        // Block the fist task and let the next tasks execute instantly.
-        doAnswer(invocation -> {
-            Void unused = blockTask.get();
-            TaskData taskData = invocation.getArgument(0);
-            taskData.getFuture().complete(taskData);
-            return unused;
-        }).when(this.taskExecutor).execute(any());
-
-        // Queue a first task to make it consumed and blocked. Then, queue a second task, then replace the first one 
-        // with a new one. Only two Tasks must be consumed in the end.
-        // Sleeps 1 millisecond between each new task to be able to assert the execution order of the tasks without
-        // timestamp collision issues.
-        this.tasksManager.addTask("wikiId", 42, "1.2", "blocked");
-        Thread.sleep(1);
-        CompletableFuture<TaskData> future0 = this.tasksManager.replaceTask("wikiId", 42, "1.2", "testtask");
-        Thread.sleep(1);
-        CompletableFuture<TaskData> future1 = this.tasksManager.replaceTask("wikiId", 42, "1.3", "othertask");
-        Thread.sleep(1);
-        CompletableFuture<TaskData> future2 = this.tasksManager.replaceTask("wikiId", 43, "1.3", "testtask");
-        Thread.sleep(1);
-        CompletableFuture<TaskData> future3 = this.tasksManager.replaceTask("wikiId", 42, "1.3", "testtask");
-
-        verify(this.tasksStore, times(4)).replaceTask(any(), any());
-        assertEquals(3, this.tasksManager.getQueueSize());
-        assertEquals(2, this.tasksManager.getQueueSize("testtask"));
-        assertEquals(1, this.tasksManager.getQueueSize("othertask"));
-
-        // Complete the blocking completable to let the thread continue consuming the queue.
-        blockTask.complete(null);
-
-        // Cancelled since it has been replaced by the latest task.
-        assertThrows(CancellationException.class, future0::get);
-        assertNotNull(future1.get());
-        assertNotNull(future2.get());
-        assertNotNull(future3.get());
-
-        InOrder inOrder = inOrder(this.taskExecutor);
-        inOrder.verify(this.taskExecutor).execute(new TaskData(42, "1.2", "blocked", "wikiId"));
-        inOrder.verify(this.taskExecutor).execute(new TaskData(42, "1.3", "othertask", "wikiId"));
-        inOrder.verify(this.taskExecutor).execute(new TaskData(43, "1.3", "testtask", "wikiId"));
-        inOrder.verify(this.taskExecutor).execute(new TaskData(42, "1.3", "testtask", "wikiId"));
-    }
-
-    @Test
-    void replaceTaskDatabaseIssue() throws Exception
-    {
-        this.tasksManager.startThread();
-        doThrow(new XWikiException()).when(this.tasksStore).replaceTask(any(), any());
-
-        CompletableFuture<TaskData> future = this.tasksManager.replaceTask("wikiId", 42, "1.3", "testtask");
-
-        // Cancelled since it has been replaced by the latest task.
-        assertNotNull(future.get());
-
-        TaskData task = new TaskData();
-        task.setDocId(42);
-        task.setType("testtask");
-        task.setWikiId("wikiId");
-        task.setVersion("1.3");
-        verify(this.taskExecutor).execute(task);
-
-        assertEquals(1, this.logCapture.size());
-        assertEquals("Failed to persist task with docId [42], type [testtask] and version [1.3] in wiki"
-            + " [wikiId]. The tasks are replaced but will not be restarted if not completed before the server stops."
             + " Cause: [XWikiException: Error number 0 in 0].", this.logCapture.getMessage(0));
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
     }
@@ -310,4 +235,56 @@ class DefaultTasksManagerTest
         verify(this.taskExecutor).execute(new TaskData(42, "1.3", "othertask", "wikiId"));
     }
 
+    @Test
+    void addTaskDuringTaskExecution() throws Exception
+    {
+        this.tasksManager.startThread();
+
+        AtomicReference<CompletableFuture<TaskData>> taskDataCompletableFuture = new AtomicReference<>();
+
+        // Block the fist task and let the next tasks execute instantly.
+        doAnswer(invocation -> {
+            taskDataCompletableFuture.set(this.tasksManager.addTask("wikiA", 42, "1.2", "concurrent"));
+            return null;
+        })
+            .doAnswer(invocation -> {
+                verify(this.tasksStore, never()).deleteTask("wikiA", 42, "1.2", "concurrent");
+                return null;
+            })
+            .doAnswer(invocation -> null)
+            .when(this.taskExecutor).execute(any());
+
+        this.tasksManager.addTask("wikiA", 42, "1.2", "concurrent").get();
+        taskDataCompletableFuture.get().get();
+
+        verify(this.taskExecutor, times(2)).execute(any());
+
+        // Queue another task to make sure that the previous tasks are fully consumed. Otherwise, the deleteTask might 
+        // not be called before the end of the test. 
+        this.tasksManager.addTask("wikiA", 42, "1.3", "concurrent").get();
+
+        verify(this.tasksStore).deleteTask("wikiA", 42, "1.2", "concurrent");
+    }
+
+    @Test
+    void addTaskConcurrently() throws Exception
+    {
+        CompletableFuture<TaskData> future0 = this.tasksManager.addTask("wikiA", 42, "1.2", "concurrent");
+        Thread.sleep(1);
+        CompletableFuture<TaskData> future1 = this.tasksManager.addTask("wikiA", 42, "1.2", "concurrent");
+
+        this.tasksManager.startThread();
+
+        assertThrows(CancellationException.class, future0::get);
+        assertNotNull(future1.get());
+
+        verify(this.taskExecutor).execute(org.mockito.ArgumentMatchers.same(future1.get()));
+        verifyNoMoreInteractions(this.taskExecutor);
+
+        // Queue another task to make sure that the previous tasks are fully consumed. Otherwise, the deleteTask might 
+        // not be called before the end of the test.
+        this.tasksManager.addTask("wikiA", 42, "1.3", "concurrent").get();
+
+        verify(this.tasksStore).deleteTask("wikiA", 42, "1.2", "concurrent");
+    }
 }

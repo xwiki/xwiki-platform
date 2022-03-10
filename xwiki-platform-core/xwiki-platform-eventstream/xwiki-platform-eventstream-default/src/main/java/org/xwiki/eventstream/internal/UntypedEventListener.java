@@ -99,7 +99,7 @@ public class UntypedEventListener extends AbstractEventListener
     private BlockRenderer renderer;
 
     @Inject
-    @Named("wiki")
+    @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
     @Inject

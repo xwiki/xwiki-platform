@@ -93,7 +93,7 @@ public class DefaultXWikiBridge implements XWikiBridge
     private Boolean checkNeedsAuthValue(String value)
     {
         if (value != null && !value.equals("")) {
-            if (value.toLowerCase().equals("yes")) {
+            if ("yes".equalsIgnoreCase(value)) {
                 return true;
             }
             try {

@@ -55,9 +55,9 @@ notifications.filters.advanced.modal.close=Закрыть
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=Системный фильтр
-notifications.filters.description.systemUserNotificationFilter=Скрыть системные уведомления
+notifications.filters.description.systemUserNotificationFilter=Скрыть системные уведомления не относящиеся к вам
 notifications.filters.name.ownEventsNotificationFilter=Фильтр собственных событий
-notifications.filters.description.ownEventsNotificationFilter=Скрыть уведомления о вашей собственной деятельности
+notifications.filters.description.ownEventsNotificationFilter=Скрыть уведомления о вашей собственной деятельности, если только событие не нацелено на вас
 notifications.filters.name.eventReadAlertFilter=Фильтр чтения событий (оповещение)
 notifications.filters.description.eventReadAlertFilter=Скрыть уведомления, помеченные как прочтенные
 notifications.filters.name.eventReadEmailFilter=Фильтр событий чтения (электронная почта)

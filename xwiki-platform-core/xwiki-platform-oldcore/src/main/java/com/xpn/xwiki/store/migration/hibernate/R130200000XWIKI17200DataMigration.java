@@ -148,6 +148,10 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
             try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
                 DatabaseMetaData databaseMetaData = connection.getMetaData();
 
+                // Get rid of XWV_COOKIE key leftover if it exist
+                deleteIndexIfExist(VisitStats.class, "xwv_cookie", databaseMetaData, builder);
+
+                // Update properties
                 for (Map.Entry<String, List<String>> entry : map.entrySet()) {
                     for (String property : entry.getValue()) {
                         maybeUpdateField(databaseMetaData, entry.getKey(), property, builder);
@@ -164,6 +168,36 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
         }
 
         return null;
+    }
+
+    private void deleteIndexIfExist(Class entityClass, String indexName, DatabaseMetaData databaseMetaData,
+        StringBuilder builder) throws SQLException
+    {
+        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
+        PersistentClass persistentClass =
+            this.hibernateStore.getConfigurationMetadata().getEntityBinding(entityClass.getName());
+        String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
+
+        ResultSet resultSet;
+        if (this.hibernateStore.isCatalog()) {
+            resultSet = databaseMetaData.getIndexInfo(databaseName, null, tableName, false, false);
+        } else {
+            resultSet = databaseMetaData.getIndexInfo(null, databaseName, tableName, false, false);
+        }
+
+        while (resultSet.next()) {
+            String databaseIndexName = resultSet.getString("INDEX_NAME");
+            if (indexName.equalsIgnoreCase(databaseIndexName)) {
+                // Delete the index
+                builder.append("<dropIndex indexName=\"");
+                builder.append(databaseIndexName);
+                builder.append("\"  tableName=\"");
+                builder.append(tableName);
+                builder.append("\"/>\n");
+
+                break;
+            }
+        }
     }
 
     private void maybeUpdateField(DatabaseMetaData databaseMetaData, String entity, String propertyName,

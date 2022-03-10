@@ -47,8 +47,7 @@
         ##------------
         ## Links field
         ##------------
-        ## TODO: activate once refactoring is supported.
-        ## #displayAttachmentLinksCheckbox()
+         #displayAttachmentLinksCheckbox()
         ##--------------------
         ## Auto redirect field
         ##--------------------

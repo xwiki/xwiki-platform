@@ -91,11 +91,11 @@ public class R1402000XWIKI19352DataMigration implements HibernateDataMigration
         if (context.getWiki().hasBacklinks(context)) {
             String wikiId = context.getWikiId();
             try {
-                List<Object[]> rows =
-                    this.queryManager.createQuery("SELECT doc.id, doc.version FROM XWikiDocument doc",
-                        Query.HQL).setWiki(wikiId).execute();
-                for (Object[] row : rows) {
-                    this.taskManager.replaceTask(wikiId, (long) row[0], (String) row[1], LINKS_TASK_TYPE);
+                List<Long> ids =
+                    this.queryManager.createQuery("SELECT doc.id FROM XWikiDocument doc", Query.HQL).setWiki(wikiId)
+                        .execute();
+                for (Long id : ids) {
+                    this.taskManager.addTask(wikiId, id, LINKS_TASK_TYPE);
                 }
             } catch (QueryException e) {
                 throw new DataMigrationException(
@@ -113,8 +113,10 @@ public class R1402000XWIKI19352DataMigration implements HibernateDataMigration
     @Override
     public String getPreHibernateLiquibaseChangeLog()
     {
-        // TODO: Remove once XWIKI-19399 is fixed.
-        return null;
+        return "<changeSet author=\"xwikiorg\"  id=\"" + HINT + "\">\n"
+            + "  <dropTable tableName=\"xwikilinks\"/>\n"
+            + "</changeSet>\n"
+            + "\n";
     }
 
     @Override

@@ -86,6 +86,7 @@ import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
 import org.xwiki.velocity.internal.DefaultVelocityEngine;
 import org.xwiki.velocity.internal.DefaultVelocityFactory;
 import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
+import org.xwiki.xml.internal.html.XWikiHTML5TagProvider;
 import org.xwiki.xml.internal.html.filter.AttributeFilter;
 import org.xwiki.xml.internal.html.filter.BodyFilter;
 import org.xwiki.xml.internal.html.filter.FontFilter;
@@ -226,6 +227,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     BodyFilter.class,
     AttributeFilter.class,
     LinkFilter.class,
+    XWikiHTML5TagProvider.class,
 
     // HTML Macro
     HTMLMacro.class,

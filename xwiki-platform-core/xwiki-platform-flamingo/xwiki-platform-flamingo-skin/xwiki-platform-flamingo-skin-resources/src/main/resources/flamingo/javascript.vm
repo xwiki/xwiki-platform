@@ -97,6 +97,14 @@
   'bundles': {},
   'config': {}
 })
+#set ($jQueryModuleId = 'jQueryNoConflict')
+#if ($services.extension.installed.getInstalledExtension('org.webjars:jquery-migrate', "wiki:$xcontext.database"))
+  #set ($jQueryModuleId = 'jquery-migrate')
+  ## The minified version of jquery-migrate is expecting a global 'jQuery' variable to be defined (even though it also
+  ## uses RequireJS to access jQuery). The unminified version is only relying on RequireJS so it doesn't have this
+  ## problem.
+  var jQuery = {};
+#end
 ## momentjs locales depend on '../moment' which gets resolved as 'moment/moment' due to our package configuration, which
 ## points to the unminified version. The consequence is that we end up loading both the minified and the unminified
 ## version of momentjs and, more importantly, the locales are loaded into the moment instance created by the unminified
@@ -105,14 +113,14 @@
 ## See http://requirejs.org/docs/jquery.html#noconflictmap to understand why this works.
 #set ($requireConfig.map = {
   '*': {
-    'jquery': 'jQueryNoConflict',
+    'jquery': $jQueryModuleId,
     'moment/moment': 'moment'
   },
   'jQueryNoConflict': {
     'jquery': 'jquery'
   },
   'jquery-migrate': {
-    'jquery': 'jquery'
+    'jquery': 'jQueryNoConflict'
   }
 })
 ## Extend the RequireJS configuration.
@@ -145,14 +153,7 @@
   #end
 #end
 require.config($jsontool.serialize($requireConfig));
-#set ($jQueryNoConflictDeps = ['jquery'])
-#if ($services.extension.installed.getInstalledExtension('org.webjars:jquery-migrate', "wiki:$xcontext.database"))
-  #set ($discard = $jQueryNoConflictDeps.add('jquery-migrate'))
-## The minified version of jquery-migrate is expecting a global 'jQuery' variable to be defined (even though it also uses
-## RequireJS to access jQuery). The unminified version is only relying on RequireJS so it doesn't have this problem.
-var jQuery = {};
-#end
-define('jQueryNoConflict', $jsontool.serialize($jQueryNoConflictDeps), function ($) {
+define('jQueryNoConflict', ['jquery'], function($) {
   return $.noConflict();
 });
 if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {

@@ -29,6 +29,7 @@ import javax.inject.Provider;
 import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer;
 import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
+import org.xwiki.attachment.refactoring.event.AttachmentMovedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.AttachmentReference;
@@ -96,7 +97,7 @@ public class MoveAttachmentJob
     @Override
     protected void process(EntityReference source)
     {
-        this.progressManager.pushLevelProgress(this);
+        this.progressManager.pushLevelProgress(2, this);
         AttachmentReference destination = this.request.getProperty(MoveAttachmentRequest.DESTINATION);
         boolean autoRedirect = this.request.getProperty(MoveAttachmentRequest.AUTO_REDIRECT);
 
@@ -104,6 +105,23 @@ public class MoveAttachmentJob
 
         // Update the author for the attribution of the attachment uploader.
         this.modelBridge.setContextUserReference(this.request.getUserReference());
+        try {
+            this.progressManager.startStep(this);
+            moveAttachment(source, destination, autoRedirect, wiki);
+            this.progressManager.endStep(this);
+
+            this.progressManager.startStep(this);
+            this.observationManager.notify(new AttachmentMovedEvent((AttachmentReference) source, destination), this,
+                this.request);
+            this.progressManager.endStep(this);
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    private void moveAttachment(EntityReference source, AttachmentReference destination, boolean autoRedirect,
+        XWiki wiki)
+    {
         try {
             XWikiDocument sourceDocument = wiki.getDocument(source.getParent(), this.xcontextProvider.get());
             XWikiDocument targetDocument = wiki.getDocument(destination.getParent(), this.xcontextProvider.get());
@@ -140,8 +158,6 @@ public class MoveAttachmentJob
         } catch (XWikiException | IOException e) {
             this.logger.warn("Failed to move attachment [{}] to [{}]. Cause: [{}]", source, destination,
                 getRootCauseMessage(e));
-        } finally {
-            this.progressManager.popLevelProgress(this);
         }
     }
 

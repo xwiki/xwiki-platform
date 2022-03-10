@@ -91,7 +91,6 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         super.setUp();
 
         setUriInfo(this.attachmentsResource);
-        this.oldCore.registerMockEnvironment();
         this.xcontext.setRequest(mock(XWikiRequest.class));
     }
 

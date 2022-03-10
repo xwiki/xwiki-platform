@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DocumentUserReferenceTest
 {
     @Test
-    void identity()
+    void equalsAndHashCode()
     {
         DocumentUserReference reference1 =
             new DocumentUserReference(new DocumentReference("wiki1", "space1", "page1"), true);

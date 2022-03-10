@@ -553,8 +553,13 @@ define('xwiki-livedata', [
           this.footnotes.reset()
         })
         .catch(err => {
-          this.translate('livedata.error.updateEntriesFailed')
-            .then(value => new XWiki.widgets.Notification(value, 'error'));
+          // Prevent undesired notifications of the end user for non business related errors (for instance, the user
+          // left the page before the request was completed).
+          // See https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
+          if (err.readyState === 4) {
+            this.translate('livedata.error.updateEntriesFailed')
+              .then(value => new XWiki.widgets.Notification(value, 'error'));
+          }
           console.error('Failed to fetch the entries', err)
         });
     },

@@ -119,6 +119,10 @@ public class DefaultIconThemesResource implements IconThemesResource, XWikiRestC
         IconSet iconSet;
         if (iconSetName == null) {
             iconSet = this.iconSetManager.getCurrentIconSet();
+            // Fallback to the default icon set if no current icon set is defined.
+            if (iconSet == null) {
+                iconSet = this.iconSetManager.getDefaultIconSet();
+            }
         } else {
             iconSet = this.iconSetManager.getIconSet(iconSetName);
         }

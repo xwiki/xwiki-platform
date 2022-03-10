@@ -22,6 +22,7 @@ package org.xwiki.icon.internal;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBContext;
@@ -50,8 +51,10 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.icon.IconManager.META_DATA_ICON_SET_TYPE;
 
 /**
  * Test of {@link DefaultIconThemesResource}.
@@ -110,14 +113,36 @@ class DefaultIconThemesResourceTest
     }
 
     @Test
+    void getIconCurrentTheme() throws Exception
+    {
+        when(this.iconSetManager.getDefaultIconSet()).thenReturn(new IconSet("testTheme"));
+        when(this.iconManager.hasIcon("plus")).thenReturn(true);
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put(META_DATA_ICON_SET_TYPE, "icon");
+        when(this.iconManager.getMetaData("plus", "testTheme")).thenReturn(metadata);
+        Icons response = this.iconThemesResource.getIcons("wikiTest", singletonList("plus"));
+
+        ObjectFactory objectFactory = new ObjectFactory();
+        Icons expected = objectFactory.createIcons();
+        Icon icon = objectFactory.createIcon();
+        icon.setName("plus");
+        icon.setIconSetType("icon");
+        icon.setIconSetName("testTheme");
+        expected.getIcons().add(icon);
+        assertEquals(marshal(expected), marshal(response));
+        verify(this.modelContext).setCurrentEntityReference(new WikiReference("wikiTest"));
+        verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
+    }
+
+    @Test
     void getIconsByTheme() throws Exception
     {
-        HashMap<String, Object> iconAMetaData = new HashMap<>();
+        Map<String, Object> iconAMetaData = new HashMap<>();
         iconAMetaData.put("iconSetName", "testTheme");
         iconAMetaData.put("iconSetType", "TYPETEST");
         iconAMetaData.put("url", "");
         iconAMetaData.put("cssClass", "testclass");
-        HashMap<String, Object> iconBMetaData = new HashMap<>();
+        Map<String, Object> iconBMetaData = new HashMap<>();
         iconBMetaData.put("iconSetName", "testTheme");
         iconBMetaData.put("iconSetType", "TYPETEST2");
         iconBMetaData.put("url", "http://test/url");
@@ -155,12 +180,12 @@ class DefaultIconThemesResourceTest
     @Test
     void getIcons() throws Exception
     {
-        HashMap<String, Object> iconAMetaData = new HashMap<>();
+        Map<String, Object> iconAMetaData = new HashMap<>();
         iconAMetaData.put("iconSetName", "testTheme");
         iconAMetaData.put("iconSetType", "TYPETEST");
         iconAMetaData.put("url", "");
         iconAMetaData.put("cssClass", "testclass");
-        HashMap<String, Object> iconBMetaData = new HashMap<>();
+        Map<String, Object> iconBMetaData = new HashMap<>();
         iconBMetaData.put("iconSetName", "testTheme");
         iconBMetaData.put("iconSetType", "TYPETEST2");
         iconBMetaData.put("url", "http://test/url");
@@ -192,6 +217,7 @@ class DefaultIconThemesResourceTest
         assertEquals(marshal(expected), marshal(response));
         verify(this.modelContext).setCurrentEntityReference(new WikiReference("wikiTest"));
         verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
+        verify(this.iconSetManager, never()).getDefaultIconSet();
     }
 
     @Test
@@ -211,6 +237,8 @@ class DefaultIconThemesResourceTest
 
         verify(this.modelContext).setCurrentEntityReference(new WikiReference("wikiTest"));
         verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
+        verify(this.iconSetManager, never()).getIconSet(any());
+        verify(this.iconSetManager, never()).getDefaultIconSet();
     }
 
     private String marshal(Icons icons) throws JAXBException

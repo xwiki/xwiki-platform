@@ -244,6 +244,9 @@ $xwiki.getUserName("xwiki:${username}")
  * }
  *#
 #macro (displayUser $arg $options)
+  #if ($stringtool.isEmpty($arg))
+    #set ($arg = "XWiki.XWikiGuest")
+  #end
   #set ($isList = $arg.iterator())
   #if ($isList)
     #set ($usersList = $arg)

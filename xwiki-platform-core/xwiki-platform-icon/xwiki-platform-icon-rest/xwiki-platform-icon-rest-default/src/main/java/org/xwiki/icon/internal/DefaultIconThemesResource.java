@@ -42,6 +42,8 @@ import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiRestComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import static org.xwiki.icon.IconManager.META_DATA_CSS_CLASS;
 import static org.xwiki.icon.IconManager.META_DATA_ICON_SET_TYPE;
@@ -66,6 +68,9 @@ public class DefaultIconThemesResource implements IconThemesResource, XWikiRestC
 
     @Inject
     private IconSetManager iconSetManager;
+    
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public Icons getIconsByTheme(String wikiId, String iconTheme, List<String> names)
@@ -81,6 +86,8 @@ public class DefaultIconThemesResource implements IconThemesResource, XWikiRestC
 
     private Icons iconsByTheme(String wikiId, String iconTheme, List<String> iconNames)
     {
+        wikiExists(wikiId);
+
         // Save the current entity reference. It will be restored on the method is finished.
         EntityReference oldEntityReference = this.modelContext.getCurrentEntityReference();
         try {
@@ -145,5 +152,21 @@ public class DefaultIconThemesResource implements IconThemesResource, XWikiRestC
             icon.setUrl(url);
         }
         return icon;
+    }
+
+    /**
+     * Throw an exception if the wiki does not exist.
+     *
+     * @param wikiId a wiki id to validate
+     */
+    private void wikiExists(String wikiId)
+    {
+        try {
+            if (!this.wikiDescriptorManager.exists(wikiId)) {
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
+        } catch (WikiManagerException e) {
+            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
 }

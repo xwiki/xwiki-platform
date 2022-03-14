@@ -20,9 +20,13 @@
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,9 +36,13 @@ import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.rcs.impl.Node;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.doc.ListAttachmentArchive;
+
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * JRCS based implementation of an archive for XWikiAttachment.
@@ -85,6 +93,46 @@ public class XWikiAttachmentArchive implements Cloneable
         }
 
         return null;
+    }
+
+    /**
+     * Clone the attachment archive while replacing the name and the document of the revisions to the one of the
+     * attachment passed in parameter.
+     *
+     * @param attachment the attachment to use for the new name and location of
+     * @param context the current context
+     * @return the cloned attachment archive
+     * @since 14.2RC1
+     */
+    @Unstable
+    public XWikiAttachmentArchive clone(XWikiAttachment attachment, XWikiContext context)
+    {
+        ListAttachmentArchive newArchive = new ListAttachmentArchive(Arrays.stream(this.getVersions())
+            .map(ToString::toString)
+            .map(version -> {
+                try {
+                    XWikiAttachment newRevision = this.getRevision(this.getAttachment(), version, context);
+                    // Update the revision with the new attachment information.
+                    newRevision.setFilename(attachment.getFilename());
+                    newRevision.setDoc(attachment.getDoc());
+                    // The context needs to be copied, otherwise the location is not found on the storage. 
+                    newRevision.setContent(newRevision.getContentInputStream(context));
+                    return newRevision;
+                } catch (XWikiException e) {
+                    LOGGER.warn("Failed to access revision [{}] for attachment [{}]. Cause: [{}].", version,
+                        this.attachment, getRootCauseMessage(e));
+                    return null;
+                } catch (IOException e) {
+                    LOGGER.warn(
+                        "Failed to copy to copy the content of attachment [{}] in revision [{}]. Cause: [{}].",
+                        this.attachment, version, getRootCauseMessage(e));
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList()));
+        newArchive.setAttachment(attachment);
+        return newArchive;
     }
 
     /**

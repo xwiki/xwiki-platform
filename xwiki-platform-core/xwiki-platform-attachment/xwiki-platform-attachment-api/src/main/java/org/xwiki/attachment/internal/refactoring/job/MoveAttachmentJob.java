@@ -126,7 +126,7 @@ public class MoveAttachmentJob
             XWikiDocument sourceDocument = wiki.getDocument(source.getParent(), this.xcontextProvider.get());
             XWikiDocument targetDocument = wiki.getDocument(destination.getParent(), this.xcontextProvider.get());
             XWikiAttachment sourceAttachment = sourceDocument.getExactAttachment(source.getName());
-            
+
             // Update the author of the source and target documents.
             UserReference authorUserReference =
                 this.documentReferenceUserReferenceResolver.resolve(this.request.getUserReference());
@@ -220,10 +220,12 @@ public class MoveAttachmentJob
         }
     }
 
-    private void addAttachment(XWikiDocument document, XWikiAttachment attachment, String name)
+    private void addAttachment(XWikiDocument targetDocument, XWikiAttachment oldAttachment, String newName)
         throws IOException, XWikiException
     {
-        document.setAttachment(name, attachment.getContentInputStream(this.xcontextProvider.get()),
-            this.xcontextProvider.get());
+        // Clone the attachment and its history to the new document, with the new name.
+        XWikiAttachment newAttachment = oldAttachment.clone(newName, this.xcontextProvider.get());
+        newAttachment.setDoc(targetDocument);
+        targetDocument.setAttachment(newAttachment);
     }
 }

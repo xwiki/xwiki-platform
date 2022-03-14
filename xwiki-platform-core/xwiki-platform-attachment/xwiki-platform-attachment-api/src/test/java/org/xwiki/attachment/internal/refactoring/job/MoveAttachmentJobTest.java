@@ -166,20 +166,20 @@ class MoveAttachmentJobTest
         this.request.setUserReference(AUTHOR_REFERENCE);
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
+        XWikiAttachment targetAttachment = mock(XWikiAttachment.class);
+
         when(sourceAttachment.getFilename()).thenReturn("oldName");
         when(this.sourceDocument.getExactAttachment("oldName")).thenReturn(sourceAttachment);
         when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.source",
             "xwiki:Space.Target"))
             .thenReturn("attachment.job.saveDocument.source [xwiki:Space.Target]");
-
         when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.target",
             "xwiki:Space.Source"))
             .thenReturn("attachment.job.saveDocument.target [xwiki:Space.Source]");
+        when(sourceAttachment.clone("newName", this.context)).thenReturn(targetAttachment);
 
         this.job.process(SOURCE_ATTACHMENT_LOCATION);
         verify(this.sourceDocument).removeAttachment(sourceAttachment);
-        verify(sourceAttachment).getContentInputStream(this.context);
-        verify(this.targetDocument).setAttachment("newName", null, this.context);
         verify(this.attachmentsManager).removeExistingRedirection("newName", this.targetDocument);
         // Initialization of the redirection.
         verify(this.sourceDocument).createXObject(RedirectAttachmentClassDocumentInitializer.REFERENCE, this.context);
@@ -192,6 +192,8 @@ class MoveAttachmentJobTest
         verify(this.sourceAuthors).setEffectiveMetadataAuthor(this.authorReference);
         verify(this.targetAuthors).setOriginalMetadataAuthor(this.authorReference);
         verify(this.sourceAuthors).setOriginalMetadataAuthor(this.authorReference);
+        verify(targetAttachment).setDoc(this.targetDocument);
+        verify(this.targetDocument).setAttachment(targetAttachment);
     }
 
     @Test
@@ -205,6 +207,7 @@ class MoveAttachmentJobTest
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
         XWikiAttachment targetAttachment = mock(XWikiAttachment.class);
+        XWikiAttachment newSourceAttachment = mock(XWikiAttachment.class);
         when(sourceAttachment.getFilename()).thenReturn("oldName");
         when(this.sourceDocument.getExactAttachment("oldName")).thenReturn(sourceAttachment);
         when(this.targetDocument.getExactAttachment("newName")).thenReturn(targetAttachment);
@@ -219,21 +222,23 @@ class MoveAttachmentJobTest
             "attachment.job.rollbackDocument.target [oldName, xwiki:Space.Source]");
         doThrow(new XWikiException()).when(this.wiki)
             .saveDocument(this.targetDocument, "attachment.job.saveDocument.target [xwiki:Space.Source]", this.context);
+        when(sourceAttachment.clone("newName", this.context)).thenReturn(targetAttachment);
+        when(targetAttachment.clone("oldName", this.context)).thenReturn(newSourceAttachment);
 
         this.job.process(SOURCE_ATTACHMENT_LOCATION);
         verify(this.sourceDocument).removeAttachment(sourceAttachment);
-        verify(sourceAttachment).getContentInputStream(this.context);
-        verify(targetAttachment).getContentInputStream(this.context);
-        verify(this.targetDocument).setAttachment("newName", null, this.context);
         verify(this.attachmentsManager).removeExistingRedirection("newName", this.targetDocument);
         // Initialization of the redirection.
         verify(this.sourceDocument).createXObject(RedirectAttachmentClassDocumentInitializer.REFERENCE, this.context);
         verify(this.wiki).saveDocument(this.sourceDocument,
             "attachment.job.saveDocument.source [xwiki:Space.Target]", this.context);
         // Check that the attachment is rolled back and saved again.
-        verify(this.sourceDocument).setAttachment("oldName", null, this.context);
         verify(this.wiki).saveDocument(this.sourceDocument,
             "attachment.job.rollbackDocument.target [oldName, xwiki:Space.Source]", true, this.context);
+        verify(targetAttachment).setDoc(this.targetDocument);
+        verify(this.targetDocument).setAttachment(targetAttachment);
+        verify(newSourceAttachment).setDoc(this.sourceDocument);
+        verify(this.sourceDocument).setAttachment(newSourceAttachment);
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
         assertEquals(
@@ -254,18 +259,21 @@ class MoveAttachmentJobTest
         this.request.setUserReference(AUTHOR_REFERENCE);
 
         XWikiAttachment sourceAttachment = mock(XWikiAttachment.class);
+        XWikiAttachment targetAttachment = mock(XWikiAttachment.class);
         when(sourceAttachment.getFilename()).thenReturn("oldName");
         when(this.sourceDocument.getExactAttachment("oldName")).thenReturn(sourceAttachment);
         when(this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.inPlace",
             "oldName", "newName")).thenReturn("attachment.job.saveDocument.inPlace [oldName, newName]");
+        when(sourceAttachment.clone("newName", this.context)).thenReturn(targetAttachment);
+
         this.job.process(SOURCE_ATTACHMENT_LOCATION);
 
         // Since we rename inside the source, the target document must not be modified.
         verifyNoInteractions(this.targetDocument);
         verify(this.sourceDocument).removeAttachment(sourceAttachment);
-        verify(sourceAttachment).getContentInputStream(this.context);
-        verify(this.sourceDocument).setAttachment("newName", null, this.context);
         verify(this.attachmentsManager).removeExistingRedirection("newName", this.sourceDocument);
+        verify(targetAttachment).setDoc(this.sourceDocument);
+        verify(this.sourceDocument).setAttachment(targetAttachment);
         // Initialization of the redirection.
         verify(this.sourceDocument).createXObject(RedirectAttachmentClassDocumentInitializer.REFERENCE, this.context);
         verify(this.wiki).saveDocument(this.sourceDocument, "attachment.job.saveDocument.inPlace [oldName, newName]",

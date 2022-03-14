@@ -184,7 +184,8 @@ public class PartFileItem implements FileItem
     @Override
     public boolean isFormField()
     {
-        return this.part.getSubmittedFileName() != null;
+        // Assume files have a file name and form fields don't
+        return this.part.getSubmittedFileName() == null;
     }
 
     @Override

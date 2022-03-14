@@ -48,13 +48,13 @@ import static org.xwiki.index.internal.DefaultLinksTaskConsumer.LINKS_TASK_TYPE;
 // TODO: Implement DataMigration once XWIKI-19399 is fixed.
 @Component
 @Singleton
-@Named(R1402000XWIKI19352DataMigration.HINT)
-public class R1402000XWIKI19352DataMigration implements HibernateDataMigration
+@Named(R140200001XWIKI19352DataMigration.HINT)
+public class R140200001XWIKI19352DataMigration implements HibernateDataMigration
 {
     /**
      * The hint for this component.
      */
-    public static final String HINT = "R1402000XWIKI19352";
+    public static final String HINT = "140200001XWIKI19352";
 
     @Inject
     private QueryManager queryManager;
@@ -80,7 +80,7 @@ public class R1402000XWIKI19352DataMigration implements HibernateDataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(140200000);
+        return new XWikiDBVersion(140200001);
     }
 
     @Override
@@ -113,10 +113,8 @@ public class R1402000XWIKI19352DataMigration implements HibernateDataMigration
     @Override
     public String getPreHibernateLiquibaseChangeLog()
     {
-        return "<changeSet author=\"xwikiorg\"  id=\"" + HINT + "\">\n"
-            + "  <dropTable tableName=\"xwikilinks\"/>\n"
-            + "</changeSet>\n"
-            + "\n";
+        // TODO: Remove once XWIKI-19399 is fixed.
+        return null;
     }
 
     @Override

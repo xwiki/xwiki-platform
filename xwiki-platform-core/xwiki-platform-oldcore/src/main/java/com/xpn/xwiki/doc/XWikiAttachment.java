@@ -233,6 +233,10 @@ public class XWikiAttachment implements Cloneable
         throws XWikiException, IOException
     {
         XWikiAttachment clone = internalClone(true, true);
+        if (clone == null) {
+            // According to #internalClone, this should never happen.
+            throw new XWikiException("Failed to clone the attachment", null);
+        }
         clone.setFilename(name);
         clone.setContent(this.getContentInputStream(context));
         clone.setAttachment_archive(getAttachmentArchive(context).clone(clone, context));

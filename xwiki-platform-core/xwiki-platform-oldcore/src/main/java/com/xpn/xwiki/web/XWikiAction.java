@@ -92,6 +92,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.web.DocExistValidator;
 import com.xpn.xwiki.internal.web.LegacyAction;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
@@ -743,33 +744,18 @@ public abstract class XWikiAction implements LegacyAction
     private boolean shouldReturnDocDoesNotExist(XWikiDocument doc, XWikiContext context)
     {
         boolean result = false;
-        if (doc.isNew()) {
-            String action = context.getAction();
-            XWikiRequest request = context.getRequest();
-            if ("view".equals(action)) {
-                result = !"recyclebin".equals(request.get("viewer"))
-                    && !"children".equals(request.get("viewer"))
-                    && !"siblings".equals(request.get("viewer"));
-            } else if ("get".equals(action)) {
-                String sheet = request.get("sheet");
-                if (!StringUtils.isEmpty(sheet)) {
-                    DocumentReference sheetReference = getCurrentMixedDocumentReferenceResolver().resolve(sheet);
-                    try {
-                        XWikiDocument sheetDoc = context.getWiki().getDocument(sheetReference, context);
-                        result = sheetDoc.isNew();
-                    } catch (XWikiException e) {
-                        LOGGER.warn("Error while trying to load sheet [{}] for checking status code "
-                            + "on GET request for [{}]: [{}]", sheetReference, doc.getDocumentReference(),
-                            ExceptionUtils.getRootCauseMessage(e));
-                        // there is an error we consider that the sheet doesn't exist.
-                        result = true;
-                    }
-                } else {
-                    result = !"1".equals(request.get("disableCheckNotExisting"));
-                }
+        String action = context.getAction();
+        try {
+            DocExistValidator instance = this.componentManager.getInstance(DocExistValidator.class, action);
+            if (instance != null) {
+                result = instance.docExist(doc, context);
             }
+        } catch (ComponentLookupException e) {
+            // It's not required to have a validator for each action, when not specific component is provided for 
+            // an action, the default false value is returned. 
+            LOGGER.debug("No DocExistValidator found for action [{}]", action);
         }
-        return  result;
+        return result;
     }
 
     private void renderInit(XWikiContext xcontext) throws Exception

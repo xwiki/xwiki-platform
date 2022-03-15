@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.web;
+package org.xwiki.internal.web;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +30,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.ViewAction;
 import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
@@ -43,7 +44,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  */
 @Component
 @Singleton
-@Named("view")
+@Named(ViewAction.VIEW_ACTION)
 public class ViewDocExistValidator implements DocExistValidator
 {
     private static final String VIEWER_REQUEST_PARAMETER = "viewer";

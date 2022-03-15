@@ -17,24 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.web;
+package org.xwiki.internal.web;
+
+import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -46,31 +49,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of {@link ViewDocExistValidator}.
+ * Test of {@link GetDocExistValidator}.
  *
  * @version $Id$
  * @since 13.10.4
  * @since 14.2RC1
  */
 @ComponentTest
-class ViewDocExistValidatorTest
+class GetDocExistValidatorTest
 {
-    public static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("wiki", "space", "page");
+    public static final String TEST_SHEET = "testSheet";
+
+    public static final DocumentReference SHEET_DOCUMENT_REFERENCE = new DocumentReference("wiki", "space",
+        TEST_SHEET);
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
-    private ViewDocExistValidator validator;
+    private GetDocExistValidator validator;
 
     @MockComponent
-    private DocumentRevisionProvider documentRevisionProvider;
+    @Named("currentmixed")
+    private DocumentReferenceResolver<String> currentmixedReferenceResolver;
 
     @Mock
     private XWikiDocument doc;
 
     @Mock
-    private XWikiDocument revisionDoc;
+    private XWikiDocument sheetDoc;
 
     @Mock
     private XWikiContext context;
@@ -78,60 +85,59 @@ class ViewDocExistValidatorTest
     @Mock
     private XWikiRequest request;
 
+    @Mock
+    private XWiki wiki;
+
     @BeforeEach
-    void setUp()
-    {
-        when(this.context.getRequest()).thenReturn(this.request);
-        when(this.doc.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
-    }
-
-    @Test
-    void docExistNoRev()
-    {
-        assertFalse(this.validator.docExist(this.doc, this.context));
-    }
-
-    @Test
-    void docExistIsNewNoRev()
+    void setUp() throws Exception
     {
         when(this.doc.isNew()).thenReturn(true);
+        when(this.context.getRequest()).thenReturn(this.request);
+        when(this.currentmixedReferenceResolver.resolve(TEST_SHEET)).thenReturn(SHEET_DOCUMENT_REFERENCE);
+        when(this.context.getWiki()).thenReturn(this.wiki);
+        when(this.wiki.getDocument(SHEET_DOCUMENT_REFERENCE, this.context)).thenReturn(this.sheetDoc);
+    }
+
+    @Test
+    void docExistIsNew()
+    {
         assertTrue(this.validator.docExist(this.doc, this.context));
+    }
+
+    @Test
+    void docIsNotNew()
+    {
+        // The doc is not new and the request does not have any specific parameter.
+        when(this.doc.isNew()).thenReturn(false);
+        assertFalse(this.validator.docExist(this.doc, this.context));
     }
 
     @ParameterizedTest
-    @CsvSource({ "recyclebin,false", "children,false", "siblings,false", "other,true" })
-    void docExistIsNewNoRevHasViewer(String viewer, boolean expected)
+    @ValueSource(booleans = { true, false })
+    void docExistIsSheet(boolean isSheetDocNew)
     {
-        when(this.doc.isNew()).thenReturn(true);
-        when(this.request.get("viewer")).thenReturn(viewer);
-        assertEquals(expected, this.validator.docExist(this.doc, this.context));
+        when(this.sheetDoc.isNew()).thenReturn(isSheetDocNew);
+        when(this.request.get("sheet")).thenReturn(TEST_SHEET);
+        // The 'isNew' status of the sheet is returned.
+        assertEquals(isSheetDocNew, this.validator.docExist(this.doc, this.context));
     }
 
     @Test
-    void docExistHasRevExists() throws Exception
+    void docExistHasError() throws Exception
     {
-        when(this.request.get("rev")).thenReturn("deleted:2");
-        when(this.documentRevisionProvider.getRevision(this.doc, "deleted:2")).thenReturn(this.revisionDoc);
-        assertFalse(this.validator.docExist(this.doc, this.context));
-    }
-
-    @Test
-    void docExistHasRevDoesNotExist() throws Exception
-    {
-        when(this.request.get("rev")).thenReturn("deleted:2");
-        when(this.documentRevisionProvider.getRevision(this.doc, "deleted:2")).thenReturn(null);
-        assertTrue(this.validator.docExist(this.doc, this.context));
-    }
-
-    @Test
-    void docExistHasRevHasError() throws Exception
-    {
-        when(this.request.get("rev")).thenReturn("deleted:2");
-        when(this.documentRevisionProvider.getRevision(this.doc, "deleted:2")).thenThrow(XWikiException.class);
+        when(this.request.get("sheet")).thenReturn(TEST_SHEET);
+        when(this.wiki.getDocument(SHEET_DOCUMENT_REFERENCE, this.context)).thenThrow(XWikiException.class);
         assertTrue(this.validator.docExist(this.doc, this.context));
         assertEquals(1, this.logCapture.size());
-        assertEquals("Error while accessing document [wiki:space.page] in revision [deleted:2]. "
-            + "Cause: [XWikiException: Error number 0 in 0].", this.logCapture.getMessage(0));
+        assertEquals("Error while trying to load sheet [wiki:space.testSheet] for checking status code on GET "
+            + "request for [null]: [XWikiException: Error number 0 in 0]", this.logCapture.getMessage(0));
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+    }
+
+    @Test
+    void docExistDisableCheckNotExisting()
+    {
+        when(this.request.get("disableCheckNotExisting")).thenReturn("0");
+        assertTrue(this.validator.docExist(this.doc, this.context));
     }
 }

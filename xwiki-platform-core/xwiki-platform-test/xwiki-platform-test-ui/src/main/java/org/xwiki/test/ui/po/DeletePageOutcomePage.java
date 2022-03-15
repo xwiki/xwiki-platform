@@ -139,7 +139,7 @@ public class DeletePageOutcomePage extends ViewPage
     {
         WebElement link = getDriver()
             .findElementWithoutWaiting(
-                By.cssSelector(String.format("table tbody tr:nth-child(%d) > td:nth-child(2) > a", row)));
+                By.cssSelector(String.format("table tbody tr:nth-child(%d) a.link-view", row)));
         link.click();
         return new ViewPage();
     }

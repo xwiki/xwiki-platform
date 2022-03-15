@@ -54,6 +54,7 @@ import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.csrf.CSRFToken;
+import org.xwiki.internal.web.DocExistValidator;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -92,7 +93,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.web.DocExistValidator;
 import com.xpn.xwiki.internal.web.LegacyAction;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
@@ -740,20 +740,15 @@ public abstract class XWikiAction implements LegacyAction
      * @param doc the doc for which to check it exists or not
      * @param context the current context
      * @return {@code true} if we should return a 404
+     * @throws ComponentLookupException if an error occurs when instantiating a {@link DocExistValidator}
      */
-    private boolean shouldReturnDocDoesNotExist(XWikiDocument doc, XWikiContext context)
+    private boolean shouldReturnDocDoesNotExist(XWikiDocument doc, XWikiContext context) throws ComponentLookupException
     {
         boolean result = false;
         String action = context.getAction();
-        try {
-            DocExistValidator instance = this.componentManager.getInstance(DocExistValidator.class, action);
-            if (instance != null) {
-                result = instance.docExist(doc, context);
-            }
-        } catch (ComponentLookupException e) {
-            // It's not required to have a validator for each action, when not specific component is provided for 
-            // an action, the default false value is returned. 
-            LOGGER.debug("No DocExistValidator found for action [{}]", action);
+        if (this.componentManager.hasComponent(DocExistValidator.class, action)) {
+            result = this.componentManager.<DocExistValidator>getInstance(DocExistValidator.class, action)
+                .docExist(doc, context);
         }
         return result;
     }

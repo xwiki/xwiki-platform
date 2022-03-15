@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
@@ -31,8 +32,10 @@ import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiRequest;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+
 /**
- * TODO: document me.
+ * Implementation of {@link DocExistValidator} for the {@code view} actions.
  *
  * @version $Id$
  * @since 13.10.4
@@ -56,14 +59,16 @@ public class ViewDocExistValidator implements DocExistValidator
     @Inject
     private DocumentRevisionProvider documentRevisionProvider;
 
-    // @return {@code true} if we should return a 404 
+    @Inject
+    private Logger logger;
+
     @Override
     public boolean docExist(XWikiDocument doc, XWikiContext context)
     {
         boolean result = false;
         XWikiRequest request = context.getRequest();
         String rev = request.get(REV_REQUEST_PARAMETER);
-        boolean hasRev = rev != null; // && rev.startsWith("deleted:");
+        boolean hasRev = rev != null;
         if (doc.isNew() && !hasRev) {
             String viewer = request.get(VIEWER_REQUEST_PARAMETER);
             result = !VIEWER_RECYCLEBIN.equals(viewer)
@@ -77,13 +82,16 @@ public class ViewDocExistValidator implements DocExistValidator
 
     private boolean revisionExists(XWikiDocument doc, String rev)
     {
+        boolean result;
         try {
-            XWikiDocument revision = this.documentRevisionProvider.getRevision(doc, rev);
-            return revision != null;
+            XWikiDocument revisionDoc = this.documentRevisionProvider.getRevision(doc, rev);
+            result = revisionDoc != null;
         } catch (XWikiException e) {
-            // TODO...
-            e.printStackTrace();
+            this.logger.warn("Error while accessing document [{}] in revision [{}]. Cause: [{}].",
+                doc.getDocumentReference(), rev, getRootCauseMessage(e));
+            // There is an error, we consider that the revision doesn't exist.
+            result = false;
         }
-        return false;
+        return result;
     }
 }

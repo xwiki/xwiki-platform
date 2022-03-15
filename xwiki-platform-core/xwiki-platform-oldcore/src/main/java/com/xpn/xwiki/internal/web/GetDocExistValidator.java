@@ -37,7 +37,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
- * TODO: document me.
+ * Implementation of {@link DocExistValidator} for the {@code get} actions.
  *
  * @version $Id$
  * @since 13.10.4
@@ -71,7 +71,7 @@ public class GetDocExistValidator implements DocExistValidator
                     this.logger.warn(
                         "Error while trying to load sheet [{}] for checking status code on GET request for "
                             + "[{}]: [{}]", sheetReference, doc.getDocumentReference(), getRootCauseMessage(e));
-                    // there is an error we consider that the sheet doesn't exist.
+                    // There is an error, we consider that the sheet doesn't exist.
                     result = true;
                 }
             } else {

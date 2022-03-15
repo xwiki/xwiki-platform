@@ -732,12 +732,12 @@ public abstract class XWikiAction implements LegacyAction
     }
 
     /**
-     * Check if the given document exists or not and if it should return a 404 based on the context.
-     * If the action is view, then it should returns a 404 for all viewers except recyclebin, children and siblings.
-     * If the action is get, it should returns a 404 if the sheet parameter is not used (or if the given sheet doesn't
-     * exist either) and if the disableCheckNotExisting parameter is not used.
+     * Check if the given document exists or not and if it should return a 404 based on the context. A {@link
+     * DocExistValidator} with an hint matching the current action is used to check if the document exists. When no
+     * {@link DocExistValidator} is found, the response is always {@code false} When a {@link DocExistValidator} is
+     * found, the result is delegated to {@link DocExistValidator#docExist(XWikiDocument, XWikiContext)}.
      *
-     * @param doc the doc for which to check it exists or not.
+     * @param doc the doc for which to check it exists or not
      * @param context the current context
      * @return {@code true} if we should return a 404
      */

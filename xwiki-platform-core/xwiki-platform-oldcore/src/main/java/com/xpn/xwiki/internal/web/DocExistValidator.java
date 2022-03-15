@@ -25,7 +25,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * TODO: document me.
+ * Provide the operations to know if a document must be considered as existing in the current context. In other words,
+ * validate if the current request must return a 404 response for the current document.
  *
  * @version $Id$
  * @since 13.10.4
@@ -35,9 +36,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public interface DocExistValidator
 {
     /**
-     * @param doc the document to check
+     * Validate if a 404 response must be returned for the current document, according to the request action
+     * parameters.
+     *
+     * @param doc the document to validate
      * @param context the current context
-     * @return {@code true} if the document does not exists and a 404 error will be returned, {@code false} otherwise
+     * @return {@code true} if the document does not exist and a 404 error will be returned, {@code false} otherwise
      */
     boolean docExist(XWikiDocument doc, XWikiContext context);
 }

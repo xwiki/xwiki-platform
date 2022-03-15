@@ -146,4 +146,10 @@ public class AllITs
     class NestedCreatePageAndSpaceIT extends CreatePageAndSpaceIT
     {
     }
+
+    @Nested
+    @DisplayName("Restore deleted Page tests")
+    class NestedRestoreDeletedPageIT extends RestoreDeletedPageIT
+    {
+    }
 }

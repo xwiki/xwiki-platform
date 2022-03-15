@@ -104,7 +104,7 @@ public class AllITs
     class NestedSectionEditIT extends SectionEditIT
     {
     }
-    
+
     @Nested
     @DisplayName("Document information tab tests")
     class NestedInformationIT extends InformationIT
@@ -132,6 +132,12 @@ public class AllITs
     @Nested
     @DisplayName("Comments tests")
     class NestedCommentsIT extends CommentsIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Restore deleted Page tests")
+    class NestedRestoreDeletedPageIT extends RestoreDeletedPageIT
     {
     }
 }

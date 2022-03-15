@@ -17,54 +17,71 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.flamingo.test.ui;
+package org.xwiki.flamingo.test.docker;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
+import org.xwiki.test.ui.po.DeletePageOutcomePage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Functional tests for restoring a deleted document from recycle bin.
- * 
+ *
  * @version $Id$
- * @since 5.2M2
+ * @since 13.10.4
+ * @since 14.2RC1
  */
-public class RestoreDeletedPageIT extends AbstractTest
+@UITest
+class RestoreDeletedPageIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
     /**
      * @see "XWIKI-9421: Attachment version is incremented when a document is restored from recycle bin"
      */
     @Test
-    public void restore() throws Exception
+    void restore(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration) throws Exception
     {
+        setup.loginAsSuperAdmin();
+
         // Clean up.
-        getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
+        setup.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
 
         // Create a new page.
-        ViewPage page = getUtil().createPage(getTestClassName(), getTestMethodName(), "Once upon a time..", "A story");
+        ViewPage page = setup.createPage(testReference, "Once upon a time..", "A story");
 
         // Add an attachment.
-        page.openAttachmentsDocExtraPane().setFileToUpload(getClass().getResource("/SmallAttachment.txt").getPath());
+        page.openAttachmentsDocExtraPane()
+            .setFileToUpload(new File(testConfiguration.getBrowser().getTestResourcesPath(),
+                "AttachmentIT/SmallAttachment.txt").getAbsolutePath());
 
         // Delete the page.
         page.delete().clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilFinished();
 
+        DeletePageOutcomePage deletePageOutcomePage = deletingPage.getDeletePageOutcomePage();
+
+        // Open the page in preview mode (by clicking on the link of the second column), and check that the content is
+        // the one expected.
+        ViewPage viewPage = deletePageOutcomePage.clickViewDocument(1);
+        assertEquals("A story", viewPage.getDocumentTitle());
+        assertEquals("Once upon a time..", viewPage.getContent());
+
+        // Goes back to the previous page to continue the page restoration.
+        setup.getDriver().navigate().back();
+
         // Restore the page.
-        page = deletingPage.getDeletePageOutcomePage().clickRestore();
+        page = deletePageOutcomePage.clickRestore();
 
         // Check the page title and content.
         assertEquals("A story", page.getDocumentTitle());
@@ -81,6 +98,6 @@ public class RestoreDeletedPageIT extends AbstractTest
 
         // Check the attachment content.
         attachmentsPane.getAttachmentLink("SmallAttachment.txt").click();
-        Assert.assertEquals("This is a small attachment.", getDriver().findElement(By.tagName("html")).getText());
+        assertEquals("This is a small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
     }
 }

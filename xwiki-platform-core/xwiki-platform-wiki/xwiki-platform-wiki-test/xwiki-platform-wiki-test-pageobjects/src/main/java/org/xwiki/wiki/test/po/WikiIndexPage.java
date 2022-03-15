@@ -95,13 +95,6 @@ public class WikiIndexPage extends ExtendedViewPage
         }
     }
 
-    @Override
-    public WikiIndexPage waitUntilPageIsLoaded()
-    {
-        this.liveData.getTableLayout().waitUntilReady();
-        return this;
-    }
-
     /**
      * @since 8.4.3
      */

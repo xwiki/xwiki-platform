@@ -34,13 +34,6 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class InplaceEditablePage extends ViewPage
 {
-    @Override
-    public void waitUntilPageJSIsLoaded()
-    {
-        // Wait until the JavaScript code of the in-place editor registers its listener on the Edit button.
-        getDriver().waitUntilElementIsVisible(By.cssSelector("#tmEdit > a[role='button'][data-editor='inplace']"));
-    }
-
     /**
      * Click on the Edit button and wait for the in-place editor to load.
      * 

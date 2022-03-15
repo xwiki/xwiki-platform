@@ -143,14 +143,13 @@ class WikiTemplateIT
         WikiEditPage wikiEditPage = new WikiEditPage();
         wikiEditPage.setContent(TEMPLATE_CONTENT);
         wikiEditPage.clickSaveAndView();
-        wikiEditPage.waitUntilPageIsLoaded();
 
         // Go back to the wiki creation wizard, and verify the template is in the list of templates in the wizard.
         createWikiPage = wikiHomePage.createWiki();
         assertTrue(createWikiPage.getTemplateList().contains("mynewtemplate"));
 
         // Verify the wiki is in the wiki index page.
-        wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
+        wikiIndexPage = WikiIndexPage.gotoPage();
         WikiLink wikiLink = wikiIndexPage.getWikiLink("My new template");
         if (wikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
@@ -170,7 +169,7 @@ class WikiTemplateIT
     private void deleteTemplateWiki() throws Exception
     {
         // Go to the template wiki.
-        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
+        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         WikiLink templateWikiLink = wikiIndexPage.getWikiLink("My new template");
         if (templateWikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
@@ -178,7 +177,7 @@ class WikiTemplateIT
         DeleteWikiPage deleteWikiPage = wikiIndexPage.deleteWiki("My new template").confirm(TEMPLATE_WIKI_ID);
         assertTrue(deleteWikiPage.hasSuccessMessage());
         // Verify the wiki has been deleted.
-        wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
+        wikiIndexPage = WikiIndexPage.gotoPage();
         assertNull(wikiIndexPage.getWikiLink("My new template", false));
     }
 
@@ -219,7 +218,7 @@ class WikiTemplateIT
         assertTrue(deleteWikiPage.hasSuccessMessage());
 
         // Verify the wiki has been deleted.
-        wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
+        wikiIndexPage = WikiIndexPage.gotoPage();
         assertNull(wikiIndexPage.getWikiLink("My new wiki", false));
     }
 

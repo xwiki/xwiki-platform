@@ -63,7 +63,7 @@ public class LiveTableEditorTest extends AbstractTest
         editQueryStringParameters.put("template", "AppWithinMinutes.LiveTableTemplate");
         editQueryStringParameters.put("AppWithinMinutes.LiveTableClass_0_class", "XWiki.XWikiUsers");
         getUtil().gotoPage(getTestClassName(), getTestMethodName(), "edit", editQueryStringParameters);
-        editPage = new ApplicationHomeEditPage().waitUntilPageIsLoaded();
+        editPage = new ApplicationHomeEditPage();
     }
 
     /**
@@ -117,7 +117,7 @@ public class LiveTableEditorTest extends AbstractTest
         // Fake a deprecated column by using a column that doesn't exist.
         editQueryStringParameters.put("AppWithinMinutes.LiveTableClass_0_columns", "doc.name foo");
         getUtil().gotoPage(getTestClassName(), getTestMethodName(), "edit", editQueryStringParameters);
-        editPage = new ApplicationHomeEditPage().waitUntilPageIsLoaded();
+        editPage = new ApplicationHomeEditPage();
 
         Assert.assertTrue(editPage.isDeprecatedLiveTableColumnsWarningDisplayed());
         Assert.assertFalse(editPage.isLiveTableColumnDeprecated("Page Name"));
@@ -159,7 +159,7 @@ public class LiveTableEditorTest extends AbstractTest
         editQueryStringParameters.put("AppWithinMinutes.LiveTableClass_0_columns", "");
         getUtil().gotoPage(getTestClassName(), getTestMethodName(), "edit", editQueryStringParameters);
         // Wait for the page to load before clicking on the save button to be sure the page layout is stable.
-        ApplicationHomePage viewPage = new ApplicationHomeEditPage().waitUntilPageIsLoaded().clickSaveAndView();
+        ApplicationHomePage viewPage = new ApplicationHomeEditPage().clickSaveAndView();
         Assert.assertFalse(viewPage.hasEntriesLiveTable());
         Assert.assertEquals("", viewPage.editWiki().getContent());
     }

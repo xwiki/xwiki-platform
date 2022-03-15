@@ -248,11 +248,4 @@ public class ClassSheetPage extends ViewPage
         // This can lead to false positives, but it should be fine if the passed document name is specific enough.
         return this.classEntriesLiveTable.countRows() > 0;
     }
-
-    @Override
-    public ClassSheetPage waitUntilPageIsLoaded()
-    {
-        this.classEntriesLiveTable.waitUntilReady();
-        return this;
-    }
 }

@@ -110,14 +110,14 @@ public class BasePage extends BaseElement
 
     /**
      * Note: when reusing instances of BasePage, the constructor is not doing the work anymore and the
-     * waitUntilPageJSIsLoaded() method needs to be executed manually, when needed.
+     * {@link #waitUntilPageIsReady()} method needs to be executed manually, when needed.
      * <p>
      * Note2: Never call the constructor before navigating to the page you need to test first.
      */
     public BasePage()
     {
         super();
-        waitUntilPageJSIsLoaded();
+        waitUntilPageIsReady();
     }
 
     public String getPageTitle()
@@ -269,19 +269,6 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Waits until the page has loaded. Normally we don't need to call this method since a click in Selenium2 is a
-     * blocking call. However there are cases (such as when using a shortcut) when we asynchronously load a page.
-     * 
-     * @return this page
-     * @since 3.2M3
-     */
-    public BasePage waitUntilPageIsLoaded()
-    {
-        getDriver().waitUntilElementIsVisible(By.id("footerglobal"));
-        return this;
-    }
-
-    /**
      * Refresh the page and wait for the javascript to be also loaded.
      *
      * @since 14.1
@@ -289,7 +276,7 @@ public class BasePage extends BaseElement
     public BasePage reloadPage()
     {
         getDriver().navigate().refresh();
-        waitUntilPageJSIsLoaded();
+        waitUntilPageIsReady();
         return this;
     }
 

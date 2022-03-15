@@ -280,22 +280,6 @@ public class EditPage extends BasePage
         return this.titleField.getAttribute("value");
     }
 
-    /**
-     * @since 7.4M2
-     */
-    @Override
-    public void waitUntilPageJSIsLoaded()
-    {
-        super.waitUntilPageJSIsLoaded();
-
-        // // Actionbuttons javascript for saving the page.
-        getDriver().waitUntilJavascriptCondition(
-            "return typeof XWiki !== 'undefined' "
-                + "&& XWiki.actionButtons != undefined "
-                + "&& XWiki.actionButtons.EditActions != undefined "
-                + "&& XWiki.actionButtons.AjaxSaveAndContinue != undefined");
-    }
-
     protected Set<Locale> getExistingLocales(List<WebElement> elements)
     {
         Set<Locale> locales = new HashSet<>(elements.size());

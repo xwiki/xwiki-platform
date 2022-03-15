@@ -201,7 +201,6 @@ class ConfigurableClassIT
             setup.gotoPage(configurableClassReference, "view",
                 "editor=globaladmin&section=" + testReference.getLastSpaceReference().getName());
             ViewPage viewPage = new ViewPage();
-            viewPage.waitUntilPageJSIsLoaded();
             String content = viewPage.getContent();
             assertTrue(content.contains("This should be displayed."));
             assertTrue(content.contains("This should also be displayed."));
@@ -523,7 +522,6 @@ class ConfigurableClassIT
 
         // Go to the document, it will create a lock.
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section1);
-        asp.waitUntilPageIsLoaded();
         asp.waitUntilActionButtonIsLoaded();
         setup.getDriver().switchTo().window(secondTab);
 
@@ -536,7 +534,6 @@ class ConfigurableClassIT
         setup.getDriver().switchTo().window(firstTab);
 
         asp = AdministrationSectionPage.gotoPage(section2);
-        asp.waitUntilPageIsLoaded();
         asp.waitUntilActionButtonIsLoaded();
         setup.getDriver().switchTo().window(secondTab);
         viewPage = setup.gotoPage(page1);

@@ -54,7 +54,6 @@ public class WikiCreationPage extends ExtendedViewPage
         finalizeButton.click();
         // And wait for the page to be loaded
         getDriver().waitUntilPageIsReloaded();
-        waitUntilPageIsLoaded();
         // And now we are in the home page of the new created wiki
         return new WikiHomePage();
     }

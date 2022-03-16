@@ -139,6 +139,10 @@ public final class DockerTestUtils
         // Get the latest image in case the tag has been updated on dockerhub.
         String dockerImageName = container.getDockerImageName();
 
+        // TODO: Force pulling the selenium FF and Chrome docker images.
+        // Remove once https://github.com/testcontainers/testcontainers-java/issues/4608 is fixed
+        BrowserTestUtils.pullBrowserImages(container, testConfiguration);
+
         // Don't pull if:
         // - we're offline
         // - we've already pulled this image in this test run

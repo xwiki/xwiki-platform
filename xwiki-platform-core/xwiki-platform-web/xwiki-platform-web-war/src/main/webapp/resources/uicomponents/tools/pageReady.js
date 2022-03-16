@@ -35,7 +35,8 @@ define('xwiki-page-ready', [], function() {
     promise.catch(() => {}).finally(() => {
       delayCount--;
       if (delayCount <= 0) {
-        pageReadyTimeout = setTimeout(resolvePageReady, 0);
+        // Mark the page as ready if there are no delays in the next 10ms.
+        pageReadyTimeout = setTimeout(resolvePageReady, 10);
       }
     });
   };
@@ -51,6 +52,27 @@ define('xwiki-page-ready', [], function() {
  * Delays the page ready state as long as there are pending XMLHttpRequest, fetch calls or scripts being loaded.
  */
 require(['xwiki-page-ready'], function(pageReady) {
+  document.documentElement.setAttribute('data-xwiki-page-ready', false);
+
+  // Make sure the page is ready only after the window is loaded. This also ensures that the page is always marked as
+  // ready, even when there are no other delays (e.g. no additional HTTP requests).
+  const interceptWindowLoad = function() {
+    let resolveWindowLoad;
+    pageReady.delayPageReady(new Promise((resolve, reject) => {
+      if (document.readyState === 'complete') {
+        // The window is already loaded.
+        resolve();
+      } else {
+        // Wait for the window to be loaded.
+        window.addEventListener('load', resolveWindowLoad = resolve);
+      }
+    }));
+    return () => {
+      window.removeEventListener('load', resolveWindowLoad);
+    };
+  };
+
+  // HTTP requests made while the window is loading should delay the page ready.
   let interceptedOpen;
   const interceptXMLHttpRequest = function() {
     const originalOpen = window.XMLHttpRequest.prototype.open;
@@ -110,6 +132,7 @@ require(['xwiki-page-ready'], function(pageReady) {
   };
 
   const reverts = [
+    interceptWindowLoad(),
     interceptXMLHttpRequest(),
     interceptFetch(),
     interceptScriptLoad()

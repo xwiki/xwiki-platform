@@ -71,8 +71,7 @@ class LightboxIT
     @Order(1)
     void disabledLightbox(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "0");
+        enableLightbox(testUtils, false);
 
         testUtils.createPage(testReference, getSimpleImage(images.get(0)), "Disabled Lightbox");
         lightboxPage = new LightboxPage();
@@ -90,8 +89,7 @@ class LightboxIT
     void openImageWithoutDescription(TestUtils testUtils, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "1");
+        enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, this.getSimpleImage(images.get(0)));
         lightboxPage = new LightboxPage();
@@ -117,8 +115,7 @@ class LightboxIT
     void openImageWithCaption(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
         throws Exception
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "1");
+        enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, this.getImageWithCaption(images.get(0)));
         lightboxPage = new LightboxPage();
@@ -144,8 +141,7 @@ class LightboxIT
     void openImageWithAlt(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
         throws Exception
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "1");
+        enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, this.getImageWithAlt(images.get(0)));
         lightboxPage = new LightboxPage();
@@ -170,8 +166,7 @@ class LightboxIT
     @Order(5)
     void openIconImage(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "1");
+        enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, "[[image:icon:accept]]");
 
@@ -189,8 +184,7 @@ class LightboxIT
     @Order(6)
     void clickLightboxEscape(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "1");
+        enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, this.getSimpleImage(images.get(0)));
         lightboxPage = new LightboxPage();
@@ -211,8 +205,7 @@ class LightboxIT
     @Order(7)
     void navigateThroughImages(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "1");
+        enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, this.getSimpleImage(images.get(0)) + this.getSimpleImage(images.get(1)));
         lightboxPage = new LightboxPage();
@@ -243,8 +236,7 @@ class LightboxIT
     @Order(8)
     void playSlideshow(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "1");
+        enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, this.getSimpleImage(images.get(0)) + this.getSimpleImage(images.get(1))
             + this.getSimpleImage(images.get(2)));
@@ -274,8 +266,7 @@ class LightboxIT
     @Order(9)
     void openMissingImage(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "1");
+        enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, this.getSimpleImage(images.get(2)));
         lightboxPage = new LightboxPage();
@@ -298,8 +289,7 @@ class LightboxIT
     @Order(10)
     void openFullscreen(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "1");
+        enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, this.getSimpleImage(images.get(0)));
         lightboxPage = new LightboxPage();
@@ -321,8 +311,7 @@ class LightboxIT
     @Order(11)
     void verifyDownload(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", "1");
+        enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, this.getSimpleImage(images.get(0)));
         lightboxPage = new LightboxPage();
@@ -352,6 +341,29 @@ class LightboxIT
         WebElement lightboxDownload = lightbox.getDownloadButton();
         assertEquals(slide.findElement(By.tagName("img")).getAttribute("src"), lightboxDownload.getAttribute("href"));
         assertEquals(images.get(0), lightboxDownload.getAttribute("download"));
+    }
+
+    @Test
+    @Order(12)
+    void verifyPartiallyDisabledLightbox(TestUtils testUtils, TestReference testReference,
+        TestConfiguration testConfiguration)
+    {
+        enableLightbox(testUtils, true);
+
+        testUtils.createPage(testReference, this.getPartiallyDisabledLightboxContent());
+        lightboxPage = new LightboxPage();
+
+        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
+        assertFalse(imagePopover.isPresent());
+
+        imagePopover = lightboxPage.hoverImage(1);
+        assertTrue(imagePopover.isPresent());
+    }
+
+    private void enableLightbox(TestUtils testUtils, boolean enable)
+    {
+        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
+            "isLightboxEnabled", enable ? "1" : "0");
     }
 
     private String getSimpleImage(String image)
@@ -385,6 +397,18 @@ class LightboxIT
         sb.append("[[image:");
         sb.append(image);
         sb.append("||alt=\"Alternative text\" width=120 height=120]]\n\n");
+
+        return sb.toString();
+    }
+
+    private String getPartiallyDisabledLightboxContent()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("{{html}}\n");
+        sb.append("<div data-xwiki-lightbox='false'><img src='/xwiki/resources/icons/silk/accept.png'/></div>\n");
+        sb.append("<div><img src='/xwiki/resources/icons/silk/accept.png'/></div>\n");
+        sb.append("{{/html}}");
 
         return sb.toString();
     }

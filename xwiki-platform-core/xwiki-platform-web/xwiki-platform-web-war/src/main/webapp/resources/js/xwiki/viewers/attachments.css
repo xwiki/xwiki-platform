@@ -33,3 +33,14 @@
 #attachform {
   margin-top: 2%;
 }
+.attachmentMimeType {
+  color: $theme.textSecondaryColor;
+  font-size: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+}
+.attachmentMimeType img {
+  max-height: 32px;
+  max-width: 48px;
+}

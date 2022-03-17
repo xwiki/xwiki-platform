@@ -137,7 +137,7 @@
         'mimeType': "#displayAttachmentMimeType($attachment)",
         'filesize': "#displayAttachmentSize($attachment)",
         'date': $xwiki.formatDate($attachment.date),
-        'author': $xwiki.getUserName($attachment.author)
+        'author': "#displayUserNameWithAvatar($attachment.author)"
       }))
     #end
     #set ($discard = $results.rows.add($row))

@@ -84,6 +84,7 @@ viewers.Attachments = Class.create({
   attachHTML5Uploader : function(input) {
     if (typeof(XWiki.FileUploader) != 'undefined') {
       input.multiple = true;
+      // Since the attachments livetable is refreshed on file upload, we skip updating the attachments container.
       return new XWiki.FileUploader(input, {
         'responseContainer' : document.createElement('div'),
         'responseURL' : '',
@@ -199,7 +200,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    */
   $(document).on('show.bs.modal', '#deleteAttachment', function(event) {
     if (event.relatedTarget) {
-      $(this).data('relatedTarget', $(event.relatedTarget));
+      $(this).data('relatedTarget', event.relatedTarget);
     }
   });
   /**
@@ -208,6 +209,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   $(document).on('click', '#deleteAttachment input.btn-danger', function() {
     var modal = $('#deleteAttachment');
     var button = $(modal.data('relatedTarget'));
+    var thisLivetableName = button.closest('.xwiki-livetable').data('settings').name;
     var notification;
     /**
      * Ajax request made for deleting an attachment. Refresh livetable on success. Disable the delete button
@@ -221,7 +223,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         notification = new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.inProgress'], 'inprogress');
       },
       success : function() {
-        docAttachmentsLivetable.refresh();
+        window[thisLivetableName].refresh();
         updateCount();
         notification.replace(new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.done'], 'done'));
       },
@@ -232,40 +234,57 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       }
     })
   });
-  $(document).on("xwiki:livetable:loadingComplete", function(event, data) {
-    if (data.tableId == 'docAttachments') {
-      $(document).on('click', '#docAttachments .actiondelete', function(event) {
-        event.preventDefault();
-        $('#deleteAttachment').data('relatedTarget', event.currentTarget);
-        $('#deleteAttachment').modal('show');
-      });
-
-      updateCount();
-    }
+  /**
+   * Make sure the number of attachments displayed matches after the livetable has been refreshed, as is the case after
+   * attachment upload.  
+   */
+  $(document).on("xwiki:livetable:docAttachments:loadingComplete", function() {
+    updateCount(docAttachmentsLivetable.totalRows);
   })
   /**
-   * Updating the number of files in AttachmentsTab and in More actions menu.
+   * On delete action, show a confirmation modal and save the element that triggered this event to be able to access
+   * information after confirmation.
    */
-  var updateCount = function() {
-    $.ajax({
-      url: XWiki.currentDocument.getURL('get', 'xpage=xpart&vm=attachmentsjson.vm'),
-      success: function(data) {
-        var itemCount = $('#Attachmentstab').find('.itemCount');
-        var attachmentsNumber = data.totalrows;
-        if(itemCount) {
-          itemCount.text(l10n['docextra.extranb'].replace("__number__", attachmentsNumber));
-        };
-        if($('#tmAttachments').length) {
-          // Calling normalize() because a text node needs to be modified and so all consecutive text nodes are merged.
-          $('#tmAttachments')[0].normalize();
-          var attachmentsLabel = ' ' + l10n['docextra.attachments'] + ' ';
-          var label = attachmentsLabel + l10n['docextra.extranb'];
-          label = label.replace("__number__", attachmentsNumber);
-          $('#tmAttachments').contents().last()[0].nodeValue=label;
+  $(document).on('click', '.attachmentActions .deletelink', function(event) {
+    event.preventDefault();
+    $('#deleteAttachment').data('relatedTarget', event.currentTarget);
+    $('#deleteAttachment').modal('show');
+  });
+  /**
+   * Update the locations that display the attachments count with the new number or, when it is not provided, make
+   * another request to get it.
+   */
+  var updateCount = function(attachmentsNumber) {
+    if (attachmentsNumber && attachmentsNumber >= 0) {
+      updateAttachmentsNumber(attachmentsNumber);
+    } else {
+      $.ajax({
+        url: XWiki.currentDocument.getURL('get', 'xpage=xpart&vm=attachmentsjson.vm'),
+        success: function(data) {
+          updateAttachmentsNumber(data.totalrows);
         }
-      }
-    });
+      });
+    }
   };
+  /**
+   * Update the number of attachments from AttachmentsTab and More actions menu.
+   *
+   * @param attachmentsNumber the total number of attachments 
+   */
+  var updateAttachmentsNumber = function(attachmentsNumber) {
+    var itemCount = $('#Attachmentstab').find('.itemCount');
+    if(itemCount) {
+      itemCount.text(l10n['docextra.extranb'].replace("__number__", attachmentsNumber));
+    };
+    if($('#tmAttachments').length) {
+      // Calling normalize() because a text node needs to be modified and so all consecutive text nodes are merged.
+      $('#tmAttachments')[0].normalize();
+      var attachmentsLabel = ' ' + l10n['docextra.attachments'] + ' ';
+      var label = attachmentsLabel + l10n['docextra.extranb'];
+      label = label.replace("__number__", attachmentsNumber);
+      $('#tmAttachments').contents().last()[0].nodeValue=label;
+    }
+  }
   /**
    * Firing updateCount event when an attachment is successfully uploaded.
    */

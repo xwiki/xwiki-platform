@@ -131,7 +131,7 @@
 #end
 
 #macro (displayAttachmentMimeType $attachment)
-  <div class="mime" data-type="$!escapetool.xml($attachment.mimeType)">
+  <div class="attachmentMimeType" data-type="$!escapetool.xml($attachment.mimeType)">
     #if ($attachment.isImage())
       <span title="$escapetool.xml($services.localization.render('core.viewers.attachments.mime.image'))">
         <img src="$xwiki.getURL($attachmentReference, 'download', 'width=48')"
@@ -143,11 +143,79 @@
   </div>
 #end
 
+#macro (displayUserNameWithAvatar $userName)
+  <div class="user" data-reference="$escapetool.xml($userName)">
+    <span class="user-avatar-wrapper">
+      #getUserAvatarURL($userName $avatarURL 120)
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+    </span>
+    $xwiki.getUserName($userName)
+  </div>
+#end
+
 #macro (displayAttachmentSize $attachment)
   <span class="size" data-size="$!escapetool.xml($attachment.longSize)">#dynamicsize($attachment.longSize)</span>
 #end
 
-#macro(deleteAttachmentModal)
+#macro (displayAttachmentActions $attachment)
+  <div class="attachmentActions">
+    #if ($services.officemanager.isConnected() &&
+        $services.officeviewer.isMimeTypeSupported($attachment.mimeType.toLowerCase()))
+      ## Link to preview office document.
+      <a class="viewlink action" title="$escapetool.xml($services.localization.render(
+        'core.viewers.attachments.officeView.title'))" target="_blank"
+        href="$attachment.document.getURL('view', $escapetool.url({
+          'xpage': 'office',
+          'attachment': $attachment.filename
+        }))">
+          <span class="action-icon">$services.icon.renderHTML('eye')</span><span class="action-label">$escapetool.xml(
+            $services.localization.render('core.viewers.attachments.officeView'))
+          </span>
+        </a>
+    #end
+    #set ($historyURL = $xwiki.getURL($attachmentReference, 'viewattachrev', $NULL))
+    <a class="action" href="$historyURL#"
+        title="$escapetool.xml($services.localization.render('core.viewers.attachments.showHistory'))">
+      <span class="action-icon">$services.icon.renderHTML('list-numbers')</span><span class="action-label">$escapetool.xml(
+        $services.localization.render('core.viewers.attachments.showHistory.label'))
+      </span>
+    </a>
+    #if ($hasEdit || $hasAdmin)
+      #set ($queryString = $escapetool.url({
+        'xpage': 'attachment/move',
+        'attachment': $services.model.serialize($attachment.getReference(), 'default')
+      }))
+      #set ($moveURL = $xwiki.getURL($attachment.document.documentReference, 'view', $queryString))
+      <a class="move-attachment action" title="$escapetool.xml($services.localization.render(
+          'core.viewers.attachments.move.title'))" href="$moveURL#">
+        <span class="action-icon">$services.icon.renderHTML('move')</span><span class="action-label">$escapetool.xml(
+          $services.localization.render('core.viewers.attachments.move'))
+        </span>
+      </a>
+    #end
+    #if ($hasEdit || $hasAdmin)
+      ## Delete attachment link.
+      ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
+      ## By providing an anchor this behavior is stopped, without altering the URL functionality.
+      #set ($queryString = $escapetool.url({
+        'form_token': $services.csrf.token,
+        'xredirect': $options.redirect
+      }))
+      #set ($deleteURL = $xwiki.getURL($attachment.getReference(), 'delattachment', $queryString))
+      <a class="deletelink action" title="$escapetool.xml($services.localization.render(
+          'core.viewers.attachments.delete.title', [$attachment.filename]))" href="$deleteURL#">
+        <span class="action-icon">$services.icon.renderHTML('cross')</span><span class="action-label">$escapetool.xml(
+          $services.localization.render('core.viewers.attachments.delete'))
+        </span>
+      </a>
+    #end
+    #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.attachment.actions'))
+      $services.rendering.render($uix.execute(), 'html/5.0')
+    #end
+  </div>
+#end
+
+#macro (deleteAttachmentModal)
   <div class="modal fade" id="deleteAttachment" tabindex="-1" role="dialog">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -167,4 +235,28 @@
       </div>
     </div>
   </div>
+#end
+
+## Display a livetable with attachments of the specified document. Use the given id when displaying the livetable and
+## for the javascript function name.
+#macro (showAttachmentsLivetable $attachmentsDoc $livetableId)
+  #set ($javascriptName = $livetableId + 'Livetable')
+  #set ($columns = ['mimeType', 'filename', 'filesize', 'date', 'author', 'actions'])
+  #set ($columnsProperties = {
+    'mimeType': {'type': 'list', "html": true, 'class': 'XWiki.AllAttachments'},
+    'filename': {'type': 'text', 'link': 'auto'},
+    'filesize': {'type': 'list', 'html': true,  'class': 'XWiki.AllAttachments'},
+    'date': {'type': 'date'},
+    'author': {'type': 'text', 'html': true},
+    'actions': {'sortable': false,'filterable': false,'html': true}
+  })
+  #set ($options = {
+    'translationPrefix': 'core.viewers.attachments.livetable.',
+    'url': $attachmentsDoc.getURL('get', "xpage=xpart&vm=attachmentsjson.vm"),
+    'rowCount': 5,
+    'selectedColumn': 'filename',
+    'javascriptName': $javascriptName,
+    'outputOnlyHtml': true
+  })
+  #livetable($livetableId $columns $columnsProperties $options)
 #end

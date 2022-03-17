@@ -102,22 +102,19 @@
   #foreach ($attachmentReference in $attachmentsReferences)
     #set ($hasAccess = $services.security.authorization.hasAccess('view', $attachmentReference))
     #set ($row = {
-      'acclev': $hasAccess,
       'filename': $attachmentReference.name,
       'filename_url': $xwiki.getURL($attachmentReference),
-      'doc_viewable': true
+      'doc_viewable': $hasAccess
     })
     #if ($hasAccess)
       #set ($attachment = $doc.getAttachment($attachmentReference.name))
       #set ($authorReference = $services.model.resolveDocument($attachment.author))
       #set ($discard = $row.putAll({
-        'version': $attachment.version,
-        'version_url': $xwiki.getURL($attachmentReference, 'viewattachrev', $NULL),
         'mimeType': "#displayAttachmentMimeType($attachment)",
         'filesize': "#displayAttachmentSize($attachment)",
         'date': $xwiki.formatDate($attachment.date),
-        'author': $xwiki.getUserName($attachment.author),
-        'doc_delete_url': "$xwiki.getURL($attachmentReference, 'delattachment', $queryString)#"
+        'author': "#displayUserNameWithAvatar($attachment.author)",
+        'actions': "#displayAttachmentActions($attachment)"
       }))
     #end
     #set ($discard = $results.rows.add($row))

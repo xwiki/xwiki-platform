@@ -14,9 +14,9 @@ beginMacroMarkerStandalone [gallery] [] [image:first.png
 image:second.png]
 beginGroup [[class]=[gallery]]
 beginParagraph
-onImage [Typed = [false] Type = [url] Reference = [first.png]] [true]
+onImage [Typed = [false] Type = [url] Reference = [first.png]] [true] [Ifirst.png]
 onNewLine
-onImage [Typed = [false] Type = [url] Reference = [second.png]] [true]
+onImage [Typed = [false] Type = [url] Reference = [second.png]] [true] [Isecond.png]
 endParagraph
 endGroup [[class]=[gallery]]
 endMacroMarkerStandalone [gallery] [] [image:first.png

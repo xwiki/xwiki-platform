@@ -265,7 +265,7 @@ public class IncludeMacroTest
             + "beginLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
             + "endLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
             + "onSpace\n"
-            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
+            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true] [Itest.png]\n"
             + "endParagraph\n"
             + "endMetaData [[base]=[includedWiki:includedSpace.includedPage]"
             + "[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"

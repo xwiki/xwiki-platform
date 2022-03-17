@@ -203,7 +203,7 @@ public class DisplayMacroTest
             + "beginLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
             + "endLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
             + "onSpace\n"
-            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
+            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true] [Itest.png]\n"
             + "endParagraph\n"
             + "endMetaData [[base]=[displayedWiki:displayedSpace.displayedPage]"
             + "[source]=[displayedWiki:displayedSpace.displayedPage][syntax]=[XWiki 2.0]]\n"

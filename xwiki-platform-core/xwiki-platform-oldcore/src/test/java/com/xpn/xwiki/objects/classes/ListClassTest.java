@@ -20,11 +20,22 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.StringListProperty;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for {@link ListClass}.
@@ -209,5 +220,78 @@ class ListClassTest
     {
         assertEquals(Arrays.asList("a", "b", "", "c", ""), ListClass.getListFromString("a|b||c|", "|", false, false));
         assertEquals(Arrays.asList("a", "b", "c"), ListClass.getListFromString("a|b||c|", "|", false, true));
+    }
+
+    @Test
+    void fromList()
+    {
+        BaseProperty property = mock(LargeStringProperty.class);
+        ListClass listClass = new ListClass()
+        {
+            @Override
+            public List<String> getList(XWikiContext context)
+            {
+                return null;
+            }
+
+            @Override
+            public Map<String, ListItem> getMap(XWikiContext context)
+            {
+                return null;
+            }
+        };
+
+        listClass.fromList(property, null, true);
+        verify(property).setValue(null);
+
+        ListProperty listProperty = mock(StringListProperty.class);
+        listClass.fromList(listProperty, null, true);
+        verify(listProperty).setList(null);
+
+        listClass.fromList(listProperty, null, false);
+        verify(listProperty, times(2)).setList(null);
+
+        List<String> strings = Arrays.asList("XWiki.Foo", null, "XWiki.Bar", "");
+        listClass.fromList(listProperty, strings, true);
+        verify(listProperty).setList(Arrays.asList("XWiki.Foo", "XWiki.Bar"));
+
+        listClass.fromList(listProperty, strings, false);
+        verify(listProperty).setList(strings);
+
+        listClass.fromList(property, strings, false);
+        verify(property).setValue("XWiki.Foo");
+
+        listClass.fromList(property, strings, true);
+        verify(property, times(2)).setValue("XWiki.Foo");
+
+        listClass.fromList(property, Collections.emptyList(), false);
+        verify(property, times(2)).setValue(null);
+
+        listClass.fromList(property, Collections.emptyList(), true);
+        verify(property, times(3)).setValue(null);
+
+        strings = Arrays.asList("", "XWiki.Foo", null, "XWiki.Bar", "");
+        listClass.fromList(property, strings, false);
+        verify(property).setValue("");
+
+        listClass.fromList(property, strings, true);
+        verify(property, times(3)).setValue("XWiki.Foo");
+
+        listClass.fromList(property, Collections.singletonList(""), true);
+        verify(property, times(4)).setValue(null);
+
+        listClass.setMultiSelect(true);
+        listClass.fromList(property, strings, false);
+        verify(property).setValue("|XWiki.Foo|XWiki.Bar|");
+
+        listClass.fromList(property, strings, true);
+        verify(property).setValue("XWiki.Foo|XWiki.Bar");
+
+        listClass.setSeparators("~@!");
+        listClass.fromList(property, strings, false);
+        verify(property).setValue("~XWiki.Foo~XWiki.Bar~");
+
+        listClass.fromList(property, strings, true);
+        verify(property).setValue("XWiki.Foo~XWiki.Bar");
     }
 }

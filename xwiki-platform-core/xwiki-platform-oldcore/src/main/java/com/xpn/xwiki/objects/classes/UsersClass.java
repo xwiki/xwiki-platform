@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -164,10 +164,16 @@ public class UsersClass extends ListClass
     @Override
     public BaseProperty fromStringArray(String[] strings)
     {
-        List<String> list = new ArrayList<>();
+        List<String> list = Arrays.asList(strings);
         BaseProperty prop = newProperty();
-        fromList(prop, list, true);
+        fromList(prop, list);
         return prop;
+    }
+
+    @Override
+    public void fromList(BaseProperty<?> property, List<String> list)
+    {
+        fromList(property, list, true);
     }
 
     /**

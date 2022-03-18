@@ -152,8 +152,14 @@ public class GroupsClass extends ListClass
         List<String> list = Arrays.asList(strings);
 
         BaseProperty prop = newProperty();
-        fromList(prop, list, true);
+        fromList(prop, list);
         return prop;
+    }
+
+    @Override
+    public void fromList(BaseProperty<?> property, List<String> list)
+    {
+        fromList(property, list, true);
     }
 
     /**

@@ -20,12 +20,12 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
@@ -116,10 +116,16 @@ public class LevelsClass extends ListClass
     @Override
     public BaseProperty fromStringArray(String[] strings)
     {
-        List<String> list = new ArrayList<String>();
+        List<String> list = Arrays.asList(strings);
         BaseProperty prop = newProperty();
         fromList(prop, list, true);
         return prop;
+    }
+
+    @Override
+    public void fromList(BaseProperty<?> property, List<String> list)
+    {
+        fromList(property, list, true);
     }
 
     public String getText(String value, XWikiContext context)

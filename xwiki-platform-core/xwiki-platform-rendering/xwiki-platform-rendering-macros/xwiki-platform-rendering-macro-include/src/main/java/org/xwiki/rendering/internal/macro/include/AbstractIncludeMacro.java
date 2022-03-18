@@ -25,6 +25,7 @@ import java.util.Stack;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.model.EntityType;
@@ -34,11 +35,14 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 /**
@@ -149,5 +153,40 @@ public abstract class AbstractIncludeMacro<P> extends AbstractMacro<P>
             throw new MacroExecutionException(String.format("Found recursive %s of document [%s]", messageText,
                 reference));
         }
+    }
+
+    /**
+     * Replace ids of heading and images by unique ids.
+     *
+     * @param context the macro transformation context to get the id generator from
+     * @param result the XDOM to modify in-place
+     * @since 14.2RC1
+     */
+    protected void makeIdsUnique(MacroTransformationContext context, XDOM result)
+    {
+        if (context.getXDOM() != null && context.getXDOM().getIdGenerator() != null) {
+            IdGenerator idGenerator = context.getXDOM().getIdGenerator();
+            // Traverse the XDOM and adapt all image and heading blocks.
+            result.getBlocks(block -> {
+                if (block instanceof ImageBlock) {
+                    ImageBlock imageBlock = (ImageBlock) block;
+                    imageBlock.setId(adaptId(idGenerator, imageBlock.getId()));
+                } else if (block instanceof HeaderBlock) {
+                    HeaderBlock headerBlock = (HeaderBlock) block;
+                    headerBlock.setId(adaptId(idGenerator, headerBlock.getId()));
+                }
+                return false;
+            }, Block.Axes.DESCENDANT);
+        }
+    }
+
+    private String adaptId(IdGenerator idGenerator, String id)
+    {
+        if (StringUtils.isNotBlank(id)) {
+            String prefix = id.substring(0, 1);
+            String suffix = id.substring(1);
+            return idGenerator.generateUniqueId(prefix, suffix);
+        }
+        return id;
     }
 }

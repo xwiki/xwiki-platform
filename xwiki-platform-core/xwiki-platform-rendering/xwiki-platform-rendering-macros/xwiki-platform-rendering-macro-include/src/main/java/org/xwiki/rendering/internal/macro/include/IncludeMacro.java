@@ -152,7 +152,10 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
             excludeFirstHeading(result);
         }
 
-        // Step 6: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
+        // Step 6: Make sure heading and image ids are unique.
+        makeIdsUnique(context, result);
+
+        // Step 7: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());
         String source = this.defaultEntityReferenceSerializer.serialize(includedReference);

@@ -841,4 +841,10 @@ public class XWikiCacheStore extends AbstractXWikiStore
         }
         return limitSize;
     }
+
+    @Override
+    public boolean isXWikiLinkEmpty(XWikiContext inputxcontext) throws XWikiException
+    {
+        return this.store.isXWikiLinkEmpty(inputxcontext);
+    }
 }

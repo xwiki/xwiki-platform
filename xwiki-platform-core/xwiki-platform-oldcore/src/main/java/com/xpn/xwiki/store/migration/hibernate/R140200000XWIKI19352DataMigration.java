@@ -30,9 +30,8 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
  * Remove the xwikilinks table to allow it to be recreated from scratch. This is needed because we migrate from a 
- * composite id to a unique id key, and the composite id index is not removed automatically. While we could selectively
- * remove the deprecated index, it is easier to remove the table and let it be recreated automatically, since 
- * {@code R140200001XWIKI19352DataMigration} would drop all the table content anyway. 
+ * composite id to a unique id key, and the composite id index is not removed automatically.
+ * When xwikilinks is empty, the {@code index} module will take care of repopulating it.
  *
  * @version $Id$
  * @since 14.2

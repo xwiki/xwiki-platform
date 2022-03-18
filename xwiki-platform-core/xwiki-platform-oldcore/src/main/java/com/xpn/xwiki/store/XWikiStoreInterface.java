@@ -596,4 +596,14 @@ public interface XWikiStoreInterface
      * @since 11.4RC1
      */
     int getLimitSize(XWikiContext context, Class<?> entityType, String property);
+
+    /**
+     * @param context the XWiki context required for getting information about the execution context.
+     * @return {@code true} if the XWikiLink table is empty, {@code false} otherwise
+     * @since 14.2RC1
+     */
+    default boolean isXWikiLinkEmpty(XWikiContext context) throws XWikiException
+    {
+        return false;
+    }
 }

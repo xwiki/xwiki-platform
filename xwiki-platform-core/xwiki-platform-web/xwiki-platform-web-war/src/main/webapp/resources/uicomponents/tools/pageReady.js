@@ -28,24 +28,28 @@ define('xwiki-page-ready', [], function() {
     resolvePageReady = resolve;
   });
 
-  let delayCount = 0, pageReadyTimeout;
-  const delayPageReady = (promise) => {
+  let delayCount = 0, pendingDelays = new Map(), pageReadyTimeout;
+  const delayPageReady = (promise, reason) => {
     clearTimeout(pageReadyTimeout);
-    delayCount++;
+    const delayId = delayCount++;
+    pendingDelays.set(delayId, reason);
     promise.catch(() => {}).finally(() => {
-      delayCount--;
-      if (delayCount <= 0) {
+      pendingDelays.delete(delayId);
+      if (!pendingDelays.size) {
         // Mark the page as ready if there are no delays in the next 10ms.
         pageReadyTimeout = setTimeout(resolvePageReady, 10);
       }
     });
   };
 
-  const onPageReady = (callback) => {
+  const getPendingDelays = () => new Map(pendingDelays);
+
+  const afterPageReady = (callback) => {
     pageReadyPromise.then(callback).catch(() => {});
   };
 
-  return window.xwikiPageReady = {delayPageReady, onPageReady};
+  // We put it on the window in order to be accessible from the parent window when the page is loaded inside an iframe.
+  return window.xwikiPageReady = {delayPageReady, getPendingDelays, afterPageReady};
 });
 
 /**
@@ -66,11 +70,15 @@ require(['xwiki-page-ready'], function(pageReady) {
         // Wait for the window to be loaded.
         window.addEventListener('load', resolveWindowLoad = resolve);
       }
-    }));
+    }), 'window:load');
     return () => {
       window.removeEventListener('load', resolveWindowLoad);
     };
   };
+
+  // Scripts are loaded only once and thus the load event is triggered only the first time a script is loaded, which is
+  // why we need to keep track of the URLs that are successfuly loaded.
+  const loadedURLs = new Set();
 
   // HTTP requests made while the window is loading should delay the page ready.
   let interceptedOpen;
@@ -81,9 +89,13 @@ require(['xwiki-page-ready'], function(pageReady) {
     }
     interceptedOpen = window.XMLHttpRequest.prototype.open = function() {
       try {
+        const url = arguments[1];
         pageReady.delayPageReady(new Promise((resolve, reject) => {
+          this.addEventListener('load', () => {
+            loadedURLs.add(url);
+          });
           this.addEventListener('loadend', resolve);
-        }));
+        }), `xhr:${url}`);
       } catch (e) {
       }
       return originalOpen.apply(this, arguments);
@@ -102,7 +114,10 @@ require(['xwiki-page-ready'], function(pageReady) {
     interceptedFetch = window.fetch = function() {
       const fetchPromise = originalFetch.apply(this, arguments);
       try {
-        pageReady.delayPageReady(fetchPromise);
+        const url = arguments[0];
+        pageReady.delayPageReady(fetchPromise.then(() => {
+          loadedURLs.add(url);
+        }), `fetch:${url}`);
       } catch (e) {
       }
       return fetchPromise;
@@ -116,11 +131,16 @@ require(['xwiki-page-ready'], function(pageReady) {
     const scriptObserver = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         mutation.addedNodes.forEach(addedNode => {
-          if (addedNode.tagName === 'SCRIPT' && typeof addedNode.src === 'string' && addedNode.src !== '') {
+          const url = addedNode.src;
+          // Delay the page ready only if the script is not already loaded, otherwise the load event is not fired.
+          if (addedNode.tagName === 'SCRIPT' && typeof url === 'string' && url !== '' && !loadedURLs.has(url)) {
             pageReady.delayPageReady(new Promise((resolve, reject) => {
-              addedNode.addEventListener('load', resolve);
+              addedNode.addEventListener('load', () => {
+                loadedURLs.add(url);
+                resolve();
+              });
               addedNode.addEventListener('error', reject);
-            }));
+            }), `script:${url}`);
           }
         });
       });
@@ -138,7 +158,7 @@ require(['xwiki-page-ready'], function(pageReady) {
     interceptScriptLoad()
   ];
 
-  pageReady.onPageReady(() => {
+  pageReady.afterPageReady(() => {
     // Revert the interception once the page is ready.
     reverts.forEach(revert => revert());
 

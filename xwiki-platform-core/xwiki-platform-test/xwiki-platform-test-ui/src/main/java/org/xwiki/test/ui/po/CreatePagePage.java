@@ -53,6 +53,9 @@ public class CreatePagePage extends ViewPage
     @FindBy(id = "terminal")
     private WebElement isTerminalCheckbox;
 
+    @FindBy(css = "form#create input[type='submit']")
+    private WebElement createButton;
+
     public static CreatePagePage gotoPage()
     {
         getUtil().gotoPage("Main", "WebHome", "create");
@@ -96,8 +99,7 @@ public class CreatePagePage extends ViewPage
 
     public void clickCreate()
     {
-        // Submit the create form. Don`t use the DocumentPicker element since it might not always be there.
-        getDriver().findElementWithoutWaiting(By.id("create")).submit();
+        this.createButton.click();
     }
 
     public EditPage createPage(String spaceValue, String pageValue)

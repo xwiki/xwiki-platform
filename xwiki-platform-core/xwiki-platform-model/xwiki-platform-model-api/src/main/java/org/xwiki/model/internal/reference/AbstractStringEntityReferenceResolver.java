@@ -213,7 +213,7 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
 
         EntityReference evaluatedReference = reference;
 
-        EntityReference evaluatedParent = evaluateKeywords(reference.getParent());
+        EntityReference evaluatedParent = evaluateKeywords(reference.getParent(), parameters);
 
         if (reference.getName().equals(getSymbolScheme().getCurrentReferenceKeyword(reference.getType()))) {
             if (evaluatedParent == null) {

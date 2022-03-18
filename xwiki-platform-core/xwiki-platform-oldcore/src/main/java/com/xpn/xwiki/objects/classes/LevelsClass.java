@@ -109,13 +109,8 @@ public class LevelsClass extends ListClass
     public BaseProperty fromStringArray(String[] strings)
     {
         List<String> list = new ArrayList<String>();
-        for (int i = 0; i < strings.length; i++) {
-            if (!strings[i].trim().equals("")) {
-                list.add(strings[i]);
-            }
-        }
         BaseProperty prop = newProperty();
-        fromList(prop, list);
+        fromList(prop, list, true);
         return prop;
     }
 
@@ -126,7 +121,7 @@ public class LevelsClass extends ListClass
 
     public static List<String> getListFromString(String value)
     {
-        return getListFromString(value, ",", false);
+        return getListFromString(value, ",", false, true);
     }
 
     @Override
@@ -192,12 +187,6 @@ public class LevelsClass extends ListClass
         }
 
         return selectlist;
-    }
-
-    @Override
-    public void fromList(BaseProperty<?> property, List<String> list)
-    {
-        property.setValue(list != null ? StringUtils.join(list, ',') : null);
     }
 
     @Override

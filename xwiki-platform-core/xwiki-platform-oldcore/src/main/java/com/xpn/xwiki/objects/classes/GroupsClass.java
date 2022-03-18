@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +144,7 @@ public class GroupsClass extends ListClass
         List<String> list = Arrays.asList(strings);
 
         BaseProperty prop = newProperty();
-        fromList(prop, list);
+        fromList(prop, list, true);
         return prop;
     }
 
@@ -170,7 +169,7 @@ public class GroupsClass extends ListClass
      */
     public static List<String> getListFromString(String value)
     {
-        return getListFromString(value, ",", false);
+        return getListFromString(value, ",", false, true);
     }
 
     @Override
@@ -192,16 +191,6 @@ public class GroupsClass extends ListClass
         }
 
         return selectlist;
-    }
-
-    @Override
-    public void fromList(BaseProperty<?> property, List<String> list)
-    {
-        if (isMultiSelect()) {
-            property.setValue(list != null ? StringUtils.join(list, ',') : null);
-        } else {
-            property.setValue(list != null && !list.isEmpty() ? list.get(0) : null);
-        }
     }
 
     @Override

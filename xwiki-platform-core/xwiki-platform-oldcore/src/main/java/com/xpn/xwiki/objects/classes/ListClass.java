@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
@@ -325,6 +326,22 @@ public abstract class ListClass extends PropertyClass
      */
     public static List<String> getListFromString(String value, String separators, boolean withMap)
     {
+        return ListClass.getListFromString(value, separators, withMap, false);
+    }
+
+    /**
+     * @param value the string holding a serialized list
+     * @param separators the separator characters (given as a string) used to delimit the list's items inside the input
+     *            string. These separators can also be present, in escaped ({@value #SEPARATOR_ESCAPE}) form, inside
+     *            list items
+     * @param withMap set to true if the list's values contain map entries (key=value pairs) that should also be parsed.
+     *            Only the keys are extracted from such list items
+     * @param filterEmptyValues {@code true} if the result should not contain any empty values.
+     * @return the list that was stored in the input string
+     */
+    protected static List<String> getListFromString(String value, String separators, boolean withMap,
+        boolean filterEmptyValues)
+    {
         List<String> list = new ArrayList<>();
         if (StringUtils.isEmpty(value)) {
             return list;
@@ -371,7 +388,9 @@ public abstract class ListClass extends PropertyClass
                 // in case of two consecutive identical characters different than a whitespace, then it means
                 // we want to record an empty value.
                 if (!inEscape && currentChar == previousSeparator && !StringUtils.isWhitespace(currentChar + "")) {
-                    list.add("");
+                    if (!filterEmptyValues) {
+                        list.add("");
+                    }
                     previousWasSeparator = false;
                 }
                 previousSeparator = currentChar;
@@ -379,7 +398,9 @@ public abstract class ListClass extends PropertyClass
             // if we are finding a separator and we are not in escape mode, then we finished to parse one value
             // we are adding the value to the result, and start a new value to parse
             } else if (StringUtils.containsAny(separators, currentChar) && !inEscape) {
-                list.add(currentValue.toString());
+                if (!filterEmptyValues || !StringUtils.isEmpty(currentValue.toString())) {
+                    list.add(currentValue.toString());
+                }
                 currentValue = new StringBuilder();
                 inMapValue = false;
                 previousWasSeparator = true;
@@ -404,7 +425,9 @@ public abstract class ListClass extends PropertyClass
             }
         }
         // don't forget to add the latest value in the result.
-        list.add(currentValue.toString());
+        if (!filterEmptyValues || !StringUtils.isEmpty(currentValue.toString())) {
+            list.add(currentValue.toString());
+        }
 
         return list;
     }
@@ -974,10 +997,46 @@ public abstract class ListClass extends PropertyClass
      */
     public void fromList(BaseProperty<?> property, List<String> list)
     {
-        if (property instanceof ListProperty) {
-            ((ListProperty) property).setList(list);
+        fromList(property, list, false);
+    }
+
+    /**
+     * Set the passed {@link List} into the passed property.
+     *
+     * @param property the property to modify
+     * @param list the list to set
+     * @param filterEmptyValues if {@code true} filter out the empty values from the list.
+     * @since 14.2RC1
+     */
+    protected void fromList(BaseProperty<?> property, List<String> list, boolean filterEmptyValues)
+    {
+        if (list == null && !(property instanceof ListProperty)) {
+            property.setValue(null);
         } else {
-            property.setValue(list == null || list.isEmpty() ? null : list.get(0));
+            List<String> actualList;
+            if (filterEmptyValues && list != null) {
+                actualList = list.stream().filter(item -> !StringUtils.isEmpty(item)).collect(Collectors.toList());
+            } else {
+                actualList = list;
+            }
+
+            if (property instanceof ListProperty) {
+                ((ListProperty) property).setList(actualList);
+            } else if (isMultiSelect()) {
+                // We don't rely on the default separator here, as we want to use the given separator from the class
+                // which not might the default.
+                // TODO: maybe we should do the same in #getStringFromList which takes a single argument?
+                String separator;
+                if (!StringUtils.isEmpty(getSeparators())) {
+                    separator = String.valueOf(getSeparators().charAt(0));
+                } else {
+                    separator = DEFAULT_SEPARATOR;
+                }
+
+                property.setValue(getStringFromList(actualList, separator));
+            } else {
+                property.setValue(actualList.isEmpty() ? null : actualList.get(0));
+            }
         }
     }
 

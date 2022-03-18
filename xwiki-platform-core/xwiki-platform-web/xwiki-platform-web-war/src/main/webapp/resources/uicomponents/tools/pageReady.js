@@ -29,7 +29,7 @@ define('xwiki-page-ready', [], function() {
   });
 
   let delayCount = 0, pendingDelays = new Map(), pageReadyTimeout;
-  const delayPageReady = (promise, reason) => {
+  let delayPageReady = (promise, reason) => {
     clearTimeout(pageReadyTimeout);
     const delayId = delayCount++;
     pendingDelays.set(delayId, reason);
@@ -48,8 +48,18 @@ define('xwiki-page-ready', [], function() {
     pageReadyPromise.then(callback).catch(() => {});
   };
 
+  afterPageReady(() => {
+    // You cannot delay the page ready after the page is ready.
+    delayPageReady = () => {};
+  });
+
   // We put it on the window in order to be accessible from the parent window when the page is loaded inside an iframe.
-  return window.xwikiPageReady = {delayPageReady, getPendingDelays, afterPageReady};
+  return window.xwikiPageReady = {
+    delayPageReady: function() {
+      // We don't expose the internal delayPageReady because we want to modify it after the page is ready.
+      return delayPageReady.apply(this, arguments);
+    },
+    getPendingDelays, afterPageReady};
 });
 
 /**
@@ -100,9 +110,8 @@ require(['xwiki-page-ready'], function(pageReady) {
       }
       return originalOpen.apply(this, arguments);
     };
-    return () => {
-      window.XMLHttpRequest.prototype.open = originalOpen;
-    };
+    // We cannot restore the original open because it may be overwritten by some other code.
+    return () => {};
   };
 
   let interceptedFetch;
@@ -122,9 +131,8 @@ require(['xwiki-page-ready'], function(pageReady) {
       }
       return fetchPromise;
     };
-    return () => {
-      window.fetch = originalFetch;
-    };
+    // We cannot restore the original fetch because it may be overwritten by some other code.
+    return () => {};
   };
 
   const interceptScriptLoad = function() {

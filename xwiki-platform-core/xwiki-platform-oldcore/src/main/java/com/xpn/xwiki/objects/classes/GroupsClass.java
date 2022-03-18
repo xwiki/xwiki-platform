@@ -51,6 +51,8 @@ public class GroupsClass extends ListClass
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupsClass.class);
 
+    private static final String COMMA = ",";
+
     /**
      * The meta property that specifies if the list box that is used to select the groups should be filled with all the
      * available groups. This property should not be set when the number of groups is very large.
@@ -69,6 +71,8 @@ public class GroupsClass extends ListClass
         setSize(20);
         setDisplayType("input");
         setPicker(true);
+        setSeparator(COMMA);
+        setSeparators(COMMA);
     }
 
     /**
@@ -169,7 +173,7 @@ public class GroupsClass extends ListClass
      */
     public static List<String> getListFromString(String value)
     {
-        return getListFromString(value, ",", false, true);
+        return getListFromString(value, COMMA, false, true);
     }
 
     @Override

@@ -50,10 +50,14 @@ public class LevelsClass extends ListClass
 
     private static final String XCLASSNAME = "levelslist";
 
+    private static final String COMMA = ",";
+
     public LevelsClass(PropertyMetaClass wclass)
     {
         super(XCLASSNAME, "Levels List", wclass);
         setSize(6);
+        setSeparator(COMMA);
+        setSeparators(COMMA);
     }
 
     public LevelsClass()
@@ -121,7 +125,7 @@ public class LevelsClass extends ListClass
 
     public static List<String> getListFromString(String value)
     {
-        return getListFromString(value, ",", false, true);
+        return getListFromString(value, COMMA, false, true);
     }
 
     @Override

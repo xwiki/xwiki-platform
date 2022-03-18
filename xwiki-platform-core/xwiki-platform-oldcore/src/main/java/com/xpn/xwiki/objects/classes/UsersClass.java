@@ -19,13 +19,12 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +56,8 @@ public class UsersClass extends ListClass
      */
     private static final String META_PROPERTY_USES_LIST = "usesList";
 
+    private static final String COMMA = ",";
+
     /**
      * Creates a new Users List property that is described by the given meta class.
      *
@@ -77,6 +78,12 @@ public class UsersClass extends ListClass
     public UsersClass()
     {
         this(null);
+    }
+
+    @Override
+    protected String getFirstSeparator()
+    {
+        return COMMA;
     }
 
     @Override
@@ -157,15 +164,16 @@ public class UsersClass extends ListClass
     @Override
     public BaseProperty fromStringArray(String[] strings)
     {
-        List<String> list = new ArrayList<>();
-        for (int i = 0; i < strings.length; i++) {
-            if (!StringUtils.isBlank(strings[i])) {
-                list.add(strings[i]);
-            }
-        }
+        List<String> list = Arrays.asList(strings);
         BaseProperty prop = newProperty();
-        prop.setValue(StringUtils.join(list, ','));
+        fromList(prop, list);
         return prop;
+    }
+
+    @Override
+    public void fromList(BaseProperty<?> property, List<String> list)
+    {
+        fromList(property, list, true);
     }
 
     /**
@@ -186,7 +194,7 @@ public class UsersClass extends ListClass
      */
     public static List<String> getListFromString(String value)
     {
-        return getListFromString(value, ",", false);
+        return getListFromString(value, COMMA, false, true);
     }
 
     @Override
@@ -208,16 +216,6 @@ public class UsersClass extends ListClass
         }
 
         return selectlist;
-    }
-
-    @Override
-    public void fromList(BaseProperty<?> property, List<String> list)
-    {
-        if (isMultiSelect()) {
-            property.setValue(list != null ? StringUtils.join(list, ',') : null);
-        } else {
-            property.setValue(list != null && !list.isEmpty() ? list.get(0) : null);
-        }
     }
 
     @Override

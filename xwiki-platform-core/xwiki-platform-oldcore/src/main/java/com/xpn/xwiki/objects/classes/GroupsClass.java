@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +50,8 @@ public class GroupsClass extends ListClass
 
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupsClass.class);
+
+    private static final String COMMA = ",";
 
     /**
      * The meta property that specifies if the list box that is used to select the groups should be filled with all the
@@ -78,6 +79,12 @@ public class GroupsClass extends ListClass
     public GroupsClass()
     {
         this(null);
+    }
+
+    @Override
+    protected String getFirstSeparator()
+    {
+        return COMMA;
     }
 
     @Override
@@ -149,6 +156,12 @@ public class GroupsClass extends ListClass
         return prop;
     }
 
+    @Override
+    public void fromList(BaseProperty<?> property, List<String> list)
+    {
+        fromList(property, list, true);
+    }
+
     /**
      * @param value a group string reference
      * @param context the XWiki context
@@ -170,7 +183,7 @@ public class GroupsClass extends ListClass
      */
     public static List<String> getListFromString(String value)
     {
-        return getListFromString(value, ",", false);
+        return getListFromString(value, COMMA, false, true);
     }
 
     @Override
@@ -192,16 +205,6 @@ public class GroupsClass extends ListClass
         }
 
         return selectlist;
-    }
-
-    @Override
-    public void fromList(BaseProperty<?> property, List<String> list)
-    {
-        if (isMultiSelect()) {
-            property.setValue(list != null ? StringUtils.join(list, ',') : null);
-        } else {
-            property.setValue(list != null && !list.isEmpty() ? list.get(0) : null);
-        }
     }
 
     @Override

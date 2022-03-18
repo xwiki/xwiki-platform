@@ -50,13 +50,13 @@ public class UsersClass extends ListClass
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(UsersClass.class);
 
-    private static final String COMMA = ",";
-
     /**
      * The meta property that specifies if the list box that is used to select the users should be filled with all the
      * available users. This property should not be set when the number of users is very large.
      */
     private static final String META_PROPERTY_USES_LIST = "usesList";
+
+    private static final String COMMA = ",";
 
     /**
      * Creates a new Users List property that is described by the given meta class.
@@ -70,8 +70,6 @@ public class UsersClass extends ListClass
         setSize(20);
         setDisplayType("input");
         setPicker(true);
-        setSeparator(COMMA);
-        setSeparators(COMMA);
     }
 
     /**
@@ -80,6 +78,12 @@ public class UsersClass extends ListClass
     public UsersClass()
     {
         this(null);
+    }
+
+    @Override
+    protected String getFirstSeparator()
+    {
+        return COMMA;
     }
 
     @Override

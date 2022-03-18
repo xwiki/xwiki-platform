@@ -71,8 +71,6 @@ public class GroupsClass extends ListClass
         setSize(20);
         setDisplayType("input");
         setPicker(true);
-        setSeparator(COMMA);
-        setSeparators(COMMA);
     }
 
     /**
@@ -81,6 +79,12 @@ public class GroupsClass extends ListClass
     public GroupsClass()
     {
         this(null);
+    }
+
+    @Override
+    protected String getFirstSeparator()
+    {
+        return COMMA;
     }
 
     @Override

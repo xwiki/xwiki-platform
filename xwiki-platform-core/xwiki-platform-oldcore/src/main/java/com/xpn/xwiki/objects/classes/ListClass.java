@@ -316,6 +316,21 @@ public abstract class ListClass extends PropertyClass
     }
 
     /**
+     * @return the first separator of the list of separators, or fallback on {@link #DEFAULT_SEPARATOR}.
+     * @since 14.2RC1
+     */
+    protected String getFirstSeparator()
+    {
+        String separator;
+        if (!StringUtils.isEmpty(getSeparators())) {
+            separator = String.valueOf(getSeparators().charAt(0));
+        } else {
+            separator = DEFAULT_SEPARATOR;
+        }
+        return separator;
+    }
+
+    /**
      * @param value the string holding a serialized list
      * @param separators the separator characters (given as a string) used to delimit the list's items inside the input
      *            string. These separators can also be present, in escaped ({@value #SEPARATOR_ESCAPE}) form, inside
@@ -1024,17 +1039,7 @@ public abstract class ListClass extends PropertyClass
             if (property instanceof ListProperty) {
                 ((ListProperty) property).setList(actualList);
             } else if (isMultiSelect()) {
-                // We don't rely on the default separator here, as we want to use the given separator from the class
-                // which not might the default.
-                // TODO: maybe we should do the same in #getStringFromList which takes a single argument?
-                String separator;
-                if (!StringUtils.isEmpty(getSeparators())) {
-                    separator = String.valueOf(getSeparators().charAt(0));
-                } else {
-                    separator = DEFAULT_SEPARATOR;
-                }
-
-                property.setValue(getStringFromList(actualList, separator));
+                property.setValue(getStringFromList(actualList, getFirstSeparator()));
             } else {
                 property.setValue(actualList.isEmpty() ? null : actualList.get(0));
             }

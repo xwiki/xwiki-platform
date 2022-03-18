@@ -56,13 +56,17 @@ public class LevelsClass extends ListClass
     {
         super(XCLASSNAME, "Levels List", wclass);
         setSize(6);
-        setSeparator(COMMA);
-        setSeparators(COMMA);
     }
 
     public LevelsClass()
     {
         this(null);
+    }
+
+    @Override
+    protected String getFirstSeparator()
+    {
+        return COMMA;
     }
 
     @Override

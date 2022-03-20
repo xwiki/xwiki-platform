@@ -1,1 +1,64 @@
+<?xml version="1.1" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.EditTranslations" locale="ko">
+  <web>XWiki</web>
+  <name>EditTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: edit.inplace.close=Close
+edit.inplace.page.lockFailed=페이지를 잠그지 못했습니다.
+edit.inplace.page.loadFailed=페이지를 로드하지 못했습니다.
+### Missing: edit.inplace.page.renderFailed=Failed to render the page.
+### Missing: edit.inplace.page.translate.messageBefore=You''re editing the {0} translation of this page (its original version) because this page has not been translated in {1} (the current locale) yet.
+### Missing: edit.inplace.page.translate.messageAfter=You''re now editing the {0} translation. Start by translating the page title.
+### Missing: edit.inplace.actionButtons.loadFailed=Failed to load the action buttons.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 12.10.5, 13.1
+#######################################
+### Missing: edit.inplace.page.original=You''re editing the original page ({0})
+### Missing: edit.inplace.page.translation=You''re editing the following translation: {0}.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  </xwikidoc>

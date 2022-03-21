@@ -111,7 +111,10 @@
     <!-- Versions of other software we need in our functional tests -->
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://downloadarchive.documentfoundation.org/libreoffice/old/ -->
-    <libreoffice.version>7.1.7.2</libreoffice.version>
+    <libreoffice.version>7.2.6.2</libreoffice.version>
+
+    <!-- Only needed for the Gradle cache, see the surefire plugin configuration below for more details -->
+    <xwiki.test.ui.browser></xwiki.test.ui.browser>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -945,6 +948,14 @@
               <property>
                 <name>xwiki.surefire.captureconsole.skip</name>
                 <value>${xwiki.surefire.captureconsole.skip}</value>
+              </property>
+              <!-- The following system properties are needed only for the Gradle cache so that they are taken into
+                   accounts as cache inputs and so that different executions with different system properties are
+                   considered differents and thus not served from the same cache.
+                   See https://github.com/gradle/gradle/issues/20109 -->
+              <property>
+                <name>xwiki.test.ui.browser</name>
+                <value>${xwiki.test.ui.browser}</value>
               </property>
             </systemProperties>
           </configuration>

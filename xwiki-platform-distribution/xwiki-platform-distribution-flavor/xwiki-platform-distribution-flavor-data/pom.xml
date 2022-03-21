@@ -161,6 +161,12 @@
               <artifactId>xwiki-platform-ratings-api</artifactId>
               <version>${project.version}</version>
             </dependency>
+            <!-- Used to process the document analysis tasks (e.g., backlinks indexing). -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-index-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
           </dependencies>
           <executions>
             <execution>

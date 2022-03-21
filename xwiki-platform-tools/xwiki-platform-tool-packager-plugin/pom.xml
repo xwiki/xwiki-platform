@@ -358,6 +358,12 @@
       <version>${commons.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed to wait for document backlink indexation queue to be consumed. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Dependencies not needed by the plugin itself but included in the WAR it generates,
          listed to be sure it's built before the plugin -->
     <dependency>

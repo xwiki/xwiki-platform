@@ -164,7 +164,12 @@ public class UsersClass extends ListClass
     @Override
     public BaseProperty fromStringArray(String[] strings)
     {
-        List<String> list = Arrays.asList(strings);
+        List<String> list;
+        if ((strings.length == 1) && (getDisplayType().equals(DISPLAYTYPE_INPUT) || isMultiSelect())) {
+            list = getListFromString(strings[0], getSeparators(), false);
+        } else {
+            list = Arrays.asList(strings);
+        }
         BaseProperty prop = newProperty();
         fromList(prop, list);
         return prop;

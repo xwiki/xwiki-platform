@@ -1,0 +1,438 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.PDFExport.WebHome" locale="">
+  <web>XWiki.PDFExport</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>XWiki.PDFExport.WebHome</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>57ca008e-5189-4605-aae7-e96467904c44</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('xwiki-pdf-export-messages', {
+  keys: [
+    'core.export.pdf.options.title',
+    'export.pdf.options.template',
+    'export.pdf.options.template.hint',
+    'export.pdf.options.loadFailure',
+    'export.pdf.modal.close',
+    'export.pdf.inProgress'
+  ]
+});
+
+define('xwiki-pdf-export-config', ['jquery'], function($) {
+  try {
+    return JSON.parse($('#pdfExportConfig').text());
+  } catch (e) {
+    console.error(e);
+    return {};
+  }
+});
+
+require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messages', 'bootstrap'], function($, config, l10n) {
+  const pdfExportOptionsModal = $(`
+    &lt;form class="modal xform" id="pdfExportOptions" tabindex="-1" role="dialog"
+        aria-labelledby="pdfExportOptionsTitle"&gt;
+      &lt;div class="modal-dialog" role="document"&gt;
+        &lt;div class="modal-content"&gt;
+          &lt;div class="modal-header"&gt;
+            &lt;button type="button" class="close" data-dismiss="modal"&gt;
+              &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;h4 class="modal-title" id="pdfExportOptionsTitle"&gt;&lt;/h4&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-body loading"&gt;&lt;/div&gt;
+          &lt;div class="modal-footer"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+  `);
+  pdfExportOptionsModal.find('button.close').attr({
+    'title': l10n['export.pdf.modal.close'],
+    'aria-label': l10n['export.pdf.modal.close']
+  });
+  pdfExportOptionsModal.find('.modal-title').text(l10n['core.export.pdf.options.title']);
+  // Fade only on hide. We don't want to fade on show because we want the transition from the Export modal (previous
+  // step) to be fast and smooth.
+  pdfExportOptionsModal.on('shown.bs.modal', function() {
+    // We need the fade CSS class name on the backdrop also, otherwise we get an ugly flicker when the modal is hidden.
+    pdfExportOptionsModal.add('.modal-backdrop.in').addClass('fade');
+  });
+
+  const templateOption = $(`
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for="pdfTemplate"&gt;&lt;/label&gt;
+        &lt;span class="xHint"&gt;&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;select id="pdfTemplate" name="template"&gt;&lt;/select&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+  `);
+  templateOption.find('label').text(l10n['export.pdf.options.template']);
+  templateOption.find('.xHint').text(l10n['export.pdf.options.template.hint']);
+  if (Array.isArray(config.templates)) {
+    const select = templateOption.find('select');
+    config.templates.forEach(template =&gt; {
+      $('&lt;option&gt;&lt;/option&gt;').text(template.label).attr('value', template.value).appendTo(select);
+    });
+    // Select the first option by default.
+    select.find('option').first().attr('selected', 'selected');
+  }
+
+  const openPDFOptionsModal = function(url) {
+    // Disable the animation on show in order to have a smooth transition from the previous modal.
+    pdfExportOptionsModal.removeClass('fade').modal();
+    if (!pdfExportOptionsModal.find('.modal-body').hasClass('loading')) {
+      // The modal is already loaded and initialized.
+      return;
+    }
+    $('&lt;div&gt;&lt;/div&gt;').load(url + ' #pdfExportOptions', function() {
+      const form = $(this).find('#pdfExportOptions');
+      if (form.length) {
+        form.find('.buttons').appendTo(pdfExportOptionsModal.find('.modal-footer'));
+        // Hide useless options.
+        form.find('#comments, #attachments').closest('dt').hide().parent().css('margin-bottom', '0');
+        // Add the template option.
+        form.find('dl').prepend(templateOption.contents());
+        pdfExportOptionsModal.attr('action', form.attr('action'));
+        pdfExportOptionsModal.find('.modal-body').removeClass('loading').append(form.contents());
+      } else {
+        new XWiki.widgets.Notification(l10n['export.pdf.options.loadFailure'], 'error');
+        pdfExportOptionsModal.modal('hide');
+      }
+    });
+  };
+
+  pdfExportOptionsModal.on('submit', event =&gt; {
+    event.preventDefault();
+    $('body').css('cursor', 'wait');
+    const notification = new XWiki.widgets.Notification(l10n['export.pdf.inProgress'], 'inprogress');
+    pdfExportOptionsModal.find('input[type=submit]').prop('disabled', true);
+    const iframe = $('&lt;iframe/&gt;').css({
+      'visibility': 'hidden'
+    }).on('load', () =&gt; {
+      iframe[0].contentWindow.xwikiPageReady.afterPageReady(() =&gt; {
+        pdfExportOptionsModal.find('input[type=submit]').prop('disabled', false);
+        notification.hide();
+        $('body').css('cursor', '');
+        iframe[0].contentWindow.print();
+        iframe.remove();
+      });
+    });
+    const exportURL = XWiki.currentDocument.getURL('get', $.param({
+      sheet: 'XWiki.PDFExport.Sheet',
+      outputSyntax: 'plain',
+      template: 'XWiki.PDFExport.Template'
+    })) + '&amp;' + pdfExportOptionsModal.serialize();
+    iframe.attr('src', exportURL).appendTo($('body'));
+  });
+
+  pdfExportOptionsModal.on('click', 'a.secondary.button', event =&gt; {
+    event.preventDefault();
+    pdfExportOptionsModal.modal('hide');
+  });
+
+  $('#exportModal a[href*="xpage=pdfoptions"]').on('click', event =&gt; {
+    event.preventDefault();
+    // Show the PDF Export Options modal only after the Export modal is completely hidden, otherwise the code that hides
+    // the Export modal can revert changes done by the code that shows the PDF Export Options modal (e.g. we loose the
+    // 'modal-open' CSS class on the BODY element which is needed in order to hide the page scrollbars).
+    $('#exportModal').one('hidden.bs.modal', () =&gt; {
+      // Enable the animation back for the next time the Export modal is shown.
+      $('#exportModal').addClass('fade');
+      openPDFOptionsModal($(event.target).attr('href'));
+    // Disable the animation when moving to the next step (PDF Export Options) in order to have a smooth transition.
+    }).removeClass('fade').modal('hide');
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.PDFExport.WebHome</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>7272898b-2569-49db-8899-4156ad57a03c</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}
+{{html clean="false"}}
+#set ($discard = $xwiki.jsx.use('XWiki.PDFExport.WebHome'))
+#set ($configClassRef = 'XWiki.PDFExport.ConfigurationClass')
+#set ($configLocalRef = 'XWiki.PDFExport.Configuration')
+#set ($configRef = $services.model.resolveDocument($configLocalRef))
+#set ($configObj = $xwiki.getDocument($configRef).getObject($configClassRef))
+#set ($templates = [])
+#foreach ($template in $configObj.getValue('templates'))
+  #if ($services.security.authorization.hasAccess('view', $template))
+    #set ($discard = $templates.add({
+      'label': $xwiki.getDocument($template).plainTitle,
+      'value': $template
+    }))
+  #end
+#end
+#set ($config = {
+  'templates': $templates
+})
+&lt;script id="pdfExportConfig" type="application/json"&gt;$jsontool.serialize($config).replace(
+  '&lt;', '\u003C')&lt;/script&gt;
+{{/html}}
+{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.plaftorm.menu.export.buttons</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.export.pdf.buttons</name>
+    </property>
+    <property>
+      <parameters>category=office</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

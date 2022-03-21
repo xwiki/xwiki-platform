@@ -40,6 +40,7 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -116,7 +117,13 @@ public class LevelsClass extends ListClass
     @Override
     public BaseProperty fromStringArray(String[] strings)
     {
-        List<String> list = Arrays.asList(strings);
+        List<String> list;
+        if ((strings.length == 1) && (getDisplayType().equals(DISPLAYTYPE_INPUT) || isMultiSelect())) {
+            list = getListFromString(strings[0], getSeparators(), false);
+        } else {
+            list = Arrays.asList(strings);
+        }
+
         BaseProperty prop = newProperty();
         fromList(prop, list, true);
         return prop;

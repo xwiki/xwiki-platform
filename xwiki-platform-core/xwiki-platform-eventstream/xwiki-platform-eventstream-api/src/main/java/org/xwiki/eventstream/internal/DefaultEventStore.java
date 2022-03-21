@@ -28,7 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -83,6 +83,9 @@ public class DefaultEventStore implements EventStore, Initializable
     @Inject
     private Execution execution;
 
+    @Inject
+    private Logger logger;
+
     private EventStore legacyStore;
 
     private EventStore store;
@@ -93,13 +96,16 @@ public class DefaultEventStore implements EventStore, Initializable
         if (this.configuration.isEventStoreEnabled()) {
             String hint = this.configuration.getEventStore();
 
-            if (StringUtils.isNotEmpty(hint)) {
-                try {
-                    this.store =
-                        this.componentManager.getInstance(EventStore.class, this.configuration.getEventStore());
-                } catch (ComponentLookupException e) {
+            try {
+                this.store = this.componentManager.getInstance(EventStore.class, hint);
+            } catch (ComponentLookupException e) {
+                if (this.configuration.isEventStoreSet()) {
+                    // Fail the init if the store was explicitly configured
                     throw new InitializationException(
                         String.format("Failed to get the configured event store [%s]", hint), e);
+                } else {
+                    // Ignore the failure if the store was not explicitly configured
+                    this.logger.warn("No default implementation of EventStore could be lookup", e);
                 }
             }
         }

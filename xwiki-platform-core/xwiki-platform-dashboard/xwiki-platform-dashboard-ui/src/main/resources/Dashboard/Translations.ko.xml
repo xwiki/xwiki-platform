@@ -41,7 +41,7 @@ dashboard.gadgetSelector.title=가젯 선택
 dashboard.gadgetEditor.title=가젯 편집
 dashboard.gadgetEditor.changeGadget.label=가젯 변경
 dashboard.gadgetEditor.gadgetTitle.label=가젯 제목
-dashboard.gadgetEditor.gadgetTitle.hint=이 Gadget의 제목은 대시보드의 Gadget 패널 맨 위에 나타납니다(velocity code를 포함할 수 있음)
+dashboard.gadgetEditor.gadgetTitle.hint=이 Gadget의 제목은 대시보드의 Gadget 패널 맨 위에 나타납니다(velocity code를 포함할 수 있음).
 dashboard.initialization.saveMessage=기본 대시보드 사용자 설정을 초기화합니다
 </content>
 </xwikidoc>

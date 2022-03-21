@@ -100,7 +100,9 @@ public class DataMojo extends AbstractOldCoreMojo
                 ((DefaultTasksManager) taskManager).startThread();
             }
 
-            getLog().info("Waiting for the document indexing queue to be empty...");
+            getLog().info(
+                String.format("Waiting for the document indexing queue of size %d to be empty...",
+                    taskManager.getQueueSize()));
             while (taskManager.getQueueSize() > 0) {
                 Thread.sleep(100);
             }

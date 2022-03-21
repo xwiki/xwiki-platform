@@ -184,6 +184,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private Map<String, String[]> validTypesMap = new HashMap<>();
 
     /**
+     * Use the store the status of the XWikiLink table at startup. If this table is empty, this means that the links
+     * needs to be indexed. The {@code null} value means that the XWikiLink table row needs to be counted. {@code false}
+     * if the table is not empty, {@code true} if it is.
+     * <p>
+     * This field is initialized lazily to make sure that the database connection is properly initialized before
+     * accessing it.
+     */
+    private Boolean emptyXWikiLink;
+
+    /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
      *
@@ -2303,6 +2313,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public void saveLinks(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
+        initializeEmptyXWikiLink(context);
 
         try {
             if (bTransaction) {
@@ -3455,7 +3466,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return this.store.getLimitSize(entityType, propertyName);
     }
     
-    private long countLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
+    private long countLinks(Long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
@@ -3467,9 +3478,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
-            Query<Long> query =
-                session.createQuery("select count(*) from XWikiLink as link where link.id.docId = :docId")
-                    .setParameter("docId", docId);
+            String queryString = "select count(*) from XWikiLink as link";
+            if (docId != null) {
+                queryString += " where link.id.docId = :docId";
+            }
+            Query<Long> query = session.createQuery(queryString);
+            if (docId != null) {
+                query = query.setParameter("docId", docId);
+            }
             count = query.getSingleResult();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -3486,5 +3502,25 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
 
         return count;
+    }
+
+    @Override
+    public boolean isXWikiLinkEmpty(XWikiContext inputxcontext) throws XWikiException
+    {
+        initializeEmptyXWikiLink(getExecutionXContext(inputxcontext, false));
+        Boolean result = this.emptyXWikiLink;
+        if (Objects.equals(this.emptyXWikiLink, Boolean.TRUE)) {
+            // We know that as soon as the true value is returned, the XWikiLink table will be populated and 
+            // will not be empty anymore. Hence, the emptyXWikiLink value is updated right away.
+            this.emptyXWikiLink = false;
+        }
+        return result;
+    }
+
+    private void initializeEmptyXWikiLink(XWikiContext context) throws XWikiException
+    {
+        if (this.emptyXWikiLink == null && context.isMainWiki()) {
+            this.emptyXWikiLink = countLinks(null, context, true) == 0L;
+        }
     }
 }

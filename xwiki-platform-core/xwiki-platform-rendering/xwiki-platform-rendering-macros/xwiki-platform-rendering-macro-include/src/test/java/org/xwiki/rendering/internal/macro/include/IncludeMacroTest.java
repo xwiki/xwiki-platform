@@ -290,6 +290,51 @@ public class IncludeMacroTest
         verify(this.dab).popDocumentFromContext(any(Map.class));
     }
 
+    /**
+     * Verify that ids are adapted if they would duplicate an id of the parent document.
+     */
+    @Test
+    void adaptIdsOfIncludedHeadingsAndImages() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginSection\n"
+            + "beginHeader [1, HHeading-1]\n"
+            + "onWord [Heading]\n"
+            + "endHeader [1, HHeading-1]\n"
+            + "beginParagraph\n"
+            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true] [Itest.png-1]\n"
+            + "endParagraph\n"
+            + "endSection\n"
+            + "endMetaData [[base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        String documentContent = "= Heading =\n"
+            + "image:test.png";
+
+        DocumentReference includedDocumentReference =
+            new DocumentReference("includedWiki", "includedSpace", "includedPage");
+        setupDocumentMocks("includedWiki:includedSpace.includedPage", includedDocumentReference,
+            documentContent);
+        when(this.dab.getCurrentDocumentReference()).thenReturn(includedDocumentReference);
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("includedWiki:includedSpace.includedPage");
+        parameters.setContext(Context.NEW);
+
+        MacroTransformationContext context = createMacroTransformationContext("whatever", false);
+        // Initialize XDOM with ids from the including page.
+        context.setXDOM(getXDOM(documentContent));
+
+        List<Block> blocks = this.includeMacro.execute(parameters, null, context);
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+        verify(this.dab).pushDocumentInContext(any(Map.class), any(DocumentModelBridge.class));
+        verify(this.dab).popDocumentFromContext(any(Map.class));
+    }
+
     @Test
     void executeWithRecursiveIncludeContextCurrent() throws Exception
     {

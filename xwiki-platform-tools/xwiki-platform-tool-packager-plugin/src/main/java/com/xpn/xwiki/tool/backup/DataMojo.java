@@ -93,7 +93,7 @@ public class DataMojo extends AbstractOldCoreMojo
         ComponentManager componentManager =
             (ComponentManager) this.oldCoreHelper.getXWikiContext().get(ComponentManager.class.getName());
         try {
-            // Manually start the consumer threads as it is not automatically started in the packaging setup.
+            // Manually starts the consumer thread as it is not automatically started in the packaging setup.
             // This is also convenient as we can be sure that the tasks are all queued before being consumed.
             TaskManager taskManager = componentManager.getInstance(TaskManager.class);
             if (taskManager instanceof DefaultTasksManager) {

@@ -290,6 +290,40 @@ public class DisplayMacroTest
     }
 
     @Test
+    void adaptIdsOfDisplayedHeadings() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginSection\n"
+            + "beginHeader [1, HHeading-1]\n"
+            + "onWord [Heading]\n"
+            + "endHeader [1, HHeading-1]\n"
+            + "endSection\n"
+            + "endMetaData [[base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        String documentContent = "= Heading =";
+
+        DocumentReference includedDocumentReference =
+            new DocumentReference("includedWiki", "includedSpace", "includedPage");
+        setupDocumentMocks("includedWiki:includedSpace.includedPage", includedDocumentReference,
+            documentContent);
+
+        DisplayMacroParameters parameters = new DisplayMacroParameters();
+        parameters.setReference("includedWiki:includedSpace.includedPage");
+
+        MacroTransformationContext context = createMacroTransformationContext("whatever", false);
+        // Initialize XDOM with ids from the including page.
+        context.setXDOM(getXDOM(documentContent));
+
+        List<Block> blocks = this.displayMacro.execute(parameters, null, context);
+
+        BlockAssert.assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
     public void executeWhenSectionSpecified() throws Exception
     {
         // @formatter:off

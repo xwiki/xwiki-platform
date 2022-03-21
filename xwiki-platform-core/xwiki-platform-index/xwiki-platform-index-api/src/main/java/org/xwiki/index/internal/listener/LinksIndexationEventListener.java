@@ -79,7 +79,7 @@ public class LinksIndexationEventListener implements EventListener
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
-    protected Logger logger;
+    private Logger logger;
 
     @Override
     public String getName()
@@ -104,7 +104,7 @@ public class LinksIndexationEventListener implements EventListener
             }
         } catch (XWikiException e) {
             this.logger.warn(
-                "Failed to access the database to count the number of entires in the XWikiLink table. Cause: [{}].",
+                "Failed to access the database to count the number of entries in the XWikiLink table. Cause: [{}].",
                 getRootCauseMessage(e));
         }
     }

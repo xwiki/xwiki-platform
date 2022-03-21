@@ -188,7 +188,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * needs to be indexed. The {@code null} value means that the XWikiLink table row needs to be counted. {@code false}
      * if the table is not empty, {@code true} if it is.
      * <p>
-     * This field is initialized lazyly to make sure that the database connection is properly initialized before
+     * This field is initialized lazily to make sure that the database connection is properly initialized before
      * accessing it.
      */
     private Boolean emptyXWikiLink;
@@ -3465,7 +3465,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         return this.store.getLimitSize(entityType, propertyName);
     }
-
+    
     private long countLinks(Long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
@@ -3508,13 +3508,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public boolean isXWikiLinkEmpty(XWikiContext inputxcontext) throws XWikiException
     {
         initializeEmptyXWikiLink(getExecutionXContext(inputxcontext, false));
-        Boolean emptyXWikiLink = this.emptyXWikiLink;
-        if (Objects.equals(this.emptyXWikiLink, Boolean.FALSE)) {
+        Boolean result = this.emptyXWikiLink;
+        if (Objects.equals(this.emptyXWikiLink, Boolean.TRUE)) {
             // We know that as soon as the true value is returned, the XWikiLink table will be populated and 
             // will not be empty anymore. Hence, the emptyXWikiLink value is updated right away.
             this.emptyXWikiLink = false;
         }
-        return emptyXWikiLink;
+        return result;
     }
 
     private void initializeEmptyXWikiLink(XWikiContext context) throws XWikiException

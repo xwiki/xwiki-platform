@@ -108,6 +108,7 @@ class LightboxIT
         assertEquals("", lightbox.getTitle());
         assertEquals("Posted by JohnDoe", lightbox.getPublisher());
         assertEquals(lastUploadDate, lightbox.getDate());
+        assertEquals("Iimage1.png", lightbox.getImageId());
     }
 
     @Test
@@ -134,6 +135,7 @@ class LightboxIT
         assertEquals(images.get(0), lightbox.getTitle());
         assertEquals("Posted by JohnDoe", lightbox.getPublisher());
         assertEquals(lastUploadDate, lightbox.getDate());
+        assertEquals("Iimage1.png", lightbox.getImageId());
     }
 
     @Test
@@ -160,6 +162,7 @@ class LightboxIT
         assertEquals("", lightbox.getTitle());
         assertEquals("Posted by JohnDoe", lightbox.getPublisher());
         assertEquals(lastUploadDate, lightbox.getDate());
+        assertEquals("Iimage1.png", lightbox.getImageId());
     }
 
     @Test
@@ -178,6 +181,7 @@ class LightboxIT
         assertEquals("", lightbox.getTitle());
         assertEquals("", lightbox.getPublisher());
         assertEquals("", lightbox.getDate());
+        assertEquals("Iaccept", lightbox.getImageId());
     }
 
     @Test
@@ -360,6 +364,27 @@ class LightboxIT
         assertTrue(imagePopover.isPresent());
     }
 
+    @Test
+    @Order(13)
+    void openImageWithManuallyAddedImageId(TestUtils testUtils, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        enableLightbox(testUtils, true);
+
+        testUtils.createPage(testReference, this.getImageWithManuallyAddedImageId(images.get(0)));
+        lightboxPage = new LightboxPage();
+
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
+
+        // Make sure that the images are displayed.
+        lightboxPage.reloadPage();
+
+        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightbox.isDisplayed());
+
+        assertEquals("manuallyAddedImageId", lightbox.getImageId());
+    }
+
     private void enableLightbox(TestUtils testUtils, boolean enable)
     {
         testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
@@ -409,6 +434,20 @@ class LightboxIT
         sb.append("<div data-xwiki-lightbox='false'><img src='/xwiki/resources/icons/silk/accept.png'/></div>\n");
         sb.append("<div><img src='/xwiki/resources/icons/silk/accept.png'/></div>\n");
         sb.append("{{/html}}");
+
+        return sb.toString();
+    }
+
+    private String getImageWithManuallyAddedImageId(String image)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("{{figure}}\n[[image:");
+        sb.append(image);
+        sb.append("||width=120 height=120]]\n\n");
+        sb.append("{{figureCaption}}{{id name=\"manuallyAddedImageId\"/}}\n");
+        sb.append("Caption{{/figureCaption}}\n\n");
+        sb.append("{{/figure}}\n\n");
 
         return sb.toString();
     }

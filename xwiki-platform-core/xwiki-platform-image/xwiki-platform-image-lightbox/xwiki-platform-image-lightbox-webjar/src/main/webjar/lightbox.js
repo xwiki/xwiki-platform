@@ -103,6 +103,7 @@ define('xwiki-lightbox-description', [
    * Update lightbox description using given information.
    */
   var updateDescriptionData = function(imageData, attachmentData) {
+    $('.lightboxDescription .imageId').val(imageData.id);
     updateDescriptionCaption(imageData, attachmentData);
 
     if (attachmentData) {
@@ -231,6 +232,18 @@ define('xwiki-lightbox', [
   };
 
   /**
+   * Extract the image id. Prefer the id manually added to the caption over the automatically generated one.
+   */
+  var getImageId = function(img) {
+    // Select the first caption child element which specifies an id.
+    var figureCaptionIdElement = $(img).closest('figure').find('figcaption').find('[id]')[0];
+    if (figureCaptionIdElement) {
+      return $(figureCaptionIdElement).attr('id');
+    }
+    return $(img).attr('id');
+  };
+
+  /**
    * Rescale image to original size.
    */
   var removeResizeParams = function(imageURL) {
@@ -279,7 +292,8 @@ define('xwiki-lightbox', [
         caption: caption,
         fileName: getImageName(imageURL),
         alt: $(this).attr('alt'),
-        title: $(this).attr('title')
+        title: $(this).attr('title'),
+        id: getImageId(this)
       });
     });
     return slidesData;
@@ -335,6 +349,19 @@ define('xwiki-lightbox', [
 
   $(function() {
     initLightboxFunctionality();
+  });
+
+  $(document).on('click', '#blueimp-gallery .copyImageId', function(event) {
+    event.preventDefault();
+    var copyIdButton = this;
+    var imageId = $(copyIdButton).siblings('.imageId');
+    navigator.clipboard.writeText(imageId.val()).then(function() {
+      // Inform the user that the image ID was copied to clipboard.
+      $(copyIdButton).tooltip('show');
+      setTimeout(function() {
+        $(copyIdButton).tooltip('hide');
+      }, 2000);
+    });
   });
 
   $(document).on('xwiki:dom:updated', function() {

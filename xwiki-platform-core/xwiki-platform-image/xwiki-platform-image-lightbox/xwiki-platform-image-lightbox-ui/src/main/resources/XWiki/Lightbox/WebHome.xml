@@ -463,6 +463,18 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
         &lt;span class="date" data-dateFormat="$dateFormat"
           aria-label="$escapetool.xml($services.localization.render('image.lightbox.date.label'))"&gt;&lt;/span&gt;
       &lt;/div&gt;
+      &lt;div class="descriptionRow"&gt;
+        &lt;div class="input-group"
+            title="$escapetool.xml($services.localization.render('image.lightbox.imageId.copy.title'))"&gt;
+          ## This title attribute will be used as tooltip content, so the displayed title is added to a parent element.
+          &lt;a class="copyImageId input-group-addon" data-toggle="tooltip" data-placement="bottom"
+            data-trigger="manual" data-original-title="$escapetool.xml(
+            $services.localization.render('image.lightbox.imageId.copy.copied'))"
+          &gt;$services.icon.renderHTML('copy')&lt;/a&gt;
+          &lt;input type="text" class="imageId form-control" readonly
+            title="$escapetool.xml($services.localization.render('image.lightbox.imageId.title'))"/&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;ol class="indicator"&gt;&lt;/ol&gt;

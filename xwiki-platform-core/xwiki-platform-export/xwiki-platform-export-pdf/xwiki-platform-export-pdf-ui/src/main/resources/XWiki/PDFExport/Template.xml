@@ -304,6 +304,17 @@ $escapetool.xml($tdoc.plainTitle)
   .pagedjs_page .pagedjs_margin-bottom-center .pagedjs_margin-content::after {
     color: @text-muted !important;
   }
+
+  /**
+   * Landscape Page
+   */
+  @page landscape {
+    size: A4 landscape;
+  }
+
+  .page-landscape {
+    page: landscape;
+  }
 }</code>
     </property>
     <property>

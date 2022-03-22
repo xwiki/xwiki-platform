@@ -124,5 +124,9 @@ public class LevelsClassTest
         expectedProperty.setValue("admin,view");
         expectedProperty.setName("levelslist");
         assertEquals(expectedProperty, levelsClass.fromStringArray(array));
+
+        array = new String[] { "edit,script" };
+        expectedProperty.setValue("edit,script");
+        assertEquals(expectedProperty, levelsClass.fromStringArray(array));
     }
 }

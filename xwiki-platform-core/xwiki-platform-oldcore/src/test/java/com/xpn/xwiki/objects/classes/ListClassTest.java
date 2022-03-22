@@ -31,6 +31,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.StringListProperty;
+import com.xpn.xwiki.objects.StringProperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -293,5 +294,47 @@ class ListClassTest
 
         listClass.fromList(property, strings, true);
         verify(property).setValue("XWiki.Foo~XWiki.Bar");
+    }
+
+    @Test
+    void fromStringArray()
+    {
+        String[] array = new String[] { "Foo||Bar", "Baz,Buz,", " ", "Other", "Thing" };
+        ListClass listClass = new ListClass()
+        {
+            @Override
+            public List<String> getList(XWikiContext context)
+            {
+                return null;
+            }
+
+            @Override
+            public Map<String, ListItem> getMap(XWikiContext context)
+            {
+                return null;
+            }
+        };
+        listClass.setMultiSelect(false);
+        listClass.setSeparators("!");
+        listClass.setName("myList");
+
+        StringProperty expectedProperty = new StringProperty();
+        expectedProperty.setValue("Foo||Bar");
+        expectedProperty.setName("myList");
+
+        assertEquals(expectedProperty, listClass.fromStringArray(array));
+
+        listClass.setSeparators("|,");
+        assertEquals(expectedProperty, listClass.fromStringArray(array));
+
+        listClass.setMultiSelect(true);
+        StringListProperty expectedList = new StringListProperty();
+        expectedList.setName("myList");
+        expectedList.setList(Arrays.asList("Foo||Bar", "Baz,Buz,", "Other", "Thing"));
+        assertEquals(expectedList, listClass.fromStringArray(array));
+
+        array = new String[] { "Foo||Bar" };
+        expectedList.setList(Arrays.asList("Foo", "", "Bar"));
+        assertEquals(expectedList, listClass.fromStringArray(array));
     }
 }

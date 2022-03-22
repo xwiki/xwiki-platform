@@ -608,6 +608,7 @@ public abstract class ListClass extends PropertyClass
             return fromString(strings[0]);
         }
         BaseProperty prop = newProperty();
+        // FIXME: this should be probably removed since we can never reach it.
         if (prop instanceof StringProperty) {
             return fromString(strings[0]);
         }

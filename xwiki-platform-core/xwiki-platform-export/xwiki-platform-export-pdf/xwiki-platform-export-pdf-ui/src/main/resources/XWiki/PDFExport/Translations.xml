@@ -39,13 +39,13 @@
   <hidden>true</hidden>
   <content>export.pdf.options.template=Template
 export.pdf.options.template.hint=The PDF template controls the information displayed on the cover page, in the table of contents as well as in the header and footer of each page.
-
 export.pdf.options.loadFailure=Failed to load the PDF export options.
 
 export.pdf.modal.close=Close
 export.pdf.inProgress=Exporting...
 
 export.pdf.templates.default=Default template
+export.pdf.templates.default.versionInfo=Version {0} authored by {1} on {2}
 export.pdf.template.name=PDF Template
 export.pdf.template.hint=Template used by PDF export
 export.pdf.template.provider=PDF Template Provider

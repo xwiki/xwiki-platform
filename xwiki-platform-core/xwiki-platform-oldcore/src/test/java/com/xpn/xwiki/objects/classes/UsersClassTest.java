@@ -103,5 +103,9 @@ class UsersClassTest
         expectedProperty.setValue("XWiki.Foo,XWiki.Bar");
         expectedProperty.setName("userslist");
         assertEquals(expectedProperty, usersClass.fromStringArray(array));
+
+        array = new String[] {"XWiki.Foo,XWiki.Bar,"};
+        expectedProperty.setValue("XWiki.Foo,XWiki.Bar");
+        assertEquals(expectedProperty, usersClass.fromStringArray(array));
     }
 }

@@ -60,5 +60,9 @@ public class GroupsClassTest
         expectedProperty.setValue("XWiki.Foo,XWiki.Bar");
         expectedProperty.setName("groupslist");
         assertEquals(expectedProperty, groupsClass.fromStringArray(array));
+
+        array = new String[] {"XWiki.Foo,XWiki.Bar,"};
+        expectedProperty.setValue("XWiki.Foo,XWiki.Bar");
+        assertEquals(expectedProperty, groupsClass.fromStringArray(array));
     }
 }

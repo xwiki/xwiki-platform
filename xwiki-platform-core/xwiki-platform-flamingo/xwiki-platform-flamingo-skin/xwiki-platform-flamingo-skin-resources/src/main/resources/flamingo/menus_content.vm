@@ -330,7 +330,7 @@
   ##
   #if ($canDelete)
     #define ($rename)
-      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'move', $extraAttributes)
+      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'edit', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $rename, 'order': 30000}))
     #define ($delete)

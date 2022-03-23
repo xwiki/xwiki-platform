@@ -195,35 +195,30 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>require(['jquery', 'xwiki-page-ready'], function($, pageReady) {
   const fixInternalAnchors = function(container) {
     var baseURL = new URL(XWiki.currentDocument.getURL(), window.location.href).toString();
     container.find('a[href]').each(function() {
-      const anchor = $(this), anchorHref = anchor.prop('href');
-      if (anchorHref.startsWith(baseURL)) {
-        anchor.attr('href', anchorHref.substring(baseURL.length));
+      const anchor = $(this);
+      try {
+        const url = new URL(anchor.prop('href'));
+        if (url.hash &amp;&amp; baseURL + url.hash === url.toString()) {
+          anchor.attr('href', url.hash);
+        }
+      } catch (e) {
+        console.log('Failed to parse URL: ' + anchor.prop('href'));
       }
     });
   };
 
-  const contentWrapper = $('#xwikicontent');
-  fixInternalAnchors(contentWrapper.add('.pdf-toc'));
-
-  // Trigger the print page rendering.
-  require(['xwiki-page-ready', 'paged-polyfill'], function(pageReady) {
-    pageReady.delayPageReady(new Promise((resolve, reject) =&gt; {
-      class PDFExportHandler extends Paged.Handler {
-        constructor(chunker, polisher, caller) {
-          super(chunker, polisher, caller);
-        }
-
-        afterPreview(pages) {
-          resolve();
-        }
-      }
-      Paged.registerHandlers(PDFExportHandler);
-    }), 'export:pdf');
-  });
+  // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page
+  // ready callbacks wait for the print preview to be ready. This is important in case one of the next page ready
+  // callbacks triggers the print.
+  pageReady.afterPageReady(() =&gt; new Promise((resolve, reject) =&gt; {
+    fixInternalAnchors($('#xwikicontent, .pdf-toc'));
+    window.PagedConfig = {after: resolve};
+    require(['paged-polyfill'], function(PagedPolyfill) {});
+  }));
 });</code>
     </property>
     <property>

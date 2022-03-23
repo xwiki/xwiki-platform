@@ -19,6 +19,7 @@
  */
 package org.xwiki.index;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.xwiki.component.annotation.Role;
@@ -67,4 +68,15 @@ public interface TaskManager
      * @return the number of  tasks of a given type in the queue
      */
     long getQueueSize(String type);
+
+    /**
+     * @param wikiId the identifier of a wiki (e.g., "xwiki")
+     * @return the number of tasks grouped by task type for a given wiki
+     * @since 14.2
+     */
+    @Unstable
+    default Map<String, Long> getQueueSizePerType(String wikiId)
+    {
+        return Map.of();
+    }
 }

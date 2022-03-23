@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -189,6 +190,14 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
     public long getQueueSize(String type)
     {
         return this.queue.stream().filter(taskData -> Objects.equals(taskData.getType(), type)).count();
+    }
+
+    @Override
+    public Map<String, Long> getQueueSizePerType(String wikiId)
+    {
+        return this.queue.stream()
+            .filter(taskData -> Objects.equals(taskData.getWikiId(), wikiId))
+            .collect(Collectors.groupingBy(TaskData::getType, Collectors.counting()));
     }
 
     @Override

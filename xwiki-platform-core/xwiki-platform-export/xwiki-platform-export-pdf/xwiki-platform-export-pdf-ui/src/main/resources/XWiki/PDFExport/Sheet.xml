@@ -38,6 +38,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
+#set ($sheetReference = 'XWiki.PDFExport.Sheet')
 #set ($pdfElements = ['cover', 'header', 'footer', 'toc'])
 
 #macro (getPDFExportConfigFromRequest $pdfExportConfig)
@@ -55,8 +56,8 @@
   #set ($discard  = $response.setContentType('text/html'))
   #set ($discard = $xwiki.ssx.use($pdfExportConfig.template))
   #set ($discard = $xwiki.jsx.use($pdfExportConfig.template))
-  #set ($discard = $xwiki.ssx.use('XWiki.PDFExport.Sheet'))
-  #set ($discard = $xwiki.jsx.use('XWiki.PDFExport.Sheet'))
+  #set ($discard = $xwiki.ssx.use($sheetReference))
+  #set ($discard = $xwiki.jsx.use($sheetReference))
   ## Output the HTML header but without the garbage from the start of the BODY tag.
   #set ($htmlHeader = "#template('htmlheader.vm')")
   #set ($bodyTagStart = $htmlHeader.indexOf('&lt;body'))
@@ -94,7 +95,7 @@
 {{/velocity}}
 
 {{velocity wiki="false"}}
-#if ($xcontext.action == 'get')
+#if ($request.sheet == $sheetReference)
   ## Default PDF Export configuration.
   #set ($pdfExportConfig = {
     'template': 'XWiki.PDFExport.Template',

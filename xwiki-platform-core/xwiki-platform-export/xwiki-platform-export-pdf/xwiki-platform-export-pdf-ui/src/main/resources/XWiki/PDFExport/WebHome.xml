@@ -221,28 +221,41 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
     });
   };
 
+  const exportToPDF = function(extraQueryString) {
+    return new Promise((resolve, reject) =&gt; {
+      const iframe = $('&lt;iframe/&gt;').css({
+        'visibility': 'hidden'
+      }).on('load', () =&gt; {
+        iframe[0].contentWindow.xwikiPageReady.afterPageReady(() =&gt; {
+          // Trigger the print only after all page ready callbacks were executed, because the print preview is
+          // initialized as a page ready callback.
+          iframe[0].contentWindow.xwikiPageReady.afterPageReady(() =&gt; {
+            iframe[0].contentWindow.print();
+            iframe.remove();
+            resolve();
+          });
+        });
+      });
+      const exportURL = XWiki.currentDocument.getURL('export', $.param({
+        format: 'html-print',
+        xpage: 'get',
+        outputSyntax: 'plain',
+        sheet: 'XWiki.PDFExport.Sheet'
+      })) + '&amp;' + extraQueryString;
+      iframe.attr('src', exportURL).appendTo($('body'));
+    });
+  };
+
   pdfExportOptionsModal.on('submit', event =&gt; {
     event.preventDefault();
     $('body').css('cursor', 'wait');
     const notification = new XWiki.widgets.Notification(l10n['export.pdf.inProgress'], 'inprogress');
     pdfExportOptionsModal.find('input[type=submit]').prop('disabled', true);
-    const iframe = $('&lt;iframe/&gt;').css({
-      'visibility': 'hidden'
-    }).on('load', () =&gt; {
-      iframe[0].contentWindow.xwikiPageReady.afterPageReady(() =&gt; {
-        pdfExportOptionsModal.find('input[type=submit]').prop('disabled', false);
-        notification.hide();
-        $('body').css('cursor', '');
-        iframe[0].contentWindow.print();
-        iframe.remove();
-      });
+    exportToPDF(pdfExportOptionsModal.serialize()).finally(() =&gt; {
+      pdfExportOptionsModal.find('input[type=submit]').prop('disabled', false);
+      notification.hide();
+      $('body').css('cursor', '');
     });
-    const exportURL = XWiki.currentDocument.getURL('get', $.param({
-      sheet: 'XWiki.PDFExport.Sheet',
-      outputSyntax: 'plain',
-      template: 'XWiki.PDFExport.Template'
-    })) + '&amp;' + pdfExportOptionsModal.serialize();
-    iframe.attr('src', exportURL).appendTo($('body'));
   });
 
   pdfExportOptionsModal.on('click', 'a.secondary.button', event =&gt; {

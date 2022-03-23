@@ -54,6 +54,7 @@ import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.csrf.CSRFToken;
+import org.xwiki.internal.web.DocExistValidator;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -731,45 +732,25 @@ public abstract class XWikiAction implements LegacyAction
     }
 
     /**
-     * Check if the given document exists or not and if it should return a 404 based on the context.
-     * If the action is view, then it should returns a 404 for all viewers except recyclebin, children and siblings.
-     * If the action is get, it should returns a 404 if the sheet parameter is not used (or if the given sheet doesn't
-     * exist either) and if the disableCheckNotExisting parameter is not used.
+     * Check if the given document exists or not and if it should return a 404 based on the context. A {@link
+     * DocExistValidator} with an hint matching the current action is used to check if the document exists. When no
+     * {@link DocExistValidator} is found, the response is always {@code false} When a {@link DocExistValidator} is
+     * found, the result is delegated to {@link DocExistValidator#docExist(XWikiDocument, XWikiContext)}.
      *
-     * @param doc the doc for which to check it exists or not.
+     * @param doc the doc for which to check it exists or not
      * @param context the current context
      * @return {@code true} if we should return a 404
+     * @throws ComponentLookupException if an error occurs when instantiating a {@link DocExistValidator}
      */
-    private boolean shouldReturnDocDoesNotExist(XWikiDocument doc, XWikiContext context)
+    private boolean shouldReturnDocDoesNotExist(XWikiDocument doc, XWikiContext context) throws ComponentLookupException
     {
         boolean result = false;
-        if (doc.isNew()) {
-            String action = context.getAction();
-            XWikiRequest request = context.getRequest();
-            if ("view".equals(action)) {
-                result = !"recyclebin".equals(request.get("viewer"))
-                    && !"children".equals(request.get("viewer"))
-                    && !"siblings".equals(request.get("viewer"));
-            } else if ("get".equals(action)) {
-                String sheet = request.get("sheet");
-                if (!StringUtils.isEmpty(sheet)) {
-                    DocumentReference sheetReference = getCurrentMixedDocumentReferenceResolver().resolve(sheet);
-                    try {
-                        XWikiDocument sheetDoc = context.getWiki().getDocument(sheetReference, context);
-                        result = sheetDoc.isNew();
-                    } catch (XWikiException e) {
-                        LOGGER.warn("Error while trying to load sheet [{}] for checking status code "
-                            + "on GET request for [{}]: [{}]", sheetReference, doc.getDocumentReference(),
-                            ExceptionUtils.getRootCauseMessage(e));
-                        // there is an error we consider that the sheet doesn't exist.
-                        result = true;
-                    }
-                } else {
-                    result = !"1".equals(request.get("disableCheckNotExisting"));
-                }
-            }
+        String action = context.getAction();
+        if (this.componentManager.hasComponent(DocExistValidator.class, action)) {
+            result = this.componentManager.<DocExistValidator>getInstance(DocExistValidator.class, action)
+                .docExist(doc, context);
         }
-        return  result;
+        return result;
     }
 
     private void renderInit(XWikiContext xcontext) throws Exception

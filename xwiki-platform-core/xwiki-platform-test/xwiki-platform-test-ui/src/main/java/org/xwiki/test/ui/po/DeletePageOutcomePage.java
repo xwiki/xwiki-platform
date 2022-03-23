@@ -125,5 +125,22 @@ public class DeletePageOutcomePage extends ViewPage
             elements.get(0).click();
         }
         return new DeletePageOutcomePage();
-    }   
+    }
+
+    /**
+     * Click on the link to view the deleted page.
+     *
+     * @param row the revision row for which to view the deleted page, starting at 1
+     * @return the view page of the deleted page
+     * @since 13.10.4
+     * @since 14.2RC1
+     */
+    public ViewPage clickViewDocument(int row)
+    {
+        WebElement link = getDriver()
+            .findElementWithoutWaiting(
+                By.cssSelector(String.format("table tbody tr:nth-child(%d) a.link-view", row)));
+        link.click();
+        return new ViewPage();
+    }
 }

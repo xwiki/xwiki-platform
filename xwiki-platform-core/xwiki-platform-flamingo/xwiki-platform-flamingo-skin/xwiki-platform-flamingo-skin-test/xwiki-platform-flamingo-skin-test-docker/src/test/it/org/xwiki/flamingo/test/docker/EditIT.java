@@ -336,7 +336,6 @@ public class EditIT
 
             // Ensure the page is properly loaded after a save and view
             ViewPage viewPage = new ViewPage();
-            viewPage.waitUntilPageJSIsLoaded();
             assertEquals("Foo bar", viewPage.getContent());
 
             // check with preview
@@ -451,7 +450,6 @@ public class EditIT
         // Tab2 = A first edit from a tab.
 
         setup.switchTab(firstTabHandle);
-        wikiEditPageTab1.waitUntilPageJSIsLoaded();
         setup.getDriver().addPageNotYetReloadedMarker();
         wikiEditPageTab1.setContent("A second edit from another tab.");
         wikiEditPageTab1.clickSaveAndContinue(false);
@@ -485,7 +483,6 @@ public class EditIT
 
         // The merge should be automatic.
         setup.switchTab(firstTabHandle);
-        wikiEditPageTab1.waitUntilPageJSIsLoaded();
         wikiEditPageTab1.setContent("A second edit from another tab.\nAnother line.");
         viewPage = wikiEditPageTab1.clickSaveAndView();
         assertEquals("A second edit from another tab.\nAnother line.\nA new line.", viewPage.getContent());
@@ -498,7 +495,6 @@ public class EditIT
         // Tab1 = "A third edit from another tab.\nAnother line.\nYet another line."
 
         setup.switchTab(secondTabHandle);
-        wikiEditPageTab2.waitUntilPageJSIsLoaded();
         // the page will be reloaded by choice
         setup.getDriver().addPageNotYetReloadedMarker();
         wikiEditPageTab2.setContent("A fourth edit from second tab.\nAnother line.");
@@ -581,14 +577,12 @@ public class EditIT
 
         // Step 4: Edit different places, ensure the automatic merge is performed and the editor refreshed
         setup.switchTab(firstTabHandle);
-        wikiEditPageTab1.waitUntilPageJSIsLoaded();
         wikiEditPageTab1.setContent("A third edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.");
         wikiEditPageTab1.clickSaveAndContinue();
         // Tab1 = "A third edit from another tab.\nAnother line.\nYet another line with other few changes."
 
         setup.switchTab(secondTabHandle);
-        wikiEditPageTab2.waitUntilPageJSIsLoaded();
         // The editor will be reloaded because of the merge
         setup.getDriver().addPageNotYetReloadedMarker();
         wikiEditPageTab2.setContent("A fourth edit from another tab.\nAnother line.\nYet another line.");
@@ -606,7 +600,6 @@ public class EditIT
         // Tab2 = "A fourth edit from another tab.\nAnother line."
         //                + "\nYet another line with other few changes.\nAnd again a new line"
         setup.switchTab(firstTabHandle);
-        wikiEditPageTab1.waitUntilPageJSIsLoaded();
         wikiEditPageTab1.setContent("A fifth edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.");
         wikiEditPageTab1.clickSaveAndContinue(false);
@@ -836,7 +829,6 @@ public class EditIT
         wikiEditPage.setContent("fourth edit");
 
         viewPage = setup.gotoPage(testReference);
-        viewPage.waitUntilPageJSIsLoaded();
 
         // view page -> wiki editor
         setup.getDriver().navigate().back();
@@ -1052,7 +1044,7 @@ public class EditIT
         setup.addObject(testReference, className, "prop", "22");
         // This should be put inside setup#addObject in the future, since addObject leads to the open of
         // the Object Editor.
-        new ObjectEditPage().waitUntilPageIsLoaded();
+        new ObjectEditPage();
         setup.gotoPage(testReference, "save", "xvalidate=1");
         ViewPage viewPage = new ViewPage();
         assertEquals("value: 22", viewPage.getContent());

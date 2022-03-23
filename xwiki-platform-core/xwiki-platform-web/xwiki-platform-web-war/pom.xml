@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-web</artifactId>
-    <version>14.2-SNAPSHOT</version>
+    <version>14.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-web-war</artifactId>
   <name>XWiki Platform - Web - WAR</name>
@@ -244,24 +244,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>com.github.searls</groupId>
-        <artifactId>jasmine-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <!-- Run the tests on the minified files in order to verify the minification also. -->
-          <jsSrcDir>${project.build.directory}/${project.build.finalName}/resources</jsSrcDir>
-          <customRunnerConfiguration>
-            ${project.basedir}/src/test/resources/jasmine-require-config.txt
-          </customRunnerConfiguration>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
@@ -276,4 +258,33 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <!-- We don't use the 'integration-tests' profile because we cannot run the tests on CI (Chrome is not installed)
+        and we're waiting for this issue https://github.com/searls/jasmine-maven-plugin/issues/349 to use docker. -->
+      <id>integration-tests-chrome</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.searls</groupId>
+            <artifactId>jasmine-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <!-- Run the tests on the minified files in order to verify the minification also. -->
+              <jsSrcDir>${project.build.directory}/${project.build.finalName}/resources</jsSrcDir>
+              <customRunnerConfiguration>
+                ${project.basedir}/src/test/resources/jasmine-require-config.txt
+              </customRunnerConfiguration>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

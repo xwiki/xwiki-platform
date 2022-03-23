@@ -58,9 +58,7 @@ public class AttachmentPane extends ViewPage
         if (!found) {
             throw new RuntimeException("Attachment " + attachmentName + " not found in the attachments pane.");
         }
-        AttachmentPane attachmentPane = new AttachmentPane();
-        attachmentPane.waitUntilPageIsLoaded();
-        return attachmentPane;
+        return new AttachmentPane();
     }
 
     /**

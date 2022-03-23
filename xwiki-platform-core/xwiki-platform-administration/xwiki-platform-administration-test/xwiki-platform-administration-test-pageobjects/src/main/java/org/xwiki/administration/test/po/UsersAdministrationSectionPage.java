@@ -22,7 +22,6 @@ package org.xwiki.administration.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
@@ -56,7 +55,7 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     public static UsersAdministrationSectionPage gotoPage()
     {
         AdministrationSectionPage.gotoPage(ADMINISTRATION_SECTION_ID);
-        return new UsersAdministrationSectionPage().waitUntilPageIsLoaded();
+        return new UsersAdministrationSectionPage();
     }
 
     public UsersAdministrationSectionPage()
@@ -68,7 +67,7 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     public RegistrationModal clickAddNewUser()
     {
         this.createUserButton.click();
-        return new RegistrationModal().waitUntilPageIsLoaded();
+        return new RegistrationModal();
     }
 
     /**
@@ -78,16 +77,6 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     public LiveTableElement getUsersLiveTable()
     {
         return this.usersLiveTable;
-    }
-
-    @Override
-    public UsersAdministrationSectionPage waitUntilPageIsLoaded()
-    {
-        this.usersLiveTable.waitUntilReady();
-        // The create user button is disabled initially and enabled later by the JavaScript code that handles the user
-        // creation (the create user modal).
-        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(this.createUserButton));
-        return this;
     }
 
     public DeleteUserConfirmationModal clickDeleteUser(String userName)
@@ -162,6 +151,6 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     {
         getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "edit")))
             .click();
-        return new RegistrationModal().waitUntilPageIsLoaded();
+        return new RegistrationModal();
     }
 }

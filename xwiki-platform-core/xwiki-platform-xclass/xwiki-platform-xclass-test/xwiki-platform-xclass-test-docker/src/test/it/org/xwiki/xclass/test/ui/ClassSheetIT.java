@@ -79,7 +79,7 @@ class ClassSheetIT
             setup.loginAsSuperAdmin();
             dataTypesPage = DataTypesPage.gotoPage();
             // Create the class document.
-            ClassSheetPage classSheetPage = dataTypesPage.createClass(spaceName, className).waitUntilPageIsLoaded();
+            ClassSheetPage classSheetPage = dataTypesPage.createClass(spaceName, className);
             assertEquals(classTitle, classSheetPage.getDocumentTitle());
             assertTrue(classSheetPage.hasBreadcrumbContent(dataTypesPageTitle, false));
 
@@ -89,7 +89,7 @@ class ClassSheetIT
             classEditor.clickSaveAndView();
 
             // Add a new property.
-            classEditor = classSheetPage.waitUntilPageIsLoaded().clickEditClassLink();
+            classEditor = classSheetPage.clickEditClassLink();
             classEditor.addProperty("age", "Number").setPrettyName("Your current age");
 
             // Add a computed property.
@@ -99,27 +99,19 @@ class ClassSheetIT
                 .setMetaProperty("customDisplay", titleDisplayer);
             classEditor.clickSaveAndView();
 
-            // We have to wait for the page to load because Selenium doesn't do it all the time when we click on Save & View
-            // (even if the Save & View button triggers a plain form submit; there must be something with the JavaScript
-            // code that is executed on submit that interferes with Selenium).
-            classSheetPage.waitUntilPageIsLoaded();
-
             // Assert that the properties are listed.
             assertTrue(classSheetPage.hasProperty("color", "Your favorite color", "String"));
             assertTrue(classSheetPage.hasProperty("age", "Your current age", "Number"));
             assertTrue(classSheetPage.hasProperty("description", "Description", "Computed Field"));
 
             // Create and bind a sheet.
-            classSheetPage = classSheetPage.clickCreateSheetButton().waitUntilPageIsLoaded()
-                .clickBindSheetLink().waitUntilPageIsLoaded();
+            classSheetPage = classSheetPage.clickCreateSheetButton().clickBindSheetLink();
             ViewPage sheetPage = classSheetPage.clickSheetLink();
             assertEquals(className + " Sheet", sheetPage.getDocumentTitle());
             sheetPage.clickBreadcrumbLink(classTitle);
-            classSheetPage.waitUntilPageIsLoaded();
 
             // Create the template.
-            classSheetPage = classSheetPage.clickCreateTemplateButton().waitUntilPageIsLoaded()
-                .clickAddObjectToTemplateLink().waitUntilPageIsLoaded();
+            classSheetPage = classSheetPage.clickCreateTemplateButton().clickAddObjectToTemplateLink();
             ViewPage templatePage = classSheetPage.clickTemplateLink();
             assertEquals(className + " Template", templatePage.getDocumentTitle());
             // The default edit button should take us to the In-line edit mode.
@@ -129,7 +121,6 @@ class ClassSheetIT
             editPage.setValue("age", "13");
             editPage.clickSaveAndContinue();
             editPage.clickBreadcrumbLink(classTitle);
-            classSheetPage.waitUntilPageIsLoaded();
 
             // Create a document based on the class template.
             assertEquals(spaceName, classSheetPage.getNewPagePicker().getParentInput().getAttribute("value"));
@@ -159,7 +150,6 @@ class ClassSheetIT
             assertEquals(pageName, viewPage.getDocumentTitle());
             assertEquals("YOUR FAVORITE COLOR\npink\nYOUR CURRENT AGE\n27\nDESCRIPTION\nTester", viewPage.getContent());
             viewPage.clickBreadcrumbLink(classTitle);
-            classSheetPage.waitUntilPageIsLoaded();
 
             // Assert the created document is listed.
             assertTrue(classSheetPage.hasDocument(pageName));

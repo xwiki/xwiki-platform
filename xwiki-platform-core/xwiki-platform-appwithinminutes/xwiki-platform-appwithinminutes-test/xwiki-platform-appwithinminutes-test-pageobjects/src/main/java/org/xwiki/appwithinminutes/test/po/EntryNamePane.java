@@ -60,10 +60,6 @@ public class EntryNamePane extends BaseElement
     {
         addButton.click();
 
-        // Make sure we wait for the new page to be loaded since apparently we got some failing tests because of this
-        // on the CI, when the agent is slow probably.
-        waitUntilPageJSIsLoaded();
-
         return new EntryEditPage();
     }
 }

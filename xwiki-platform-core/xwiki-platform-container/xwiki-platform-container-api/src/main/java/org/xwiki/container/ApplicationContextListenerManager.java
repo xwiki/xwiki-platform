@@ -37,7 +37,6 @@ public interface ApplicationContextListenerManager
      * 
      * @param applicationContext the {@link ApplicationContext}.
      */
-    @Deprecated
     void initializeApplicationContext(ApplicationContext applicationContext);
     
     /**
@@ -45,6 +44,5 @@ public interface ApplicationContextListenerManager
      * 
      * @param applicationContext the {@link ApplicationContext}.
      */
-    @Deprecated
     void destroyApplicationContext(ApplicationContext applicationContext);
 }

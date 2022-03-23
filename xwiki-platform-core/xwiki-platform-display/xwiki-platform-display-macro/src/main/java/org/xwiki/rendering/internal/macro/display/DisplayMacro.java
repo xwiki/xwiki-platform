@@ -111,6 +111,9 @@ public class DisplayMacro extends AbstractIncludeMacro<DisplayMacroParameters>
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());
         displayParameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
         displayParameters.setContentTranslated(true);
+        if (context.getXDOM() != null) {
+            displayParameters.setIdGenerator(context.getXDOM().getIdGenerator());
+        }
 
         Stack<Object> references = this.macrosBeingExecuted.get();
         if (references == null) {

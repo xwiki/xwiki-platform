@@ -78,7 +78,10 @@ public class AttachmentsPane extends BaseElement
     public void setFileToUpload(final String filePath)
     {
         final List<WebElement> inputs = this.pane.findElements(By.className("uploadFileInput"));
-        inputs.get(inputs.size() - 1).sendKeys(filePath);
+        WebElement input = inputs.get(inputs.size() - 1);
+        // Clean the field before setting the value in case of successive uploads.
+        input.clear();
+        input.sendKeys(filePath);
     }
 
     public void waitForUploadToFinish(String fileName)
@@ -202,9 +205,28 @@ public class AttachmentsPane extends BaseElement
         return this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 6).getText();
     }
 
+    /**
+     * Return the version number for the requested attachment.
+     *
+     * @param attachmentName the name of the attachment
+     * @return the version number displayed for the attachment
+     */
     public String getLatestVersionOfAttachment(String attachmentName)
     {
-        return this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 3).getText();
+        return getAttachmentVersionElement(attachmentName).getText();
+    }
+
+    /**
+     * Click on the attachment history link for a given attachment.
+     *
+     * @param attachmentName the name of the attachment (e.g., "myfile.txt")
+     * @return the attachment history page object
+     * @since 14.2RC1
+     */
+    public AttachmentHistoryPage goToAttachmentHistory(String attachmentName)
+    {
+        getAttachmentVersionElement(attachmentName).click();
+        return new AttachmentHistoryPage();
     }
 
     public String getSizeOfAttachment(String attachmentName)
@@ -227,5 +249,12 @@ public class AttachmentsPane extends BaseElement
             return false;
         }
         return true;
+    }
+
+    private WebElement getAttachmentVersionElement(String attachmentName)
+    {
+        return getDriver()
+            .findElement(By.xpath(
+                "//div[@id='attachmentscontent']//a[text()= '" + attachmentName + "']/../../span[@class='version']/a"));
     }
 }

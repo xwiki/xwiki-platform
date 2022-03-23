@@ -43,6 +43,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -80,10 +82,14 @@ class DefaultIconThemesResourceTest
     @MockComponent
     private IconSetManager iconSetManager;
 
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @BeforeEach
-    void setUp()
+    void setUp() throws Exception
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(CURRENT_ENTITY);
+        when(this.wikiDescriptorManager.exists(any(String.class))).thenReturn(true);
     }
 
     @Test
@@ -239,6 +245,25 @@ class DefaultIconThemesResourceTest
         verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
         verify(this.iconSetManager, never()).getIconSet(any());
         verify(this.iconSetManager, never()).getDefaultIconSet();
+    }
+
+    @Test
+    void getIconsWikiDoesNotExist() throws Exception
+    {
+        when(this.wikiDescriptorManager.exists(any(String.class))).thenReturn(false);
+        WebApplicationException webApplicationException =
+            assertThrows(WebApplicationException.class, () -> this.iconThemesResource.getIcons("unknown", null));
+        assertEquals(NOT_FOUND.getStatusCode(), webApplicationException.getResponse().getStatus());
+    }
+
+    @Test
+    void getIconsWikiManagerFail() throws Exception
+    {
+        when(this.wikiDescriptorManager.exists(any(String.class))).thenThrow(WikiManagerException.class);
+        WebApplicationException webApplicationException =
+            assertThrows(WebApplicationException.class, () -> this.iconThemesResource.getIcons("unknown", null));
+        assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), webApplicationException.getResponse().getStatus());
+        assertEquals(WikiManagerException.class, webApplicationException.getCause().getClass());
     }
 
     private String marshal(Icons icons) throws JAXBException

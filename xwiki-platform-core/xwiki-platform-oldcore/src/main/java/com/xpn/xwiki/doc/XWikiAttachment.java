@@ -59,6 +59,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 import org.xwiki.tika.internal.TikaUtils;
 
@@ -214,38 +215,32 @@ public class XWikiAttachment implements Cloneable
     @Override
     public XWikiAttachment clone()
     {
-        XWikiAttachment attachment = null;
+        return internalClone(false, false);
+    }
 
-        try {
-            attachment = (XWikiAttachment) super.clone();
-
-            // The new attachment is not associated to any document yet
-            attachment.setDoc(null, false);
-
-            attachment.setComment(getComment());
-            attachment.setDate(getDate());
-            attachment.setFilename(getFilename());
-            attachment.setMimeType(getMimeType());
-            attachment.setLongSize(getLongSize());
-            attachment.setRCSVersion(getRCSVersion());
-            attachment.setMetaDataDirty(isMetaDataDirty());
-            if (getAttachment_content() != null) {
-                attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
-                attachment.getAttachment_content().setAttachment(attachment);
-            }
-            if (getAttachment_archive() != null) {
-                attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());
-                attachment.getAttachment_archive().setAttachment(attachment);
-            }
-
-            // Reset container since this new instance is not yet stored anywhere
-            attachment.container = null;
-        } catch (CloneNotSupportedException e) {
-            // This should not happen
-            LOGGER.error("exception while attach.clone", e);
+    /**
+     * Clone the attachment and its history to a new name, and attach it to a new document.
+     *
+     * @param name the name of the attachment after the clone
+     * @param context the current context
+     * @return the clone attachment with its updated history
+     * @throws XWikiException in case of error when accessing the attachments content
+     * @throws IOException in case of error when writing the attachments content
+     * @since 14.2RC1
+     */
+    @Unstable
+    public XWikiAttachment clone(String name, XWikiContext context)
+        throws XWikiException, IOException
+    {
+        XWikiAttachment clone = internalClone(true, true);
+        if (clone == null) {
+            // According to #internalClone, this should never happen.
+            throw new XWikiException("Failed to clone the attachment", null);
         }
-
-        return attachment;
+        clone.setFilename(name);
+        clone.setContent(this.getContentInputStream(context));
+        clone.setAttachment_archive(getAttachmentArchive(context).clone(clone, context));
+        return clone;
     }
 
     /**
@@ -1503,6 +1498,42 @@ public class XWikiAttachment implements Cloneable
         if (this.container != null) {
             this.container.onAttachmentNameModified(previousAttachmentName, attachment);
         }
+    }
+
+    private XWikiAttachment internalClone(boolean skipArchive, boolean skipContent)
+    {
+        XWikiAttachment attachment = null;
+
+        try {
+            attachment = (XWikiAttachment) super.clone();
+
+            // The new attachment is not associated to any document yet
+            attachment.setDoc(null, false);
+
+            attachment.setComment(getComment());
+            attachment.setDate(getDate());
+            attachment.setFilename(getFilename());
+            attachment.setMimeType(getMimeType());
+            attachment.setLongSize(getLongSize());
+            attachment.setRCSVersion(getRCSVersion());
+            attachment.setMetaDataDirty(isMetaDataDirty());
+            if (!skipContent && getAttachment_content() != null) {
+                attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
+                attachment.getAttachment_content().setAttachment(attachment);
+            }
+            if (!skipArchive && getAttachment_archive() != null) {
+                attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());
+                attachment.getAttachment_archive().setAttachment(attachment);
+            }
+
+            // Reset container since this new instance is not yet stored anywhere
+            attachment.container = null;
+        } catch (CloneNotSupportedException e) {
+            // This should not happen
+            LOGGER.error("exception while attach.clone", e);
+        }
+
+        return attachment;
     }
 
     @Override

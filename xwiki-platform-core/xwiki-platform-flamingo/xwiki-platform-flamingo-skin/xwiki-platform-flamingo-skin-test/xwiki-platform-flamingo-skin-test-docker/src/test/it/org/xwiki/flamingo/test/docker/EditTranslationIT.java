@@ -178,7 +178,6 @@ public class EditTranslationIT
         // Verify edit mode informations in edit page
         setup.gotoPage(referenceDEFAULT, "edit", "language=");
         editPage = new WikiEditPage();
-        editPage.waitUntilPageJSIsLoaded();
 
         assertEquals(new HashSet<>(), editPage.getNotExistingLocales());
         assertEquals(new HashSet<>(Arrays.asList(Locale.ENGLISH, Locale.FRENCH)), editPage.getExistingLocales());
@@ -195,7 +194,6 @@ public class EditTranslationIT
 
         setup.gotoPage(testReference, "inline", "language=en");
         InlinePage inlinePage = new InlinePage();
-        inlinePage.waitUntilPageJSIsLoaded();
         assertEquals("custom panel", inlinePage.getValue("content"));
         inlinePage.setValue("content", "another value");
         inlinePage.clickSaveAndView();

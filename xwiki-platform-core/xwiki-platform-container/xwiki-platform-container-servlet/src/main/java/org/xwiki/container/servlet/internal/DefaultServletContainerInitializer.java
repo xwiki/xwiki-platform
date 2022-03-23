@@ -65,9 +65,9 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     private ComponentManager componentManager;
 
     /**
-     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     * @deprecated use the notion of Environment instead
      */
-    @Deprecated
+    @Deprecated(since = "3.5M1")
     @Override
     public void initializeApplicationContext(ServletContext servletContext)
     {

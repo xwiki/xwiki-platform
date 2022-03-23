@@ -29,8 +29,11 @@ import java.util.Map;
 import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.text.StringUtils;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.XWikiDateTool;
 import org.xwiki.velocity.tools.EscapeTool;
@@ -47,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @version $Id$
  */
-@ComponentList(XWikiDateTool.class)
+@ComponentList({XWikiDateTool.class, ModelScriptService.class})
 class MacrosTest extends PageTest
 {
     private VelocityManager velocityManager;
@@ -59,6 +62,7 @@ class MacrosTest extends PageTest
         registerVelocityTool("escapetool", new EscapeTool());
         registerVelocityTool("datetool", this.componentManager.getInstance(XWikiDateTool.class));
         registerVelocityTool("numbertool", new NumberTool());
+        registerVelocityTool("stringtool", new StringUtils());
     }
 
     @Test
@@ -215,5 +219,58 @@ class MacrosTest extends PageTest
             (Map<Object, Object>) this.velocityManager.getVelocityContext().get("dateRange");
         assertEquals(1607295600000L, ((Date) dateRange.get("start")).getTime());
         assertEquals(1632347999999L, ((Date) dateRange.get("end")).getTime());
+    }
+
+    @Test
+    void displayUser() throws Exception
+    {
+        // displaying user without any arg, should display Guest user
+        String script = "#displayUser()";
+        StringWriter out = new StringWriter();
+        this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
+        assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.XWikiGuest\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
+            + "alt=\"XWikiGuest\" />"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">XWikiGuest</a>"
+            + "</div>", out.toString().trim());
+
+        script = "#displayUser($NULL)";
+        out = new StringWriter();
+        this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
+        assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.XWikiGuest\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
+            + "alt=\"XWikiGuest\" />"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">XWikiGuest</a>"
+            + "</div>", out.toString().trim());
+
+        script = "#displayUser(\"\")";
+        out = new StringWriter();
+        this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
+        assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.XWikiGuest\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
+            + "alt=\"XWikiGuest\" />"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">XWikiGuest</a>"
+            + "</div>", out.toString().trim());
+
+        script = "#displayUser(\"XWiki.Foo\")";
+        out = new StringWriter();
+        this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
+        assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.Foo\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
+            + "alt=\"Foo\" />"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/Foo\">Foo</a>"
+            + "</div>", out.toString().trim());
+
+        DocumentReference userFoo = new DocumentReference("xwiki", "XWiki", "Foo");
+        this.velocityManager.getVelocityContext().put("userFoo", userFoo);
+
+        script = "#displayUser($userFoo)";
+        out = new StringWriter();
+        this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
+        assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.Foo\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
+            + "alt=\"Foo\" />"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/Foo\">Foo</a>"
+            + "</div>", out.toString().trim());
     }
 }

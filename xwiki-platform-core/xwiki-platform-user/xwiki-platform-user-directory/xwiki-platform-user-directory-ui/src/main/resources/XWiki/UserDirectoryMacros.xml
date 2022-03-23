@@ -309,7 +309,8 @@
       $escapetool.url({
         'customize': true,
         'action': 'reset',
-        'xredirect': $xredirect
+        'xredirect': $xredirect,
+        'form_token': $services.csrf.token
       }),
       "$doc.fullName",
       'customize=true'

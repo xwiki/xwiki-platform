@@ -20,12 +20,12 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
@@ -40,6 +40,7 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -50,6 +51,8 @@ public class LevelsClass extends ListClass
 
     private static final String XCLASSNAME = "levelslist";
 
+    private static final String COMMA = ",";
+
     public LevelsClass(PropertyMetaClass wclass)
     {
         super(XCLASSNAME, "Levels List", wclass);
@@ -59,6 +62,12 @@ public class LevelsClass extends ListClass
     public LevelsClass()
     {
         this(null);
+    }
+
+    @Override
+    protected String getFirstSeparator()
+    {
+        return COMMA;
     }
 
     @Override
@@ -108,15 +117,22 @@ public class LevelsClass extends ListClass
     @Override
     public BaseProperty fromStringArray(String[] strings)
     {
-        List<String> list = new ArrayList<String>();
-        for (int i = 0; i < strings.length; i++) {
-            if (!strings[i].trim().equals("")) {
-                list.add(strings[i]);
-            }
+        List<String> list;
+        if ((strings.length == 1) && (getDisplayType().equals(DISPLAYTYPE_INPUT) || isMultiSelect())) {
+            list = getListFromString(strings[0], getSeparators(), false);
+        } else {
+            list = Arrays.asList(strings);
         }
+
         BaseProperty prop = newProperty();
-        fromList(prop, list);
+        fromList(prop, list, true);
         return prop;
+    }
+
+    @Override
+    public void fromList(BaseProperty<?> property, List<String> list)
+    {
+        fromList(property, list, true);
     }
 
     public String getText(String value, XWikiContext context)
@@ -126,7 +142,7 @@ public class LevelsClass extends ListClass
 
     public static List<String> getListFromString(String value)
     {
-        return getListFromString(value, ",", false);
+        return getListFromString(value, COMMA, false, true);
     }
 
     @Override
@@ -192,12 +208,6 @@ public class LevelsClass extends ListClass
         }
 
         return selectlist;
-    }
-
-    @Override
-    public void fromList(BaseProperty<?> property, List<String> list)
-    {
-        property.setValue(list != null ? StringUtils.join(list, ',') : null);
     }
 
     @Override

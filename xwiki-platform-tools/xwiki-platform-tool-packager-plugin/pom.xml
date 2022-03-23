@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>14.2-SNAPSHOT</version>
+    <version>14.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -357,6 +357,12 @@
       <artifactId>xwiki-commons-job-default</artifactId>
       <version>${commons.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- Needed to wait for document backlink indexation queue to be consumed. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- Dependencies not needed by the plugin itself but included in the WAR it generates,
          listed to be sure it's built before the plugin -->

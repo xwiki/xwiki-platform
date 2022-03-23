@@ -24,7 +24,7 @@
  */
 define('xwiki-page-ready', [], function() {
   let resolvePageReady;
-  const pageReadyPromise = new Promise((resolve) => {
+  let pageReadyPromise = new Promise((resolve) => {
     resolvePageReady = resolve;
   });
 
@@ -45,7 +45,7 @@ define('xwiki-page-ready', [], function() {
   const getPendingDelays = () => new Map(pendingDelays);
 
   const afterPageReady = (callback) => {
-    pageReadyPromise.then(callback).catch(() => {});
+    pageReadyPromise = pageReadyPromise.then(callback).catch(() => {});
   };
 
   afterPageReady(() => {

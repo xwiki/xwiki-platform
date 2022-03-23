@@ -152,4 +152,10 @@ public class AllITs
     class NestedRestoreDeletedPageIT extends RestoreDeletedPageIT
     {
     }
+    
+    @Nested
+    @DisplayName("Invitation tests")
+    class NestedInvitationIT extends InvitationIT
+    {
+    }
 }

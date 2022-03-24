@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @since 12.8RC1
  */
 @ComponentTest
-public class DefaultDocumentStringUserReferenceResolverTest
+class DefaultDocumentStringUserReferenceResolverTest
 {
     @InjectMockComponents
     private DefaultDocumentStringUserReferenceResolver resolver;
@@ -101,6 +101,12 @@ public class DefaultDocumentStringUserReferenceResolverTest
 
         reference = this.resolver.resolve("xWiKiGuEsT");
         assertSame(GuestUserReference.INSTANCE, reference);
+
+        reference = this.resolver.resolve("XWiki.XWikiGuest");
+        assertSame(GuestUserReference.INSTANCE, reference);
+
+        reference = this.resolver.resolve("xwiki:XWiki.XWikiGuest");
+        assertSame(GuestUserReference.INSTANCE, reference);
     }
 
     @Test
@@ -110,6 +116,12 @@ public class DefaultDocumentStringUserReferenceResolverTest
         assertSame(SuperAdminUserReference.INSTANCE, reference);
 
         reference = this.resolver.resolve("sUpErAdMiN");
+        assertSame(SuperAdminUserReference.INSTANCE, reference);
+
+        reference = this.resolver.resolve("XWiki.superadmin");
+        assertSame(SuperAdminUserReference.INSTANCE, reference);
+
+        reference = this.resolver.resolve("xwiki:XWiki.superadmin");
         assertSame(SuperAdminUserReference.INSTANCE, reference);
     }
 

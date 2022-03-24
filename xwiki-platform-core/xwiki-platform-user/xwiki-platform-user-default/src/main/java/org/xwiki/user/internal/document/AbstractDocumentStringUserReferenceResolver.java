@@ -45,7 +45,11 @@ public abstract class AbstractDocumentStringUserReferenceResolver extends Abstra
     @Override
     public UserReference resolve(String userName, Object... parameters)
     {
-        UserReference reference = resolveName(userName);
+        String userNameId = userName;
+        if (userName != null && userName.indexOf('.') != -1) {
+            userNameId = userName.substring(userName.indexOf('.') + 1);
+        }
+        UserReference reference = resolveName(userNameId);
         if (reference == null) {
             EntityReference baseEntityReference;
             if (parameters.length == 1 && parameters[0] instanceof WikiReference) {

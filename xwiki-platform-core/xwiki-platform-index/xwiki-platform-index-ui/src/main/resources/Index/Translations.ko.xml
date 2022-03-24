@@ -45,5 +45,8 @@ index.spacesMacro.createSpace.link=스페이스 생성
 index.spacesMacro.createSpace.defaultSpaceName=스페이스 이름
 index.spacesMacro.createSpace.submit=글쓰기
 index.deletedDocuments.deleteAll=전체 삭제
+index.administration.remainingTasks.heading=나머지 문서 분석 작업
+index.administration.remainingTasks.emptyQueue=남은 작업이 없습니다.
+admin.documentanalysis=문서 분석
 </content>
 </xwikidoc>

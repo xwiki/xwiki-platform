@@ -62,6 +62,12 @@ public class RegisterAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
 
+        // Disallow template override with xpage parameter.
+        if (!REGISTER.equals(Utils.getPage(context.getRequest(), REGISTER))) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                String.format("Template may not be overriden with 'xpage' in [%s] action.", REGISTER));
+        }
+
         String register = request.getParameter(REGISTER);
         if (register != null && register.equals("1")) {
             // CSRF prevention

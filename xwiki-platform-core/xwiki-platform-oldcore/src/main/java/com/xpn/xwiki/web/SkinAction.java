@@ -66,6 +66,7 @@ import com.xpn.xwiki.util.Util;
 @Singleton
 public class SkinAction extends XWikiAction
 {
+
     /** Logging helper. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SkinAction.class);
 
@@ -83,6 +84,20 @@ public class SkinAction extends XWikiAction
      */
     private static final String ENCODING = "UTF-8";
 
+    private static final String DOCDOESNOTEXIST = "docdoesnotexist";
+
+    @Override
+    public boolean action(XWikiContext context) throws XWikiException
+    {
+        // Disallow template override with xpage parameter.
+        if (!DOCDOESNOTEXIST.equals(Utils.getPage(context.getRequest(), DOCDOESNOTEXIST))) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "Template may not be overriden with 'xpage' in [skin] action.");
+        }
+
+        return super.action(context);
+    }
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -90,7 +105,7 @@ public class SkinAction extends XWikiAction
             return render(context.getRequest().getPathInfo(), context);
         } catch (IOException e) {
             context.getResponse().setStatus(404);
-            return "docdoesnotexist";
+            return DOCDOESNOTEXIST;
         }
     }
 
@@ -177,7 +192,7 @@ public class SkinAction extends XWikiAction
         }
         if (!found) {
             context.getResponse().setStatus(404);
-            return "docdoesnotexist";
+            return DOCDOESNOTEXIST;
         }
         return null;
     }

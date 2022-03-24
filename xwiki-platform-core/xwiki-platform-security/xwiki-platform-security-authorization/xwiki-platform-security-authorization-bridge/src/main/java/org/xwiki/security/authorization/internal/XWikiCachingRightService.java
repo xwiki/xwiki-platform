@@ -280,7 +280,9 @@ public class XWikiCachingRightService implements XWikiRightService
         // implementation, so code that simply want to verify if a user can delete (but is not actually deleting)
         // has to call checkAccess. This happen really often, and this why we should not redirect to login on failed
         // delete, since it would prevent most user to do anything.
-        if (context.getUserReference() == null && !DELETE_ACTION.equals(action) && !LOGIN_ACTION.equals(action)) {
+        // Also we don't show the login if an inactive user logged in.
+        if (context.getUserReference() == null && !DELETE_ACTION.equals(action) && !LOGIN_ACTION.equals(action)
+            && context.get(XWikiContext.INACTIVE_USER_REFERENCE) == null) {
             LOGGER.debug("Redirecting unauthenticated user to login, since it have been denied [{}] on [{}].",
                          right, entityReference);
             showLogin(context);

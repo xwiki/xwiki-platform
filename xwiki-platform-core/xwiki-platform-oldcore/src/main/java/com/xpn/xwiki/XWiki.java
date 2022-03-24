@@ -4322,9 +4322,23 @@ public class XWiki implements EventListener
         }
     }
 
+    /**
+     * Authenticate the user from the context and check if the user is disabled or not.
+     * If the user is disabled, the method returns {@code null} but set the reference of the authenticated user in the
+     * context with the {@link XWikiContext#INACTIVE_USER_REFERENCE} property.
+     *
+     * @param context the context used to authenticate the user.
+     * @return an {@link XWikiUser} if the user is authenticated and enabled, else {@code null}.
+     * @throws XWikiException in case of problem when dealing with the authentication.
+     */
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
-        return getAuthService().checkAuth(context);
+        XWikiUser user = getAuthService().checkAuth(context);
+        if (user != null && user.isDisabled(context)) {
+            context.put(XWikiContext.INACTIVE_USER_REFERENCE, user.getUserReference());
+            user = null;
+        }
+        return user;
     }
 
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
@@ -5866,70 +5880,26 @@ public class XWiki implements EventListener
         boolean hasAccess = checkAccess(context.getAction(), doc, context);
 
         XWikiUser user;
+        XWikiUser inactiveUser = null;
+        if (context.getUserReference() == null && context.get(XWikiContext.INACTIVE_USER_REFERENCE) != null) {
+            inactiveUser = new XWikiUser((DocumentReference) context.get(XWikiContext.INACTIVE_USER_REFERENCE));
+        }
         if (context.getUserReference() != null) {
             user = new XWikiUser(context.getUserReference());
         } else {
             user = new XWikiUser(context.getUser());
         }
 
+        if (inactiveUser != null && context.getAction().equals("view")) {
+            this.handleInactiveUserViewAction(inactiveUser, context, reference, vcontext);
+        }
         // We need to check rights before we look for translations
         // Otherwise we don't have the user language
-        if (!hasAccess) {
+        else if (!hasAccess) {
             Object[] args = { doc.getFullName(), user.getUser() };
             setPhonyDocument(reference, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access to document {0} has been denied to user {1}", null, args);
-        // User is disabled: the mail address is marked as checked
-        } else if (user.isDisabled(context) && user.isEmailChecked(context)) {
-            String action = context.getAction();
-            /*
-             * Allow inactive users to see skins, ressources, SSX, JSX and downloads they could have seen as guest. The
-             * rational behind this behaviour is that inactive users should be able to access the same UI that guests
-             * are used to see, including custom icons, panels, and so on...
-             */
-            if (!((action.equals("skin") && (doc.getSpace().equals("skins") || doc.getSpace().equals("resources")))
-                || ((action.equals("skin") || action.equals("download") || action.equals("ssx") || action.equals("jsx"))
-                    && getRightService().hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME,
-                        doc.getPrefixedFullName(), context))
-                || ((action.equals("view") && doc.getFullName().equals("XWiki.AccountValidation"))))) {
-                Object[] args = { user.getUser() };
-                setPhonyDocument(reference, context, vcontext);
-                throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_DISABLED,
-                    "User {0} account is disabled", null, args);
-            }
-        // User actually needs to activate his mail address.
-        } else if (user.isDisabled(context) && !user.isEmailChecked(context)) {
-            boolean allow = false;
-            String action = context.getAction();
-            /*
-             * Allow inactive users to see skins, ressources, SSX, JSX and downloads they could have seen as guest. The
-             * rational behind this behaviour is that inactive users should be able to access the same UI that guests
-             * are used to see, including custom icons, panels, and so on...
-             */
-            if ((action.equals("skin") && (doc.getSpace().equals("skins") || doc.getSpace().equals("resources")))
-                || ((action.equals("skin") || action.equals("download") || action.equals("ssx") || action.equals("jsx"))
-                    && getRightService().hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME,
-                        doc.getPrefixedFullName(), context))
-                || ((action.equals("view") && doc.getFullName().equals("XWiki.AccountValidation")))) {
-                allow = true;
-            } else {
-                String allowed = getConfiguration().getProperty("xwiki.inactiveuser.allowedpages", "");
-                if (context.getAction().equals("view") && !allowed.equals("")) {
-                    String[] allowedList = StringUtils.split(allowed, " ,");
-                    for (String element : allowedList) {
-                        if (element.equals(doc.getFullName())) {
-                            allow = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (!allow) {
-                Object[] args = { context.getUser() };
-                setPhonyDocument(reference, context, vcontext);
-                throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INACTIVE,
-                    "User {0} account is inactive", null, args);
-            }
         }
 
         if (!"skin".equals(context.getAction())
@@ -5969,6 +5939,37 @@ public class XWiki implements EventListener
         }
 
         return true;
+    }
+
+    private void handleInactiveUserViewAction(XWikiUser inactiveUser, XWikiContext context, DocumentReference reference,
+        VelocityContext vcontext) throws XWikiException
+    {
+        if (inactiveUser.isEmailChecked(context)) {
+            Object[] args = { inactiveUser.getUser() };
+            setPhonyDocument(reference, context, vcontext);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_DISABLED,
+                "User {0} account is disabled", null, args);
+        } else if (!reference.getLocalDocumentReference().equals(XWikiUser.ACCOUNT_VALIDATION_DOCUMENT_REFERENCE)) {
+            String allowed = getConfiguration().getProperty("xwiki.inactiveuser.allowedpages", "");
+            boolean allow = false;
+            if (!StringUtils.isEmpty(allowed)) {
+                XWikiDocument doc = this.getDocument(reference, context);
+                String[] allowedList = StringUtils.split(allowed, " ,");
+                for (String element : allowedList) {
+                    if (element.equals(doc.getFullName())) {
+                        allow = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!allow) {
+                Object[] args = { inactiveUser.getUser() };
+                setPhonyDocument(reference, context, vcontext);
+                throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INACTIVE,
+                    "User {0} account is inactive", null, args);
+            }
+        }
     }
 
     /**

@@ -1482,10 +1482,11 @@ public class XWikiDocumentMockitoTest
         o.setXClassReference(CLASS_REFERENCE);
         doc.addXObject(o);
         doc.setLocale(Locale.ENGLISH);
+        doc.setNew(false);
 
         XWikiDocument newDoc = doc.copyDocument(newReference, this.oldcore.getXWikiContext());
         BaseObject newO = newDoc.getXObject(CLASS_REFERENCE);
-        
+
         assertNotSame(o, newDoc.getXObject(CLASS_REFERENCE));
         assertFalse(newO.getGuid().equals(o.getGuid()));
         // Verify that the title is copied
@@ -1494,6 +1495,7 @@ public class XWikiDocumentMockitoTest
         assertEquals(newReference, newDoc.getDocumentReference());
         assertEquals(new DocumentReference(newReference, Locale.ENGLISH),
             newDoc.getDocumentReferenceWithLocale());
+        assertTrue(newDoc.isNew());
     }
 
     /**

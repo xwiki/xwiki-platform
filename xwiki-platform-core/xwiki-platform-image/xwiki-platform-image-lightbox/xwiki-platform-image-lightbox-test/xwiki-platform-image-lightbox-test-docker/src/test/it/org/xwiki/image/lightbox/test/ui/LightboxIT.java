@@ -100,6 +100,20 @@ class LightboxIT
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
 
+        // Verify the image popover permalink action.
+        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
+        if (imagePopover.isPresent()) {
+            ImagePopover currentImagePopover = imagePopover.get();
+            assertTrue(currentImagePopover.isImagePopoverDisplayed());
+
+            WebElement imagePermalinkButton = currentImagePopover.getImagePermalinkButton();
+            String[] elements = imagePermalinkButton.getAttribute("href").split("#");
+            assertEquals("Iimage1.png", elements[elements.length - 1]);
+
+            imagePermalinkButton.click();
+            assertEquals(testUtils.getDriver().getCurrentUrl(), imagePermalinkButton.getAttribute("href"));
+        }
+
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
 
@@ -126,6 +140,20 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
+
+        // Verify the image popover permalink action.
+        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
+        if (imagePopover.isPresent()) {
+            ImagePopover currentImagePopover = imagePopover.get();
+            assertTrue(currentImagePopover.isImagePopoverDisplayed());
+
+            WebElement imagePermalinkButton = currentImagePopover.getImagePermalinkButton();
+            String[] elements = imagePermalinkButton.getAttribute("href").split("#");
+            assertEquals("manuallyAddedImageId", elements[elements.length - 1]);
+
+            imagePermalinkButton.click();
+            assertEquals(testUtils.getDriver().getCurrentUrl(), imagePermalinkButton.getAttribute("href"));
+        }
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -364,6 +392,33 @@ class LightboxIT
         assertTrue(imagePopover.isPresent());
     }
 
+    @Test
+    @Order(13)
+    void openImageWithoutId(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        enableLightbox(testUtils, true);
+
+        testUtils.createPage(testReference, this.getImageWithoutId(images.get(0)));
+        lightboxPage = new LightboxPage();
+
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
+
+        // Make sure that the images are displayed.
+        lightboxPage.reloadPage();
+
+        Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
+        if (imagePopover.isPresent()) {
+            ImagePopover currentImagePopover = imagePopover.get();
+            assertTrue(currentImagePopover.isImagePopoverDisplayed());
+            assertFalse(currentImagePopover.getImagePermalinkButton().isDisplayed());
+        }
+
+        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightbox.isDisplayed());
+        assertFalse(lightbox.getCopyImageIdButton().isDisplayed());
+    }
+
     private void enableLightbox(TestUtils testUtils, boolean enable)
     {
         testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
@@ -389,6 +444,20 @@ class LightboxIT
         sb.append(image);
         sb.append("||width=120 height=120]]\n\n");
         sb.append("{{figureCaption}}{{id name=\"manuallyAddedImageId\"/}}\n");
+        sb.append("Caption{{/figureCaption}}\n\n");
+        sb.append("{{/figure}}\n\n");
+
+        return sb.toString();
+    }
+
+    private String getImageWithoutId(String image)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("{{figure}}\n[[image:");
+        sb.append(image);
+        sb.append("||width=120 height=120]]\n\n");
+        sb.append("{{figureCaption}}{{id name=''/}}\n");
         sb.append("Caption{{/figureCaption}}\n\n");
         sb.append("{{/figure}}\n\n");
 

@@ -52,27 +52,23 @@
   }
 }
 .blueimp-gallery {
-  .fullscreen:hover,
-  .download:hover,
-  .autoPlay:hover,
-  .escape:hover {
+  .action:hover {
     color: @text-color;
     opacity: 1;
   }
 
-  .fullscreen,
-  .download,
-  .autoPlay,
-  .escape {
+  .action {
     color: @xwiki-page-content-bg;
     display: none;
   }
+
+  .tooltip-inner {
+    white-space:nowrap;
+  }
 }
+
 .blueimp-gallery-controls {
-  .fullscreen,
-  .download,
-  .autoPlay,
-  .escape {
+  .action {
     display: block;
     /* Fix z-index issues (controls behind slide element) on Android: */
     -webkit-transform: translateZ(0);

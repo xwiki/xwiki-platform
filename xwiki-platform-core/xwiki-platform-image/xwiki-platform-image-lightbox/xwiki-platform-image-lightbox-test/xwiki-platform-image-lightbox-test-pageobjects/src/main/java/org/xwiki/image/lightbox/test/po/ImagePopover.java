@@ -60,6 +60,11 @@ public class ImagePopover extends BaseElement
         return getDriver().findElement(downloadSelector);
     }
 
+    public WebElement getImagePermalinkButton()
+    {
+        return getDriver().findElement(By.cssSelector(".popover .imageId"));
+    }
+
     private ImagePopover waitUntilReady()
     {
         getDriver().waitUntilElementIsVisible(By.cssSelector(".popover .imageDownload"));

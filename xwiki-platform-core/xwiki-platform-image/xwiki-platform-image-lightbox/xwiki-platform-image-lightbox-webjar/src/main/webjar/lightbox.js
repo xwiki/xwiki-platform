@@ -103,7 +103,6 @@ define('xwiki-lightbox-description', [
    * Update lightbox description using given information.
    */
   var updateDescriptionData = function(imageData, attachmentData) {
-    $('.lightboxDescription .imageId').val(imageData.id);
     updateDescriptionCaption(imageData, attachmentData);
 
     if (attachmentData) {
@@ -209,9 +208,14 @@ define('xwiki-lightbox', [
       $('#lightboxDownload').attr('download', getImageName(img.src));
       // Remember the index of the image to show first.
       $('.openLightbox').data('index', [...lightboxImages].indexOf(img));
-    }).on('shown.bs.popover', function(e) {
-      $('.popover .imageDownload').attr('href', e.target.src);
-      $('.popover .imageDownload').attr('download', getImageName(e.target.src));
+    }).on('inserted.bs.popover', function() {
+      $('.popover .imageDownload').attr('href', this.src);
+      $('.popover .imageDownload').attr('download', getImageName(this.src));
+      var imageId = getImageId(this);
+      if (imageId) {
+        $('.popover .imageId').attr('href', '#' + imageId);
+        $('.popover .imageId').removeClass('hidden');
+      }
     }).on('mouseenter', function() {
       clearTimeout(timeout);
       $(this).popover('show');
@@ -317,6 +321,15 @@ define('xwiki-lightbox', [
         // Set the attributes for the download button inside lightbox.
         $('#lightboxDownload').attr('href', imageData.href);
         $('#lightboxDownload').attr('download', imageData.fileName);
+        // Save the image ID, or hide the action in case it doesn't exist.
+        var copyImageId = $('#blueimp-gallery .copyImageId');
+        if (imageData.id) {
+          copyImageId.parent().removeClass('hidden');
+          copyImageId.attr('data-imageId', imageData.id);
+        } else {
+          copyImageId.parent().addClass('hidden');
+          copyImageId.removeAttr('data-imageId');
+        }
       }
     };
     openedLightbox = gallery(slidesData, options);
@@ -354,8 +367,7 @@ define('xwiki-lightbox', [
   $(document).on('click', '#blueimp-gallery .copyImageId', function(event) {
     event.preventDefault();
     var copyIdButton = this;
-    var imageId = $(copyIdButton).siblings('.imageId');
-    navigator.clipboard.writeText(imageId.val()).then(function() {
+    navigator.clipboard.writeText($(copyIdButton).attr('data-imageId')).then(function() {
       // Inform the user that the image ID was copied to clipboard.
       $(copyIdButton).tooltip('show');
       setTimeout(function() {

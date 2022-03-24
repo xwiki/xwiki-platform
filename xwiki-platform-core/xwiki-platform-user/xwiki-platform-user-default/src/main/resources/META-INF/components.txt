@@ -7,11 +7,15 @@ org.xwiki.user.internal.AllGuestConfigurationSource
 org.xwiki.user.internal.DefaultConfiguredStringUserReferenceResolver
 org.xwiki.user.internal.CurrentConfiguredStringUserReferenceResolver
 org.xwiki.user.internal.ConfiguredStringUserReferenceSerializer
-org.xwiki.user.internal.UserReferenceConverter
 org.xwiki.user.internal.AllUserPropertiesResolver
 org.xwiki.user.internal.SecureAllUserPropertiesResolver
 org.xwiki.user.internal.DefaultUserPropertiesResolver
 org.xwiki.user.internal.SecureUserPropertiesResolver
+org.xwiki.user.internal.converter.CurrentUserReferenceConverter
+org.xwiki.user.internal.converter.DocumentUserReferenceConverter
+org.xwiki.user.internal.converter.GuestUserReferenceConverter
+org.xwiki.user.internal.converter.SuperAdminUserReferenceConverter
+org.xwiki.user.internal.converter.UserReferenceConverter
 org.xwiki.user.internal.document.DocumentUserManager
 org.xwiki.user.internal.document.CurrentUserManager
 org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceResolver

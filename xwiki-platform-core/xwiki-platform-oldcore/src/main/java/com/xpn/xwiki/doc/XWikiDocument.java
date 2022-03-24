@@ -7028,6 +7028,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         newdoc.setOriginalDocument(null);
         newdoc.setContentDirty(true);
+        newdoc.setNew(true);
         newdoc.getXClass().setOwnerDocument(newdoc);
 
         return newdoc;

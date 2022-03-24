@@ -660,10 +660,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 Query query =
                     session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
                 query.setParameter("id", doc.getId());
+                if (query.uniqueResult() == null) {
+                    doc.setNew(true);
+                }
 
                 // Note: we don't use session.saveOrUpdate(doc) because it used to be slower in Hibernate than calling
                 // session.save() and session.update() separately.
-                if (query.uniqueResult() == null) {
+                if (doc.isNew()) {
                     if (doc.isContentDirty() || doc.isMetaDataDirty()) {
                         // Reset the creationDate to reflect the date of the first save, not the date of the object
                         // creation
@@ -750,6 +753,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private void updateXWikiSpaceTable(XWikiDocument document, Session session)
     {
         if (document.getLocale().equals(Locale.ROOT)) {
+            // It's possible the space does not yet exist yet
+            maybeCreateSpace(document.getDocumentReference().getLastSpaceReference(), document.isHidden(), session);
+
             if (!document.isNew()) {
                 // If the hidden state of an existing document did not changed there is nothing to do
                 if (document.isHidden() != document.getOriginalDocument().isHidden()) {
@@ -762,22 +768,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         makeSpaceVisible(document.getDocumentReference().getLastSpaceReference(), session);
                     }
                 }
-            } else {
-                // It's possible the space of a new document does not yet exist
-                maybeCreateSpace(document.getDocumentReference().getLastSpaceReference(), document.isHidden(),
-                    document.getFullName(), session);
             }
         }
     }
 
-    private void insertXWikiSpace(XWikiSpace space, String newDocument, Session session)
+    private void insertXWikiSpace(XWikiSpace space, Session session)
     {
         // Insert the space
         session.save(space);
 
         // Update parent space
         if (space.getSpaceReference().getParent() instanceof SpaceReference) {
-            maybeCreateSpace((SpaceReference) space.getSpaceReference().getParent(), space.isHidden(), newDocument,
+            maybeCreateSpace((SpaceReference) space.getSpaceReference().getParent(), space.isHidden(),
                 session);
         }
     }
@@ -833,7 +835,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private void maybeCreateSpace(SpaceReference spaceReference, boolean hidden, String newDocument, Session session)
+    private void maybeCreateSpace(SpaceReference spaceReference, boolean hidden, Session session)
     {
         XWikiSpace space = loadXWikiSpace(spaceReference, session);
 
@@ -842,7 +844,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 makeSpaceVisible(space, session);
             }
         } else {
-            insertXWikiSpace(new XWikiSpace(spaceReference, hidden), newDocument, session);
+            insertXWikiSpace(new XWikiSpace(spaceReference, hidden), session);
         }
     }
 

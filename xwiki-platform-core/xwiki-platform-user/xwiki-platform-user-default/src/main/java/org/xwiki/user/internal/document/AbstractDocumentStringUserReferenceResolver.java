@@ -21,12 +21,14 @@ package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 
 /**
@@ -45,12 +47,10 @@ public abstract class AbstractDocumentStringUserReferenceResolver extends Abstra
     @Override
     public UserReference resolve(String userName, Object... parameters)
     {
-        String userNameId = userName;
-        if (userName != null && userName.indexOf('.') != -1) {
-            userNameId = userName.substring(userName.indexOf('.') + 1);
-        }
-        UserReference reference = resolveName(userNameId);
-        if (reference == null) {
+        UserReference reference;
+        if (StringUtils.isEmpty(userName)) {
+            reference = CurrentUserReference.INSTANCE;
+        } else {
             EntityReference baseEntityReference;
             if (parameters.length == 1 && parameters[0] instanceof WikiReference) {
                 baseEntityReference = new EntityReference(USER_SPACE_REFERENCE, (WikiReference) parameters[0]);
@@ -58,9 +58,14 @@ public abstract class AbstractDocumentStringUserReferenceResolver extends Abstra
                 baseEntityReference = USER_SPACE_REFERENCE;
             }
             DocumentReference documentReference = getDocumentReferenceResolver().resolve(userName, baseEntityReference);
-            boolean isGlobal = this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)
-                .equals(documentReference.getWikiReference());
-            reference = new DocumentUserReference(documentReference, isGlobal);
+            UserReference resolvedReference = resolveName(documentReference.getName());
+            if (resolvedReference == null) {
+                boolean isGlobal = this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)
+                    .equals(documentReference.getWikiReference());
+                reference = new DocumentUserReference(documentReference, isGlobal);
+            } else {
+                reference = resolvedReference;
+            }
         }
         return reference;
     }

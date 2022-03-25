@@ -25,11 +25,13 @@ import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.SeleniumUtils;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.utility.DockerImageName;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.browser.Browser;
 
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
+import static org.xwiki.test.docker.junit5.browser.Browser.CHROME;
 
 /**
  * Create and execute the browser docker container for driving the tests.
@@ -73,7 +75,13 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
         Browser browser = testConfiguration.getBrowser();
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
-        BrowserWebDriverContainer<?> webDriverContainer = new XWikiBrowserWebDriverContainer<>()
+        // Note: The official Selenium dockerhub images don't support ARM64 (they won't work on Mac M1 for example).
+        // Thus we swap them for seleniarm docker images when we notice that the architecture is ARM64.
+        // See https://github.com/SeleniumHQ/docker-selenium#experimental-mult-arch-aarch64armhfamd64-images
+        // TODO: Remove if/when https://github.com/testcontainers/testcontainers-java/issues/5183 is fixed
+        BrowserWebDriverContainer<?> webDriverContainer = new XWikiBrowserWebDriverContainer<>(isARM64()
+            ? DockerImageName.parse(getSeleniarmImageName()).asCompatibleSubstituteFor(getSeleniumImageName())
+            : DockerImageName.parse(getSeleniumImageName()))
             // We set the width and height to one of the most used resolution by users so that we can reproduce issues
             // for the larger use case and also we use a relatively large resolution to display the maximum number of
             // elements on screen and reduce the risk of false positives in tests that could be due to elements not
@@ -120,5 +128,22 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
             testClassesDirectory = String.format("%s/test-classes", this.testConfiguration.getOutputDirectory());
         }
         return testClassesDirectory;
+    }
+
+    private String getSeleniarmImageName()
+    {
+        return CHROME.equals(this.testConfiguration.getBrowser()) ? "seleniarm/standalone-chromium"
+             : "seleniarm/standalone-firefox";
+    }
+
+    private String getSeleniumImageName()
+    {
+        return CHROME.equals(this.testConfiguration.getBrowser()) ? "selenium/standalone-chrome"
+            : "selenium/standalone-firefox";
+    }
+
+    private boolean isARM64()
+    {
+        return System.getProperty("os.arch").equals("aarch64");
     }
 }

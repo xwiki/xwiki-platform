@@ -240,6 +240,8 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
         format: 'html-print',
         xpage: 'get',
         outputSyntax: 'plain',
+        // Asynchronous rendering is disabled by default on the export action so we need to force it.
+        async: true,
         sheet: 'XWiki.PDFExport.Sheet'
       })) + '&amp;' + extraQueryString;
       iframe.attr('src', exportURL).appendTo($('body'));

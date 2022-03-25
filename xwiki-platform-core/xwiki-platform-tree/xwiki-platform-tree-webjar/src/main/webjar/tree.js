@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) {
+define(['jquery', 'xwiki-page-ready', 'JobRunner', 'jsTree', 'tree-finder'], function($, pageReady, JobRunner) {
   'use strict';
 
   // jsTree uses the underscore notation for its API, instead of camel case.
@@ -455,9 +455,11 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       }
       // Select the nodes if no callback is provided.
       callback = callback || this.select_node.bind(this);
-      openToNodes(this, nodeIds).then(function(nodes) {
+      // The tree is often expanded to show a specific node when the page loads (i.e. right after the tree is ready) and
+      // thus we should delay the page ready until this operation is done.
+      pageReady.delayPageReady(openToNodes(this, nodeIds).then(function(nodes) {
         return isArray ? nodes : nodes[0];
-      }).then(callback);
+      }).then(callback), 'tree:openTo');
     },
     refreshNode: function(node) {
       if (node === $.jstree.root) {
@@ -686,6 +688,11 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     //
 
     .each(function() {
+      // jsTree is using Web Workers to parse the JSON input and create the tree and there's no generic way to detect
+      // when they finish work so we need to manually delay the page ready until the tree is ready.
+      pageReady.delayPageReady(new Promise((resolve, reject) => {
+        $(this).one('ready.jstree', resolve);
+      }), 'tree:ready');
       $(this).jstree($.extend(true, getDefaultParams($(this)), params || {}));
       $.extend($.jstree.reference(this), customTreeAPI, {jobRunner: createJobRunner(this)});
     });

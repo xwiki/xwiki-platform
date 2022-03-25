@@ -21,6 +21,7 @@ package org.xwiki.user.internal.document;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -40,6 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
@@ -64,14 +67,28 @@ class DefaultDocumentStringUserReferenceResolverTest
     void setup()
     {
         when(this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(new WikiReference("wiki"));
+        when(this.defaultDocumentReferenceResolver.resolve(any(), eq(new EntityReference("XWiki", EntityType.SPACE))))
+            .thenAnswer(invocationOnMock -> {
+                String pageName = invocationOnMock.getArgument(0);
+                String spaceName = "XWiki";
+                String wikiName = "wiki";
+                if (pageName.contains(":")) {
+                    String[] split = pageName.split(":");
+                    wikiName = split[0];
+                    pageName = split[1];
+                }
+                if (pageName.contains(".")) {
+                    String[] split = pageName.split("\\.");
+                    spaceName = split[0];
+                    pageName = split[1];
+                }
+                return new DocumentReference(wikiName, spaceName, pageName);
+            });
     }
 
     @Test
     void resolveWithoutParameter()
     {
-        when(this.defaultDocumentReferenceResolver.resolve("page", new EntityReference("XWiki", EntityType.SPACE)))
-            .thenReturn(new DocumentReference("wiki", "XWiki", "page"));
-
         UserReference reference = this.resolver.resolve("page");
         assertNotNull(reference);
         assertTrue(reference instanceof DocumentUserReference);

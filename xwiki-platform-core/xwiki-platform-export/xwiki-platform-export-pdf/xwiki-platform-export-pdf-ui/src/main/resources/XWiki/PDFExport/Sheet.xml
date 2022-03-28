@@ -211,11 +211,44 @@
     });
   };
 
+  const replaceCanvasesWithImages = function(container) {
+    return $.makeArray(container.find('canvas')).reduce((replacePreviousCanvas, canvas) =&gt; {
+      return replacePreviousCanvas.then(replaceCanvasWithImage.bind(null, canvas)).catch((e) =&gt; {
+        console.log(`Failed to replace ${canvas.outerHTML} with image: ${e}`);
+      });
+    }, Promise.resolve());
+  };
+
+  // See https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#getting_a_file_representing_the_canvas
+  const replaceCanvasWithImage = function(canvas) {
+    return new Promise((resolve, reject) =&gt; {
+      canvas.toBlob(blob =&gt; {
+        const image = document.createElement('img'),
+          url = URL.createObjectURL(blob);
+        image.onload = function() {
+          // Revoke the object URL as soon as the image is loaded in order to release resources.
+          URL.revokeObjectURL(url);
+          resolve();
+        };
+        image.src = url;
+        canvas.parentNode.replaceChild(image, canvas);
+      }, 'image/png', 1);
+    });
+  };
+
+  // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become blank when
+  // they are moved around within the DOM tree.
+  pageReady.afterPageReady(() =&gt; {
+    fixInternalAnchors($('#xwikicontent, .pdf-toc'));
+    // Canvases are replaced with images asynchronously so we need to return a promise in order to delay the rest of the
+    // page ready callbacks.
+    return replaceCanvasesWithImages($('#xwikicontent'));
+  });
+
   // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page
   // ready callbacks wait for the print preview to be ready. This is important in case one of the next page ready
   // callbacks triggers the print.
   pageReady.afterPageReady(() =&gt; new Promise((resolve, reject) =&gt; {
-    fixInternalAnchors($('#xwikicontent, .pdf-toc'));
     window.PagedConfig = {after: resolve};
     require(['paged-polyfill'], function(PagedPolyfill) {});
   }));

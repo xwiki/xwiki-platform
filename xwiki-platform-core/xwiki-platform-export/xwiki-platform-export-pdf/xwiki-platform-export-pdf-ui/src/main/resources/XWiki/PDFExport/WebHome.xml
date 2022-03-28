@@ -224,7 +224,11 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
   const exportToPDF = function(extraQueryString) {
     return new Promise((resolve, reject) =&gt; {
       const iframe = $('&lt;iframe/&gt;').css({
-        'visibility': 'hidden'
+        // The load event is not fired if we hide it completely with display:none.
+        'visibility': 'hidden',
+        // Use the same width as the main window because the CSS or JavaScript code could rely on it (we want the result
+        // to look exactly as if the user has opened the export URL directly).
+        'width': $(window).width()
       }).on('load', () =&gt; {
         iframe[0].contentWindow.xwikiPageReady.afterPageReady(() =&gt; {
           // Trigger the print only after all page ready callbacks were executed, because the print preview is

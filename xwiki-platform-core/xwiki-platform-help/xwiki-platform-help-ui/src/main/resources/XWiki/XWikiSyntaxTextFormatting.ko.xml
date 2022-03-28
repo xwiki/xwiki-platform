@@ -20,33 +20,48 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Index.Translations" locale="ko">
-  <web>Index</web>
-  <name>Translations</name>
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxTextFormatting</name>
   <language>ko</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Index.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title/>
+  <title>XWikiSyntaxTextFormatting</title>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>plain/1.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Spaces
-index.spacesMacro.spaceIndex.title=스페이스 목록 보기
-index.spacesMacro.spaceIndex.alt=스페이스 목록
-index.spacesMacro.spaceAdministration.title=스페이스 관리자 보기
-index.spacesMacro.spaceAdministration.alt=관리자 스페이스
-index.spacesMacro.createSpace.link=스페이스 생성
-index.spacesMacro.createSpace.defaultSpaceName=스페이스 이름
-index.spacesMacro.createSpace.submit=글쓰기
-index.deletedDocuments.deleteAll=전체 삭제
-index.administration.remainingTasks.heading=나머지 문서 분석 작업
-index.administration.remainingTasks.emptyQueue=남은 작업이 없습니다.
-admin.documentanalysis=문서 분석
-</content>
+  <content>= 편집 =
+
+== 텍스트 형식 지정 ==
+
+=== 1.0 텍스트 형식 지정 ===
+
+|=요소|=XWiki 구문 1.0|=결과
+|굵은 글씨|{{{*굵은 글씨*}}}|**굵은 글씨**
+|밑줄|{{{__밑줄___}}}|__밑줄__
+|기울임|{{{~~기울임~~}}}|//기울임//
+|취소선|{{{--취소선--}}}|--취소선--
+|고정폭 글꼴|&lt;tt&gt;monospace&lt;/tt&gt;|##monospace##
+|위 첨자|some &lt;sup&gt;위 첨자&lt;/sup&gt;|some ^^위 첨자^^
+|아래 첨자|some &lt;sub&gt;아래 첨자&lt;/sub&gt;|some ,,아래 첨자,,
+
+=== 2.0 텍스트 형식 지정 ===
+
+|=요소|=XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
+|굵은 글씨|{{{**굵은 글씨**}}}|**굵은 글씨**
+|밑줄|{{{__밑줄__}}}|__밑줄__
+|기울임|{{{//기울임//}}}|//기울임//
+|취소선|{{{--취소선--}}}|--취소선--
+|고정폭 글꼴|{{{##monospace##}}}|##monospace##
+|위 첨자|{{{some ^^위 첨자^^}}}|some ^^위 첨자^^
+|아래 첨자|{{{some ,,아래 첨자,,}}}|some ,,아래 첨자,,</content>
 </xwikidoc>

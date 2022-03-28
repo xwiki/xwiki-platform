@@ -236,10 +236,19 @@
     });
   };
 
+  // Remove the Table of Contents if empty.
+  const removeEmptyToC = function() {
+    const toc = $('.pdf-toc');
+    if (!toc.find('li').length) {
+      toc.remove();
+    }
+  };
+
   // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become blank when
   // they are moved around within the DOM tree.
   pageReady.afterPageReady(() =&gt; {
     fixInternalAnchors($('#xwikicontent, .pdf-toc'));
+    removeEmptyToC();
     // Canvases are replaced with images asynchronously so we need to return a promise in order to delay the rest of the
     // page ready callbacks.
     return replaceCanvasesWithImages($('#xwikicontent'));

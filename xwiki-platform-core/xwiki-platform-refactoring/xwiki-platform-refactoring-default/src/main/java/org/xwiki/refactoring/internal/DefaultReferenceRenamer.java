@@ -74,7 +74,8 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
         ResourceType.DOCUMENT,
         ResourceType.SPACE,
         ResourceType.PAGE,
-        ResourceType.ATTACHMENT
+        ResourceType.ATTACHMENT,
+        ResourceType.PAGE_ATTACHMENT
     ));
 
     @Inject

@@ -5408,7 +5408,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the XWiki context.
      * @param entityType the type of references to return
      * @return the references of the linked entities (documents, attachments, etc.), if null an error append.
-     * @since 11.2RC1
+     * @since 14.2RC1
      */
     private Set<EntityReference> getUniqueLinkedEntityReferences(XWikiContext context, EntityType entityType)
     {

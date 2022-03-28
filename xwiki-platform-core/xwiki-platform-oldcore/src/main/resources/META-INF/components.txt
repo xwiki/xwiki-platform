@@ -43,6 +43,7 @@ com.xpn.xwiki.internal.filter.input.PropertyClassEventGenerator
 com.xpn.xwiki.internal.filter.input.XWikiAttachmentContentInputSourceReferenceParser
 com.xpn.xwiki.internal.filter.input.XWikiAttachmentEventGenerator
 com.xpn.xwiki.internal.filter.input.XWikiDocumentLocaleEventGenerator
+com.xpn.xwiki.internal.filter.input.XWikiPageAttachmentContentInputSourceReferenceParser
 com.xpn.xwiki.internal.filter.output.BaseClassOutputFilterStream
 com.xpn.xwiki.internal.filter.output.BaseObjectOutputFilterStream
 com.xpn.xwiki.internal.filter.output.BasePropertyOutputFilterStream

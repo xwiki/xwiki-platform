@@ -137,6 +137,7 @@ public class LinkParser
      * @param entityType the entity type to use for resolving the references.
      * @param currentReference the current document reference for making a relative resolution.
      * @return a set of references contained in the XDOM.
+     * @since 14.2RC1
      */
     public Set<EntityReference> getUniqueLinkedEntityReferences(XDOM dom, EntityType entityType,
         DocumentReference currentReference)

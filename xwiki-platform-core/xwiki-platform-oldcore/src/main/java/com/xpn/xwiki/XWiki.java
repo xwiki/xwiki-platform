@@ -486,6 +486,8 @@ public class XWiki implements EventListener
 
     private AsyncContext asyncContext;
 
+    private AuthorizationManager authorizationManager;
+
     private ConfigurationSource getConfiguration()
     {
         if (this.xwikicfg == null) {
@@ -816,6 +818,15 @@ public class XWiki implements EventListener
         }
 
         return this.asyncContext;
+    }
+
+    private AuthorizationManager getAuthorizationManager()
+    {
+        if (this.authorizationManager == null) {
+            this.authorizationManager = Utils.getComponent(AuthorizationManager.class);
+        }
+
+        return this.authorizationManager;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -5919,9 +5930,8 @@ public class XWiki implements EventListener
             }
         }
 
-        AuthorizationManager authorizationManager = Utils.getComponent(AuthorizationManager.class);
-        if (!"skin".equals(context.getAction()) &&
-            !authorizationManager.hasAccess(Right.VIEW, context.getUserReference(), reference)) {
+        if (!"skin".equals(context.getAction())
+            && !getAuthorizationManager().hasAccess(Right.VIEW, context.getUserReference(), reference)) {
             // If for some reason (e.g., login action) the user has rights for the action but no view right on the
             // document, do not load the document into the context.
             setPhonyDocument(reference, context, vcontext);

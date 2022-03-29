@@ -26,15 +26,14 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -187,13 +186,11 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     protected Pair<String, Set<File>> buildPresentationHTML(OfficeConverterResult officeConverterResult, String nameSpace)
         throws IOException
     {
-        StringBuilder presentationHTML = new StringBuilder();
-
         Set<File> artifactFiles = new HashSet<>();
         // Iterate all the slides.
         Set<File> conversionOutputFiles = officeConverterResult.getAllFiles();
         File outputDirectory = officeConverterResult.getOutputDirectory();
-        List<String> filenames = new ArrayList<>();
+        Map<Integer, String> filenames = new HashMap<>();
         for (File conversionOutputFile : conversionOutputFiles) {
             Matcher matcher = SLIDE_FORMAT.matcher(conversionOutputFile.getName());
             if (matcher.matches()) {
@@ -217,13 +214,14 @@ public class DefaultPresentationBuilder implements PresentationBuilder
                 // https://github.com/sbraconnier/jodconverter/issues/125 is fixed.
                 slideImageURL = slideImageURL.replace('+', ' ');
 
-                filenames.add(slideImageURL);
+                filenames.put(Integer.parseInt(number), slideImageURL);
             }
         }
-        // We sort the filenames so that the numbers are ordered.
-        Collections.sort(filenames);
-        filenames.forEach(name -> presentationHTML.append(String.format("<p><img src=\"%s\"/></p>", name)));
-        return Pair.of(presentationHTML.toString(), artifactFiles);
+        // We sort by number so that the filenames are ordered by slide number.
+        String presentationHTML = filenames.entrySet().stream().sorted(Map.Entry.comparingByKey())
+            .map(entry -> String.format("<p><img src=\"%s\"/></p>", entry.getValue()))
+            .collect(Collectors.joining());
+        return Pair.of(presentationHTML, artifactFiles);
     }
 
     /**

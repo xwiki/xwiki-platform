@@ -239,17 +239,20 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
 
                 Set<String> dynamicTables = new HashSet<>();
 
+                // Gather existing tables
                 List<PersistentClass> existingTables = new ArrayList<>(bindings.size());
+                for (PersistentClass entity : this.hibernateStore.getConfigurationMetadata().getEntityBindings()) {
+                    if (exists(entity, databaseMetaData)) {
+                        existingTables.add(entity);
+                    }
+                }
 
+                // Cleanup specific to MySQL/MariaDB
                 if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
                     // Make sure all MySQL/MariaDB tables use a DYNAMIC row format (required to support key prefix
                     // length limit up to 3072 bytes)
-                    for (PersistentClass entity : this.hibernateStore.getConfigurationMetadata().getEntityBindings()) {
-                        if (exists(entity, databaseMetaData)) {
-                            existingTables.add(entity);
-
-                            setTableDYNAMIC(entity, builder, dynamicTables);
-                        }
+                    for (PersistentClass entity : existingTables) {
+                        setTableDYNAMIC(entity, builder, dynamicTables);
                     }
 
                     // Remove combined UNIQUE KEY affecting xwikiattrecyclebin#XDA_FILENAME column since those are not

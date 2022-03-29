@@ -81,7 +81,8 @@ $response.setContentType("application/json")
 ##
 #set ($order = "$!request.sort")
 #if (!$regextool.compile('^(doc\.)?\w+$').matcher($order).matches())
-  #set ($order = '')
+  { "error" : "invalid sort parameter" }
+  #stop ("invalid sort parameter [$order] found")
 #end
 #set ($orderQueryPart = '')
 #if ($order != '')

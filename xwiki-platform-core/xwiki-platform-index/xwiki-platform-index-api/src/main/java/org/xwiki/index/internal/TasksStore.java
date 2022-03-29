@@ -21,6 +21,8 @@ package org.xwiki.index.internal;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -48,6 +50,14 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 @Singleton
 public class TasksStore extends XWikiHibernateBaseStore
 {
+    /**
+     * A special character inserted at the beginning of all document versions, to make sure that the versions are never
+     * the empty string, otherwise Oracle fails to persist the task.
+     *
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-19571">XWIKI-19571</a></a>
+     */
+    private static final String FILLER = "-";
+
     @Inject
     private ExecutionContextManager contextManager;
 
@@ -58,18 +68,27 @@ public class TasksStore extends XWikiHibernateBaseStore
      * Retrieve the list of all the tasks queued for a given wiki for the current instance.
      *
      * @param wikiId the wiki in which to execute the query
-     * @param instanceId the identitfier of the cluster instance in which to execute the task. Each cluster member
-     *     is in charge of consuming its own tasks
+     * @param instanceId the identifier of the cluster instance in which to execute the task. Each cluster member is
+     *     in charge of consuming its own tasks
      * @return the list of all the task
      * @throws XWikiException in case of error when creating or executing the query
      */
     public List<XWikiDocumentIndexingTask> getAllTasks(String wikiId, String instanceId) throws XWikiException
     {
-        return initWikiContext(xWikiContext -> executeRead(xWikiContext,
-            session -> session.createQuery("SELECT t FROM XWikiDocumentIndexingTask t " 
+        List<XWikiDocumentIndexingTask> tasks = initWikiContext(xWikiContext -> executeRead(xWikiContext,
+            session -> session.createQuery("SELECT t FROM XWikiDocumentIndexingTask t "
                     + "WHERE t.id.instanceId = :instanceId")
                 .setParameter("instanceId", instanceId)
                 .getResultList()), wikiId);
+        // TODO: XWIKI-19581
+        // Cleanup the filler placed at the beginning of the versions before returning the tasks as they are only needed
+        // to prevent empty string in the version column on Oracle.  
+        return tasks.stream()
+            .map(task -> {
+                task.getId().setVersion(task.getId().getVersion().replace(FILLER, ""));
+                return task;
+            })
+            .collect(Collectors.toList());
     }
 
     /**
@@ -82,10 +101,19 @@ public class TasksStore extends XWikiHibernateBaseStore
     public void addTask(String wikiId, XWikiDocumentIndexingTask task) throws XWikiException
     {
         initWikiContext(xWikiContext -> {
-            executeWrite(xWikiContext, session -> {
-                innerAddTask(task, session);
-                return null;
-            });
+            // TODO: XWIKI-19581
+            String version = task.getId().getVersion();
+            try {
+                task.getId().setVersion(FILLER + Optional.ofNullable(version).orElse(""));
+                executeWrite(xWikiContext, session -> {
+                    innerAddTask(task, session);
+                    return null;
+                });
+            } finally {
+                // Make sure the version is modified only for the duration of the save as it is only needed to prevent 
+                // empty string in the version column on Oracle.
+                task.getId().setVersion(version);
+            }
             return null;
         }, wikiId);
     }
@@ -103,7 +131,6 @@ public class TasksStore extends XWikiHibernateBaseStore
     {
         initWikiContext(xWikiContext -> {
             executeWrite(xWikiContext, session -> {
-
                 session.createQuery("delete from XWikiDocumentIndexingTask t where t.id.docId = :docId "
                         + "and t.id.version = :version "
                         + "and t.id.type = :type")
@@ -127,16 +154,24 @@ public class TasksStore extends XWikiHibernateBaseStore
     public void replaceTask(String wikiId, XWikiDocumentIndexingTask task) throws XWikiException
     {
         initWikiContext(xWikiContext -> {
-            executeWrite(xWikiContext, session -> {
-                XWikiDocumentIndexingTaskId taskId = task.getId();
-                session.createQuery("delete from XWikiDocumentIndexingTask t where t.id.docId = :docId "
-                        + "and t.id.type = :type")
-                    .setParameter("docId", taskId.getDocId())
-                    .setParameter("type", taskId.getType())
-                    .executeUpdate();
-                innerAddTask(task, session);
-                return null;
-            });
+            String version = task.getId().getVersion();
+            try {
+                task.getId().setVersion(FILLER + Optional.ofNullable(version).orElse(""));
+                executeWrite(xWikiContext, session -> {
+                    XWikiDocumentIndexingTaskId taskId = task.getId();
+                    session.createQuery("delete from XWikiDocumentIndexingTask t where t.id.docId = :docId "
+                            + "and t.id.type = :type")
+                        .setParameter("docId", taskId.getDocId())
+                        .setParameter("type", taskId.getType())
+                        .executeUpdate();
+                    innerAddTask(task, session);
+                    return null;
+                });
+            } finally {
+                // Make sure the version is modified only for the duration of the save as it is only needed to prevent 
+                // empty string in the version column on Oracle.
+                task.getId().setVersion(version);
+            }
             return null;
         }, wikiId);
     }
@@ -182,7 +217,8 @@ public class TasksStore extends XWikiHibernateBaseStore
             task.setTimestamp(new Date());
         }
 
-        // Update allowed in case the same document is queued again with the same version and the same task on restart.
+        // Update allowed in case the same document is queued again with the same version and the same task on 
+        // restart.
         session.saveOrUpdate(task);
     }
 

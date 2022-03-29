@@ -74,6 +74,7 @@ public class IntegrationTests implements RenderingTests
 
         when(mockConfiguration.getRenderer()).thenReturn("snuggletex");
         when(mockConfiguration.getDefaultType()).thenReturn(FormulaRenderer.Type.DEFAULT);
+        when(mockConfiguration.getDefaultFontSize()).thenReturn(FormulaRenderer.FontSize.DEFAULT);
         when(mockImageStorage.get(any(String.class))).thenReturn(null);
     }
 

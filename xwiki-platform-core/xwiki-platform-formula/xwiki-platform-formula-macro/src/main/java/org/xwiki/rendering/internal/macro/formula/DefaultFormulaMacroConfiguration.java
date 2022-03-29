@@ -65,6 +65,13 @@ public class DefaultFormulaMacroConfiguration implements FormulaMacroConfigurati
     private static final String DEFAULT_TYPE = FormulaRenderer.Type.DEFAULT.toString();
 
     /**
+     * Default value for the default font size.
+     *
+     * @see #getDefaultFontSize()
+     */
+    private static final String DEFAULT_FONT_SIZE = FormulaRenderer.FontSize.DEFAULT.toString();
+
+    /**
      * Defines from where to read the rendering configuration data.
      */
     @Inject
@@ -86,5 +93,12 @@ public class DefaultFormulaMacroConfiguration implements FormulaMacroConfigurati
     public FormulaRenderer.Type getDefaultType()
     {
         return FormulaRenderer.Type.valueOf(this.configuration.getProperty(PREFIX + "defaultType", DEFAULT_TYPE));
+    }
+
+    @Override
+    public FormulaRenderer.FontSize getDefaultFontSize()
+    {
+        return FormulaRenderer.FontSize.valueOf(this.configuration.getProperty(PREFIX + "defaultFontSize",
+            DEFAULT_FONT_SIZE));
     }
 }

@@ -62,4 +62,15 @@ public interface FormulaMacroConfiguration
     {
         return FormulaRenderer.Type.DEFAULT;
     }
+
+    /**
+     * The default font size to be used when rendering formulas.
+     *
+     * @return the font size
+     * @since 14.3RC1
+     */
+    default FormulaRenderer.FontSize getDefaultFontSize()
+    {
+        return FormulaRenderer.FontSize.DEFAULT;
+    }
 }

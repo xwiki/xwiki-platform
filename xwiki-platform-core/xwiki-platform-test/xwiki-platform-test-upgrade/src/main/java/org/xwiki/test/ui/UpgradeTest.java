@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,6 +53,7 @@ import org.xwiki.extension.test.po.flavor.FlavorPicker;
 import org.xwiki.extension.test.po.flavor.FlavorPickerInstallStep;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.model.namespace.WikiNamespace;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.test.ui.po.ViewPage;
@@ -247,9 +249,14 @@ public class UpgradeTest extends AbstractTest
 
         // Make sure the watchlist UI has been uninstalled
         assertNotInstalledOnMainWiki(EXTENSIONID_WATCHLIST_UI);
+
         // Make sure the previous codemirror versions have been replaced
         assertNotInstalled(EXTENSIONID_CODEMIRROR_58);
         assertNotInstalled(EXTENSIONID_CODEMIRROR_5242);
+
+        // Make sure it's possible to create a page with 768 characters in the reference
+        getUtil().rest()
+            .savePage(new LocalDocumentReference("Upgrade", StringUtils.repeat("a", 768 - "Upgrade".length() - 1)));
 
         ////////////////////
         // Custom validation

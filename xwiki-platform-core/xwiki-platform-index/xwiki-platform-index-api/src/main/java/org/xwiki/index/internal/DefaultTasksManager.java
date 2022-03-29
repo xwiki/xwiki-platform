@@ -53,7 +53,6 @@ import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTask;
-import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTaskId;
 
 import static java.lang.Thread.NORM_PRIORITY;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
@@ -307,9 +306,9 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
     {
         TaskData taskData = new TaskData();
         taskData.setTimestamp(task.getTimestamp().getTime());
-        taskData.setVersion(task.getId().getVersion());
-        taskData.setDocId(task.getId().getDocId());
-        taskData.setType(task.getId().getType());
+        taskData.setVersion(task.getVersion());
+        taskData.setDocId(task.getDocId());
+        taskData.setType(task.getType());
         taskData.setWikiId(wikiId);
         return taskData;
     }
@@ -317,12 +316,10 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
     private XWikiDocumentIndexingTask initTask(long docId, String type, String version)
     {
         XWikiDocumentIndexingTask xWikiTask = new XWikiDocumentIndexingTask();
-        XWikiDocumentIndexingTaskId id = new XWikiDocumentIndexingTaskId();
-        id.setDocId(docId);
-        id.setType(type);
-        id.setVersion(version);
-        id.setInstanceId(this.remoteObservationManagerConfiguration.getId());
-        xWikiTask.setId(id);
+        xWikiTask.setDocId(docId);
+        xWikiTask.setType(type);
+        xWikiTask.setVersion(version);
+        xWikiTask.setInstanceId(this.remoteObservationManagerConfiguration.getId());
         xWikiTask.setTimestamp(new Date());
         return xWikiTask;
     }

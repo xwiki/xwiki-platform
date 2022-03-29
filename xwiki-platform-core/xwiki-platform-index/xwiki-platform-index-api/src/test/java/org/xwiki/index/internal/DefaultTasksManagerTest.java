@@ -45,7 +45,6 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTask;
-import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTaskId;
 
 import ch.qos.logback.classic.Level;
 
@@ -136,12 +135,10 @@ class DefaultTasksManagerTest
             this.tasksManager.addTask("wikiId", 42, "1.3", "testtask");
 
         XWikiDocumentIndexingTask task = new XWikiDocumentIndexingTask();
-        XWikiDocumentIndexingTaskId taskId = new XWikiDocumentIndexingTaskId();
-        taskId.setDocId(42);
-        taskId.setType("testtask");
-        taskId.setInstanceId(INSTANCE_ID);
-        taskId.setVersion("1.3");
-        task.setId(taskId);
+        task.setDocId(42);
+        task.setType("testtask");
+        task.setInstanceId(INSTANCE_ID);
+        task.setVersion("1.3");
         verify(this.tasksStore).addTask("wikiId", task);
 
         TaskData taskData = new TaskData(42, "1.3", "testtask", "wikiId");
@@ -163,12 +160,10 @@ class DefaultTasksManagerTest
             this.tasksManager.addTask("wikiId", 42, "1.3", "testtask");
 
         XWikiDocumentIndexingTask task = new XWikiDocumentIndexingTask();
-        XWikiDocumentIndexingTaskId taskId = new XWikiDocumentIndexingTaskId();
-        taskId.setDocId(42);
-        taskId.setType("testtask");
-        taskId.setInstanceId(INSTANCE_ID);
-        taskId.setVersion("1.3");
-        task.setId(taskId);
+        task.setDocId(42);
+        task.setType("testtask");
+        task.setInstanceId(INSTANCE_ID);
+        task.setVersion("1.3");
         verify(this.tasksStore).addTask("wikiId", task);
 
         TaskData taskData = new TaskData(42, "1.3", "testtask", "wikiId");
@@ -186,12 +181,10 @@ class DefaultTasksManagerTest
     {
         this.tasksManager.startThread();
         XWikiDocumentIndexingTask task = new XWikiDocumentIndexingTask();
-        XWikiDocumentIndexingTaskId taskId = new XWikiDocumentIndexingTaskId();
-        taskId.setDocId(42);
-        taskId.setType("testtask");
-        taskId.setInstanceId(INSTANCE_ID);
-        taskId.setVersion("");
-        task.setId(taskId);
+        task.setDocId(42);
+        task.setType("testtask");
+        task.setInstanceId(INSTANCE_ID);
+        task.setVersion("");
 
         doThrow(new XWikiException()).when(this.tasksStore).addTask("wikiId", task);
 
@@ -214,11 +207,9 @@ class DefaultTasksManagerTest
         when(this.wikiDescriptorManager.getAllIds()).thenReturn(List.of("wikiId", "wikiB"));
         XWikiDocumentIndexingTask xWikiTask = new XWikiDocumentIndexingTask();
         xWikiTask.setTimestamp(new Date());
-        XWikiDocumentIndexingTaskId id = new XWikiDocumentIndexingTaskId();
-        id.setVersion("1.3");
-        id.setType("testtask");
-        id.setDocId(42);
-        xWikiTask.setId(id);
+        xWikiTask.setVersion("1.3");
+        xWikiTask.setType("testtask");
+        xWikiTask.setDocId(42);
         when(this.tasksStore.getAllTasks("wikiId", INSTANCE_ID)).thenReturn(List.of(xWikiTask));
 
         this.tasksManager.startThread();

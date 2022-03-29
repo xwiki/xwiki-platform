@@ -26,5 +26,7 @@
 
 <suppressions>
   <suppress checks="MultipleStringLiterals" files="src/main/java/org/xwiki/index/internal/TasksStore\.java"/>
+  <suppress checks="MultipleStringLiterals" 
+    files="src/main/java/org/xwiki/index/migration/R140300001XWIKI19571DataMigration\.java"/>
   <suppress checks="ClassFanOutComplexity" files="src/main/java/org/xwiki/index/internal/DefaultTasksManager\.java"/>
 </suppressions>

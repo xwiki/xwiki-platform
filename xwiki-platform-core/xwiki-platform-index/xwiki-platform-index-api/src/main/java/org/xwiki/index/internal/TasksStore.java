@@ -37,7 +37,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTask;
-import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTaskId;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 
 /**
@@ -78,7 +77,7 @@ public class TasksStore extends XWikiHibernateBaseStore
     {
         List<XWikiDocumentIndexingTask> tasks = initWikiContext(xWikiContext -> executeRead(xWikiContext,
             session -> session.createQuery("SELECT t FROM XWikiDocumentIndexingTask t "
-                    + "WHERE t.id.instanceId = :instanceId")
+                    + "WHERE t.instanceId = :instanceId")
                 .setParameter("instanceId", instanceId)
                 .getResultList()), wikiId);
         // TODO: XWIKI-19581
@@ -132,9 +131,9 @@ public class TasksStore extends XWikiHibernateBaseStore
     {
         initWikiContext(xWikiContext -> {
             executeWrite(xWikiContext, session -> {
-                session.createQuery("delete from XWikiDocumentIndexingTask t where t.id.docId = :docId "
-                        + "and t.id.version = :version "
-                        + "and t.id.type = :type")
+                session.createQuery("delete from XWikiDocumentIndexingTask t where t.docId = :docId "
+                        + "and t.version = :version "
+                        + "and t.type = :type")
                     .setParameter("docId", docId)
                     .setParameter("version", internalVersion(version))
                     .setParameter("type", type)
@@ -159,11 +158,10 @@ public class TasksStore extends XWikiHibernateBaseStore
             try {
                 task.getId().setVersion(internalVersion(version));
                 executeWrite(xWikiContext, session -> {
-                    XWikiDocumentIndexingTaskId taskId = task.getId();
-                    session.createQuery("delete from XWikiDocumentIndexingTask t where t.id.docId = :docId "
-                            + "and t.id.type = :type")
-                        .setParameter("docId", taskId.getDocId())
-                        .setParameter("type", taskId.getType())
+                    session.createQuery("delete from XWikiDocumentIndexingTask t where t.docId = :docId "
+                            + "and t.type = :type")
+                        .setParameter("docId", task.getDocId())
+                        .setParameter("type", task.getType())
                         .executeUpdate();
                     innerAddTask(task, session);
                     return null;

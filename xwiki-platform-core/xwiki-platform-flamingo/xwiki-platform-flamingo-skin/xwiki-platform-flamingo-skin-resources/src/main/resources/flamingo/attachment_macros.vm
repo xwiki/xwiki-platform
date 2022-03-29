@@ -174,7 +174,7 @@
         </a>
     #end
     #set ($historyURL = $xwiki.getURL($attachmentReference, 'viewattachrev', $NULL))
-    <a class="action" href="$historyURL#"
+    <a class="history action" href="$historyURL#"
         title="$escapetool.xml($services.localization.render('core.viewers.attachments.showHistory'))">
       <span class="action-icon">$services.icon.renderHTML('list-numbers')</span><span class="action-label">$escapetool.xml(
         $services.localization.render('core.viewers.attachments.showHistory.label'))
@@ -202,7 +202,7 @@
         'xredirect': $options.redirect
       }))
       #set ($deleteURL = $xwiki.getURL($attachment.getReference(), 'delattachment', $queryString))
-      <a class="deletelink action" title="$escapetool.xml($services.localization.render(
+      <a class="actiondelete action" title="$escapetool.xml($services.localization.render(
           'core.viewers.attachments.delete.title', [$attachment.filename]))" href="$deleteURL#">
         <span class="action-icon">$services.icon.renderHTML('cross')</span><span class="action-label">$escapetool.xml(
           $services.localization.render('core.viewers.attachments.delete'))

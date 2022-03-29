@@ -245,7 +245,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    * On delete action, show a confirmation modal and save the element that triggered this event to be able to access
    * information after confirmation.
    */
-  $(document).on('click', '.attachmentActions .deletelink', function(event) {
+  $(document).on('click', '.attachmentActions .actiondelete', function(event) {
     event.preventDefault();
     $('#deleteAttachment').data('relatedTarget', event.currentTarget);
     $('#deleteAttachment').modal('show');

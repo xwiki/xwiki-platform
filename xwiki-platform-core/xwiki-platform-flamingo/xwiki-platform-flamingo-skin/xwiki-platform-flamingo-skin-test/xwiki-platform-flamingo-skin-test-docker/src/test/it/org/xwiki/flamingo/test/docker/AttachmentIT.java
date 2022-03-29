@@ -72,10 +72,13 @@ class AttachmentIT
 
     /**
      * Ensure that the attachment is properly deleted through the UI.
+     *
+     * @throws Exception in case of errors
      */
     @Test
     @Order(1)
     void uploadAttachments(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
     {
         String testPageName = setup.serializeReference(testReference).split(":")[1];
         setup.deletePage(testReference);

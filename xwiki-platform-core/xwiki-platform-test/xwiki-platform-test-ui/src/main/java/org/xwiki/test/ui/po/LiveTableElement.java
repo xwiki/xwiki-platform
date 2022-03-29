@@ -214,6 +214,14 @@ public class LiveTableElement extends BaseElement
         return getDriver().findElementWithoutWaiting(liveTableBody, By.xpath("tr[" + rowNumber + "]"));
     }
 
+    public int getRowNumberForElement(By by)
+    {
+        WebElement livetableRowElement =
+            getDriver().findElement(By.xpath("//tbody[@id='" + this.livetableId + "-display']/tr/td")).findElement(by);
+        return Integer
+            .parseInt(livetableRowElement.findElement(By.xpath("./ancestor::tr[1]")).getAttribute("data-index"));
+    }
+
     /**
      * @since 5.3RC1
      */

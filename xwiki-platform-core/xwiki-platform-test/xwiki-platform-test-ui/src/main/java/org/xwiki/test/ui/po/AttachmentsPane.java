@@ -19,16 +19,20 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-
-import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 
 /**
  * Represents the actions possible on the Attachment Pane at the bottom of a page.
@@ -110,11 +114,9 @@ public class AttachmentsPane extends BaseElement
             .click();
     }
 
-    public int getAttachmentRowNb(String attachmentName)
+    public int getRowNumberByAttachmentName(String attachmentName)
     {
-        return Integer.parseInt(getDriver()
-            .findElement(By.xpath("//tbody[@id='docAttachments-display']//tr[td//a[text()='" + attachmentName + "']]"))
-            .getAttribute("data-index"));
+        return this.attachmentsLivetable.getRowNumberForElement(By.xpath("//a[text()='" + attachmentName + "']"));
     }
 
     /**
@@ -126,13 +128,8 @@ public class AttachmentsPane extends BaseElement
      */
     public WebElement getAttachmentLink(String attachmentName)
     {
-        By attachementLinkSelector = By.xpath(
-            String.format("//div[@id='_attachments']//a[@title = 'Download this attachment' and contains(@href, '%s')]",
-                attachmentName));
-        // Make sure that the element is visible and can be clicked before returning it to prevent interacting too 
-        // early with the attachment link.
-        getDriver().waitUntilCondition(elementToBeClickable(attachementLinkSelector));
-        return getDriver().findElementWithoutWaiting(attachementLinkSelector);
+        return this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 2)
+            .findElement(By.tagName("a"));
     }
 
     /**
@@ -144,9 +141,9 @@ public class AttachmentsPane extends BaseElement
     {
         // We initialize before so we can remove the animation before the modal is shown
         this.confirmDelete = new ConfirmationModal(By.id("deleteAttachment"));
-        int attachmentsNumber = getNumberOfAttachments();
-        this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 7)
-            .findElement(By.className("actiondelete")).click();
+        WebElement deleteButton = this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 6)
+            .findElement(By.className("actiondelete"));
+        deleteButton.click();
         this.confirmDelete.clickOk();
 
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
@@ -154,7 +151,11 @@ public class AttachmentsPane extends BaseElement
             @Override
             public Boolean apply(WebDriver driver)
             {
-                return getNumberOfAttachments() == attachmentsNumber - 1;
+                try {
+                    return !confirmDelete.isDisplayed() && !deleteButton.isDisplayed();
+                } catch (StaleElementReferenceException e) {
+                    return true;
+                }
             }
         });
     }
@@ -166,8 +167,8 @@ public class AttachmentsPane extends BaseElement
     {
         // We initialize before so we can remove the animation before the modal is shown
         this.confirmDelete = new ConfirmationModal(By.id("deleteAttachment"));
-        int attachmentsNumber = getNumberOfAttachments();
-        this.attachmentsLivetable.getCell(1, 7).findElement(By.className("actiondelete")).click();
+        WebElement deleteButton = this.attachmentsLivetable.getCell(1, 6).findElement(By.className("actiondelete"));
+        deleteButton.click();
         this.confirmDelete.clickOk();
 
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
@@ -175,7 +176,11 @@ public class AttachmentsPane extends BaseElement
             @Override
             public Boolean apply(WebDriver driver)
             {
-                return getNumberOfAttachments() == attachmentsNumber - 1;
+                try {
+                    return !confirmDelete.isDisplayed() && !deleteButton.isDisplayed();
+                } catch (StaleElementReferenceException e) {
+                    return true;
+                }
             }
         });
 
@@ -202,18 +207,22 @@ public class AttachmentsPane extends BaseElement
 
     public String getUploaderOfAttachment(String attachmentName)
     {
-        return this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 6).getText();
+        return this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 5).getText();
     }
 
     /**
      * Return the version number for the requested attachment.
      *
      * @param attachmentName the name of the attachment
-     * @return the version number displayed for the attachment
+     * @return the version number displayed in the attachment URL
      */
-    public String getLatestVersionOfAttachment(String attachmentName)
+    public String getLatestVersionOfAttachment(String attachmentName) throws Exception
     {
-        return getAttachmentVersionElement(attachmentName).getText();
+        URL url = new URL(getAttachmentLink(attachmentName).getAttribute("href"));
+        List<NameValuePair> params =
+            new ArrayList<NameValuePair>(URLEncodedUtils.parse(url.getQuery(), Charset.forName("UTF-8")));
+
+        return params.stream().filter(p -> p.getName().equals("rev")).findFirst().get().getValue();
     }
 
     /**
@@ -225,19 +234,20 @@ public class AttachmentsPane extends BaseElement
      */
     public AttachmentHistoryPage goToAttachmentHistory(String attachmentName)
     {
-        getAttachmentVersionElement(attachmentName).click();
+        this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 6)
+            .findElement(By.className("history")).click();
         return new AttachmentHistoryPage();
     }
 
     public String getSizeOfAttachment(String attachmentName)
     {
-        return this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 4).getText();
+        return this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 3).getText();
 
     }
 
     public String getDateOfLastUpload(String attachmentName)
     {
-        return this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 5).getText();
+        return this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 4).getText();
     }
 
     public boolean attachmentExistsByFileName(String attachmentName)
@@ -249,12 +259,5 @@ public class AttachmentsPane extends BaseElement
             return false;
         }
         return true;
-    }
-
-    private WebElement getAttachmentVersionElement(String attachmentName)
-    {
-        return getDriver()
-            .findElement(By.xpath(
-                "//div[@id='attachmentscontent']//a[text()= '" + attachmentName + "']/../../span[@class='version']/a"));
     }
 }

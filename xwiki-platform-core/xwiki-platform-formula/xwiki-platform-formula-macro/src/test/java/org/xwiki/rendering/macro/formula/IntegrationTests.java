@@ -50,7 +50,9 @@ public class IntegrationTests implements RenderingTests
 
     private FormulaMacroConfiguration mockConfiguration;
 
-    private AttachmentReference attachmentReference;
+    private AttachmentReference attachmentReference1;
+
+    private AttachmentReference attachmentReference2;
 
     @RenderingTests.Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
@@ -67,10 +69,15 @@ public class IntegrationTests implements RenderingTests
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         when(mockDocumentAccessBridge.getCurrentDocumentReference()).thenReturn(documentReference);
 
-        attachmentReference = new AttachmentReference(
+        attachmentReference1 = new AttachmentReference(
             "06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966", documentReference);
-        when(mockDocumentAccessBridge.getAttachmentURL(attachmentReference, false)).thenReturn(
+        when(mockDocumentAccessBridge.getAttachmentURL(attachmentReference1, false)).thenReturn(
             "/xwiki/bin/view/space/page/06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966");
+
+        attachmentReference2 = new AttachmentReference(
+            "190ef2f68e7fbd75c869d74dea959b1a48faadefc7a0c9219e3e94d005821935", documentReference);
+        when(mockDocumentAccessBridge.getAttachmentURL(attachmentReference2, false)).thenReturn(
+            "/xwiki/bin/view/space/page/190ef2f68e7fbd75c869d74dea959b1a48faadefc7a0c9219e3e94d005821935");
 
         when(mockConfiguration.getRenderer()).thenReturn("snuggletex");
         when(mockConfiguration.getDefaultType()).thenReturn(FormulaRenderer.Type.DEFAULT);
@@ -82,7 +89,6 @@ public class IntegrationTests implements RenderingTests
     public void after()
     {
         verify(mockDocumentAccessBridge, times(1)).getCurrentDocumentReference();
-        verify(mockDocumentAccessBridge, times(1)).getAttachmentURL(attachmentReference, false);
 
         verify(mockConfiguration, times(1)).getRenderer();
         verify(mockConfiguration, times(1)).getDefaultType();

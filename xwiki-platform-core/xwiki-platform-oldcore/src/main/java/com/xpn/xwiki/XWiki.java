@@ -171,6 +171,8 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
@@ -5917,8 +5919,9 @@ public class XWiki implements EventListener
             }
         }
 
-        if (!"skin".equals(context.getAction()) && !this.getRightService().hasAccessLevel("view",
-            user.getFullName(), doc.getFullName(), context)) {
+        AuthorizationManager authorizationManager = Utils.getComponent(AuthorizationManager.class);
+        if (!"skin".equals(context.getAction()) &&
+            !authorizationManager.hasAccess(Right.VIEW, context.getUserReference(), reference)) {
             // If for some reason (e.g., login action) the user has rights for the action but no view right on the
             // document, do not load the document into the context.
             setPhonyDocument(reference, context, vcontext);

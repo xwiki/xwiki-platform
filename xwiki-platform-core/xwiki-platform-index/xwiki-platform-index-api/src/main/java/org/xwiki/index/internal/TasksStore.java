@@ -56,6 +56,7 @@ public class TasksStore extends XWikiHibernateBaseStore
      *
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-19571">XWIKI-19571</a></a>
      */
+    // FIXME: this value is only temporary and should be removed once a proper fix is provided.
     private static final String FILLER = "-";
 
     @Inject

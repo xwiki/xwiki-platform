@@ -31,6 +31,7 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.junit5.RuntimeUtils;
@@ -248,14 +249,17 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     private void startOracleContainer(TestConfiguration testConfiguration) throws Exception
     {
         JdbcDatabaseContainer<?> databaseContainer;
+        String oracleImageFullName;
         if (testConfiguration.getDatabaseTag() != null) {
-            databaseContainer = new OracleContainer(String.format("xwiki/oracle-database:%s",
-                testConfiguration.getDatabaseTag()));
+            oracleImageFullName = String.format("xwiki/oracle-database:%s", testConfiguration.getDatabaseTag());
         } else {
-            databaseContainer = new OracleContainer("xwiki/oracle-database");
+            oracleImageFullName = "xwiki/oracle-database";
         }
+        DockerImageName oracleImage = DockerImageName.parse(oracleImageFullName)
+            .asCompatibleSubstituteFor("gvenzl/oracle-xe");
+        databaseContainer = new OracleContainer(oracleImage);
         databaseContainer
-            .withUsername("system")
+            .withUsername("oracle")
             .withPassword("oracle");
 
         startDatabaseContainer(databaseContainer, 1521, testConfiguration);

@@ -633,10 +633,12 @@ define(
       var value = data[parameter.name];
       if (value === undefined) {
         data[parameter.name] = parameter.value;
-      } else if (Array.isArray(value)) {
-        value.push(parameter.value);
-      } else {
-        data[parameter.name] = [value, parameter.value];
+      } else if (parameter.value !== '') {
+        if (Array.isArray(value)) {
+          value.push(parameter.value);
+        } else {
+          data[parameter.name] = [value, parameter.value];
+        }
       }
     });
     return data;

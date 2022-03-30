@@ -195,6 +195,8 @@ define('xwiki-lightbox', [
         return $('#imageToolbarTemplate').html();
       },
       html: true,
+      // The copyImageId tooltip attributes are deleted by sanitization.
+      sanitize: false,
       // The popover needs to be placed outside of the xwiki content to not depend on it's overflow.
       container: 'body',
       placement: 'bottom',
@@ -213,8 +215,10 @@ define('xwiki-lightbox', [
       $('.popover .imageDownload').attr('download', getImageName(this.src));
       var imageId = getImageId(this);
       if (imageId) {
-        $('.popover .imageId').attr('href', '#' + imageId);
-        $('.popover .imageId').removeClass('hidden');
+        $('.popover .permalink').attr('href', '#' + imageId);
+        $('.popover .permalink').removeClass('hidden');
+        $('.popover .copyImageId').attr('data-imageId', imageId);
+        $('.popover .copyImageId').parent().removeClass('hidden');
       }
     }).on('mouseenter', function() {
       clearTimeout(timeout);
@@ -306,7 +310,8 @@ define('xwiki-lightbox', [
   /**
    * Open Gallery lightbox at the current index.
    */
-  var openLightbox = function() {
+  var openLightbox = function(e) {
+    e.preventDefault();
     var options = {
       container: '#blueimp-gallery',
       index: parseInt($('.openLightbox').data('index')),
@@ -364,7 +369,7 @@ define('xwiki-lightbox', [
     initLightboxFunctionality();
   });
 
-  $(document).on('click', '#blueimp-gallery .copyImageId', function(event) {
+  $(document).on('click', '.copyImageId', function(event) {
     event.preventDefault();
     var copyIdButton = this;
     navigator.clipboard.writeText($(copyIdButton).attr('data-imageId')).then(function() {

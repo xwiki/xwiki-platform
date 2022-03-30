@@ -48,6 +48,7 @@ image.lightbox.caption.label=Caption
 image.lightbox.imageId.title=Image ID
 image.lightbox.imageId.copy.title=Copy image ID
 image.lightbox.imageId.copy.copied=Copied to clipboard
+image.lightbox.imageId.permalink=Permalink
 image.lightbox.date.label=Date
 image.lightbox.download.title=Download
 image.lightbox.escape.title=Escape

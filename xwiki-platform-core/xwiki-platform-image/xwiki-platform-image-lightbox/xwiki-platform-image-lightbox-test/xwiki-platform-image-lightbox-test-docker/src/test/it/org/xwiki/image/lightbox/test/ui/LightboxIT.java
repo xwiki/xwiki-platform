@@ -100,7 +100,7 @@ class LightboxIT
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
 
-        // Verify the image popover permalink action.
+        // Verify the image ID popover actions.
         Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
         if (imagePopover.isPresent()) {
             ImagePopover currentImagePopover = imagePopover.get();
@@ -112,6 +112,7 @@ class LightboxIT
 
             imagePermalinkButton.click();
             assertEquals(testUtils.getDriver().getCurrentUrl(), imagePermalinkButton.getAttribute("href"));
+            assertEquals("Iimage1.png", currentImagePopover.getImageId());
         }
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
@@ -141,7 +142,7 @@ class LightboxIT
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
 
-        // Verify the image popover permalink action.
+        // Verify the image ID popover actions.
         Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
         if (imagePopover.isPresent()) {
             ImagePopover currentImagePopover = imagePopover.get();
@@ -153,6 +154,7 @@ class LightboxIT
 
             imagePermalinkButton.click();
             assertEquals(testUtils.getDriver().getCurrentUrl(), imagePermalinkButton.getAttribute("href"));
+            assertEquals("manuallyAddedImageId", currentImagePopover.getImageId());
         }
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
@@ -412,6 +414,7 @@ class LightboxIT
             ImagePopover currentImagePopover = imagePopover.get();
             assertTrue(currentImagePopover.isImagePopoverDisplayed());
             assertFalse(currentImagePopover.getImagePermalinkButton().isDisplayed());
+            assertFalse(currentImagePopover.getCopyImageIdButton().isDisplayed());
         }
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);

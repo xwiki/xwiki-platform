@@ -105,7 +105,7 @@ public class TasksStore extends XWikiHibernateBaseStore
             // TODO: XWIKI-19581
             String version = task.getId().getVersion();
             try {
-                task.getId().setVersion(FILLER + Optional.ofNullable(version).orElse(""));
+                task.getId().setVersion(internalVersion(version));
                 executeWrite(xWikiContext, session -> {
                     innerAddTask(task, session);
                     return null;
@@ -136,7 +136,7 @@ public class TasksStore extends XWikiHibernateBaseStore
                         + "and t.id.version = :version "
                         + "and t.id.type = :type")
                     .setParameter("docId", docId)
-                    .setParameter("version", version)
+                    .setParameter("version", internalVersion(version))
                     .setParameter("type", type)
                     .executeUpdate();
                 return null;
@@ -157,7 +157,7 @@ public class TasksStore extends XWikiHibernateBaseStore
         initWikiContext(xWikiContext -> {
             String version = task.getId().getVersion();
             try {
-                task.getId().setVersion(FILLER + Optional.ofNullable(version).orElse(""));
+                task.getId().setVersion(internalVersion(version));
                 executeWrite(xWikiContext, session -> {
                     XWikiDocumentIndexingTaskId taskId = task.getId();
                     session.createQuery("delete from XWikiDocumentIndexingTask t where t.id.docId = :docId "
@@ -230,5 +230,10 @@ public class TasksStore extends XWikiHibernateBaseStore
     private interface Lambda<T>
     {
         T call(XWikiContext context) throws Exception;
+    }
+
+    private String internalVersion(String version)
+    {
+        return FILLER + Optional.ofNullable(version).orElse("");
     }
 }

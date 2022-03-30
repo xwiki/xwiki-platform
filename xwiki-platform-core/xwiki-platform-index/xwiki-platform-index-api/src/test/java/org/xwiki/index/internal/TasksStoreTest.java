@@ -172,7 +172,7 @@ class TasksStoreTest
         verify(this.session).createQuery("delete from XWikiDocumentIndexingTask t where t.id.docId = :docId "
             + "and t.id.version = :version and t.id.type = :type");
         verify(this.query).setParameter("docId", 42L);
-        verify(this.query).setParameter("version", "7.1");
+        verify(this.query).setParameter("version", "-7.1");
         verify(this.query).setParameter("type", "testtask");
         verify(this.query).executeUpdate();
     }

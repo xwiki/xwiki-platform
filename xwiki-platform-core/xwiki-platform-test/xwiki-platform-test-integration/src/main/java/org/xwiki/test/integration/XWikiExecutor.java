@@ -556,6 +556,12 @@ public class XWikiExecutor
 
     private String findXWikiDirectoryInTarget(String baseDirectory)
     {
+        // Try the standard location first
+        File defaultDirectory = new File(String.format("%starget/xwiki", baseDirectory));
+        if (defaultDirectory.exists()) {
+            return defaultDirectory.getPath();
+        }
+
         // Find all directories starting with "xwiki" and look for a file inside named "start_xwiki.sh". Return the
         // first such directory found.
         File targetFile = new File(String.format("%starget", baseDirectory));

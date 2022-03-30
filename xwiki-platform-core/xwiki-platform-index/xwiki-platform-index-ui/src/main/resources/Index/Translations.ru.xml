@@ -44,5 +44,9 @@ index.spacesMacro.spaceAdministration.alt=Администрирование п�
 index.spacesMacro.createSpace.link=Создать новое пространство
 index.spacesMacro.createSpace.defaultSpaceName=Имя пространства
 index.spacesMacro.createSpace.submit=Создать
-index.deletedDocuments.deleteAll=Удалить всё</content>
+index.deletedDocuments.deleteAll=Удалить всё
+index.administration.remainingTasks.heading=Оставшиеся задачи анализа документов
+index.administration.remainingTasks.emptyQueue=Нет оставшихся задач.
+admin.documentanalysis=Анализ документов
+</content>
 </xwikidoc>

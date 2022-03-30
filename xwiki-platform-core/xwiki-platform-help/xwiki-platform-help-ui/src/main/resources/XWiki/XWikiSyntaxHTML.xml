@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.5" reference="XWiki.XWikiSyntaxHTML" locale="">
   <web>XWiki</web>
   <name>XWikiSyntaxHTML</name>
   <language/>
@@ -29,6 +29,7 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>XWiki.XWikiSyntax</parent>
   <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>XWikiSyntaxHTML</title>
@@ -46,14 +47,14 @@
 {{info}}It is possible to enter HTML markup directly in the text in XWiki Syntax 1.0.{{/info}}
 
 |=XWiki Syntax 1.0|=Result
-|&lt;b&gt;bold&lt;/b&gt;|{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}
+|&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;|{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}}
 
 === 2.0 HTML ===
 
 {{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} HTML or XHTML must be entered by using the [[HTML macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/HTML%20Macro]].{{/info}}
 
 |=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
-|{{{{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}} }}}|{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}</content>
+|{{{{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}} }}}|{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}}</content>
   <object>
     <name>XWiki.XWikiSyntaxHTML</name>
     <number>0</number>

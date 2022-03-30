@@ -44,5 +44,9 @@ index.spacesMacro.spaceAdministration.alt=Bereich administrieren
 index.spacesMacro.createSpace.link=Neuen Bereich erstellen
 index.spacesMacro.createSpace.defaultSpaceName=Bereichsname
 index.spacesMacro.createSpace.submit=Erstellen
-index.deletedDocuments.deleteAll=Alle löschen</content>
+index.deletedDocuments.deleteAll=Alle löschen
+index.administration.remainingTasks.heading=Verbleibende Aufgaben zur Dokumentenanalyse
+index.administration.remainingTasks.emptyQueue=Keine verbleibenden Aufgaben.
+admin.documentanalysis=Dokumentenanalyse
+</content>
 </xwikidoc>

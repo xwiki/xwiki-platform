@@ -775,97 +775,97 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElementById(String using)
     {
-        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsById(String using)
     {
-        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByLinkText(String using)
     {
-        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByLinkText(String using)
     {
-        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByPartialLinkText(String using)
     {
-        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByPartialLinkText(String using)
     {
-        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByTagName(String using)
     {
-        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByTagName(String using)
     {
-        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByName(String using)
     {
-        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByName(String using)
     {
-        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByClassName(String using)
     {
-        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByClassName(String using)
     {
-        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByCssSelector(String using)
     {
-        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByCssSelector(String using)
     {
-        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public WebElement findElementByXPath(String using)
     {
-        throw new RuntimeException("Use findElement(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override
     public List<WebElement> findElementsByXPath(String using)
     {
-        throw new RuntimeException("Use findElements(By) instead, in preparaton for the move to Selenium4");
+        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override

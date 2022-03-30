@@ -71,11 +71,11 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
         new ClassBlockMatcher(MacroBlock.class)
     );
 
-    private static final Set<ResourceType> SUPPORTED_RESOURCE_TYPES_FOR_DOCUMENTS =
-        Set.of(ResourceType.DOCUMENT, ResourceType.SPACE, ResourceType.PAGE, ResourceType.ATTACHMENT);
+    private static final Set<ResourceType> SUPPORTED_RESOURCE_TYPES_FOR_DOCUMENTS = Set.of(ResourceType.DOCUMENT,
+        ResourceType.SPACE, ResourceType.PAGE, ResourceType.ATTACHMENT, ResourceType.PAGE_ATTACHMENT);
 
     private static final Set<ResourceType> SUPPORTED_RESOURCE_TYPES_FOR_ATTACHMENTS =
-        Set.of(ResourceType.ATTACHMENT);
+        Set.of(ResourceType.ATTACHMENT, ResourceType.PAGE_ATTACHMENT);
 
     @Inject
     private Provider<MacroRefactoring> macroRefactoringProvider;

@@ -49,7 +49,10 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageAttachmentReference;
+import org.xwiki.model.reference.PageAttachmentReferenceResolver;
 import org.xwiki.office.viewer.OfficeResourceViewer;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
@@ -116,6 +119,13 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     @Inject
     @Named("current")
     private AttachmentReferenceResolver<String> attachmentResolver;
+
+    @Inject
+    @Named("current")
+    private PageAttachmentReferenceResolver<String> pageAttachmentResolver;
+
+    @Inject
+    private AttachmentReferenceResolver<EntityReference> attachmentConverter;
 
     /**
      * Used to initialize the view cache.
@@ -414,6 +424,10 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             AttachmentReference attachmentReference = this.attachmentResolver.resolve(reference.getReference());
 
             view = getView(reference, attachmentReference, parameters);
+        } else if (reference.getType().equals(ResourceType.PAGE_ATTACHMENT)) {
+            PageAttachmentReference attachmentReference = this.pageAttachmentResolver.resolve(reference.getReference());
+
+            view = getView(reference, this.attachmentConverter.resolve(attachmentReference), parameters);
         } else {
             view = getView(reference, parameters);
         }

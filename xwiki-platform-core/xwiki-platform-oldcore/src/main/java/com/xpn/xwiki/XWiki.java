@@ -171,6 +171,8 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
@@ -483,6 +485,8 @@ public class XWiki implements EventListener
     private WikiDescriptorManager wikiDescriptorManager;
 
     private AsyncContext asyncContext;
+
+    private AuthorizationManager authorizationManager;
 
     private ConfigurationSource getConfiguration()
     {
@@ -814,6 +818,15 @@ public class XWiki implements EventListener
         }
 
         return this.asyncContext;
+    }
+
+    private AuthorizationManager getAuthorizationManager()
+    {
+        if (this.authorizationManager == null) {
+            this.authorizationManager = Utils.getComponent(AuthorizationManager.class);
+        }
+
+        return this.authorizationManager;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -5917,31 +5930,41 @@ public class XWiki implements EventListener
             }
         }
 
-        context.put("doc", doc);
-        context.put("cdoc", doc);
-        vcontext.put("doc", doc.newDocument(context));
-        vcontext.put("cdoc", vcontext.get("doc"));
-        XWikiDocument tdoc;
-
-        // If the parameter language exists and is empty, it means we want to force loading the regular document
-        // not a translation. This should be handled later by doing a better separation between locale used in the UI
-        // and for loading the documents.
-        if ("".equals(context.getRequest().getParameter("language"))) {
-            tdoc = doc;
+        if (!"skin".equals(context.getAction())
+            && !getAuthorizationManager().hasAccess(Right.VIEW, context.getUserReference(), reference)) {
+            // If for some reason (e.g., login action) the user has rights for the action but no view right on the
+            // document, do not load the document into the context.
+            setPhonyDocument(reference, context, vcontext);
+            doc = context.getDoc();
+            context.put("tdoc", doc);
+            context.put("cdoc", doc);
         } else {
-            tdoc = doc.getTranslatedDocument(context);
-        }
+            context.put("doc", doc);
+            context.put("cdoc", doc);
+            vcontext.put("doc", doc.newDocument(context));
+            vcontext.put("cdoc", vcontext.get("doc"));
+            XWikiDocument tdoc;
 
-        try {
-            String rev = (String) context.get("rev");
-            if (StringUtils.isNotEmpty(rev)) {
-                tdoc = getDocument(tdoc, rev, context);
+            // If the parameter language exists and is empty, it means we want to force loading the regular document
+            // not a translation. This should be handled later by doing a better separation between locale used in the UI
+            // and for loading the documents.
+            if ("".equals(context.getRequest().getParameter("language"))) {
+                tdoc = doc;
+            } else {
+                tdoc = doc.getTranslatedDocument(context);
             }
-        } catch (Exception ex) {
-            // Invalid version, just use the most recent one
+
+            try {
+                String rev = (String) context.get("rev");
+                if (StringUtils.isNotEmpty(rev)) {
+                    tdoc = getDocument(tdoc, rev, context);
+                }
+            } catch (Exception ex) {
+                // Invalid version, just use the most recent one
+            }
+            context.put("tdoc", tdoc);
+            vcontext.put("tdoc", tdoc.newDocument(context));
         }
-        context.put("tdoc", tdoc);
-        vcontext.put("tdoc", tdoc.newDocument(context));
 
         return true;
     }

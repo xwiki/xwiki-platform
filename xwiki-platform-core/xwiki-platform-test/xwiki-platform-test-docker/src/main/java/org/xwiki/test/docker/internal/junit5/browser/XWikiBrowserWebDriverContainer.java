@@ -19,15 +19,16 @@
  */
 package org.xwiki.test.docker.internal.junit5.browser;
 
+import java.lang.reflect.Field;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.rnorth.ducttape.timeouts.Timeouts;
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.testcontainers.containers.BrowserWebDriverContainer;
-
-import com.github.dockerjava.api.command.InspectContainerResponse;
+import org.testcontainers.utility.DockerImageName;
 
 /**
  * Extending TestContainer's {@code BrowserWebDriverContainer} to increase the default timeout of 30s, since it seems
@@ -41,13 +42,47 @@ public class XWikiBrowserWebDriverContainer<T extends BrowserWebDriverContainer<
 {
     private Capabilities capabilities;
 
-    @Override
-    protected void containerIsStarted(InspectContainerResponse containerInfo)
+    private RemoteWebDriver driver;
+
+    /**
+     * Use the default docker image name for selenium.
+     */
+    public XWikiBrowserWebDriverContainer()
     {
-        Unreliables.retryUntilSuccess(240, TimeUnit.SECONDS,
-            Timeouts.getWithTimeout(60, TimeUnit.SECONDS,
-                () -> () -> new RemoteWebDriver(this.getSeleniumAddress(), this.capabilities)));
-        super.containerIsStarted(containerInfo);
+        super();
+    }
+
+    /**
+     * @param dockerImageName the selenium image name to use
+     */
+    public XWikiBrowserWebDriverContainer(String dockerImageName)
+    {
+        super(dockerImageName);
+    }
+
+    /**
+     * @param dockerImageName the selenium image name to use
+     */
+    public XWikiBrowserWebDriverContainer(DockerImageName dockerImageName)
+    {
+        super(dockerImageName);
+    }
+
+    @Override
+    public synchronized RemoteWebDriver getWebDriver()
+    {
+        if (this.driver == null) {
+            if (this.capabilities == null) {
+                this.logger().warn("No capabilities provided - this will cause an exception in future versions. "
+                    + "Falling back to ChromeOptions");
+                this.capabilities = new ChromeOptions();
+            }
+            this.driver = Unreliables.retryUntilSuccess(240, TimeUnit.SECONDS,
+                () -> Timeouts.getWithTimeout(60, TimeUnit.SECONDS,
+                    () -> new RemoteWebDriver(this.getSeleniumAddress(), this.capabilities)));
+            setDriverField();
+        }
+        return super.getWebDriver();
     }
 
     @Override
@@ -55,5 +90,20 @@ public class XWikiBrowserWebDriverContainer<T extends BrowserWebDriverContainer<
     {
         this.capabilities = capabilities;
         return super.withCapabilities(capabilities);
+    }
+
+    private void setDriverField()
+    {
+        try {
+            Field field = this.getClass().getSuperclass().getDeclaredField("driver");
+            field.setAccessible(true);
+            try {
+                field.set(this, this.driver);
+            } finally {
+                field.setAccessible(false);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set selenium webdriver field", e);
+        }
     }
 }

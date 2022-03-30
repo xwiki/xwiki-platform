@@ -188,7 +188,7 @@
       #set ($moveURL = $xwiki.getURL($attachment.document.documentReference, 'view', $queryString))
       <a class="move-attachment action" title="$escapetool.xml($services.localization.render(
           'core.viewers.attachments.move.title'))" href="$moveURL#">
-        <span class="action-icon">$services.icon.renderHTML('move')</span><span class="action-label">$escapetool.xml(
+        <span class="action-icon">$services.icon.renderHTML('edit')</span><span class="action-label">$escapetool.xml(
           $services.localization.render('core.viewers.attachments.move'))
         </span>
       </a>

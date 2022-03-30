@@ -38,6 +38,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
+#set ($sheetReference = 'XWiki.PDFExport.Sheet')
 #set ($pdfElements = ['cover', 'header', 'footer', 'toc'])
 
 #macro (getPDFExportConfigFromRequest $pdfExportConfig)
@@ -55,8 +56,8 @@
   #set ($discard  = $response.setContentType('text/html'))
   #set ($discard = $xwiki.ssx.use($pdfExportConfig.template))
   #set ($discard = $xwiki.jsx.use($pdfExportConfig.template))
-  #set ($discard = $xwiki.ssx.use('XWiki.PDFExport.Sheet'))
-  #set ($discard = $xwiki.jsx.use('XWiki.PDFExport.Sheet'))
+  #set ($discard = $xwiki.ssx.use($sheetReference))
+  #set ($discard = $xwiki.jsx.use($sheetReference))
   ## Output the HTML header but without the garbage from the start of the BODY tag.
   #set ($htmlHeader = "#template('htmlheader.vm')")
   #set ($bodyTagStart = $htmlHeader.indexOf('&lt;body'))
@@ -94,7 +95,7 @@
 {{/velocity}}
 
 {{velocity wiki="false"}}
-#if ($xcontext.action == 'get')
+#if ($request.sheet == $sheetReference)
   ## Default PDF Export configuration.
   #set ($pdfExportConfig = {
     'template': 'XWiki.PDFExport.Template',
@@ -194,35 +195,72 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>require(['jquery', 'xwiki-page-ready'], function($, pageReady) {
   const fixInternalAnchors = function(container) {
     var baseURL = new URL(XWiki.currentDocument.getURL(), window.location.href).toString();
     container.find('a[href]').each(function() {
-      const anchor = $(this), anchorHref = anchor.prop('href');
-      if (anchorHref.startsWith(baseURL)) {
-        anchor.attr('href', anchorHref.substring(baseURL.length));
+      const anchor = $(this);
+      try {
+        const url = new URL(anchor.prop('href'));
+        if (url.hash &amp;&amp; baseURL + url.hash === url.toString()) {
+          anchor.attr('href', url.hash);
+        }
+      } catch (e) {
+        console.log('Failed to parse URL: ' + anchor.prop('href'));
       }
     });
   };
 
-  const contentWrapper = $('#xwikicontent');
-  fixInternalAnchors(contentWrapper.add('.pdf-toc'));
+  const replaceCanvasesWithImages = function(container) {
+    return $.makeArray(container.find('canvas')).reduce((replacePreviousCanvas, canvas) =&gt; {
+      return replacePreviousCanvas.then(replaceCanvasWithImage.bind(null, canvas)).catch((e) =&gt; {
+        console.log(`Failed to replace ${canvas.outerHTML} with image: ${e}`);
+      });
+    }, Promise.resolve());
+  };
 
-  // Trigger the print page rendering.
-  require(['xwiki-page-ready', 'paged-polyfill'], function(pageReady) {
-    pageReady.delayPageReady(new Promise((resolve, reject) =&gt; {
-      class PDFExportHandler extends Paged.Handler {
-        constructor(chunker, polisher, caller) {
-          super(chunker, polisher, caller);
-        }
-
-        afterPreview(pages) {
+  // See https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#getting_a_file_representing_the_canvas
+  const replaceCanvasWithImage = function(canvas) {
+    return new Promise((resolve, reject) =&gt; {
+      canvas.toBlob(blob =&gt; {
+        const image = document.createElement('img'),
+          url = URL.createObjectURL(blob);
+        image.onload = function() {
+          // Revoke the object URL as soon as the image is loaded in order to release resources.
+          URL.revokeObjectURL(url);
           resolve();
-        }
-      }
-      Paged.registerHandlers(PDFExportHandler);
-    }), 'export:pdf');
+        };
+        image.src = url;
+        canvas.parentNode.replaceChild(image, canvas);
+      }, 'image/png', 1);
+    });
+  };
+
+  // Remove the Table of Contents if empty.
+  const removeEmptyToC = function() {
+    const toc = $('.pdf-toc');
+    if (!toc.find('li').length) {
+      toc.remove();
+    }
+  };
+
+  // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become blank when
+  // they are moved around within the DOM tree.
+  pageReady.afterPageReady(() =&gt; {
+    fixInternalAnchors($('#xwikicontent, .pdf-toc'));
+    removeEmptyToC();
+    // Canvases are replaced with images asynchronously so we need to return a promise in order to delay the rest of the
+    // page ready callbacks.
+    return replaceCanvasesWithImages($('#xwikicontent'));
   });
+
+  // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page
+  // ready callbacks wait for the print preview to be ready. This is important in case one of the next page ready
+  // callbacks triggers the print.
+  pageReady.afterPageReady(() =&gt; new Promise((resolve, reject) =&gt; {
+    window.PagedConfig = {after: resolve};
+    require(['paged-polyfill'], function(PagedPolyfill) {});
+  }));
 });</code>
     </property>
     <property>

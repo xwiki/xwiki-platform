@@ -17,50 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal;
+package org.xwiki.index;
 
-import java.lang.reflect.Type;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.properties.converter.AbstractConverter;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserReferenceSerializer;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
- * Converts a String to a {@link UserReference}. Useful from Velocity scripts for example when resolving a user.
+ * Provides the operations to interact with the task consumer from the scripts.
  *
  * @version $Id$
- * @since 12.2
+ * @since 14.2
  */
+@Unstable
+@Named("taskConsumer")
 @Component
 @Singleton
-public class UserReferenceConverter extends AbstractConverter<UserReference>
+public class TaskConsumerScriptService implements ScriptService
 {
     @Inject
-    @Named("current")
-    private UserReferenceResolver<String> userReferenceResolver;
+    private TaskManager taskManager;
 
     @Inject
-    private UserReferenceSerializer<String> userReferenceSerializer;
+    private Provider<XWikiContext> xcontextProvider;
 
-    @Override
-    protected UserReference convertToType(Type targetType, Object value)
+    /**
+     * @return the count of queued tasks, grouped by task type
+     */
+    public Map<String, Long> getQueueSizePerType()
     {
-        if (value == null) {
-            return null;
-        }
-
-        return this.userReferenceResolver.resolve(value.toString());
-    }
-
-    @Override
-    protected String convertToString(UserReference value)
-    {
-        return this.userReferenceSerializer.serialize(value);
+        return this.taskManager.getQueueSizePerType(this.xcontextProvider.get().getWikiId());
     }
 }

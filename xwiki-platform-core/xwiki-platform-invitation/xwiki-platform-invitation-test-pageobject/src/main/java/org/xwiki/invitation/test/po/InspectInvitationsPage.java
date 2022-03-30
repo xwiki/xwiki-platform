@@ -75,8 +75,9 @@ public abstract class InspectInvitationsPage extends BasePage
             }
             columnEntries.add(cell.getText());
         }
-        throw new WebDriverException("Could not find message with " + column + " equal to "
-                                     + value + "\nIn columbn with entries: " + columnEntries.toString());
+        throw new WebDriverException(
+            String.format("Could not find message with %s equal to %s\nIn column with entries: %s", column, value,
+                columnEntries));
     }
 
     /** Should only be made available to OneMessage implementations. */

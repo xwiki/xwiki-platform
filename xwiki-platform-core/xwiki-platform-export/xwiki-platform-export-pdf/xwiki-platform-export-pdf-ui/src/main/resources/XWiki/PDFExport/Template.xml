@@ -125,8 +125,9 @@
       <cover>{{velocity}}
 {{html clean="false"}}
 &lt;h1&gt;$escapetool.xml($tdoc.plainTitle)&lt;/h1&gt;
-&lt;p&gt;$escapetool.xml($services.localization.render('lastmodifiedby')) #displayUser($tdoc.authorReference {'useInlineHTML': true})&lt;/p&gt;
-&lt;p&gt;$escapetool.xml("$services.localization.render('lastmodifiedon') $!xwiki.formatDate($tdoc.date)")&lt;/p&gt;
+#set ($versionInfo = $escapetool.xml($services.localization.render('export.pdf.templates.default.versionInfo',
+  [$tdoc.version, '__author__', $xwiki.formatDate($tdoc.date)])))
+&lt;p&gt;$versionInfo.replace('__author__', "#displayUser($tdoc.authorReference {'useInlineHTML': true})")&lt;/p&gt;
 {{/html}}
 {{/velocity}}</cover>
     </property>
@@ -302,6 +303,17 @@ $escapetool.xml($tdoc.plainTitle)
 
   .pagedjs_page .pagedjs_margin-bottom-center .pagedjs_margin-content::after {
     color: @text-muted !important;
+  }
+
+  /**
+   * Landscape Page
+   */
+  @page landscape {
+    size: A4 landscape;
+  }
+
+  .page-landscape {
+    page: landscape;
   }
 }</code>
     </property>

@@ -17,17 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal;
+package org.xwiki.user.internal.converter;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.internal.ContextComponentManagerProvider;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.properties.internal.DefaultConverterManager;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
+import org.xwiki.user.internal.document.DocumentUserReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -41,8 +49,13 @@ import static org.mockito.Mockito.when;
  * @since 12.8RC1
  */
 @ComponentTest
+@ComponentList({CurrentUserReferenceConverter.class, DocumentUserReferenceConverter.class,
+    GuestUserReferenceConverter.class, SuperAdminUserReferenceConverter.class, ContextComponentManagerProvider.class})
 class UserReferenceConverterTest
 {
+    @InjectMockComponents
+    private DefaultConverterManager converterManager;
+
     @InjectMockComponents
     private UserReferenceConverter converter;
 
@@ -74,7 +87,19 @@ class UserReferenceConverterTest
     {
         UserReference userReference = mock(UserReference.class);
         when(this.userReferenceSerializer.serialize(userReference)).thenReturn("space.userPage");
-        String convertedReference = this.converter.convert(String.class, userReference);
-        assertEquals("space.userPage", convertedReference);
+        assertEquals("space.userPage", this.converter.convert(String.class, userReference));
+
+        when(this.userReferenceSerializer.serialize(CurrentUserReference.INSTANCE)).thenReturn("currentuser");
+        assertEquals("currentuser", this.converterManager.convert(String.class, CurrentUserReference.INSTANCE));
+
+        when(this.userReferenceSerializer.serialize(GuestUserReference.INSTANCE)).thenReturn("guestuser");
+        assertEquals("guestuser", this.converterManager.convert(String.class, GuestUserReference.INSTANCE));
+
+        when(this.userReferenceSerializer.serialize(SuperAdminUserReference.INSTANCE)).thenReturn("superadmin");
+        assertEquals("superadmin", this.converterManager.convert(String.class, SuperAdminUserReference.INSTANCE));
+
+        userReference = new DocumentUserReference(new DocumentReference("wiki", "space", "user"), false);
+        when(this.userReferenceSerializer.serialize(userReference)).thenReturn("superadmin");
+        assertEquals("superadmin", this.converterManager.convert(String.class, userReference));
     }
 }

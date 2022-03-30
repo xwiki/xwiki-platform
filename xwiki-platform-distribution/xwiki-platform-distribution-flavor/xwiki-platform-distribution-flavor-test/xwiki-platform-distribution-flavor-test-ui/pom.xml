@@ -60,13 +60,6 @@
       <artifactId>xwiki-platform-application-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- Used by several tests to send mails -->
-    <dependency>
-      <groupId>com.icegreen</groupId>
-      <artifactId>greenmail-junit5</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

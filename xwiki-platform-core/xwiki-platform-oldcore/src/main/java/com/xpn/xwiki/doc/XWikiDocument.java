@@ -5604,7 +5604,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the XWiki context.
      * @param entityTypes the mapping of the types of references to return (and their corresponding resource types)
      * @return the references of the linked entities (documents, attachments, etc.), if null an error append.
-     * @since 11.2RC1
+     * @since 14.2RC1
      */
     private Set<EntityReference> getUniqueLinkedEntityReferences(XWikiContext context,
         Map<EntityType, Set<ResourceType>> entityTypes)
@@ -5705,8 +5705,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public Set<String> getUniqueLinkedPages(XWikiContext context)
     {
-        Set<EntityReference> references = getUniqueLinkedEntityReferences(context, Map.of(EntityType.DOCUMENT,
-            Set.of(ResourceType.SPACE, ResourceType.DOCUMENT, ResourceType.ATTACHMENT, ResourceType.PAGE)));
+        Set<EntityReference> references =
+            getUniqueLinkedEntityReferences(context, Map.of(EntityType.DOCUMENT, Set.of(ResourceType.SPACE,
+                ResourceType.DOCUMENT, ResourceType.ATTACHMENT, ResourceType.PAGE, ResourceType.PAGE_ATTACHMENT)));
         Set<String> documentNames = new LinkedHashSet<>(references.size());
 
         XWikiDocument contextDoc = context.getDoc();
@@ -5751,7 +5752,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         return getUniqueLinkedEntityReferences(context, Map.of(
             EntityType.DOCUMENT, Set.of(ResourceType.SPACE, ResourceType.DOCUMENT, ResourceType.PAGE),
-            EntityType.ATTACHMENT, Set.of(ResourceType.ATTACHMENT)
+            EntityType.ATTACHMENT, Set.of(ResourceType.ATTACHMENT, ResourceType.PAGE_ATTACHMENT)
         ));
     }
 
@@ -7245,6 +7246,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         newdoc.setOriginalDocument(null);
         newdoc.setContentDirty(true);
+        newdoc.setNew(true);
         newdoc.getXClass().setOwnerDocument(newdoc);
 
         return newdoc;

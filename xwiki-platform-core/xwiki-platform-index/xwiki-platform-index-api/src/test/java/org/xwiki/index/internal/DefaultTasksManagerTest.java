@@ -21,6 +21,7 @@ package org.xwiki.index.internal;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -286,5 +287,18 @@ class DefaultTasksManagerTest
         this.tasksManager.addTask("wikiA", 42, "1.3", "concurrent").get();
 
         verify(this.tasksStore).deleteTask("wikiA", 42, "1.2", "concurrent");
+    }
+
+    @Test
+    void getQueueSizePerType()
+    {
+        this.tasksManager.addTask("wikiA", 42, "1.2", "typeB");
+        this.tasksManager.addTask("wikiA", 42, "1.2", "typeA");
+        this.tasksManager.addTask("wikiA", 42, "1.2", "typeB");
+        this.tasksManager.addTask("wikiB", 42, "1.2", "typeA");
+        this.tasksManager.addTask("wikiB", 42, "1.2", "typeA");
+        assertEquals(Map.of("typeA", 1L, "typeB", 2L), this.tasksManager.getQueueSizePerType("wikiA"));
+        assertEquals(Map.of("typeA", 2L), this.tasksManager.getQueueSizePerType("wikiB"));
+        assertEquals(Map.of(), this.tasksManager.getQueueSizePerType("wikiC"));
     }
 }

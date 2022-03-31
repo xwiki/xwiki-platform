@@ -66,8 +66,7 @@ public class DocumentDocumentReferenceUserReferenceSerializer implements UserRef
             result = new DocumentReference(
                 this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).getName(), XWIKI_SPACE, "superadmin");
         } else if (GuestUserReference.INSTANCE == normalizedUserReference) {
-            result = new DocumentReference(
-                this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).getName(), XWIKI_SPACE, "XWikiGuest");
+            result = null;
         } else {
             if (!(normalizedUserReference instanceof DocumentUserReference)) {
                 throw new IllegalArgumentException(String.format("Passed user reference must be of type [%s]",

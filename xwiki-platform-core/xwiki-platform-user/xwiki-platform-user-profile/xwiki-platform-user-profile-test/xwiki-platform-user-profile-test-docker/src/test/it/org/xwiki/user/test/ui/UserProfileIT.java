@@ -31,6 +31,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.user.test.po.ChangeAvatarPage;
 import org.xwiki.user.test.po.GroupsUserProfilePage;
@@ -314,4 +315,26 @@ class UserProfileIT
         assertFalse(userProfilePage.isEnableButtonAvailable());
     }
 
+    @Test
+    @Order(9)
+    void disabledUserTest(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.setGlobalRights("", "XWiki.XWikiGuest", "edit", false);
+        ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        userProfilePage.clickDisable();
+
+        setup.login(this.userName, DEFAULT_PASSWORD);
+        boolean gotException = false;
+        try {
+            setup.rest().savePage(testReference, "Some content", "A title");
+        } catch (Throwable e) {
+            assertTrue(e.getMessage().startsWith("Unexpected code [401], was expecting one of [[201, 202]] for "));
+            gotException = true;
+        }
+        setup.loginAsSuperAdmin();
+        ViewPage viewPage = setup.gotoPage(testReference);
+        assertFalse(viewPage.exists());
+        assertTrue(gotException);
+    }
 }

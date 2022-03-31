@@ -80,12 +80,12 @@ $response.setContentType("application/json")
 ## ORDER
 ##
 #set ($order = "$!request.sort")
-#if (!$regextool.compile('^(doc\.)?\w+$').matcher($order).matches())
-  { "error" : "invalid sort parameter" }
-  #stop ("invalid sort parameter [$order] found")
-#end
 #set ($orderQueryPart = '')
 #if ($order != '')
+  #if (!$regextool.compile('^(doc\.)?\w+$').matcher($order).matches())
+    { "error" : "invalid sort parameter" }
+    #stop ("invalid sort parameter [$order] found")
+  #end
   #set ($orderDirection = "$!{request.get('dir').toLowerCase()}")
   #if ("$!orderDirection" != '' && "$!orderDirection" != 'asc')
     #set($orderDirection = 'desc')

@@ -112,11 +112,19 @@ The full format of an image is either **##image~: (reference)##** or **##~[~[{ca
 *** **##url:##** An optional string identifying the image as an URL.
 *** **##protocol:~/~/path/imageName##**: The URL to the image
 ** **Attachment**: A reference in the form **##[attach~:]~{~{~{(wikiName):}(spaceNameList).}(pageName)@}(imageName)##**
-*** **##attach~:##** An optional string identifying the reference as an XWiki attachment.
+*** **##attach~:##** An optional string identifying the reference as an XWiki Document attachment.
 *** **##wikiName##**: An optional string containing the name of a wiki. The image reference will point to an image attached to a page inside that wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##.
 *** **##spaceNameList##**: An optional dot-separated list of wiki Space names. If no space is specified the current space is used. Examples: ##Main##, ##A.B##, ##A.B.C##
 *** **##pageName##**: An optional string containing the name of the wiki page to which the referenced image is attached. Example: ##Welcome##
 *** **##imageName##**: A required string containing the name of the image attached to a page as it is stored in the wiki. Example: ##myImage.png##
+** **Page Attachment**: A reference in the form **##pageAttach~:~{~{~{(wikiName):}(pageNameList)/}(imageName)##**
+*** **##pageAttach~:##** An required string identifying the reference as an XWiki Page attachment.
+*** **##wikiName##**: An optional string containing the name of a wiki. The image reference will point to an image attached to a page inside that wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##.
+*** **##pageNameList##**: An optional dot-separated list of wiki page names. If no page is specified the current page is used. Examples: ##Main##, ##A/B##, ##A/B/C##
+*** **##imageName##**: A required string containing the name of the image attached to a page as it is stored in the wiki. Example: ##myImage.png##
+** **Icon**: A reference in the form **##icon{{{:(}}}iconName)##**. Example: **##icon:accept##**
+*** **##icon:##** A required string identifying the image reference as an icon from the [[XWiki Icon Set&gt;&gt;https://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
+*** **##iconName##**: A required string identifying the icon referenced. Example: ##accept##
 ** **Icon**: A reference in the form **##icon{{{:(}}}iconName)##**. Example: **##icon:accept##**
 *** **##icon:##** A required string identifying the image reference as an icon from the [[XWiki Icon Set&gt;&gt;https://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
 *** **##iconName##**: A required string identifying the icon referenced. Example: ##accept##

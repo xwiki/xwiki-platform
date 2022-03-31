@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.XWikiSyntaxLinks" locale="">
+<xwikidoc version="1.3" reference="XWiki.XWikiSyntaxLinks" locale="">
   <web>XWiki</web>
   <name>XWikiSyntaxLinks</name>
   <language/>
@@ -29,7 +29,6 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>XWiki.XWikiSyntax</parent>
   <author>xwiki:XWiki.Admin</author>
-  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>XWikiSyntaxLinks</title>
@@ -142,7 +141,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 **** **##mailto~:##** A required string identifying the resource as email.
 **** **##emailAddress##**: Targeted email address. Example: "##john@smith.com##"
 ** **##queryString##**: An optional query string for specifying parameters that will be used in the rendered URL. Example: ##mydata1=5&amp;mydata2=Hello##
-** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings and images. Example: ##HTableOfContents##
+** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##HTableOfContents##
 * **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;https://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
 * **##parameters##**: An optional list of parameters passed to the link. Example: ##target="~_blank"## (open in new window)
 
@@ -230,7 +229,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
 *** //Note2 - Special handling of ##.WebHome##//: If the untyped link ends in ##.WebHome##, it will //always// be handled as a terminal page. Example: ##~[~[A.WebHome]]## will always be resolved to the equivalent of ##~[~[doc:A.WebHome]]## and not to ##~[~[doc:A.WebHome.WebHome]]##.
 * **##parameters##**: An optional list of space-separated parameters passed to the link. Example: ##queryString="mydata1=5&amp;mydata2=Hello" anchor="HTableOfContents" target="~_blank"##
 ** **##queryString##**: An optional query string for specifying parameters that will be appended to the link target address and used in the rendered URL. Example: ##url:http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"## produces target address ##http:~/~/domain.com/path?mydata1=5&amp;mydata2=Hello##
-** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings and images. Example: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## produces target address ##http:~/~/domain.com/path#HTableOfContents##
+** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## produces target address ##http:~/~/domain.com/path#HTableOfContents##
 ** **##target##**: An optional parameter that allows to open link target in new window. Example: ##target="~_blank"##</content>
   <attachment>
     <filename>img.png</filename>

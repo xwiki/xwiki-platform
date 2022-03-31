@@ -135,7 +135,7 @@ public class DefaultTasksManager implements TaskManager, Initializable, Disposab
         try {
             try {
                 this.tasksStore.get().addTask(wikiId, xWikiTask);
-            } catch (XWikiException e) {
+            } catch (Exception e) {
                 this.logger.warn(
                     "Failed to add a task for docId [{}], type [{}] and version [{}] in wiki [{}]. This task is queued"
                         + " but will not be will not be restarted if not completed before the server stops."

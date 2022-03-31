@@ -122,7 +122,7 @@ class DefaultIconThemesResourceTest
     void getIconCurrentTheme() throws Exception
     {
         when(this.iconSetManager.getDefaultIconSet()).thenReturn(new IconSet("testTheme"));
-        when(this.iconManager.hasIcon("plus")).thenReturn(true);
+        when(this.iconManager.hasIcon("testTheme", "plus")).thenReturn(true);
         Map<String, Object> metadata = new HashMap<>();
         metadata.put(META_DATA_ICON_SET_TYPE, "icon");
         when(this.iconManager.getMetaData("plus", "testTheme")).thenReturn(metadata);
@@ -155,8 +155,8 @@ class DefaultIconThemesResourceTest
         iconBMetaData.put("cssClass", "");
 
         when(this.iconSetManager.getIconSet("testTheme")).thenReturn(new IconSet("testTheme"));
-        when(this.iconManager.hasIcon("iconA")).thenReturn(true);
-        when(this.iconManager.hasIcon("iconB")).thenReturn(true);
+        when(this.iconManager.hasIcon("testTheme","iconA")).thenReturn(true);
+        when(this.iconManager.hasIcon("testTheme", "iconB")).thenReturn(true);
         when(this.iconManager.getMetaData("iconA", "testTheme")).thenReturn(iconAMetaData);
         when(this.iconManager.getMetaData("iconB", "testTheme")).thenReturn(iconBMetaData);
 
@@ -198,8 +198,8 @@ class DefaultIconThemesResourceTest
         iconBMetaData.put("cssClass", "");
 
         when(this.iconSetManager.getCurrentIconSet()).thenReturn(new IconSet("testTheme"));
-        when(this.iconManager.hasIcon("iconA")).thenReturn(true);
-        when(this.iconManager.hasIcon("iconB")).thenReturn(true);
+        when(this.iconManager.hasIcon("testTheme", "iconA")).thenReturn(true);
+        when(this.iconManager.hasIcon("testTheme", "iconB")).thenReturn(true);
         when(this.iconManager.getMetaData("iconA", "testTheme")).thenReturn(iconAMetaData);
         when(this.iconManager.getMetaData("iconB", "testTheme")).thenReturn(iconBMetaData);
 
@@ -231,7 +231,7 @@ class DefaultIconThemesResourceTest
     {
         IconException iconException = new IconException("icon error", null);
 
-        when(this.iconManager.hasIcon(any())).thenThrow(iconException);
+        when(this.iconManager.hasIcon(any(), any())).thenThrow(iconException);
         when(this.iconSetManager.getCurrentIconSet()).thenReturn(new IconSet("testTheme"));
 
         List<String> names = asList("iconA", "unknownIcon", "iconB");

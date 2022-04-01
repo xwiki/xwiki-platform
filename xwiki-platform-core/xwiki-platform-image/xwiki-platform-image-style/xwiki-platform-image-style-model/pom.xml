@@ -29,8 +29,10 @@
   </parent>
   <artifactId>xwiki-platform-image-style-model</artifactId>
   <name>XWiki Platform - Image - Style - Model</name>
+  <packaging>jar</packaging>
+  <description>The (JAXB) model the for image styles REST module.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager. -->
     <xwiki.extension.name>Model for the Image Style Rest Endpoint.</xwiki.extension.name>
     <!-- Description to display by the Extension Manager. -->

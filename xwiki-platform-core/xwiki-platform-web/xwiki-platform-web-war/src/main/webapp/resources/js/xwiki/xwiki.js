@@ -1897,6 +1897,7 @@ require(['jquery'], function($) {
     }
   };
 
-  $(interceptXMLHttpRequest);
-  $(interceptFetch);
+  // Intercept right away, as early as possible, in order to be sure we catch all requests.
+  interceptXMLHttpRequest();
+  interceptFetch();
 });

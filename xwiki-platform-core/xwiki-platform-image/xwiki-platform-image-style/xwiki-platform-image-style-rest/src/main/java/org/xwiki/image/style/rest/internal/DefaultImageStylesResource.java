@@ -20,6 +20,7 @@
 package org.xwiki.image.style.rest.internal;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -72,13 +73,18 @@ public class DefaultImageStylesResource implements ImageStylesResource, XWikiRes
     }
 
     @Override
-    public String getDefaultStyleIdentifier(String wikiName, String documentReference) throws ImageStyleException
+    public Map<String, String> getDefaultStyleIdentifier(String wikiName, String documentReference)
+        throws ImageStyleException
     {
         String defaultStyle = this.imageStyleConfiguration.getDefaultStyle(wikiName, documentReference);
+        Map<String, String> response;
         if (StringUtils.isEmpty(defaultStyle)) {
             this.contextProvider.get().getResponse().setStatus(NO_CONTENT.getStatusCode());
+            response = Map.of();
+        } else {
+            response = Map.of("defaultStyle", defaultStyle);
         }
-        return defaultStyle;
+        return response;
     }
 
     private List<Style> convert(Set<ImageStyle> imageStyles)

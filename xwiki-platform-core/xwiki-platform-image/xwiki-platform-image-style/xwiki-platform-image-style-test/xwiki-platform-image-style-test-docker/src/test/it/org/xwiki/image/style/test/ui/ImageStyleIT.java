@@ -37,7 +37,6 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Docker tests for the image style administration, tests the user interface of the administation as well as the rest
@@ -60,7 +59,7 @@ class ImageStyleIT
         testUtils.updateObject(new DocumentReference("xwiki", List.of("Image", "Style", "Code"), "Configuration"),
             "Image.Style.Code.ConfigurationClass", 0, "defaultStyle", "");
 
-        assertNull(getDefaultFromRest(testUtils));
+        assertEquals("<MapN/>", getDefaultFromRest(testUtils));
 
         assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
             + "<styles xmlns=\"http://www.xwiki.org/imageStyle\"/>", getImageStylesFromRest(testUtils));
@@ -83,7 +82,7 @@ class ImageStyleIT
         assertEquals("Default", tableLayout.getCell("Pretty Name", 1).getText());
         assertEquals("default-class", tableLayout.getCell("Type", 1).getText());
 
-        assertEquals("default", getDefaultFromRest(testUtils));
+        assertEquals("<Map1><defaultStyle>default</defaultStyle></Map1>", getDefaultFromRest(testUtils));
 
         assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
             + "<styles xmlns=\"http://www.xwiki.org/imageStyle\">"

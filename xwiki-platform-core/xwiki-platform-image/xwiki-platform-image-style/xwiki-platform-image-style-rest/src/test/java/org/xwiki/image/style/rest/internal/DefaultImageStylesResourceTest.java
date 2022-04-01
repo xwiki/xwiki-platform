@@ -19,6 +19,7 @@
  */
 package org.xwiki.image.style.rest.internal;
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Provider;
@@ -99,14 +100,15 @@ class DefaultImageStylesResourceTest
     void getDefaultStyleIdentifier() throws Exception
     {
         when(this.imageStyleConfiguration.getDefaultStyle("wiki", "xwiki:Space.Page")).thenReturn("defaultStyle");
-        assertEquals("defaultStyle", this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page"));
+        assertEquals(Map.of("defaultStyle", "defaultStyle"),
+            this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page"));
     }
 
     @Test
     void getDefaultStyleIdentifierNotFound() throws Exception
     {
         when(this.imageStyleConfiguration.getDefaultStyle("wiki", "xwiki:Space.Page")).thenReturn("");
-        assertEquals("", this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page"));
+        assertEquals(Map.of(), this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page"));
         verify(this.response).setStatus(NO_CONTENT.getStatusCode());
     }
 

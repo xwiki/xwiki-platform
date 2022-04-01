@@ -83,5 +83,6 @@
 &lt;/div&gt;
 {{/html}}
 {{/velocity}}
+
 [[{{translation key='image.style.imageStyleSheet.backToAdministration.link' /}}&gt;&gt;XWiki.XWikiPreferences||class="btn btn-primary admin-link" queryString="editor=globaladmin&amp;section=image.style"]]</content>
 </xwikidoc>

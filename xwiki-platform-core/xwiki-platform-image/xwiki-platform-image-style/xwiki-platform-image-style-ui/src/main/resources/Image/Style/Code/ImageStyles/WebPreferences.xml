@@ -225,7 +225,7 @@
         <separators/>
         <size>1</size>
         <sort>none</sort>
-        <sql>select doc.name, doc.title from XWikiDocument as doc, BaseObject as theme where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' or theme.className='FlamingoThemesCode.ThemeClass') and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' and doc.fullName&lt;&gt;'FlamingoThemesCode.ThemeTemplate'</sql>
+        <sql>select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' or theme.className='FlamingoThemesCode.ThemeClass') and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' and doc.fullName&lt;&gt;'FlamingoThemesCode.ThemeTemplate'</sql>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
@@ -500,7 +500,7 @@
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <size>1</size>
-        <sql>select doc.name, propName.value from XWikiDocument as doc, BaseObject as theme, StringProperty propName where doc.fullName=theme.name and theme.className='IconThemesCode.IconThemeClass' and doc.fullName&lt;&gt;'IconThemesCode.IconThemeTemplate' and theme.id = propName.id and propName.name = 'name'</sql>
+        <sql>select doc.fullName, propName.value from XWikiDocument as doc, BaseObject as theme, StringProperty propName where doc.fullName=theme.name and theme.className='IconThemesCode.IconThemeClass' and doc.fullName&lt;&gt;'IconThemesCode.IconThemeTemplate' and theme.id = propName.id and propName.name = 'name'</sql>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
       </iconTheme>
@@ -1352,7 +1352,19 @@
       <accessibility/>
     </property>
     <property>
+      <admin_email/>
+    </property>
+    <property>
       <colorTheme/>
+    </property>
+    <property>
+      <comment_anonymous/>
+    </property>
+    <property>
+      <comment_registered/>
+    </property>
+    <property>
+      <confirmation_email_content/>
     </property>
     <property>
       <core.defaultDocumentSyntax/>
@@ -1361,10 +1373,25 @@
       <dateformat/>
     </property>
     <property>
+      <default_language/>
+    </property>
+    <property>
+      <documentBundles/>
+    </property>
+    <property>
+      <edit_anonymous/>
+    </property>
+    <property>
+      <edit_registered/>
+    </property>
+    <property>
       <editcomment/>
     </property>
     <property>
       <editcomment_mandatory/>
+    </property>
+    <property>
+      <editor/>
     </property>
     <property>
       <guest_comment_requires_captcha/>
@@ -1373,7 +1400,13 @@
       <iconTheme/>
     </property>
     <property>
+      <invitation_email_content/>
+    </property>
+    <property>
       <javamail_extra_props/>
+    </property>
+    <property>
+      <languages/>
     </property>
     <property>
       <ldap/>
@@ -1433,7 +1466,13 @@
       <ldap_validate_password/>
     </property>
     <property>
+      <leftPanels/>
+    </property>
+    <property>
       <leftPanelsWidth/>
+    </property>
+    <property>
+      <meta/>
     </property>
     <property>
       <minoredit/>
@@ -1446,6 +1485,15 @@
     </property>
     <property>
       <plugins/>
+    </property>
+    <property>
+      <registration_anonymous/>
+    </property>
+    <property>
+      <registration_registered/>
+    </property>
+    <property>
+      <rightPanels/>
     </property>
     <property>
       <rightPanelsWidth/>
@@ -1466,7 +1514,13 @@
       <showinformation/>
     </property>
     <property>
+      <skin/>
+    </property>
+    <property>
       <smtp_port/>
+    </property>
+    <property>
+      <smtp_server/>
     </property>
     <property>
       <smtp_server_password/>
@@ -1475,13 +1529,31 @@
       <smtp_server_username/>
     </property>
     <property>
+      <stylesheet/>
+    </property>
+    <property>
+      <stylesheets/>
+    </property>
+    <property>
       <tags/>
     </property>
     <property>
       <timezone/>
     </property>
     <property>
+      <title/>
+    </property>
+    <property>
       <upload_maxsize/>
+    </property>
+    <property>
+      <validation_email_content/>
+    </property>
+    <property>
+      <version/>
+    </property>
+    <property>
+      <webcopyright/>
     </property>
     <property>
       <xwiki.title.mandatory/>

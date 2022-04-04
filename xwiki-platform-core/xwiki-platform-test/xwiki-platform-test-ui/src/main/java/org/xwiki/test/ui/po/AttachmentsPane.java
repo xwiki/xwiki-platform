@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -50,11 +51,26 @@ public class AttachmentsPane extends BaseElement
 
     private LiveTableElement attachmentsLivetable;
 
+    private String livetableId;
+
     private ConfirmationModal confirmDelete;
+
+    /*
+     * List of attachments livetable column labels.
+     */
+    private static final List<String> LIVETABLE_COLUMNS =
+        Arrays.asList("mimeType", "filename", "filesize", "date", "author");
 
     AttachmentsPane()
     {
-        this.attachmentsLivetable = new LiveTableElement("docAttachments");
+        this.livetableId = "docAttachments";
+        this.attachmentsLivetable = new LiveTableElement(this.livetableId);
+    }
+
+    public AttachmentsPane(String livetableId)
+    {
+        this.livetableId = livetableId;
+        this.attachmentsLivetable = new LiveTableElement(this.livetableId);
     }
 
     public boolean isOpened()
@@ -120,6 +136,17 @@ public class AttachmentsPane extends BaseElement
     }
 
     /**
+     * Get the filename of an attachment knowing the index in the attachments livetable.
+     *
+     * @param positionNumber the index of the attachment in the livetable
+     * @return the filename of the attachment
+     */
+    public String getAttachmentNameByPosition(int positionNumber)
+    {
+        return this.attachmentsLivetable.getCell(positionNumber, 2).getText();
+    }
+
+    /**
      * Return the {@code a} tag of an attachment link according to its name.
      *
      * @param attachmentName the name of the attachment (for instance {@code "my_doc.txt"})
@@ -140,7 +167,8 @@ public class AttachmentsPane extends BaseElement
     public void deleteAttachmentByFileByName(String attachmentName)
     {
         // We initialize before so we can remove the animation before the modal is shown
-        this.confirmDelete = new ConfirmationModal(By.id("deleteAttachment"));
+        this.confirmDelete = new ConfirmationModal(By.xpath(".//table[@id='" + this.livetableId
+            + "']/parent::div/following-sibling::div[contains(@class, 'deleteAttachment')]"));
         WebElement deleteButton = this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 6)
             .findElement(By.className("actiondelete"));
         deleteButton.click();
@@ -166,7 +194,9 @@ public class AttachmentsPane extends BaseElement
     public void deleteFirstAttachment()
     {
         // We initialize before so we can remove the animation before the modal is shown
-        this.confirmDelete = new ConfirmationModal(By.id("deleteAttachment"));
+        // this.confirmDelete = new ConfirmationModal(By.id("deleteAttachment"));
+        this.confirmDelete = new ConfirmationModal(By.xpath(".//table[@id='" + this.livetableId
+            + "']/parent::div/following-sibling::div[contains(@class, 'deleteAttachment')]"));
         WebElement deleteButton = this.attachmentsLivetable.getCell(1, 6).findElement(By.className("actiondelete"));
         deleteButton.click();
         this.confirmDelete.clickOk();
@@ -193,6 +223,15 @@ public class AttachmentsPane extends BaseElement
     {
         By countLocator = By.cssSelector("#Attachmentstab .itemCount");
         return Integer.parseInt(getDriver().findElement(countLocator).getText().replaceAll("[()]", ""));
+    }
+
+    /**
+     * @return the number of attachments displayed.
+     * @since 14.3RC1
+     */
+    public int getNumberOfAttachmentsDisplayed()
+    {
+        return this.attachmentsLivetable.getRowCount();
     }
 
     /**
@@ -253,11 +292,23 @@ public class AttachmentsPane extends BaseElement
     public boolean attachmentExistsByFileName(String attachmentName)
     {
         try {
-            getDriver().findElement(
-                By.xpath("//tbody[@id='docAttachments-display']//tr[td//a[text()='" + attachmentName + "']]"));
+            getDriver().findElement(By
+                .xpath("//tbody[@id='" + this.livetableId + "-display']//tr[td//a[text()='" + attachmentName + "']]"));
         } catch (NoSuchElementException e) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Set the value in the filter of a column.
+     *
+     * @param columnLabel the label of the column to filter
+     * @param filterValue the value to filter by
+     */
+    public void filterColumn(String columnLabel, String filterValue)
+    {
+        int index = LIVETABLE_COLUMNS.indexOf(columnLabel) + 1;
+        this.attachmentsLivetable.filterColumn("xwiki-livetable-" + this.livetableId + "-filter-" + index, filterValue);
     }
 }

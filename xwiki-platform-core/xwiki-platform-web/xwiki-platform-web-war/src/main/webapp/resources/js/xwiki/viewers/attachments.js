@@ -196,18 +196,11 @@ viewers.Attachments = Class.create({
  */
 require(['jquery', 'xwiki-events-bridge'], function($) {
   /**
-   * Getting the button that triggers the modal.
-   */
-  $(document).on('show.bs.modal', '#deleteAttachment', function(event) {
-    if (event.relatedTarget) {
-      $(this).data('relatedTarget', event.relatedTarget);
-    }
-  });
-  /**
    * Event on deleteAttachment button.
    */
-  $(document).on('click', '#deleteAttachment input.btn-danger', function() {
-    var modal = $('#deleteAttachment');
+  $(document).on('click', '.deleteAttachment input.btn-danger', function(e) {
+    e.preventDefault();
+    var modal = $(e.currentTarget).closest('.deleteAttachment');
     var button = $(modal.data('relatedTarget'));
     var thisLivetableName = button.closest('.xwiki-livetable').data('settings').name;
     var notification;
@@ -224,7 +217,9 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       },
       success : function() {
         window[thisLivetableName].refresh();
-        updateCount();
+        if (thisLivetableName == 'docAttachments') {
+          updateCount();
+        }
         notification.replace(new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.done'], 'done'));
       },
       error: function() {
@@ -247,8 +242,9 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    */
   $(document).on('click', '.attachmentActions .actiondelete', function(event) {
     event.preventDefault();
-    $('#deleteAttachment').data('relatedTarget', event.currentTarget);
-    $('#deleteAttachment').modal('show');
+    var modal = $(event.currentTarget).closest('.xwiki-livetable-container').next('.deleteAttachment');
+    modal.data('relatedTarget', event.currentTarget);
+    modal.modal('show');
   });
   /**
    * Update the locations that display the attachments count with the new number or, when it is not provided, make

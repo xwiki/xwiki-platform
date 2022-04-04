@@ -99,7 +99,7 @@ public class LiveTableElement extends BaseElement
         getDriver().executeJavascript("return $('" + StringEscapeUtils.escapeEcmaScript(livetableId)
             + "-ajax-loader').removeClassName('hidden')");
 
-        WebElement element = getDriver().findElement(By.id(inputId));
+        WebElement element = getDriver().findElement(By.id(livetableId)).findElement(By.id(inputId));
         if ("select".equals(element.getTagName())) {
             if (element.getAttribute("class").contains("selectized")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(element);
@@ -214,6 +214,13 @@ public class LiveTableElement extends BaseElement
         return getDriver().findElementWithoutWaiting(liveTableBody, By.xpath("tr[" + rowNumber + "]"));
     }
 
+    /**
+     * Get the row index of an element.
+     *
+     * @param by the selector of the searched element
+     * @return the row index where the element was found
+     * @since 14.3RC1
+     */
     public int getRowNumberForElement(By by)
     {
         WebElement livetableRowElement =

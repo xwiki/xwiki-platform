@@ -22,11 +22,13 @@ package org.xwiki.flamingo.test.docker;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -56,13 +58,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AttachmentIT
 {
     private static final String FIRST_ATTACHMENT = "SmallAttachment.txt";
+
     private static final String SECOND_ATTACHMENT = "SmallAttachment2.txt";
+
     private static final String IMAGE_ATTACHMENT = "image.gif";
+
+    private static final String SMALL_SIZE_ATTACHMENT = "SmallSizeAttachment.png";
 
     @BeforeAll
     public void setup(TestUtils setup)
     {
-        setup.loginAsSuperAdmin();
+        setup.createUser("User2", "pass", "");
+        setup.createUserAndLogin("User1", "pass");
     }
 
     private File getFileToUpload(TestConfiguration testConfiguration, String filename)
@@ -276,5 +283,126 @@ class AttachmentIT
         assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment("toto.txt"));
         attachmentsPane.getAttachmentLink("toto.txt").click();
         assertEquals("v1.1", setup.getDriver().findElement(By.tagName("html")).getText());
+    }
+
+    @Test
+    @Order(5)
+    void filterAttachmentsLivetable(TestUtils setup, TestReference testReference) throws Exception
+    {
+        ViewPage viewPage = setup.createPage(testReference, "", "");
+
+        // Upload attachments with 2 different users.
+        AttachmentsPane attachmentsPane = viewPage.openAttachmentsDocExtraPane();
+        setup.attachFile(testReference, FIRST_ATTACHMENT,
+            getClass().getResourceAsStream("/AttachmentIT/" + FIRST_ATTACHMENT), false);
+        setup.attachFile(testReference, SECOND_ATTACHMENT,
+            getClass().getResourceAsStream("/AttachmentIT/" + SECOND_ATTACHMENT), false);
+
+        setup.login("User2", "pass");
+        setup.gotoPage(testReference);
+        attachmentsPane = viewPage.openAttachmentsDocExtraPane();
+        setup.attachFile(testReference, SMALL_SIZE_ATTACHMENT,
+            getClass().getResourceAsStream("/AttachmentIT/" + SMALL_SIZE_ATTACHMENT), false);
+
+        attachmentsPane.filterColumn("filename", "SmallAttachment");
+        assertEquals(2, attachmentsPane.getNumberOfAttachments());
+        attachmentsPane.filterColumn("filename", "");
+
+        attachmentsPane.filterColumn("mimeType", "Image");
+        assertEquals(1, attachmentsPane.getNumberOfAttachments());
+        assertEquals(SMALL_SIZE_ATTACHMENT, attachmentsPane.getAttachmentNameByPosition(1));
+        attachmentsPane.filterColumn("mimeType", "Text");
+        assertEquals(2, attachmentsPane.getNumberOfAttachments());
+        attachmentsPane.filterColumn("mimeType", "All");
+
+        attachmentsPane.filterColumn("filesize", "Tiny");
+        assertEquals(2, attachmentsPane.getNumberOfAttachments());
+        attachmentsPane.filterColumn("filesize", "Small");
+        assertEquals(1, attachmentsPane.getNumberOfAttachments());
+        assertEquals(SMALL_SIZE_ATTACHMENT, attachmentsPane.getAttachmentNameByPosition(1));
+        attachmentsPane.filterColumn("filesize", "All");
+
+        attachmentsPane.filterColumn("author", "User1");
+        assertEquals(2, attachmentsPane.getNumberOfAttachments());
+        attachmentsPane.filterColumn("author", "User2");
+        assertEquals(1, attachmentsPane.getNumberOfAttachments());
+        assertEquals(SMALL_SIZE_ATTACHMENT, attachmentsPane.getAttachmentNameByPosition(1));
+        attachmentsPane.filterColumn("author", "");
+
+        String firstAttachUploadDate = attachmentsPane.getDateOfLastUpload(FIRST_ATTACHMENT);
+        List<String> uploadDates =
+            Arrays.asList(firstAttachUploadDate, attachmentsPane.getDateOfLastUpload(SECOND_ATTACHMENT),
+                attachmentsPane.getDateOfLastUpload(SMALL_SIZE_ATTACHMENT));
+        attachmentsPane.filterColumn("date", firstAttachUploadDate);
+        long expected = uploadDates.stream().filter(d -> d.equals(firstAttachUploadDate)).count();
+        assertEquals(expected, attachmentsPane.getNumberOfAttachments());
+        attachmentsPane.filterColumn("date", "");
+    }
+
+    @Test
+    @Order(6)
+    void addAttachmentsMacroToPageContent(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        DocumentReference attachmentsDocRef =
+            new DocumentReference("PageWithAttachments", testReference.getLastSpaceReference());
+        setup.createPage(attachmentsDocRef, "", "");
+        setup.attachFile(attachmentsDocRef, FIRST_ATTACHMENT,
+            getClass().getResourceAsStream("/AttachmentIT/" + FIRST_ATTACHMENT), false);
+        setup.attachFile(attachmentsDocRef, SECOND_ATTACHMENT,
+            getClass().getResourceAsStream("/AttachmentIT/" + SECOND_ATTACHMENT), false);
+        setup.attachFile(attachmentsDocRef, IMAGE_ATTACHMENT,
+            getClass().getResourceAsStream("/AttachmentIT/" + IMAGE_ATTACHMENT), false);
+
+        ViewPage viewPage = setup.createPage(testReference, getAttachmentsMacroContent(attachmentsDocRef), "");
+
+        setup.attachFile(testReference, FIRST_ATTACHMENT,
+            getClass().getResourceAsStream("/AttachmentIT/" + FIRST_ATTACHMENT), false);
+        setup.attachFile(testReference, SECOND_ATTACHMENT,
+            getClass().getResourceAsStream("/AttachmentIT/" + SECOND_ATTACHMENT), false);
+
+        viewPage.reloadPage();
+        AttachmentsPane pageAttachmentsPane = viewPage.openAttachmentsDocExtraPane();
+        AttachmentsPane macroAttachmentsPane = new AttachmentsPane("testAttachments");
+
+        // Check the delete action with multiple attachments livetables displayed.
+        assertEquals(3, macroAttachmentsPane.getNumberOfAttachmentsDisplayed());
+        assertEquals(2, pageAttachmentsPane.getNumberOfAttachmentsDisplayed());
+        macroAttachmentsPane.deleteAttachmentByFileByName(FIRST_ATTACHMENT);
+        assertEquals(2, macroAttachmentsPane.getNumberOfAttachmentsDisplayed());
+        assertEquals(2, pageAttachmentsPane.getNumberOfAttachmentsDisplayed());
+
+        pageAttachmentsPane.deleteAttachmentByFileByName(FIRST_ATTACHMENT);
+        assertEquals(2, macroAttachmentsPane.getNumberOfAttachmentsDisplayed());
+        assertEquals(1, pageAttachmentsPane.getNumberOfAttachmentsDisplayed());
+
+        // Check filtering with multiple attachments livetables displayed.
+        macroAttachmentsPane.filterColumn("filename", IMAGE_ATTACHMENT);
+        assertEquals(1, macroAttachmentsPane.getNumberOfAttachmentsDisplayed());
+        assertEquals(1, pageAttachmentsPane.getNumberOfAttachmentsDisplayed());
+        macroAttachmentsPane.filterColumn("filename", "");
+
+        pageAttachmentsPane.filterColumn("filename", SECOND_ATTACHMENT);
+        assertEquals(2, macroAttachmentsPane.getNumberOfAttachmentsDisplayed());
+        assertEquals(1, pageAttachmentsPane.getNumberOfAttachmentsDisplayed());
+
+        macroAttachmentsPane.filterColumn("mimeType", "Image");
+        assertEquals(1, macroAttachmentsPane.getNumberOfAttachmentsDisplayed());
+        assertEquals(1, pageAttachmentsPane.getNumberOfAttachmentsDisplayed());
+        macroAttachmentsPane.filterColumn("mimeType", "All");
+    }
+
+    private String getAttachmentsMacroContent(DocumentReference docRef)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("{{velocity}}\n{{html}}\n");
+        sb.append("#template('attachment_macros.vm')\n");
+        sb.append("#set($attachmentsDoc = $xwiki.getDocument(\"" + docRef + "\"))\n");
+        sb.append("#showAttachmentsLivetable($attachmentsDoc 'testAttachments')\n");
+        sb.append("{{/html}}\n{{/velocity}}");
+
+        return sb.toString();
     }
 }

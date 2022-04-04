@@ -216,7 +216,7 @@
 #end
 
 #macro (deleteAttachmentModal)
-  <div class="modal fade" id="deleteAttachment" tabindex="-1" role="dialog">
+  <div class="modal fade deleteAttachment" tabindex="-1" role="dialog">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -259,4 +259,5 @@
     'outputOnlyHtml': true
   })
   #livetable($livetableId $columns $columnsProperties $options)
+  #deleteAttachmentModal
 #end

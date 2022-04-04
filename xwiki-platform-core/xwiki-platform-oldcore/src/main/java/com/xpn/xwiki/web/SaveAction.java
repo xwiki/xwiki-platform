@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
@@ -112,10 +113,13 @@ public class SaveAction extends EditAction
      */
     private static final String FORCE_SAVE_OVERRIDE = "override";
 
+    @Inject
     private DocumentRevisionProvider documentRevisionProvider;
 
+    @Inject
     private MergeManager mergeManager;
 
+    @Inject
     private MergeConflictDecisionsManager conflictDecisionsManager;
 
     public SaveAction()
@@ -325,33 +329,6 @@ public class SaveAction extends EditAction
         return configurationSource.getProperty("edit.conflictChecking.enabled", true);
     }
 
-    private DocumentRevisionProvider getDocumentRevisionProvider()
-    {
-        if (this.documentRevisionProvider == null) {
-            this.documentRevisionProvider = Utils.getComponent(DocumentRevisionProvider.class);
-        }
-
-        return this.documentRevisionProvider;
-    }
-
-    private MergeManager getMergeManager()
-    {
-        if (this.mergeManager == null) {
-            this.mergeManager = Utils.getComponent(MergeManager.class);
-        }
-
-        return this.mergeManager;
-    }
-
-    private MergeConflictDecisionsManager getConflictDecisionsManager()
-    {
-        if (this.conflictDecisionsManager == null) {
-            this.conflictDecisionsManager = Utils.getComponent(MergeConflictDecisionsManager.class);
-        }
-
-        return this.conflictDecisionsManager;
-    }
-
     /**
      * Retrieve the conflict decisions made from the request and fill the conflict decision manager with them. We handle
      * two list of parameters here: - mergeChoices: those parameters are on the form [conflict id]=[choice] where the
@@ -393,7 +370,7 @@ public class SaveAction extends EditAction
                 if (decisionType == ConflictDecision.DecisionType.CUSTOM) {
                     customValue = Collections.singletonList(customChoicesMap.get(conflictReference));
                 }
-                getConflictDecisionsManager().recordDecision(documentReference, context.getUserReference(),
+                this.conflictDecisionsManager.recordDecision(documentReference, context.getUserReference(),
                     conflictReference, decisionType, customValue);
             }
         }
@@ -437,7 +414,7 @@ public class SaveAction extends EditAction
         if (!latestVersion.equals(previousVersion) || latestVersionDate.after(editingVersionDate)) {
             try {
                 XWikiDocument previousDoc =
-                    getDocumentRevisionProvider().getRevision(originalDoc, previousVersion.toString());
+                    this.documentRevisionProvider.getRevision(originalDoc, previousVersion.toString());
 
                 // We also check that the previousDoc revision exists to avoid an exception if it has been deleted
                 // Note that if we're here and the request says that the document is new, it's not necessarily a
@@ -486,11 +463,11 @@ public class SaveAction extends EditAction
                         recordConflictDecisions(context, modifiedDoc.getDocumentReferenceWithLocale());
 
                         MergeDocumentResult mergeDocumentResult =
-                            getMergeManager().mergeDocument(previousDoc, originalDoc, modifiedDoc, mergeConfiguration);
+                            this.mergeManager.mergeDocument(previousDoc, originalDoc, modifiedDoc, mergeConfiguration);
 
                         // Be sure to not keep the conflict decisions we might have made if new conflicts occurred
                         // we don't want to pollute the list of decisions.
-                        getConflictDecisionsManager().removeConflictDecisionList(
+                        this.conflictDecisionsManager.removeConflictDecisionList(
                             modifiedDoc.getDocumentReferenceWithLocale(), context.getUserReference());
 
                         // If we don't get any conflict, or if we want to force the merge even with conflicts,
@@ -503,7 +480,7 @@ public class SaveAction extends EditAction
                             // If we got merge conflicts and we don't want to force it, then we record the conflict in
                             // order to allow fixing them independently.
                         } else {
-                            getConflictDecisionsManager().recordConflicts(modifiedDoc.getDocumentReferenceWithLocale(),
+                            this.conflictDecisionsManager.recordConflicts(modifiedDoc.getDocumentReferenceWithLocale(),
                                 context.getUserReference(),
                                 mergeDocumentResult.getConflicts(MergeDocumentResult.DocumentPart.CONTENT));
                         }

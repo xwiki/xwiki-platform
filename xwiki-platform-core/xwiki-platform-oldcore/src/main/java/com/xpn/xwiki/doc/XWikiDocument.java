@@ -45,6 +45,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -151,6 +152,7 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
+import org.xwiki.store.TemporaryAttachmentManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.user.GuestUserReference;
@@ -4298,6 +4300,25 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         readTranslationMetaFromForm(eform, context);
 
         readAddedUpdatedAndRemovedObjectsFromForm(eform, context);
+        readTemporaryUploadedFiles(eform);
+    }
+
+    private TemporaryAttachmentManager getTemporaryAttachmentManager()
+    {
+        return Utils.getComponent(TemporaryAttachmentManager.class);
+    }
+
+    public void readTemporaryUploadedFiles(EditForm editForm)
+    {
+        List<String> temporaryUploadedFiles = editForm.getTemporaryUploadedFiles();
+        if (!temporaryUploadedFiles.isEmpty()) {
+            TemporaryAttachmentManager attachmentManager = getTemporaryAttachmentManager();
+            for (String temporaryUploadedFile : temporaryUploadedFiles) {
+                Optional<XWikiAttachment> uploadedAttachment =
+                    attachmentManager.getUploadedAttachment(getDocumentReference(), temporaryUploadedFile);
+                uploadedAttachment.ifPresent(this::setAttachment);
+            }
+        }
     }
 
     /**

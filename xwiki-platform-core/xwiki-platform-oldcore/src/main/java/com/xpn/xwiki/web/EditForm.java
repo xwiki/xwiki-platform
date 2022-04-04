@@ -20,6 +20,7 @@
 package com.xpn.xwiki.web;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -104,6 +105,8 @@ public class EditForm extends XWikiForm
 
     private Map<String, SortedMap<Integer, Map<String, String[]>>> updateOrCreateMap;
 
+    private List<String> temporaryUploadedFiles;
+
     @Override
     public void readRequest()
     {
@@ -129,6 +132,7 @@ public class EditForm extends XWikiForm
         setUpdateOrCreateMap(request);
         setObjectsToRemove(request.getParameterValues("deletedObjects"));
         setObjectsToAdd(request.getParameterValues("addedObjects"));
+        setTemporaryUploadedFiles(request.getParameterValues("uploadedFiles"));
     }
 
     public void setTags(String[] parameter)
@@ -444,6 +448,20 @@ public class EditForm extends XWikiForm
                 }
             }
         }
+    }
+
+    private void setTemporaryUploadedFiles(String[] temporaryUploadedFiles)
+    {
+        if (temporaryUploadedFiles == null || temporaryUploadedFiles.length == 0) {
+            this.temporaryUploadedFiles = Collections.emptyList();
+        } else {
+            this.temporaryUploadedFiles = Arrays.asList(temporaryUploadedFiles);
+        }
+    }
+
+    public List<String> getTemporaryUploadedFiles()
+    {
+        return temporaryUploadedFiles;
     }
 
     public Map<String, List<Integer>> getObjectsToAdd()

@@ -19,12 +19,16 @@
  */
 package org.xwiki.wysiwyg.script;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.ServletException;
+import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -42,11 +46,14 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
+import org.xwiki.store.TemporaryAttachmentException;
+import org.xwiki.store.TemporaryAttachmentManager;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -95,6 +102,9 @@ public class WysiwygEditorScriptService implements ScriptService
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    private TemporaryAttachmentManager temporaryAttachmentManager;
 
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
@@ -350,7 +360,19 @@ public class WysiwygEditorScriptService implements ScriptService
         // We clone the document in order to not impact the environment (the document cache for example).
         XWikiDocument clonedDocument = xwikiContext.getDoc().clone();
         clonedDocument.setContentAuthorReference(xwikiContext.getUserReference());
+        this.injectTemoraryAttachments(clonedDocument);
         return clonedDocument;
+    }
+
+    private void injectTemoraryAttachments(XWikiDocument clonedDocument)
+    {
+        Collection<XWikiAttachment> uploadedAttachments =
+            this.temporaryAttachmentManager.getUploadedAttachments(clonedDocument.getDocumentReference());
+        if (!uploadedAttachments.isEmpty()) {
+            for (XWikiAttachment uploadedAttachment : uploadedAttachments) {
+                clonedDocument.setAttachment(uploadedAttachment);
+            }
+        }
     }
 
     /**
@@ -391,5 +413,49 @@ public class WysiwygEditorScriptService implements ScriptService
         } catch (ParseException e) {
             throw new RuntimeException(String.format("Invalid syntax [%s]", syntaxId), e);
         }
+    }
+
+    /**
+     * Temporary upload the attachment identified by the given field name: the request should be of type
+     * {@code multipart/form-data}.
+     *
+     * @param documentReference the target document reference the attachment should be later attached to.
+     * @param fieldName the name of the field of the uploaded data.
+     * @return a temporary {@link XWikiAttachment} not yet persisted.
+     * @throws TemporaryAttachmentException in case of problem when reading the request, or to handle the temporary
+     *          attachment.
+     * @since 14.3RC1
+     */
+    @Unstable
+    public XWikiAttachment temporaryUploadAttachment(DocumentReference documentReference, String fieldName)
+        throws TemporaryAttachmentException
+    {
+        XWikiContext context = this.xcontextProvider.get();
+        XWikiAttachment result = null;
+        try {
+            Collection<Part> parts = context.getRequest().getParts();
+            for (Part part : parts) {
+                if (fieldName.equals(part.getName())) {
+                    result = this.temporaryAttachmentManager.uploadAttachment(documentReference, part);
+                }
+            }
+        } catch (IOException | ServletException e) {
+            throw new TemporaryAttachmentException("Error while reading the request content part.", e);
+        }
+        return result;
+    }
+
+    /**
+     * Define if the temporary attachment feature is supported.
+     *
+     * @return {@code true} if {@link #temporaryUploadAttachment(DocumentReference, String)} could be used.
+     * @see #temporaryUploadAttachment(DocumentReference, String)
+     * @since 14.3RC1
+     */
+    @Unstable
+    public boolean isTemporaryAttachmentSupported()
+    {
+        // FIXME: maybe use a configuration to allow disabling the feature?
+        return true;
     }
 }

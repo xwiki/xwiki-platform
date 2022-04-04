@@ -27,9 +27,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
@@ -51,6 +53,7 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.stability.Unstable;
+import org.xwiki.store.TemporaryAttachmentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -105,6 +108,9 @@ public class DownloadAction extends XWikiAction
     /** The format of a valid range header. */
     private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=([0-9]+)?-([0-9]+)?");
 
+    @Inject
+    private TemporaryAttachmentManager temporaryAttachmentManager;
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -118,34 +124,41 @@ public class DownloadAction extends XWikiAction
         Map<String, Object> backwardCompatibilityContextObjects = null;
 
         if (attachment == null) {
-            // If some plugins extend the Download URL format for the Standard Scheme the document in the context will
-            // most likely not have a reference that corresponds to what the plugin expects. For example imagine that
-            // the URL is a Zip Explorer URL like .../download/space/page/attachment/index.html. This will be parsed
-            // as space.page.attachment@index.html by the Standard URL scheme parsers. Thus the attachment won't be
-            // found since index.html is not the correct attachment for the Zip Explorer plugin's URL format.
-            //
-            // Thus in order to preserve backward compatibility for existing plugins that have custom URL formats
-            // extending the Download URL format, we parse again the URL by considering that it doesn't contain any
-            // Nested Space. This also means that those plugins will need to completely reparse the URL if they wish to
-            // support Nested Spaces.
-            //
-            // Also note that this code below is not compatible with the notion of having several URL schemes. The real
-            // fix will be to not allow plugins to support custom URL formats and instead to have them register new
-            // Actions if they need a different URL format.
-            Pair<XWikiDocument, XWikiAttachment> result =
-                extractAttachmentAndDocumentFromURLWithoutSupportingNestedSpaces(request, context);
+            // We first check if the attachment has not been temporary uploaded.
+            Optional<XWikiAttachment> optionalXWikiAttachment =
+                this.temporaryAttachmentManager.getUploadedAttachment(doc.getDocumentReference(), filename);
+            if (optionalXWikiAttachment.isPresent()) {
+                attachment = optionalXWikiAttachment.get();
+            } else {
+                // If some plugins extend the Download URL format for the Standard Scheme the document in the context will
+                // most likely not have a reference that corresponds to what the plugin expects. For example imagine that
+                // the URL is a Zip Explorer URL like .../download/space/page/attachment/index.html. This will be parsed
+                // as space.page.attachment@index.html by the Standard URL scheme parsers. Thus the attachment won't be
+                // found since index.html is not the correct attachment for the Zip Explorer plugin's URL format.
+                //
+                // Thus in order to preserve backward compatibility for existing plugins that have custom URL formats
+                // extending the Download URL format, we parse again the URL by considering that it doesn't contain any
+                // Nested Space. This also means that those plugins will need to completely reparse the URL if they wish to
+                // support Nested Spaces.
+                //
+                // Also note that this code below is not compatible with the notion of having several URL schemes. The real
+                // fix will be to not allow plugins to support custom URL formats and instead to have them register new
+                // Actions if they need a different URL format.
+                Pair<XWikiDocument, XWikiAttachment> result =
+                    extractAttachmentAndDocumentFromURLWithoutSupportingNestedSpaces(request, context);
 
-            if (result == null) {
-                throwNotFoundException(filename);
+                if (result == null) {
+                    throwNotFoundException(filename);
+                }
+
+                XWikiDocument backwardCompatibilityDocument = result.getLeft();
+                attachment = result.getRight();
+
+                // Set the new doc as the context doc so that plugins see it as the context doc
+                backwardCompatibilityContextObjects = new HashMap<>();
+                pushDocumentInContext(backwardCompatibilityContextObjects,
+                    backwardCompatibilityDocument.getDocumentReference());
             }
-
-            XWikiDocument backwardCompatibilityDocument = result.getLeft();
-            attachment = result.getRight();
-
-            // Set the new doc as the context doc so that plugins see it as the context doc
-            backwardCompatibilityContextObjects = new HashMap<>();
-            pushDocumentInContext(backwardCompatibilityContextObjects,
-                backwardCompatibilityDocument.getDocumentReference());
         }
 
         try {

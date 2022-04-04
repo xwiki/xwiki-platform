@@ -67,6 +67,10 @@ public class AttachmentsPane extends BaseElement
         this.attachmentsLivetable = new LiveTableElement(this.livetableId);
     }
 
+    /**
+     * @param livetableId the id of the attachments livetable
+     * @since 14.3RC1
+     */
     public AttachmentsPane(String livetableId)
     {
         this.livetableId = livetableId;
@@ -78,6 +82,11 @@ public class AttachmentsPane extends BaseElement
         return this.attachmentsLivetable.isReady();
     }
 
+    /**
+     * Wait for the attachments livetable to be ready.
+     *
+     * @since 14.3RC1
+     */
     public void waitForAttachmentsLivetable()
     {
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
@@ -130,7 +139,14 @@ public class AttachmentsPane extends BaseElement
             .click();
     }
 
-    public int getRowNumberByAttachmentName(String attachmentName)
+    /**
+     * Get the row index of an attachment knowing the filename.
+     *
+     * @param attachmentName the name of the attachment
+     * @return the row index of the searched attachment
+     * @since 14.3RC1
+     */
+    public int getRowIndexByAttachmentName(String attachmentName)
     {
         return this.attachmentsLivetable.getRowNumberForElement(By.xpath("//a[text()='" + attachmentName + "']"));
     }
@@ -140,6 +156,7 @@ public class AttachmentsPane extends BaseElement
      *
      * @param positionNumber the index of the attachment in the livetable
      * @return the filename of the attachment
+     * @since 14.3RC1
      */
     public String getAttachmentNameByPosition(int positionNumber)
     {
@@ -155,7 +172,7 @@ public class AttachmentsPane extends BaseElement
      */
     public WebElement getAttachmentLink(String attachmentName)
     {
-        return this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 2)
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 2)
             .findElement(By.tagName("a"));
     }
 
@@ -169,7 +186,7 @@ public class AttachmentsPane extends BaseElement
         // We initialize before so we can remove the animation before the modal is shown
         this.confirmDelete = new ConfirmationModal(By.xpath(".//table[@id='" + this.livetableId
             + "']/parent::div/following-sibling::div[contains(@class, 'deleteAttachment')]"));
-        WebElement deleteButton = this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 6)
+        WebElement deleteButton = this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 6)
             .findElement(By.className("actiondelete"));
         deleteButton.click();
         this.confirmDelete.clickOk();
@@ -226,6 +243,8 @@ public class AttachmentsPane extends BaseElement
     }
 
     /**
+     * Get the number of displayed attachments, regardless of the total number.
+     *
      * @return the number of attachments displayed.
      * @since 14.3RC1
      */
@@ -246,7 +265,7 @@ public class AttachmentsPane extends BaseElement
 
     public String getUploaderOfAttachment(String attachmentName)
     {
-        return this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 5).getText();
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 5).getText();
     }
 
     /**
@@ -273,20 +292,20 @@ public class AttachmentsPane extends BaseElement
      */
     public AttachmentHistoryPage goToAttachmentHistory(String attachmentName)
     {
-        this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 6)
+        this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 6)
             .findElement(By.className("history")).click();
         return new AttachmentHistoryPage();
     }
 
     public String getSizeOfAttachment(String attachmentName)
     {
-        return this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 3).getText();
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 3).getText();
 
     }
 
     public String getDateOfLastUpload(String attachmentName)
     {
-        return this.attachmentsLivetable.getCell(getRowNumberByAttachmentName(attachmentName), 4).getText();
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 4).getText();
     }
 
     public boolean attachmentExistsByFileName(String attachmentName)
@@ -305,6 +324,7 @@ public class AttachmentsPane extends BaseElement
      *
      * @param columnLabel the label of the column to filter
      * @param filterValue the value to filter by
+     * @since 14.3RC1
      */
     public void filterColumn(String columnLabel, String filterValue)
     {

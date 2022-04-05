@@ -25,12 +25,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.utility.DockerImageName;
 import org.xwiki.test.docker.internal.junit5.browser.XWikiBrowserWebDriverContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallbackTemplate;
 import com.github.dockerjava.api.command.PullImageResultCallback;
+
+import static org.xwiki.test.docker.junit5.browser.Browser.CHROME;
 
 /**
  * Force pulling the selenium FF and Chrome docker images. Workaround for
@@ -46,6 +49,10 @@ public final class BrowserTestUtils
     private static final String SELENIUM_FIREFOX_DOCKER_IMAGE_NAME = "selenium/standalone-firefox-debug:3.141.59";
 
     private static final String SELENIUM_CHROME_DOCKER_IMAGE_NAME = "selenium/standalone-chrome-debug:3.141.59";
+
+    private static final boolean IS_ARM64 = System.getProperty("os.arch").equals("aarch64");
+
+    private static final String SELENIARM_VERSION = "4.1.3-20220331";
 
     private static List<String> pulledImages = new ArrayList<>();
 
@@ -64,17 +71,25 @@ public final class BrowserTestUtils
     public static void pullBrowserImages(GenericContainer<?> container, TestConfiguration testConfiguration)
     {
         if (container instanceof XWikiBrowserWebDriverContainer && !testConfiguration.isOffline()) {
-            if (!pulledImages.contains(SELENIUM_FIREFOX_DOCKER_IMAGE_NAME)) {
-                pullImage(container.getDockerClient(), SELENIUM_FIREFOX_DOCKER_IMAGE_NAME);
-                pulledImages.add(SELENIUM_FIREFOX_DOCKER_IMAGE_NAME);
-
-            }
-            if (!pulledImages.contains(SELENIUM_CHROME_DOCKER_IMAGE_NAME)) {
-                pullImage(container.getDockerClient(), SELENIUM_CHROME_DOCKER_IMAGE_NAME);
-                pulledImages.add(SELENIUM_CHROME_DOCKER_IMAGE_NAME);
-
+            DockerImageName din = getSeleniumDockerImageName(testConfiguration);
+            if (!pulledImages.contains(din.asCanonicalNameString())) {
+                pullImage(container.getDockerClient(), din.asCanonicalNameString());
+                pulledImages.add(din.asCanonicalNameString());
             }
         }
+    }
+
+    /**
+     * @param testConfiguration the configuration to build (database, debug mode, etc). Used to verify what browser is
+     *         being asked so that we return an appropriate image for it
+     * @return the docker image to be used for BrowserWebDriverContainer taking into account the os architecture
+     *         and using seleniarm images for {@code aarch64}
+     */
+    public static DockerImageName getSeleniumDockerImageName(TestConfiguration testConfiguration)
+    {
+        return IS_ARM64 ? DockerImageName.parse(getSeleniarmImageName(testConfiguration))
+            .asCompatibleSubstituteFor(getSeleniumImageName(testConfiguration))
+            : DockerImageName.parse(getSeleniumImageName(testConfiguration));
     }
 
     private static void pullImage(DockerClient dockerClient, String imageName)
@@ -95,5 +110,21 @@ public final class BrowserTestUtils
             // Restore interrupted state to be a good citizen...
             Thread.currentThread().interrupt();
         }
+    }
+
+    private static String getSeleniarmImageName(TestConfiguration testConfiguration)
+    {
+        // Note: Unfortunately the dockerhub seleniarm maintainers don't always update the "latest" to be the latest...
+        // Thus we have to manually set the tag to use the latest released version.
+        // See https://hub.docker.com/r/seleniarm/standalone-chromium/tags and
+        // https://hub.docker.com/r/seleniarm/standalone-firefox/tags
+        return CHROME.equals(testConfiguration.getBrowser()) ? String.format("seleniarm/standalone-chromium:%s",
+            SELENIARM_VERSION) : String.format("seleniarm/standalone-firefox:%s", SELENIARM_VERSION);
+    }
+
+    private static String getSeleniumImageName(TestConfiguration testConfiguration)
+    {
+        return CHROME.equals(testConfiguration.getBrowser()) ? "selenium/standalone-chrome:latest"
+            : "selenium/standalone-firefox:latest";
     }
 }

@@ -46,13 +46,27 @@ public final class BrowserTestUtils
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowserTestUtils.class);
 
-    private static final String SELENIUM_FIREFOX_DOCKER_IMAGE_NAME = "selenium/standalone-firefox-debug:3.141.59";
+    private static final String SELENIUM_VERSION = "latest";
 
-    private static final String SELENIUM_CHROME_DOCKER_IMAGE_NAME = "selenium/standalone-chrome-debug:3.141.59";
+    // Note: Unfortunately the dockerhub seleniarm maintainers don't always update the "latest" to be the latest...
+    // Thus we have to manually set the tag to use the latest released version.
+    // See https://hub.docker.com/r/seleniarm/standalone-chromium/tags and
+    // https://hub.docker.com/r/seleniarm/standalone-firefox/tags
+    private static final String SELENIARM_VERSION = "4.1.3-20220331";
+
+    private static final String SELENIUM_FIREFOX_DOCKER_IMAGE_NAME =
+        String.format("selenium/standalone-firefox:%s", SELENIUM_VERSION);
+
+    private static final String SELENIUM_CHROME_DOCKER_IMAGE_NAME =
+        String.format("selenium/standalone-chrome:%s", SELENIUM_VERSION);
+
+    private static final String SELENIARM_FIREFOX_DOCKER_IMAGE_NAME =
+        String.format("seleniarm/standalone-firefox:%s", SELENIARM_VERSION);
+
+    private static final String SELENIARM_CHROME_DOCKER_IMAGE_NAME =
+        String.format("seleniarm/standalone-chromium:%s", SELENIARM_VERSION);
 
     private static final boolean IS_ARM64 = System.getProperty("os.arch").equals("aarch64");
-
-    private static final String SELENIARM_VERSION = "4.1.3-20220331";
 
     private static List<String> pulledImages = new ArrayList<>();
 
@@ -114,17 +128,13 @@ public final class BrowserTestUtils
 
     private static String getSeleniarmImageName(TestConfiguration testConfiguration)
     {
-        // Note: Unfortunately the dockerhub seleniarm maintainers don't always update the "latest" to be the latest...
-        // Thus we have to manually set the tag to use the latest released version.
-        // See https://hub.docker.com/r/seleniarm/standalone-chromium/tags and
-        // https://hub.docker.com/r/seleniarm/standalone-firefox/tags
-        return CHROME.equals(testConfiguration.getBrowser()) ? String.format("seleniarm/standalone-chromium:%s",
-            SELENIARM_VERSION) : String.format("seleniarm/standalone-firefox:%s", SELENIARM_VERSION);
+        return CHROME.equals(testConfiguration.getBrowser()) ? SELENIARM_CHROME_DOCKER_IMAGE_NAME
+            : SELENIARM_FIREFOX_DOCKER_IMAGE_NAME;
     }
 
     private static String getSeleniumImageName(TestConfiguration testConfiguration)
     {
-        return CHROME.equals(testConfiguration.getBrowser()) ? "selenium/standalone-chrome:latest"
-            : "selenium/standalone-firefox:latest";
+        return CHROME.equals(testConfiguration.getBrowser()) ? SELENIUM_CHROME_DOCKER_IMAGE_NAME
+            : SELENIUM_FIREFOX_DOCKER_IMAGE_NAME;
     }
 }

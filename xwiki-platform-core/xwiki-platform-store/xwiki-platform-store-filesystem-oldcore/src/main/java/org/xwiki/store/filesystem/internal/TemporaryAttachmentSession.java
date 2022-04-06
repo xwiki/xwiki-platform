@@ -19,25 +19,27 @@
  */
 package org.xwiki.store.filesystem.internal;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.cache.Cache;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * Contains all information for a user editing session when performing temporary attachment uploads.
- * This class manipulates a map of {@link TemporaryAttachmentDocumentSession} since a user might edit several document
- * at once.
+ * This class manipulates a map of map of {@link XWikiAttachment} since a user might edit several documents and add
+ * several attachments in each of them.
  *
  * @see DefaultTemporaryAttachmentManager
- * @see TemporaryAttachmentDocumentSession
  * @version $Id$
  * @since 14.3RC1
  */
@@ -45,7 +47,7 @@ public class TemporaryAttachmentSession
 {
     private final String sessionId;
 
-    private final Map<DocumentReference, TemporaryAttachmentDocumentSession> temporaryAttachmentDocumentSessionMap;
+    private final Map<DocumentReference, Map<String, XWikiAttachment>> editionsMap;
 
     /**
      * Default constructor.
@@ -55,83 +57,129 @@ public class TemporaryAttachmentSession
     public TemporaryAttachmentSession(String sessionId)
     {
         this.sessionId = sessionId;
-        this.temporaryAttachmentDocumentSessionMap = new ConcurrentHashMap<>();
+        this.editionsMap = new ConcurrentHashMap<>();
     }
 
     /**
-     * Accessor of the temporary attachment document session map for testing purpose.
+     * Add a new attachment for the given document reference.
      *
-     * @return the temporary attachment document session map.
+     * @param documentReference the reference of the document for which the attachment should be added.
+     * @param attachment the temporary attachment to add
      */
-    protected Map<DocumentReference, TemporaryAttachmentDocumentSession> getTemporaryAttachmentDocumentSessionMap()
+    public void addAttachment(DocumentReference documentReference, XWikiAttachment attachment)
     {
-        return temporaryAttachmentDocumentSessionMap;
+        Map<String, XWikiAttachment> attachmentMap;
+        if (!this.editionsMap.containsKey(documentReference)) {
+            attachmentMap = new ConcurrentHashMap<>();
+            this.editionsMap.put(documentReference, attachmentMap);
+        } else {
+            attachmentMap = this.editionsMap.get(documentReference);
+        }
+        attachmentMap.put(attachment.getFilename(), attachment);
     }
 
     /**
-     * Check if there is already a cache created for the given document reference.
-     *
-     * @param documentReference the reference for which to cache temporary attachment.
-     * @return {@code true} if a cache already exists.
-     */
-    public boolean hasOpenEditionSession(DocumentReference documentReference)
-    {
-        return this.temporaryAttachmentDocumentSessionMap.containsKey(documentReference);
-    }
-
-    /**
-     * Add a new cache for the given document reference.
-     * This method also creates the appropriate listener for the cache to handle set of file names.
-     *
-     * @param documentReference the reference of the document for which the cache is created.
-     * @param cache a newly created cache to be used with the given document reference.
-     */
-    public void startEditionSession(DocumentReference documentReference, Cache<XWikiAttachment> cache)
-    {
-        TemporaryAttachmentDocumentSession temporaryAttachmentDocumentSession =
-            new TemporaryAttachmentDocumentSession(this.sessionId, documentReference, cache);
-        this.temporaryAttachmentDocumentSessionMap.put(documentReference, temporaryAttachmentDocumentSession);
-    }
-
-    /**
-     * Dispose all caches created for this session.
+     * Dispose all attachments created for this session.
      */
     public void dispose()
     {
-        this.temporaryAttachmentDocumentSessionMap.values().forEach(TemporaryAttachmentDocumentSession::dispose);
+        this.editionsMap.values().forEach(
+            stringXWikiAttachmentMap -> stringXWikiAttachmentMap.values()
+                .forEach(attachment -> attachment.getAttachment_content().dispose()));
+        this.editionsMap.clear();
     }
 
-    /**
-     * Retrieve the cache created for the given document reference.
-     *
-     * @param documentReference the reference for which to retrieve a cache.
-     * @return the cache associated to the given reference, or {@code null} if no cache exists for the given reference
-     * @see #hasOpenEditionSession(DocumentReference)
-     */
-    public Cache<XWikiAttachment> getCache(DocumentReference documentReference)
-    {
-        if (this.hasOpenEditionSession(documentReference)) {
-            return this.temporaryAttachmentDocumentSessionMap.get(documentReference).getAttachmentCache();
-        } else {
-            return null;
-        }
-    }
 
     /**
      * Retrieve the set of filenames of uploaded attachments for the given document reference.
      *
      * @param documentReference the reference for which to retrieve the set of filenames.
-     * @return the set of filenames of uploaded attachments, or {@link Collections#emptySet()} if there's no session
-     *          opened for the given reference.
-     * @see #hasOpenEditionSession(DocumentReference)
+     * @return the set of filenames of uploaded attachments, or {@link Collections#emptySet()}
      */
     public Set<String> getFilenames(DocumentReference documentReference)
     {
-        if (this.hasOpenEditionSession(documentReference)) {
-            return this.temporaryAttachmentDocumentSessionMap.get(documentReference).getFilenames();
+        if (this.editionsMap.containsKey(documentReference)) {
+            return this.editionsMap.get(documentReference).keySet();
         } else {
             return Collections.emptySet();
         }
+    }
+
+    /**
+     * Retrieve the attachment added for the given document reference and with the given filename.
+     *
+     * @param documentReference the reference for which to retrieve the attachment
+     * @param filename the name of the attachment to retrieve
+     * @return an optional containing the attachment instance or an {@link Optional#empty()} if it cannot be find
+     */
+    public Optional<XWikiAttachment> getAttachment(DocumentReference documentReference, String filename)
+    {
+        Optional<XWikiAttachment> result = Optional.empty();
+
+        if (this.editionsMap.containsKey(documentReference)) {
+            Map<String, XWikiAttachment> attachmentMap = this.editionsMap.get(documentReference);
+            if (attachmentMap.containsKey(filename)) {
+                result = Optional.of(attachmentMap.get(filename));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Retrieve the set of attachments added for the given document reference.
+     *
+     * @param documentReference the reference for which to retrieve added attachments
+     * @return the set of added attachments or an empty set.
+     */
+    public Collection<XWikiAttachment> getAttachments(DocumentReference documentReference)
+    {
+        Collection<XWikiAttachment> result = Collections.emptySet();
+        if (this.editionsMap.containsKey(documentReference)) {
+            result = new HashSet<>(this.editionsMap.get(documentReference).values());
+        }
+        return result;
+    }
+
+    /**
+     * Remove the attachment added to the given reference and identified by the given name and dispose its content.
+     *
+     * @param documentReference the reference for which the attachment have been added
+     * @param filename the name of the attachment
+     * @return {@code true} if the attachment has been found, removed and disposed, {@code false} if it cannot be found
+     */
+    public boolean removeAttachment(DocumentReference documentReference, String filename)
+    {
+        boolean result = false;
+        if (this.editionsMap.containsKey(documentReference)) {
+            Map<String, XWikiAttachment> attachmentMap = this.editionsMap.get(documentReference);
+            if (attachmentMap.containsKey(filename)) {
+                XWikiAttachment attachment = attachmentMap.remove(filename);
+                attachment.getAttachment_content().dispose();
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Remove and dispose all attachments added for the given reference.
+     *
+     * @param documentReference the reference for which to retrieve all the attachments.
+     * @return {@code true} if there was attachments to remove, {@code false} otherwise
+     */
+    public boolean removeAttachments(DocumentReference documentReference)
+    {
+        boolean result = false;
+        if (this.editionsMap.containsKey(documentReference)) {
+            Map<String, XWikiAttachment> attachmentMap = this.editionsMap.get(documentReference);
+            if (!attachmentMap.isEmpty()) {
+                result = true;
+                Collection<XWikiAttachment> attachments = new ArrayList<>(attachmentMap.values());
+                attachmentMap.clear();
+                attachments.forEach(attachment -> attachment.getAttachment_content().dispose());
+            }
+        }
+        return result;
     }
 
     /**
@@ -162,5 +210,15 @@ public class TemporaryAttachmentSession
     public int hashCode()
     {
         return new HashCodeBuilder(17, 63).append(sessionId).toHashCode();
+    }
+
+    /**
+     * Retrieve the editions map, mainly for testing purpose.
+     *
+     * @return the map of maps containing all attachment information
+     */
+    protected Map<DocumentReference, Map<String, XWikiAttachment>> getEditionsMap()
+    {
+        return editionsMap;
     }
 }

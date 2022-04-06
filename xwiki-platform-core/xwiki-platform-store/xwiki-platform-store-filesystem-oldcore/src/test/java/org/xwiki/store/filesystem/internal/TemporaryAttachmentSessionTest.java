@@ -21,20 +21,20 @@ package org.xwiki.store.filesystem.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.cache.Cache;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentContent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -51,88 +51,141 @@ class TemporaryAttachmentSessionTest
 {
     private TemporaryAttachmentSession temporaryAttachmentSession;
 
+    private DocumentReference docRef1;
+    private DocumentReference docRef2;
+    private DocumentReference docRef3;
+    private XWikiAttachment fooAttachment1;
+    private XWikiAttachment barAttachment1;
+    private XWikiAttachment fooAttachment2;
+
+
     @BeforeEach
     void setup()
     {
         this.temporaryAttachmentSession = new TemporaryAttachmentSession("session");
-    }
 
-    @Test
-    void hasOpenEditionSession()
-    {
-        DocumentReference documentReference = mock(DocumentReference.class);
-        assertFalse(this.temporaryAttachmentSession.hasOpenEditionSession(documentReference));
+        this.docRef1 = mock(DocumentReference.class);
+        this.docRef2 = mock(DocumentReference.class);
+        this.docRef3 = mock(DocumentReference.class);
 
-        TemporaryAttachmentDocumentSession temporaryAttachmentDocumentSession =
-            mock(TemporaryAttachmentDocumentSession.class);
-        this.temporaryAttachmentSession.getTemporaryAttachmentDocumentSessionMap()
-            .put(documentReference, temporaryAttachmentDocumentSession);
-        assertTrue(this.temporaryAttachmentSession.hasOpenEditionSession(documentReference));
+        this.fooAttachment1 = mock(XWikiAttachment.class);
+        this.fooAttachment2 = mock(XWikiAttachment.class);
+        this.barAttachment1 = mock(XWikiAttachment.class);
 
-        this.temporaryAttachmentSession.getTemporaryAttachmentDocumentSessionMap().remove(documentReference);
-        assertFalse(this.temporaryAttachmentSession.hasOpenEditionSession(documentReference));
-    }
+        // Editions Map fixture:
+        // DocRef1:
+        //   - Foo1 -> FooAttachment1
+        //   - Bar1 -> BarAttachment1
+        // DocRef2: <empty>
+        // DocRef3:
+        //   - Foo2 -> FooAttachment2
+        Map<DocumentReference, Map<String, XWikiAttachment>> editionsMap =
+            this.temporaryAttachmentSession.getEditionsMap();
 
-    @Test
-    void startEditionSession()
-    {
-        Cache<XWikiAttachment> cache = mock(Cache.class);
-        DocumentReference documentReference = mock(DocumentReference.class);
-        TemporaryAttachmentDocumentSession temporaryAttachmentDocumentSession =
-            new TemporaryAttachmentDocumentSession("session", documentReference, cache);
-        Map<DocumentReference, TemporaryAttachmentDocumentSession> temporaryAttachmentDocumentSessionMap =
-            this.temporaryAttachmentSession.getTemporaryAttachmentDocumentSessionMap();
-        assertTrue(temporaryAttachmentDocumentSessionMap.isEmpty());
+        HashMap<String, XWikiAttachment> map = new HashMap<>();
+        editionsMap.put(this.docRef1, map);
+        map.put("foo1", this.fooAttachment1);
+        map.put("bar1", barAttachment1);
 
-        this.temporaryAttachmentSession.startEditionSession(documentReference, cache);
-        assertTrue(temporaryAttachmentDocumentSessionMap.containsKey(documentReference));
-        assertEquals(temporaryAttachmentDocumentSession, temporaryAttachmentDocumentSessionMap.get(documentReference));
+        map = new HashMap<>();
+        editionsMap.put(this.docRef2, map);
+
+        map = new HashMap<>();
+        editionsMap.put(this.docRef3, map);
+        map.put("foo2", fooAttachment2);
     }
 
     @Test
     void dispose()
     {
-        Map<DocumentReference, TemporaryAttachmentDocumentSession> map =
-            this.temporaryAttachmentSession.getTemporaryAttachmentDocumentSessionMap();
+        Map<DocumentReference, Map<String, XWikiAttachment>> editionsMap =
+            this.temporaryAttachmentSession.getEditionsMap();
 
-        DocumentReference documentReference1 = mock(DocumentReference.class);
-        TemporaryAttachmentDocumentSession session1 = mock(TemporaryAttachmentDocumentSession.class);
-        map.put(documentReference1, session1);
+        XWikiAttachmentContent contentFoo1 = mock(XWikiAttachmentContent.class);
+        XWikiAttachmentContent contentBar1 = mock(XWikiAttachmentContent.class);
+        XWikiAttachmentContent contentFoo2 = mock(XWikiAttachmentContent.class);
 
-        DocumentReference documentReference2 = mock(DocumentReference.class);
-        TemporaryAttachmentDocumentSession session2 = mock(TemporaryAttachmentDocumentSession.class);
-        map.put(documentReference2, session2);
+        when(this.fooAttachment1.getAttachment_content()).thenReturn(contentFoo1);
+        when(this.barAttachment1.getAttachment_content()).thenReturn(contentBar1);
+        when(this.fooAttachment2.getAttachment_content()).thenReturn(contentFoo2);
 
         this.temporaryAttachmentSession.dispose();
-        verify(session1).dispose();
-        verify(session2).dispose();
+        verify(contentFoo1).dispose();
+        verify(contentBar1).dispose();
+        verify(contentFoo2).dispose();
+
+        assertTrue(this.temporaryAttachmentSession.getEditionsMap().isEmpty());
     }
 
     @Test
-    void getCache()
+    void addAttachment()
     {
-        DocumentReference documentReference = mock(DocumentReference.class);
-        assertNull(this.temporaryAttachmentSession.getCache(documentReference));
+        XWikiAttachment newAttachment = mock(XWikiAttachment.class);
+        when(newAttachment.getFilename()).thenReturn("buz");
 
-        TemporaryAttachmentDocumentSession session = mock(TemporaryAttachmentDocumentSession.class);
-        this.temporaryAttachmentSession.getTemporaryAttachmentDocumentSessionMap().put(documentReference, session);
-        Cache<XWikiAttachment> cache = mock(Cache.class);
-        when(session.getAttachmentCache()).thenReturn(cache);
-
-        assertSame(cache, this.temporaryAttachmentSession.getCache(documentReference));
+        this.temporaryAttachmentSession.addAttachment(this.docRef1, newAttachment);
+        assertEquals(3, this.temporaryAttachmentSession.getEditionsMap().get(this.docRef1).size());
+        assertSame(newAttachment, this.temporaryAttachmentSession.getEditionsMap().get(this.docRef1).get("buz"));
     }
 
     @Test
     void getFilenames()
     {
-        DocumentReference documentReference = mock(DocumentReference.class);
-        assertEquals(Collections.emptySet(), this.temporaryAttachmentSession.getFilenames(documentReference));
-
-        TemporaryAttachmentDocumentSession session = mock(TemporaryAttachmentDocumentSession.class);
-        this.temporaryAttachmentSession.getTemporaryAttachmentDocumentSessionMap().put(documentReference, session);
-        Set<String> filenames = new HashSet<>(Arrays.asList("one", "two", "three"));
-        when(session.getFilenames()).thenReturn(filenames);
-
-        assertEquals(filenames, this.temporaryAttachmentSession.getFilenames(documentReference));
+        assertEquals(new HashSet<>(Arrays.asList("foo1", "bar1")),
+            this.temporaryAttachmentSession.getFilenames(this.docRef1));
+        assertEquals(Collections.emptySet(),
+            this.temporaryAttachmentSession.getFilenames(this.docRef2));
+        assertEquals(Collections.singleton("foo2"),
+            this.temporaryAttachmentSession.getFilenames(this.docRef3));
     }
+
+    @Test
+    void getAttachment()
+    {
+        assertEquals(
+            Optional.of(this.fooAttachment1), this.temporaryAttachmentSession.getAttachment(this.docRef1, "foo1"));
+        assertEquals(Optional.empty(),
+            this.temporaryAttachmentSession.getAttachment(mock(DocumentReference.class), "something"));
+        assertEquals(Optional.empty(),
+            this.temporaryAttachmentSession.getAttachment(this.docRef2, "something"));
+    }
+
+    @Test
+    void getAttachments()
+    {
+        assertEquals(new HashSet<>(Arrays.asList(this.fooAttachment1, this.barAttachment1)),
+            this.temporaryAttachmentSession.getAttachments(this.docRef1));
+        assertEquals(Collections.emptySet(), this.temporaryAttachmentSession.getAttachments(this.docRef2));
+    }
+
+    @Test
+    void removeAttachment()
+    {
+        XWikiAttachmentContent attachmentContent = mock(XWikiAttachmentContent.class);
+        when(this.fooAttachment2.getAttachment_content()).thenReturn(attachmentContent);
+
+        assertTrue(this.temporaryAttachmentSession.removeAttachment(this.docRef3, "foo2"));
+        verify(attachmentContent).dispose();
+        assertTrue(this.temporaryAttachmentSession.getEditionsMap().get(this.docRef3).isEmpty());
+
+        assertFalse(this.temporaryAttachmentSession.removeAttachment(this.docRef3, "another"));
+    }
+
+    @Test
+    void removeAttachments()
+    {
+        XWikiAttachmentContent attachmentContent1 = mock(XWikiAttachmentContent.class);
+        when(this.fooAttachment1.getAttachment_content()).thenReturn(attachmentContent1);
+
+        XWikiAttachmentContent attachmentContent2 = mock(XWikiAttachmentContent.class);
+        when(this.barAttachment1.getAttachment_content()).thenReturn(attachmentContent2);
+
+        assertTrue(this.temporaryAttachmentSession.removeAttachments(this.docRef1));
+        verify(attachmentContent1).dispose();
+        verify(attachmentContent2).dispose();
+        assertTrue(this.temporaryAttachmentSession.getEditionsMap().get(this.docRef1).isEmpty());
+
+        assertFalse(this.temporaryAttachmentSession.removeAttachments(this.docRef1));
+    }
+
 }

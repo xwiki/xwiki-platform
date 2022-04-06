@@ -32,6 +32,7 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.xwiki.environment.Environment;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.UnexpectedException;
 
 import com.xpn.xwiki.web.Utils;
@@ -364,6 +365,22 @@ public class XWikiAttachmentContent implements Cloneable
             if (this.isContentDirty && ownerDocument != null) {
                 ownerDocument.setMetaDataDirty(true);
             }
+        }
+    }
+
+    /**
+     * Delete the temporary file item created to hold the content of the attachment.
+     * This method only performs the deletion if its content is dirty, its purpose is mainly to allow cleaning temporary
+     * attachments.
+     *
+     * @since 14.3RC1
+     */
+    @Unstable
+    public void dispose()
+    {
+        if (this.file != null && this.isContentDirty()) {
+            this.file.delete();
+            this.file = null;
         }
     }
 }

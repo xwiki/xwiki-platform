@@ -84,8 +84,8 @@ public class DefaultImageStyleManager implements ImageStyleManager
         try {
             this.contextManager.pushContext(new ExecutionContext(), true);
             this.xcontextProvider.get().setWikiId(wikiName);
-            return this.queryManager.createQuery("select doc.fullName " 
-                        + "from Document doc, doc.object(Image.Style.Code.ImageStyleClass) as obj " 
+            return this.queryManager.createQuery("select doc.fullName "
+                        + "from Document doc, doc.object(Image.Style.Code.ImageStyleClass) as obj "
                         + "where doc.space = 'Image.Style.Code.ImageStyles'",
                     Query.XWQL)
                 .setWiki(wikiName)
@@ -114,19 +114,48 @@ public class DefaultImageStyleManager implements ImageStyleManager
                 .setIdentifier(document.getDocumentReference().getName())
                 .setPrettyName(xObject.getStringValue("prettyName"))
                 .setType(xObject.getStringValue("type"))
-                .setAdjustableSize(xObject.getLongValue("adjustableSize") == 1)
-                .setDefaultWidth(xObject.getLongValue("defaultWidth"))
-                .setDefaultHeight(xObject.getLongValue("defaultHeight"))
-                .setAdjustableBorder(xObject.getLongValue("adjustableBorder") == 1)
-                .setDefaultBorder(xObject.getLongValue("defaultBorder") == 1)
-                .setAdjustableAlignment(xObject.getLongValue("adjustableAlignment") == 1)
+                .setAdjustableSize(getBoolean(xObject, "adjustableSize"))
+                .setDefaultWidth(getLongIfNotEmpty(xObject, "defaultWidth"))
+                .setDefaultHeight(getLongIfNotEmpty(xObject, "defaultHeight"))
+                .setAdjustableBorder(getBoolean(xObject, "adjustableBorder"))
+                .setDefaultBorder(getBoolean(xObject, "defaultBorder"))
+                .setAdjustableAlignment(getBoolean(xObject, "adjustableAlignment"))
                 .setDefaultAlignment(xObject.getStringValue("defaultAlignment"))
-                .setAdjustableTextWrap(xObject.getLongValue("adjustableTextWrap") == 1)
-                .setDefaultTextWrap(xObject.getLongValue("defaultTextWrap") == 1);
+                .setAdjustableTextWrap(getBoolean(xObject, "adjustableTextWrap"))
+                .setDefaultTextWrap(getBoolean(xObject, "defaultTextWrap"));
         } catch (XWikiException e) {
             this.logger.warn("Failed to resolve document reference [{}]. Cause: [{}].", documentReference,
                 getRootCauseMessage(e));
             return null;
         }
+    }
+
+    /**
+     * Return {@code true} of the property is number value is {@code 1}, {@code false} otherwise.
+     *
+     * @param xObject an XObject
+     * @param propertyName the property name in the XObject
+     * @return {@code true} of the property is number value is {@code 1}, {@code false} otherwise.
+     */
+    private boolean getBoolean(BaseObject xObject, String propertyName)
+    {
+        return 1 == xObject.getLongValue(propertyName);
+    }
+
+    /**
+     * Return the long value of the property only if it is explicitly defined (i.e., its string representation is not
+     * the empty string).
+     *
+     * @param xObject an XObject
+     * @param propertyName the property name in the XObject
+     * @return {@code null} if the string representation of the property is the empty string, the long value of the
+     *     property otherwise
+     */
+    private Long getLongIfNotEmpty(BaseObject xObject, String propertyName)
+    {
+        if (Objects.equals(xObject.getStringValue(propertyName), "")) {
+            return null;
+        }
+        return xObject.getLongValue(propertyName);
     }
 }

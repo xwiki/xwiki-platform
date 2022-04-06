@@ -4308,6 +4308,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return Utils.getComponent(TemporaryAttachmentManager.class);
     }
 
+    /**
+     * Read the list of attachment that should be added from {@link EditForm#getTemporaryUploadedFiles()} and attach
+     * them to the current document if they can be found in the {@link TemporaryAttachmentManager}.
+     *
+     * @param editForm the form from which to read the list of files.
+     * @since 14.3RC1
+     */
+    @Unstable
     public void readTemporaryUploadedFiles(EditForm editForm)
     {
         List<String> temporaryUploadedFiles = editForm.getTemporaryUploadedFiles();

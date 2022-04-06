@@ -49,6 +49,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.web.Utils;
@@ -64,6 +65,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.xwiki.store.filesystem.internal.DefaultTemporaryAttachmentManager.UPLOAD_DEFAULT_MAXSIZE;
+import static org.xwiki.store.filesystem.internal.DefaultTemporaryAttachmentManager.UPLOAD_MAXSIZE_PARAMETER;
 
 /**
  * Tests for {@link DefaultTemporaryAttachmentManager}.
@@ -132,6 +135,11 @@ class DefaultTemporaryAttachmentManagerTest
         InputStream inputStream = new ByteArrayInputStream("foo".getBytes(StandardCharsets.UTF_8));
         when(part.getInputStream()).thenReturn(inputStream);
 
+        XWiki xWiki = mock(XWiki.class);
+        when(context.getWiki()).thenReturn(xWiki);
+        when(xWiki.getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context)).thenReturn(42L);
+        when(part.getSize()).thenReturn(41L);
+
         XWikiAttachment attachment = this.attachmentManager.uploadAttachment(documentReference, part);
         assertNotNull(attachment);
         assertEquals("fileFoo.xml", attachment.getFilename());
@@ -174,6 +182,11 @@ class DefaultTemporaryAttachmentManagerTest
         when(part.getSubmittedFileName()).thenReturn(filename);
         InputStream inputStream = new ByteArrayInputStream("foo".getBytes(StandardCharsets.UTF_8));
         when(part.getInputStream()).thenReturn(inputStream);
+
+        XWiki xWiki = mock(XWiki.class);
+        when(context.getWiki()).thenReturn(xWiki);
+        when(xWiki.getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context)).thenReturn(42L);
+        when(part.getSize()).thenReturn(41L);
 
         XWikiAttachment attachment = this.attachmentManager.uploadAttachment(documentReference, part);
         assertNotNull(attachment);

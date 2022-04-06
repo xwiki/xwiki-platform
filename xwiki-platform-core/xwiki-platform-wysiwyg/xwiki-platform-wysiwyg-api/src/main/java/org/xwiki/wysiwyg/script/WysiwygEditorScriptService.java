@@ -34,6 +34,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -102,6 +103,10 @@ public class WysiwygEditorScriptService implements ScriptService
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiPropertiesConfiguration;
 
     @Inject
     private TemporaryAttachmentManager temporaryAttachmentManager;
@@ -455,7 +460,6 @@ public class WysiwygEditorScriptService implements ScriptService
     @Unstable
     public boolean isTemporaryAttachmentSupported()
     {
-        // FIXME: maybe use a configuration to allow disabling the feature?
-        return true;
+        return this.xwikiPropertiesConfiguration.getProperty("attachment.temporary.upload.enabled", true);
     }
 }

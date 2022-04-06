@@ -65,6 +65,10 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 public class DefaultTemporaryAttachmentManager implements TemporaryAttachmentManager, Initializable, Disposable,
     HttpSessionListener
 {
+    protected static final String UPLOAD_MAXSIZE_PARAMETER = "upload_maxsize";
+
+    protected static final long UPLOAD_DEFAULT_MAXSIZE = 33554432L;
+
     private Map<String, TemporaryAttachmentSession> temporaryAttachmentSessionMap;
 
     @Inject
@@ -125,6 +129,22 @@ public class DefaultTemporaryAttachmentManager implements TemporaryAttachmentMan
         return String.format("%s_%s", sessionId, this.stringEntityReferenceSerializer.serialize(documentReference));
     }
 
+    private long getUploadMaxSize()
+    {
+        XWikiContext context = this.contextProvider.get();
+        return context.getWiki().getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context);
+    }
+
+    private int getCacheIdleTime()
+    {
+        return 3600;
+    }
+
+    private int getCacheMaxEntries()
+    {
+        return 10000;
+    }
+
     private Cache<XWikiAttachment> getOrCreateCache(TemporaryAttachmentSession temporaryAttachmentSession,
         DocumentReference documentReference) throws CacheException
     {
@@ -133,8 +153,8 @@ public class DefaultTemporaryAttachmentManager implements TemporaryAttachmentMan
         if (!temporaryAttachmentSession.hasOpenEditionSession(documentReference)) {
             String key = getCacheKey(temporaryAttachmentSession.getSessionId(), documentReference);
             String configName = String.format("temp.attachment.%s", key);
-            // FIXME: the configuration values should be configurable
-            result = this.cacheManager.createNewCache(new LRUCacheConfiguration(configName, 10000, 3600));
+            result = this.cacheManager.createNewCache(
+                new LRUCacheConfiguration(configName, getCacheMaxEntries(), getCacheIdleTime()));
             temporaryAttachmentSession.startEditionSession(documentReference, result);
         } else {
             result = temporaryAttachmentSession.getCache(documentReference);
@@ -159,8 +179,12 @@ public class DefaultTemporaryAttachmentManager implements TemporaryAttachmentMan
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
         throws TemporaryAttachmentException
     {
-        // FIXME: handle upload max size
         XWikiAttachment xWikiAttachment;
+        long uploadMaxSize = getUploadMaxSize();
+        if (part.getSize() > uploadMaxSize) {
+            throw new TemporaryAttachmentException(String.format(
+                "The file size [%s] is larger than the upload max size [%s]", part.getSize(), uploadMaxSize));
+        }
         TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
         try {
             Cache<XWikiAttachment> cache = this.getOrCreateCache(temporaryAttachmentSession, documentReference);

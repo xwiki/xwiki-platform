@@ -124,9 +124,10 @@ public class DefaultTemporaryAttachmentManager implements TemporaryAttachmentMan
         }
     }
 
-    private String getCacheKey(String sessionId, DocumentReference documentReference)
+    private String getCacheName(String sessionId, DocumentReference documentReference)
     {
-        return String.format("%s_%s", sessionId, this.stringEntityReferenceSerializer.serialize(documentReference));
+        return String.format("temp.attachment.%s_%s", sessionId,
+            this.stringEntityReferenceSerializer.serialize(documentReference));
     }
 
     private long getUploadMaxSize()
@@ -151,10 +152,9 @@ public class DefaultTemporaryAttachmentManager implements TemporaryAttachmentMan
         Cache<XWikiAttachment> result;
 
         if (!temporaryAttachmentSession.hasOpenEditionSession(documentReference)) {
-            String key = getCacheKey(temporaryAttachmentSession.getSessionId(), documentReference);
-            String configName = String.format("temp.attachment.%s", key);
+            String cacheName = getCacheName(temporaryAttachmentSession.getSessionId(), documentReference);
             result = this.cacheManager.createNewCache(
-                new LRUCacheConfiguration(configName, getCacheMaxEntries(), getCacheIdleTime()));
+                new LRUCacheConfiguration(cacheName, getCacheMaxEntries(), getCacheIdleTime()));
             temporaryAttachmentSession.startEditionSession(documentReference, result);
         } else {
             result = temporaryAttachmentSession.getCache(documentReference);

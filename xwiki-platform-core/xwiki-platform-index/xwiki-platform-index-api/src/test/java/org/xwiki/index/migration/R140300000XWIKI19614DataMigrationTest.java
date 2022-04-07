@@ -47,16 +47,16 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of {@link R140200001XWIKI19352DataMigration}.
+ * Test of {@link R140300000XWIKI19614DataMigration}.
  *
  * @version $Id$
  * @since 14.2RC1
  */
 @ComponentTest
-class R140200001XWIKI19352DataMigrationTest
+class R140300000XWIKI19614DataMigrationTest
 {
     @InjectMockComponents(role = HibernateDataMigration.class)
-    private R140200001XWIKI19352DataMigration migration;
+    private R140300000XWIKI19614DataMigration migration;
 
     @MockComponent
     private QueryManager queryManager;

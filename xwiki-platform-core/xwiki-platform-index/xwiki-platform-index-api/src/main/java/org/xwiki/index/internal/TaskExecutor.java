@@ -98,6 +98,6 @@ public class TaskExecutor
             doc = this.documentRevisionProvider.getRevision(document, task.getVersion());
         }
         this.componentManager.get().<TaskConsumer>getInstance(TaskConsumer.class, task.getType())
-            .consume(doc.getDocumentReference(), doc.getVersion());
+            .consume(doc.getDocumentReferenceWithLocale(), doc.getVersion());
     }
 }

@@ -7233,10 +7233,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public XWikiDocument copyDocument(DocumentReference newDocumentReference, XWikiContext context)
         throws XWikiException
     {
-        loadAttachments(context);
-        loadArchive(context);
+        return copyDocument(newDocumentReference, true, context);
+    }
 
-        XWikiDocument newdoc = cloneInternal(newDocumentReference, false, true);
+    /**
+     * @since 14.3RC1
+     */
+    public XWikiDocument copyDocument(DocumentReference newDocumentReference, boolean cloneArchive, XWikiContext context)
+        throws XWikiException
+    {
+        loadAttachments(context);
+        if (cloneArchive) {
+            loadArchive(context);
+        }
+
+        XWikiDocument newdoc = cloneInternal(newDocumentReference, false, cloneArchive);
 
         // If the copied document has a title set to the original page name then set the new title to be the new page
         // name.
@@ -7247,7 +7258,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         newdoc.setOriginalDocument(null);
         newdoc.setContentDirty(true);
         newdoc.setNew(true);
-        newdoc.getXClass().setOwnerDocument(newdoc);
 
         return newdoc;
     }
@@ -7674,7 +7684,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         boolean hasVersioning = context.getWiki().hasVersioning(context);
         if (hasVersioning) {
-            getVersioningStore(context).resetRCSArchive(this, true, context);
+            WikiReference currentWiki = context.getWikiReference();
+            try {
+                context.setWikiReference(getDocumentReference().getWikiReference());
+
+                getVersioningStore(context).resetRCSArchive(this, true, context);
+            } finally {
+                context.setWikiReference(currentWiki);
+            }
         }
     }
 

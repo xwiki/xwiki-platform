@@ -96,7 +96,7 @@ class ImageStyleIT
             + "<adjustableBorder>false</adjustableBorder>"
             + "<defaultBorder>false</defaultBorder>"
             + "<adjustableAlignment>false</adjustableAlignment>"
-            + "<defaultAlignment>default</defaultAlignment>"
+            + "<defaultAlignment>none</defaultAlignment>"
             + "<adjustableTextWrap>false</adjustableTextWrap>"
             + "<defaultTextWrap>false</defaultTextWrap>"
             + "</imageStyle>"

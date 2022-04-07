@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.ui;
 
+import java.time.Duration;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -104,13 +106,7 @@ public class SkinxTest extends AbstractTest
      */
     private void waitForScriptResult()
     {
-        new WebDriverWait(getDriver(), getDriver().getTimeout()).until(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                return StringUtils.equals("script active", driver.getTitle());
-            }
-        });
+        new WebDriverWait(getDriver(), Duration.ofSeconds(getDriver().getTimeout())).until(
+            (ExpectedCondition<Boolean>) driver -> StringUtils.equals("script active", driver.getTitle()));
     }
 }

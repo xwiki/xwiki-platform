@@ -77,10 +77,8 @@ class IncludeMacroRefactoringTest
     {
         assertEquals(Optional.empty(), this.includeMacroRefactoring.replaceReference(this.macroBlock,
             this.currentDocumentReference, this.sourceReference, this.targetReference, false));
-        when(this.macroBlock.getParameter(IncludeMacroRefactoring.REFERENCE_MACRO_PARAMETER))
-            .thenReturn("");
-        when(this.macroBlock.getParameter(IncludeMacroRefactoring.DOCUMENT_MACRO_PARAMETER))
-            .thenReturn("");
+        when(this.macroBlock.getParameter("reference")).thenReturn("");
+        when(this.macroBlock.getParameter("document")).thenReturn("");
         assertEquals(Optional.empty(), this.includeMacroRefactoring.replaceReference(this.macroBlock,
             this.currentDocumentReference, this.sourceReference, this.targetReference, false));
     }
@@ -89,8 +87,7 @@ class IncludeMacroRefactoringTest
     void replaceReferenceReferenceParameter() throws MacroRefactoringException
     {
         String referenceParam = "foo";
-        when(this.macroBlock.getParameter(IncludeMacroRefactoring.REFERENCE_MACRO_PARAMETER))
-            .thenReturn(referenceParam);
+        when(this.macroBlock.getParameter("reference")).thenReturn(referenceParam);
         when(this.documentReferenceResolver.resolve(referenceParam)).thenReturn(this.sourceReference);
 
         when(this.stringEntityReferenceSerializer.serialize(this.targetReference, this.currentDocumentReference))
@@ -99,15 +96,14 @@ class IncludeMacroRefactoringTest
         when(this.macroBlock.clone()).thenReturn(expectedBlock);
         assertEquals(Optional.of(expectedBlock), this.includeMacroRefactoring.replaceReference(this.macroBlock,
             this.currentDocumentReference, this.sourceReference, this.targetReference, false));
-        verify(expectedBlock).setParameter(IncludeMacroRefactoring.REFERENCE_MACRO_PARAMETER, "foobar42");
+        verify(expectedBlock).setParameter("reference", "foobar42");
     }
 
     @Test
     void replaceReferenceDocumentParameter() throws MacroRefactoringException
     {
         String referenceParam = "foo";
-        when(this.macroBlock.getParameter(IncludeMacroRefactoring.DOCUMENT_MACRO_PARAMETER))
-            .thenReturn(referenceParam);
+        when(this.macroBlock.getParameter("document")).thenReturn(referenceParam);
         when(this.documentReferenceResolver.resolve(referenceParam)).thenReturn(this.sourceReference);
 
         when(this.stringEntityReferenceSerializer.serialize(this.targetReference, this.currentDocumentReference))
@@ -116,7 +112,7 @@ class IncludeMacroRefactoringTest
         when(this.macroBlock.clone()).thenReturn(expectedBlock);
         assertEquals(Optional.of(expectedBlock), this.includeMacroRefactoring.replaceReference(this.macroBlock,
             this.currentDocumentReference, this.sourceReference, this.targetReference, false));
-        verify(expectedBlock).setParameter(IncludeMacroRefactoring.DOCUMENT_MACRO_PARAMETER, "foobar42");
+        verify(expectedBlock).setParameter("document", "foobar42");
     }
 
     @Test
@@ -124,14 +120,13 @@ class IncludeMacroRefactoringTest
     {
         assertEquals(Collections.emptySet(), this.includeMacroRefactoring.extractReferences(this.macroBlock));
         String referenceParam = "foo";
-        when(this.macroBlock.getParameter(IncludeMacroRefactoring.DOCUMENT_MACRO_PARAMETER))
+        when(this.macroBlock.getParameter("document"))
             .thenReturn(referenceParam);
         assertEquals(Collections.singleton(new DocumentResourceReference(referenceParam)),
             this.includeMacroRefactoring.extractReferences(this.macroBlock));
 
         String otherReferenceParam = "bar";
-        when(this.macroBlock.getParameter(IncludeMacroRefactoring.REFERENCE_MACRO_PARAMETER))
-            .thenReturn(otherReferenceParam);
+        when(this.macroBlock.getParameter("reference")).thenReturn(otherReferenceParam);
         assertEquals(Collections.singleton(new DocumentResourceReference(otherReferenceParam)),
             this.includeMacroRefactoring.extractReferences(this.macroBlock));
     }

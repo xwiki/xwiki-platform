@@ -51,8 +51,8 @@ import org.xwiki.rendering.macro.MacroRefactoringException;
 @Named("include")
 public class IncludeMacroRefactoring implements MacroRefactoring
 {
-    protected static final String DOCUMENT_MACRO_PARAMETER = "document";
-    protected static final String REFERENCE_MACRO_PARAMETER = "reference";
+    private static final String DOCUMENT_MACRO_PARAMETER = "document";
+    private static final String REFERENCE_MACRO_PARAMETER = "reference";
 
     @Inject
     @Named("compact")

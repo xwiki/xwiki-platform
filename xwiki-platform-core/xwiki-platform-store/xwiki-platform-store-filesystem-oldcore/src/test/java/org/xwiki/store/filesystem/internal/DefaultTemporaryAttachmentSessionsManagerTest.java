@@ -60,16 +60,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link DefaultTemporaryAttachmentManager}.
+ * Tests for {@link DefaultTemporaryAttachmentSessionsManager}.
  *
  * @version $Id$
  * @since 14.3RC1
  */
 @ComponentTest
-class DefaultTemporaryAttachmentManagerTest
+class DefaultTemporaryAttachmentSessionsManagerTest
 {
     @InjectMockComponents
-    private DefaultTemporaryAttachmentManager attachmentManager;
+    private DefaultTemporaryAttachmentSessionsManager attachmentManager;
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;

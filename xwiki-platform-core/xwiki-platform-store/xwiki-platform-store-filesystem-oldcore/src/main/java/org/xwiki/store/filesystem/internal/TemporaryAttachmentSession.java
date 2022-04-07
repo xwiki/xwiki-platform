@@ -39,7 +39,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * This class manipulates a map of map of {@link XWikiAttachment} since a user might edit several documents and add
  * several attachments in each of them.
  *
- * @see DefaultTemporaryAttachmentManager
+ * @see DefaultTemporaryAttachmentSessionsManager
  * @version $Id$
  * @since 14.3RC1
  */

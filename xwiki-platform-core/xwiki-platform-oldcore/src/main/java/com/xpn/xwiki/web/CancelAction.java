@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.store.TemporaryAttachmentManager;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -38,7 +38,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 public class CancelAction extends XWikiAction
 {
     @Inject
-    private TemporaryAttachmentManager temporaryAttachmentManager;
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
     @Override
     protected Class<? extends XWikiForm> getFormClass()
@@ -75,7 +75,7 @@ public class CancelAction extends XWikiAction
         }
 
         // Ensure to clean up the temporary uploaded attachment when canceling edition.
-        this.temporaryAttachmentManager.removeUploadedAttachments(tdoc.getDocumentReference());
+        this.temporaryAttachmentSessionsManager.removeUploadedAttachments(tdoc.getDocumentReference());
 
         // forward to view
         if (Utils.isAjaxRequest(context)) {

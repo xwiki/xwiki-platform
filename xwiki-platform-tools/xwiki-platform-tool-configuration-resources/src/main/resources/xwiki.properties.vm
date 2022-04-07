@@ -811,13 +811,6 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# with programming rights, while this configuration affect any attachment.
 # attachment.download.forceDownload=
 
-#-# [Since 14.3RC1]
-#-# Enable or not the feature to allow uploading attachment in a temporary cache during edition of documents.
-#-# This feature is enabled by default, but since it's a new experimental feature we provide here a way to disable it
-#-# in case of problem with some extensions.
-#-#
-# attachment.temporary.upload.enabled=true
-
 #-------------------------------------------------------------------------------------
 # Active Installs
 #-------------------------------------------------------------------------------------

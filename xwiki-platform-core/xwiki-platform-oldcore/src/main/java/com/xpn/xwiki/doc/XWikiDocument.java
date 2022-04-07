@@ -152,7 +152,7 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
-import org.xwiki.store.TemporaryAttachmentManager;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.user.GuestUserReference;
@@ -4303,14 +4303,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         readTemporaryUploadedFiles(eform);
     }
 
-    private TemporaryAttachmentManager getTemporaryAttachmentManager()
+    private TemporaryAttachmentSessionsManager getTemporaryAttachmentManager()
     {
-        return Utils.getComponent(TemporaryAttachmentManager.class);
+        return Utils.getComponent(TemporaryAttachmentSessionsManager.class);
     }
 
     /**
      * Read the list of attachment that should be added from {@link EditForm#getTemporaryUploadedFiles()} and attach
-     * them to the current document if they can be found in the {@link TemporaryAttachmentManager}.
+     * them to the current document if they can be found in the {@link TemporaryAttachmentSessionsManager}.
      *
      * @param editForm the form from which to read the list of files.
      * @since 14.3RC1
@@ -4320,7 +4320,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         List<String> temporaryUploadedFiles = editForm.getTemporaryUploadedFiles();
         if (!temporaryUploadedFiles.isEmpty()) {
-            TemporaryAttachmentManager attachmentManager = getTemporaryAttachmentManager();
+            TemporaryAttachmentSessionsManager attachmentManager = getTemporaryAttachmentManager();
             for (String temporaryUploadedFile : temporaryUploadedFiles) {
                 Optional<XWikiAttachment> uploadedAttachment =
                     attachmentManager.getUploadedAttachment(getDocumentReference(), temporaryUploadedFile);

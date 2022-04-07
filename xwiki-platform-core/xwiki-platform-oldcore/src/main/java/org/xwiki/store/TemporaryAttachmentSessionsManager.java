@@ -33,14 +33,15 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 /**
  * Interface for operations related to temporary upload of attachments.
  * The idea of this API is to allow obtaining directly a temporary {@link XWikiAttachment} from a {@link Part} and to
- * keep it in cache until it's saved. The cache is managed per user session, and per edited document.
+ * keep it in cache until it's saved.
+ * The manager is handling a separated map of attachments for each {@link javax.servlet.http.HttpSession}.
  *
  * @version $Id$
  * @since 14.3RC1
  */
 @Unstable
 @Role
-public interface TemporaryAttachmentManager
+public interface TemporaryAttachmentSessionsManager
 {
     /**
      * Temporary store the given {@link Part} to a cached {@link XWikiAttachment} attached to the given

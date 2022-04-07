@@ -41,14 +41,14 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.store.TemporaryAttachmentException;
-import org.xwiki.store.TemporaryAttachmentManager;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
 /**
- * Default implementation of {@link TemporaryAttachmentManager}.
+ * Default implementation of {@link TemporaryAttachmentSessionsManager}.
  * Note that this component also implements {@link HttpSessionListener} so that the cache is properly clean up whenever
  * a session is destroyed.
  *
@@ -57,7 +57,8 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
  */
 @Component
 @Singleton
-public class DefaultTemporaryAttachmentManager implements TemporaryAttachmentManager, Initializable, Disposable,
+public class DefaultTemporaryAttachmentSessionsManager
+    implements TemporaryAttachmentSessionsManager, Initializable, Disposable,
     HttpSessionListener
 {
     private Map<String, TemporaryAttachmentSession> temporaryAttachmentSessionMap;

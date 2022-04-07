@@ -48,7 +48,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentException;
-import org.xwiki.store.TemporaryAttachmentManager;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
 
@@ -109,7 +109,7 @@ public class WysiwygEditorScriptService implements ScriptService
     private ConfigurationSource xwikiPropertiesConfiguration;
 
     @Inject
-    private TemporaryAttachmentManager temporaryAttachmentManager;
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
@@ -372,7 +372,7 @@ public class WysiwygEditorScriptService implements ScriptService
     private void injectTemoraryAttachments(XWikiDocument clonedDocument)
     {
         Collection<XWikiAttachment> uploadedAttachments =
-            this.temporaryAttachmentManager.getUploadedAttachments(clonedDocument.getDocumentReference());
+            this.temporaryAttachmentSessionsManager.getUploadedAttachments(clonedDocument.getDocumentReference());
         if (!uploadedAttachments.isEmpty()) {
             for (XWikiAttachment uploadedAttachment : uploadedAttachments) {
                 clonedDocument.setAttachment(uploadedAttachment);
@@ -441,25 +441,12 @@ public class WysiwygEditorScriptService implements ScriptService
             Collection<Part> parts = context.getRequest().getParts();
             for (Part part : parts) {
                 if (fieldName.equals(part.getName())) {
-                    result = this.temporaryAttachmentManager.uploadAttachment(documentReference, part);
+                    result = this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part);
                 }
             }
         } catch (IOException | ServletException e) {
             throw new TemporaryAttachmentException("Error while reading the request content part.", e);
         }
         return result;
-    }
-
-    /**
-     * Define if the temporary attachment feature is supported.
-     *
-     * @return {@code true} if {@link #temporaryUploadAttachment(DocumentReference, String)} could be used.
-     * @see #temporaryUploadAttachment(DocumentReference, String)
-     * @since 14.3RC1
-     */
-    @Unstable
-    public boolean isTemporaryAttachmentSupported()
-    {
-        return this.xwikiPropertiesConfiguration.getProperty("attachment.temporary.upload.enabled", true);
     }
 }

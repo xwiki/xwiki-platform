@@ -53,7 +53,7 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.stability.Unstable;
-import org.xwiki.store.TemporaryAttachmentManager;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -109,7 +109,7 @@ public class DownloadAction extends XWikiAction
     private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=([0-9]+)?-([0-9]+)?");
 
     @Inject
-    private TemporaryAttachmentManager temporaryAttachmentManager;
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
     @Override
     public String render(XWikiContext context) throws XWikiException
@@ -126,7 +126,7 @@ public class DownloadAction extends XWikiAction
         if (attachment == null) {
             // We first check if the attachment has not been temporary uploaded.
             Optional<XWikiAttachment> optionalXWikiAttachment =
-                this.temporaryAttachmentManager.getUploadedAttachment(doc.getDocumentReference(), filename);
+                this.temporaryAttachmentSessionsManager.getUploadedAttachment(doc.getDocumentReference(), filename);
             if (optionalXWikiAttachment.isPresent()) {
                 attachment = optionalXWikiAttachment.get();
             } else {

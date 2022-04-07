@@ -259,8 +259,15 @@ public class DefaultLinkRefactoring implements LinkRefactoring
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
+            // Update default version
             XWikiDocument document = xcontext.getWiki().getDocument(newReference, xcontext);
             renameLinks(document, oldReference, document.getDocumentReference(), xcontext, true);
+
+            // Update translations
+            for (Locale locale : document.getTranslationLocales(xcontext)) {
+                XWikiDocument translationDocument =
+                    xcontext.getWiki().getDocument(new DocumentReference(newReference, locale), xcontext);
+                renameLinks(translationDocument, oldReference, document.getDocumentReference(), xcontext, true);
         } catch (XWikiException e) {
             this.logger.error("Failed to update the relative links from [{}].", newReference, e);
         }

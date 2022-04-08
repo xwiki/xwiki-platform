@@ -144,10 +144,12 @@ public class DefaultTemporaryAttachmentSessionsManager
                 "The file size [%s] is larger than the upload max size [%s]", part.getSize(), uploadMaxSize));
         }
         TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
+        XWikiContext context = this.contextProvider.get();
         try {
             xWikiAttachment = new XWikiAttachment();
             xWikiAttachment.setFilename(part.getSubmittedFileName());
             xWikiAttachment.setContent(part.getInputStream());
+            xWikiAttachment.setAuthorReference(context.getAuthorReference());
             temporaryAttachmentSession.addAttachment(documentReference, xWikiAttachment);
         } catch (IOException e) {
             throw new TemporaryAttachmentException("Error while reading the content of a request part", e);

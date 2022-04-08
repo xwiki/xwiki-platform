@@ -124,41 +124,34 @@ public class DownloadAction extends XWikiAction
         Map<String, Object> backwardCompatibilityContextObjects = null;
 
         if (attachment == null) {
-            // We first check if the attachment has not been temporary uploaded.
-            Optional<XWikiAttachment> optionalXWikiAttachment =
-                this.temporaryAttachmentSessionsManager.getUploadedAttachment(doc.getDocumentReference(), filename);
-            if (optionalXWikiAttachment.isPresent()) {
-                attachment = optionalXWikiAttachment.get();
-            } else {
-                // If some plugins extend the Download URL format for the Standard Scheme the document in the context will
-                // most likely not have a reference that corresponds to what the plugin expects. For example imagine that
-                // the URL is a Zip Explorer URL like .../download/space/page/attachment/index.html. This will be parsed
-                // as space.page.attachment@index.html by the Standard URL scheme parsers. Thus the attachment won't be
-                // found since index.html is not the correct attachment for the Zip Explorer plugin's URL format.
-                //
-                // Thus in order to preserve backward compatibility for existing plugins that have custom URL formats
-                // extending the Download URL format, we parse again the URL by considering that it doesn't contain any
-                // Nested Space. This also means that those plugins will need to completely reparse the URL if they wish to
-                // support Nested Spaces.
-                //
-                // Also note that this code below is not compatible with the notion of having several URL schemes. The real
-                // fix will be to not allow plugins to support custom URL formats and instead to have them register new
-                // Actions if they need a different URL format.
-                Pair<XWikiDocument, XWikiAttachment> result =
-                    extractAttachmentAndDocumentFromURLWithoutSupportingNestedSpaces(request, context);
+            // If some plugins extend the Download URL format for the Standard Scheme the document in the context will
+            // most likely not have a reference that corresponds to what the plugin expects. For example imagine that
+            // the URL is a Zip Explorer URL like .../download/space/page/attachment/index.html. This will be parsed
+            // as space.page.attachment@index.html by the Standard URL scheme parsers. Thus the attachment won't be
+            // found since index.html is not the correct attachment for the Zip Explorer plugin's URL format.
+            //
+            // Thus in order to preserve backward compatibility for existing plugins that have custom URL formats
+            // extending the Download URL format, we parse again the URL by considering that it doesn't contain any
+            // Nested Space. This also means that those plugins will need to completely reparse the URL if they wish to
+            // support Nested Spaces.
+            //
+            // Also note that this code below is not compatible with the notion of having several URL schemes. The real
+            // fix will be to not allow plugins to support custom URL formats and instead to have them register new
+            // Actions if they need a different URL format.
+            Pair<XWikiDocument, XWikiAttachment> result =
+                extractAttachmentAndDocumentFromURLWithoutSupportingNestedSpaces(request, context);
 
-                if (result == null) {
-                    throwNotFoundException(filename);
-                }
-
-                XWikiDocument backwardCompatibilityDocument = result.getLeft();
-                attachment = result.getRight();
-
-                // Set the new doc as the context doc so that plugins see it as the context doc
-                backwardCompatibilityContextObjects = new HashMap<>();
-                pushDocumentInContext(backwardCompatibilityContextObjects,
-                    backwardCompatibilityDocument.getDocumentReference());
+            if (result == null) {
+                throwNotFoundException(filename);
             }
+
+            XWikiDocument backwardCompatibilityDocument = result.getLeft();
+            attachment = result.getRight();
+
+            // Set the new doc as the context doc so that plugins see it as the context doc
+            backwardCompatibilityContextObjects = new HashMap<>();
+            pushDocumentInContext(backwardCompatibilityContextObjects,
+                backwardCompatibilityDocument.getDocumentReference());
         }
 
         try {
@@ -424,16 +417,26 @@ public class DownloadAction extends XWikiAction
     {
         XWikiAttachment attachment = null;
 
+        boolean fallback = true;
         String idStr = request.getParameter("id");
         if (StringUtils.isNumeric(idStr)) {
             int id = Integer.parseInt(idStr);
             if (document.getAttachmentList().size() > id) {
                 attachment = document.getAttachmentList().get(id);
             }
-        } else {
-            attachment = document.getAttachment(filename);
+            // we use to not fallback to the attachment filename, and we seem to have a test for that behaviour.
+            fallback = false;
+        } else if (Boolean.parseBoolean(request.get("tempupload"))) {
+            // if the attachment has been temporary upload we first look there
+            Optional<XWikiAttachment> optionalXWikiAttachment = this.temporaryAttachmentSessionsManager
+                .getUploadedAttachment(document.getDocumentReference(), filename);
+            attachment = optionalXWikiAttachment.orElse(null);
         }
 
+        // but we fallback on the document if it cannot be found for some reasons.
+        if (attachment == null && fallback) {
+            attachment = document.getAttachment(filename);
+        }
         return attachment;
     }
 

@@ -21,6 +21,8 @@ package org.xwiki.wysiwyg.script;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -30,6 +32,7 @@ import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -74,6 +77,13 @@ public class WysiwygEditorScriptService implements ScriptService
      * @see #parseAndRender(String, String)
      */
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
+
+    /**
+     * The list of supported features that are checked with {@link #isFeatureSupported(String)}.
+     */
+    private static final List<String> SUPPORTED_FEATURES = Collections.singletonList(
+        "uploadtemporaryattachments"
+    );
 
     @Inject
     private Logger logger;
@@ -448,5 +458,20 @@ public class WysiwygEditorScriptService implements ScriptService
             logger.warn("Error while uploading the attachment: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
         return result;
+    }
+
+    /**
+     * Determine if a specific feature is supported by the instance.
+     * This check could be dynamic for some features, but could also be purely static since this method aims to be used
+     * for different versions of xwiki.
+     *
+     * @param featureName the name of the feature for which to check if it's supported.
+     * @return {@code true} if the feature is supported.
+     * @since 14.3RC1
+     */
+    @Unstable
+    public boolean isFeatureSupported(String featureName)
+    {
+        return SUPPORTED_FEATURES.contains(StringUtils.toRootLowerCase(featureName));
     }
 }

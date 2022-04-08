@@ -4322,9 +4322,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (!temporaryUploadedFiles.isEmpty()) {
             TemporaryAttachmentSessionsManager attachmentManager = getTemporaryAttachmentManager();
             for (String temporaryUploadedFile : temporaryUploadedFiles) {
-                Optional<XWikiAttachment> uploadedAttachment =
+                Optional<XWikiAttachment> uploadedAttachmentOpt =
                     attachmentManager.getUploadedAttachment(getDocumentReference(), temporaryUploadedFile);
-                uploadedAttachment.ifPresent(this::setAttachment);
+                uploadedAttachmentOpt.ifPresent(uploadedAttachment -> {
+                    XWikiAttachment previousAttachment = this.setAttachment(uploadedAttachment);
+                    if (previousAttachment != null) {
+                        uploadedAttachment.setVersion(previousAttachment.getNextVersion());
+                    }
+                });
             }
         }
     }

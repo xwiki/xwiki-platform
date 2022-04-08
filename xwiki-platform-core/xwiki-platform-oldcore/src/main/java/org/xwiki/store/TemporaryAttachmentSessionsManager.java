@@ -50,7 +50,8 @@ public interface TemporaryAttachmentSessionsManager
      * @param documentReference the reference of the document that the attachment should be attached to.
      * @param part the actual data that is uploaded.
      * @return an attachment that is not saved yet but cached and contains the data of the given part.
-     * @throws TemporaryAttachmentException in case of problem when initializing the cache or reading the data.
+     * @throws TemporaryAttachmentException if the part size exceeds the maximum upload size, or in case of problem
+     *                                      when reading the part.
      */
     XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
         throws TemporaryAttachmentException;

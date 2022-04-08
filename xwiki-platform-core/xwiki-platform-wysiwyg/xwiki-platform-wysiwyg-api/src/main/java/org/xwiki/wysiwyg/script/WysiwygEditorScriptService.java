@@ -427,13 +427,11 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param documentReference the target document reference the attachment should be later attached to.
      * @param fieldName the name of the field of the uploaded data.
      * @return a temporary {@link XWikiAttachment} not yet persisted.
-     * @throws TemporaryAttachmentException in case of problem when reading the request, or to handle the temporary
      *          attachment.
      * @since 14.3RC1
      */
     @Unstable
     public XWikiAttachment temporaryUploadAttachment(DocumentReference documentReference, String fieldName)
-        throws TemporaryAttachmentException
     {
         XWikiContext context = this.xcontextProvider.get();
         XWikiAttachment result = null;
@@ -445,7 +443,9 @@ public class WysiwygEditorScriptService implements ScriptService
                 }
             }
         } catch (IOException | ServletException e) {
-            throw new TemporaryAttachmentException("Error while reading the request content part.", e);
+            logger.warn("Error while reading the request content part: [{}]", ExceptionUtils.getRootCauseMessage(e));
+        } catch (TemporaryAttachmentException e) {
+            logger.warn("Error while uploading the attachment: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
         return result;
     }

@@ -36,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
@@ -44,7 +45,9 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityEngine;
@@ -126,6 +129,9 @@ public class XWikiDocumentTest
     private BaseObject baseObject;
 
     private BaseObject baseObject2;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     protected void setUp() throws Exception
@@ -294,12 +300,14 @@ public class XWikiDocumentTest
 
         // Simulate an error to retrieve the document for the passed PageReference. This will default to returning
         // the terminal reference.
-        doThrow(new XWikiException("error", new Exception("error"))).when(this.xWiki).getDocument(
+        doThrow(new XWikiException("error", new Exception("rooterror"))).when(this.xWiki).getDocument(
             (EntityReference) eq(new PageReference("Wiki", "OtherPage")), any(XWikiContext.class));
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
 
         assertEquals(new LinkedHashSet<>(Arrays.asList("OtherPage")), linkedPages);
+        assertEquals("Failed to retrieve document [Wiki:OtherPage]. Considering the reference to be a terminal one. "
+            + "Root cause [Exception: rooterror]", logCapture.getMessage(0));
     }
 
     @Test

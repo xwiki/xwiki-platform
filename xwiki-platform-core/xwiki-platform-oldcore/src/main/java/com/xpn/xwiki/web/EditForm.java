@@ -20,6 +20,7 @@
 package com.xpn.xwiki.web;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.stability.Unstable;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.util.Util;
 
@@ -104,6 +107,8 @@ public class EditForm extends XWikiForm
 
     private Map<String, SortedMap<Integer, Map<String, String[]>>> updateOrCreateMap;
 
+    private List<String> temporaryUploadedFiles;
+
     @Override
     public void readRequest()
     {
@@ -129,6 +134,7 @@ public class EditForm extends XWikiForm
         setUpdateOrCreateMap(request);
         setObjectsToRemove(request.getParameterValues("deletedObjects"));
         setObjectsToAdd(request.getParameterValues("addedObjects"));
+        setTemporaryUploadedFiles(request.getParameterValues("uploadedFiles"));
     }
 
     public void setTags(String[] parameter)
@@ -444,6 +450,28 @@ public class EditForm extends XWikiForm
                 }
             }
         }
+    }
+
+    private void setTemporaryUploadedFiles(String[] temporaryUploadedFiles)
+    {
+        if (temporaryUploadedFiles == null || temporaryUploadedFiles.length == 0) {
+            this.temporaryUploadedFiles = Collections.emptyList();
+        } else {
+            this.temporaryUploadedFiles = Arrays.asList(temporaryUploadedFiles);
+        }
+    }
+
+    /**
+     * Retrieve the list of temporary uploaded files to add as attachment.
+     *
+     * @see TemporaryAttachmentSessionsManager
+     * @return a list of filenames that should be attached.
+     * @since 14.3RC1
+     */
+    @Unstable
+    public List<String> getTemporaryUploadedFiles()
+    {
+        return temporaryUploadedFiles;
     }
 
     public Map<String, List<Integer>> getObjectsToAdd()

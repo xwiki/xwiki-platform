@@ -55,6 +55,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
@@ -121,6 +122,9 @@ public class SaveAction extends EditAction
 
     @Inject
     private MergeConflictDecisionsManager conflictDecisionsManager;
+
+    @Inject
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
     public SaveAction()
     {
@@ -288,6 +292,7 @@ public class SaveAction extends EditAction
         // We get the comment to be used from the document
         // It was read using readFromForm
         xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
+        this.temporaryAttachmentSessionsManager.removeUploadedAttachments(tdoc.getDocumentReference());
 
         context.put(SAVED_OBJECT_VERSION_KEY, tdoc.getRCSVersion());
 

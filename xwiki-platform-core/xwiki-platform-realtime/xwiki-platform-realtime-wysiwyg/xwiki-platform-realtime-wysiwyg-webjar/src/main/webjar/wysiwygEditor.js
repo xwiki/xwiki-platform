@@ -257,6 +257,11 @@ define('xwiki-realtime-wysiwygEditor', [
         cursor = Cursor(editableContent);
         $('head', editableContent.ownerDocument).append(userIconStyle);
         fixMagicLine(editor);
+
+        // FIXME: disable the temporary attachment support for now, until it's supported.
+        if (CKEDITOR.switchTemporaryAttachmentUpload) {
+          CKEDITOR.switchTemporaryAttachmentUpload(false, editor);
+        }
       };
 
       // Initialize the editable content when the editor is ready.

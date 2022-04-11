@@ -45,6 +45,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -151,6 +152,7 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.user.GuestUserReference;
@@ -4298,6 +4300,38 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         readTranslationMetaFromForm(eform, context);
 
         readAddedUpdatedAndRemovedObjectsFromForm(eform, context);
+        readTemporaryUploadedFiles(eform);
+    }
+
+    private TemporaryAttachmentSessionsManager getTemporaryAttachmentManager()
+    {
+        return Utils.getComponent(TemporaryAttachmentSessionsManager.class);
+    }
+
+    /**
+     * Read the list of attachment that should be added from {@link EditForm#getTemporaryUploadedFiles()} and attach
+     * them to the current document if they can be found in the {@link TemporaryAttachmentSessionsManager}.
+     *
+     * @param editForm the form from which to read the list of files.
+     * @since 14.3RC1
+     */
+    @Unstable
+    public void readTemporaryUploadedFiles(EditForm editForm)
+    {
+        List<String> temporaryUploadedFiles = editForm.getTemporaryUploadedFiles();
+        if (!temporaryUploadedFiles.isEmpty()) {
+            TemporaryAttachmentSessionsManager attachmentManager = getTemporaryAttachmentManager();
+            for (String temporaryUploadedFile : temporaryUploadedFiles) {
+                Optional<XWikiAttachment> uploadedAttachmentOpt =
+                    attachmentManager.getUploadedAttachment(getDocumentReference(), temporaryUploadedFile);
+                uploadedAttachmentOpt.ifPresent(uploadedAttachment -> {
+                    XWikiAttachment previousAttachment = this.setAttachment(uploadedAttachment);
+                    if (previousAttachment != null) {
+                        uploadedAttachment.setVersion(previousAttachment.getNextVersion());
+                    }
+                });
+            }
+        }
     }
 
     /**

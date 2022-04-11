@@ -41,6 +41,9 @@ $services.progress.endStep()
 ## ----------------------------
 $services.progress.startStep('Display the title and content')
 <div class="xcontent">
+  #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.content.header.before'))
+    $services.rendering.render($uix.execute(), 'xhtml/1.0')
+  #end
   #template('contentheader.vm')
   #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.content.header.after'))
     $services.rendering.render($uix.execute(), 'xhtml/1.0')

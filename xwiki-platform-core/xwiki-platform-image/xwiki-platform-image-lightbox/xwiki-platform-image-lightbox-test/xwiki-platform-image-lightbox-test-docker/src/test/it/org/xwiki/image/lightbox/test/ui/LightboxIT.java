@@ -102,18 +102,17 @@ class LightboxIT
 
         // Verify the image ID popover actions.
         Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
-        if (imagePopover.isPresent()) {
-            ImagePopover currentImagePopover = imagePopover.get();
-            assertTrue(currentImagePopover.isImagePopoverDisplayed());
+        assertTrue(imagePopover.isPresent());
+        ImagePopover currentImagePopover = imagePopover.get();
+        assertTrue(currentImagePopover.isImagePopoverDisplayed());
 
-            WebElement imagePermalinkButton = currentImagePopover.getImagePermalinkButton();
-            String[] elements = imagePermalinkButton.getAttribute("href").split("#");
-            assertEquals("Iimage1.png", elements[elements.length - 1]);
+        WebElement imagePermalinkButton = currentImagePopover.getImagePermalinkButton();
+        String[] elements = imagePermalinkButton.getAttribute("href").split("#");
+        assertEquals("Iimage1.png", elements[elements.length - 1]);
 
-            imagePermalinkButton.click();
-            assertEquals(testUtils.getDriver().getCurrentUrl(), imagePermalinkButton.getAttribute("href"));
-            assertEquals("Iimage1.png", currentImagePopover.getImageId());
-        }
+        imagePermalinkButton.click();
+        assertEquals(testUtils.getDriver().getCurrentUrl(), imagePermalinkButton.getAttribute("href"));
+        assertEquals("Iimage1.png", currentImagePopover.getImageId());
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -144,18 +143,17 @@ class LightboxIT
 
         // Verify the image ID popover actions.
         Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
-        if (imagePopover.isPresent()) {
-            ImagePopover currentImagePopover = imagePopover.get();
-            assertTrue(currentImagePopover.isImagePopoverDisplayed());
+        assertTrue(imagePopover.isPresent());
+        ImagePopover currentImagePopover = imagePopover.get();
+        assertTrue(currentImagePopover.isImagePopoverDisplayed());
 
-            WebElement imagePermalinkButton = currentImagePopover.getImagePermalinkButton();
-            String[] elements = imagePermalinkButton.getAttribute("href").split("#");
-            assertEquals("manuallyAddedImageId", elements[elements.length - 1]);
+        WebElement imagePermalinkButton = currentImagePopover.getImagePermalinkButton();
+        String[] elements = imagePermalinkButton.getAttribute("href").split("#");
+        assertEquals("manuallyAddedImageId", elements[elements.length - 1]);
 
-            imagePermalinkButton.click();
-            assertEquals(testUtils.getDriver().getCurrentUrl(), imagePermalinkButton.getAttribute("href"));
-            assertEquals("manuallyAddedImageId", currentImagePopover.getImageId());
-        }
+        imagePermalinkButton.click();
+        assertEquals(testUtils.getDriver().getCurrentUrl(), imagePermalinkButton.getAttribute("href"));
+        assertEquals("manuallyAddedImageId", currentImagePopover.getImageId());
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
@@ -357,15 +355,13 @@ class LightboxIT
 
         // Verify the image popover download action.
         Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
+        assertTrue(imagePopover.isPresent());
+        ImagePopover currentImagePopover = imagePopover.get();
+        assertTrue(currentImagePopover.isImagePopoverDisplayed());
 
-        if (imagePopover.isPresent()) {
-            ImagePopover currentImagePopover = imagePopover.get();
-            assertTrue(currentImagePopover.isImagePopoverDisplayed());
-
-            WebElement popoverDownload = currentImagePopover.getDownloadButton();
-            assertEquals(lightboxPage.getImageElement(0).getAttribute("src"), popoverDownload.getAttribute("href"));
-            assertEquals("image1.png", popoverDownload.getAttribute("download"));
-        }
+        WebElement popoverDownload = currentImagePopover.getDownloadButton();
+        assertEquals(lightboxPage.getImageElement(0).getAttribute("src"), popoverDownload.getAttribute("href"));
+        assertEquals("image1.png", popoverDownload.getAttribute("download"));
 
         // Verify the image lightbox download action.
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
@@ -410,12 +406,11 @@ class LightboxIT
         lightboxPage.reloadPage();
 
         Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
-        if (imagePopover.isPresent()) {
-            ImagePopover currentImagePopover = imagePopover.get();
-            assertTrue(currentImagePopover.isImagePopoverDisplayed());
-            assertFalse(currentImagePopover.getImagePermalinkButton().isDisplayed());
-            assertFalse(currentImagePopover.getCopyImageIdButton().isDisplayed());
-        }
+        assertTrue(imagePopover.isPresent());
+        ImagePopover currentImagePopover = imagePopover.get();
+        assertTrue(currentImagePopover.isImagePopoverDisplayed());
+        assertFalse(currentImagePopover.getImagePermalinkButton().isDisplayed());
+        assertFalse(currentImagePopover.getCopyImageIdButton().isDisplayed());
 
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());

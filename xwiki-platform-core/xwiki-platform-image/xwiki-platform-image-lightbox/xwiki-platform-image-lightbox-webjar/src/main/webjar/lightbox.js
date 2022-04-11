@@ -312,8 +312,8 @@ define('xwiki-lightbox', [
    * Initialize the lightbox functionality for a set of images.
    */
   var initLightboxFunctionality = function() {
-    // The lightbox will be added to xwikicontent images that don't explicitly disable it.
-    lightboxImages = $('#xwikicontent img')
+    // The lightbox will be added to .xcontent images that don't explicitly disable it.
+    lightboxImages = $('.xcontent img')
       .filter((i, img) => $(img.closest('[data-xwiki-lightbox]')).data('xwikiLightbox') != false);
     slidesData = getSlidesData();
     lightboxDescription.invalidateCachedAttachments();

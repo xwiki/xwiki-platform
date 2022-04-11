@@ -21,6 +21,8 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -417,26 +419,34 @@ public class DownloadAction extends XWikiAction
     {
         XWikiAttachment attachment = null;
 
-        boolean fallback = true;
         String idStr = request.getParameter("id");
         if (StringUtils.isNumeric(idStr)) {
             int id = Integer.parseInt(idStr);
             if (document.getAttachmentList().size() > id) {
                 attachment = document.getAttachmentList().get(id);
             }
-            // we use to not fallback to the attachment filename, and we seem to have a test for that behaviour.
-            fallback = false;
-        } else if (Boolean.parseBoolean(request.get("tempupload"))) {
-            // if the attachment has been temporary upload we first look there
-            Optional<XWikiAttachment> optionalXWikiAttachment = this.temporaryAttachmentSessionsManager
-                .getUploadedAttachment(document.getDocumentReference(), filename);
-            attachment = optionalXWikiAttachment.orElse(null);
+        } else {
+            XWikiAttachment standardAttachment = document.getAttachment(filename);
+            DocumentReference documentReference = document.getDocumentReference();
+            Optional<XWikiAttachment> uploadedAttachmentOpt =
+                this.temporaryAttachmentSessionsManager.getUploadedAttachment(documentReference, filename);
+
+            // If there's no uploaded attachment, we always rely on the standard attachment, be it empty.
+            if (uploadedAttachmentOpt.isEmpty()) {
+                attachment = standardAttachment;
+            // If there's an uploaded attachment on current session, and no standard attachment, then we should display
+            // that one.
+            } else if (standardAttachment == null) {
+                attachment = uploadedAttachmentOpt.get();
+            // Finally, if there's both an uploaded attachment in current session and a standard one with same name,
+            // we use the uploaded one.
+            // TODO: this should be better handled since it's possible that the user who uploaded the attachment wants
+            // to see the original page with the old attachment: right now this usecase is not supported.
+            } else {
+                attachment = uploadedAttachmentOpt.get();
+            }
         }
 
-        // but we fallback on the document if it cannot be found for some reasons.
-        if (attachment == null && fallback) {
-            attachment = document.getAttachment(filename);
-        }
         return attachment;
     }
 

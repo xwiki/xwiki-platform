@@ -52,6 +52,10 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
     private static final String DBPASSWORD = DBUSERNAME;
 
+    private static final String ORACLE_USERNAME = "oracle";
+
+    private static final String ORACLE_PASSWORD = ORACLE_USERNAME;
+
     /**
      * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @throws Exception if the container fails to start
@@ -259,8 +263,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             .asCompatibleSubstituteFor("gvenzl/oracle-xe");
         databaseContainer = new OracleContainer(oracleImage);
         databaseContainer
-            .withUsername("oracle")
-            .withPassword("oracle");
+            .withUsername(ORACLE_USERNAME)
+            .withPassword(ORACLE_PASSWORD);
 
         startDatabaseContainer(databaseContainer, 1521, testConfiguration);
     }

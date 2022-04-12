@@ -74,6 +74,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageAttachmentReference;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
@@ -2332,12 +2334,24 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                 wikiLink.setDocId(doc.getId());
                 wikiLink.setFullName(fullName);
-                wikiLink.setLink(this.localEntityReferenceSerializer.serialize(
-                    entityReference.extractReference(EntityType.DOCUMENT)));
-                if (Objects.equals(entityReference.getType(), EntityType.ATTACHMENT)) {
+
+                // getUniqueLinkedEntities() returns both DOCUMENT and PAGE references (and ATTACHMENT and
+                // PAGE_ATTACHMENT references). If the reference is a PageReference (or a PageAttachmentReference) then
+                // we can't know if it points to a terminal page or a non-terminal one, and thus we need to get the
+                // document to check if it exists, starting with the non-terminal one since "[[page:test]]" points
+                // first to the non-terminal page when it exists.
+                EntityReference documentReferenceToSerialize =
+                    convertToDocumentReference(entityReference, inputxcontext);
+                wikiLink.setLink(this.localEntityReferenceSerializer.serialize(documentReferenceToSerialize));
+                boolean isAttachmentReference = false;
+                if (Objects.equals(entityReference.getType(), EntityType.ATTACHMENT)
+                    || Objects.equals(entityReference.getType(), EntityType.PAGE_ATTACHMENT))
+                {
                     wikiLink.setAttachmentName(entityReference.getName());
+                    isAttachmentReference = true;
                 }
-                wikiLink.setType(entityReference.getType().getLowerCase());
+                wikiLink.setType(isAttachmentReference ? EntityType.ATTACHMENT.getLowerCase()
+                    : EntityType.DOCUMENT.getLowerCase());
 
                 links.add(wikiLink);
             }
@@ -2385,6 +2399,29 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             restoreExecutionXContext();
         }
+    }
+
+    private EntityReference convertToDocumentReference(EntityReference entityReference, XWikiContext context)
+    {
+        // The passed entityReference can of type DOCUMENT, ATTACHMENT, PAGE or PAGE_ATTACHMENT.
+        EntityReference documentReference = entityReference;
+        if (documentReference instanceof PageAttachmentReference) {
+            documentReference = documentReference.extractReference(EntityType.PAGE);
+        }
+        if (documentReference instanceof PageReference) {
+            try {
+                // Note: getDocument() will find the right document when passed a PageReference.
+                documentReference =
+                    context.getWiki().getDocument(documentReference, context).getDocumentReference();
+            } catch (XWikiException e) {
+                // Log a warning but return the reference
+                this.logger.warn("Failed to retrieve document [{}]. Considering the reference to be a terminal one",
+                    documentReference);
+            }
+        } else {
+            documentReference = documentReference.extractReference(EntityType.DOCUMENT);
+        }
+        return documentReference;
     }
 
     @Override

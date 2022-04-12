@@ -148,7 +148,7 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
         for (Block matchingBlock : blocks) {
             if (matchingBlock instanceof MacroBlock) {
                 MacroBlock macroBlock = (MacroBlock) matchingBlock;
-                Optional<MacroBlock> optionalMacroBlock = this.handleMacroBlock(macroBlock, currentDocumentReference,
+                Optional<MacroBlock> optionalMacroBlock = handleMacroBlock(macroBlock, currentDocumentReference,
                     oldTarget, newTarget, macroRefactoringLambda);
                 if (optionalMacroBlock.isPresent()) {
                     block.replaceChild(optionalMacroBlock.get(), macroBlock);

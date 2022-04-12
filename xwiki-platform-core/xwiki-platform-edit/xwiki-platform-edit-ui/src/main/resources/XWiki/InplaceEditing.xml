@@ -1592,6 +1592,7 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
     ## We have to explicitly enable the source mode for in-line edit because the latest version of the content editor
     ## could be installed on an older version of XWiki where the in-place editor didn't support the source mode (so the
     ## content editor cannot enable the source mode by default).
+    #set ($isTemporaryAttachmentSupported = ("$!services.temporaryattachments" != ""))
     #set ($inplaceEditingConfig = {
       'contentType': 'org.xwiki.rendering.syntax.SyntaxContent',
       'editMode': $defaultEditMode,
@@ -1600,7 +1601,7 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
       'translateButtonSelector': '#tmTranslate &gt; a',
       'enableSourceMode': true,
       'enableOfficeImport': $services.officemanager.isConnected(),
-      'enableTemporaryAttachmentUpload': $services.wysiwyg.isFeatureSupported('uploadTemporaryAttachments'),
+      'enableTemporaryAttachmentUpload': $isTemporaryAttachmentSupported,
       'syntax': $services.wysiwyg.HTMLSyntax.toIdString(),
       'paths': {
         'js': {

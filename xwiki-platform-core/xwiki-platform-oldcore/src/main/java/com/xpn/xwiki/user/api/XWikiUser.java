@@ -29,6 +29,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWiki;
@@ -57,6 +58,9 @@ public class XWikiUser
      * @since 11.8RC1
      */
     public static final String EMAIL_CHECKED_PROPERTY = "email_checked";
+
+    public static final LocalDocumentReference ACCOUNT_VALIDATION_DOCUMENT_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "AccountValidation");
 
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver

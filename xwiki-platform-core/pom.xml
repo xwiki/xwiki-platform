@@ -146,7 +146,7 @@
                   <code>java.class.removed</code>
                   <old>class org.xwiki.index.migration.R140200001XWIKI19352DataMigration</old>
                   <justification>R140200001XWIKI19352DataMigration replaced by R140300000XWIKI19614DataMigration because a link reindexing is required by XWIKI-19614, making an additional reindexing for migrations from version lower than 14.2RC1 useless.</justification>
-                  <criticality>highlight</criticality>
+                  <criticality>allowed</criticality>
                 </item>
               </differences>
             </revapi.differences>

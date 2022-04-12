@@ -48,13 +48,13 @@ import static org.xwiki.index.internal.DefaultLinksTaskConsumer.LINKS_TASK_TYPE;
 // TODO: Implement DataMigration once XWIKI-19399 is fixed.
 @Component
 @Singleton
-@Named(R140200001XWIKI19352DataMigration.HINT)
-public class R140200001XWIKI19352DataMigration implements HibernateDataMigration
+@Named(R140300000XWIKI19614DataMigration.HINT)
+public class R140300000XWIKI19614DataMigration implements HibernateDataMigration
 {
     /**
      * The hint for this component.
      */
-    public static final String HINT = "140200001XWIKI19352";
+    public static final String HINT = "R140300000XWIKI19614";
 
     @Inject
     private QueryManager queryManager;
@@ -80,7 +80,7 @@ public class R140200001XWIKI19352DataMigration implements HibernateDataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(140200001);
+        return new XWikiDBVersion(140300000);
     }
 
     @Override

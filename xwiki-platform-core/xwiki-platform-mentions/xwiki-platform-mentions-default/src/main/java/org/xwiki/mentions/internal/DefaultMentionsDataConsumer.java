@@ -93,7 +93,8 @@ public class DefaultMentionsDataConsumer implements TaskConsumer
                 } else {
                     // UPDATE
                     XWikiDocument oldDoc =
-                        this.documentRevisionProvider.getRevision(doc.getDocumentReference(), doc.getPreviousVersion());
+                        this.documentRevisionProvider.getRevision(doc.getDocumentReferenceWithLocale(),
+                            doc.getPreviousVersion());
                     mentionNotificationParameters = this.updatedDocumentMentionsAnalyzer
                         .analyze(oldDoc, doc, documentReference, doc.getVersion(), authorReference);
                 }

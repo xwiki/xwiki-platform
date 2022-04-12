@@ -17,9 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.doc.tasks;
+package org.xwiki.doc.tasks;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -33,10 +32,9 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 14.1RC1
  */
-public class XWikiDocumentIndexingTask implements Serializable
+@Unstable
+public class XWikiDocumentIndexingTask
 {
-    private static final long serialVersionUID = -2306455239336814283L;
-
     private long id;
 
     private long docId;
@@ -53,7 +51,7 @@ public class XWikiDocumentIndexingTask implements Serializable
      * Getter for {@link #id}.
      *
      * @return the synthetic id of this deleted attachment. Uniquely identifies a link
-     * @since 14.2RC1
+     * @since 14.3RC1
      */
     @Unstable
     public long getId()
@@ -65,6 +63,7 @@ public class XWikiDocumentIndexingTask implements Serializable
      * Setter for {@link #id}.
      *
      * @param id the synthetic id to set. Used only by hibernate
+     * @since 14.3RC1
      */
     // This method is private because it is only used reflexively by Hibernate.
     @SuppressWarnings("java:S1144")
@@ -75,7 +74,9 @@ public class XWikiDocumentIndexingTask implements Serializable
 
     /**
      * @return the document id
+     * @since 14.3RC1
      */
+    @Unstable
     public long getDocId()
     {
         return this.docId;
@@ -83,7 +84,9 @@ public class XWikiDocumentIndexingTask implements Serializable
 
     /**
      * @param docId the id of the document to be processed
+     * @since 14.3RC1
      */
+    @Unstable
     public void setDocId(long docId)
     {
         this.docId = docId;
@@ -91,7 +94,9 @@ public class XWikiDocumentIndexingTask implements Serializable
 
     /**
      * @return the version to of the document to be processed
+     * @since 14.3RC1
      */
+    @Unstable
     public String getVersion()
     {
         return this.version;
@@ -99,7 +104,9 @@ public class XWikiDocumentIndexingTask implements Serializable
 
     /**
      * @param version the version of the document to be processed
+     * @since 14.3RC1
      */
+    @Unstable
     public void setVersion(String version)
     {
         this.version = version;
@@ -107,7 +114,9 @@ public class XWikiDocumentIndexingTask implements Serializable
 
     /**
      * @return the type of the task to do on the document
+     * @since 14.3RC1
      */
+    @Unstable
     public String getType()
     {
         return this.type;
@@ -115,7 +124,9 @@ public class XWikiDocumentIndexingTask implements Serializable
 
     /**
      * @param type the type of the task to do on the document
+     * @since 14.3RC1
      */
+    @Unstable
     public void setType(String type)
     {
         this.type = type;
@@ -123,7 +134,9 @@ public class XWikiDocumentIndexingTask implements Serializable
 
     /**
      * @return the identifier of the instance that queued the task
+     * @since 14.3RC1
      */
+    @Unstable
     public String getInstanceId()
     {
         return this.instanceId;
@@ -131,7 +144,9 @@ public class XWikiDocumentIndexingTask implements Serializable
 
     /**
      * @param instanceId the identifier of the instance that queued the task
+     * @since 14.3RC1
      */
+    @Unstable
     public void setInstanceId(String instanceId)
     {
         this.instanceId = instanceId;

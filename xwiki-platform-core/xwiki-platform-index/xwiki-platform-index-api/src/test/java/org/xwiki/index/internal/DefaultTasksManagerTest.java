@@ -32,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
+import org.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
@@ -44,7 +45,6 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 
 import ch.qos.logback.classic.Level;
 

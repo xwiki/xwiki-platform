@@ -36,7 +36,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTask;
+import org.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -100,25 +100,18 @@ class TasksStoreTest
     {
         XWikiDocumentIndexingTask t0 = new XWikiDocumentIndexingTask();
         XWikiDocumentIndexingTask t1 = new XWikiDocumentIndexingTask();
-        XWikiDocumentIndexingTaskId tid0 = new XWikiDocumentIndexingTaskId();
-        XWikiDocumentIndexingTaskId tid1 = new XWikiDocumentIndexingTaskId();
-        tid0.setVersion("-");
-        tid1.setVersion("-4.3");
-        t0.setId(tid0);
-        t1.setId(tid1);
+        t0.setVersion("");
+        t1.setVersion("4.3");
+        
 
         when(this.query.getResultList()).thenReturn(List.of(t0, t1));
 
         List<XWikiDocumentIndexingTask> tasks = this.tasksStore.getAllTasks("wikiId", "instance-id");
 
         XWikiDocumentIndexingTask expectedTask0 = new XWikiDocumentIndexingTask();
-        XWikiDocumentIndexingTaskId expectedTaskId0 = new XWikiDocumentIndexingTaskId();
-        expectedTaskId0.setVersion("");
-        expectedTask0.setId(expectedTaskId0);
+        expectedTask0.setVersion("");
         XWikiDocumentIndexingTask expectedTask1 = new XWikiDocumentIndexingTask();
-        XWikiDocumentIndexingTaskId expectedTaskId1 = new XWikiDocumentIndexingTaskId();
-        expectedTaskId1.setVersion("4.3");
-        expectedTask1.setId(expectedTaskId1);
+        expectedTask1.setVersion("4.3");
         assertEquals(List.of(expectedTask0, expectedTask1), tasks);
 
         verify(this.contextManager).initialize(any());
@@ -141,7 +134,7 @@ class TasksStoreTest
         doAnswer(invocation -> {
             XWikiDocumentIndexingTask expectedTask = new XWikiDocumentIndexingTask();
             expectedTask.setDocId(42);
-            expectedTask.setVersion("-7.1");
+            expectedTask.setVersion("7.1");
             expectedTask.setType("testtask");
             expectedTask.setInstanceId("instance-id");
             XWikiDocumentIndexingTask actualTask = invocation.getArgument(0);
@@ -167,7 +160,7 @@ class TasksStoreTest
         verify(this.session).createQuery("delete from XWikiDocumentIndexingTask t where t.docId = :docId "
             + "and t.version = :version and t.type = :type");
         verify(this.query).setParameter("docId", 42L);
-        verify(this.query).setParameter("version", "-7.1");
+        verify(this.query).setParameter("version", "7.1");
         verify(this.query).setParameter("type", "testtask");
         verify(this.query).executeUpdate();
     }
@@ -182,7 +175,6 @@ class TasksStoreTest
         doAnswer(invocation -> {
             XWikiDocumentIndexingTask expectedTask = new XWikiDocumentIndexingTask();
             expectedTask.setDocId(42);
-            expectedTask.setVersion("-");
             expectedTask.setType("testtask");
             XWikiDocumentIndexingTask actualTask = invocation.getArgument(0);
             assertEquals(expectedTask, actualTask);
@@ -200,7 +192,7 @@ class TasksStoreTest
         verify(this.query).executeUpdate();
         verify(this.session).saveOrUpdate(task);
         assertNotNull(task.getTimestamp());
-        assertNull(task.getId().getVersion());
+        assertNull(task.getVersion());
     }
 
     @Test

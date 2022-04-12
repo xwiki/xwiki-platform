@@ -19,12 +19,29 @@
  */
 package org.xwiki.index.migration;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.mapping.PersistentClass;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.doc.tasks.XWikiDocumentIndexingTask;
+import org.xwiki.index.internal.TasksStore;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
@@ -47,18 +64,19 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
      */
     public static final String HINT = "R140300001XWIKI19571";
 
+    @Inject
+    private HibernateStore hibernateStore;
+
+    @Inject
+    private Provider<TasksStore> tasksStore;
+
+    private List<XWikiDocumentIndexingTask> tasks = new ArrayList<>();
+
     @Override
     public String getDescription()
     {
-        return "Copy the content of XWikiDocumentIndexingTask in a temporary table, let hibernate initialize "
-            + "XWikiDocumentIndexingTask with a new schema, copy the content of the temporary table in "
-            + "XWikiDocumentIndexingTask, then drop the temporary table.";
-    }
-
-    @Override
-    protected void hibernateMigrate() throws DataMigrationException, XWikiException
-    {
-        // Nothing to do here, all the work is done as Liquibase changes
+        return "Save the content of xwikidocumentindexingqueue, remove it, let Hibernate recreate it with a new schema"
+            + " and finally re-insert the saved content in xwikidocumentindexingqueue";
     }
 
     @Override
@@ -70,49 +88,97 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
     @Override
     public String getPreHibernateLiquibaseChangeLog() throws DataMigrationException
     {
-        // If the 
-        // TASK_TIMESTAMP Needs to be dropped, otherwise xwikidocumentindexingqueue cannot be created again since the 
-        // index already exists
-        return "<changeSet author=\"xwikiorg\" id=\"" + HINT + "0\">\n"
-            + "  <preConditions onFail=\"MARK_RAN\">\n"
-            + "    <and>\n"
-            + "      <tableExists tableName=\"xwikidocumentindexingqueue\"/>\n"
-            + "      <not>\n"
-            + "        <sqlCheck expectedResult=\"0\">SELECT count(1) FROM xwikidocumentindexingqueue;</sqlCheck>\n"
-            + "      </not>\n"
-            + "    </and>\n"
-            + "  </preConditions>\n"
-            + "  <renameTable oldTableName=\"xwikidocumentindexingqueue\" "
-            + "newTableName=\"xwikidocumentindexingqueuetmp\"/>\n"
-            + "   <dropIndex tableName=\"xwikidocumentindexingqueuetmp\" indexName=\"TASK_TIMESTAMP\"/>\n"
-            + "</changeSet>\n"
-            + "<changeSet author=\"xwikiorg\" id=\"" + HINT + "1\">\n"
-            + "  <preConditions onFail=\"MARK_RAN\">\n"
-            + "    <tableExists tableName=\"xwikidocumentindexingqueue\"/>\n"
-            + "    <sqlCheck expectedResult=\"0\">SELECT count(1) FROM xwikidocumentindexingqueue;</sqlCheck>\n"
-            + "  </preConditions>\n"
-            + "  <dropTable tableName=\"xwikidocumentindexingqueue\"/>\n"
-            + "</changeSet>\n\n";
+        SessionFactory sessionFactory = this.hibernateStore.getSessionFactory();
+        try (SessionImplementor session = (SessionImplementor) sessionFactory.openSession()) {
+            JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
+            try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
+                DatabaseMetaData databaseMetaData = connection.getMetaData();
+
+                PersistentClass persistentClass =
+                    this.hibernateStore.getConfigurationMetadata()
+                        .getEntityBinding(XWikiDocumentIndexingTask.class.getName());
+                String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
+                if (exists(databaseMetaData, tableName)) {
+                    saveTasks(connection, persistentClass, tableName);
+                }
+                return String.format("<changeSet author=\"xwikiorg\" id=\"%s0\">\n"
+                    + "  <preConditions onFail=\"MARK_RAN\">\n"
+                    + "    <tableExists tableName=\"%s\"/>\n"
+                    + "  </preConditions>\n"
+                    + "  <dropTable tableName=\"%s\"/>"
+                    + "\n</changeSet>\n"
+                    + "\n", HINT, tableName, tableName);
+            }
+        } catch (SQLException e) {
+            throw new DataMigrationException("Error while loading the existing tasks.", e);
+        }
     }
 
     @Override
-    public String getLiquibaseChangeLog() throws DataMigrationException
+    protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        return "<changeSet author=\"xwikiorg\" id=\"" + HINT + "\">\n"
-            + "  <preConditions onFail=\"MARK_RAN\">\n"
-            + "    <and>\n"
-            + "      <tableExists tableName=\"xwikidocumentindexingqueuetmp\"/>\n"
-            + "      <not>\n"
-            + "        <sqlCheck expectedResult=\"0\">SELECT count(1) FROM xwikidocumentindexingqueuetmp;</sqlCheck>\n"
-            + "      </not>\n"
-            + "    </and>\n"
-            + "  </preConditions>\n"
-            + "  <sql>" 
-            + "INSERT INTO xwikidocumentindexingqueue (XWT_DOC_ID, XWT_VERSION, XWT_TYPE, XWT_INSTANCE_ID, XWT_TIMESTAMP) "
-            + "SELECT XWT_DOC_ID, XWT_VERSION, XWT_TYPE, XWT_INSTANCE_ID, XWT_TIMESTAMP " 
-            + "FROM xwikidocumentindexingqueuetmp" 
-            + "</sql>\n"
-            + "  <dropTable tableName= \"xwikidocumentindexingqueuetmp\"/>\n"
-            + "</changeSet>\n\n";
+        for (XWikiDocumentIndexingTask task : this.tasks) {
+            this.tasksStore.get().addTask(getXWikiContext().getWikiId(), task);
+        }
+    }
+
+    /**
+     * Check if the table exists for XWikiDocumentIndexingTask.
+     *
+     * @param databaseMetaData the database metadata
+     * @param tableName the table name to search for
+     * @return {@code true} if the table exists for {@link XWikiDocumentIndexingTask}, {@code false} otherwise
+     * @throws SQLException in case of error when accessing the tables metadata
+     */
+    private boolean exists(DatabaseMetaData databaseMetaData, String tableName) throws SQLException
+    {
+        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
+
+        ResultSet resultSet;
+        if (this.hibernateStore.isCatalog()) {
+            resultSet = databaseMetaData.getTables(databaseName, null, tableName, null);
+        } else {
+            resultSet = databaseMetaData.getTables(null, databaseName, tableName, null);
+        }
+
+        return resultSet.next();
+    }
+
+    /**
+     * Select all the rows for the table of {@link XWikiDocumentIndexingTask} and save them in memory.
+     *
+     * @param connection the connection to the database
+     * @param entity the entity to select the rows from
+     * @param tableName the table name of the entity
+     * @throws SQLException in case of error when retrieving the rows
+     */
+    private void saveTasks(Connection connection, PersistentClass entity, String tableName) throws SQLException
+    {
+        String docIdColumnName = this.hibernateStore.getConfiguredColumnName(entity, "docId");
+        String versionColumnName = this.hibernateStore.getConfiguredColumnName(entity, "version");
+        String typeColumnName = this.hibernateStore.getConfiguredColumnName(entity, "type");
+        String instanceIdColumnName = this.hibernateStore.getConfiguredColumnName(entity, "instanceId");
+        String timestampColumnName = this.hibernateStore.getConfiguredColumnName(entity, "timestamp");
+
+        // We can't execute this query with Hibernate since the entity correspond to the new schema, which is 
+        // updated later in the migration.
+        String sql = String.format("select %s, %s, %s, %s, %s from %s", docIdColumnName, versionColumnName,
+            typeColumnName, instanceIdColumnName, timestampColumnName, tableName);
+        try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            while (resultSet.next()) {
+                XWikiDocumentIndexingTask task = new XWikiDocumentIndexingTask();
+                task.setDocId(resultSet.getLong(docIdColumnName));
+                task.setVersion(cleanupVersion(resultSet.getString(versionColumnName)));
+                task.setType(resultSet.getString(typeColumnName));
+                task.setInstanceId(resultSet.getString(instanceIdColumnName));
+                task.setTimestamp(resultSet.getTimestamp(timestampColumnName));
+                this.tasks.add(task);
+            }
+        }
+    }
+
+    private String cleanupVersion(String version)
+    {
+        return Optional.ofNullable(version).orElse("").replace("-", "");
     }
 }

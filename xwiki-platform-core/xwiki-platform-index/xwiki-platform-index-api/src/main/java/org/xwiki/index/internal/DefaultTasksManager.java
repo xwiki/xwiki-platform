@@ -44,6 +44,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 import org.xwiki.index.TaskManager;
 import org.xwiki.index.internal.jmx.JMXTasks;
 import org.xwiki.management.JMXBeanRegistration;
@@ -52,7 +53,6 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 
 import static java.lang.Thread.NORM_PRIORITY;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;

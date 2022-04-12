@@ -470,17 +470,17 @@
     </class>
 
     <!-- XWikiDocumentIndexingTask custom mapping-->
-    <class name="com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTask" table="xwikidocumentindexingqueue">
+    <class name="org.xwiki.doc.tasks.XWikiDocumentIndexingTask" table="xwikidocumentindexingqueue">
         <id name="id" column="XWT_ID">
             <generator class="native"/>
         </id>
         <!-- Stores the queued tasks as well as the running tasks. -->
-        <property name="docId" column="XWT_DOC_ID" type="long" />
+        <property name="docId" column="XWT_DOC_ID" type="long"/>
         <property name="version" column="XWT_VERSION" type="string" length="39" not-null="false"/>
-        <property name="type" column="XWT_TYPE" type="string" length="100" />
-        <property name="instanceId" column="XWT_INSTANCE_ID" type="string" length="100" />
+        <property name="type" column="XWT_TYPE" type="string" length="100"/>
+        <property name="instanceId" column="XWT_INSTANCE_ID" type="string" length="100"/>
 
         <!-- The timestamp of creation of the task. Used to prioritize tasks. -->
-        <property name="timestamp" type="timestamp" column="XWT_TIMESTAMP" index="TASK_TIMESTAMP" not-null="true" />
+        <property name="timestamp" type="timestamp" column="XWT_TIMESTAMP" index="TASK_TIMESTAMP" not-null="true"/>
     </class>
 </hibernate-mapping>

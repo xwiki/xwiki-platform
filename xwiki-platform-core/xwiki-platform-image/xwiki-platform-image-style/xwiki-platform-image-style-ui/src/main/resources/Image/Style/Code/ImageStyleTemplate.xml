@@ -133,7 +133,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>none=None|left=Left|center=Center|right=Right</values>
+        <values>none=None|start=Start|center=Center|end=End</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </defaultAlignment>
       <defaultBorder>

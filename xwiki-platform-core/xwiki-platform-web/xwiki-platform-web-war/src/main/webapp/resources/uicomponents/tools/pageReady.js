@@ -53,13 +53,14 @@ define('xwiki-page-ready', [], function() {
     delayPageReady = () => {};
   });
 
-  // We put it on the window in order to be accessible from the parent window when the page is loaded inside an iframe.
-  return window.xwikiPageReady = {
+  return {
     delayPageReady: function() {
       // We don't expose the internal delayPageReady because we want to modify it after the page is ready.
       return delayPageReady.apply(this, arguments);
     },
-    getPendingDelays, afterPageReady};
+    getPendingDelays,
+    afterPageReady
+  };
 });
 
 /**

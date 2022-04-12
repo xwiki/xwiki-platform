@@ -20,6 +20,7 @@
 package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
@@ -38,9 +39,11 @@ import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecu
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
+import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -367,7 +370,9 @@ public class XWikiDockerExtension extends AbstractExtension
 
         // Initialize the test context
         LOGGER.info("(*) Initialize Test Context...");
-        PersistentTestContext testContext = initializePersistentTestContext(xwikiWebDriver);
+        PersistentTestContext testContext =
+            new PersistentTestContext(Arrays.asList(new XWikiExecutor(0)), xwikiWebDriver);
+        AbstractTest.initializeSystem(testContext);
         savePersistentTestContext(extensionContext, testContext);
 
         // Set the URLs to access XWiki:

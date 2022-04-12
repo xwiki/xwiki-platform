@@ -21,6 +21,10 @@ package com.xpn.xwiki.web;
 
 import com.xpn.xwiki.util.Util;
 
+/**
+ * @deprecated Since 14.3RC1, use {@link EditForm} instead.
+ */
+@Deprecated(since = "14.3RC1")
 public class PrepareEditForm extends XWikiForm
 {
     private String template;

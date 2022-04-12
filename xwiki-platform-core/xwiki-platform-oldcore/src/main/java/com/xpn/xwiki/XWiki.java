@@ -5072,6 +5072,52 @@ public class XWiki implements EventListener
         return copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale, reset, force, false, context);
     }
 
+    private boolean copyDocument(XWikiDocument sourceDocument, DocumentReference targetDocumentReference, boolean reset,
+        boolean force, boolean resetCreationData, XWikiContext context) throws XWikiException
+    {
+        if (!force) {
+            XWikiDocument currentTargetDocument = getDocument(targetDocumentReference, context);
+            // There is already an existing document
+            if (!currentTargetDocument.isNew()) {
+                return false;
+            }
+        }
+
+        LOGGER.info("Copying document [{}] to [{}]", sourceDocument.getDocumentReferenceWithLocale(), targetDocumentReference);
+
+        XWikiDocument targetDocument = sourceDocument.copyDocument(targetDocumentReference, !reset, context);
+
+        if (resetCreationData) {
+            Date now = new Date();
+            targetDocument.setCreationDate(now);
+            targetDocument.setContentUpdateDate(now);
+            targetDocument.setDate(now);
+            targetDocument.setCreatorReference(context.getUserReference());
+            targetDocument.setAuthorReference(context.getUserReference());
+        }
+
+        if (reset) {
+            // Reset the version
+            targetDocument.setVersion("1.1");
+        }
+
+        // We don't want to trigger a new version otherwise the version number will be wrong.
+        targetDocument.setMetaDataDirty(false);
+        targetDocument.setContentDirty(false);
+
+        saveDocument(targetDocument, "Copied from " + sourceDocument.getDocumentReference(), context);
+
+        // Generate an history for the reseted document (non reseted document get their history saved along with the
+        // document)
+        // TODO: create an history without going through the store to let saveDocument() store it with the document ?
+        if (reset) {
+            // Reload the document from the store to modify the right one
+            context.getWiki().getDocument(targetDocumentReference, context).resetArchive(context);
+        }
+
+        return true;
+    }
+
     /**
      * @since 2.2M2
      */
@@ -5079,169 +5125,37 @@ public class XWiki implements EventListener
         String wikilocale, boolean reset, boolean force, boolean resetCreationData, XWikiContext context)
         throws XWikiException
     {
-        String db = context.getWikiId();
-        String sourceWiki = sourceDocumentReference.getWikiReference().getName();
-        String targetWiki = targetDocumentReference.getWikiReference().getName();
+        // Get the document to copy
+        XWikiDocument sourceDocument = getDocument(sourceDocumentReference, context);
 
-        String sourceStringReference = getDefaultEntityReferenceSerializer().serialize(sourceDocumentReference);
-
-        try {
-            context.setWikiId(sourceWiki);
-            XWikiDocument sdoc = getDocument(sourceDocumentReference, context);
-            if (!sdoc.isNew()) {
-                LOGGER.info("Copying document [{}] to [{}]", sourceDocumentReference, targetDocumentReference);
-
-                // Let's switch to the other database to verify if the document already exists
-                context.setWikiId(targetWiki);
-                XWikiDocument previoustdoc = getDocument(targetDocumentReference, context);
-                // There is already an existing document
-                if (!previoustdoc.isNew()) {
-                    if (!force) {
-                        return false;
-                    }
+        // Make sure the document to copy exists
+        if (!sourceDocument.isNew()) {
+            if (wikilocale == null) {
+                // Copy default document
+                if (!copyDocument(sourceDocument, targetDocumentReference, reset, force, resetCreationData, context)) {
+                    return false;
                 }
 
-                // Let's switch back again to the original db
-                context.setWikiId(sourceWiki);
+                // Copy the translations
+                List<Locale> locales = sourceDocument.getTranslationLocales(context);
+                for (Locale locale : locales) {
+                    XWikiDocument translationDocument = sourceDocument.getTranslatedDocument(locale, context);
 
-                if (wikilocale == null) {
-                    XWikiDocument tdoc = sdoc.copyDocument(targetDocumentReference, context);
-
-                    // Make sure to replace the existing document if any
-                    tdoc.setNew(true);
-
-                    // forget past versions
-                    if (reset) {
-                        tdoc.setVersion("1.1");
-                    }
-                    if (resetCreationData) {
-                        Date now = new Date();
-                        tdoc.setCreationDate(now);
-                        tdoc.setContentUpdateDate(now);
-                        tdoc.setDate(now);
-                        tdoc.setCreatorReference(context.getUserReference());
-                        tdoc.setAuthorReference(context.getUserReference());
-                    }
-
-                    // We don't want to trigger a new version otherwise the version number will be wrong.
-                    tdoc.setMetaDataDirty(false);
-                    tdoc.setContentDirty(false);
-
-                    saveDocument(tdoc, "Copied from " + sourceStringReference, context);
-
-                    if (!reset) {
-                        context.setWikiId(sourceWiki);
-                        XWikiDocumentArchive txda = getVersioningStore().getXWikiDocumentArchive(sdoc, context);
-                        context.setWikiId(targetWiki);
-                        txda = txda.clone(tdoc.getId(), context);
-                        getVersioningStore().saveXWikiDocArchive(txda, true, context);
-                    } else {
-                        context.setWikiId(targetWiki);
-                        getVersioningStore().resetRCSArchive(tdoc, true, context);
-                    }
-
-                    // Now we need to copy the translations
-                    context.setWikiId(sourceWiki);
-                    List<String> tlist = sdoc.getTranslationList(context);
-                    for (String clanguage : tlist) {
-                        XWikiDocument stdoc = sdoc.getTranslatedDocument(clanguage, context);
-                        LOGGER.info("Copying document [{}], language [{}] to [{}]", sourceWiki, clanguage,
-                            targetDocumentReference);
-
-                        context.setWikiId(targetWiki);
-                        XWikiDocument ttdoc = tdoc.getTranslatedDocument(clanguage, context);
-
-                        // There is already an existing document
-                        if (ttdoc != tdoc) {
-                            return false;
-                        }
-
-                        // Let's switch back again to the original db
-                        context.setWikiId(sourceWiki);
-
-                        ttdoc = stdoc.copyDocument(targetDocumentReference, context);
-
-                        // Make sure to replace the existing document if any
-                        ttdoc.setNew(true);
-
-                        // forget past versions
-                        if (reset) {
-                            ttdoc.setNew(true);
-                            ttdoc.setVersion("1.1");
-                        }
-                        if (resetCreationData) {
-                            Date now = new Date();
-                            ttdoc.setCreationDate(now);
-                            ttdoc.setContentUpdateDate(now);
-                            ttdoc.setDate(now);
-                            ttdoc.setCreatorReference(context.getUserReference());
-                            ttdoc.setAuthorReference(context.getUserReference());
-                        }
-
-                        // we don't want to trigger a new version
-                        // otherwise the version number will be wrong
-                        tdoc.setMetaDataDirty(false);
-                        tdoc.setContentDirty(false);
-
-                        saveDocument(ttdoc, "Copied from " + sourceStringReference, context);
-
-                        if (!reset) {
-                            context.setWikiId(sourceWiki);
-                            XWikiDocumentArchive txda = getVersioningStore().getXWikiDocumentArchive(sdoc, context);
-                            context.setWikiId(targetWiki);
-                            txda = txda.clone(tdoc.getId(), context);
-                            getVersioningStore().saveXWikiDocArchive(txda, true, context);
-                        } else {
-                            getVersioningStore().resetRCSArchive(tdoc, true, context);
-                        }
-                    }
-                } else {
-                    // We want only one language in the end
-                    XWikiDocument stdoc = sdoc.getTranslatedDocument(wikilocale, context);
-
-                    XWikiDocument tdoc = stdoc.copyDocument(targetDocumentReference, context);
-
-                    // Make sure to replace the existing document if any
-                    tdoc.setNew(true);
-
-                    // forget language
-                    tdoc.setDefaultLanguage(wikilocale);
-                    tdoc.setLanguage("");
-                    // forget past versions
-                    if (reset) {
-                        tdoc.setVersion("1.1");
-                    }
-                    if (resetCreationData) {
-                        Date now = new Date();
-                        tdoc.setCreationDate(now);
-                        tdoc.setContentUpdateDate(now);
-                        tdoc.setDate(now);
-                        tdoc.setCreatorReference(context.getUserReference());
-                        tdoc.setAuthorReference(context.getUserReference());
-                    }
-
-                    // we don't want to trigger a new version
-                    // otherwise the version number will be wrong
-                    tdoc.setMetaDataDirty(false);
-                    tdoc.setContentDirty(false);
-
-                    saveDocument(tdoc, "Copied from " + sourceStringReference, context);
-
-                    if (!reset) {
-                        context.setWikiId(sourceWiki);
-                        XWikiDocumentArchive txda = getVersioningStore().getXWikiDocumentArchive(sdoc, context);
-                        context.setWikiId(targetWiki);
-                        txda = txda.clone(tdoc.getId(), context);
-                        getVersioningStore().saveXWikiDocArchive(txda, true, context);
-                    } else {
-                        getVersioningStore().resetRCSArchive(tdoc, true, context);
-                    }
+                    copyDocument(translationDocument, targetDocumentReference, reset, force, resetCreationData,
+                        context);
                 }
+
+                return true;
+            } else {
+                // Copy the translation
+                XWikiDocument trandlationDocument = sourceDocument.getTranslatedDocument(wikilocale, context);
+
+                return copyDocument(trandlationDocument, targetDocumentReference, reset, force, resetCreationData,
+                    context);
             }
-            return true;
-        } finally {
-            context.setWikiId(db);
         }
+
+        return false;
     }
 
     public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String locale,

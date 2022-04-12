@@ -64,7 +64,7 @@
     <jetty.version>9.4.29.v20200521</jetty.version>
 
     <!-- Netty version -->
-    <netty.version>4.1.74.Final</netty.version>
+    <netty.version>4.1.75.Final</netty.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -87,7 +87,7 @@
     <xwiki.enforcer.enforce-tika2-parsers.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-tika2-parsers.skip>
 
     <!-- Hibernate -->
-    <hibernate.version>5.6.5.Final</hibernate.version>
+    <hibernate.version>5.6.7.Final</hibernate.version>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
@@ -398,7 +398,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.10.13</version>
+        <version>2.10.14</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -807,7 +807,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>1.6.4</version>
+        <version>1.6.8</version>
       </dependency>
 
       <!-- Make sure to use a version of the Jetty client libraries matching the Jetty version we package -->
@@ -897,6 +897,21 @@
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-buffer</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-transport-native-epoll</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-transport-native-unix-common</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-transport-native-kqueue</artifactId>
         <version>${netty.version}</version>
       </dependency>
 

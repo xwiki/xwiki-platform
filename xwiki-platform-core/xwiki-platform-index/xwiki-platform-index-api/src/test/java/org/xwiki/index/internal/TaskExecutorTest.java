@@ -111,7 +111,7 @@ class TaskExecutorTest
         when(this.tasksStore.getDocument("wikiId", 42)).thenReturn(this.xwikiDocument);
         when(this.documentRevisionProvider.getRevision(this.xwikiDocument, "1.5")).thenReturn(this.xwikiDocument);
 
-        when(this.xwikiDocument.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        when(this.xwikiDocument.getDocumentReferenceWithLocale()).thenReturn(DOCUMENT_REFERENCE);
         when(this.xwikiDocument.getVersion()).thenReturn("1.5");
 
         this.taskExecutor.execute(task);

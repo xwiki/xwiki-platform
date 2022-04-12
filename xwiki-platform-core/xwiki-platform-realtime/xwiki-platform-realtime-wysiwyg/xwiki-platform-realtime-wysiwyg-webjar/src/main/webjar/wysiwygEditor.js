@@ -217,54 +217,55 @@ define('xwiki-realtime-wysiwygEditor', [
       isHTML: true,
       mergeContent: realtimeConfig.enableMerge !== 0
     });
+    
+    // Fix the magic line issue.
+    var fixMagicLine = function(editor) {
+      if (editor.plugins.magicline) {
+        var ml = editor.plugins.magicline.backdoor ? editor.plugins.magicline.backdoor.that.line.$ :
+          editor._.magiclineBackdoor.that.line.$;
+        [ml, ml.parentElement].forEach(function(el) {
+          el.setAttribute('class', 'rt-non-realtime');
+        });
+      }
+    },
 
-    var whenReady = function(editor, iframe) {
-      var inner = window.inner = iframe.contentWindow.body,
-      innerDoc = window.innerDoc = iframe.contentWindow.document,
-      cursor = window.cursor = Cursor(inner),
-      initializing = true,
+    // User position indicator style.
+    userIconStyle = [
+      '<style>',
+      '.rt-user-position {',
+        'position : absolute;',
+        'width : 15px;',
+        'height: 15px;',
+        'display: inline-block;',
+        'background : #CCCCFF;',
+        'border : 1px solid #AAAAAA;',
+        'text-align : center;',
+        'line-height: 15px;',
+        'font-size: 11px;',
+        'font-weight: bold;',
+        'color: #3333FF;',
+        'user-select: none;',
+      '}',
+      '</style>'
+    ].join('\n');
 
-      // Fix the magic line issue.
-      fixMagicLine = function() {
-        if (editor.plugins.magicline) {
-          var ml = editor.plugins.magicline.backdoor ? editor.plugins.magicline.backdoor.that.line.$ :
-            editor._.magiclineBackdoor.that.line.$;
-          [ml, ml.parentElement].forEach(function(el) {
-            el.setAttribute('class', 'rt-non-realtime');
-          });
-        } else {
-          setTimeout(fixMagicLine, 100);
+    var whenReady = function(editor) {
+      var initializing = true, editableContent, cursor,
+
+      initEditableContent = function() {
+        editableContent = editor.editable().$;
+        cursor = Cursor(editableContent);
+        $('head', editableContent.ownerDocument).append(userIconStyle);
+        fixMagicLine(editor);
+
+        // FIXME: disable the temporary attachment support for now, until it's supported.
+        if (CKEDITOR.switchTemporaryAttachmentUpload) {
+          CKEDITOR.switchTemporaryAttachmentUpload(false, editor);
         }
       };
-      fixMagicLine();
 
-      // User position indicator style.
-      var userIconStyle = [
-        '<style>',
-        '.rt-user-position {',
-          'position : absolute;',
-          'width : 15px;',
-          'height: 15px;',
-          'display: inline-block;',
-          'background : #CCCCFF;',
-          'border : 1px solid #AAAAAA;',
-          'text-align : center;',
-          'line-height: 15px;',
-          'font-size: 11px;',
-          'font-weight: bold;',
-          'color: #3333FF;',
-          'user-select: none;',
-        '}',
-        '</style>'
-      ].join('\n'),
-      addStyle = function() {
-        var iframe = jQuery('iframe')[0];
-        inner = iframe.contentWindow.body;
-        innerDoc = iframe.contentWindow.document;
-        $('head', innerDoc).append(userIconStyle);
-        fixMagicLine();
-      };
-      addStyle();
+      // Initialize the editable content when the editor is ready.
+      initEditableContent();
 
       var afterRefresh = [];
       editor.on('afterCommandExec', function(event) {
@@ -273,15 +274,13 @@ define('xwiki-realtime-wysiwygEditor', [
           realtimeOptions.onLocal();
           afterRefresh.forEach(item => item());
           afterRefresh = [];
-          fixMagicLine();
+          // Re-initialize the editable content after it is refreshed.
+          initEditableContent();
         }
       });
 
-      // Add the style again when modifying a macro (which reloads the iframe).
-      iframe.onload = addStyle;
-
       var setEditable = module.setEditable = function(editable) {
-        window.inner.setAttribute('contenteditable', editable);
+        editableContent.setAttribute('contenteditable', editable);
         $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').prop('disabled', !editable);
       };
 
@@ -352,7 +351,6 @@ define('xwiki-realtime-wysiwygEditor', [
           // Cursor indicators
           //
 
-          var cursor = window.cursor;
           // No use trying to recover the cursor if it doesn't exist.
           if (!cursor.exists()) {
             return;
@@ -383,7 +381,6 @@ define('xwiki-realtime-wysiwygEditor', [
         },
 
         postDiffApply: function(info) {
-          var cursor = window.cursor;
           if (info.frame) {
             if (info.node) {
               if (info.frame & 1) {
@@ -413,7 +410,7 @@ define('xwiki-realtime-wysiwygEditor', [
 
       fixMacros = function() {
         var dataValues = {};
-        var $elements = $(window.innerDoc).find('[data-cke-widget-data]');
+        var $elements = $(editableContent.ownerDocument).find('[data-cke-widget-data]');
         $elements.each(function(idx, element) {
           dataValues[idx] = $(element).attr('data-cke-widget-data');
         });
@@ -429,8 +426,8 @@ define('xwiki-realtime-wysiwygEditor', [
         var userDocStateDom = Hyperjson.toDOM(JSON.parse(shjson));
         userDocStateDom.setAttribute('contenteditable', 'true');
         // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
-        var patch = DD.diff(diffDOM.nodeToObj(window.inner), diffDOM.nodeToObj(userDocStateDom));
-        DD.apply(window.inner, patch);
+        var patch = DD.diff(diffDOM.nodeToObj(editableContent), diffDOM.nodeToObj(userDocStateDom));
+        DD.apply(editableContent, patch);
         try {
           fixMacros();
         } catch (e) {
@@ -461,16 +458,16 @@ define('xwiki-realtime-wysiwygEditor', [
           setTextValue: function(newText, toConvert, callback) {
             var andThen = function(data) {
               var doc = new DOMParser().parseFromString(data, 'text/html');
-              window.cursor.update();
+              cursor.update();
               doc.body.setAttribute('contenteditable', 'true');
               // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
-              var patch = DD.diff(diffDOM.nodeToObj(window.inner), diffDOM.nodeToObj(doc.body));
-              DD.apply(window.inner, patch);
+              var patch = DD.diff(diffDOM.nodeToObj(editableContent), diffDOM.nodeToObj(doc.body));
+              DD.apply(editableContent, patch);
 
               // If available, transform the HTML comments for XWiki macros into macros before saving
               // (<!--startmacro:{...}-->). We can do that by using the "xwiki-refresh" command provided the by
               // CKEditor Integration application.
-              if (editor.plugins['xwiki-macro'] && findMacroComments(window.inner).length > 0) {
+              if (editor.plugins['xwiki-macro'] && findMacroComments(editableContent).length > 0) {
                 initializing = true;
                 editor.execCommand('xwiki-refresh');
                 afterRefresh.push(callback);
@@ -594,15 +591,15 @@ define('xwiki-realtime-wysiwygEditor', [
         // If no new data (someone has just joined or left the channel), get the latest known values.
         var updatedData = newdata || userData;
 
-        $(window.innerDoc).find('.rt-user-position').remove();
+        $(editableContent.ownerDocument).find('.rt-user-position').remove();
         var positions = {};
         var requiredPadding = 0;
         userList.users.filter(id => updatedData[id]?.['cursor_' + editorId]).forEach(id => {
           var data = updatedData[id];
           var name = getPrettyName(data.name);
           // Set the user position.
-          var element = window.innerDoc.evaluate(data['cursor_' + editorId], window.innerDoc, null,
-            XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+          var element = editableContent.ownerDocument.evaluate(data['cursor_' + editorId],
+            editableContent.ownerDocument, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
           if (!element) {
             return;
           }
@@ -630,16 +627,16 @@ define('xwiki-realtime-wysiwygEditor', [
             'left': posLeft + 'px',
             'top': posTop + 'px'
           });
-          $('html', window.innerDoc).append($indicator);
+          $('html', editableContent.ownerDocument).append($indicator);
         });
 
-        $(window.inner).css('padding-left', requiredPadding === 0 ? '' : ((requiredPadding + 15) + 'px'));
+        $(editableContent).css('padding-left', requiredPadding === 0 ? '' : ((requiredPadding + 15) + 'px'));
       };
 
       var isFirstOnReadyCall = true;
 
       var realtimeOptions = {
-        initialState: stringifyDOM(inner) || '{}',
+        initialState: stringifyDOM(editableContent) || '{}',
         websocketURL: editorConfig.WebsocketURL,
         userName: editorConfig.userName,
         channel: channel,
@@ -657,12 +654,12 @@ define('xwiki-realtime-wysiwygEditor', [
           var shjson = info.realtime.getUserDoc();
 
           // Remember where the cursor is.
-          window.cursor.update();
+          cursor.update();
 
           // Build a DOM from HJSON, diff, and patch the editor.
           applyHjson(shjson);
 
-          var shjson2 = stringifyDOM(window.inner);
+          var shjson2 = stringifyDOM(editableContent);
           if (shjson2 !== shjson) {
             console.error('shjson2 !== shjson');
             var diff = Chainpad.Diff.diff(shjson, shjson2);
@@ -676,8 +673,9 @@ define('xwiki-realtime-wysiwygEditor', [
           var config = {
             userData,
             onUsernameClick: function(id) {
-              var basehref = iframe.contentWindow.location.href.split('#')[0] || '';
-              iframe.contentWindow.location.href = basehref + '#rt-user-' + id;
+              const editableContentLocation = editableContent.ownerDocument.defaultView.location;
+              const baseHref = editableContentLocation.href.split('#')[0] || '';
+              editableContentLocation.href = baseHref + '#rt-user-' + id;
             }
           };
           toolbar = Toolbar.create({
@@ -805,19 +803,15 @@ define('xwiki-realtime-wysiwygEditor', [
               allowRealtimeCheckbox.prop('checked', false);
               module.onAbort();
             } else {
-              callback(channel, stringifyDOM(window.inner));
+              callback(channel, stringifyDOM(editableContent));
             }
           });
         },
 
         // This function resets the realtime fields after coming back from source mode.
         onLocalFromSource: function() {
-          var iframe = jQuery('iframe')[0]; 
-          window.inner = iframe.contentWindow.body;
-          window.innerDoc = iframe.contentWindow.document;
-          window.cursor = Cursor(window.inner);
-          iframe.onload = addStyle;
-          addStyle();
+          // Re-initialize the editable content when coming back from source mode because the WYSIWYG area is recreated.
+          initEditableContent();
           this.onLocal();
         },
 
@@ -826,7 +820,7 @@ define('xwiki-realtime-wysiwygEditor', [
             return;
           }
           // Stringify the JSON and send it into ChainPad.
-          var shjson = stringifyDOM(window.inner);
+          var shjson = stringifyDOM(editableContent);
           module.chainpad.contentUpdate(shjson);
 
           if (module.chainpad.getUserDoc() !== shjson) {
@@ -843,7 +837,7 @@ define('xwiki-realtime-wysiwygEditor', [
       // that you cannot type until you click, which is rather unnacceptable. If the cursor is ever inside such a <br>,
       // you probably want to push it out to the parent element, which ought to be a paragraph tag. This needs to be
       // done on keydown, otherwise the first such keypress will not be inserted into the P.
-      window.inner.addEventListener('keydown', window.cursor.brFix);
+      editableContent.addEventListener('keydown', cursor.brFix);
 
       editor.on('change', function() {
         Saver.destroyDialog();
@@ -857,19 +851,17 @@ define('xwiki-realtime-wysiwygEditor', [
       // call like `test = easyTest()`
       // terminate the test like `test.cancel()`
       window.easyTest = function () {
-        window.cursor.update();
-        var start = window.cursor.Range.start;
-        var test = TypingTest.testInput(inner, start.el, start.offset, realtimeOptions.onLocal);
+        cursor.update();
+        var start = cursor.Range.start;
+        var test = TypingTest.testInput(editableContent, start.el, start.offset, realtimeOptions.onLocal);
         realtimeOptions.onLocal();
         return test;
       };
+
+      return editor;
     };
 
-    return waitForEditorInstance().then(editor => {
-      // FIXME: This works only with the stand-alone (classic) editor.
-      whenReady(editor, $(editor.container.$).find('iframe')[0]);
-      return editor;
-    });
+    return waitForEditorInstance().then(whenReady);
   };
 
   return module;

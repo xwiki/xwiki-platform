@@ -71,6 +71,12 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     public static final String UPLOAD_MAXSIZE_PARAMETER = "upload_maxsize";
 
     /**
+     * The default maximum size for uploaded documents. This limit can be changed using the {@code upload_maxsize}
+     * XWiki preference.
+     */
+    public static final long UPLOAD_DEFAULT_MAXSIZE = 33554432L;
+
+    /**
      * The name of the parameter that can be set in the global XWiki preferences to override the default size threshold
      * for on-disk storage.
      */
@@ -80,12 +86,6 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      * Log object to log messages in this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadPlugin.class);
-
-    /**
-     * The default maximum size for uploaded documents. This limit can be changed using the {@code upload_maxsize}
-     * XWiki preference.
-     */
-    private static final long UPLOAD_DEFAULT_MAXSIZE = 33554432L;
 
     /**
      * The default maximum size for in-memory stored uploaded documents. If a file is larger than this limit, it will be

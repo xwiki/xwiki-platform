@@ -147,10 +147,15 @@ class DefaultImageStyleManagerTest
     void getImageStyles() throws Exception
     {
         when(this.query.execute()).thenReturn(List.of("doc1", "docfail", "doc2"));
+        when(this.doc1BaseObject.getStringValue("defaultWidth")).thenReturn("");
+        when(this.doc1BaseObject.getStringValue("defaultHeight")).thenReturn("100");
+        when(this.doc1BaseObject.getLongValue("defaultHeight")).thenReturn(100L);
+        when(this.doc2BaseObject.getStringValue("defaultWidth")).thenReturn("");
+        when(this.doc2BaseObject.getStringValue("defaultHeight")).thenReturn("");
         Set<ImageStyle> imageStyles = this.manager.getImageStyles("wiki");
         assertEquals(2, imageStyles.size());
         assertEquals(Set.of(
-            getDefaultStyle().setIdentifier("doc1"),
+            getDefaultStyle().setIdentifier("doc1").setDefaultHeight(100L),
             getDefaultStyle().setIdentifier("doc2")
         ), imageStyles);
         verify(this.contextManager).pushContext(any(ExecutionContext.class), eq(true));
@@ -194,8 +199,6 @@ class DefaultImageStyleManagerTest
     {
         return new ImageStyle()
             .setAdjustableSize(false)
-            .setDefaultWidth(0L)
-            .setDefaultHeight(0L)
             .setAdjustableBorder(false)
             .setDefaultBorder(false)
             .setAdjustableAlignment(false)

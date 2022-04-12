@@ -1,6 +1,4 @@
-<?xml version="1.1" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,23 +16,37 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.store;
 
-<xwikidoc version="1.4" reference="Image.Style.Code.ImageStyles.WebHome" locale="">
-  <web>Image.Style.Code.ImageStyles</web>
-  <name>WebHome</name>
-  <language/>
-  <defaultLanguage/>
-  <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <parent>WebHome</parent>
-  <author>xwiki:XWiki.Admin</author>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <version>1.1</version>
-  <title/>
-  <comment/>
-  <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
-  <content/>
-</xwikidoc>
+import org.xwiki.stability.Unstable;
+
+/**
+ * Dedicated exception for the operations related to {@link TemporaryAttachmentSessionsManager}.
+ *
+ * @version $Id$
+ * @since 14.3RC1
+ */
+@Unstable
+public class TemporaryAttachmentException extends Exception
+{
+    /**
+     * Default constructor with only a message.
+     * @param msg the message to display
+     */
+    public TemporaryAttachmentException(String msg)
+    {
+        super(msg);
+    }
+
+    /**
+     * Default constructor with a message and the original root cause.
+     *
+     * @param msg the message to display
+     * @param e the root cause of the exception
+     */
+    public TemporaryAttachmentException(String msg, Throwable e)
+    {
+        super(msg, e);
+    }
+}

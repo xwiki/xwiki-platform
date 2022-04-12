@@ -76,6 +76,7 @@ import org.opentest4j.AssertionFailedError;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AbstractLocalizedEntityReference;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -2394,6 +2395,11 @@ public class TestUtils
             // Add name
             elements.add(page.getName());
 
+            // Add translation
+            if (StringUtils.isNotEmpty(page.getLanguage())) {
+                elements.add(page.getLanguage());
+            }
+
             return elements.toArray();
         }
 
@@ -2512,7 +2518,10 @@ public class TestUtils
                 expectedCodes = STATUS_CREATED_ACCEPTED;
             }
 
-            return TestUtils.assertStatusCodes(executePut(PageResource.class, page, toElements(page)), release,
+            Class resourceClass =
+                StringUtils.isEmpty(page.getLanguage()) ? PageResource.class : PageTranslationResource.class;
+
+            return TestUtils.assertStatusCodes(executePut(resourceClass, page, toElements(page)), release,
                 expectedCodes);
         }
 
@@ -2538,6 +2547,14 @@ public class TestUtils
             // Add page
             EntityReference documentReference = reference.extractReference(EntityType.DOCUMENT);
             page.setName(documentReference.getName());
+
+            // Add locale
+            if (reference instanceof AbstractLocalizedEntityReference) {
+                Locale locale = getLocale(reference);
+                if (locale != null) {
+                    page.setLanguage(locale.toString());
+                }
+            }
 
             return page;
         }
@@ -2667,10 +2684,8 @@ public class TestUtils
         // TODO: make EntityReference#getParameter() public
         private Locale getLocale(EntityReference reference)
         {
-            if (reference instanceof DocumentReference) {
-                return ((DocumentReference) reference).getLocale();
-            } else if (reference instanceof LocalDocumentReference) {
-                return ((LocalDocumentReference) reference).getLocale();
+            if (reference instanceof AbstractLocalizedEntityReference) {
+                return ((AbstractLocalizedEntityReference) reference).getLocale();
             }
 
             return null;

@@ -98,18 +98,16 @@
       <artifactId>xwiki-commons-environment-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
 
     <!-- Testing Dependencies -->
     <!-- Needed for ClassImposteriser for mocking XWikiContext etc. -->
     <dependency>
       <groupId>org.jmock</groupId>
       <artifactId>jmock-legacy</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- For some tests we need to have the Servlet API JAR available -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

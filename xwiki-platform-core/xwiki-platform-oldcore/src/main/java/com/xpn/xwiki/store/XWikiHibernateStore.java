@@ -149,6 +149,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Inject
     private DocumentReferenceResolver<String> defaultDocumentReferenceResolver;
 
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<PageReference> currentPageReferenceDocumentReferenceResolver;
+
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
@@ -2409,15 +2413,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             documentReference = documentReference.extractReference(EntityType.PAGE);
         }
         if (documentReference instanceof PageReference) {
-            try {
-                // Note: getDocument() will find the right document when passed a PageReference.
-                documentReference =
-                    context.getWiki().getDocument(documentReference, context).getDocumentReference();
-            } catch (XWikiException e) {
-                // Log a warning but return the reference
-                this.logger.warn("Failed to retrieve document [{}]. Considering the reference to be a terminal one",
-                    documentReference);
-            }
+            // If the reference is a PageReference then we can't know if it points to a terminal page or a
+            // non-terminal one, and thus we need to resolve it.
+            documentReference =
+                this.currentPageReferenceDocumentReferenceResolver.resolve((PageReference) documentReference);
         } else {
             documentReference = documentReference.extractReference(EntityType.DOCUMENT);
         }

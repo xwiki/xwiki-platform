@@ -39,9 +39,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
@@ -54,7 +55,6 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -79,7 +79,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -273,10 +272,12 @@ public class XWikiDocumentTest
             + "image:ImageSpace.ImageDocument@image.png image:image.png");
         this.baseObject.setLargeStringValue("area", "[[TargetPage]][[ObjectTargetPage]]");
 
-        // Simulate that "OtherPage.WebHome" exists (but not "OtherPage")
-        when(this.xWiki.getDocument((EntityReference) eq(new PageReference("Wiki", "OtherPage")),
-            any(XWikiContext.class))).thenReturn(
-                new XWikiDocument(new DocumentReference("Wiki", "OtherPage", "WebHome")));
+        // Simulate that "OtherPage.WebHome" exists
+        DocumentReferenceResolver<PageReference> currentPageReferenceDcoumentReferenceResolver =
+            this.oldcore.getMocker().registerMockComponent(
+                new DefaultParameterizedType(null, DocumentReferenceResolver.class, PageReference.class), "current");
+        when(currentPageReferenceDcoumentReferenceResolver.resolve(new PageReference("Wiki", "OtherPage")))
+            .thenReturn(new DocumentReference("Wiki", "OtherPage", "WebHome"));
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
 
@@ -290,24 +291,6 @@ public class XWikiDocumentTest
                 "ImageSpace.ImageDocument.WebHome",
                 "Space.ObjectTargetPage.WebHome"
             )), linkedPages);
-    }
-
-    @Test
-    public void getUniqueLinkedPages21WhenErrorGettingDocument() throws Exception
-    {
-        this.document.setSyntax(Syntax.XWIKI_2_1);
-        this.document.setContent("[[page:OtherPage]]");
-
-        // Simulate an error to retrieve the document for the passed PageReference. This will default to returning
-        // the terminal reference.
-        doThrow(new XWikiException("error", new Exception("rooterror"))).when(this.xWiki).getDocument(
-            (EntityReference) eq(new PageReference("Wiki", "OtherPage")), any(XWikiContext.class));
-
-        Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
-
-        assertEquals(new LinkedHashSet<>(Arrays.asList("OtherPage")), linkedPages);
-        assertEquals("Failed to retrieve document [Wiki:OtherPage]. Considering the reference to be a terminal one. "
-            + "Root cause [Exception: rooterror]", logCapture.getMessage(0));
     }
 
     @Test

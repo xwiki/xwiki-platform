@@ -109,6 +109,7 @@ com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter
 com.xpn.xwiki.internal.model.reference.UserAndGroupDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.UserAndGroupEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentPageReferenceDocumentReferenceResolver
 com.xpn.xwiki.internal.model.DefaultLegacySpaceResolver
 com.xpn.xwiki.internal.namespace.DefaultNamespaceContextExecutor
 com.xpn.xwiki.internal.objects.classes.DefaultDBListQueryBuilder

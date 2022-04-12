@@ -418,6 +418,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return Utils.getComponent(UserConfiguration.class);
     }
 
+    /**
+     * Used to convert {@link PageReference} into {@link DocumentReference}.
+     */
+    private static DocumentReferenceResolver<PageReference> getCurrentPageReferenceDocumentReferenceResolver()
+    {
+        return Utils.getComponent(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
+            PageReference.class), "current");
+    }
+
     private String title;
 
     /**
@@ -5772,17 +5781,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
             for (EntityReference reference : references) {
                 // If the reference is a PageReference then we can't know if it points to a terminal page or a
-                // non-terminal one, and thus we need to get the document to check if it exists, starting with the
-                // non-terminal one since [[page:test]] points first to the non-terminal page when it exists.
+                // non-terminal one, and thus we need to resolve it.
                 if (reference instanceof PageReference) {
-                    try {
-                        // Note: getDocument() will find the right document when passed a PageReference.
-                        reference = context.getWiki().getDocument(reference, context).getDocumentReference();
-                    } catch (XWikiException e) {
-                        // Log a warning but return the reference
-                        LOGGER.warn("Failed to retrieve document [{}]. Considering the reference to be a terminal"
-                            + " one. Root cause [{}]", reference, ExceptionUtils.getRootCauseMessage(e));
-                    }
+                    reference = getCurrentPageReferenceDocumentReferenceResolver().resolve((PageReference) reference);
                 }
                 documentNames.add(serializer.serialize(reference));
             }

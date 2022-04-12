@@ -99,7 +99,7 @@ public class DisplayMacro extends AbstractIncludeMacro<DisplayMacroParameters>
         if (!this.authorization.hasAccess(Right.VIEW, documentBridge.getDocumentReference())) {
             throw new MacroExecutionException(
                 String.format("Current user [%s] doesn't have view rights on document [%s]",
-                    this.documentAccessBridge.getCurrentUserReference(), displayedReference));
+                    this.documentAccessBridge.getCurrentUserReference(), documentBridge.getDocumentReference()));
         }
 
         // Step 4: Display the content of the displayed document.
@@ -120,7 +120,7 @@ public class DisplayMacro extends AbstractIncludeMacro<DisplayMacroParameters>
             references = new Stack<>();
             this.macrosBeingExecuted.set(references);
         }
-        references.push(displayedReference);
+        references.push(documentBridge.getDocumentReference());
 
         XDOM result;
         try {
@@ -144,7 +144,9 @@ public class DisplayMacro extends AbstractIncludeMacro<DisplayMacroParameters>
         // Step 6: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());
-        String source = this.defaultEntityReferenceSerializer.serialize(displayedReference);
+        // Serialize the document reference since that's what is expected in those properties
+        // TODO: add support for more generic source and base reference (object property reference, etc.)
+        String source = this.defaultEntityReferenceSerializer.serialize(documentBridge.getDocumentReference());
         metadata.getMetaData().addMetaData(MetaData.SOURCE, source);
         metadata.getMetaData().addMetaData(MetaData.BASE, source);
 

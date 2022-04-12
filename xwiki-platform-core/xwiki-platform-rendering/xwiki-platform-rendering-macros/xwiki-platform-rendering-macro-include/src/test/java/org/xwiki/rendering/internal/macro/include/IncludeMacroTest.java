@@ -45,6 +45,7 @@ import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
@@ -97,7 +98,7 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
     CurrentMacroEntityReferenceResolver.class,
     DefaultAuthorizationManager.class
 })
-public class IncludeMacroTest
+class IncludeMacroTest
 {
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -274,7 +275,9 @@ public class IncludeMacroTest
 
         DocumentReference includedDocumentReference =
             new DocumentReference("includedWiki", "includedSpace", "includedPage");
+        PageReference includedPageReference = new PageReference("includedWiki", "includedSpace", "includedPage");
         setupDocumentMocks("includedWiki:includedSpace.includedPage", includedDocumentReference,
+            "includedWiki:includedSpace/includedPage", includedPageReference,
             "[[page]] [[attach:test.png]] image:test.png");
         when(this.dab.getCurrentDocumentReference()).thenReturn(includedDocumentReference);
 
@@ -288,6 +291,13 @@ public class IncludeMacroTest
         assertBlocks(expected, blocks, this.rendererFactory);
         verify(this.dab).pushDocumentInContext(any(Map.class), any(DocumentModelBridge.class));
         verify(this.dab).popDocumentFromContext(any(Map.class));
+
+        parameters.setPage("includedWiki:includedSpace/includedPage");
+
+        blocks =
+            this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
+
+        assertBlocks(expected, blocks, this.rendererFactory);
     }
 
     /**
@@ -596,12 +606,27 @@ public class IncludeMacroTest
     private void setupDocumentMocks(String includedReferenceString, DocumentReference includedReference,
         String includedContent) throws Exception
     {
-        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, includedReference)).thenReturn(true);
-        when(this.macroEntityReferenceResolver.resolve(eq(includedReferenceString), eq(EntityType.DOCUMENT),
-            any(MacroBlock.class))).thenReturn(includedReference);
-        when(this.dab.getDocumentInstance((EntityReference) includedReference)).thenReturn(this.includedDocument);
+        setupDocumentMocks(includedReferenceString, includedReference, null, null, includedContent);
+    }
+
+    private void setupDocumentMocks(String includedDocumentReferenceString, DocumentReference includedDocumentReference,
+        String includedPageReferenceString, PageReference includedPageReference, String includedContent)
+        throws Exception
+    {
+        when(this.macroEntityReferenceResolver.resolve(eq(includedDocumentReferenceString), eq(EntityType.DOCUMENT),
+            any(MacroBlock.class))).thenReturn(includedDocumentReference);
+        when(this.dab.getDocumentInstance((EntityReference) includedDocumentReference))
+            .thenReturn(this.includedDocument);
+        if (includedPageReference != null) {
+            when(this.macroEntityReferenceResolver.resolve(eq(includedPageReferenceString), eq(EntityType.PAGE),
+                any(MacroBlock.class))).thenReturn(includedPageReference);
+            when(this.dab.getDocumentInstance((EntityReference) includedPageReference))
+                .thenReturn(this.includedDocument);
+        }
+
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, includedDocumentReference)).thenReturn(true);
         when(this.dab.getTranslatedDocumentInstance(this.includedDocument)).thenReturn(this.includedDocument);
-        when(this.includedDocument.getDocumentReference()).thenReturn(includedReference);
+        when(this.includedDocument.getDocumentReference()).thenReturn(includedDocumentReference);
         when(this.includedDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
         when(this.includedDocument.getXDOM()).thenReturn(getXDOM(includedContent));
         when(this.includedDocument.getRealLanguage()).thenReturn("");

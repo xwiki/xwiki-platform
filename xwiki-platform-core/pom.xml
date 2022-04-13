@@ -150,6 +150,22 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>Those changes are not real: we need to add those rules because revapi detected a change, but it's actually a false positive.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <class>com.xpn.xwiki.web.XWikiResponse</class>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <class>com.xpn.xwiki.web.XWikiRequest</class>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

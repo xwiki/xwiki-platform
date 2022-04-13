@@ -128,22 +128,7 @@ define('xwiki-realtime-wysiwygEditor', [
 
   var waitForEditorInstance = function(name) {
     name = name || 'content';
-    return ckeditorPromise.then(ckeditor => {
-      ckeditor.on('instanceCreated', function(event) {
-        // The editor instance was created but it not yet initialized. Unfortunately the configuration object passed
-        // when the instance was created has not been merged with the global configuration yet.
-        event.editor.once('configLoaded', function(event) {
-          // The editor configuration has been loaded (the instance configuration has been merged with the global
-          // configuration) but the editor has not been fully initialized yet so we can modify the configuration.
-          ckeditor.tools.extend(event.editor.config, {
-            // Right now the temporary attachment upload is not supported with realtime editor.
-            'xwiki-upload': {
-              'isTemporaryAttachmentSupported': false
-            }
-          }, true);
-        });
-      });
-      return new Promise((resolve, reject) => {
+    return ckeditorPromise.then(ckeditor => new Promise((resolve, reject) => {
         var editor = ckeditor.instances[name];
         if (editor) {
           if (editor.status === 'ready') {
@@ -158,8 +143,7 @@ define('xwiki-realtime-wysiwygEditor', [
             }
           });
         }
-      });
-    });
+    }));
   };
 
   module.main = function(editorConfig, docKeys, useRt) {
@@ -269,6 +253,10 @@ define('xwiki-realtime-wysiwygEditor', [
       var initializing = true, editableContent, cursor,
 
       initEditableContent = function() {
+        // Disable temporary attachment upload for now.
+        if (editor.config['xwiki-upload']) {
+          editor.config['xwiki-upload'].isTemporaryAttachmentSupported = false;
+        }
         editableContent = editor.editable().$;
         cursor = Cursor(editableContent);
         $('head', editableContent.ownerDocument).append(userIconStyle);

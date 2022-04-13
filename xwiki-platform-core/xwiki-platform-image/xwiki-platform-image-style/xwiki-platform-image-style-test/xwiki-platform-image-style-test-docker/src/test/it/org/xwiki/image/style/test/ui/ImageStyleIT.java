@@ -70,7 +70,7 @@ class ImageStyleIT
         imageStyleConfigurationForm
             .setPrettyName("Default")
             .setType("default-class")
-            .clickSaveAndContinue(true);
+            .clickSaveAndView(true);
         imageStyleAdministrationPage = imageStyleConfigurationForm.clickBackToTheAdministration();
         assertEquals("", imageStyleAdministrationPage.getDefaultStyle());
         imageStyleAdministrationPage.submitDefaultStyleForm("default");

@@ -128,22 +128,38 @@ define('xwiki-realtime-wysiwygEditor', [
 
   var waitForEditorInstance = function(name) {
     name = name || 'content';
-    return ckeditorPromise.then(ckeditor => new Promise((resolve, reject) => {
-      var editor = ckeditor.instances[name];
-      if (editor) {
-        if (editor.status === 'ready') {
-          resolve(editor);
-        } else {
-          editor.on('instanceReady', resolve.bind(null, editor));
-        }
-      } else {
-        ckeditor.on('instanceReady', function(event) {
-          if (event.editor.name === name) {
-            resolve(event.editor);
-          }
+    return ckeditorPromise.then(ckeditor => {
+      ckeditor.on('instanceCreated', function(event) {
+        // The editor instance was created but it not yet initialized. Unfortunately the configuration object passed
+        // when the instance was created has not been merged with the global configuration yet.
+        event.editor.once('configLoaded', function(event) {
+          // The editor configuration has been loaded (the instance configuration has been merged with the global
+          // configuration) but the editor has not been fully initialized yet so we can modify the configuration.
+          ckeditor.tools.extend(event.editor.config, {
+            // Right now the temporary attachment upload is not supported with realtime editor.
+            'xwiki-upload': {
+              'isTemporaryAttachmentSupported': false
+            }
+          }, true);
         });
-      }
-    }));
+      });
+      return new Promise((resolve, reject) => {
+        var editor = ckeditor.instances[name];
+        if (editor) {
+          if (editor.status === 'ready') {
+            resolve(editor);
+          } else {
+            editor.on('instanceReady', resolve.bind(null, editor));
+          }
+        } else {
+          ckeditor.on('instanceReady', function (event) {
+            if (event.editor.name === name) {
+              resolve(event.editor);
+            }
+          });
+        }
+      });
+    });
   };
 
   module.main = function(editorConfig, docKeys, useRt) {
@@ -257,11 +273,6 @@ define('xwiki-realtime-wysiwygEditor', [
         cursor = Cursor(editableContent);
         $('head', editableContent.ownerDocument).append(userIconStyle);
         fixMagicLine(editor);
-
-        // FIXME: disable the temporary attachment support for now, until it's supported.
-        if (CKEDITOR.switchTemporaryAttachmentUpload) {
-          CKEDITOR.switchTemporaryAttachmentUpload(false, editor);
-        }
       };
 
       // Initialize the editable content when the editor is ready.

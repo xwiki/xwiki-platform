@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.internal.transformation.macro;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -62,19 +62,19 @@ class CurrentMacroEntityReferenceResolverTest
     @Test
     void resolveWhenNoBlockPassed()
     {
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
-            this.resolver.resolve("something", EntityType.DOCUMENT);
-        });
-        assertEquals("You must pass one parameter of type [org.xwiki.rendering.block.Block]", exception.getMessage());
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+            () -> this.resolver.resolve("something", EntityType.DOCUMENT));
+        assertEquals("There must be at least one parameter, with the first parameter of type "
+            + "[org.xwiki.rendering.block.Block]", exception.getMessage());
     }
 
     @Test
     void resolveWhenWrongParameterPassed()
     {
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
-            this.resolver.resolve("something", EntityType.ATTACHMENT, "wrong param type must be Block");
-        });
-        assertEquals("You must pass one parameter of type [org.xwiki.rendering.block.Block]", exception.getMessage());
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+            () -> this.resolver.resolve("something", EntityType.ATTACHMENT, "wrong param type must be Block"));
+        assertEquals("There must be at least one parameter, with the first parameter of type "
+            + "[org.xwiki.rendering.block.Block]", exception.getMessage());
     }
 
     @Test
@@ -89,7 +89,7 @@ class CurrentMacroEntityReferenceResolverTest
     }
 
     @Test
-    void resolveWhenMetaDataBlock() throws Exception
+    void resolveWhenMetaDataBlock()
     {
         DocumentReference baseReference = new DocumentReference("basewiki", "basespace", "basepage");
         EntityReference expectedReference = new AttachmentReference("file", baseReference);
@@ -101,8 +101,20 @@ class CurrentMacroEntityReferenceResolverTest
         Block wordBlock = new WordBlock("whatever");
         MetaData metaData =
             new MetaData(Collections.singletonMap(MetaData.BASE, "basewiki:basespace.basepage"));
-        new XDOM(Arrays.<Block> asList(new MetaDataBlock(Arrays.asList(wordBlock), metaData)));
+        new XDOM(List.of(new MetaDataBlock(List.of(wordBlock), metaData)));
 
         assertEquals(expectedReference, this.resolver.resolve("file", EntityType.ATTACHMENT, wordBlock));
+    }
+
+    @Test
+    void resolveWhenNoMetaDataBlockAndEntityReferenceParameter()
+    {
+        DocumentReference baseReference = new DocumentReference("basewiki", "basespace", "basepage");
+        EntityReference expectedReference = new DocumentReference("Wiki", "Space", "Page");
+        when(this.currentEntityReferenceResolver.resolve("Space.Page", EntityType.DOCUMENT, baseReference))
+            .thenReturn(expectedReference);
+
+        Block block = new WordBlock("whatever");
+        assertEquals(expectedReference, this.resolver.resolve("Space.Page", EntityType.DOCUMENT, block, baseReference));
     }
 }

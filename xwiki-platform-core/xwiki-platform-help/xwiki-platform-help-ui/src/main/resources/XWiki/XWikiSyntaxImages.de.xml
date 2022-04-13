@@ -107,11 +107,16 @@ Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** ode
 * **##image~:##** Ein erforderlicher Text, welches die folgenden Angaben als Bild kennzeichnet.
 * **##Verweis##**: Der Verweis auf das anzuzeigende Bild. Der Verweis kann in folgenden Formaten angegeben werden:
 ** **URL**: Eine URL zu einem externen Bild in dem Format **##http:~/~/pfad/BildName##**. Beispiel: ##http:~/~/example.org/pfad/bild.png##
-** **Anhang**: Ein Verweis auf einen Anhang im Wiki im Format **##~{~{~{wikiName:} Bereich.} Seite@} (BildName)##**
+** **Anhang**: Ein Verweis auf einen Anhang eines XWiki-Dokuments im Format **##~{~{~{wikiName:} Bereich.} Seite@} (BildName)##**
 *** **##wikiName##**: Ein optionaler Text, welcher den Namen eines Subwikis enthält. Das Bild wird dann in dem entsprechenden Subwiki nachgeschlagen. Beispiel: ##mywiki##
 *** **##Bereich##**: Der Name eines Bereiches, in dem das Bild nachgeschlagen wird (optional). Wenn kein Bereich angegeben, wird der aktuelle Bereich verwendet. Beispiel: ##Main##
 *** **##Seite##**: Der Namen einer Seite, an der das Bild angehangen ist (optional). Wird keine Seite angegeben, wird die aktuelle Seite verwendet. Beispiel: ##WebHome##
 *** **##BildName##**: Ein erforderlicher Text, welcher den Dateinamen des anzuzeigenden Bildes enthält, wie er im Wiki gespeichert ist.
+** **Seiten-Anhang**: Ein Verweis in der Form **##pageAttach~:~{~{~{(wikiName):}(seitenNamenListe)/}(anhangName)##**
+*** **##pageAttach~:##** Eine erforderliche Zeichenfolge, die die Referenz als Anhang einer XWiki-Seite identifiziert.
+*** **##wikiName##**: Ein optionaler Text, welcher den Namen eines Subwikis enthält. Das Bild wird dann in dem entsprechenden Subwiki nachgeschlagen. Beispiel: ##mywiki##
+*** **##seitenNamenListe##**: Eine optionale, durch Punkte getrennte Liste von Wiki-Seitennamen. Wenn keine Seite angegeben ist, wird die aktuelle Seite verwendet. Beispiele: ##Main##, ##A/B##, ##A/B/C##
+*** **##anhangName##**: Eine erforderliche Zeichenfolge, die den Namen des an eine Seite angehängten Bildes enthält, wie es im Wiki gespeichert ist. Beispiel: ##myImage.png##
 ** **Piktogramme** Ein Verweis mittels des Textes **##{{{(icon:)}}} (iconName)##**. Beispiel: **##icon:accept##**
 *** **##icon:##** Ein erforderlicher Text, welcher die folgende Angabe als Piktogramm kennzeichnet. Piktogramme können nur aus der vorinstallierten Liste der [[XWiki Icons&gt;&gt;http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]] ausgewählt werden.
 *** **##iconName##**: Ein erforderlicher Text mit dem (englischen) Namen des anzuzeigenden Piktogramms. Beispiel: ##accept##

@@ -188,9 +188,11 @@ Das vollständige Format eines Links ist **##[Linktext&gt;&gt;] (Ressource) [||P
 *** **##interwiki:##** Eine erforderliche Zeichenkette, die die Ressource als einen InterWiki Link identifiziert.
 *** **##interWikiAlias##**: Ein optionales [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] Alias, entsprechend der Definition in der InterWiki Map (siehe [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Beispiel: ##wikipedia##
 *** **##Seite##**: Eine erforderliche Zeichenkette, die den Namen der verknüpften Wikiseite enthält. Beispiel: ##XWiki##
-** **Anhang** Referenz in der Form **##attach~: [wikiSeitenName @] (anhangsName)##**. Beispiele: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
-*** **##attach~:##**: Eine notwendige Zeichenkette, die die Ressource als Anhang identifiziert.
-*** **##wikiSeitenName##**: Eine optionale Zeichenkette, die das Dokument, an das der Anhang angehängt ist, referenziert, siehe "Wikiseitenname" oben.
+** **Anhang**: Referenz in der Form **##attach~:~{~{~{(wikiName):}(spaceNameListe).}(seitenName)@}(anhangsName)##**
+*** **##attach~:##** Eine erforderliche Zeichenfolge, die die Referenz als XWiki-Dokumentanhang identifiziert.
+*** **##wikiName##**: Eine optionale Zeichenfolge, die den Namen eines Wikis enthält. Die Bildreferenz zeigt auf ein Bild, das an eine Seite innerhalb dieses Wikis angehängt ist. Wenn kein Wiki angegeben ist, wird das aktuelle Wiki verwendet. Beispiel: ##mywiki##.
+*** **##spaceNameListe##**: Eine optionale, durch Punkte getrennte Liste von Wiki-Bereichs-Namen. Wenn kein Bereich angegeben ist, wird der aktuelle Bereich verwendet. Beispiele: ##Main##, ##A.B##, ##A.B.C##
+*** **##seitenName##**: Eine optionale Zeichenfolge, die den Namen der Wiki-Seite enthält, an die das referenzierte Bild angehängt ist. Beispiel: ##Welcome##
 *** **##anhangsName##**: Name des Anhangs, wie er im Wiki gespeichert ist.
 ** **E-Mail-Adresse** in der Form **##mailto~: (emailAdresse)##** (###Anker## ist nicht zulässig). Beispiel: ##mailto~:john@smith.com##
 *** **##mailto~:##**: Eine notwendige Zeichenkette, die die Ressource als E-Mail identifiziert.

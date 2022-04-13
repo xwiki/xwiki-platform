@@ -54,10 +54,25 @@ public class ImagePopover extends BaseElement
         }
     }
 
+    public String getImageId()
+    {
+        return getCopyImageIdButton().getAttribute("data-imageId");
+    }
+
+    public WebElement getCopyImageIdButton()
+    {
+        return getDriver().findElement(By.cssSelector(".popover .copyImageId"));
+    }
+
     public WebElement getDownloadButton()
     {
         By downloadSelector = By.cssSelector(".popover .imageDownload");
         return getDriver().findElement(downloadSelector);
+    }
+
+    public WebElement getImagePermalinkButton()
+    {
+        return getDriver().findElement(By.cssSelector(".popover .permalink"));
     }
 
     private ImagePopover waitUntilReady()

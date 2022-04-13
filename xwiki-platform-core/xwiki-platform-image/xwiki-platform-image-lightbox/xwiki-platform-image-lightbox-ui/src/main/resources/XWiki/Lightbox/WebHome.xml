@@ -428,24 +428,33 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
   &gt;&lt;/a&gt;
   &lt;div class="controls btn-group"&gt;
     &lt;a
-      class="btn fullscreen" id="lightboxFullscreen" aria-controls="blueimp-gallery"
+      class="btn action fullscreen" id="lightboxFullscreen" aria-controls="blueimp-gallery"
       aria-label="$escapetool.xml($services.localization.render('image.lightbox.fullscreen.title'))"
       title="$escapetool.xml($services.localization.render('image.lightbox.fullscreen.title'))"
       aria-keyshortcuts="F11"
     &gt;$services.icon.renderHTML('arrows')&lt;/a&gt;
     &lt;a
-      class="btn download" id="lightboxDownload" aria-controls="blueimp-gallery" target="_blank"
+      class="btn action download" id="lightboxDownload" aria-controls="blueimp-gallery" target="_blank"
       aria-label="$escapetool.xml($services.localization.render('image.lightbox.download.title'))"
       title="$escapetool.xml($services.localization.render('image.lightbox.download.title'))"
     &gt;$services.icon.renderHTML('download')&lt;/a&gt;
+    &lt;span class="btn" title="$escapetool.xml(
+        $services.localization.render('image.lightbox.imageId.copy.title'))"&gt;
+      ## The title attribute will be used as tooltip content, so the displayed title is added to a parent element.
+      &lt;a class="action copyImageId" aria-controls="blueimp-gallery" aria-label="$escapetool.xml(
+        $services.localization.render('image.lightbox.imageId.copy.title'))" data-original-title="$escapetool.xml(
+        $services.localization.render('image.lightbox.imageId.copy.copied'))" data-toggle="tooltip"
+        data-placement="bottom" data-trigger="manual"
+      &gt;$services.icon.renderHTML('anchor')&lt;/a&gt;
+    &lt;/span&gt;
     &lt;a
-      class="btn autoPlay" aria-controls="blueimp-gallery"
+      class="btn action autoPlay" aria-controls="blueimp-gallery"
       aria-label="$escapetool.xml($services.localization.render('image.lightbox.autoPlay.title'))"
       title="$escapetool.xml($services.localization.render('image.lightbox.autoPlay.title'))"
       aria-keyshortcuts="Space" aria-pressed="false"
     &gt;$services.icon.renderHTML('play')&lt;/a&gt;
     &lt;a
-      class="btn escape" aria-controls="blueimp-gallery"
+      class="btn action escape" aria-controls="blueimp-gallery"
       aria-label="$escapetool.xml($services.localization.render('image.lightbox.escape.title'))"
       title="$escapetool.xml($services.localization.render('image.lightbox.escape.title'))"
       aria-keyshortcuts="Escape"
@@ -470,14 +479,22 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
 &lt;!-- The image toolbar popover template. --&gt;
 &lt;div id="imageToolbarTemplate"&gt;
   &lt;div class="btn-group imageToolbar" hidden&gt;
-    &lt;a class="openLightbox"
-      title="$escapetool.xml($services.localization.render('image.lightbox.gallery.title'))"&gt;
-      $services.icon.renderHTML("arrows")
-    &lt;/a&gt;
+    &lt;a class="openLightbox" href=""
+      title="$escapetool.xml($services.localization.render('image.lightbox.gallery.title'))"
+    &gt;$services.icon.renderHTML("arrows")&lt;/a&gt;
     &lt;a class="imageDownload" target="_blank"
-      title="$escapetool.xml($services.localization.render('image.lightbox.download.title'))"&gt;
-      $services.icon.renderHTML("download")
-    &lt;/a&gt;
+      title="$escapetool.xml($services.localization.render('image.lightbox.download.title'))"
+    &gt;$services.icon.renderHTML("download")&lt;/a&gt;
+    &lt;a class="permalink hidden"
+      title="$escapetool.xml($services.localization.render('image.lightbox.imageId.permalink'))"
+    &gt;$services.icon.renderHTML('link')&lt;/a&gt;
+    &lt;span class="hidden" title="$escapetool.xml($services.localization.render('image.lightbox.imageId.copy.title'))"&gt;
+      ## The title attribute will be used as tooltip content, so the displayed title is added to a parent element.
+      &lt;a class="copyImageId" href="" data-original-title="$escapetool.xml(
+        $services.localization.render('image.lightbox.imageId.copy.copied'))"
+        data-toggle="tooltip" data-placement="bottom" data-trigger="manual"
+      &gt;$services.icon.renderHTML('anchor')&lt;/a&gt;
+    &lt;/span&gt;
   &lt;/div&gt;
 &lt;/div&gt;
 #end

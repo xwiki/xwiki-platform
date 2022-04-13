@@ -129,20 +129,20 @@ define('xwiki-realtime-wysiwygEditor', [
   var waitForEditorInstance = function(name) {
     name = name || 'content';
     return ckeditorPromise.then(ckeditor => new Promise((resolve, reject) => {
-        var editor = ckeditor.instances[name];
-        if (editor) {
-          if (editor.status === 'ready') {
-            resolve(editor);
-          } else {
-            editor.on('instanceReady', resolve.bind(null, editor));
-          }
+      var editor = ckeditor.instances[name];
+      if (editor) {
+        if (editor.status === 'ready') {
+          resolve(editor);
         } else {
-          ckeditor.on('instanceReady', function (event) {
-            if (event.editor.name === name) {
-              resolve(event.editor);
-            }
-          });
+          editor.on('instanceReady', resolve.bind(null, editor));
         }
+      } else {
+        ckeditor.on('instanceReady', function (event) {
+          if (event.editor.name === name) {
+            resolve(event.editor);
+          }
+        });
+      }
     }));
   };
 

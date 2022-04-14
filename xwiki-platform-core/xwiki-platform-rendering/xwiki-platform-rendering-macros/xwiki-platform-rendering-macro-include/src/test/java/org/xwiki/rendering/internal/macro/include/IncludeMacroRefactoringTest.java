@@ -33,6 +33,8 @@ import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultReferencePageReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -79,7 +81,10 @@ import static org.mockito.Mockito.when;
     DefaultReferencePageReferenceResolver.class,
     DefaultReferenceEntityReferenceResolver.class,
     DefaultEntityReferenceProvider.class,
-    DefaultModelConfiguration.class
+    DefaultModelConfiguration.class,
+    DefaultReferenceEntityReferenceResolver.class,
+    DefaultStringEntityReferenceSerializer.class,
+    DefaultSymbolScheme.class
 })
 class IncludeMacroRefactoringTest
 {
@@ -101,7 +106,7 @@ class IncludeMacroRefactoringTest
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    void replaceReferenceWhenNoReferenceParameterSet() throws MacroRefactoringException
+    void replaceDocumentReferenceWhenNoReferenceParameterSet() throws Exception
     {
         MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
         assertEquals(Optional.empty(), this.includeMacroRefactoring.replaceReference(block, null, null,
@@ -109,7 +114,7 @@ class IncludeMacroRefactoringTest
     }
 
     @Test
-    void replaceReferenceWhenEmptyReferenceParameterSet() throws MacroRefactoringException
+    void replaceDocumentReferenceWhenEmptyReferenceParameterSet() throws Exception
     {
         MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
         block.setParameter("reference", "");
@@ -118,7 +123,7 @@ class IncludeMacroRefactoringTest
     }
 
     @Test
-    void replaceReferenceWhenEmptyPageParameterSet() throws MacroRefactoringException
+    void replaceDocumentReferenceWhenEmptyPageParameterSet() throws Exception
     {
         MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
         block.setParameter("page", "");
@@ -127,126 +132,219 @@ class IncludeMacroRefactoringTest
     }
 
     @Test
-    void replaceReferenceWhenMatchingSourceReferenceTypeReference() throws MacroRefactoringException
+    void replaceDocumentReferenceWhenIncludedReferenceIsRenamedUsingReferenceParameterAndNoBASEReference()
+        throws Exception
     {
-        DocumentReference sourceReference = new DocumentReference("wiki", "space", "page");
+        DocumentReference sourceReference = new DocumentReference("sourcewiki", "sourcespace", "foo");
         MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
         block.setParameter("reference", "foo");
+
+        // This is what tells IncludeMacroRefactoring that it's the included reference that is being renamed
+        // (as macro parameter reference == passed source reference).
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, sourceReference))
+            .thenReturn(sourceReference);
 
         DocumentReference targetReference = mock(DocumentReference.class);
-        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block)).thenReturn(sourceReference);
-        when(this.compactEntityReferenceSerializer.serialize(targetReference)).thenReturn("foobar42");
-
-        Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null, sourceReference,
-            targetReference, false);
-        assertFalse(result.isEmpty());
-        assertEquals("foobar42", result.get().getParameter("reference"));
-    }
-
-    @Test
-    void replaceReferenceWhenNotMatchingSourceReferenceDifferentType() throws MacroRefactoringException
-    {
-        DocumentReference sourceReference = new DocumentReference("wiki", "space", "page");
-        MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
-        block.setParameter("reference", "foo");
-
-        // Use a different reference type to verify it doesn't match
-        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block)).thenReturn(
-            new PageReference("wiki", "space", "page"));
-
-        Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null, sourceReference,
-            null, false);
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void replaceReferenceWhenNotMatchingSourceReferenceDifferentReference() throws MacroRefactoringException
-    {
-        DocumentReference sourceReference = new DocumentReference("wiki", "space", "page");
-        MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
-        block.setParameter("reference", "foo");
-
-        // Use a different reference content to verify it doesn't match
-        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block)).thenReturn(
-            new DocumentReference("wiki", "space", "page2"));
-
-        Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null, sourceReference,
-            null, false);
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void replaceReferenceWhenMatchingSourceReferenceRelative() throws MacroRefactoringException
-    {
-        DocumentReference sourceReference = new DocumentReference("wiki", "space", "page");
-        MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
-        block.setParameter("reference", "foo");
-        DocumentReference currentReference = new DocumentReference("currentwiki", "currentspace", "currentpage");
-        DocumentReference targetReference = mock(DocumentReference.class);
-        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block)).thenReturn(sourceReference);
+        DocumentReference currentReference = new DocumentReference("foowiki", "foospace", "foo");
         when(this.compactEntityReferenceSerializer.serialize(targetReference, currentReference))
-            .thenReturn("foobar42");
+            .thenReturn("targetwiki:targetspace.targetfoo");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, currentReference,
-            sourceReference, targetReference, true);
+            sourceReference, targetReference, false);
         assertFalse(result.isEmpty());
-        assertEquals("foobar42", result.get().getParameter("reference"));
+        assertEquals("targetwiki:targetspace.targetfoo", result.get().getParameter("reference"));
     }
 
     @Test
-    void replaceReferenceWhenMatchingSourceReferenceTypePage() throws MacroRefactoringException
+    void replaceDocumentReferenceWhenIncludingDocumentRenamedUsingReferenceParameterAndNoBASEReference()
+        throws Exception
     {
-        DocumentReference sourceReference = new DocumentReference("wiki", "space", "page");
+        // The source reference points to the including document original reference
+        DocumentReference sourceReference = new DocumentReference("sourcewiki", "sourcespace", "sourcepage");
+        // The target reference points to the including document new reference
+        DocumentReference targetReference = new DocumentReference("targetwiki", "targetspace", "targetpage");
+        MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
+        // The reference was pointing to: sourcewiki:sourcespace.foo
+        block.setParameter("reference", "foo");
+
+        // This tells IncludeMacroRefactoring that the macro parameter reference isn't equal to the passed
+        // source reference and thus that we are in the case of a including document rename.
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, sourceReference)).thenReturn(
+            new DocumentReference("sourcewiki", "sourcespace", "foo"));
+
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, sourceReference)).thenReturn(
+            new DocumentReference("sourcewiki", "sourcespace", "foo"));
+        DocumentReference fooTargetReference = new DocumentReference("targetwiki", "targetspace", "foo");
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, targetReference)).thenReturn(
+            fooTargetReference);
+        when(this.compactEntityReferenceSerializer.serialize(
+            new DocumentReference("sourcewiki", "sourcespace", "foo"), fooTargetReference))
+            .thenReturn("sourcewiki:sourcespace.foo");
+
+        Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null,
+            sourceReference, targetReference, false);
+        assertFalse(result.isEmpty());
+        assertEquals("sourcewiki:sourcespace.foo", result.get().getParameter("reference"));
+    }
+
+    @Test
+    void replaceDocumentReferenceWhenIncludingDocumentRenamedUsingPageParameterAndNoBASEReference()
+        throws Exception
+    {
+        // The source reference points to the including document original reference
+        DocumentReference sourceReference = new DocumentReference("sourcewiki", "sourcespace", "sourcepage");
+        // The target reference points to the including document new reference
+        DocumentReference targetReference = new DocumentReference("targetwiki", "targetspace", "targetpage");
+        MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
+        // The reference was pointing to: sourcewiki:sourcespace.foo
+        block.setParameter("page", "foo");
+
+        // This tells IncludeMacroRefactoring that the macro parameter reference isn't equal to the passed
+        // source reference and thus that we are in the case of a including document rename.
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.PAGE, block, sourceReference)).thenReturn(
+            new PageReference("sourcewiki", "sourcespace", "foo"));
+
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.PAGE, block, sourceReference)).thenReturn(
+            new PageReference("sourcewiki", "sourcespace", "foo"));
+        PageReference footTargetPageReference = new PageReference("targetwiki", "targetspace", "foo");
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.PAGE, block, targetReference)).thenReturn(
+            footTargetPageReference);
+        when(this.compactEntityReferenceSerializer.serialize(
+            new PageReference("sourcewiki", "sourcespace", "foo"), footTargetPageReference))
+            .thenReturn("sourcewiki:sourcespace.foo");
+
+        Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null,
+            sourceReference, targetReference, false);
+        assertFalse(result.isEmpty());
+        assertEquals("sourcewiki:sourcespace.foo", result.get().getParameter("page"));
+    }
+
+    @Test
+    void replaceDocumentReferenceWhenIncludedReferenceIsRenamedUsingPageParameterAndNoBASEReference()
+        throws Exception
+    {
+        DocumentReference sourceReference = new DocumentReference("sourcewiki", "sourcespace", "foo");
         MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
         block.setParameter("page", "foo");
 
-        PageReference pageReference = new PageReference("wiki", "space", "page");
-        DocumentReference targetReference = new DocumentReference("targetwiki", "targetspace", "targetpage");
-        PageReference targetPageReference = new PageReference("targetwiki", "targetspace", "targetpage");
-        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.PAGE, block)).thenReturn(pageReference);
-        when(this.compactEntityReferenceSerializer.serialize(targetPageReference)).thenReturn("foobar42");
+        // This is what tells IncludeMacroRefactoring that it's the included reference that is being renamed
+        // (as macro parameter reference == passed source reference).
+        PageReference pageReference = new PageReference("sourcewiki", "sourcespace", "foo");
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.PAGE, block, sourceReference))
+            .thenReturn(pageReference);
 
-        Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null, sourceReference,
-            targetReference, false);
+        DocumentReference targetReference = new DocumentReference("targetwiki", "targetspace", "targetfoo");
+        PageReference targetPageReference = new PageReference("targetwiki", "targetspace", "targetfoo");
+        DocumentReference currentReference = new DocumentReference("foowiki", "foospace", "foo");
+        when(this.compactEntityReferenceSerializer.serialize(targetPageReference, currentReference))
+            .thenReturn("targetwiki:targetspace.targetfoo");
+
+        Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, currentReference,
+            sourceReference, targetReference, false);
         assertFalse(result.isEmpty());
-        assertEquals("foobar42", result.get().getParameter("page"));
+        assertEquals("targetwiki:targetspace.targetfoo", result.get().getParameter("page"));
     }
 
     @Test
-    void replaceReferenceWhenMatchingSourceReferenceTypeAttachment() throws Exception
+    void replaceDocumentReferenceWhenIncludingDocumentIsRenamedToSameReference() throws Exception
+    {
+        DocumentReference sourceReference = new DocumentReference("sourcewiki", "sourcespace", "sourcepage");
+        DocumentReference targetReference = new DocumentReference("sourcewiki", "sourcespace", "sourcepage");
+        MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
+        block.setParameter("reference", "foo");
+
+        // This tells IncludeMacroRefactoring that the macro parameter reference isn't equal to the passed
+        // source reference and thus that we are in the case of a including document rename.
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, sourceReference))
+            .thenReturn(new PageReference("sourcewiki", "sourcespace", "foo"));
+
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, sourceReference)).thenReturn(
+            new DocumentReference("sourcewiki", "sourcespace", "foo"));
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, targetReference)).thenReturn(
+            new DocumentReference("sourcewiki", "sourcespace", "foo"));
+
+        Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null, sourceReference,
+            targetReference, false);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void replaceAttachmentReferenceWhenIncludedAttachmentReferenceIsRenamedUsingReferenceParameterAndNoBASEReference()
+        throws Exception
     {
         this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
 
         AttachmentReference sourceReference =
-            new AttachmentReference("file", new DocumentReference("wiki", "space", "page"));
+            new AttachmentReference("sourcefile", new DocumentReference("sourcewiki", "sourcespace", "foo"));
         MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
-        block.setParameter("reference", "test");
-        // Unsupported type
+        block.setParameter("reference", "foo");
+        // Unsupported type ATM (by the include and display macros) but we still check that we can refactor the
+        // parameter
         block.setParameter("type", "attachment");
 
-        AttachmentReference targetAttachmentReference = new AttachmentReference("targetFile",
-            new DocumentReference("targetwiki", "targetspace", "targetpage"));
-        when(this.macroEntityReferenceResolver.resolve("test", EntityType.ATTACHMENT, block))
+        AttachmentReference targetAttachmentReference = new AttachmentReference("targetfile",
+            new DocumentReference("targetwiki", "targetspace", "targetfoo"));
+        when(this.macroEntityReferenceResolver.resolve("foo", EntityType.ATTACHMENT, block, sourceReference))
             .thenReturn(sourceReference);
-        when(this.compactEntityReferenceSerializer.serialize(targetAttachmentReference)).thenReturn("foobar42");
+        DocumentReference currentReference = new DocumentReference("foowiki", "foospace", "foo");
+        when(this.compactEntityReferenceSerializer.serialize(targetAttachmentReference, currentReference))
+            .thenReturn("targetwiki:targetspace.targetfoo@targetfile");
 
-        Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null, sourceReference,
-            targetAttachmentReference, false);
+        Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, currentReference,
+            sourceReference, targetAttachmentReference, false);
         assertFalse(result.isEmpty());
-        assertEquals("foobar42", result.get().getParameter("reference"));
+        assertEquals("targetwiki:targetspace.targetfoo@targetfile", result.get().getParameter("reference"));
     }
 
     @Test
-    void replaceReferenceWhenPopulateError() throws Exception
+    void replaceDocumentReferenceWhenIncludingDocumentIsRenamedUsingAttachmentReferenceParameterAndNoBASEReference()
+        throws Exception
+    {
+        this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
+
+        // The source reference points to the including document original reference
+        DocumentReference sourceReference = new DocumentReference("sourcewiki", "sourcespace", "sourcepage");
+        // The target reference points to the including document new reference
+        DocumentReference targetReference = new DocumentReference("targetwiki", "targetspace", "targetpage");
+        MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
+        block.setParameter("reference", "foopage@foofile");
+        // Unsupported type ATM (by the include and display macros) but we still check that we can refactor the
+        // parameter
+        block.setParameter("type", "attachment");
+
+        // This tells IncludeMacroRefactoring that the macro parameter reference isn't equal to the passed
+        // source reference and thus that we are in the case of a including document rename.
+        when(this.macroEntityReferenceResolver.resolve("foopage@foofile", EntityType.ATTACHMENT, block,
+            sourceReference)).thenReturn(new AttachmentReference("foofile",
+            new DocumentReference("sourcewiki", "sourcespace", "foopage")));
+        when(this.macroEntityReferenceResolver.resolve("foopage@foofile", EntityType.ATTACHMENT, block,
+            sourceReference)).thenReturn(new AttachmentReference("foofile",
+                new DocumentReference("sourcewiki", "sourcespace", "foopage")));
+        AttachmentReference fooTargetReference = new AttachmentReference("foofile",
+            new DocumentReference("targetwiki", "targetspace", "foopage"));
+        when(this.macroEntityReferenceResolver.resolve("foopage@foofile", EntityType.ATTACHMENT, block,
+            targetReference)).thenReturn(fooTargetReference);
+
+        when(this.compactEntityReferenceSerializer.serialize(new AttachmentReference("foofile",
+            new DocumentReference("sourcewiki", "sourcespace", "foopage")), fooTargetReference))
+            .thenReturn("sourcewiki:sourcespace.foopage@foofile");
+
+        Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null,
+            sourceReference, targetReference, false);
+        assertFalse(result.isEmpty());
+        assertEquals("sourcewiki:sourcespace.foopage@foofile", result.get().getParameter("reference"));
+    }
+
+    @Test
+    void replaceDocumentReferenceWhenParametersPopulateError() throws Exception
     {
         this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
 
         MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
         block.setParameter("type", "invalid");
 
-        Throwable exception = assertThrows(MacroRefactoringException.class, () -> {
-            this.includeMacroRefactoring.replaceReference(block, null, null, (DocumentReference) null, false);
-        });
+        Throwable exception = assertThrows(MacroRefactoringException.class,
+            () -> this.includeMacroRefactoring.replaceReference(block, null, null, (DocumentReference) null, false));
         assertEquals("There's one or several invalid parameters for an [include] macro with parameters "
             + "[{type=invalid}]", exception.getMessage());
     }

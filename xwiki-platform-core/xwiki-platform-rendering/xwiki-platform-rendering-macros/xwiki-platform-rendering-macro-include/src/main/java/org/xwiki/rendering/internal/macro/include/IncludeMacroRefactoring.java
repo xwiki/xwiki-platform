@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -36,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageAttachmentReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.properties.BeanManager;
@@ -47,6 +47,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.macro.MacroRefactoring;
 import org.xwiki.rendering.macro.MacroRefactoringException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
+import org.xwiki.text.StringUtils;
 
 /**
  * Implementation of reference refactoring operation for include macro.
@@ -67,8 +68,14 @@ public class IncludeMacroRefactoring implements MacroRefactoring
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @Inject
     @Named("macro")
     private EntityReferenceResolver<String> macroEntityReferenceResolver;
+
+    @Inject
+    private EntityReferenceResolver<EntityReference> defaultEntityReferenceResolver;
 
     @Inject
     private BeanManager beanManager;
@@ -99,18 +106,51 @@ public class IncludeMacroRefactoring implements MacroRefactoring
         Optional<MacroBlock> result;
 
         IncludeMacroParameters parameters = getMacroParameters(macroBlock);
+        // Note: an empty string means a reference to the current page and thus a recursive include. Renaming the page
+        // doesn't require changing the value (since it's still an empty string), thus, we skip it!
         if (!StringUtils.isEmpty(parameters.getReference())) {
+            // There are 3 use cases here to handle:
+            // - UC1: the document/attachment pointed to by the include parameter has been moved. In this case the
+            //        passed sourceReference should be equal to that parameter in the MacroBlock.
+            // - UC2: the document containing the include macro has been moved. In this case the passed
+            //         sourceReference/targetReference point to the original/new document reference.
+
+            MacroBlock newMacroBlock = (MacroBlock) macroBlock.clone();
+
             // Check if the macro block's reference parameter contains the same reference as the one being refactored.
-            // If true then perform the refactoring. If not, do nothing.
-            EntityReference reference =
-                this.macroEntityReferenceResolver.resolve(parameters.getReference(), parameters.getType(), macroBlock);
-            if (sourceReference.equals(reference, parameters.getType())) {
-                MacroBlock newMacroBlock = (MacroBlock) macroBlock.clone();
+            // Note: Make sure to pass the sourceReference in the resolver since the context document may not be set
+            // in the refactoring job.
+            EntityReference reference = this.macroEntityReferenceResolver.resolve(parameters.getReference(),
+                parameters.getType(), macroBlock, sourceReference);
+
+            // TODO: Don't honor the relative parameter for now since its usage seems to be not correct or hazy at
+            // best. Instead refactoring using a relative reference if the user was using a relative reference and
+            // an absolute reference if the user was using an absolute reference.
+            boolean resolvedRelative = !isReferenceAbsolute(parameters.getReference(), reference);
+
+            if (areReferencesEqual(reference, sourceReference)) {
+                // We are in UC1
                 boolean serialized = serializeTargetReference(reference, newMacroBlock, targetReference,
-                    currentDocumentReference, relative);
+                    currentDocumentReference, resolvedRelative);
                 result = serialized ? Optional.of(newMacroBlock) : Optional.empty();
             } else {
-                result = Optional.empty();
+                // We assume we are in UC2 since there should only be two uses cases (UC1 and UC2).
+                // Resolve the macro parameter relative to the new targetReference and check if it's different from
+                // the original resolved macro parameter.
+                // Note that the use case when sourceReference and targetReference are Attachment References but the
+                // sourceReference is not pointing to the macro reference/page parameter is not a valid use case and
+                // thus we don't handle it.
+                reference = this.macroEntityReferenceResolver.resolve(parameters.getReference(), parameters.getType(),
+                    macroBlock, sourceReference);
+                EntityReference targetResolvedReference = this.macroEntityReferenceResolver.resolve(
+                    parameters.getReference(), parameters.getType(), macroBlock, targetReference);
+                if (!reference.equals(targetResolvedReference)) {
+                    boolean serialized = serializeTargetReference(reference, newMacroBlock, reference,
+                        targetResolvedReference, resolvedRelative);
+                    result = serialized ? Optional.of(newMacroBlock) : Optional.empty();
+                } else {
+                    result = Optional.empty();
+                }
             }
         } else {
             result = Optional.empty();
@@ -138,36 +178,72 @@ public class IncludeMacroRefactoring implements MacroRefactoring
         return resourceReference != null ? Collections.singleton(resourceReference) : Collections.emptySet();
     }
 
-    private <T extends EntityReference> boolean serializeTargetReference(EntityReference reference,
-        MacroBlock newMacroBlock, T targetReference, DocumentReference currentDocumentReference, boolean relative)
+    private boolean areReferencesEqual(EntityReference reference1, EntityReference reference2)
     {
         boolean result;
+
+        if (reference1.equals(reference2)) {
+            result = true;
+        } else if (isPointingToDocuments(reference1, reference2) || isPointingToAttachments(reference1, reference2)) {
+            // Convert the passed reference2 into a reference of the same type as reference1 so that they can be
+            // compared. However, we also need to check that they are of the same type/level since otherwise the
+            // resolver will extract internal reference parts, and we can find having, say, an Attachment Reference
+            // equal to a Document Reference.
+            EntityReference convertedReference2 =
+                this.defaultEntityReferenceResolver.resolve(reference2, reference1.getType());
+            result = reference1.equals(convertedReference2);
+        } else {
+            result = false;
+        }
+
+        return result;
+    }
+
+    private boolean isPointingToDocuments(EntityReference reference1, EntityReference reference2)
+    {
+        return (reference1 instanceof PageReference || reference1 instanceof DocumentReference)
+            && (reference2 instanceof PageReference || reference2 instanceof DocumentReference);
+    }
+
+    private boolean isPointingToAttachments(EntityReference reference1, EntityReference reference2)
+    {
+        return (reference1 instanceof PageAttachmentReference || reference1 instanceof AttachmentReference)
+            && (reference2 instanceof PageAttachmentReference || reference2 instanceof AttachmentReference);
+    }
+
+    private <T extends EntityReference> boolean serializeTargetReference(EntityReference originalReference,
+        MacroBlock newMacroBlock, T targetReference, EntityReference currentReference, boolean relative)
+    {
+        boolean result;
+
+        // TODO: the relative parameter has no impact ATM since the passed reference to serialize
+        // (i.e. targetReference) is an absolute reference (either a DocumentReference or an AttachmentReference)
 
         // If the user was using the "page" parameter then continue to use it. Otherwise, use "reference".
         // Note that this means that if the user was using the old legacy "document" parameter, it'll get
         // canonized into a "reference" parameter.
-        if (EntityType.PAGE.equals(reference.getType())) {
+        if (EntityType.PAGE.equals(originalReference.getType())) {
             // Note: we make sure we serialize a PageReference to keep the page syntax, by converting the
             // targetReference (DocumentReference) to a PageReference.
             PageReference pageReference = this.pageReferenceResolver.resolve(targetReference);
             newMacroBlock.setParameter("page",
-                serializeTargetReference(pageReference, currentDocumentReference, relative));
+                serializeTargetReference(pageReference, currentReference, relative));
             result = true;
         } else {
             newMacroBlock.setParameter("reference",
-                serializeTargetReference(targetReference, currentDocumentReference, relative));
+                serializeTargetReference(targetReference, currentReference, relative));
             result = true;
         }
         return result;
     }
 
-    private String serializeTargetReference(EntityReference newTargetReference,
-        DocumentReference currentDocumentReference, boolean relative)
+    private String serializeTargetReference(EntityReference newTargetReference, EntityReference currentReference,
+        boolean relative)
     {
         // Note: if the wiki was specified by the user, it'll get removed if it's not needed.
         return relative
-            ? this.compactEntityReferenceSerializer.serialize(newTargetReference, currentDocumentReference)
-            : this.compactEntityReferenceSerializer.serialize(newTargetReference);
+            ? this.compactEntityReferenceSerializer.serialize(newTargetReference, currentReference)
+            : this.defaultEntityReferenceSerializer.serialize(newTargetReference);
     }
 
     private IncludeMacroParameters getMacroParameters(MacroBlock macroBlock) throws MacroRefactoringException
@@ -184,5 +260,18 @@ public class IncludeMacroRefactoring implements MacroRefactoring
                 e);
         }
         return macroParameters;
+    }
+
+    private boolean isReferenceAbsolute(String referenceRepresentation, EntityReference absoluteEntityReference)
+    {
+        // Serialize the entityReference and verify if it matches the string representation
+        // Remove the wiki part since we want to consider that a reference without a wiki part can still be an absolute
+        // one.
+        EntityReference newReference = new EntityReference(absoluteEntityReference);
+        EntityReference wikiReference = absoluteEntityReference.extractReference(EntityType.WIKI);
+        if (wikiReference != null) {
+            newReference = newReference.removeParent(wikiReference);
+        }
+        return this.defaultEntityReferenceSerializer.serialize(newReference).equals(referenceRepresentation);
     }
 }

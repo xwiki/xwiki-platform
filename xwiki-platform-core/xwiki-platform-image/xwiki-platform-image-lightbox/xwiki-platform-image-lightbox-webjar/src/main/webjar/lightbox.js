@@ -172,15 +172,15 @@ define('xwiki-lightbox', [
   /*
    * Make sure that the toolbar will remain open also while hovering it, not just the image.
    */
-  var keepToolbarOpenOnHover = function(image, timeout) {
-    timeout = setTimeout(function() {
-      image.popover('hide');
+  var keepToolbarOpenOnHover = function(image, hideTimeout) {
+    hideTimeout = setTimeout(function() {
+      $('#imagePopoverContainer').popover('hide');
     }, 3000);
-    $('.popover').on('mouseenter', function() {
-      clearTimeout(timeout);
+    $('#imagePopoverContainer .popover').on('mouseenter', function() {
+      clearTimeout(hideTimeout);
     });
-    $('.popover').on('mouseleave', function() {
-      image.popover('hide');
+    $('#imagePopoverContainer .popover').on('mouseleave', function() {
+      $(this).popover('hide');
     });
   };
 
@@ -188,20 +188,23 @@ define('xwiki-lightbox', [
    * Assign to each selected image a toolbar popover with download and lightbox options.
    */
   var enableToolbarPopovers = function() {
-    var timeout;
-    lightboxImages.popover({
+    var hideTimeout;
+    var showTimeout;
+    // In order to place the popover at cursor location, it would be added to an element that changes its position
+    // based on mouse events.
+    var popoverContainer = $('#imagePopoverContainer');
+    popoverContainer.popover({
       content: function() {
         return $('#imageToolbarTemplate').html();
       },
       html: true,
       // The copyImageId tooltip attributes are deleted by sanitization.
       sanitize: false,
-      // The popover needs to be placed outside of the xwiki content to not depend on it's overflow.
-      container: 'body',
+      container: '#imagePopoverContainer',
       placement: 'bottom',
       trigger: 'manual'
-    }).on("show.bs.popover", function(e){
-      var img = e.target;
+    }).on("show.bs.popover", function(){
+      var img = $("#imagePopoverContainer").data('target');
       // Hide all other popovers.
       $('.popover').hide();
       // Set the attributes for the download button inside lightbox.
@@ -210,20 +213,32 @@ define('xwiki-lightbox', [
       // Remember the index of the image to show first.
       $('.openLightbox').data('index', [...lightboxImages].indexOf(img));
     }).on('inserted.bs.popover', function() {
-      $('.popover .imageDownload').attr('href', this.src);
-      $('.popover .imageDownload').attr('download', getImageName(this.src));
-      var imageId = getImageId(this);
+      var img = $("#imagePopoverContainer").data('target');
+      $('.popover .imageDownload').attr('href', img.src);
+      $('.popover .imageDownload').attr('download', getImageName(img.src));
+      var imageId = getImageId(img);
       if (imageId) {
         $('.popover .permalink').attr('href', '#' + imageId);
         $('.popover .permalink').removeClass('hidden');
         $('.popover .copyImageId').attr('data-imageId', imageId);
         $('.popover .copyImageId').parent().removeClass('hidden');
       }
-    }).on('mouseenter', function() {
-      clearTimeout(timeout);
+    });
+    lightboxImages.on('mouseenter', function(e) {
+      clearTimeout(hideTimeout);
+      popoverContainer.data('target', e.target);
       $(this).popover('show');
+    }).on('mousemove', function(e) {
+      popoverContainer.popover('hide');
+      // Delay to show the popover until the mouse stops moving.
+      clearTimeout(showTimeout);
+      showTimeout = setTimeout(function() {
+        popoverContainer.css({top: e.pageY, left: e.pageX });
+        popoverContainer.popover('show');
+      }, 800);
     }).on('mouseleave', function() {
-      keepToolbarOpenOnHover($(this), timeout);
+      clearTimeout(showTimeout);
+      keepToolbarOpenOnHover($(this), hideTimeout);
     });
   };
 

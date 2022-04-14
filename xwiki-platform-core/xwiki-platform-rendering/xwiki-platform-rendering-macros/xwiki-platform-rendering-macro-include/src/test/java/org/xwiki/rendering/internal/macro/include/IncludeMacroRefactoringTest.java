@@ -33,10 +33,9 @@ import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultReferencePageReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.PageReference;
@@ -81,10 +80,7 @@ import static org.mockito.Mockito.when;
     DefaultReferencePageReferenceResolver.class,
     DefaultReferenceEntityReferenceResolver.class,
     DefaultEntityReferenceProvider.class,
-    DefaultModelConfiguration.class,
-    DefaultReferenceEntityReferenceResolver.class,
-    DefaultStringEntityReferenceSerializer.class,
-    DefaultSymbolScheme.class
+    DefaultModelConfiguration.class
 })
 class IncludeMacroRefactoringTest
 {
@@ -97,6 +93,10 @@ class IncludeMacroRefactoringTest
     @MockComponent
     @Named("compact")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
+
+    @MockComponent
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     @MockComponent
     @Named("macro")
@@ -149,6 +149,9 @@ class IncludeMacroRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(targetReference, currentReference))
             .thenReturn("targetwiki:targetspace.targetfoo");
 
+        when(this.compactWikiEntityReferenceSerializer.serialize(sourceReference,
+            new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace.foo");
+
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, currentReference,
             sourceReference, targetReference, false);
         assertFalse(result.isEmpty());
@@ -169,8 +172,9 @@ class IncludeMacroRefactoringTest
 
         // This tells IncludeMacroRefactoring that the macro parameter reference isn't equal to the passed
         // source reference and thus that we are in the case of a including document rename.
+        DocumentReference fooReference = new DocumentReference("sourcewiki", "sourcespace", "foo");
         when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, sourceReference)).thenReturn(
-            new DocumentReference("sourcewiki", "sourcespace", "foo"));
+            fooReference);
 
         when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, sourceReference)).thenReturn(
             new DocumentReference("sourcewiki", "sourcespace", "foo"));
@@ -180,6 +184,9 @@ class IncludeMacroRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(
             new DocumentReference("sourcewiki", "sourcespace", "foo"), fooTargetReference))
             .thenReturn("sourcewiki:sourcespace.foo");
+
+        when(this.compactWikiEntityReferenceSerializer.serialize(fooReference,
+            new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace.foo");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null,
             sourceReference, targetReference, false);
@@ -201,8 +208,9 @@ class IncludeMacroRefactoringTest
 
         // This tells IncludeMacroRefactoring that the macro parameter reference isn't equal to the passed
         // source reference and thus that we are in the case of a including document rename.
+        PageReference fooReference = new PageReference("sourcewiki", "sourcespace", "foo");
         when(this.macroEntityReferenceResolver.resolve("foo", EntityType.PAGE, block, sourceReference)).thenReturn(
-            new PageReference("sourcewiki", "sourcespace", "foo"));
+            fooReference);
 
         when(this.macroEntityReferenceResolver.resolve("foo", EntityType.PAGE, block, sourceReference)).thenReturn(
             new PageReference("sourcewiki", "sourcespace", "foo"));
@@ -212,6 +220,9 @@ class IncludeMacroRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(
             new PageReference("sourcewiki", "sourcespace", "foo"), footTargetPageReference))
             .thenReturn("sourcewiki:sourcespace.foo");
+
+        when(this.compactWikiEntityReferenceSerializer.serialize(fooReference,
+            new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace/foo");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null,
             sourceReference, targetReference, false);
@@ -239,6 +250,9 @@ class IncludeMacroRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(targetPageReference, currentReference))
             .thenReturn("targetwiki:targetspace.targetfoo");
 
+        when(this.compactWikiEntityReferenceSerializer.serialize(pageReference,
+            new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace/foo");
+
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, currentReference,
             sourceReference, targetReference, false);
         assertFalse(result.isEmpty());
@@ -255,13 +269,17 @@ class IncludeMacroRefactoringTest
 
         // This tells IncludeMacroRefactoring that the macro parameter reference isn't equal to the passed
         // source reference and thus that we are in the case of a including document rename.
+        DocumentReference fooReference = new DocumentReference("sourcewiki", "sourcespace", "foo");
         when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, sourceReference))
-            .thenReturn(new PageReference("sourcewiki", "sourcespace", "foo"));
+            .thenReturn(fooReference);
 
         when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, sourceReference)).thenReturn(
             new DocumentReference("sourcewiki", "sourcespace", "foo"));
         when(this.macroEntityReferenceResolver.resolve("foo", EntityType.DOCUMENT, block, targetReference)).thenReturn(
             new DocumentReference("sourcewiki", "sourcespace", "foo"));
+
+        when(this.compactWikiEntityReferenceSerializer.serialize(fooReference,
+            new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace.foo");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null, sourceReference,
             targetReference, false);
@@ -290,6 +308,9 @@ class IncludeMacroRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(targetAttachmentReference, currentReference))
             .thenReturn("targetwiki:targetspace.targetfoo@targetfile");
 
+        when(this.compactWikiEntityReferenceSerializer.serialize(sourceReference,
+            new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace.foo");
+
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, currentReference,
             sourceReference, targetAttachmentReference, false);
         assertFalse(result.isEmpty());
@@ -314,9 +335,10 @@ class IncludeMacroRefactoringTest
 
         // This tells IncludeMacroRefactoring that the macro parameter reference isn't equal to the passed
         // source reference and thus that we are in the case of a including document rename.
+        AttachmentReference fooReference = new AttachmentReference("foofile",
+            new DocumentReference("sourcewiki", "sourcespace", "foopage"));
         when(this.macroEntityReferenceResolver.resolve("foopage@foofile", EntityType.ATTACHMENT, block,
-            sourceReference)).thenReturn(new AttachmentReference("foofile",
-            new DocumentReference("sourcewiki", "sourcespace", "foopage")));
+            sourceReference)).thenReturn(fooReference);
         when(this.macroEntityReferenceResolver.resolve("foopage@foofile", EntityType.ATTACHMENT, block,
             sourceReference)).thenReturn(new AttachmentReference("foofile",
                 new DocumentReference("sourcewiki", "sourcespace", "foopage")));
@@ -328,6 +350,9 @@ class IncludeMacroRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(new AttachmentReference("foofile",
             new DocumentReference("sourcewiki", "sourcespace", "foopage")), fooTargetReference))
             .thenReturn("sourcewiki:sourcespace.foopage@foofile");
+
+        when(this.compactWikiEntityReferenceSerializer.serialize(fooReference,
+            new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace.foopage@foofile");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null,
             sourceReference, targetReference, false);

@@ -35,7 +35,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.PageAttachmentReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.properties.BeanManager;
@@ -68,7 +67,8 @@ public class IncludeMacroRefactoring implements MacroRefactoring
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     @Inject
-    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     @Inject
     @Named("macro")
@@ -201,14 +201,16 @@ public class IncludeMacroRefactoring implements MacroRefactoring
 
     private boolean isPointingToDocuments(EntityReference reference1, EntityReference reference2)
     {
-        return (reference1 instanceof PageReference || reference1 instanceof DocumentReference)
-            && (reference2 instanceof PageReference || reference2 instanceof DocumentReference);
+        return (EntityType.DOCUMENT.equals(reference1.getType()) || EntityType.PAGE.equals(reference1.getType()))
+            && (EntityType.DOCUMENT.equals(reference2.getType()) || EntityType.PAGE.equals(reference2.getType()));
     }
 
     private boolean isPointingToAttachments(EntityReference reference1, EntityReference reference2)
     {
-        return (reference1 instanceof PageAttachmentReference || reference1 instanceof AttachmentReference)
-            && (reference2 instanceof PageAttachmentReference || reference2 instanceof AttachmentReference);
+        return (EntityType.ATTACHMENT.equals(reference1.getType())
+                || EntityType.PAGE_ATTACHMENT.equals(reference1.getType()))
+            && (EntityType.ATTACHMENT.equals(reference2.getType())
+                || EntityType.PAGE_ATTACHMENT.equals(reference2.getType()));
     }
 
     private <T extends EntityReference> boolean serializeTargetReference(EntityReference originalReference,
@@ -240,10 +242,14 @@ public class IncludeMacroRefactoring implements MacroRefactoring
     private String serializeTargetReference(EntityReference newTargetReference, EntityReference currentReference,
         boolean relative)
     {
-        // Note: if the wiki was specified by the user, it'll get removed if it's not needed.
+        // Notes:
+        // - If the wiki was specified by the user, it'll get removed if it's not needed.
+        // - When relative is false, we still don't want to display the wiki if it's the same as the wiki of the
+        //   current reference.
         return relative
             ? this.compactEntityReferenceSerializer.serialize(newTargetReference, currentReference)
-            : this.defaultEntityReferenceSerializer.serialize(newTargetReference);
+            : this.compactWikiEntityReferenceSerializer.serialize(newTargetReference,
+                currentReference.extractReference(EntityType.WIKI));
     }
 
     private IncludeMacroParameters getMacroParameters(MacroBlock macroBlock) throws MacroRefactoringException
@@ -267,11 +273,7 @@ public class IncludeMacroRefactoring implements MacroRefactoring
         // Serialize the entityReference and verify if it matches the string representation
         // Remove the wiki part since we want to consider that a reference without a wiki part can still be an absolute
         // one.
-        EntityReference newReference = new EntityReference(absoluteEntityReference);
-        EntityReference wikiReference = absoluteEntityReference.extractReference(EntityType.WIKI);
-        if (wikiReference != null) {
-            newReference = newReference.removeParent(wikiReference);
-        }
-        return this.defaultEntityReferenceSerializer.serialize(newReference).equals(referenceRepresentation);
+        return this.compactWikiEntityReferenceSerializer.serialize(absoluteEntityReference,
+            absoluteEntityReference.extractReference(EntityType.WIKI)).equals(referenceRepresentation);
     }
 }

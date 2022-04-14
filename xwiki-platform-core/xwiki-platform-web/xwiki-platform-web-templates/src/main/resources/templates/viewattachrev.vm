@@ -20,7 +20,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-<h3>$services.localization.render("core.viewers.attachments.revisions", [$escapetool.xml($attachment.filename)])</h3>
+<h3>$services.localization.render("core.viewers.attachments.revisions", [$escapetool.html($attachment.filename)])</h3>
 #if ("$tdoc.realLocale" != '')
 #set($lang = "&language=${tdoc.realLocale}")
 #else

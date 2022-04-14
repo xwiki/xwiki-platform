@@ -85,6 +85,7 @@ import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
 import org.xwiki.velocity.internal.DefaultVelocityEngine;
 import org.xwiki.velocity.internal.DefaultVelocityFactory;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
+import org.xwiki.velocity.internal.XWikiDateTool;
 import org.xwiki.velocity.internal.XWikiMathTool;
 import org.xwiki.velocity.internal.XWikiNumberTool;
 import org.xwiki.velocity.internal.XWikiVelocityConfiguration;
@@ -211,6 +212,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     VelocityExecutionContextInitializer.class,
     XWikiNumberTool.class,
     XWikiMathTool.class,
+    XWikiDateTool.class,
 
     // Skin
     DefaultSkinManager.class,

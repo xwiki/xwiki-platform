@@ -88,9 +88,8 @@ define('xwiki-lightbox-description', [
       $('.lightboxDescription .title').text(attachmentData.name);
     }
 
-    if (attachmentData.author) {
-      $('.lightboxDescription .publisher')
-        .text(l10n.get('author', XWiki.Model.resolve(attachmentData.author, XWiki.EntityType.DOCUMENT).name));
+    if (attachmentData.authorName) {
+      $('.lightboxDescription .publisher').text(l10n.get('author', attachmentData.authorName));
     }
 
     if (attachmentData.date) {

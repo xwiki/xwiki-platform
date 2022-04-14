@@ -156,9 +156,6 @@ class R140300001XWIKI19571DataMigrationTest
         when(resultSetSaveTasks.getTimestamp("TIMESTAMP")).thenReturn(newTimestamp);
 
         assertEquals("<changeSet author=\"xwikiorg\" id=\"R140300001XWIKI195710\">\n"
-            + "  <preConditions onFail=\"MARK_RAN\">\n"
-            + "    <tableExists tableName=\"XWIKIDOCUMENTINDEXINGQUEUE\"/>\n"
-            + "  </preConditions>\n"
             + "  <dropTable tableName=\"XWIKIDOCUMENTINDEXINGQUEUE\"/>\n"
             + "</changeSet>\n"
             + "\n", this.dataMigration.getPreHibernateLiquibaseChangeLog());
@@ -196,9 +193,6 @@ class R140300001XWIKI19571DataMigrationTest
         when(resultSetSaveTasks.getTimestamp("TIMESTAMP")).thenReturn(newTimestamp);
 
         assertEquals("<changeSet author=\"xwikiorg\" id=\"R140300001XWIKI195710\">\n"
-            + "  <preConditions onFail=\"MARK_RAN\">\n"
-            + "    <tableExists tableName=\"XWIKIDOCUMENTINDEXINGQUEUE\"/>\n"
-            + "  </preConditions>\n"
             + "  <dropTable tableName=\"XWIKIDOCUMENTINDEXINGQUEUE\"/>\n"
             + "</changeSet>\n"
             + "\n", this.dataMigration.getPreHibernateLiquibaseChangeLog());

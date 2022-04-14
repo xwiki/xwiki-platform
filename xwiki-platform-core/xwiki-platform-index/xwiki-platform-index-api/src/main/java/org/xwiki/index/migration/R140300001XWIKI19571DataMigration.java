@@ -47,9 +47,8 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
- * Migrate XWikiDocumentIndexingTask by copying the table to a new temporary table. Then, after hibernate migration,
- * when XWikiDocumentIndexingTask is created again, the rows from the temporary table are copied to the new table.
- * Finally, the temporary table is dropped.
+ * Migrate XWikiDocumentIndexingTask by saving the content of the table in memory. Then, after hibernate migration, when
+ * XWikiDocumentIndexingTask is created again, the rows are copied from memory to the new table.
  *
  * @version $Id$
  * @since 14.3RC1
@@ -98,16 +97,15 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
                     this.hibernateStore.getConfigurationMetadata()
                         .getEntityBinding(XWikiDocumentIndexingTask.class.getName());
                 String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
+                String changeSet = "";
                 if (exists(databaseMetaData, tableName)) {
                     saveTasks(connection, persistentClass, tableName);
+                    changeSet = String.format("<changeSet author=\"xwikiorg\" id=\"%s0\">\n"
+                        + "  <dropTable tableName=\"%s\"/>"
+                        + "\n</changeSet>\n"
+                        + "\n", HINT, tableName);
                 }
-                return String.format("<changeSet author=\"xwikiorg\" id=\"%s0\">\n"
-                    + "  <preConditions onFail=\"MARK_RAN\">\n"
-                    + "    <tableExists tableName=\"%s\"/>\n"
-                    + "  </preConditions>\n"
-                    + "  <dropTable tableName=\"%s\"/>"
-                    + "\n</changeSet>\n"
-                    + "\n", HINT, tableName, tableName);
+                return changeSet;
             }
         } catch (SQLException e) {
             throw new DataMigrationException("Error while loading the existing tasks.", e);

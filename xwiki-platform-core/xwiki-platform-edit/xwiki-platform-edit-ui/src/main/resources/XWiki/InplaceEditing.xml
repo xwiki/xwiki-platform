@@ -880,6 +880,13 @@ define('editInPlace', [
         extra[entry.name] = value;
         return extra;
       }, {});
+      // retrieve all input fields listing the temporary uploaded files.
+      var uploadedFiles = $('#xwikicontent').nextAll('input[name="uploadedFiles"]').serializeArray().reduce(function(extra, entry) {
+        var value = extra[entry.name] || [];
+        value.push(entry.value);
+        extra[entry.name] = value;
+        return extra;
+      }, {});
       var xwikiDocument = this._getActionButtons().data('xwikiDocument');
       var formData = {
         title: xwikiDocument.rawTitle,
@@ -897,6 +904,8 @@ define('editInPlace', [
           content_syntax: xwikiDocument.syntax
         });
       }
+      // Add the temporary uploaded files to the form.
+      $.extend(formData, uploadedFiles);
       // Check for merge conflicts only if the document is not new and we know the current version.
       if (!xwikiDocument.isNew &amp;&amp; xwikiDocument.version) {
         formData.previousVersion = xwikiDocument.version;
@@ -1583,6 +1592,7 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
     ## We have to explicitly enable the source mode for in-line edit because the latest version of the content editor
     ## could be installed on an older version of XWiki where the in-place editor didn't support the source mode (so the
     ## content editor cannot enable the source mode by default).
+    #set ($isTemporaryAttachmentSupported = ("$!services.temporaryattachments" != ""))
     #set ($inplaceEditingConfig = {
       'contentType': 'org.xwiki.rendering.syntax.SyntaxContent',
       'editMode': $defaultEditMode,
@@ -1591,6 +1601,7 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
       'translateButtonSelector': '#tmTranslate &gt; a',
       'enableSourceMode': true,
       'enableOfficeImport': $services.officemanager.isConnected(),
+      'enableTemporaryAttachmentUpload': $isTemporaryAttachmentSupported,
       'syntax': $services.wysiwyg.HTMLSyntax.toIdString(),
       'paths': {
         'js': {

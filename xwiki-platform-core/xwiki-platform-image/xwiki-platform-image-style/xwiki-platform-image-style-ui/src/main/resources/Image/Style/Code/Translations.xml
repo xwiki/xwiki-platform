@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="Image.Style.Code.Translations" locale="">
+<xwikidoc version="1.4" reference="Image.Style.Code.Translations" locale="">
   <web>Image.Style.Code</web>
   <name>Translations</name>
   <language/>
@@ -29,7 +29,6 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>Translations</title>
@@ -59,14 +58,16 @@ Image.Style.Code.ImageStyleClass_adjustableBorder=Adjustable Border
 Image.Style.Code.ImageStyleClass_adjustableBorder_hint=When checked, the user is allowed to customize the border of the image.
 Image.Style.Code.ImageStyleClass_adjustableSize=Adjustable Size
 Image.Style.Code.ImageStyleClass_adjustableSize_hint=When checked, the user is allowed to customize the size of the image.
-Image.Style.Code.ImageStyleClass_adjustrableTextWrap=Adjustable Text Wrap
-Image.Style.Code.ImageStyleClass_adjustrableTextWrap_hint=When checked, the user is allowed to customize the text wrap of the image.
+Image.Style.Code.ImageStyleClass_adjustableTextWrap=Adjustable Text Wrap
+Image.Style.Code.ImageStyleClass_adjustableTextWrap_hint=When checked, the user is allowed to customize the text wrap of the image.
 Image.Style.Code.ImageStyleClass_defaultAlignment=Default Alignment
 Image.Style.Code.ImageStyleClass_defaultAlignment_center=Center
 Image.Style.Code.ImageStyleClass_defaultAlignment_default=
-Image.Style.Code.ImageStyleClass_defaultAlignment_hint=The dedefault alignment of the image.
-Image.Style.Code.ImageStyleClass_defaultAlignment_left=Left
-Image.Style.Code.ImageStyleClass_defaultAlignment_right=Right
+Image.Style.Code.ImageStyleClass_defaultAlignment_hint=The default alignment of the image.
+Image.Style.Code.ImageStyleClass_defaultAlignment_none=None
+Image.Style.Code.ImageStyleClass_defaultAlignment_start=Start
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=Center
+Image.Style.Code.ImageStyleClass_defaultAlignment_end=End
 Image.Style.Code.ImageStyleClass_defaultBorder=Default Border
 Image.Style.Code.ImageStyleClass_defaultBorder_hint=When checked, the image has a border by default.
 Image.Style.Code.ImageStyleClass_defaultHeight=Default height

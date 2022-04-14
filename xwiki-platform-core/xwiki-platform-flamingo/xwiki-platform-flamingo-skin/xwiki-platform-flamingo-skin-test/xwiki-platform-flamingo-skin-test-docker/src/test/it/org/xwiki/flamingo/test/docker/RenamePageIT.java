@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -31,7 +32,9 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -62,7 +65,7 @@ public class RenamePageIT
     @Test
     public void convertNestedPageToTerminalPage(TestUtils setup) throws Exception
     {
-        // Note: we use a 3-level-deep nested page  since 2 levels wouldn't show problems such as the regression
+        // Note: we use a 3-level-deep nested page since 2 levels wouldn't show problems such as the regression
         // we've had with https://jira.xwiki.org/browse/XWIKI-16170
 
         // Clean-up: delete the pages that will be used in this test
@@ -121,8 +124,8 @@ public class RenamePageIT
         assertEquals("Done.", renameStatusPage.getInfoMessage());
         // Test the Rename operation: we need to have 2.WebHome and 2.3.WebHome under A.B
         assertTrue(setup.pageExists(Arrays.asList("A", "B", "2"), "WebHome"), "Page A.B.2.WebHome doesn't exist!");
-        assertTrue(setup.pageExists(Arrays.asList("A", "B", "2", "3"),
-            "WebHome"), "Page A.B.2.3.WebHome doesn't exist!");
+        assertTrue(setup.pageExists(Arrays.asList("A", "B", "2", "3"), "WebHome"),
+            "Page A.B.2.3.WebHome doesn't exist!");
         // Test the Auto Redirect: when visiting the original pages you need to be redirected to the new locations
         setup.gotoPage(Arrays.asList("1", "2"), "WebHome", "view", "");
         assertEquals("/A/B/2", vp.getBreadcrumbContent());
@@ -133,11 +136,10 @@ public class RenamePageIT
     }
 
     /**
-     * This test check the behaviour of job questions when renaming a page with a used class
-     *   - check that the question UI is displayed in that case
-     *   - check that when two jobs are triggered one is blocked and display the UI
-     *   - check that we can cancel a job on a question and it unblocks the others
-     *   - check that we can select some files in the question to be renamed.
+     * This test check the behaviour of job questions when renaming a page with a used class - check that the question
+     * UI is displayed in that case - check that when two jobs are triggered one is blocked and display the UI - check
+     * that we can cancel a job on a question and it unblocks the others - check that we can select some files in the
+     * question to be renamed.
      */
     @Order(3)
     @Test
@@ -147,15 +149,15 @@ public class RenamePageIT
         // 2 of them are free pages (WebHome and FreePage)
         // 1 of them is a class (ClassPage)
         // the last one contains an object property using the class
-        String space = testReference.getSpaceReferences()
-            .stream().map(SpaceReference::getName).collect(Collectors.joining("."));
+        String space =
+            testReference.getSpaceReferences().stream().map(SpaceReference::getName).collect(Collectors.joining("."));
         String classPageName = "ClassPage";
         String objectPageName = "ObjectPage";
         String freePageName = "FreePage";
 
         DocumentReference classReference = new DocumentReference(classPageName, testReference.getLastSpaceReference());
-        DocumentReference objectReference = new DocumentReference(objectPageName,
-            testReference.getLastSpaceReference());
+        DocumentReference objectReference =
+            new DocumentReference(objectPageName, testReference.getLastSpaceReference());
         DocumentReference freeReference = new DocumentReference(freePageName, testReference.getLastSpaceReference());
 
         setup.createPage(testReference, "Some content", "Parent");
@@ -181,8 +183,8 @@ public class RenamePageIT
         List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
 
         // there is two main nodes:
-        //  1. to represent free pages
-        //  2. to represent classes with associated objects
+        // 1. to represent free pages
+        // 2. to represent classes with associated objects
         assertEquals(2, topLevelNodes.size());
         TreeNodeElement freePages = topLevelNodes.get(0);
         assertEquals("Pages that do not contain any used XClass", freePages.getLabel());
@@ -192,9 +194,9 @@ public class RenamePageIT
         List<TreeNodeElement> children = freePages.getChildren();
 
         // free pages should contain three nodes with alphabetical order:
-        //   1. the FreePage obviously
-        //   2. the ObjectPage since it does not contain a class
-        //   3. the WebHome page
+        // 1. the FreePage obviously
+        // 2. the ObjectPage since it does not contain a class
+        // 3. the WebHome page
         assertEquals(3, children.size());
 
         TreeNodeElement freePage = children.get(0);
@@ -271,8 +273,7 @@ public class RenamePageIT
         assertFalse(viewPage.exists());
 
         DocumentReference newFreePage = new DocumentReference("xwiki",
-            Arrays.asList(newParentName, testReference.getLastSpaceReference().getName()),
-            freePageName);
+            Arrays.asList(newParentName, testReference.getLastSpaceReference().getName()), freePageName);
         viewPage = setup.gotoPage(newFreePage);
         assertTrue(viewPage.exists());
     }
@@ -350,14 +351,12 @@ public class RenamePageIT
 
         setup.rest().delete(testReference);
 
-        ViewPage standardLinkPage = setup.createPage(sourcePageReference1,
-            "Some content to be linked. number 1");
-        ViewPage standardMacroLinkPage = setup.createPage(sourcePageReference2,
-            "Some content to be linked in macro. number 2");
-        ViewPage nestedMacroLinkPage = setup.createPage(sourcePageReference3,
-            "Some content to be linked in nested macro. number 3");
-        ViewPage imageLinkPage = setup.createPage(sourcePageReference4,
-            "A page with image to be linked. number 4");
+        ViewPage standardLinkPage = setup.createPage(sourcePageReference1, "Some content to be linked. number 1");
+        ViewPage standardMacroLinkPage =
+            setup.createPage(sourcePageReference2, "Some content to be linked in macro. number 2");
+        ViewPage nestedMacroLinkPage =
+            setup.createPage(sourcePageReference3, "Some content to be linked in nested macro. number 3");
+        ViewPage imageLinkPage = setup.createPage(sourcePageReference4, "A page with image to be linked. number 4");
         AttachmentsPane attachmentsPane = imageLinkPage.openAttachmentsDocExtraPane();
         File image = new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/image.gif");
         attachmentsPane.setFileToUpload(image.getAbsolutePath());
@@ -365,21 +364,10 @@ public class RenamePageIT
 
         ViewPage includeLinkPage = setup.createPage(sourcePageReference5, "A page to be included. number 5");
 
-        String testPageContent = "Check out this page: [[type the link label>>doc:%1$s]]\n"
-            + "\n"
-            + "{{warning}}\n"
-            + "Withing a macro: Check out this page: [[type the link label>>doc:%2$s]]\n"
-            + "\n"
-            + "{{error}}\n"
-            + "And in nested macro: Check out this page: [[type the link label>>doc:%3$s]]\n"
-            + "{{/error}}\n"
-            + "\n"
-            + " \n"
-            + "{{/warning}}\n"
-            + "\n"
-            + "Picture: [[image:%4$s@image.gif]]\n"
-            + "Include macro:\n"
-            + "\n"
+        String testPageContent = "Check out this page: [[type the link label>>doc:%1$s]]\n" + "\n" + "{{warning}}\n"
+            + "Withing a macro: Check out this page: [[type the link label>>doc:%2$s]]\n" + "\n" + "{{error}}\n"
+            + "And in nested macro: Check out this page: [[type the link label>>doc:%3$s]]\n" + "{{/error}}\n" + "\n"
+            + " \n" + "{{/warning}}\n" + "\n" + "Picture: [[image:%4$s@image.gif]]\n" + "Include macro:\n" + "\n"
             + "{{include reference=\"%5$s\"/}}";
         setup.createPage(testReference,
             String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5));
@@ -453,5 +441,41 @@ public class RenamePageIT
         wikiEditPage = viewPage.editWiki();
         assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, targetPage5),
             wikiEditPage.getContent());
+    }
+
+    /**
+     * Test renaming a page refactor outgoing links in both the default locale and translations.
+     */
+    @Order(5)
+    @Test
+    void renamePageRelativeLinkPageAndTranslation(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        String parent = "RenamePageIT";
+        String name = "renamePageRefactorOutgoingLinksInPageAndTranslation";
+        LocalDocumentReference reference = new LocalDocumentReference(parent, name);
+
+        // Create a page and a translation with a link
+        setup.rest().savePage(reference, "[[OtherPage]]", "");
+        setup.rest().savePage(new LocalDocumentReference(reference, Locale.FRENCH), "fr [[OtherPage]]", "");
+
+        assertEquals("[[OtherPage]]", setup.rest().<Page>get(reference).getContent());
+
+        // Rename the page
+        ViewPage vp = setup.gotoPage(reference);
+        String newSpace = "New" + parent;
+        String newName = "New" + name;
+        RenamePage renamePage = vp.rename();
+        renamePage.getDocumentPicker().setParent(newSpace);
+        renamePage.getDocumentPicker().setName(newName);
+        renamePage.clickRenameButton().waitUntilFinished();
+
+        // Make sure the link was refactored in both the page and its translation
+        Page newPage = setup.rest().get(new LocalDocumentReference(newSpace, newName));
+        assertEquals("[[" + parent + ".OtherPage.WebHome]]", newPage.getContent());
+
+        newPage = setup.rest().get(new LocalDocumentReference(newSpace, newName, Locale.FRENCH));
+        assertEquals("fr [[" + parent + ".OtherPage.WebHome]]", newPage.getContent());
+
     }
 }

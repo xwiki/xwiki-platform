@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="Image.Style.Code.ImageStyleTemplate" locale="">
+<xwikidoc version="1.4" reference="Image.Style.Code.ImageStyleTemplate" locale="">
   <web>Image.Style.Code</web>
   <name>ImageStyleTemplate</name>
   <language/>
@@ -29,7 +29,6 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>Image.Style.Code.ImageStyleClass</parent>
   <author>xwiki:XWiki.Admin</author>
-  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>ImageStyle Template</title>
@@ -97,25 +96,25 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </adjustableSize>
-      <adjustrableTextWrap>
+      <adjustableTextWrap>
         <customDisplay/>
         <defaultValue>0</defaultValue>
         <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
         <displayType/>
         <hint/>
-        <name>adjustrableTextWrap</name>
+        <name>adjustableTextWrap</name>
         <number>10</number>
-        <prettyName>adjustrableTextWrap</prettyName>
+        <prettyName>adjustableTextWrap</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </adjustrableTextWrap>
+      </adjustableTextWrap>
       <defaultAlignment>
         <cache>0</cache>
         <customDisplay/>
-        <defaultValue>default</defaultValue>
+        <defaultValue>none</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText/>
@@ -124,7 +123,7 @@
         <multiSelect>0</multiSelect>
         <name>defaultAlignment</name>
         <number>9</number>
-        <picker>1</picker>
+        <picker>0</picker>
         <prettyName>defaultAlignment</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -134,7 +133,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>default=|left=Left|center=Center|right=Right</values>
+        <values>none=None|start=Start|center=Center|end=End</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </defaultAlignment>
       <defaultBorder>
@@ -234,10 +233,10 @@
       <adjustableSize>0</adjustableSize>
     </property>
     <property>
-      <adjustrableTextWrap>0</adjustrableTextWrap>
+      <adjustableTextWrap>0</adjustableTextWrap>
     </property>
     <property>
-      <defaultAlignment>default</defaultAlignment>
+      <defaultAlignment>none</defaultAlignment>
     </property>
     <property>
       <defaultBorder>0</defaultBorder>

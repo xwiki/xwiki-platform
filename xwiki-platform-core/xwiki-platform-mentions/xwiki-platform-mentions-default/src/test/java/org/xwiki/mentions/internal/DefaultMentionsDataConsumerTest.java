@@ -110,7 +110,7 @@ class DefaultMentionsDataConsumerTest
     {
         when(this.documentRevisionProvider.getRevision(DOCUMENT_REFERENCE, "1.1")).thenReturn(this.doc);
         when(this.doc.getPreviousVersion()).thenReturn(null);
-        when(this.doc.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        when(this.doc.getDocumentReferenceWithLocale()).thenReturn(DOCUMENT_REFERENCE);
         when(this.createdDocumentMentionsAnalyzer.analyze(this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE))
             .thenReturn(emptyList());
 
@@ -126,7 +126,7 @@ class DefaultMentionsDataConsumerTest
     {
         when(this.documentRevisionProvider.getRevision(DOCUMENT_REFERENCE, "1.1")).thenReturn(this.doc);
         when(this.doc.getPreviousVersion()).thenReturn(null);
-        when(this.doc.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        when(this.doc.getDocumentReferenceWithLocale()).thenReturn(DOCUMENT_REFERENCE);
         MentionNotificationParameters mentionNotificationParameters =
             new MentionNotificationParameters(AUTHOR_REFERENCE, DOCUMENT_REFERENCE, MentionLocation.DOCUMENT,
                 "1.1")
@@ -153,7 +153,7 @@ class DefaultMentionsDataConsumerTest
         when(this.documentRevisionProvider.getRevision(DOCUMENT_REFERENCE, "1.1")).thenReturn(this.doc);
 
         when(this.doc.getPreviousVersion()).thenReturn("1.0");
-        when(this.doc.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        when(this.doc.getDocumentReferenceWithLocale()).thenReturn(DOCUMENT_REFERENCE);
         when(
             this.updatedDocumentMentionsAnalyzer.analyze(oldDoc, this.doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE))
             .thenReturn(emptyList());
@@ -173,7 +173,7 @@ class DefaultMentionsDataConsumerTest
         when(this.documentRevisionProvider.getRevision(DOCUMENT_REFERENCE, "1.0")).thenReturn(oldDoc);
         when(this.documentRevisionProvider.getRevision(DOCUMENT_REFERENCE, "1.1")).thenReturn(this.doc);
         when(this.doc.getPreviousVersion()).thenReturn("1.0");
-        when(this.doc.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        when(this.doc.getDocumentReferenceWithLocale()).thenReturn(DOCUMENT_REFERENCE);
         MentionNotificationParameters mentionNotificationParameters =
             new MentionNotificationParameters(AUTHOR_REFERENCE, DOCUMENT_REFERENCE, MentionLocation.DOCUMENT,
                 "1.1")

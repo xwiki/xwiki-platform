@@ -42,32 +42,32 @@
     }
 
     .descriptionMetadata {
-      padding-top: 2%;
+      padding-top: 1%;
+
+      .copyImageId {
+        width: fit-content;
+      }
     }
   }
 }
 .blueimp-gallery {
-  .fullscreen:hover,
-  .download:hover,
-  .autoPlay:hover,
-  .escape:hover {
+  .action:hover {
     color: @text-color;
     opacity: 1;
   }
 
-  .fullscreen,
-  .download,
-  .autoPlay,
-  .escape {
+  .action {
     color: @xwiki-page-content-bg;
     display: none;
   }
+
+  .tooltip-inner {
+    white-space:nowrap;
+  }
 }
+
 .blueimp-gallery-controls {
-  .fullscreen,
-  .download,
-  .autoPlay,
-  .escape {
+  .action {
     display: block;
     /* Fix z-index issues (controls behind slide element) on Android: */
     -webkit-transform: translateZ(0);
@@ -79,4 +79,13 @@
 }
 #imageToolbarTemplate {
   display: none;
+}
+.imageToolbar {
+  > * {
+    margin: .5em;
+  }
+
+  .tooltip-inner {
+    white-space:nowrap;
+  }
 }

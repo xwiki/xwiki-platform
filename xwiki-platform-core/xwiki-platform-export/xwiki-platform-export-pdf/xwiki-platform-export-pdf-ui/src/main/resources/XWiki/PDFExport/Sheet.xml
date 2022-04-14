@@ -220,16 +220,18 @@
   };
 
   // See https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#getting_a_file_representing_the_canvas
+  const objectURLs = [];
   const replaceCanvasWithImage = function(canvas) {
     return new Promise((resolve, reject) =&gt; {
       canvas.toBlob(blob =&gt; {
         const image = document.createElement('img'),
           url = URL.createObjectURL(blob);
-        image.onload = function() {
-          // Revoke the object URL as soon as the image is loaded in order to release resources.
-          URL.revokeObjectURL(url);
-          resolve();
-        };
+        objectURLs.push(url);
+        // Note that we don't revoke the object URL when the image is loaded because the image is going to be moved
+        // within the DOM when paged.js generates the print layout. Firefox is smart enough to not reload moved images
+        // but Chrome isn't and shows the broken image icon if the object URL was revoked since the image was loaded.
+        // The solution is to collect the object URLs and revoke them only after the print layout is ready.
+        image.onload = resolve;
         image.src = url;
         canvas.parentNode.replaceChild(image, canvas);
       }, 'image/png', 1);
@@ -261,6 +263,11 @@
     window.PagedConfig = {after: resolve};
     require(['paged-polyfill'], function(PagedPolyfill) {});
   }));
+
+  // Revoke the object URLs previously created, after the print layout is ready.
+  pageReady.afterPageReady(() =&gt; {
+    objectURLs.forEach(url =&gt; URL.revokeObjectURL(url));
+  });
 });</code>
     </property>
     <property>

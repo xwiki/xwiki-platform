@@ -203,15 +203,14 @@ public class XWikiMockitoTest
 
         DocumentReference sourceReference = new DocumentReference("foo", "Space", "Source");
         XWikiDocument source = mock(XWikiDocument.class);
-        when(source.copyDocument(targetReference, context)).thenReturn(target);
-        when(source.getLocalReferenceMaxLength()).thenReturn(255);
+        when(source.copyDocument(targetReference, false, context)).thenReturn(target);
 
-        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(source, target);
+        when(xwiki.getStore().loadXWikiDoc(OldcoreMatchers.isDocument(sourceReference), same(context)))
+            .thenReturn(source);
+        when(xwiki.getStore().loadXWikiDoc(OldcoreMatchers.isDocument(targetReferenceWithLocale), same(context)))
+            .thenReturn(target);
 
         assertTrue(xwiki.copyDocument(sourceReference, targetReference, context));
-
-        // The target document needs to be new in order for the attachment version to be preserved on save.
-        verify(target).setNew(true);
 
         verify(xwiki.getStore()).saveXWikiDoc(target, context);
     }

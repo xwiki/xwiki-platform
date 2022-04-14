@@ -27,9 +27,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
@@ -51,6 +53,7 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.stability.Unstable;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -104,6 +107,9 @@ public class DownloadAction extends XWikiAction
 
     /** The format of a valid range header. */
     private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=([0-9]+)?-([0-9]+)?");
+
+    @Inject
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
     @Override
     public String render(XWikiContext context) throws XWikiException
@@ -418,7 +424,25 @@ public class DownloadAction extends XWikiAction
                 attachment = document.getAttachmentList().get(id);
             }
         } else {
-            attachment = document.getAttachment(filename);
+            XWikiAttachment standardAttachment = document.getAttachment(filename);
+            DocumentReference documentReference = document.getDocumentReference();
+            Optional<XWikiAttachment> uploadedAttachmentOpt =
+                this.temporaryAttachmentSessionsManager.getUploadedAttachment(documentReference, filename);
+
+            // If there's no uploaded attachment, we always rely on the standard attachment, be it empty.
+            if (uploadedAttachmentOpt.isEmpty()) {
+                attachment = standardAttachment;
+            // If there's an uploaded attachment on current session, and no standard attachment, then we should display
+            // that one.
+            } else if (standardAttachment == null) {
+                attachment = uploadedAttachmentOpt.get();
+            // Finally, if there's both an uploaded attachment in current session and a standard one with same name,
+            // we use the uploaded one.
+            // TODO: this should be better handled since it's possible that the user who uploaded the attachment wants
+            // to see the original page with the old attachment: right now this usecase is not supported.
+            } else {
+                attachment = uploadedAttachmentOpt.get();
+            }
         }
 
         return attachment;

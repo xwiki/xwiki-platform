@@ -19,12 +19,12 @@
  */
 package org.xwiki.test.ui.appwithinminutes;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
@@ -425,13 +425,7 @@ public class ClassEditorTest extends AbstractClassEditorTest
      */
     private void waitForPageSourceContains(final String text)
     {
-        new WebDriverWait(getDriver(), getDriver().getTimeout()).until(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                return StringUtils.contains(getDriver().getPageSource(), text);
-            }
-        });
+        new WebDriverWait(getDriver(), Duration.ofSeconds(getDriver().getTimeout())).until(
+            (ExpectedCondition<Boolean>) driver -> StringUtils.contains(getDriver().getPageSource(), text));
     }
 }

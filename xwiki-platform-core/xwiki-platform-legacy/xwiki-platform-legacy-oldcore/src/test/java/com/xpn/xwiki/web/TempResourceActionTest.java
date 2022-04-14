@@ -27,12 +27,15 @@ import javax.servlet.ServletOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.environment.Environment;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.includeservletasstring.BufferOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -51,10 +54,14 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
+@ReferenceComponentList
 public class TempResourceActionTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @MockComponent
+    private Environment environment;
 
     /**
      * The action being tested.

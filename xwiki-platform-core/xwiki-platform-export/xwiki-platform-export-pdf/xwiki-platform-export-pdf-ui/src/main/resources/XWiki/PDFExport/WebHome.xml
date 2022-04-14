@@ -230,13 +230,15 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
         // to look exactly as if the user has opened the export URL directly).
         'width': $(window).width()
       }).on('load', () =&gt; {
-        iframe[0].contentWindow.xwikiPageReady.afterPageReady(() =&gt; {
-          // Trigger the print only after all page ready callbacks were executed, because the print preview is
-          // initialized as a page ready callback.
-          iframe[0].contentWindow.xwikiPageReady.afterPageReady(() =&gt; {
-            iframe[0].contentWindow.print();
-            iframe.remove();
-            resolve();
+        iframe[0].contentWindow.require(['xwiki-page-ready'], function(pageReady) {
+          pageReady.afterPageReady(() =&gt; {
+            // Trigger the print only after all page ready callbacks were executed, because the print preview is
+            // initialized as a page ready callback.
+            pageReady.afterPageReady(() =&gt; {
+              iframe[0].contentWindow.print();
+              iframe.remove();
+              resolve();
+            });
           });
         });
       });

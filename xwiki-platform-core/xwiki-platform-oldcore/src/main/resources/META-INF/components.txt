@@ -109,6 +109,7 @@ com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter
 com.xpn.xwiki.internal.model.reference.UserAndGroupDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.UserAndGroupEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver
+org.xwiki.internal.model.reference.CurrentPageReferenceDocumentReferenceResolver
 com.xpn.xwiki.internal.model.DefaultLegacySpaceResolver
 com.xpn.xwiki.internal.namespace.DefaultNamespaceContextExecutor
 com.xpn.xwiki.internal.objects.classes.DefaultDBListQueryBuilder
@@ -235,7 +236,6 @@ com.xpn.xwiki.web.EditAction
 com.xpn.xwiki.web.ExportAction
 com.xpn.xwiki.web.GetAction
 com.xpn.xwiki.web.ImportAction
-com.xpn.xwiki.web.InlineAction
 com.xpn.xwiki.web.LockAction
 com.xpn.xwiki.web.LoginAction
 com.xpn.xwiki.web.LoginErrorAction
@@ -244,7 +244,6 @@ com.xpn.xwiki.web.LogoutAction
 com.xpn.xwiki.web.ObjectAddAction
 com.xpn.xwiki.web.ObjectRemoveAction
 com.xpn.xwiki.web.ObjectsSynchronizeAction
-com.xpn.xwiki.web.PDFAction
 com.xpn.xwiki.web.PreviewAction
 com.xpn.xwiki.web.PropAddAction
 com.xpn.xwiki.web.PropDeleteAction
@@ -259,7 +258,6 @@ com.xpn.xwiki.web.SaveAction
 com.xpn.xwiki.web.SaveAndContinueAction
 com.xpn.xwiki.web.SkinAction
 com.xpn.xwiki.web.SVGAction
-com.xpn.xwiki.web.TempResourceAction
 com.xpn.xwiki.web.TexAction
 com.xpn.xwiki.web.UndeleteAction
 com.xpn.xwiki.web.UnknownAction

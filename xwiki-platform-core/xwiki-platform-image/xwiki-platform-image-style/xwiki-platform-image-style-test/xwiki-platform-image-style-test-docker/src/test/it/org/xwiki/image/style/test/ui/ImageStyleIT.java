@@ -70,7 +70,7 @@ class ImageStyleIT
         imageStyleConfigurationForm
             .setPrettyName("Default")
             .setType("default-class")
-            .clickSaveAndContinue(true);
+            .clickSaveAndView(true);
         imageStyleAdministrationPage = imageStyleConfigurationForm.clickBackToTheAdministration();
         assertEquals("", imageStyleAdministrationPage.getDefaultStyle());
         imageStyleAdministrationPage.submitDefaultStyleForm("default");
@@ -91,12 +91,12 @@ class ImageStyleIT
             + "<prettyName>Default</prettyName>"
             + "<type>default-class</type>"
             + "<adjustableSize>false</adjustableSize>"
-            + "<defaultWidth>0</defaultWidth>"
-            + "<defaultHeight>0</defaultHeight>"
+            + "<defaultWidth xsi:nil=\"true\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"/>"
+            + "<defaultHeight xsi:nil=\"true\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"/>"
             + "<adjustableBorder>false</adjustableBorder>"
             + "<defaultBorder>false</defaultBorder>"
             + "<adjustableAlignment>false</adjustableAlignment>"
-            + "<defaultAlignment>default</defaultAlignment>"
+            + "<defaultAlignment>none</defaultAlignment>"
             + "<adjustableTextWrap>false</adjustableTextWrap>"
             + "<defaultTextWrap>false</defaultTextWrap>"
             + "</imageStyle>"

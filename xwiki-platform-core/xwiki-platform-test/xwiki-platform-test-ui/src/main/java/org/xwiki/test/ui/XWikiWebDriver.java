@@ -19,10 +19,10 @@
  */
 package org.xwiki.test.ui;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.openqa.selenium.By;
@@ -78,7 +78,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     public WebElement findElementWithoutWaiting(By by)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
         try {
             return findElement(by);
         } finally {
@@ -99,7 +99,7 @@ public class XWikiWebDriver extends RemoteWebDriver
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
         // Trying to use another unit in case there is a conflict when calling implicitlyWait both here
         // and in waitUntilCondition.
-        manage().timeouts().implicitlyWait(1, TimeUnit.MILLISECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofMillis(1));
         try {
             return findElementWithoutScrolling(by);
         } finally {
@@ -110,7 +110,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     public List<WebElement> findElementsWithoutWaiting(By by)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
         try {
             return findElements(by);
         } finally {
@@ -121,7 +121,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     public WebElement findElementWithoutWaiting(WebElement element, By by)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
         try {
             return element.findElement(by);
         } finally {
@@ -132,7 +132,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     public List<WebElement> findElementsWithoutWaiting(WebElement element, By by)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
         try {
             return element.findElements(by);
         } finally {
@@ -221,8 +221,8 @@ public class XWikiWebDriver extends RemoteWebDriver
     public <T> void waitUntilCondition(ExpectedCondition<T> condition)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        Wait<WebDriver> wait = new WebDriverWait(this, getTimeout());
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+        Wait<WebDriver> wait = new WebDriverWait(this, Duration.ofSeconds(getTimeout()));
         try {
             wait.until(condition::apply);
         } finally {
@@ -246,7 +246,7 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void setDriverImplicitWait(int timeout)
     {
-        manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(timeout));
     }
 
     public int getTimeout()
@@ -770,102 +770,6 @@ public class XWikiWebDriver extends RemoteWebDriver
     public <X> X getScreenshotAs(OutputType<X> outputType) throws WebDriverException
     {
         return this.wrappedDriver.getScreenshotAs(outputType);
-    }
-
-    @Override
-    public WebElement findElementById(String using)
-    {
-        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public List<WebElement> findElementsById(String using)
-    {
-        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public WebElement findElementByLinkText(String using)
-    {
-        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public List<WebElement> findElementsByLinkText(String using)
-    {
-        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public WebElement findElementByPartialLinkText(String using)
-    {
-        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public List<WebElement> findElementsByPartialLinkText(String using)
-    {
-        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public WebElement findElementByTagName(String using)
-    {
-        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public List<WebElement> findElementsByTagName(String using)
-    {
-        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public WebElement findElementByName(String using)
-    {
-        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public List<WebElement> findElementsByName(String using)
-    {
-        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public WebElement findElementByClassName(String using)
-    {
-        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public List<WebElement> findElementsByClassName(String using)
-    {
-        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public WebElement findElementByCssSelector(String using)
-    {
-        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public List<WebElement> findElementsByCssSelector(String using)
-    {
-        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public WebElement findElementByXPath(String using)
-    {
-        throw new RuntimeException("Use findElement(By) instead, in preparation for the move to Selenium4");
-    }
-
-    @Override
-    public List<WebElement> findElementsByXPath(String using)
-    {
-        throw new RuntimeException("Use findElements(By) instead, in preparation for the move to Selenium4");
     }
 
     @Override

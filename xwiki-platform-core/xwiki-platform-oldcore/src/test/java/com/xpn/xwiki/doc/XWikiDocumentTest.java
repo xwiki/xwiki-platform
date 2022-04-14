@@ -36,13 +36,19 @@ import org.apache.commons.io.IOUtils;
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityEngine;
@@ -122,6 +128,9 @@ public class XWikiDocumentTest
     private BaseObject baseObject;
 
     private BaseObject baseObject2;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     protected void setUp() throws Exception
@@ -241,26 +250,47 @@ public class XWikiDocumentTest
     }
 
     @Test
-    public void getUniqueLinkedPages21()
+    public void getUniqueLinkedPages21() throws Exception
     {
         XWikiDocument contextDocument =
             new XWikiDocument(new DocumentReference("contextdocwiki", "contextdocspace", "contextdocpage"));
         this.oldcore.getXWikiContext().setDoc(contextDocument);
 
         this.document.setSyntax(Syntax.XWIKI_2_1);
-        this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
-            + "[[http://externallink]][[mailto:mailto]][[]][[targetwiki:TargetSpace.TargetPage]][[page:OtherPage]]"
-            + "[[attach:AttachSpace.AttachDocument@attachment.ext]][[attach:attachent.ext]]"
+        this.document.setContent(""
+            + "[[TargetPage]]"
+            + "[[TargetLabel>>TargetPage]]"
+            + "[[TargetSpace.TargetPage]]"
+            + "[[http://externallink]]"
+            + "[[mailto:mailto]]"
+            + "[[]]"
+            + "[[targetwiki:TargetSpace.TargetPage]]"
+            + "[[page:OtherPage]]"
+            + "[[attach:AttachSpace.AttachDocument@attachment.ext]]"
+            + "[[attach:attachment.ext]]"
+            + "[[pageAttach:OtherPage/attachment.ext]]"
             + "image:ImageSpace.ImageDocument@image.png image:image.png");
         this.baseObject.setLargeStringValue("area", "[[TargetPage]][[ObjectTargetPage]]");
+
+        // Simulate that "OtherPage.WebHome" exists
+        DocumentReferenceResolver<PageReference> currentPageReferenceDcoumentReferenceResolver =
+            this.oldcore.getMocker().registerMockComponent(
+                new DefaultParameterizedType(null, DocumentReferenceResolver.class, PageReference.class), "current");
+        when(currentPageReferenceDcoumentReferenceResolver.resolve(new PageReference("Wiki", "OtherPage")))
+            .thenReturn(new DocumentReference("Wiki", "OtherPage", "WebHome"));
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
 
         assertEquals(
-            new LinkedHashSet<>(Arrays.asList("Space.TargetPage.WebHome", "TargetSpace.TargetPage.WebHome",
-                "targetwiki:TargetSpace.TargetPage.WebHome", "OtherPage.WebHome", "AttachSpace.AttachDocument.WebHome",
-                "ImageSpace.ImageDocument.WebHome", "Space.ObjectTargetPage.WebHome")),
-            linkedPages);
+            new LinkedHashSet<>(Arrays.asList(
+                "Space.TargetPage.WebHome",
+                "TargetSpace.TargetPage.WebHome",
+                "targetwiki:TargetSpace.TargetPage.WebHome",
+                "OtherPage.WebHome",
+                "AttachSpace.AttachDocument.WebHome",
+                "ImageSpace.ImageDocument.WebHome",
+                "Space.ObjectTargetPage.WebHome"
+            )), linkedPages);
     }
 
     @Test

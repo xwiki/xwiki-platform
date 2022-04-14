@@ -57,6 +57,7 @@
 #set ($discard = $doc.use($xobject))
 ## Using the xform vertical form layout.
 &lt;div class="xform"&gt;
+  &lt;input name="xhidden" type="hidden" value="1" /&gt;
   &lt;dl&gt;
   #foreach ($property in $xclass.properties)
     &lt;dt #if (!$editing &amp;&amp; $hasEdit)
@@ -82,7 +83,11 @@
   &lt;/dl&gt;
 &lt;/div&gt;
 {{/html}}
+
+#if (!$editing)
+[[{{translation key='image.style.imageStyleSheet.backToAdministration.link' /}}&gt;&gt;XWiki.XWikiPreferences||class="btn btn-primary admin-link" queryString="editor=globaladmin&amp;section=image.style"]]
+#end
 {{/velocity}}
 
-[[{{translation key='image.style.imageStyleSheet.backToAdministration.link' /}}&gt;&gt;XWiki.XWikiPreferences||class="btn btn-primary admin-link" queryString="editor=globaladmin&amp;section=image.style"]]</content>
+</content>
 </xwikidoc>

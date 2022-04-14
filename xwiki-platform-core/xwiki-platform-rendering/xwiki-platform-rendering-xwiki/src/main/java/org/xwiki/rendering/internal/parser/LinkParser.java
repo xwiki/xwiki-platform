@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.parser;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -124,23 +125,23 @@ public class LinkParser
     }
 
     /**
-     * Retrieve all linked entity references contained in the given XDOM. This method checks for references contained in
+     * Retrieve all entity references contained in the given XDOM. This method checks for references contained in
      * links, images, or macros.
      *
-     * @param dom the XDOM for which to retrieve links.
+     * @param dom the XDOM for which to retrieve links
      * @param entityTypes mapping of the types of references to return (and their corresponding resource types)
-     * @param currentReference the current document reference for making a relative resolution.
-     * @return a set of references contained in the XDOM.
+     * @param currentReference the current document reference for making a relative resolution
+     * @return a set of references contained in the XDOM
      * @since 14.2RC1
      */
     public Set<EntityReference> getUniqueLinkedEntityReferences(XDOM dom,
         Map<EntityType, Set<ResourceType>> entityTypes, DocumentReference currentReference)
     {
-        Set<EntityReference> result = new HashSet<>();
+        Set<EntityReference> result = new LinkedHashSet<>();
 
         Set<ResourceReference> resourceReferences = this.extractReferences(dom);
         for (ResourceReference resourceReference : resourceReferences) {
-            this.addReference(resourceReference, entityTypes, currentReference, result);
+            addReference(resourceReference, entityTypes, currentReference, result);
         }
 
         return result;

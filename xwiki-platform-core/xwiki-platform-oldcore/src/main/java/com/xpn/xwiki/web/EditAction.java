@@ -115,6 +115,7 @@ public class EditAction extends XWikiAction
             editedDocument.setAuthorReference(context.getUserReference());
             editedDocument.setContentAuthorReference(context.getUserReference());
         }
+        editedDocument.readTemporaryUploadedFiles(editForm);
 
         // Expose the edited document on the XWiki context and the Velocity context.
         putDocumentOnContext(editedDocument, context);

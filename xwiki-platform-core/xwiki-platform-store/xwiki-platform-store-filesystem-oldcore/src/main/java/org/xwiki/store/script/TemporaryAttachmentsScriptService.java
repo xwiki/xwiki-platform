@@ -20,7 +20,6 @@
 package org.xwiki.store.script;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,7 +49,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  */
 @Component
 @Singleton
-@Named("temporaryattachments")
+@Named("temporaryAttachments")
 @Unstable
 public class TemporaryAttachmentsScriptService implements ScriptService
 {
@@ -77,11 +76,9 @@ public class TemporaryAttachmentsScriptService implements ScriptService
         XWikiContext context = this.contextProvider.get();
         XWikiAttachment result = null;
         try {
-            Collection<Part> parts = context.getRequest().getParts();
-            for (Part part : parts) {
-                if (fieldName.equals(part.getName())) {
-                    result = this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part);
-                }
+            Part part = context.getRequest().getPart(fieldName);
+            if (part != null) {
+                result = this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part);
             }
         } catch (IOException | ServletException e) {
             logger.warn("Error while reading the request content part: [{}]", ExceptionUtils.getRootCauseMessage(e));

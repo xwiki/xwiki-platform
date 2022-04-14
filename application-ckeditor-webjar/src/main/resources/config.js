@@ -33,7 +33,7 @@ CKEDITOR.editorConfig = function(config) {
       overrides: 'u'
     },
     // Add support for overwriting the default configuration from a wiki page.
-    customConfig: new XWiki.Document('Config', 'CKEditor').getURL('get', 'outputSyntax=plain'),
+    customConfig: new XWiki.Document('Config', 'CKEditor').getURL('get', 'outputSyntax=plain&sheet=CKEditor.ConfigSheet'),
     // Enable the native (in-browser) spell checker because we don't bundle any spell checker plugin. Most of the spell
     // checker plugins are relying on an external service which leads to security and privacy concerns.
     disableNativeSpellChecker: false,

@@ -78,6 +78,7 @@
   #end
 #end
 
+## Old way of uploading, with a save of the document for each upload.
 #macro (handleUploadRequest)
   #set ($fileName = $xwiki.fileupload.getFileName('upload'))
   #if ("$!fileName" != '')
@@ -89,11 +90,30 @@
       #end
       #createAttachment($fileName)
     #else
-      #sendError(403 'The CSRF token is missing.')
+      #sendError(403 "$services.localization.render('ckeditor.upload.error.csrf')")
     #end
   #else
     ## Bad Request
-    #sendError(400 "The 'upload' request parameter is missing. Either you didn't submit any file or the size of the submitted file exceeds the configured maximum upload size.")
+    #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyReturn')")
+  #end
+#end
+
+## New way of handling attachment without saving immediately the document.
+#macro (handleTemporaryUploadRequest)
+  #if ($services.csrf.isTokenValid($request.form_token))
+    #set ($document = $doc)
+    #if ("$!request.document" != '')
+      #set ($document = $xwiki.getDocument($request.document))
+    #end
+    #set ($reference = $document.documentReference)
+    #set ($attachment = $services.temporaryAttachments.uploadTemporaryAttachment($reference, 'upload'))
+    #if ($attachment)
+      #sendSuccess($document, $attachment.filename)
+    #else
+      #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyreturn')")
+    #end
+  #else
+    #sendError(403 "$services.localization.render('ckeditor.upload.error.csrf')")
   #end
 #end
 
@@ -117,6 +137,7 @@
     $jsontool.serialize({
       'uploaded': 1,
       'url': $url,
+      'fileName': $fileName,
       'message': {
         'resourceReference': $resourceReference
       }
@@ -142,7 +163,11 @@
 
 {{velocity wiki="false"}}
 #if ($xcontext.action == 'get')
-  #handleUploadRequest
+  #if ($request.getHeader('X-XWiki-Temporary-Attachment-Support') == 'true')
+    #handleTemporaryUploadRequest
+  #else
+    #handleUploadRequest
+  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

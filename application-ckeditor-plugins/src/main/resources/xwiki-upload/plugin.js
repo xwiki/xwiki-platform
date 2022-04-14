@@ -21,11 +21,17 @@
   'use strict';
   var $ = jQuery;
 
+  // Declare the configuration namespace.
+  CKEDITOR.config['xwiki-upload'] = CKEDITOR.config['xwiki-upload'] || {
+    __namespace: true
+  };
+
   CKEDITOR.plugins.add('xwiki-upload', {
     requires: 'uploadfile,uploadimage,xwiki-marker,xwiki-resource',
 
     init: function(editor) {
       preventParallelUploads(editor);
+      listenToUploadedAttachments(editor);
     },
 
     afterInit: function(editor) {
@@ -138,5 +144,28 @@
     // * another event listener might send the upload request before we overwrite the send function;
     //   see https://ckeditor.com/docs/ckeditor4/latest/guide/dev_file_upload.html#request-2
     }, null, null, 1);
+  };
+
+  var  listenToUploadedAttachments = function (editor) {
+    // Inject header for FileUploader to know which upload mechanism to use.
+    editor.on('fileUploadRequest', function (event) {
+      if (editor.config['xwiki-upload']) {
+        var xhr = event.data.fileLoader.xhr;
+        xhr.setRequestHeader( 'X-XWiki-Temporary-Attachment-Support',
+          editor.config['xwiki-upload'].isTemporaryAttachmentSupported);
+      }
+    });
+    // Inject a new input field when an attachment is added so that the save request knows
+    // which are the new attachments.
+    editor.on('fileUploadResponse', function (event) {
+      if (editor.config['xwiki-upload'].isTemporaryAttachmentSupported) {
+        var input = $('<input>').attr({
+          'type': 'hidden',
+          'name': 'uploadedFiles',
+          'value': event.data.fileLoader.fileName
+        });
+        input.insertAfter($(editor.element.$));
+      }
+    });
   };
 })();

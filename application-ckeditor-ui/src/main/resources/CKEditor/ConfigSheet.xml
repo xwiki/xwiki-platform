@@ -56,7 +56,15 @@
   #if ($xcontext.action == 'get')
     #set ($discard = $response.setContentType('application/javascript'))
   #end
-  #set ($customConfig = {})
+  #set ($isTemporaryAttachmentSupported = "$!services.temporaryAttachments" != '')
+  ## Global default configuration that doesn't depend on the edited content and that needs Velocity code for evaluation.
+  ## Static global configuration (that doesn't need Velocity) should be put in config.js . The default instance level
+  ## configuration is in EditSheet.
+  #set ($customConfig = {
+    'xwiki-upload': {
+      'isTemporaryAttachmentSupported': $isTemporaryAttachmentSupported
+    }
+  })
   #set ($configObj = $doc.getObject('CKEditor.ConfigClass'))
   #foreach ($propName in $configObj.propertyNames)
     #if ($propName != 'advanced')

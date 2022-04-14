@@ -17,44 +17,76 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.doc.tasks;
+package org.xwiki.doc.tasks;
 
-import java.io.Serializable;
+import java.util.Date;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.stability.Unstable;
 
 /**
- * Hold the information about the compound id of a queued task.
+ * Hold the information about a queued task.
  *
  * @version $Id$
- * @see XWikiDocumentIndexingTask
  * @since 14.1RC1
  */
-public class XWikiDocumentIndexingTaskId implements Serializable
+@Unstable
+public class XWikiDocumentIndexingTask
 {
-    private static final long serialVersionUID = -7991702269746938433L;
+    private long id;
 
     private long docId;
 
     private String version;
-    
+
     private String type;
 
     private String instanceId;
 
+    private Date timestamp;
+
+    /**
+     * Getter for {@link #id}.
+     *
+     * @return the synthetic id of this deleted attachment. Uniquely identifies a link
+     * @since 14.3RC1
+     */
+    @Unstable
+    public long getId()
+    {
+        return this.id;
+    }
+
+    /**
+     * Setter for {@link #id}.
+     *
+     * @param id the synthetic id to set. Used only by hibernate
+     * @since 14.3RC1
+     */
+    // This method is private because it is only used reflexively by Hibernate.
+    @SuppressWarnings("java:S1144")
+    private void setId(long id)
+    {
+        this.id = id;
+    }
+
     /**
      * @return the document id
+     * @since 14.3RC1
      */
+    @Unstable
     public long getDocId()
     {
         return this.docId;
     }
 
     /**
-     * @param docId the id of the document to be processed 
+     * @param docId the id of the document to be processed
+     * @since 14.3RC1
      */
+    @Unstable
     public void setDocId(long docId)
     {
         this.docId = docId;
@@ -62,7 +94,9 @@ public class XWikiDocumentIndexingTaskId implements Serializable
 
     /**
      * @return the version to of the document to be processed
+     * @since 14.3RC1
      */
+    @Unstable
     public String getVersion()
     {
         return this.version;
@@ -70,7 +104,9 @@ public class XWikiDocumentIndexingTaskId implements Serializable
 
     /**
      * @param version the version of the document to be processed
+     * @since 14.3RC1
      */
+    @Unstable
     public void setVersion(String version)
     {
         this.version = version;
@@ -78,7 +114,9 @@ public class XWikiDocumentIndexingTaskId implements Serializable
 
     /**
      * @return the type of the task to do on the document
+     * @since 14.3RC1
      */
+    @Unstable
     public String getType()
     {
         return this.type;
@@ -86,7 +124,9 @@ public class XWikiDocumentIndexingTaskId implements Serializable
 
     /**
      * @param type the type of the task to do on the document
+     * @since 14.3RC1
      */
+    @Unstable
     public void setType(String type)
     {
         this.type = type;
@@ -94,7 +134,9 @@ public class XWikiDocumentIndexingTaskId implements Serializable
 
     /**
      * @return the identifier of the instance that queued the task
+     * @since 14.3RC1
      */
+    @Unstable
     public String getInstanceId()
     {
         return this.instanceId;
@@ -102,21 +144,28 @@ public class XWikiDocumentIndexingTaskId implements Serializable
 
     /**
      * @param instanceId the identifier of the instance that queued the task
+     * @since 14.3RC1
      */
+    @Unstable
     public void setInstanceId(String instanceId)
     {
         this.instanceId = instanceId;
     }
 
-    @Override
-    public String toString()
+    /**
+     * @return the timestamp of the insertion of the task in the queue
+     */
+    public Date getTimestamp()
     {
-        return new ToStringBuilder(this)
-            .append("docId", this.docId)
-            .append("type", this.type)
-            .append("version", getVersion())
-            .append("instanceId", getInstanceId())
-            .toString();
+        return this.timestamp;
+    }
+
+    /**
+     * @param timestamp the timestamp of the insertion of the task in the queue
+     */
+    public void setTimestamp(Date timestamp)
+    {
+        this.timestamp = timestamp;
     }
 
     @Override
@@ -130,11 +179,12 @@ public class XWikiDocumentIndexingTaskId implements Serializable
             return false;
         }
 
-        XWikiDocumentIndexingTaskId that = (XWikiDocumentIndexingTaskId) o;
+        XWikiDocumentIndexingTask that = (XWikiDocumentIndexingTask) o;
 
         return new EqualsBuilder()
-            .append(this.version, that.version)
+            .append(this.id, that.id)
             .append(this.docId, that.docId)
+            .append(this.version, that.version)
             .append(this.type, that.type)
             .append(this.instanceId, that.instanceId)
             .isEquals();
@@ -144,10 +194,24 @@ public class XWikiDocumentIndexingTaskId implements Serializable
     public int hashCode()
     {
         return new HashCodeBuilder(17, 37)
+            .append(this.id)
             .append(this.docId)
             .append(this.version)
             .append(this.type)
             .append(this.instanceId)
             .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+            .append("id", this.id)
+            .append("docId", this.docId)
+            .append("version", this.version)
+            .append("type", this.type)
+            .append("instanceId", this.instanceId)
+            .append("timestamp", this.timestamp)
+            .toString();
     }
 }

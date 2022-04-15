@@ -80,7 +80,7 @@ public enum Browser
         desiredCapabilities.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
         desiredCapabilities.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
         desiredCapabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-        this.capabilities.merge(desiredCapabilities);
+        this.capabilities = this.capabilities.merge(desiredCapabilities);
 
         if (this.capabilities instanceof FirefoxOptions) {
             FirefoxOptions firefoxOptions = (FirefoxOptions) this.capabilities;
@@ -89,7 +89,7 @@ public enum Browser
                 firefoxOptions.setProfile(new FirefoxProfile());
             }
             // We want to ensure that those events are taking into account.
-            firefoxOptions.getProfile().setPreference("dom.disable_beforeunload", false);
+            firefoxOptions.addPreference("dom.disable_beforeunload", false);
         } else if (this.capabilities instanceof ChromeOptions) {
             ChromeOptions chromeOptions = (ChromeOptions) this.capabilities;
             chromeOptions.addArguments(

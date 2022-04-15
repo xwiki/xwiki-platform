@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -67,7 +66,7 @@ import static org.mockito.Mockito.when;
  * @since 13.4.4
  */
 @ComponentList({
-   UserScriptService.class
+    UserScriptService.class
 })
 @DefaultUserComponentList
 @LikeScriptServiceComponentList
@@ -105,7 +104,6 @@ class LikersPageTest extends PageTest
         // Make sure UserScriptService loads properly.
         this.componentManager.getInstance(ScriptService.class, "user");
 
-        registerVelocityTool("numbertool", new NumberTool());
         registerVelocityTool("escapetool", new EscapeTool());
     }
 

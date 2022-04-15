@@ -23,8 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.velocity.tools.generic.MathTool;
-import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -80,9 +78,6 @@ class GetusersPageTest extends PageTest
         this.groupService = this.context.getWiki().getGroupService(this.context);
 
         this.contextualAuthorizationManager = this.componentManager.getInstance(ContextualAuthorizationManager.class);
-
-        registerVelocityTool("numbertool", new NumberTool());
-        registerVelocityTool("mathtool", new MathTool());
     }
 
     @Test

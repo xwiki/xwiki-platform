@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.tools.generic.MathTool;
-import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -102,8 +100,6 @@ class GetgroupmembersPageTest extends PageTest
         this.componentManager.getInstance(ScriptService.class, "user");
         this.componentManager.getInstance(ScriptService.class, "user.group");
 
-        registerVelocityTool("numbertool", new NumberTool());
-        registerVelocityTool("mathtool", new MathTool());
         registerVelocityTool("stringutils", new StringUtils());
         registerVelocityTool("stringtool", new StringUtils());
         registerVelocityTool("escapetool", new EscapeTool());

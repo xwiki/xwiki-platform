@@ -22,8 +22,6 @@ package org.xwiki.web;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.velocity.tools.generic.MathTool;
-import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -92,9 +90,7 @@ class GetdeleteddocumentsPageTest extends PageTest
 
         this.xwiki.setRecycleBinStore(this.recycleBinStore);
 
-        registerVelocityTool("mathtool", new MathTool());
         registerVelocityTool("escapetool", new EscapeTool());
-        registerVelocityTool("numbertool", new NumberTool());
     }
 
     @Test

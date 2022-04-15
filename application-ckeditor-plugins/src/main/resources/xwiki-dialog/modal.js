@@ -94,6 +94,29 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
     };
   };
 
+  // TODO: This method must be removed once the parent version is upgraded to  13.4.3+, 12.10.9+, or 13.7-rc-1+ 
+  // (see https://jira.xwiki.org/browse/XWIKI-18895)
+  $.fn.loadRequiredSkinExtensions = function(requiredSkinExtensions) {
+    return this.each(function() {
+      // 'this' can be an element, the window or the document itself.
+      var ownerDocument = this.ownerDocument || this.document || this;
+      var head = $(ownerDocument).find('head');
+      var existingSkinExtensions;
+      var getExistingSkinExtensions = function() {
+        return head.find('link, script').map(function() {
+          return $(this).attr('href') || $(this).attr('src');
+        }).get();
+      };
+      $('<div></div>').html(requiredSkinExtensions).find('link, script').filter(function() {
+        if (!existingSkinExtensions) {
+          existingSkinExtensions = getExistingSkinExtensions();
+        }
+        var url = $(this).attr('href') || $(this).attr('src');
+        return existingSkinExtensions.indexOf(url) < 0;
+      }).appendTo(head);
+    });
+  };
+  
   return {
     createModal: createModal,
     createModalStep: createModalStep

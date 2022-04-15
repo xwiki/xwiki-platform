@@ -51,7 +51,7 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
   };
 
   CKEDITOR.plugins.add('xwiki-office', {
-    requires: 'uploadwidget,notification,xwiki-localization,xwiki-macro',
+    requires: 'uploadwidget,notification,xwiki-localization,xwiki-macro,xwiki-dialog',
 
     init : function(editor) {
       var officeImporterURL = (editor.config['xwiki-office'] || {}).importer;

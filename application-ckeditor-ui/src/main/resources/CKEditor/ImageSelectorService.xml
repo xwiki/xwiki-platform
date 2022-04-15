@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="CKEditor.ImageSelectorService" locale="">
+  <web>CKEditor</web>
+  <name>ImageSelectorService</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1648816214000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1649343095000</date>
+  <contentUpdateDate>1649343095000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#if ($xcontext.action == 'get')
+  #template('display_macros.vm')
+  #initRequiredSkinExtensions()
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($xcontext.action == 'get')
+{{html clean='false'}}
+&lt;div&gt;
+  &lt;!-- Nav tabs --&gt;
+  &lt;ul class="nav nav-tabs" role="tablist"&gt;
+    &lt;li role="presentation" class="active"&gt;
+      &lt;a href="#documentTree" aria-controls="documentTree" role="tab" data-toggle="tab"&gt;
+        $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageSelector.documentTreeTab.title'))
+      &lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li role="presentation"&gt;
+      &lt;a href="#upload" aria-controls="upload" role="tab" data-toggle="tab"&gt;
+        $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageSelector.uploadTab.title'))
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+
+  &lt;!-- Tab panes --&gt;
+  &lt;div class="tab-content"&gt;
+    &lt;div role="tabpanel" class="tab-pane active" id="documentTree"&gt;
+      #template('documentTree_macros.vm')
+      #documentTree({
+        'class': 'attachments-tree',
+        'finder': true,
+        'openTo': "document:$services.model.serialize($doc.documentReference, 'default')",
+        'showWikis': true,
+        'showTranslations': false
+      })
+    &lt;/div&gt;
+    &lt;div role="tabpanel" class="tab-pane" id="upload"&gt;
+      &lt;form class="xform"&gt;
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label for="fileUploadField"&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageSelector.uploadTab.file.title'))
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageSelector.uploadTab.file.hint'))
+            &lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            &lt;input id="fileUploadField" name="fileUploadField" type="file" accept="image/*"/&gt;
+          &lt;/dd&gt;
+        &lt;/dl&gt;
+        &lt;p&gt;
+          &lt;span class="buttonwrapper"&gt;
+            &lt;input class="button" type="submit"
+              value="$escapetool.xml($services.localization.render('ckeditor.plugin.image.imageSelector.uploadTab.uploadButton'))"/&gt;
+          &lt;/span&gt;
+        &lt;/p&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
+#end
+{{/velocity}}
+
+{{velocity output="false"}}
+#if ($xcontext.action == 'get')
+  #getRequiredSkinExtensions($requiredSkinExtensions)
+  #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#end
+{{/velocity}}</content>
+</xwikidoc>

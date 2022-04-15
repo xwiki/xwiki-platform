@@ -64,7 +64,10 @@
   };
 
   CKEDITOR.plugins.add('xwiki-macro', {
-    requires: 'widget,balloontoolbar,notification,xwiki-marker,xwiki-loading,xwiki-localization,xwiki-selection',
+    // CKEditor build fails if the requires string contains a concatenation. To match the line length limit, the string
+    // is moved one line down.
+    requires: 
+      'widget,balloontoolbar,notification,xwiki-marker,xwiki-loading,xwiki-localization,xwiki-selection,xwiki-dialog',
 
     init: function(editor) {
       var macroPlugin = this;

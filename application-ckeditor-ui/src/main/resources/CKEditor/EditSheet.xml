@@ -161,6 +161,7 @@
 #set ($ckeditorBasePath = $stringtool.removeEnd($stringtool.removeEnd($ckeditorPath, '.js'), 'ckeditor'))
 #set ($resourcePickerBundlePath = "${ckeditorBasePath}plugins/xwiki-resource/resourcePicker.bundle.min")
 #set ($macroWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-macro/macroWizard.bundle.min")
+#set ($imageWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-image/imageWizard.bundle.min")
 #set ($modalPath = "${ckeditorBasePath}plugins/xwiki-dialog/modal.min")
 #set ($l10nPath = "${ckeditorBasePath}plugins/xwiki-localization/l10n.min")
 */
@@ -171,6 +172,7 @@ require.config({
     modal: '$!modalPath',
     l10n: '$!l10nPath',
     macroWizard: '$!macroWizardBundlePath',
+    imageWizard: '$!imageWizardBundlePath',
     // This is used by the resource suggest picker on the link modal.
     'bootstrap3-typeahead': $jsontool.serialize($services.webjars.url('org.webjars.npm:bootstrap-3-typeahead',
       'bootstrap3-typeahead.min')),
@@ -185,7 +187,7 @@ require.config({
     ckeditor: {
       exports: 'CKEDITOR',
       // This includes dependencies of the plugins bundled with the CKEditor code.
-      deps: ['jquery', 'resource', 'resourcePicker', 'macroWizard']
+      deps: ['jquery', 'resource', 'resourcePicker', 'macroWizard', 'imageWizard']
     }
   },
   config: {

@@ -156,6 +156,17 @@
                 <exclude>plugin.js</exclude>
               </excludes>
             </aggregation>
+            <!-- Aggregate the Image Dialog modules. -->
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <output>${webjar.contentDirectory}/xwiki-image/imageWizard.bundle.js</output>
+              <includes>
+                <include>*.js</include>
+              </includes>
+              <excludes>
+                <exclude>plugin.js</exclude>
+              </excludes>
+            </aggregation>
           </aggregations>
           <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
           <jswarn>false</jswarn>

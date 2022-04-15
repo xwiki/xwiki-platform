@@ -377,35 +377,9 @@ define('macroParameterTreeSorter', ['jquery'], function($) {
 });
 
 /**
- * Utility module to load required skin extensions.
- */
-define('xwiki-skinx', ['jquery'], function($) {
-  $.fn.loadRequiredSkinExtensions = function(requiredSkinExtensions) {
-    return this.each(function() {
-      // 'this' can be an element, the window or the document itself.
-      var ownerDocument = this.ownerDocument || this.document || this;
-      var head = $(ownerDocument).find('head');
-      var existingSkinExtensions;
-      var getExistingSkinExtensions = function() {
-        return head.find('link, script').map(function() {
-          return $(this).attr('href') || $(this).attr('src');
-        }).get();
-      };
-      $('<div></div>').html(requiredSkinExtensions).find('link, script').filter(function() {
-        if (!existingSkinExtensions) {
-          existingSkinExtensions = getExistingSkinExtensions();
-        }
-        var url = $(this).attr('href') || $(this).attr('src');
-        return existingSkinExtensions.indexOf(url) < 0;
-      }).appendTo(head);
-    });
-  };
-});
-
-/**
  * Macro Parameter Tree Displayer
  */
-define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor', 'xwiki-skinx'], function($, translations) {
+define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($, translations) {
   'use strict';
 
   var displayMacroParameterTree = function(macroParameterTree, requiredSkinExtensions) {

@@ -54,11 +54,11 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @version $Id$
  */
 @UITest
-public class ObjectEditorIT
+class ObjectEditorIT
 {
     // We're using classes with a nested space to ensure class names with multiple dots are not causing problems.
-    private final static String NUMBER_CLASS = "ObjectEditorIT.NestedSpace.NumberClass";
-    private final static String STRING_CLASS = "ObjectEditorIT.NestedSpace.StringClass";
+    private static final String NUMBER_CLASS = "ObjectEditorIT.NestedSpace.NumberClass";
+    private static final String STRING_CLASS = "ObjectEditorIT.NestedSpace.StringClass";
 
     @BeforeAll
     public void setup(TestUtils setup)
@@ -76,12 +76,13 @@ public class ObjectEditorIT
         setup.createPage(stringClassReference, "", "StringClass");
         setup.addClassProperty(stringClassReference, "string", "String");
     }
-
-    @Order(1)
+    
     @Test
-    public void preventUsersToLeaveTheEditorWithoutSaving(TestUtils testUtils, TestReference testReference)
+    @Order(1)
+    void preventUsersToLeaveTheEditorWithoutSaving(TestUtils testUtils, TestReference testReference)
     {
         // fixture
+        testUtils.deletePage(testReference);
         testUtils.createPage(testReference, "Some content");
         testUtils.addObject(testReference, NUMBER_CLASS, "number", 42);
 
@@ -157,9 +158,9 @@ public class ObjectEditorIT
         assertTrue(xobjects.isEmpty());
     }
 
-    @Order(2)
     @Test
-    public void addingAndDeletingMultipleObjects(TestUtils testUtils, TestReference testReference)
+    @Order(2)
+    void addingAndDeletingMultipleObjects(TestUtils testUtils, TestReference testReference)
     {
         ViewPage viewPage = testUtils.createPage(testReference, "Some content"); // version 1.1
         ObjectEditPage objectEditPage = viewPage.editObjects();
@@ -304,7 +305,7 @@ public class ObjectEditorIT
      */
     @Test
     @Order(3)
-    public void createEmptyGroup(TestUtils testUtils, TestReference testReference)
+    void createEmptyGroup(TestUtils testUtils, TestReference testReference)
     {
         ViewPage vp = testUtils.createPage(testReference, "this is the content");
 
@@ -319,7 +320,7 @@ public class ObjectEditorIT
 
     @Test
     @Order(4)
-    public void changeMultiselectProperty(TestUtils testUtils, TestReference testReference)
+    void changeMultiselectProperty(TestUtils testUtils, TestReference testReference)
     {
         String dedicatedSpace = testReference.getLastSpaceReference().getName();
         String testClassPage = "TestClass";
@@ -361,7 +362,7 @@ public class ObjectEditorIT
 
     @Test
     @Order(5)
-    public void changeNumberType(TestUtils testUtils, TestReference testReference)
+    void changeNumberType(TestUtils testUtils, TestReference testReference)
     {
         String dedicatedSpace = testReference.getLastSpaceReference().getName();
         String testClassPage = "TestClass";
@@ -417,7 +418,7 @@ public class ObjectEditorIT
 
     @Test
     @Order(6)
-    public void changeListMultipleSelect(TestUtils testUtils, TestReference testReference)
+    void changeListMultipleSelect(TestUtils testUtils, TestReference testReference)
     {
         String dedicatedSpace = testReference.getLastSpaceReference().getName();
         String testClassPage = "TestClass";
@@ -466,7 +467,7 @@ public class ObjectEditorIT
 
     @Test
     @Order(7)
-    public void changeListTypeRelationalStorage(TestUtils testUtils, TestReference testReference)
+    void changeListTypeRelationalStorage(TestUtils testUtils, TestReference testReference)
     {
         String dedicatedSpace = testReference.getLastSpaceReference().getName();
         String testClassPage = "TestClass";
@@ -530,7 +531,7 @@ public class ObjectEditorIT
 
     @Test
     @Order(8)
-    public void objectAddAndRemove(TestReference testReference)
+    void objectAddAndRemove(TestReference testReference)
     {
         String dedicatedSpace = testReference.getLastSpaceReference().getName();
         String testObjectPage = "TestObject";
@@ -562,7 +563,7 @@ public class ObjectEditorIT
 
     @Test
     @Order(9)
-    public void inlineObjectAddButton(TestReference testReference)
+    void inlineObjectAddButton(TestReference testReference)
     {
         String dedicatedSpace = testReference.getLastSpaceReference().getName();
         String testObjectPage = "TestObject";
@@ -577,7 +578,7 @@ public class ObjectEditorIT
 
     @Test
     @Order(10)
-    public void propertyDisplayersForNewObjects(TestUtils testUtils, TestReference testReference) throws Exception
+    void propertyDisplayersForNewObjects(TestUtils testUtils, TestReference testReference) throws Exception
     {
         String dedicatedSpace = testReference.getLastSpaceReference().getName();
         String testClassPage = "TestClass";

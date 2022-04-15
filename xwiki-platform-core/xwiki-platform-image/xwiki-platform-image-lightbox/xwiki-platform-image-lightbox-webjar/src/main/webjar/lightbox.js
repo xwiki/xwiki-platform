@@ -172,16 +172,20 @@ define('xwiki-lightbox', [
   /*
    * Make sure that the toolbar will remain open also while hovering it, not just the image.
    */
-  var keepToolbarOpenOnHover = function(image, hideTimeout) {
-    hideTimeout = setTimeout(function() {
+  var keepToolbarOpenOnHover = function() {
+    // Hide the image popover after 3 seconds (if the mouse doesn't enter the popover).
+    var hideTimeout = setTimeout(function() {
       $('#imagePopoverContainer').popover('hide');
     }, 3000);
+    // Don't hide the image popover when the mouse is over it.
     $('#imagePopoverContainer .popover').on('mouseenter', function() {
       clearTimeout(hideTimeout);
     });
+    // Hide the image popover when the mouse leaves its area.
     $('#imagePopoverContainer .popover').on('mouseleave', function() {
       $(this).popover('hide');
     });
+    return hideTimeout;
   };
 
   /**
@@ -235,10 +239,10 @@ define('xwiki-lightbox', [
       showTimeout = setTimeout(function() {
         popoverContainer.css({top: e.pageY, left: e.pageX });
         popoverContainer.popover('show');
-      }, 800);
+      }, 400);
     }).on('mouseleave', function() {
       clearTimeout(showTimeout);
-      keepToolbarOpenOnHover($(this), hideTimeout);
+      hideTimeout = keepToolbarOpenOnHover();
     });
   };
 

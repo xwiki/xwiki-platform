@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 11.3RC1
  */
 @UITest
-public class EditTranslationIT
+class EditTranslationIT
 {
     @BeforeAll
     public void setup(TestUtils setup) throws Exception
@@ -63,7 +63,7 @@ public class EditTranslationIT
 
     @Test
     @Order(1)
-    public void translateDocument(TestUtils setup, TestReference testReference) throws Exception
+    void translateDocument(TestUtils setup, TestReference testReference) throws Exception
     {
         LocalDocumentReference referenceDEFAULT = new LocalDocumentReference(testReference);
         LocalDocumentReference referenceFR = new LocalDocumentReference(referenceDEFAULT, Locale.FRENCH);
@@ -185,19 +185,19 @@ public class EditTranslationIT
 
     @Test
     @Order(2)
-    public void testTranslatePanel(TestUtils setup, TestReference testReference) throws Exception
+    void testTranslatePanel(TestUtils setup, TestReference testReference) throws Exception
     {
         // Create a new Panel with a content and set the wiki as multilingual en/fr.
         setup.addObject(testReference, "Panels.PanelClass", "content", "custom panel");
         setup.setWikiPreference("multilingual", "true");
         setup.setWikiPreference("languages", "en,fr");
 
-        setup.gotoPage(testReference, "inline", "language=en");
+        setup.gotoPage(testReference, "edit", "language=en&editor=inline");
         InlinePage inlinePage = new InlinePage();
         assertEquals("custom panel", inlinePage.getValue("content"));
         inlinePage.setValue("content", "another value");
         inlinePage.clickSaveAndView();
-        setup.gotoPage(testReference, "inline", "language=en");
+        setup.gotoPage(testReference, "edit", "language=en&editor=inline");
         assertEquals("another value", inlinePage.getValue("content"));
     }
 }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -105,6 +105,8 @@ ckeditor.plugin.syntax.update.done=Éditeur WYSIWYG mis à jour
 ckeditor.plugin.syntax.update.failed=Échec de la mise à jour de l'éditeur WYSIWYG
 ckeditor.plugin.syntax.wysiwygModeUnsupported=L''édition WYSIWYG n''est pas supportée pour la syntaxe {0}.
 ckeditor.inline.failedToInit=Échec de l'initialisation du CKEditor.
+ckeditor.upload.error.csrf=Le jeton CSRF est manquant.
+ckeditor.upload.error.emptyReturn=Erreur lors de l'envoi du fichier : sa taille doit dépasser la taille maximum autorisée.
 modal.ok=OK
 modal.cancel=Annuler
 modal.close=Fermer

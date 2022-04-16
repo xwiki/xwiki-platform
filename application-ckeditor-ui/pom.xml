@@ -40,8 +40,9 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor Integration</xwiki.extension.name>
-    <!-- Don't run CLIRR here since there's no Java code. -->
+    <!-- Don't run CLIRR and Revapi here because there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>
   <dependencies>
     <dependency>

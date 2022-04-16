@@ -17,6 +17,7 @@ paths: {
 
   testUtils: '/spec/testUtils',
 
+  'xwiki-dialog': 'xwiki-dialog/plugin',
   'xwiki-filter': 'xwiki-filter/plugin',
   'xwiki-loading': 'xwiki-loading/plugin',
   'xwiki-localization': 'xwiki-localization/plugin',
@@ -38,10 +39,11 @@ shim: {
     exports: 'CKEDITOR'
   },
 
+  'xwiki-dialog': ['ckeditor'],
   'xwiki-filter': ['ckeditor'],
   'xwiki-loading': ['ckeditor'],
   'xwiki-localization': ['ckeditor'],
-  'xwiki-macro': ['ckeditor', 'xwiki-loading', 'xwiki-localization', 'xwiki-marker', 'textSelection'],
+  'xwiki-macro': ['ckeditor', 'xwiki-dialog', 'xwiki-loading', 'xwiki-localization', 'xwiki-marker', 'textSelection'],
   'xwiki-marker': ['ckeditor'],
   'xwiki-resource': ['ckeditor', 'resource', 'resourcePicker', 'l10n', 'xwiki-marker'],
   'xwiki-table': ['ckeditor'],

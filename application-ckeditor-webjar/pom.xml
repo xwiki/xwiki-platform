@@ -38,6 +38,7 @@
     <xwiki.extension.jar.type>webjar</xwiki.extension.jar.type>
     <!-- No Java code here -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Where to unpack the WebJars with the custom CKEditor plugins. -->
     <webjars.unpack.directory>${project.build.directory}/webjars</webjars.unpack.directory>
     <webjars.unpack.contentDirectory>

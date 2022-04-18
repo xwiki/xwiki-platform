@@ -91,7 +91,7 @@ class CreatePanelTest extends PageTest
         renderPage(new DocumentReference("xwiki", "Panels", "CreatePanel"));
 
         // Verify in particular that the document we are redirected to has a name that conforms to the naming strategy.
-        verify(this.response).sendRedirect("/xwiki/bin/inline/Panels/" + tool.url(TRANSFORMED_PAGE_TITLE)
+        verify(this.response).sendRedirect("/xwiki/bin/edit/Panels/" + tool.url(TRANSFORMED_PAGE_TITLE)
             + "?template=Panels.PanelTemplate"
             + "&Panels.PanelClass_0_name=" + tool.url(PAGE_TITLE)
             + "&Panels.PanelClass_0_content=" + tool

@@ -319,7 +319,7 @@
                   /xwiki/bin/edit/XWiki/XWikiPreferences?editor=object
                   /xwiki/bin/edit/XWiki/XWikiPreferences?editor=class
                   /xwiki/bin/edit/XWiki/XWikiPreferences?editor=rights
-                  /xwiki/bin/inline/Panels/QuickLinks
+                  /xwiki/bin/edit/Panels/QuickLinks
                   /xwiki/bin/view/XWiki/Admin?category=preferences
                   /xwiki/bin/create/Main/?tocreate=page
                   /xwiki/bin/create/Main/?tocreate=space

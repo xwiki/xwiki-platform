@@ -26,6 +26,7 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -183,8 +184,17 @@ class EditTranslationIT
         assertEquals(new HashSet<>(Arrays.asList(Locale.ENGLISH, Locale.FRENCH)), editPage.getExistingLocales());
     }
 
+    /**
+     * Tests that saving a panel always updates the default page translation even when another locale is specified,
+     * because all panel information is stored on the default panel page translation using an xobject (which is shared
+     * by all panel page translations but editable only through the default translation).
+     */
     @Test
     @Order(2)
+    @Disabled("It's possible to create a panel page translation from the UI, e.g. using the Wiki edit mode or from the"
+        + " Information tab for user-created panels, but editing it doesn't update the panel meta data from the default"
+        + " page translation, meaning that all changes are lost. See XWIKI-9617: Object properties are not saved when"
+        + " editing a document translation inline")
     void testTranslatePanel(TestUtils setup, TestReference testReference) throws Exception
     {
         // Create a new Panel with a content and set the wiki as multilingual en/fr.

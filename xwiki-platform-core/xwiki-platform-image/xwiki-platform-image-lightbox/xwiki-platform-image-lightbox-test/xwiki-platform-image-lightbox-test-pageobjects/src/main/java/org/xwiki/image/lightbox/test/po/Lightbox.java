@@ -102,6 +102,16 @@ public class Lightbox extends BaseElement
         return getDriver().findElement(publisherSelector).getText();
     }
 
+    public WebElement getCopyImageIdButton()
+    {
+        return getDriver().findElement(By.cssSelector("#blueimp-gallery .copyImageId"));
+    }
+
+    public String getImageId()
+    {
+        return getCopyImageIdButton().getAttribute("data-imageId");
+    }
+
     public String getDate()
     {
         By dateSelector = By.cssSelector("#blueimp-gallery .date");

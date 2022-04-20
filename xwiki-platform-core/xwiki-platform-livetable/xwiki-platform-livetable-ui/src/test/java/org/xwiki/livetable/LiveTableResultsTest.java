@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.tools.generic.MathTool;
-import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -105,9 +103,7 @@ class LiveTableResultsTest extends PageTest
 
         // Register velocity tools used by the LiveTableResultsMacros page
         registerVelocityTool("stringtool", new StringUtils());
-        registerVelocityTool("mathtool", new MathTool());
         registerVelocityTool("regextool", new RegexTool());
-        registerVelocityTool("numbertool", new NumberTool());
         registerVelocityTool("escapetool", new EscapeTool());
 
         loadPage(new DocumentReference("xwiki", "XWiki", "LiveTableResultsMacros"));

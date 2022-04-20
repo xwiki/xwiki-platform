@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -50,20 +49,10 @@ public class LightboxPage extends ViewPage
             Actions action = new Actions(getDriver().getWrappedDriver());
             action.moveToElement(image).build().perform();
 
-            // Workaround to manually display the popup since in firefox the hover is not always triggered even if the
-            // mouse is moved over the image.
-            showPopup(image);
-
             return Optional.of(new ImagePopover());
         } catch (TimeoutException e) {
             return Optional.empty();
         }
-    }
-
-    private void showPopup(WebElement image)
-    {
-        JavascriptExecutor js = (JavascriptExecutor) getDriver();
-        js.executeScript("jQuery(arguments[0]).popover('show');", image);
     }
 
     public WebElement getImageElement(int index)

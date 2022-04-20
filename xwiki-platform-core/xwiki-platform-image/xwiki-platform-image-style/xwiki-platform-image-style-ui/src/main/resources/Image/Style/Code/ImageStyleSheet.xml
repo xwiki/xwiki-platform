@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="Image.Style.Code.ImageStyleSheet" locale="">
+<xwikidoc version="1.5" reference="Image.Style.Code.ImageStyleSheet" locale="">
   <web>Image.Style.Code</web>
   <name>ImageStyleSheet</name>
   <language/>
@@ -29,6 +29,7 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>Image.Style.Code.ImageStyleClass</parent>
   <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>#if($doc.documentReference.name == 'ImageStyleSheet')ImageStyle Sheet#{else}$services.display.title($doc, {'displayerHint': 'default', 'outputSyntaxId': 'plain/1.0'})#end</title>
@@ -56,6 +57,7 @@
 #set ($discard = $doc.use($xobject))
 ## Using the xform vertical form layout.
 &lt;div class="xform"&gt;
+  &lt;input name="xhidden" type="hidden" value="1" /&gt;
   &lt;dl&gt;
   #foreach ($property in $xclass.properties)
     &lt;dt #if (!$editing &amp;&amp; $hasEdit)
@@ -81,7 +83,11 @@
   &lt;/dl&gt;
 &lt;/div&gt;
 {{/html}}
+
+#if (!$editing)
+[[{{translation key='image.style.imageStyleSheet.backToAdministration.link' /}}&gt;&gt;XWiki.XWikiPreferences||class="btn btn-primary admin-link" queryString="editor=globaladmin&amp;section=image.style"]]
+#end
 {{/velocity}}
 
-[[{{translation key='image.style.imageStyleSheet.backToAdministration.link' /}}&gt;&gt;XWiki.XWikiPreferences||class="btn btn-primary admin-link" queryString="editor=globaladmin&amp;section=image.style"]]</content>
+</content>
 </xwikidoc>

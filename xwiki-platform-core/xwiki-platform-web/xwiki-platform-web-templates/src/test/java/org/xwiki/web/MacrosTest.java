@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -60,8 +59,6 @@ class MacrosTest extends PageTest
     {
         this.velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
         registerVelocityTool("escapetool", new EscapeTool());
-        registerVelocityTool("datetool", this.componentManager.getInstance(XWikiDateTool.class));
-        registerVelocityTool("numbertool", new NumberTool());
         registerVelocityTool("stringtool", new StringUtils());
     }
 

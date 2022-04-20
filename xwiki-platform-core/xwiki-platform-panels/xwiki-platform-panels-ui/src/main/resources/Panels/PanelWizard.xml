@@ -289,7 +289,7 @@
               (((
                 (% class="label" %)((($doc.display('name', $obj))))
                 (% id="panelContainer${panelCount}" class="panelcontainer" title="${doc.display('description', 'view', $obj, 'xwiki/2.0').replaceAll('^\{\{html(.*?)\}\}', '').replaceAll('\{\{/html\}\}$', '')}" %)(((#if($panelsStatus.get($item) == 'false')#displaypanel($item)#else(% class="panel" %)((()))#end)))
-                (% class="xwikibuttonlink" %)((([[$services.localization.render('edit')&gt;&gt;path:$xwiki.getURL($item, 'inline')]] [[$services.localization.render('delete')&gt;&gt;path:$xwiki.getURL($item, 'delete')]])))
+                (% class="xwikibuttonlink" %)((([[$services.localization.render('edit')&gt;&gt;path:$xwiki.getURL($item, 'edit')]] [[$services.localization.render('delete')&gt;&gt;path:$xwiki.getURL($item, 'delete')]])))
               )))
               #set ($panelCount = $panelCount + 1)
             #end## foreach panel

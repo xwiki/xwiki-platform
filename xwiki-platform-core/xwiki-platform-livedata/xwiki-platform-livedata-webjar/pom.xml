@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>14.3-SNAPSHOT</version>
+    <version>14.4-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
@@ -159,7 +159,7 @@
               <goal>install-node-and-npm</goal>
             </goals>
             <configuration>
-              <nodeVersion>v16.13.2</nodeVersion>
+              <nodeVersion>v16.14.2</nodeVersion>
             </configuration>
           </execution>
           <execution>

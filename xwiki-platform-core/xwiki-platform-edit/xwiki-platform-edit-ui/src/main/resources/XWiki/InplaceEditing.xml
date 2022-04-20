@@ -1600,7 +1600,6 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
       'translateButtonSelector': '#tmTranslate &gt; a',
       'enableSourceMode': true,
       'enableOfficeImport': $services.officemanager.isConnected(),
-      'enableTemporaryAttachmentUpload': $services.wysiwyg.isFeatureSupported('uploadTemporaryAttachments'),
       'syntax': $services.wysiwyg.HTMLSyntax.toIdString(),
       'paths': {
         'js': {

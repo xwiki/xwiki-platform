@@ -39,7 +39,7 @@
   <content>{{velocity output="false"}}
 #if ($request.createExtension == "true")
   #set($extensionPage = $services.model.createDocumentReference($xcontext.database, ['Extension', $request.name], 'WebHome'))
-  $response.sendRedirect($xwiki.getURL($extensionPage, "inline", "$!{request.queryString}"))
+  $response.sendRedirect($xwiki.getURL($extensionPage, 'edit', "$!{request.queryString}"))
 #end
 {{/velocity}}</content>
 </xwikidoc>

@@ -21,8 +21,6 @@ package org.xwiki.index.internal;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -32,12 +30,11 @@ import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTask;
-import com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTaskId;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 
 /**
@@ -50,15 +47,6 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 @Singleton
 public class TasksStore extends XWikiHibernateBaseStore
 {
-    /**
-     * A special character inserted at the beginning of all document versions, to make sure that the versions are never
-     * the empty string, otherwise Oracle fails to persist the task.
-     *
-     * @see <a href="https://jira.xwiki.org/browse/XWIKI-19571">XWIKI-19571</a></a>
-     */
-    // FIXME: this value is only temporary and should be removed once a proper fix is provided.
-    private static final String FILLER = "-";
-
     @Inject
     private ExecutionContextManager contextManager;
 
@@ -76,20 +64,11 @@ public class TasksStore extends XWikiHibernateBaseStore
      */
     public List<XWikiDocumentIndexingTask> getAllTasks(String wikiId, String instanceId) throws XWikiException
     {
-        List<XWikiDocumentIndexingTask> tasks = initWikiContext(xWikiContext -> executeRead(xWikiContext,
+        return initWikiContext(xWikiContext -> executeRead(xWikiContext,
             session -> session.createQuery("SELECT t FROM XWikiDocumentIndexingTask t "
-                    + "WHERE t.id.instanceId = :instanceId")
+                    + "WHERE t.instanceId = :instanceId")
                 .setParameter("instanceId", instanceId)
                 .getResultList()), wikiId);
-        // TODO: XWIKI-19581
-        // Cleanup the filler placed at the beginning of the versions before returning the tasks as they are only needed
-        // to prevent empty string in the version column on Oracle.  
-        return tasks.stream()
-            .map(task -> {
-                task.getId().setVersion(task.getId().getVersion().replace(FILLER, ""));
-                return task;
-            })
-            .collect(Collectors.toList());
     }
 
     /**
@@ -102,19 +81,10 @@ public class TasksStore extends XWikiHibernateBaseStore
     public void addTask(String wikiId, XWikiDocumentIndexingTask task) throws XWikiException
     {
         initWikiContext(xWikiContext -> {
-            // TODO: XWIKI-19581
-            String version = task.getId().getVersion();
-            try {
-                task.getId().setVersion(internalVersion(version));
-                executeWrite(xWikiContext, session -> {
-                    innerAddTask(task, session);
-                    return null;
-                });
-            } finally {
-                // Make sure the version is modified only for the duration of the save as it is only needed to prevent 
-                // empty string in the version column on Oracle.
-                task.getId().setVersion(version);
-            }
+            executeWrite(xWikiContext, session -> {
+                innerAddTask(task, session);
+                return null;
+            });
             return null;
         }, wikiId);
     }
@@ -132,11 +102,11 @@ public class TasksStore extends XWikiHibernateBaseStore
     {
         initWikiContext(xWikiContext -> {
             executeWrite(xWikiContext, session -> {
-                session.createQuery("delete from XWikiDocumentIndexingTask t where t.id.docId = :docId "
-                        + "and t.id.version = :version "
-                        + "and t.id.type = :type")
+                session.createQuery("delete from XWikiDocumentIndexingTask t where t.docId = :docId "
+                        + "and t.version = :version "
+                        + "and t.type = :type")
                     .setParameter("docId", docId)
-                    .setParameter("version", internalVersion(version))
+                    .setParameter("version", version)
                     .setParameter("type", type)
                     .executeUpdate();
                 return null;
@@ -155,24 +125,15 @@ public class TasksStore extends XWikiHibernateBaseStore
     public void replaceTask(String wikiId, XWikiDocumentIndexingTask task) throws XWikiException
     {
         initWikiContext(xWikiContext -> {
-            String version = task.getId().getVersion();
-            try {
-                task.getId().setVersion(internalVersion(version));
-                executeWrite(xWikiContext, session -> {
-                    XWikiDocumentIndexingTaskId taskId = task.getId();
-                    session.createQuery("delete from XWikiDocumentIndexingTask t where t.id.docId = :docId "
-                            + "and t.id.type = :type")
-                        .setParameter("docId", taskId.getDocId())
-                        .setParameter("type", taskId.getType())
-                        .executeUpdate();
-                    innerAddTask(task, session);
-                    return null;
-                });
-            } finally {
-                // Make sure the version is modified only for the duration of the save as it is only needed to prevent 
-                // empty string in the version column on Oracle.
-                task.getId().setVersion(version);
-            }
+            executeWrite(xWikiContext, session -> {
+                session.createQuery("delete from XWikiDocumentIndexingTask t where t.docId = :docId "
+                        + "and t.type = :type")
+                    .setParameter("docId", task.getDocId())
+                    .setParameter("type", task.getType())
+                    .executeUpdate();
+                innerAddTask(task, session);
+                return null;
+            });
             return null;
         }, wikiId);
     }
@@ -230,10 +191,5 @@ public class TasksStore extends XWikiHibernateBaseStore
     private interface Lambda<T>
     {
         T call(XWikiContext context) throws Exception;
-    }
-
-    private String internalVersion(String version)
-    {
-        return FILLER + Optional.ofNullable(version).orElse("");
     }
 }

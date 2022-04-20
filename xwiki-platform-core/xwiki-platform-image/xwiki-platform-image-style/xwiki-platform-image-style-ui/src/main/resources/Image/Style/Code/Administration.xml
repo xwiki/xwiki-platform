@@ -108,7 +108,7 @@
 {{liveData
   id='imageStyles'
   source='liveTable'
-  sourceParameters='className=Image.Style.Code.ImageStyleClass&amp;translationPrefix=image.style.administration.liveData.'
+  sourceParameters='queryFilters=&amp;className=Image.Style.Code.ImageStyleClass&amp;translationPrefix=image.style.administration.liveData.'
   properties='doc.title,prettyName,type,_actions'
   sort='doc.title:asc'}}{
   "meta": {

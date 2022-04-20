@@ -81,10 +81,14 @@ import org.xwiki.script.internal.service.ServicesScriptContextInitializer;
 import org.xwiki.sheet.internal.DefaultSheetManager;
 import org.xwiki.sheet.internal.SheetDocumentDisplayer;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.velocity.internal.DefaultVelocityConfiguration;
 import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
 import org.xwiki.velocity.internal.DefaultVelocityEngine;
 import org.xwiki.velocity.internal.DefaultVelocityFactory;
+import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
+import org.xwiki.velocity.internal.XWikiDateTool;
+import org.xwiki.velocity.internal.XWikiMathTool;
+import org.xwiki.velocity.internal.XWikiNumberTool;
+import org.xwiki.velocity.internal.XWikiVelocityConfiguration;
 import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 import org.xwiki.xml.internal.html.XWikiHTML5TagProvider;
 import org.xwiki.xml.internal.html.filter.AttributeFilter;
@@ -199,12 +203,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     // Velocity
     DefaultScriptContextManager.class,
     DefaultVelocityFactory.class,
-    DefaultVelocityConfiguration.class,
+    XWikiVelocityConfiguration.class,
     DefaultLoggerConfiguration.class,
     DefaultVelocityEngine.class,
     DefaultVelocityContextFactory.class,
     DefaultVelocityManager.class,
     DefaultAuthorExecutor.class,
+    VelocityExecutionContextInitializer.class,
+    XWikiNumberTool.class,
+    XWikiMathTool.class,
+    XWikiDateTool.class,
 
     // Skin
     DefaultSkinManager.class,

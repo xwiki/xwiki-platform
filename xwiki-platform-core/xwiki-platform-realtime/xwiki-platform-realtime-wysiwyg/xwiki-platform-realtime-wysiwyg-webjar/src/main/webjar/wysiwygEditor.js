@@ -137,7 +137,7 @@ define('xwiki-realtime-wysiwygEditor', [
           editor.on('instanceReady', resolve.bind(null, editor));
         }
       } else {
-        ckeditor.on('instanceReady', function(event) {
+        ckeditor.on('instanceReady', function (event) {
           if (event.editor.name === name) {
             resolve(event.editor);
           }
@@ -253,15 +253,14 @@ define('xwiki-realtime-wysiwygEditor', [
       var initializing = true, editableContent, cursor,
 
       initEditableContent = function() {
+        // Disable temporary attachment upload for now.
+        if (editor.config['xwiki-upload']) {
+          editor.config['xwiki-upload'].isTemporaryAttachmentSupported = false;
+        }
         editableContent = editor.editable().$;
         cursor = Cursor(editableContent);
         $('head', editableContent.ownerDocument).append(userIconStyle);
         fixMagicLine(editor);
-
-        // FIXME: disable the temporary attachment support for now, until it's supported.
-        if (CKEDITOR.switchTemporaryAttachmentUpload) {
-          CKEDITOR.switchTemporaryAttachmentUpload(false, editor);
-        }
       };
 
       // Initialize the editable content when the editor is ready.

@@ -5098,22 +5098,15 @@ public class XWiki implements EventListener
 
         if (reset) {
             // Reset the version
-            targetDocument.setVersion("1.1");
+            targetDocument.setRCSVersion(null);
+            targetDocument.setMetaDataDirty(true);
+        } else {
+            // We don't want to trigger a new version otherwise the version number will be wrong.
+            targetDocument.setMetaDataDirty(false);
+            targetDocument.setContentDirty(false);
         }
-
-        // We don't want to trigger a new version otherwise the version number will be wrong.
-        targetDocument.setMetaDataDirty(false);
-        targetDocument.setContentDirty(false);
 
         saveDocument(targetDocument, "Copied from " + sourceDocument.getDocumentReference(), context);
-
-        // Generate an history for the reseted document (non reseted document get their history saved along with the
-        // document)
-        // TODO: create an history without going through the store to let saveDocument() store it with the document ?
-        if (reset) {
-            // Reload the document from the store to modify the right one
-            context.getWiki().getDocument(targetDocumentReference, context).resetArchive(context);
-        }
 
         return true;
     }

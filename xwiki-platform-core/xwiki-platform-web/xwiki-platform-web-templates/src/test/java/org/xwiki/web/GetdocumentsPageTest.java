@@ -24,8 +24,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.velocity.tools.generic.MathTool;
-import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -97,11 +95,8 @@ class GetdocumentsPageTest extends PageTest
 
         this.jsonTool = spy(new JSONTool());
         registerVelocityTool("jsontool", this.jsonTool);
-        registerVelocityTool("mathtool", new MathTool());
         registerVelocityTool("escapetool", new EscapeTool());
-        registerVelocityTool("numbertool", new NumberTool());
         registerVelocityTool("regextool", new RegexTool());
-        registerVelocityTool("datetool", this.componentManager.getInstance(XWikiDateTool.class));
     }
 
     @Test
@@ -243,6 +238,7 @@ class GetdocumentsPageTest extends PageTest
     private void initDefaultQueryMocks(long count) throws QueryException
     {
         when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.addFilter(anyString())).thenReturn(this.query);
         when(this.query.setLimit(anyInt())).thenReturn(this.query);
         when(this.query.setOffset(anyInt())).thenReturn(this.query);
         when(this.query.bindValues(any(Map.class))).thenReturn(this.query);

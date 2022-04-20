@@ -88,9 +88,8 @@ define('xwiki-lightbox-description', [
       $('.lightboxDescription .title').text(attachmentData.name);
     }
 
-    if (attachmentData.author) {
-      $('.lightboxDescription .publisher')
-        .text(l10n.get('author', XWiki.Model.resolve(attachmentData.author, XWiki.EntityType.DOCUMENT).name));
+    if (attachmentData.authorName) {
+      $('.lightboxDescription .publisher').text(l10n.get('author', attachmentData.authorName));
     }
 
     if (attachmentData.date) {
@@ -173,34 +172,43 @@ define('xwiki-lightbox', [
   /*
    * Make sure that the toolbar will remain open also while hovering it, not just the image.
    */
-  var keepToolbarOpenOnHover = function(image, timeout) {
-    timeout = setTimeout(function() {
-      image.popover('hide');
+  var keepToolbarOpenOnHover = function() {
+    // Hide the image popover after 3 seconds (if the mouse doesn't enter the popover).
+    var hideTimeout = setTimeout(function() {
+      $('#imagePopoverContainer').popover('hide');
     }, 3000);
-    $('.popover').on('mouseenter', function() {
-      clearTimeout(timeout);
+    // Don't hide the image popover when the mouse is over it.
+    $('#imagePopoverContainer .popover').on('mouseenter', function() {
+      clearTimeout(hideTimeout);
     });
-    $('.popover').on('mouseleave', function() {
-      image.popover('hide');
+    // Hide the image popover when the mouse leaves its area.
+    $('#imagePopoverContainer .popover').on('mouseleave', function() {
+      $(this).popover('hide');
     });
+    return hideTimeout;
   };
 
   /**
    * Assign to each selected image a toolbar popover with download and lightbox options.
    */
   var enableToolbarPopovers = function() {
-    var timeout;
-    lightboxImages.popover({
+    var hideTimeout;
+    var showTimeout;
+    // In order to place the popover at cursor location, it would be added to an element that changes its position
+    // based on mouse events.
+    var popoverContainer = $('#imagePopoverContainer');
+    popoverContainer.popover({
       content: function() {
         return $('#imageToolbarTemplate').html();
       },
       html: true,
-      // The popover needs to be placed outside of the xwiki content to not depend on it's overflow.
-      container: 'body',
+      // The copyImageId tooltip attributes are deleted by sanitization.
+      sanitize: false,
+      container: '#imagePopoverContainer',
       placement: 'bottom',
       trigger: 'manual'
-    }).on("show.bs.popover", function(e){
-      var img = e.target;
+    }).on("show.bs.popover", function(){
+      var img = $("#imagePopoverContainer").data('target');
       // Hide all other popovers.
       $('.popover').hide();
       // Set the attributes for the download button inside lightbox.
@@ -208,14 +216,32 @@ define('xwiki-lightbox', [
       $('#lightboxDownload').attr('download', getImageName(img.src));
       // Remember the index of the image to show first.
       $('.openLightbox').data('index', [...lightboxImages].indexOf(img));
-    }).on('shown.bs.popover', function(e) {
-      $('.popover .imageDownload').attr('href', e.target.src);
-      $('.popover .imageDownload').attr('download', getImageName(e.target.src));
-    }).on('mouseenter', function() {
-      clearTimeout(timeout);
-      $(this).popover('show');
+    }).on('inserted.bs.popover', function() {
+      var img = $("#imagePopoverContainer").data('target');
+      $('.popover .imageDownload').attr('href', img.src);
+      $('.popover .imageDownload').attr('download', getImageName(img.src));
+      var imageId = getImageId(img);
+      if (imageId) {
+        $('.popover .permalink').attr('href', '#' + imageId);
+        $('.popover .permalink').removeClass('hidden');
+        $('.popover .copyImageId').attr('data-imageId', imageId);
+        $('.popover .copyImageId').parent().removeClass('hidden');
+      }
+    });
+    lightboxImages.on('mouseenter', function(e) {
+      clearTimeout(hideTimeout);
+      popoverContainer.data('target', e.target);
+    }).on('mousemove', function(e) {
+      popoverContainer.popover('hide');
+      // Delay to show the popover until the mouse stops moving.
+      clearTimeout(showTimeout);
+      showTimeout = setTimeout(function() {
+        popoverContainer.css({top: e.pageY, left: e.pageX });
+        popoverContainer.popover('show');
+      }, 400);
     }).on('mouseleave', function() {
-      keepToolbarOpenOnHover($(this), timeout);
+      clearTimeout(showTimeout);
+      hideTimeout = keepToolbarOpenOnHover();
     });
   };
 
@@ -228,6 +254,18 @@ define('xwiki-lightbox', [
     if (/\.[a-zA-Z]*/g.test(name)) {
       return name;
     }
+  };
+
+  /**
+   * Extract the image id. Prefer the id manually added to the caption over the automatically generated one.
+   */
+  var getImageId = function(img) {
+    // Select the first caption child element which specifies an id.
+    var figureCaptionIdElement = $(img).closest('figure').find('figcaption').find('[id]')[0];
+    if (figureCaptionIdElement) {
+      return $(figureCaptionIdElement).attr('id');
+    }
+    return $(img).attr('id');
   };
 
   /**
@@ -279,7 +317,8 @@ define('xwiki-lightbox', [
         caption: caption,
         fileName: getImageName(imageURL),
         alt: $(this).attr('alt'),
-        title: $(this).attr('title')
+        title: $(this).attr('title'),
+        id: getImageId(this)
       });
     });
     return slidesData;
@@ -288,7 +327,8 @@ define('xwiki-lightbox', [
   /**
    * Open Gallery lightbox at the current index.
    */
-  var openLightbox = function() {
+  var openLightbox = function(e) {
+    e.preventDefault();
     var options = {
       container: '#blueimp-gallery',
       index: parseInt($('.openLightbox').data('index')),
@@ -303,6 +343,15 @@ define('xwiki-lightbox', [
         // Set the attributes for the download button inside lightbox.
         $('#lightboxDownload').attr('href', imageData.href);
         $('#lightboxDownload').attr('download', imageData.fileName);
+        // Save the image ID, or hide the action in case it doesn't exist.
+        var copyImageId = $('#blueimp-gallery .copyImageId');
+        if (imageData.id) {
+          copyImageId.parent().removeClass('hidden');
+          copyImageId.attr('data-imageId', imageData.id);
+        } else {
+          copyImageId.parent().addClass('hidden');
+          copyImageId.removeAttr('data-imageId');
+        }
       }
     };
     openedLightbox = gallery(slidesData, options);
@@ -335,6 +384,18 @@ define('xwiki-lightbox', [
 
   $(function() {
     initLightboxFunctionality();
+  });
+
+  $(document).on('click', '.copyImageId', function(event) {
+    event.preventDefault();
+    var copyIdButton = this;
+    navigator.clipboard.writeText($(copyIdButton).attr('data-imageId')).then(function() {
+      // Inform the user that the image ID was copied to clipboard.
+      $(copyIdButton).tooltip('show');
+      setTimeout(function() {
+        $(copyIdButton).tooltip('hide');
+      }, 2000);
+    });
   });
 
   $(document).on('xwiki:dom:updated', function() {

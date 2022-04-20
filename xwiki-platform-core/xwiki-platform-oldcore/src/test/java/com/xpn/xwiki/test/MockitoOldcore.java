@@ -338,6 +338,30 @@ public class MockitoOldcore
             registerMockEnvironment();
         }
 
+        // Initialize XWikiContext provider
+        if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER)) {
+            Provider<XWikiContext> xcontextProvider =
+                this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+            when(xcontextProvider.get()).thenReturn(getXWikiContext());
+        } else {
+            Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
+            if (MockUtil.isMock(xcontextProvider)) {
+                when(xcontextProvider.get()).thenReturn(getXWikiContext());
+            }
+        }
+
+        // Initialize readonly XWikiContext provider
+        if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER, "readonly")) {
+            Provider<XWikiContext> xcontextProvider =
+                this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER, "readonly");
+            when(xcontextProvider.get()).thenReturn(getXWikiContext());
+        } else {
+            Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
+            if (MockUtil.isMock(xcontextProvider)) {
+                when(xcontextProvider.get()).thenReturn(getXWikiContext());
+            }
+        }
+
         // Initialize the Execution Context
         if (this.componentManager.hasComponent(ExecutionContextManager.class)) {
             ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
@@ -373,30 +397,6 @@ public class MockitoOldcore
                 this.componentManager.registerMockComponent(ScriptContextManager.class);
             when(scriptContextManager.getCurrentScriptContext()).thenReturn(this.scriptContext);
             when(scriptContextManager.getScriptContext()).thenReturn(this.scriptContext);
-        }
-
-        // Initialize XWikiContext provider
-        if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER)) {
-            Provider<XWikiContext> xcontextProvider =
-                this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-            when(xcontextProvider.get()).thenReturn(getXWikiContext());
-        } else {
-            Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
-            if (MockUtil.isMock(xcontextProvider)) {
-                when(xcontextProvider.get()).thenReturn(getXWikiContext());
-            }
-        }
-
-        // Initialize readonly XWikiContext provider
-        if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER, "readonly")) {
-            Provider<XWikiContext> xcontextProvider =
-                this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER, "readonly");
-            when(xcontextProvider.get()).thenReturn(getXWikiContext());
-        } else {
-            Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
-            if (MockUtil.isMock(xcontextProvider)) {
-                when(xcontextProvider.get()).thenReturn(getXWikiContext());
-            }
         }
 
         // Initialize the initial context in the stub context provider (which is then used for all calls to

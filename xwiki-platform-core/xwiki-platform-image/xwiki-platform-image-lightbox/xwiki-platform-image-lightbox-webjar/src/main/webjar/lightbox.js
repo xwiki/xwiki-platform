@@ -231,7 +231,6 @@ define('xwiki-lightbox', [
     lightboxImages.on('mouseenter', function(e) {
       clearTimeout(hideTimeout);
       popoverContainer.data('target', e.target);
-      $(this).popover('show');
     }).on('mousemove', function(e) {
       popoverContainer.popover('hide');
       // Delay to show the popover until the mouse stops moving.

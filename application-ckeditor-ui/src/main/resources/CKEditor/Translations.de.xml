@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -104,7 +104,37 @@ ckeditor.plugin.syntax.update.inProgress=Aktualisieren des WYSIWYG-Editors
 ckeditor.plugin.syntax.update.done=WYSIWYG-Editor aktualisiert
 ckeditor.plugin.syntax.update.failed=Fehler beim Aktualisieren des WYSIWYG-Editors
 ckeditor.plugin.syntax.wysiwygModeUnsupported=Der WYSIWYG-Bearbeitungsmodus wird von der {0}-Syntax nicht unterstützt.
+ckeditor.plugin.image.imageEditor.standardTab.title=Standard
+ckeditor.plugin.image.imageEditor.advancedTab.title=Erweitert
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=Bildstile
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=Wählen Sie den Stil aus, der auf das Bild angewendet werden soll.
+ckeditor.plugin.image.imageEditor.standardTab.alt.label=Alternativer Text
+ckeditor.plugin.image.imageEditor.standardTab.alt.hint=Definieren Sie einen alternativen Text für ein Bild, wenn das Bild nicht angezeigt werden kann.
+ckeditor.plugin.image.imageEditor.standardTab.caption.label=Bildunterschrift
+ckeditor.plugin.image.imageEditor.standardTab.caption.hint=Aktivieren und definieren Sie eine Bildunterschrift.
+ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=Aktivieren und definieren Sie eine Bildunterschrift.
+ckeditor.plugin.image.imageEditor.advancedTab.size.label=Größe
+ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=Breite
+ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=Höhe
+ckeditor.plugin.image.imageEditor.advancedTab.size.hint=Definieren Sie die Bildgröße.
+ckeditor.plugin.image.imageEditor.advancedTab.border.label=Rahmen
+ckeditor.plugin.image.imageEditor.advancedTab.border.hint=Wenn diese Option aktiviert ist, wird das Bild mit einem Rahmen angezeigt
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=Ausrichtung
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=Definieren Sie die Bildausrichtung.
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=Kein
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=Start
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Mitte
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=Ende
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Textumbruch
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Wenn diese Option aktiviert ist, umfließt der Text das Bild.
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=Dokumentenbaum
+ckeditor.plugin.image.imageSelector.uploadTab.title=Hochladen
+ckeditor.plugin.image.imageSelector.uploadTab.file.title=Datei
+ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Wählen Sie eine lokale Datei aus, die der Seite hinzugefügt werden soll.
+ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=Hochladen
 ckeditor.inline.failedToInit=Der Editor konnte nicht initialisiert werden.
+ckeditor.upload.error.csrf=Das CSRF-Token fehlt.
+ckeditor.upload.error.emptyReturn=Fehler beim Hochladen der Datei: möglicherweise ist die konfigurierte maximale Upload-Größe überschritten.
 modal.ok=OK
 modal.cancel=Abbrechen
 modal.close=Schließen
@@ -145,5 +175,19 @@ macroEditor.submit=Übernehmen
 macroEditor.content=Inhalt
 macroEditor.noParameters=Dieses Makro hat keine Parameter.
 macroEditor.descriptorRequestFailed=Fehler beim Abrufen des {0} Makro Deskriptors.
+
+
+imageEditor.modal.backToEditor.button=Zurück
+imageEditor.modal.loadFail.message=Fehler beim Abrufen des Bildbearbeitungsformulars.
+imageEditor.modal.title=Bild bearbeiten
+imageEditor.modal.insertButton=Einfügen
+imageEditor.modal.initialization.fail=Fehler beim Abrufen des Bildauswahlformulars.
+imageSelector.modal.title=Bild auswählen
+imageSelector.modal.selectButton=Auswählen
+imageSelector.modal.loadFail.message=Fehler beim Abrufen des Bildauswahlformulars.
+imageSelector.modal.fileUpload.success=Dateiupload erfolgreich.
+imageSelector.modal.fileUpload.fail=Datei-Upload fehlgeschlagen.
+imageSelector.modal.fileUpload.abort=Datei-Upload abgebrochen.
+imageSelector.modal.initialization.fail=Fehler beim Abrufen des Bildauswahlformulars.
 </content>
 </xwikidoc>

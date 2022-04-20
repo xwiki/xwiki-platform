@@ -497,6 +497,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
     &lt;/span&gt;
   &lt;/div&gt;
 &lt;/div&gt;
+&lt;div id='imagePopoverContainer'&gt;&lt;/div&gt;
 #end
 #set ($lightboxConfigDoc = $xwiki.getDocument('XWiki.Lightbox.LightboxConfiguration'))
 #set ($lightboxConfigObj = $lightboxConfigDoc.getObject('XWiki.Lightbox.LightboxConfigurationClass'))

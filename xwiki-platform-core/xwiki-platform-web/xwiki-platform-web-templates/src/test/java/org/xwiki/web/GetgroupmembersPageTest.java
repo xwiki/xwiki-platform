@@ -100,7 +100,6 @@ class GetgroupmembersPageTest extends PageTest
         this.componentManager.getInstance(ScriptService.class, "user");
         this.componentManager.getInstance(ScriptService.class, "user.group");
 
-        registerVelocityTool("stringutils", new StringUtils());
         registerVelocityTool("stringtool", new StringUtils());
         registerVelocityTool("escapetool", new EscapeTool());
     }

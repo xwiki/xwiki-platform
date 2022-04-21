@@ -31,7 +31,6 @@ import org.xwiki.user.test.po.ChangePasswordPage;
 import org.xwiki.user.test.po.PreferencesUserProfilePage;
 import org.xwiki.user.test.po.ProfileUserProfilePage;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -115,7 +114,7 @@ class UserChangePasswordIT
         changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePasswordAsAdmin(DEFAULT_PASSWORD, DEFAULT_PASSWORD);
         changePasswordPage = changePasswordPage.submit();
-        assertEquals("Your password has been successfully changed.", changePasswordPage.getSuccessMessage());
+        changePasswordPage.assertSuccessMessage("Your password has been successfully changed.");
     }
 
     @Test
@@ -127,7 +126,7 @@ class UserChangePasswordIT
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePassword(DEFAULT_PASSWORD, PASSWORD_1, PASSWORD_2);
         changePasswordPage = changePasswordPage.submit();
-        assertEquals("The two passwords do not match.", changePasswordPage.getValidationErrorMessage());
+        changePasswordPage.assertValidationErrorMessage("The two passwords do not match.");
     }
 
     @Test
@@ -137,7 +136,7 @@ class UserChangePasswordIT
         ChangePasswordPage changePasswordPage = ProfileUserProfilePage.gotoPage(this.userName)
             .switchToPreferences().changePassword();
         changePasswordPage = changePasswordPage.submit();
-        assertEquals("This field is required.", changePasswordPage.getValidationErrorMessage());
+        changePasswordPage.assertValidationErrorMessage("This field is required.");
     }
 
     @Test
@@ -152,7 +151,7 @@ class UserChangePasswordIT
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePasswordAsAdmin(PASSWORD_1, PASSWORD_2);
         changePasswordPage = changePasswordPage.submit();
-        assertEquals("The two passwords do not match.", changePasswordPage.getValidationErrorMessage());
+        changePasswordPage.assertValidationErrorMessage("The two passwords do not match.");
     }
 
     @Test
@@ -164,7 +163,7 @@ class UserChangePasswordIT
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePassword("badPassword", PASSWORD_1, PASSWORD_1);
         changePasswordPage = changePasswordPage.submit();
-        assertEquals("Current password is invalid.", changePasswordPage.getErrorMessage());
+        changePasswordPage.assertErrorMessage("Current password is invalid.");
     }
 
     @Test
@@ -182,14 +181,12 @@ class UserChangePasswordIT
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePasswordAsAdmin("foo", "foo");
         changePasswordPage = changePasswordPage.submit();
-        assertEquals("Your new password must be at least 8 characters long.",
-            changePasswordPage.getValidationErrorMessage());
+        changePasswordPage.assertValidationErrorMessage("Your new password must be at least 8 characters long.");
         changePasswordPage.changePasswordAsAdmin("foofoofoo", "foofoofoo");
         changePasswordPage = changePasswordPage.submit();
-        assertEquals("The password must contain at least one number.",
-            changePasswordPage.getValidationErrorMessage());
+        changePasswordPage.assertValidationErrorMessage("The password must contain at least one number.");
         changePasswordPage.changePasswordAsAdmin("foofoofoo42", "foofoofoo42");
         changePasswordPage = changePasswordPage.submit();
-        assertEquals("Your password has been successfully changed.", changePasswordPage.getSuccessMessage());
+        changePasswordPage.assertSuccessMessage("Your password has been successfully changed.");
     }
 }

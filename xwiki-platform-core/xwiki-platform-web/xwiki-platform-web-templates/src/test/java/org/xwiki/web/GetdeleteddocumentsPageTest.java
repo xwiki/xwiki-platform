@@ -34,7 +34,6 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
-import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.velocity.tools.JSONTool;
 
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -89,8 +88,6 @@ class GetdeleteddocumentsPageTest extends PageTest
         this.oldcore.getMocker().registerComponent(ScriptService.class, "query", this.queryService);
 
         this.xwiki.setRecycleBinStore(this.recycleBinStore);
-
-        registerVelocityTool("escapetool", new EscapeTool());
     }
 
     @Test

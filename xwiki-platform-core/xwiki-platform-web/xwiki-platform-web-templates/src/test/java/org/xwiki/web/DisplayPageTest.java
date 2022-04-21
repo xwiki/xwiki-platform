@@ -30,9 +30,6 @@ import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
-import org.xwiki.text.StringUtils;
-import org.xwiki.velocity.tools.CollectionTool;
-import org.xwiki.velocity.tools.EscapeTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -94,11 +91,6 @@ class DisplayPageTest extends PageTest
         xClass.addStaticListField(FIELD_NAME, FIELD_PRETTY_NAME, String.join("|", "=" + DEFAULT_LABEL, VALUE_1));
         this.xwiki.saveDocument(document, this.context);
         this.context.setDoc(document);
-
-        // Make tools available since they are used in the tested vm
-        registerVelocityTool("escapetool", new EscapeTool());
-        registerVelocityTool("collectiontool", new CollectionTool());
-        registerVelocityTool("stringtool", new StringUtils());
 
         EntityReferenceSerializer<String> localReferenceSerializer =
             this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");

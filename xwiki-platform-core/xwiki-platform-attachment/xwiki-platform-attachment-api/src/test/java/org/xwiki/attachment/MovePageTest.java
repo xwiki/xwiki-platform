@@ -22,7 +22,6 @@ package org.xwiki.attachment;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +44,6 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
-import org.xwiki.velocity.tools.EscapeTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
@@ -89,8 +87,6 @@ class MovePageTest extends PageTest
     void setUp() throws Exception
     {
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
-        registerVelocityTool("escapetool", new EscapeTool());
-        registerVelocityTool("stringtool", new StringUtils());
         // Initializes then environment for the icon extension.
         IconSetup.setUp(this, "/icons/default.iconset");
         this.componentManager.registerComponent(ScriptService.class, "csrf", this.csrfScriptService);

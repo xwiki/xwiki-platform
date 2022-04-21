@@ -32,7 +32,6 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
-import org.xwiki.velocity.tools.EscapeTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -76,9 +75,6 @@ class DocumentTagsTest extends PageTest
         document.setSyntax(Syntax.XWIKI_2_1);
         this.xwiki.saveDocument(document, this.context);
         this.context.setDoc(document);
-
-        // Make $escapetool available since it's used in the tested vm
-        registerVelocityTool("escapetool", new EscapeTool());
     }
 
     @Test

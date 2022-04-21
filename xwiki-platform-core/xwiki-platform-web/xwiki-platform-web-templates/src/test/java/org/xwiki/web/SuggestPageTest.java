@@ -42,7 +42,6 @@ import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.page.PageTest;
-import org.xwiki.velocity.tools.EscapeTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -83,7 +82,6 @@ class SuggestPageTest extends PageTest
     void setUp() throws Exception
     {
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
-        registerVelocityTool("escapetool", new EscapeTool());
 
         // suggest.vm needs programming rights and normally has them as a Velocity template.
         when(this.xwiki.getRightService().hasProgrammingRights(any())).thenReturn(true);

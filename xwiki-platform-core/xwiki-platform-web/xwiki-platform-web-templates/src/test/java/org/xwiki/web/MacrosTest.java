@@ -32,10 +32,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
-import org.xwiki.text.StringUtils;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.XWikiDateTool;
-import org.xwiki.velocity.tools.EscapeTool;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
@@ -58,8 +56,6 @@ class MacrosTest extends PageTest
     void setup() throws Exception
     {
         this.velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
-        registerVelocityTool("escapetool", new EscapeTool());
-        registerVelocityTool("stringtool", new StringUtils());
     }
 
     @Test

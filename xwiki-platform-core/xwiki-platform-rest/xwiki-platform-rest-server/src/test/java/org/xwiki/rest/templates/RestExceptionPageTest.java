@@ -21,7 +21,6 @@ package org.xwiki.rest.templates;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Tag;
@@ -29,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.tools.EscapeTool;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,9 +47,6 @@ class RestExceptionPageTest extends PageTest
     void exception() throws Exception
     {
         IOException cause = new IOException("file not found");
-
-        registerVelocityTool("exceptiontool", new ExceptionUtils());
-        registerVelocityTool("escapetool", new EscapeTool());
 
         TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         VelocityManager velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);

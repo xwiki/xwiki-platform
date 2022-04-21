@@ -40,9 +40,7 @@ import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax20ComponentList;
-import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.velocity.tools.JSONTool;
-import org.xwiki.velocity.tools.RegexTool;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -100,11 +98,6 @@ class LiveTableResultsTest extends PageTest
         // The LiveTableResultsMacros page uses the tag plugin for the LT tag cloud feature
         TagPluginApi tagPluginApi = mock(TagPluginApi.class);
         doReturn(tagPluginApi).when(this.oldcore.getSpyXWiki()).getPluginApi(eq("tag"), any(XWikiContext.class));
-
-        // Register velocity tools used by the LiveTableResultsMacros page
-        registerVelocityTool("stringtool", new StringUtils());
-        registerVelocityTool("regextool", new RegexTool());
-        registerVelocityTool("escapetool", new EscapeTool());
 
         loadPage(new DocumentReference("xwiki", "XWiki", "LiveTableResultsMacros"));
     }

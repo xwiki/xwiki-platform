@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.nodes.Document;
@@ -35,8 +34,6 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
-import org.xwiki.velocity.tools.EscapeTool;
-import org.xwiki.velocity.tools.JSONTool;
 import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
@@ -77,10 +74,6 @@ class WikiManagerTest extends PageTest
         // Return minimal icons metadata since this is not what we want to test in this method.
         IconManager iconManager = this.componentManager.registerMockComponent(IconManager.class);
         doReturn(new HashMap<>()).when(iconManager).getMetaData(anyString());
-
-        registerVelocityTool("jsontool", new JSONTool());
-        registerVelocityTool("stringtool", new StringUtils());
-        registerVelocityTool("escapetool", new EscapeTool());
 
         Document htmlDocument = renderHTMLPage(new DocumentReference("xwiki", "WikiManager", "WebHome"));
         JSONArray propertyDescriptors =

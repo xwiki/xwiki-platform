@@ -104,7 +104,6 @@ class GetgroupmembersPageTest extends PageTest
 
         registerVelocityTool("numbertool", new NumberTool());
         registerVelocityTool("mathtool", new MathTool());
-        registerVelocityTool("stringutils", new StringUtils());
         registerVelocityTool("stringtool", new StringUtils());
         registerVelocityTool("escapetool", new EscapeTool());
     }

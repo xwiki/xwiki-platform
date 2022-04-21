@@ -130,10 +130,15 @@ class DocumentTagsTest extends PageTest
         // - The tags after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
         assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label "
-            + "<span class=\"tag-wrapper\"><span class=\"tag\">"
-                + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag1\">tag1</a></span></span> "
-            + "<span class=\"tag-wrapper\"><span class=\"tag\">"
-                + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag2\">tag2</a></span></span> "
+            + "<span class=\"tag-wrapper\"> "
+            + "<span class=\"tag\">"
+                + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag1\">tag1</a></span> "
+            + "</span> "
+            + "<span class=\"tag-wrapper\"> "
+            + "<span class=\"tag\">"
+                + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag2\">tag2</a>"
+            + "</span> "
+            + "</span> "
             + "</div>"));
     }
 }

@@ -134,13 +134,29 @@
   <div class="attachmentMimeType" data-type="$!escapetool.xml($attachment.mimeType)">
     #if ($attachment.isImage())
       <span title="$escapetool.xml($services.localization.render('core.viewers.attachments.mime.image'))">
-        <img src="$xwiki.getURL($attachmentReference, 'download', 'width=48')"
+        <img src="$xwiki.getURL($attachment.getReference(), 'download', 'width=48')"
           alt="$escapetool.xml($attachment.filename)"/>
       </span>
     #else
       #mimetypeimg($attachment.mimeType.toLowerCase() $attachment.filename.toLowerCase())
     #end
   </div>
+#end
+
+#macro (displayFileNameAndVersion $attachmentReference $attachment)
+  <span class="name">
+    <a href="$xwiki.getURL($attachment.getReference())" data-entity-type="$escapetool.xml($attachmentReference.type)"
+      data-entity-reference="$escapetool.xml($services.model.serialize($attachmentReference, 'default'))"
+      title="$escapetool.xml($services.localization.render('core.viewers.attachments.download'))"
+    >$escapetool.xml($attachment.filename)</a>
+  </span>
+  <sup>
+    <span class="version">
+      <a href="$xwiki.getURL($attachmentReference, 'viewattachrev', $NULL)"
+        title="$escapetool.xml($services.localization.render('core.viewers.attachments.showHistory'))"
+      >$escapetool.xml($attachment.version)</a>
+    </span>
+  </sup>
 #end
 
 #macro (displayUserNameWithAvatar $userName)
@@ -153,8 +169,8 @@
   </div>
 #end
 
-#macro (displayAttachmentSize $attachment)
-  <span class="size" data-size="$!escapetool.xml($attachment.longSize)">#dynamicsize($attachment.longSize)</span>
+#macro (displayAttachmentSize $longSize)
+  <span class="size" data-size="$!escapetool.xml($longSize)">#dynamicsize($longSize)</span>
 #end
 
 #macro (displayAttachmentActions $attachment)
@@ -173,13 +189,6 @@
           </span>
         </a>
     #end
-    #set ($historyURL = $xwiki.getURL($attachmentReference, 'viewattachrev', $NULL))
-    <a class="history action" href="$historyURL#"
-        title="$escapetool.xml($services.localization.render('core.viewers.attachments.showHistory'))">
-      <span class="action-icon">$services.icon.renderHTML('list-numbers')</span><span class="action-label">$escapetool.xml(
-        $services.localization.render('core.viewers.attachments.showHistory.label'))
-      </span>
-    </a>
     #if ($hasEdit || $hasAdmin)
       #set ($queryString = $escapetool.url({
         'xpage': 'attachment/move',
@@ -244,7 +253,7 @@
   #set ($columns = ['mimeType', 'filename', 'filesize', 'date', 'author', 'actions'])
   #set ($columnsProperties = {
     'mimeType': {'type': 'list', "html": true, 'class': 'XWiki.AllAttachments'},
-    'filename': {'type': 'text', 'link': 'auto'},
+    'filename': {'type': 'text', 'html': true},
     'filesize': {'type': 'list', 'html': true,  'class': 'XWiki.AllAttachments'},
     'date': {'type': 'date'},
     'author': {'type': 'text', 'html': true},

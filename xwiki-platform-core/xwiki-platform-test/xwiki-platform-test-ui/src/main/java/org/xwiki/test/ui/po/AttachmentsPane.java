@@ -19,14 +19,9 @@
  */
 package org.xwiki.test.ui.po;
 
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -160,7 +155,7 @@ public class AttachmentsPane extends BaseElement
      */
     public String getAttachmentNameByPosition(int positionNumber)
     {
-        return this.attachmentsLivetable.getCell(positionNumber, 2).getText();
+        return this.attachmentsLivetable.getCell(positionNumber, 2).findElement(By.className("name")).getText();
     }
 
     /**
@@ -173,7 +168,7 @@ public class AttachmentsPane extends BaseElement
     public WebElement getAttachmentLink(String attachmentName)
     {
         return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 2)
-            .findElement(By.tagName("a"));
+            .findElement(By.className("name")).findElement(By.tagName("a"));
     }
 
     /**
@@ -272,15 +267,11 @@ public class AttachmentsPane extends BaseElement
      * Return the version number for the requested attachment.
      *
      * @param attachmentName the name of the attachment
-     * @return the version number displayed in the attachment URL
+     * @return the version number displayed for the attachment
      */
     public String getLatestVersionOfAttachment(String attachmentName) throws Exception
     {
-        URL url = new URL(getAttachmentLink(attachmentName).getAttribute("href"));
-        List<NameValuePair> params =
-            new ArrayList<NameValuePair>(URLEncodedUtils.parse(url.getQuery(), Charset.forName("UTF-8")));
-
-        return params.stream().filter(p -> p.getName().equals("rev")).findFirst().get().getValue();
+        return this.getAttachmentVersionElement(attachmentName).getText();
     }
 
     /**
@@ -292,8 +283,7 @@ public class AttachmentsPane extends BaseElement
      */
     public AttachmentHistoryPage goToAttachmentHistory(String attachmentName)
     {
-        this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 6)
-            .findElement(By.className("history")).click();
+        this.getAttachmentVersionElement(attachmentName).click();
         return new AttachmentHistoryPage();
     }
 
@@ -317,6 +307,12 @@ public class AttachmentsPane extends BaseElement
             return false;
         }
         return true;
+    }
+
+    private WebElement getAttachmentVersionElement(String attachmentName)
+    {
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 2)
+            .findElement(By.className("version"));
     }
 
     /**

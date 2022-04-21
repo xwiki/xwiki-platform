@@ -39,10 +39,8 @@
     'match': 'exact',
     'value': $doc.getId()
   }])
-  #maybeApplyStringFilter('parent' 'partial' $constraints $queryParameters)
   #maybeApplyStringFilter('mimeType' 'prefix' $constraints $queryParameters)
   #maybeApplyStringFilter('filename' 'partial' $constraints $queryParameters)
-  #maybeApplyStringFilter('doc.fullName' 'partial' $constraints $queryParameters)
   #maybeApplyIntegerRangeFilter('filesize' $constraints $queryParameters)
   #maybeApplyDateRangeFilter('date' $constraints $queryParameters)
   #maybeApplyStringFilter('author' 'partial' $constraints $queryParameters)
@@ -102,16 +100,15 @@
   #foreach ($attachmentReference in $attachmentsReferences)
     #set ($hasAccess = $services.security.authorization.hasAccess('view', $attachmentReference))
     #set ($row = {
-      'filename': $attachmentReference.name,
-      'filename_url': $xwiki.getURL($attachmentReference),
       'doc_viewable': $hasAccess
     })
     #if ($hasAccess)
       #set ($attachment = $doc.getAttachment($attachmentReference.name))
       #set ($authorReference = $services.model.resolveDocument($attachment.author))
       #set ($discard = $row.putAll({
+        'filename': "#displayFileNameAndVersion($attachmentReference $attachment)",
         'mimeType': "#displayAttachmentMimeType($attachment)",
-        'filesize': "#displayAttachmentSize($attachment)",
+        'filesize': "#displayAttachmentSize($attachment.longSize)",
         'date': $xwiki.formatDate($attachment.date),
         'author': "#displayUserNameWithAvatar($attachment.author)",
         'actions': "#displayAttachmentActions($attachment)"

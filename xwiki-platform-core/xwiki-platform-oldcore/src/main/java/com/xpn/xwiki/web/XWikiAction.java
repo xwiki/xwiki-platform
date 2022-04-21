@@ -313,6 +313,7 @@ public abstract class XWikiAction implements LegacyAction
                     "Cannot create document {0} because its name does not respect the name strategy of the wiki.", null,
                     args);
                 ScriptContext scontext = getCurrentScriptContext();
+                scontext.setAttribute("invalidNameReference", entityReference, ScriptContext.ENGINE_SCOPE);
                 scontext.setAttribute("createException", invalidNameException, ScriptContext.ENGINE_SCOPE);
                 return false;
             }

@@ -28,13 +28,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ComponentTest
-public class SlugEntityNameValidationTest
+class SlugEntityNameValidationTest
 {
     @InjectMockComponents
     private SlugEntityNameValidation slugNameValidator;
 
     @Test
-    public void transformation()
+    void transformation()
     {
         assertEquals("test", slugNameValidator.transform("test"));
         assertEquals("test", slugNameValidator.transform("tést"));
@@ -49,7 +49,7 @@ public class SlugEntityNameValidationTest
     }
 
     @Test
-    public void isValid()
+    void isValid()
     {
         assertTrue(slugNameValidator.isValid("test"));
         assertFalse(slugNameValidator.isValid("tést"));
@@ -60,5 +60,6 @@ public class SlugEntityNameValidationTest
         assertFalse(slugNameValidator.isValid("test-many-forbidden-"));
         assertTrue(slugNameValidator.isValid("test-many-forbidden"));
         assertTrue(slugNameValidator.isValid("1test-many-forbidden"));
+        assertTrue(slugNameValidator.isValid("1-2-Test"));
     }
 }

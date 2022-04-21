@@ -49,7 +49,7 @@ En syntaxe XWiki 1.0, il y a deux types de macros:
 * Les macros Radeox appelées en utilisant la syntaxe ##{macroname:param1=value1|...|paramN=valueN}##
 
 {{info}}
-Pour accéder à la liste de toutes les macros disponibles, allez à la [[page de référence des macros&gt;&gt;http://extensions.xwiki.org/]].
+Pour accéder à la liste de toutes les macros disponibles, allez à la [[page de référence des macros&gt;&gt;https://extensions.xwiki.org/]].
 {{/info}}
 
 |=Fonctionnalité|=Syntaxe XWiki 1.0
@@ -70,7 +70,7 @@ En syntaxe XWiki 2.0, il y a aussi deux types de macros:
 * Les macros XWiki appelées en utilisant la syntaxe##{{{{{macroname param1="value1" ... paramN="valueN"}}}}}##
 
 {{info}}
-Pour accéder à la liste de toutes les macros disponibles, allez à la [[page de référence des macros&gt;&gt;http://extensions.xwiki.org/]].
+Pour accéder à la liste de toutes les macros disponibles, allez à la [[page de référence des macros&gt;&gt;https://extensions.xwiki.org/]].
 {{/info}}
 
 |=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
@@ -86,7 +86,7 @@ Les macros Radeox ne peuvent pas être utilisées en syntaxe XWiki 2.0. C'est la
 {{/info}}
 
 {{info}}
-Pour accéder à la liste de toutes les macros disponibles, allez sur [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
+Pour accéder à la liste de toutes les macros disponibles, allez sur [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
 {{/info}}
 
 ==== Macros dans ce wiki ====

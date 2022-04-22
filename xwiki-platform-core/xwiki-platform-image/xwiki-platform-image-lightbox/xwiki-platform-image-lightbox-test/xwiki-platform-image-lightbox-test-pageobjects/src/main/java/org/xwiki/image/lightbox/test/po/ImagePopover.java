@@ -37,9 +37,15 @@ public class ImagePopover extends BaseElement
         waitUntilReady();
     }
 
-    public Lightbox openLightbox(int index)
+    /**
+     * Click on the open lightbox action of the image popover.
+     *
+     * @return a lightbox page object
+     */
+    public Lightbox openLightbox()
     {
-        getDriver().findElementWithoutWaiting(By.cssSelector(".popover .openLightbox")).click();
+        // We need to wait for the element to appear as the popover is displayed only after a delay.
+        getDriver().findElement(By.cssSelector(".popover .openLightbox")).click();
 
         return new Lightbox();
     }

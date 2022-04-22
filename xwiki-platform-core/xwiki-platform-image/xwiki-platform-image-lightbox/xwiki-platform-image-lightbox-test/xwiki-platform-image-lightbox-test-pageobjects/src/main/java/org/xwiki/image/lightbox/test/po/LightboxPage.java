@@ -19,8 +19,6 @@
  */
 package org.xwiki.image.lightbox.test.po;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +29,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Actions for interacting with page images and their attached popover.
@@ -62,9 +62,16 @@ public class LightboxPage extends ViewPage
         return images.get(index);
     }
 
+    /**
+     * Get the nth image of the document, move the mouse over the image, waits for the popover toi be displayed and
+     * click on the open lightbox action.
+     *
+     * @param index the index of the image to open in the lightbox
+     * @return a lightbox page object
+     */
     public Lightbox openLightboxAtImage(int index)
     {
-        return hoverImage(index).get().openLightbox(index);
+        return hoverImage(index).get().openLightbox();
     }
 
     private File getFileToUpload(String testResourcePath, String filename)

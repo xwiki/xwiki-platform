@@ -121,7 +121,7 @@ public class XWikiDockerExtension extends AbstractExtension
             return;
         }
 
-        // Note: TestConfiguration is created in evaluateExecutionCondition()à which executes before beforeAll()
+        // Note: TestConfiguration is created in evaluateExecutionCondition() which executes before beforeAll()
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
 
         // Programmatically enable logging for TestContainers code when verbose is on so that we can get the maximum

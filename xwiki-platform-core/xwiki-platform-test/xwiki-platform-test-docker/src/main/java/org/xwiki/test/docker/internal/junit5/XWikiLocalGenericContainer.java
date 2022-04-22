@@ -36,6 +36,7 @@ public class XWikiLocalGenericContainer<T extends GenericContainer<T>> extends G
     /**
      * @see GenericContainer#GenericContainer() 
      */
+    @Deprecated
     public XWikiLocalGenericContainer()
     {
         super();

@@ -31,8 +31,10 @@ import org.xwiki.test.docker.junit5.UITest;
  * @version $Id$
  * @since 12.8RC1
  */
-public class TestConfigurationResolver
+public class ExtensionContextTestConfigurationResolver
 {
+    private UITestTestConfigurationResolver uiTestResolver = new UITestTestConfigurationResolver();
+
     /**
      * Resolve {@link TestConfiguration} by finding and parsing {@link UITest} annotations on the current class and
      * on nested classes too, and merge them.
@@ -45,12 +47,12 @@ public class TestConfigurationResolver
         UITest uiTest = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
         Class<?> topLevelTestClass = extensionContext.getRequiredTestClass();
 
-        TestConfiguration testConfiguration = new TestConfiguration(uiTest);
+        TestConfiguration testConfiguration = this.uiTestResolver.resolve(uiTest);
         for (Class<?> nestedTestClass : topLevelTestClass.getDeclaredClasses()) {
             UITest nestedUITest = getAnnotationFromClassAndParent(nestedTestClass);
             if (nestedUITest != null) {
                 try {
-                    testConfiguration.merge(new TestConfiguration(nestedUITest));
+                    testConfiguration.merge(this.uiTestResolver.resolve(nestedUITest));
                 } catch (DockerTestException e) {
                     throw new RuntimeException("Failed to merge @UITest annotation", e);
                 }

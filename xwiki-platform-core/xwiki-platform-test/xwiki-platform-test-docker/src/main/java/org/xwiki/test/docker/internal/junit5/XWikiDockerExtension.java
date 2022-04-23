@@ -99,7 +99,8 @@ public class XWikiDockerExtension extends AbstractExtension
 
     private boolean isVncStarted;
 
-    private TestConfigurationResolver testConfigurationMerger = new TestConfigurationResolver();
+    private ExtensionContextTestConfigurationResolver testConfigurationMerger =
+        new ExtensionContextTestConfigurationResolver();
 
     @Override
     public void beforeAll(ExtensionContext extensionContext)

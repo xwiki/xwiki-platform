@@ -99,8 +99,8 @@ class TestConfigurationTest
     void getConfigurationWhenDefault()
     {
         UITest uiTest = EmptyAnnotation.class.getAnnotation(UITest.class);
-
-        TestConfiguration configuration = new TestConfiguration(uiTest);
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(uiTest);
         assertEquals(ServletEngine.JETTY_STANDALONE, configuration.getServletEngine());
         assertEquals(Browser.FIREFOX, configuration.getBrowser());
         assertEquals(Database.HSQLDB_EMBEDDED, configuration.getDatabase());
@@ -112,8 +112,8 @@ class TestConfigurationTest
     void getConfigurationWhenInAnnotationAndNoSystemProperty()
     {
         UITest uiTest = SampleAnnotation.class.getAnnotation(UITest.class);
-
-        TestConfiguration configuration = new TestConfiguration(uiTest);
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(uiTest);
         assertEquals(ServletEngine.TOMCAT, configuration.getServletEngine());
         assertTrue(configuration.isVerbose());
         assertEquals("version", configuration.getDatabaseTag());
@@ -127,7 +127,8 @@ class TestConfigurationTest
         System.setProperty("xwiki.test.ui.verbose", "true");
         System.setProperty("xwiki.test.ui.databaseTag", "version");
 
-        TestConfiguration configuration = new TestConfiguration(uiTest);
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(uiTest);
         assertEquals(ServletEngine.JETTY, configuration.getServletEngine());
         assertTrue(configuration.isVerbose());
         assertEquals("version", configuration.getDatabaseTag());
@@ -142,7 +143,8 @@ class TestConfigurationTest
         System.setProperty("xwiki.test.ui.databaseTag", "otherversion");
 
         // System properties win!
-        TestConfiguration configuration = new TestConfiguration(uiTest);
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(uiTest);
         assertEquals(ServletEngine.JETTY, configuration.getServletEngine());
         assertTrue(configuration.isVerbose());
         assertEquals("otherversion", configuration.getDatabaseTag());
@@ -152,9 +154,10 @@ class TestConfigurationTest
     void mergeConfigurationWhenOk() throws Exception
     {
         UITest uiTest = ToMergeMainAnnotation.class.getAnnotation(UITest.class);
-        TestConfiguration configuration = new TestConfiguration(uiTest);
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(uiTest);
         UITest uiTest2 = ToMergeOkAnnotation.class.getAnnotation(UITest.class);
-        configuration.merge(new TestConfiguration(uiTest2));
+        configuration.merge(resolver.resolve(uiTest2));
 
         assertTrue(configuration.isVerbose());
         assertEquals("version", configuration.getDatabaseTag());
@@ -171,11 +174,12 @@ class TestConfigurationTest
     void mergeConfigurationWhenNotOk()
     {
         UITest uiTest = ToMergeMainAnnotation.class.getAnnotation(UITest.class);
-        TestConfiguration configuration = new TestConfiguration(uiTest);
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(uiTest);
         UITest uiTest2 = ToMergeNotOkAnnotation.class.getAnnotation(UITest.class);
 
         Throwable exception = assertThrows(DockerTestException.class, () -> {
-            configuration.merge(new TestConfiguration(uiTest2));
+            configuration.merge(resolver.resolve(uiTest2));
         });
         assertEquals("Cannot merge property [key1] = [othervalue] since it was already specified with value [value1]",
             exception.getMessage());

@@ -52,7 +52,8 @@ public final class BrowserTestUtils
     // Thus we have to manually set the tag to use the latest released version.
     // See https://hub.docker.com/r/seleniarm/standalone-chromium/tags and
     // https://hub.docker.com/r/seleniarm/standalone-firefox/tags
-    private static final String SELENIARM_VERSION = "4.1.3-20220331";
+    // TODO: Remove when https://github.com/seleniumhq-community/docker-seleniarm/issues/7 is fixed.
+    private static final String SELENIARM_VERSION = "4.1.3-20220412";
 
     private static final String SELENIUM_FIREFOX_DOCKER_IMAGE_NAME =
         String.format("selenium/standalone-firefox:%s", SELENIUM_VERSION);

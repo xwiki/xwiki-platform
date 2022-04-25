@@ -42,6 +42,7 @@ import org.xwiki.invitation.test.po.InvitationMessageDisplayElement;
 import org.xwiki.invitation.test.po.InvitationSenderPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.RegistrationPage;
 import org.xwiki.test.ui.po.TableElement;
@@ -96,6 +97,7 @@ class InvitationIT
     @BeforeEach
     void setUp(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
+        // TODO: replace with @BeforeAll the parts of the setup that can be executed only once.
         // Login as admin and delete existing messages.
         setup.loginAsSuperAdmin();
         setup.recacheSecretToken();
@@ -113,6 +115,9 @@ class InvitationIT
             config.getFormContainerElement("admin-page-content")
                 .setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_smtp_port"),
                     "3025");
+            config.getFormContainerElement("admin-page-content")
+                .setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_smtp_server"),
+                    testConfiguration.getServletEngine().getHostIP());
             // Make sure that by default we don't allow non admin to send emails to multiple addresses
             config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
                 + "usersMaySendToMultiple"), "false");
@@ -329,7 +334,7 @@ class InvitationIT
      */
     @Test
     @Order(6)
-    void spamReporting(TestUtils setup) throws Exception
+    void spamReporting(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         TestUtils.Session admin = setup.getSession();
         try {
@@ -410,9 +415,8 @@ class InvitationIT
             assertFalse(getSenderPage().userIsSpammer(),
                 "User permission to send not returned by admin action.");
 
-            // TODO: replace with modern solution.
-//            this.validateConsole.getLogCaptureConfiguration()
-//                .registerExcludes("Login cookie validation hash mismatch! Cookies have been tampered with");
+            logCaptureConfiguration
+                .registerExcludes("Login cookie validation hash mismatch! Cookies have been tampered with");
         } finally {
             stopGreenMail();
             setup.setSession(admin);

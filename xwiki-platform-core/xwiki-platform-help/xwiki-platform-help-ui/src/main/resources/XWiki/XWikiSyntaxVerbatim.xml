@@ -125,7 +125,7 @@
 
 Allow to enter content that will not be formatted (in other words the XWiki Syntax will not be taken into account).
 
-{{info}}In XWiki Syntax 1.0 the [[Pre macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Pre+Macro+%28Radeox%29]] only preserves XWiki Syntax and Radeox macros. However HTML snippets and Groovy/Velocity scripts are still executed.{{/info}}
+{{info}}In XWiki Syntax 1.0 the [[Pre macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Pre%20Macro%20%28Radeox%29]] only preserves XWiki Syntax and Radeox macros. However HTML snippets and Groovy/Velocity scripts are still executed.{{/info}}
 
 |=Feature|=XWiki Syntax 1.0|=Result
 |Verbatim inline|{{{Some verbatim {pre}*[not rendered]*{/pre} content}}}|Some verbatim {{{*[not rendered]*}}} content
@@ -136,7 +136,7 @@ multi line
 content
 {/pre}
 }}}
-{{info}}It's also possible to use the [[Code macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Code+Macro+%28Radeox%29]] but it displays its content in a box by default.{{/info}}
+{{info}}It's also possible to use the [[Code macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Code%20Macro%20%28Radeox%29]] but it displays its content in a box by default.{{/info}}
 )))|((({{{
 multi line
 *verbatim*

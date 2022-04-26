@@ -139,47 +139,8 @@
             <!-- Difference related to the Security refactoring. Start a new <revapi.differences> entry for other
                  differences -->
 
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTask</old>
-                  <justification>This class should have been marked as unstable on 14.1RC1. Moved to the package 'org.xwiki.doc.tasks' since it was not located in the right package.</justification>
-                  <criticality>documented</criticality>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.doc.tasks.XWikiDocumentIndexingTaskId</old>
-                  <justification>This class should have been marked as unstable on 14.1RC1. The accessors are moved to 'org.xwiki.doc.tasks.XWikiDocumentIndexingTask' since we are not relying on a composite id anymore.</justification>
-                  <criticality>documented</criticality>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class org.xwiki.index.migration.R140200001XWIKI19352DataMigration</old>
-                  <justification>R140200001XWIKI19352DataMigration replaced by R140300000XWIKI19614DataMigration because a link reindexing is required by XWIKI-19614, making an additional reindexing for migrations from version lower than 14.2RC1 useless.</justification>
-                  <criticality>allowed</criticality>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>Those changes are not real: we need to add those rules because revapi detected a change, but it's actually a false positive.</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <class>com.xpn.xwiki.web.XWikiResponse</class>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <class>com.xpn.xwiki.web.XWikiRequest</class>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

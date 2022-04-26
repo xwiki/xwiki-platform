@@ -46,6 +46,8 @@ class SlugEntityNameValidationTest
             slugNameValidator.transform("-test---many-forbidden---"));
         assertEquals("1-test-many-forbidden",
             slugNameValidator.transform("1-test---many-forbidden---"));
+        assertEquals("x", slugNameValidator.transform("-- x --"));
+        assertEquals("_-_", slugNameValidator.transform("¯\\_(ツ)_/¯"));
     }
 
     @Test
@@ -61,5 +63,6 @@ class SlugEntityNameValidationTest
         assertTrue(slugNameValidator.isValid("test-many-forbidden"));
         assertTrue(slugNameValidator.isValid("1test-many-forbidden"));
         assertTrue(slugNameValidator.isValid("1-2-Test"));
+        assertTrue(slugNameValidator.isValid("t"));
     }
 }

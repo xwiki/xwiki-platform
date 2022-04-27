@@ -83,9 +83,7 @@ public class ImagePopover extends BaseElement
 
     private ImagePopover waitUntilReady()
     {
-        getDriver().waitUntilElementIsVisible(By.cssSelector(".popover .imageDownload"));
-        // This attribute is set when the show transition of the popover is complete.
-        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.cssSelector(".popover .imageDownload"), "download");
+        getDriver().waitUntilElementIsVisible(By.cssSelector("#imagePopoverContainer .popover"));
 
         return this;
     }

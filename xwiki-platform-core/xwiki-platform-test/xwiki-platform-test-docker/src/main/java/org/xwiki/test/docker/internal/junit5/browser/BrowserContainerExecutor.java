@@ -91,7 +91,7 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
             // than 5mn or we can get the error. Thus, as a test, we increase the value to 10 times the default value.
             // If there are still errors happening after this change then it'll mean the problem is elsewhere and we'll
             // revert this change.
-            .withEnv("SE_NODE_SESSION_TIMEOUT", String.valueOf(10*300L))
+            .withEnv("SE_NODE_SESSION_TIMEOUT", String.valueOf(10 * 300L))
             .withCapabilities(browser.getCapabilities())
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")

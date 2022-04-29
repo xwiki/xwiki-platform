@@ -29,6 +29,7 @@ import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.renderer.AnnotationEvent;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
+import org.xwiki.xml.html.HTMLElementSanitizer;
 
 /**
  * XHTML Printer to handle printing annotations markers in the rendered XHTML. It is able to generate the annotation
@@ -67,10 +68,11 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
      * Builds an XHTML markers annotations printer which uses the underlying wiki printer.
      *
      * @param printer the wiki printer used by this XHTML printer
+     * @param htmlElementSanitizer the HTML element sanitizer to use by this XHTML printer
      */
-    public AnnotationMarkersXHTMLPrinter(WikiPrinter printer)
+    public AnnotationMarkersXHTMLPrinter(WikiPrinter printer, HTMLElementSanitizer htmlElementSanitizer)
     {
-        super(printer);
+        super(printer, htmlElementSanitizer);
     }
 
     /**

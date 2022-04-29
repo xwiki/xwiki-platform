@@ -1,0 +1,19 @@
+.imageGroup {
+  display: inline-block;
+  max-width: 150px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 5px;
+}
+
+.imageGroup a {
+  color: inherit;
+}
+
+.imageGroup img {
+  object-fit: contain;
+  max-width: 150px;
+  max-height: 150px;
+  margin-bottom: 5px;
+}

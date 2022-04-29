@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,23 +16,36 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.image.picker;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>14.4-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-image</artifactId>
-  <name>XWiki Platform - Image - Parent POM</name>
-  <description>XWiki Platform - Image - Parent POM</description>
-  <packaging>pom</packaging>
-  <modules>
-    <module>xwiki-platform-image-lightbox</module>
-    <module>xwiki-platform-image-processing</module>
-    <module>xwiki-platform-image-style</module>
-    <module>xwiki-platform-image-picker</module>
-  </modules>
-</project>
+import org.xwiki.image.picker.internal.ImagePickerMacro;
+import org.xwiki.stability.Unstable;
+
+/**
+ * Parameters for the {@link ImagePickerMacro} Macro.
+ *
+ * @version $Id$
+ * @since 14.4RC1
+ */
+@Unstable
+public class ImagePickerMacroParameters
+{
+    private String id;
+
+    /**
+     * @return the id of the image picker macro
+     */
+    public String getId()
+    {
+        return this.id;
+    }
+
+    /**
+     * @param id the id of the image picker macro
+     */
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+}

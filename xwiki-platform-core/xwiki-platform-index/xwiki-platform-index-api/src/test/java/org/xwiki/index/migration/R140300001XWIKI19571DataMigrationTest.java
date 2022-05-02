@@ -29,6 +29,7 @@ import java.util.Date;
 
 import javax.inject.Provider;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
@@ -46,12 +47,15 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -169,6 +173,7 @@ class R140300001XWIKI19571DataMigrationTest
         expected.setInstanceId("testinstanceid");
         expected.setTimestamp(now);
         verify(this.tasksStore).addTask("wikidi", expected);
+        verify(this.hibernateStore).setWiki(this.session, "wikidi");
     }
 
     @Test
@@ -196,6 +201,7 @@ class R140300001XWIKI19571DataMigrationTest
             + "  <dropTable tableName=\"XWIKIDOCUMENTINDEXINGQUEUE\"/>\n"
             + "</changeSet>\n"
             + "\n", this.dataMigration.getPreHibernateLiquibaseChangeLog());
+        verify(this.hibernateStore).setWiki(this.session, "wikidi");
     }
 
     @Test
@@ -206,5 +212,17 @@ class R140300001XWIKI19571DataMigrationTest
             assertThrows(DataMigrationException.class, () -> this.dataMigration.getPreHibernateLiquibaseChangeLog());
         assertEquals("Error while loading the existing tasks.", dataMigrationException.getMessage());
         assertEquals(SQLException.class, dataMigrationException.getCause().getClass());
+        verify(this.hibernateStore).setWiki(this.session, "wikidi");
     }
+
+    @Test
+    void hibernateMigrateXWikiException() throws Exception
+    {
+        doThrow(XWikiException.class).when(this.hibernateStore).setWiki(any(Session.class), any());
+        DataMigrationException dataMigrationException =
+            assertThrows(DataMigrationException.class, () -> this.dataMigration.getPreHibernateLiquibaseChangeLog());
+        assertEquals("Error while setting the current wiki [wikidi].", dataMigrationException.getMessage());
+        assertEquals(XWikiException.class, dataMigrationException.getCause().getClass());
+    }
+
 }

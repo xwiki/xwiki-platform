@@ -123,6 +123,7 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
         for (XWikiDocumentIndexingTask task : this.tasks) {
             this.tasksStore.get().addTask(getXWikiContext().getWikiId(), task);
         }
+        // Clear the tasks before the migration of the next wiki.
         this.tasks.clear();
     }
 

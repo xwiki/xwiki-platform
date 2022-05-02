@@ -698,7 +698,13 @@ public class ExtensionIndexStore implements Initializable
         StringBuilder builder = new StringBuilder();
         builder.append(toSearchFieldName(filter));
         builder.append(':');
+        if (filter.getComparison() == COMPARISON.MATCH) {
+            builder.append('*');
+        }
         builder.append(toFilterQueryString(filter));
+        if (filter.getComparison() == COMPARISON.MATCH) {
+            builder.append('*');
+        }
 
         return builder.toString();
     }

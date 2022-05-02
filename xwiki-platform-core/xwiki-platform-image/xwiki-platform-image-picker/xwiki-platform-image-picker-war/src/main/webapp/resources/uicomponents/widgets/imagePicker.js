@@ -24,10 +24,12 @@
 #set ($imagePickerPath = $xwiki.getSkinFile('uicomponents/imagePicker/imagePicker.js'))
 #set ($blueimpGalleryPath = $services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 
   'js/blueimp-gallery-bundle.min'))
+#set ($lightboxPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-image-lightbox-webjar', "lightbox"))
 #set ($paths = {
   'js': {
     'xwiki-image-picker': $imagePickerPath,
-    'blueimp-gallery-bundle': $blueimpGalleryPath
+    'blueimp-gallery-bundle': $blueimpGalleryPath,
+    'xwiki-lightbox-description': $lightboxPath 
   },
   'css': [$services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'css/blueimp-gallery.min.css')]
 })

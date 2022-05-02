@@ -254,6 +254,16 @@ class ExtensionIndexStoreTest
         result = this.indexStore.search(new ExtensionQuery("component_macro:mymacro"));
 
         assertEquals(1, result.getSize());
+
+        result = this.indexStore.search(new ExtensionQuery("").addFilter(Extension.FIELD_COMPONENTS,
+            Macro.class.getName() + "/mymacro", COMPARISON.EQUAL));
+
+        assertEquals(1, result.getSize());
+
+        result = this.indexStore.search(
+            new ExtensionQuery("").addFilter(Extension.FIELD_COMPONENTS, Macro.class.getName(), COMPARISON.MATCH));
+
+        assertEquals(1, result.getSize());
     }
 
     @Test

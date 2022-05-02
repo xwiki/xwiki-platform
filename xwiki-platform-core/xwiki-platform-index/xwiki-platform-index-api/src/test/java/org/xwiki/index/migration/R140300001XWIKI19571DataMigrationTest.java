@@ -173,7 +173,7 @@ class R140300001XWIKI19571DataMigrationTest
         expected.setInstanceId("testinstanceid");
         expected.setTimestamp(now);
         verify(this.tasksStore).addTask("wikidi", expected);
-        verify(this.hibernateStore).setWiki(this.session, "wikidi");
+        verify(this.hibernateStore).setWiki(this.session);
     }
 
     @Test
@@ -201,7 +201,7 @@ class R140300001XWIKI19571DataMigrationTest
             + "  <dropTable tableName=\"XWIKIDOCUMENTINDEXINGQUEUE\"/>\n"
             + "</changeSet>\n"
             + "\n", this.dataMigration.getPreHibernateLiquibaseChangeLog());
-        verify(this.hibernateStore).setWiki(this.session, "wikidi");
+        verify(this.hibernateStore).setWiki(this.session);
     }
 
     @Test
@@ -212,16 +212,17 @@ class R140300001XWIKI19571DataMigrationTest
             assertThrows(DataMigrationException.class, () -> this.dataMigration.getPreHibernateLiquibaseChangeLog());
         assertEquals("Error while loading the existing tasks.", dataMigrationException.getMessage());
         assertEquals(SQLException.class, dataMigrationException.getCause().getClass());
-        verify(this.hibernateStore).setWiki(this.session, "wikidi");
+        verify(this.hibernateStore).setWiki(this.session);
     }
 
     @Test
     void hibernateMigrateXWikiException() throws Exception
     {
-        doThrow(XWikiException.class).when(this.hibernateStore).setWiki(any(Session.class), any());
+        doThrow(XWikiException.class).when(this.hibernateStore).setWiki(any(Session.class));
         DataMigrationException dataMigrationException =
             assertThrows(DataMigrationException.class, () -> this.dataMigration.getPreHibernateLiquibaseChangeLog());
-        assertEquals("Error while setting the current wiki [wikidi].", dataMigrationException.getMessage());
+        assertEquals("Error while setting the current wiki in the hibernate session.",
+            dataMigrationException.getMessage());
         assertEquals(XWikiException.class, dataMigrationException.getCause().getClass());
     }
 

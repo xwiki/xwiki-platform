@@ -88,9 +88,8 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
     public String getPreHibernateLiquibaseChangeLog() throws DataMigrationException
     {
         SessionFactory sessionFactory = this.hibernateStore.getSessionFactory();
-        String wikiId = getXWikiContext().getWikiId();
         try (SessionImplementor session = (SessionImplementor) sessionFactory.openSession()) {
-            this.hibernateStore.setWiki(session, wikiId);
+            this.hibernateStore.setWiki(session);
             JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
             try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
                 DatabaseMetaData databaseMetaData = connection.getMetaData();
@@ -112,7 +111,7 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
         } catch (SQLException e) {
             throw new DataMigrationException("Error while loading the existing tasks.", e);
         } catch (XWikiException e) {
-            throw new DataMigrationException(String.format("Error while setting the current wiki [%s].", wikiId), e);
+            throw new DataMigrationException("Error while setting the current wiki in the hibernate session.", e);
         }
     }
 

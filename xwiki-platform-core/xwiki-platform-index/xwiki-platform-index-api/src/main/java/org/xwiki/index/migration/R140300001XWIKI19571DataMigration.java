@@ -19,10 +19,12 @@
  */
 package org.xwiki.index.migration;
 
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -100,7 +102,7 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
                 String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
                 String changeSet = "";
                 if (exists(databaseMetaData, tableName)) {
-                    saveTasks(connection, persistentClass, tableName);
+                    saveTasks(session, persistentClass, tableName);
                     changeSet = String.format("<changeSet author=\"xwikiorg\" id=\"%s0\">\n"
                         + "  <dropTable tableName=\"%s\"/>"
                         + "\n</changeSet>\n"
@@ -116,11 +118,12 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
     }
 
     @Override
-    protected void hibernateMigrate() throws DataMigrationException, XWikiException
+    protected void hibernateMigrate() throws XWikiException
     {
         for (XWikiDocumentIndexingTask task : this.tasks) {
             this.tasksStore.get().addTask(getXWikiContext().getWikiId(), task);
         }
+        this.tasks.clear();
     }
 
     /**
@@ -148,12 +151,12 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
     /**
      * Select all the rows for the table of {@link XWikiDocumentIndexingTask} and save them in memory.
      *
-     * @param connection the connection to the database
+     * @param session the current session
      * @param entity the entity to select the rows from
      * @param tableName the table name of the entity
      * @throws SQLException in case of error when retrieving the rows
      */
-    private void saveTasks(Connection connection, PersistentClass entity, String tableName) throws SQLException
+    private void saveTasks(SessionImplementor session, PersistentClass entity, String tableName) throws SQLException
     {
         String docIdColumnName = this.hibernateStore.getConfiguredColumnName(entity, "docId");
         String versionColumnName = this.hibernateStore.getConfiguredColumnName(entity, "version");
@@ -165,16 +168,15 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
         // updated later in the migration.
         String sql = String.format("select %s, %s, %s, %s, %s from %s", docIdColumnName, versionColumnName,
             typeColumnName, instanceIdColumnName, timestampColumnName, tableName);
-        try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            while (resultSet.next()) {
-                XWikiDocumentIndexingTask task = new XWikiDocumentIndexingTask();
-                task.setDocId(resultSet.getLong(docIdColumnName));
-                task.setVersion(cleanupVersion(resultSet.getString(versionColumnName)));
-                task.setType(resultSet.getString(typeColumnName));
-                task.setInstanceId(resultSet.getString(instanceIdColumnName));
-                task.setTimestamp(resultSet.getTimestamp(timestampColumnName));
-                this.tasks.add(task);
-            }
+        List<Object[]> resultList = session.createSQLQuery(sql).getResultList();
+        for (Object[] resultSet : resultList) {
+            XWikiDocumentIndexingTask task = new XWikiDocumentIndexingTask();
+            task.setDocId(((BigInteger) resultSet[0]).longValue());
+            task.setVersion(cleanupVersion((String) resultSet[1]));
+            task.setType((String) resultSet[2]);
+            task.setInstanceId((String) resultSet[3]);
+            task.setTimestamp((Timestamp) resultSet[4]);
+            this.tasks.add(task);
         }
     }
 

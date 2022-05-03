@@ -34,6 +34,7 @@
   <modules>
     <module>xwiki-platform-attachment-ui</module>
     <module>xwiki-platform-attachment-api</module>
+    <module>xwiki-platform-attachment-picker</module>
   </modules>
   <profiles>
     <profile>

@@ -24,16 +24,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-attachment</artifactId>
     <version>14.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-image</artifactId>
-  <name>XWiki Platform - Image - Parent POM</name>
-  <description>XWiki Platform - Image - Parent POM</description>
+  <artifactId>xwiki-platform-attachment-picker</artifactId>
+  <name>XWiki Platform - Attachment - Picker - Parent POM</name>
+  <description>Code related to the attachment picker.</description>
   <packaging>pom</packaging>
   <modules>
-    <module>xwiki-platform-image-lightbox</module>
-    <module>xwiki-platform-image-processing</module>
-    <module>xwiki-platform-image-style</module>
+    <module>xwiki-platform-attachment-picker-macro</module>
+    <module>xwiki-platform-attachment-picker-war</module>
+    <module>xwiki-platform-attachment-picker-webjar</module>
   </modules>
 </project>

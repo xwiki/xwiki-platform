@@ -1,0 +1,33 @@
+.attachmentGroup {
+  display: inline-block;
+  max-width: 150px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 5px;
+}
+
+.attachmentGroup a {
+  color: inherit;
+}
+
+.attachmentGroup img {
+  object-fit: contain;
+  max-width: 150px;
+  max-height: 150px;
+  margin-bottom: 5px;
+}
+
+.attachmentGroup > div {
+  position: relative;
+}
+
+.attachmentGroup input[type='radio'] {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.attachmentPickerSearch {
+  margin-bottom: 1em;
+}

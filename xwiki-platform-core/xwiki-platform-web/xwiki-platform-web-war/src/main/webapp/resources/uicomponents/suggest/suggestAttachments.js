@@ -21,15 +21,6 @@
 #set ($paths = {
   'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
 })
-#set ($discard = "#mimetypeimg('' '')")
-#set ($discard = $mimetypeMap.put('attachment', ['attach', 'attachment']))
-#foreach ($map in [$mimetypeMap, $extensionMap])
-  #foreach ($entry in $map.entrySet())
-    #set ($discard = $entry.value.set(0, $services.icon.getMetaData($entry.value.get(0))))
-    #set ($translationKey = "core.viewers.attachments.mime.$entry.value.get(1)")
-    #set ($discard = $entry.value.set(1, $services.localization.render($translationKey)))
-  #end
-#end
 #set ($l10nBundle = {
   'upload': $services.localization.render('web.uicomponents.suggest.attachments.upload'),
   'uploading': $services.localization.render('web.uicomponents.suggest.attachments.uploading', ['{0}']),
@@ -38,7 +29,7 @@
 })
 #[[*/
 // Start JavaScript-only code.
-(function(paths, contextPath, mimeTypeMap, extensionMap, l10nBundle) {
+(function(paths, contextPath, l10nBundle) {
   "use strict";
 
 require.config({paths});
@@ -138,79 +129,6 @@ define('xwiki-attachments-store', ['jquery'], function($) {
     get: getAttachments,
     upload: attachFile,
     create: createAttachment
-  };
-});
-
-define('xwiki-attachments-icon', ['jquery'], function($) {
-  var getAttachmentIcon = function(attachment) {
-    if (typeof attachment.mimeType === 'string' && attachment.mimeType.substring(0, 6) === 'image/') {
-      var url = attachment.xwikiRelativeUrl;
-      // If the image URL is relative to the current page or is absolute (HTTP) then we can pass the icon width as a
-      // query string parameter to allow the image to be resized on the server side.
-      if (url.substring(0, 1) === '/' || url.substring(0, 7) === 'http://') {
-        url += (url.indexOf('?') < 0 ? '?' : '&') + 'width=48';
-      }
-      var icon = {
-        iconSetType: 'IMAGE',
-        url: url
-      };
-      if (attachment.file) {
-        // Show the icon using the local file while the file is being uploaded.
-        icon.promise = readAsDataURL(attachment.file).then(function(dataURL) {
-          icon.url = dataURL;
-          return dataURL;
-        });
-      }
-      return icon;
-    } else {
-      return getIcon(attachment.mimeType, attachment.name);
-    }
-  };
-
-  var readAsDataURL = function(file) {
-    return new Promise((resolve, reject) => {
-      var fileReader = new FileReader();
-      fileReader.onload = function(event) {
-        resolve(event.target.result);
-      };
-      fileReader.readAsDataURL(file);
-    });
-  };
-
-  var getIcon = function(mimeType, fileName) {
-    var extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-    if (mimeTypeMap.hasOwnProperty(mimeType)) {
-      return mimeTypeMap[mimeType][0];
-    } else if (extensionMap.hasOwnProperty(extension)) {
-      return extensionMap[extension][0];
-    } else {
-      var mimeTypePrefix = mimeType.substring(0, mimeType.indexOf('/') + 1);
-      if (mimeTypeMap.hasOwnProperty(mimeTypePrefix)) {
-        return mimeTypeMap[mimeTypePrefix][0];
-      } else {
-        return mimeTypeMap['attachment'][0];
-      }
-    }
-  };
-
-  var loadAttachmentIcon = function(attachment) {
-    return new Promise((resolve, reject) => {
-      if (attachment.icon.iconSetType === 'IMAGE') {
-        var image = new Image();
-        image.onload = function() {
-          resolve(attachment);
-        };
-        image.src = attachment.icon.url;
-      } else {
-        // Nothing to load.
-        resolve(attachment);
-      }
-    });
-  };
-
-  return {
-    getIcon: getAttachmentIcon,
-    loadIcon: loadAttachmentIcon
   };
 });
 

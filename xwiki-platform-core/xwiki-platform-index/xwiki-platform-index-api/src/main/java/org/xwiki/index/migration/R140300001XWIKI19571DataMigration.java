@@ -19,7 +19,6 @@
  */
 package org.xwiki.index.migration;
 
-import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -172,7 +171,7 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
         List<Object[]> resultList = session.createSQLQuery(sql).getResultList();
         for (Object[] resultSet : resultList) {
             XWikiDocumentIndexingTask task = new XWikiDocumentIndexingTask();
-            task.setDocId(((BigInteger) resultSet[0]).longValue());
+            task.setDocId(((Number) resultSet[0]).longValue());
             task.setVersion(cleanupVersion((String) resultSet[1]));
             task.setType((String) resultSet[2]);
             task.setInstanceId((String) resultSet[3]);

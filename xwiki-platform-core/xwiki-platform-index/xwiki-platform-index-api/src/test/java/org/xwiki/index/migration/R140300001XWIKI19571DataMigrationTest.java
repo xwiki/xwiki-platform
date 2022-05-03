@@ -19,6 +19,7 @@
  */
 package org.xwiki.index.migration;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -153,7 +154,8 @@ class R140300001XWIKI19571DataMigrationTest
 
         Timestamp now = new Timestamp(new Date().getTime());
         when(this.nativeQueryImplementor.getResultList()).thenReturn(List.<Object[]>of(new Object[] {
-            BigInteger.valueOf(1000L),
+            // Oracle returns BigDecimal values.
+            BigDecimal.valueOf(1000L),
             "-4.3",
             "testtype",
             "testinstanceid",

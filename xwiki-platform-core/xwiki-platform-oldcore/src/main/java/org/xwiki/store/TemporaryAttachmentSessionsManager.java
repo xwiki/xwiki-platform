@@ -25,6 +25,7 @@ import java.util.Optional;
 import javax.servlet.http.Part;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
@@ -72,6 +73,20 @@ public interface TemporaryAttachmentSessionsManager
      * @return an {@link Optional#empty()} if the attachment cannot be found, else an optional containing the attachment
      */
     Optional<XWikiAttachment> getUploadedAttachment(DocumentReference documentReference, String filename);
+
+    /**
+     * Retrieve a specific temporary attachment related to the given document reference and matching the given filename.
+     * This method is only a helper to {@link #getUploadedAttachment(DocumentReference, String)}.
+     *
+     * @param attachmentReference the reference of the attachment to retrieve
+     * @return an {@link Optional#empty()} if the attachment cannot be found, else an optional containing the attachment
+     * @since 14.3.1
+     * @since 14.4RC1
+     */
+    default Optional<XWikiAttachment> getUploadedAttachment(AttachmentReference attachmentReference)
+    {
+        return getUploadedAttachment(attachmentReference.getDocumentReference(), attachmentReference.getName());
+    }
 
     /**
      * Search for temporary attachment related to the given document reference and matching the given filename, and

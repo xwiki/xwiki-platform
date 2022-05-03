@@ -602,8 +602,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         XWikiDocument attachmentDocument =
             xcontext.getWiki().getDocument(attachmentReference.getDocumentReference(), xcontext);
-        return new ByteArrayInputStream(
-            attachmentDocument.getAttachment(attachmentReference.getName()).getContent(xcontext));
+        return attachmentDocument.getAttachment(attachmentReference.getName()).getContentInputStream(xcontext);
     }
 
     @Override

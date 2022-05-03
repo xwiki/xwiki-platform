@@ -35,6 +35,5 @@
     <module>xwiki-platform-image-lightbox</module>
     <module>xwiki-platform-image-processing</module>
     <module>xwiki-platform-image-style</module>
-    <module>xwiki-platform-image-picker</module>
   </modules>
 </project>

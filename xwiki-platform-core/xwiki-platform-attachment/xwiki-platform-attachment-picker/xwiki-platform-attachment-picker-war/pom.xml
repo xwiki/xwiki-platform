@@ -24,15 +24,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-image-picker</artifactId>
+    <artifactId>xwiki-platform-attachment-picker</artifactId>
     <version>14.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-image-picker-war</artifactId>
-  <name>XWiki Platform - Image - Picker - WAR</name>
+  <artifactId>xwiki-platform-attachment-picker-war</artifactId>
+  <name>XWiki Platform - Attachment - Picker - WAR</name>
   <packaging>war</packaging>
   <!-- We need this module because we're missing a skin extension plugin to load JavaScript code from a WebJar.
     See XWIKI-12788 (Introduce skin extension plugins for webjar resources) -->
-  <description>Velocity macros and JavaScript files that can't be packaged in the WebJar</description>
+  <description>Velocity macros and JavaScript files that can't be packaged in the Attachment Picker WebJar.</description>
   <build>
     <plugins>
       <!-- Javascript compression -->

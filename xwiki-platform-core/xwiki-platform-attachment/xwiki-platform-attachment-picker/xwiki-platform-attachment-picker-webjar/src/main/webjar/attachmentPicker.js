@@ -18,11 +18,49 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-define('xwiki-image-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-description'],
-  function ($, gallery, lightboxDescription) {
+/*define('xwiki-attachment-picker-icons', ['jquery'], function ($) {
+  'use strict';
+
+  const iconCache = {};
+
+  function getIcon(iconName) {
+    return new Promise((resolve, reject) => {
+      if (iconCache[iconName]) {
+        resolve(iconCache[iconName]);
+      } else {
+        const parameters = `name=${encodeURIComponent(iconName)}`;
+        const iconURL = `${XWiki.contextPath}/rest/wikis/${XWiki.currentWiki}/iconThemes/icons?${parameters}`;
+        $.getJSON(iconURL).done((response) => {
+          iconCache[iconName] = response.icons[0];
+          const icon = response.icons[0];
+          resolve(icon);
+        }).fail((error) => {
+          reject(error);
+        });
+      }
+    });
+  } 
+
+  function renderIcon(iconDescriptor) {
+    if (iconDescriptor.iconSetType === 'IMAGE') {
+      return $('<img/>').prop("src", iconDescriptor.url);
+    } else {
+      return $('<span/>').addClass(iconDescriptor.cssClass);
+    }
+  }
+
+  return {
+    getIcon: getIcon,
+    renderIcon: renderIcon
+  };
+})*/
+// ;
+
+define('xwiki-attachment-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-description'],
+  function ($, gallery, lightboxDescription, iconsClient) {
     'use strict';
 
-    const IMAGE_PICKER_INITIALIZED_CLASS = 'initialized';
+    const ATTACHMENT_PICKER_INITIALIZED_CLASS = 'initialized';
 
     /**
      * Utility function to debounce an event. The callback is delayed until no similar event is received before the end
@@ -60,21 +98,30 @@ define('xwiki-image-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-descr
         // TODO: deal with the case where one of the query failed!
         return Promise.all([localDocumentOnly, globalSearch]).then(results => {
           /*
-           * Take the images from the current document first.
-           * Then take the images from the global search that are not from the current document (to avoid duplicates).
-           * At the end, only keep a fixed number of images (this.nb).
+           * Take the attachments from the current document first. Then take the attachments from the global search that
+           *  are not from the current document (to avoid duplicates). At the end, only keep a fixed number of 
+           * attachments (this.nb).
            */
-          const localImages = results[0];
-          const localImagesId = localImages.map(image => image.id);
-          const globalImages = results[1].filter(it => !localImagesId.includes(it.id));
-          return localImages.concat(globalImages).slice(0, this.nb);
+          const localAttachments = results[0];
+          const localAttachmentsId = localAttachments.map(attachment => attachment.id);
+          const globalAttachments = results[1].filter(it => !localAttachmentsId.includes(it.id));
+          return localAttachments.concat(globalAttachments).slice(0, this.nb);
         });
       }
 
       searchSolr(input, options) {
-        const fqs = (options || {}).fqs || [];
-        const defaultFqs = ['type:ATTACHMENT', 'mimetype:image/*'].concat(fqs);
-        const query = defaultFqs.map((fq) => 'fq=' + fq).join('\n');
+        console.log('searchSolr');
+        options = options || {};
+        const optionsFqs = options.fqs || [];
+        const types = options.types;
+        var typesFqs;
+        if (types !== undefined && types !== '') {
+          typesFqs = ['mimetype:(' + types.split(",").join(" OR ") + ')'];
+        } else {
+          typesFqs = [];
+        }
+        const computedFqs = ['type:ATTACHMENT'].concat(optionsFqs).concat(typesFqs);
+        const query = computedFqs.map((fq) => 'fq=' + fq).join('\n');
 
         return new Promise((resolve, reject) => {
           // TODO: handle more kind of scopes
@@ -126,7 +173,7 @@ define('xwiki-image-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-descr
           .catch((error) => {
             console.log(error);
             // TODO: localization
-            new XWiki.widgets.Notification('The image search query failed', 'error');
+            new XWiki.widgets.Notification('The attachments search query failed', 'error');
           }).finally(() => {
             this.rootBlock.removeClass('loading');
           });
@@ -136,16 +183,18 @@ define('xwiki-image-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-descr
     /**
      * TODO: document me
      */
-    class ImagePicker {
-      constructor(imagePicker) {
-        this.imagePicker = imagePicker;
-        this.searchBlock = new SearchBlock(this.imagePicker, this.imagePicker.find('.imagePickerSearch'));
-        this.resultsBlock = this.imagePicker.find('.imagePickerResults');
-        this.noResultsBlock = this.imagePicker.find('.imagePickerNoResults');
+    class AttachmentPicker {
+
+      constructor(attachmentPicker) {
+        this.attachmentPicker = attachmentPicker;
+        const attachmentPickerSearch = this.attachmentPicker.find('.attachmentPickerSearch');
+        this.searchBlock = new SearchBlock(this.attachmentPicker, attachmentPickerSearch);
+        this.resultsBlock = this.attachmentPicker.find('.attachmentPickerResults');
+        this.noResultsBlock = this.attachmentPicker.find('.attachmentPickerNoResults');
       }
 
       initialize() {
-        if (!this.imagePicker.hasClass(IMAGE_PICKER_INITIALIZED_CLASS)) {
+        if (!this.attachmentPicker.hasClass(ATTACHMENT_PICKER_INITIALIZED_CLASS)) {
           this.searchBlock.initialize((results) => {
             // TODO: display results
             this.resultsBlock.empty();
@@ -156,83 +205,89 @@ define('xwiki-image-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-descr
               this.noResultsBlock.removeClass('hidden');
             }
           });
-          this.imagePicker.addClass(IMAGE_PICKER_INITIALIZED_CLASS);
+          this.attachmentPicker.addClass(ATTACHMENT_PICKER_INITIALIZED_CLASS);
         }
       }
 
       initializeWhenHasResults(results) {
         var index = 0;
-        const imagePickerId = this.imagePicker.attr('id');
+        const attachmentPickerId = this.attachmentPicker.attr('id');
         for (let result of results) {
-          const attachmentReference = XWiki.Model.resolve(result.id, XWiki.EntityType.ATTACHMENT);
-          const downloadDocumentURL = new XWiki.Document(attachmentReference.parent).getURL('download');
-          const downloadURL = `${downloadDocumentURL}/${encodeURIComponent(attachmentReference.name)}`;
-          const filename = result.filename[0];
-          const img = $(`<img />`)
-            .prop('loading', 'lazy')
-            .prop('width', 150)
-            .prop('height', 150)
-            .prop('src', `${downloadURL}?width=150&height=150`)
-            .prop('alt', filename);
-          const textSpan = $('<span>').text(filename).prop('title', filename);
-          const link = $(`<a></a>`)
-            .append(img)
-            .prop('title', filename)
-            .prop('href', downloadURL)
-            .data('index', index)
-            .append(img)
-            .append('<br/>')
-            .append(textSpan);
-          const radioButton = $("<input>")
-            .prop('type', 'radio')
-            .prop("name", `radio-${imagePickerId}`)
-            .val(attachmentReference);
-          const imageGroup = $('<span class="imageGroup">')
-            .append($('<div/>')
-              .append(radioButton)
-              .append(link));
-          this.resultsBlock.append(imageGroup);
+          this.addAttachment(result, index);
           index = index + 1;
         }
-        const images = this.resultsBlock.find('a');
+        const attachments = this.resultsBlock.find('a');
 
-        const galleryId = `#${imagePickerId}-gallery`;
+        const galleryId = `#${attachmentPickerId}-gallery`;
         const lightboxOptions = {rootSelector: galleryId};
 
         $(document).on('click', lightboxOptions.rootSelector + ' .slides',
           () => lightboxDescription.toggleDescription(lightboxOptions));
 
-        images.on('click', function (e) {
+        attachments.on('click', function (e) {
           const slideParams = {
             href: $(this).attr('href'),
-            // thumbnail: createThumbnailURL(imageURL),
+            // thumbnail: createThumbnailURL(attachmentURL),
             // caption: caption,
             fileName: $(this).attr('title'),
             alt: $(this).attr('alt'),
             title: $(this).attr('title'),
-            // id: getImageId(this)
+            // id: getAttachmentId(this)
           };
 
           lightboxDescription.addSlideDescription(slideParams, lightboxOptions);
           e.preventDefault();
-          gallery(images, {
+          gallery(attachments, {
             container: galleryId,
             index: parseInt($(this).data('index')),
           });
         });
       }
+
+      addAttachment(result, index) {
+        const attachmentReference = XWiki.Model.resolve(result.id, XWiki.EntityType.ATTACHMENT);
+        const downloadDocumentURL = new XWiki.Document(attachmentReference.parent).getURL('download');
+        const filename = result.filename[0];
+        var preview;
+        var downloadURL = `${downloadDocumentURL}/${encodeURIComponent(attachmentReference.name)}`;
+        if (result.mimetype && result.mimetype[0].startsWith("image/")) {
+          preview = $(`<img />`)
+            .prop('loading', 'lazy')
+            .prop('width', 150)
+            .prop('height', 150)
+            .prop('src', `${downloadURL}?width=150&height=150`)
+            .prop('alt', filename);
+        } else {
+          console.log("HERE");
+          iconsClient.getIcon({});
+          preview = $("<img/>");
+        }
+        console.log('HERE');
+
+        const textSpan = $('<span>').text(filename).prop('title', filename);
+        const link = $(`<a></a>`)
+          .append(preview)
+          .prop('title', filename)
+          .prop('href', downloadURL)
+          .data('index', index)
+          .append(preview)
+          .append('<br/>')
+          .append(textSpan);
+        this.resultsBlock.append($('<span class="attachmentGroup">')
+          .append($('<div/>').append(link)));
+      }
     }
 
-    $.fn.imagePicker = function () {
+    $.fn.attachmentPicker = function () {
       return this.each(function () {
-        const imagePicker = new ImagePicker($(this));
-        imagePicker.initialize();
+        const attachmentPicker = new AttachmentPicker($(this));
+        attachmentPicker.initialize();
       });
     };
 
     function init(_event, data) {
       var container = $((data && data.elements) || document);
-      container.find('.imagePicker').imagePicker();
+      container.find('.attachmentPicker').attachmentPicker();
     }
 
     $(document).on('xwiki:dom:updated', init);

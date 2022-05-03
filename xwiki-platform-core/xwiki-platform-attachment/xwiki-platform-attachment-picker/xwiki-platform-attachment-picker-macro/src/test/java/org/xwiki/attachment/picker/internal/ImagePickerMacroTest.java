@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.image.picker.internal;
+package org.xwiki.attachment.picker.internal;
 
 import java.util.List;
 import java.util.Map;
@@ -26,9 +26,11 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.image.picker.ImagePickerMacroParameters;
+import org.xwiki.attachment.picker.AttachmentPickerMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -40,16 +42,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 /**
- * Test of {@link ImagePickerMacro}.
+ * Test of {@link AttachmentPickerMacro}.
  *
  * @version $Id$
  * @since 14.4RC1
  */
 @ComponentTest
-class ImagePickerMacroTest
+class AttachmentPickerMacroTest
 {
     @InjectMockComponents
-    private ImagePickerMacro imagePickerMacro;
+    private AttachmentPickerMacro attachmentPickerMacro;
 
     @MockComponent
     @Named("jsfx")
@@ -63,20 +65,38 @@ class ImagePickerMacroTest
     private MacroTransformationContext macroTransformationContext;
 
     @Test
-    void execute() throws Exception
+    void execute()
     {
-        ImagePickerMacroParameters parameters = new ImagePickerMacroParameters();
-        parameters.setId("my-id");
+        AttachmentPickerMacroParameters params = new AttachmentPickerMacroParameters();
+        params.setId("my-id");
         List<Block> actual =
-            this.imagePickerMacro.execute(parameters, null, this.macroTransformationContext);
+            this.attachmentPickerMacro.execute(params, null, this.macroTransformationContext);
         assertEquals(List.of(new GroupBlock(List.of(
-            new GroupBlock(Map.of("class", "imagePickerSearch")),
-            new GroupBlock(Map.of("class", "imagePickerResults"))
+            new GroupBlock(List.of(), Map.of("class", "attachmentPickerSearch")),
+            new GroupBlock(Map.of("class", "attachmentPickerResults")),
+            new GroupBlock(List.of(new WordBlock("No results.")),
+                Map.of("class", "attachmentPickerNoResults hidden box warningmessage")),
+            new MacroBlock("include", Map.of("reference", "XWiki.Lightbox.Code.BlueImpScripts"), false),
+            new MacroBlock("velocity", Map.of(),
+                "{{html}}#lightboxHTMLTemplate('my-id-gallery'){{/html}}", false)
         ), Map.ofEntries(
-            entry("id", parameters.getId()),
-            entry("class", "imagePicker")
+            entry("id", "my-id"),
+            entry("class", "attachmentPicker"),
+            entry("data-xwiki-lightbox", "false"),
+            entry("data-xwiki-attachment-picker-types", "")
         ))), actual);
-        verify(this.jsfx).use("uicomponents/widgets/imagePicker.js", Map.of("forceSkinAction", true));
-        verify(this.ssfx).use("uicomponents/widgets/imagePicker.css");
+        verify(this.jsfx).use("uicomponents/widgets/attachmentPicker.js", Map.of("forceSkinAction", true));
+        verify(this.ssfx).use("uicomponents/widgets/attachmentPicker.css");
+    }
+
+    @Test
+    void executeWithTypes()
+    {
+        AttachmentPickerMacroParameters params = new AttachmentPickerMacroParameters();
+        params.setId("my-id");
+        params.setTypes(List.of("image/png", "image/jpeg"));
+        List<Block> actual =
+            this.attachmentPickerMacro.execute(params, null, this.macroTransformationContext);
+        assertEquals("image/png,image/jpeg", actual.get(0).getParameter("data-xwiki-attachment-picker-types"));
     }
 }

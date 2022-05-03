@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.image.picker.internal;
+package org.xwiki.attachment.picker.internal;
 
 import java.util.List;
 import java.util.Map;
@@ -26,14 +26,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.attachment.picker.AttachmentPickerMacroParameters;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.image.picker.ImagePickerMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
-import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
 
@@ -46,33 +45,33 @@ import static java.util.Map.entry;
  * @since 14.4RC1
  */
 @Component
-@Named("imagePicker")
+@Named("attachmentPicker")
 @Singleton
-public class ImagePickerMacro extends AbstractMacro<ImagePickerMacroParameters>
+public class AttachmentPickerMacro extends AbstractMacro<AttachmentPickerMacroParameters>
 {
     /**
      * id parameter for the {@link Block}s returned by
-     * {@link #execute(ImagePickerMacroParameters, String, MacroTransformationContext)}.
+     * {@link #execute(AttachmentPickerMacroParameters, String, MacroTransformationContext)}.
      */
     private static final String BLOCK_PARAM_ID = "id";
 
     /**
      * class parameter for the {@link Block}s returned by
-     * {@link #execute(ImagePickerMacroParameters, String, MacroTransformationContext)}.
+     * {@link #execute(AttachmentPickerMacroParameters, String, MacroTransformationContext)}.
      */
     private static final String BLOCK_PARAM_CLASS = "class";
 
-    private static final String IMAGE_PICKER_CLASSES = "imagePicker";
+    private static final String ATTACHMENT_PICKER_CLASSES = "attachmentPicker";
 
     /**
-     * CSS file skin extension, to include the image picker css.
+     * CSS file skin extension, to include the attachment picker css.
      */
     @Inject
     @Named("ssfx")
     private SkinExtension ssfx;
 
     /**
-     * JS file skin extension, to include the image picker javascript. A single javascript file provided by the war
+     * JS file skin extension, to include the attachment picker javascript. A single javascript file provided by the war
      * module is required. This file has some velocity to define the other webjar dependencies dynamically, all the rest
      * is provided by the webjar module and its dependencies.
      */
@@ -83,9 +82,9 @@ public class ImagePickerMacro extends AbstractMacro<ImagePickerMacroParameters>
     /**
      * Default constructor.
      */
-    public ImagePickerMacro()
+    public AttachmentPickerMacro()
     {
-        super("Image Picker", "Grid based image picker.", ImagePickerMacroParameters.class);
+        super("Attachment Picker", "Grid based attachment picker.", AttachmentPickerMacroParameters.class);
     }
 
     @Override
@@ -95,23 +94,23 @@ public class ImagePickerMacro extends AbstractMacro<ImagePickerMacroParameters>
     }
 
     @Override
-    public List<Block> execute(ImagePickerMacroParameters parameters, String content,
-        MacroTransformationContext context) throws MacroExecutionException
+    public List<Block> execute(AttachmentPickerMacroParameters parameters, String content,
+        MacroTransformationContext context)
     {
         // TODO: add data-* attributes to pass the other configurations (or a single json serialized data)?
         // TODO: verify that the minified versions are actually loaded in the browser. 
-        this.jsfx.use("uicomponents/widgets/imagePicker.js", Map.of("forceSkinAction", true));
-        this.ssfx.use("uicomponents/widgets/imagePicker.css");
+        this.jsfx.use("uicomponents/widgets/attachmentPicker.js", Map.of("forceSkinAction", true));
+        this.ssfx.use("uicomponents/widgets/attachmentPicker.css");
         return List.of(new GroupBlock(List.of(
             // Search block.
-            new GroupBlock(List.of(), Map.of(BLOCK_PARAM_CLASS, "imagePickerSearch")),
+            new GroupBlock(List.of(), Map.of(BLOCK_PARAM_CLASS, "attachmentPickerSearch")),
             // Results block.
-            new GroupBlock(Map.of(BLOCK_PARAM_CLASS, "imagePickerResults")),
+            new GroupBlock(Map.of(BLOCK_PARAM_CLASS, "attachmentPickerResults")),
             // No results block.
             // TODO: localization
             new GroupBlock(List.of(new WordBlock("No results.")),
-                Map.of(BLOCK_PARAM_CLASS, "imagePickerNoResults hidden box warningmessage")),
-            // Images carousel.
+                Map.of(BLOCK_PARAM_CLASS, "attachmentPickerNoResults hidden box warningmessage")),
+            // Attachments preview carousel.
             // TODO: add an explicit runtime dependency to the lighbox-ui module. 
             new MacroBlock("include", Map.of("reference", "XWiki.Lightbox.Code.BlueImpScripts"), false),
             // TODO: check XSS.
@@ -119,8 +118,9 @@ public class ImagePickerMacro extends AbstractMacro<ImagePickerMacroParameters>
                 "{{html}}#lightboxHTMLTemplate('" + parameters.getId() + "-gallery'){{/html}}", false)
         ), Map.ofEntries(
             entry(BLOCK_PARAM_ID, parameters.getId()),
-            entry(BLOCK_PARAM_CLASS, IMAGE_PICKER_CLASSES),
-            entry("data-xwiki-lightbox", "false")
+            entry(BLOCK_PARAM_CLASS, ATTACHMENT_PICKER_CLASSES),
+            entry("data-xwiki-lightbox", "false"),
+            entry("data-xwiki-attachment-picker-types", String.join(",", parameters.getTypes()))
         )));
     }
 }

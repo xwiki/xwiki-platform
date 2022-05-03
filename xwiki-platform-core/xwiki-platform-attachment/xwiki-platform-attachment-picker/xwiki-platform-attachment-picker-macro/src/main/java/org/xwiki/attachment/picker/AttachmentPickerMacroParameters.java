@@ -17,24 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.image.picker;
+package org.xwiki.attachment.picker;
 
-import org.xwiki.image.picker.internal.ImagePickerMacro;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.xwiki.attachment.picker.internal.AttachmentPickerMacro;
 import org.xwiki.stability.Unstable;
 
 /**
- * Parameters for the {@link ImagePickerMacro} Macro.
+ * Parameters for the {@link AttachmentPickerMacro} Macro.
  *
  * @version $Id$
  * @since 14.4RC1
  */
 @Unstable
-public class ImagePickerMacroParameters
+public class AttachmentPickerMacroParameters
 {
     private String id;
 
+    private List<String> types = new ArrayList<>();
+
     /**
-     * @return the id of the image picker macro
+     * @return the id of the attachment picker macro
      */
     public String getId()
     {
@@ -42,10 +47,26 @@ public class ImagePickerMacroParameters
     }
 
     /**
-     * @param id the id of the image picker macro
+     * @param id the id of the attachment picker macro
      */
     public void setId(String id)
     {
         this.id = id;
+    }
+
+    /**
+     * @return the supported types of attachments
+     */
+    public List<String> getTypes()
+    {
+        return this.types;
+    }
+
+    /**
+     * @param types the supported types of attachments
+     */
+    public void setTypes(List<String> types)
+    {
+        this.types = types;
     }
 }

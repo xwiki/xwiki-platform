@@ -18,18 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($imagePickerEntry = 'imagePicker.min')
-## #set ($imagePickerPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-image-picker-webjar', 
-##   $imagePickerEntry))
-#set ($imagePickerPath = $xwiki.getSkinFile('uicomponents/imagePicker/imagePicker.js'))
+#set ($attachmentPickerEntry = 'attachmentPicker.min')
+## #set ($attachmentPickerPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-attachment-picker-webjar', 
+##   $attachmentPickerEntry))
+#set ($attachmentPickerPath = $xwiki.getSkinFile('uicomponents/attachmentPicker/attachmentPicker.js'))
 #set ($blueimpGalleryPath = $services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 
   'js/blueimp-gallery-bundle.min'))
 #set ($lightboxPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-image-lightbox-webjar', "lightbox"))
 #set ($paths = {
   'js': {
-    'xwiki-image-picker': $imagePickerPath,
+    'xwiki-attachment-picker': $attachmentPickerPath,
     'blueimp-gallery-bundle': $blueimpGalleryPath,
-    'xwiki-lightbox-description': $lightboxPath 
+    'xwiki-lightbox-description': $lightboxPath,
+    'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true) 
   },
   'css': [$services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'css/blueimp-gallery.min.css')]
 })
@@ -54,7 +55,7 @@
     });
   });
 
-  // Bootstrap the image picker, all the business code is located in the module initialization.
-  require(['xwiki-image-picker'], function () {});
+  // Bootstrap the attachment picker, all the business code is located in the module initialization.
+  require(['xwiki-attachment-picker'], function () {});
 // End JavaScript-only code.
 }).apply(']]#', $jsontool.serialize([$paths]));

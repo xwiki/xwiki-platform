@@ -1,4 +1,4 @@
-.imageGroup {
+.attachmentGroup {
   display: inline-block;
   max-width: 150px;
   text-overflow: ellipsis;
@@ -7,27 +7,27 @@
   margin: 5px;
 }
 
-.imageGroup a {
+.attachmentGroup a {
   color: inherit;
 }
 
-.imageGroup img {
+.attachmentGroup img {
   object-fit: contain;
   max-width: 150px;
   max-height: 150px;
   margin-bottom: 5px;
 }
 
-.imageGroup > div {
+.attachmentGroup > div {
   position: relative;
 }
 
-.imageGroup input[type='radio'] {
+.attachmentGroup input[type='radio'] {
   position: absolute;
   top: 0;
   left: 0;
 }
 
-.imagePickerSearch {
+.attachmentPickerSearch {
   margin-bottom: 1em;
 }

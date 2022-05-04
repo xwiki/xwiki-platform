@@ -406,6 +406,19 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
     }
 
     /**
+     * @param property the name of the property
+     * @param value the value the property should contain
+     * @return this {@link SimpleEventQuery}
+     * @since 14.4RC1
+     */
+    public SimpleEventQuery contains(String property, Object value)
+    {
+        addCompareCondition(property, value, CompareType.CONTAINS);
+
+        return this;
+    }
+
+    /**
      * @param date the date before which events should be selected
      * @return this {@link SimpleEventQuery}
      * @since 12.5RC1

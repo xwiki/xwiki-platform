@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -483,6 +484,12 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4),
             new SimpleEventQuery().startsWith(Event.FIELD_ID, "id"));
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().endsWith(Event.FIELD_ID, "1"));
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().contains(Event.FIELD_ID,
+            ""));
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().contains(Event.FIELD_ID,
+            "d"));
+        assertSearch(List.of(EVENT1), new SimpleEventQuery().contains(Event.FIELD_ID, "d1"));
     }
 
     @Test

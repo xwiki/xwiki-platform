@@ -36,7 +36,7 @@ public class AttachmentPickerMacroParameters
 {
     private String id;
 
-    private List<String> types = new ArrayList<>();
+    private List<String> filter = new ArrayList<>();
 
     /**
      * @return the id of the attachment picker macro
@@ -57,16 +57,16 @@ public class AttachmentPickerMacroParameters
     /**
      * @return the supported types of attachments
      */
-    public List<String> getTypes()
+    public List<String> getFilter()
     {
-        return this.types;
+        return this.filter;
     }
 
     /**
-     * @param types the supported types of attachments
+     * @param filter the supported types of attachments
      */
-    public void setTypes(List<String> types)
+    public void setFilter(List<String> filter)
     {
-        this.types = types;
+        this.filter = filter;
     }
 }

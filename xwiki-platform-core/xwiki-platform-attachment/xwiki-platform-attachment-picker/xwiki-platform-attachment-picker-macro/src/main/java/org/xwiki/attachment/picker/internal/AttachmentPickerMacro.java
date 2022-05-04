@@ -19,6 +19,7 @@
  */
 package org.xwiki.attachment.picker.internal;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,9 +29,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.attachment.picker.AttachmentPickerMacroParameters;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
@@ -38,7 +39,8 @@ import org.xwiki.skinx.SkinExtension;
 import static java.util.Map.entry;
 
 /**
- * TODO: document me. TODO: translations (macro title, description, properties...)
+ * Display an attachment picker with a search field and a grid preview of the attachments. This widget is adapted to
+ * UIs where vertical space usage is not an issue.
  *
  * @version $Id$
  * @since 14.4RC1
@@ -49,13 +51,13 @@ import static java.util.Map.entry;
 public class AttachmentPickerMacro extends AbstractMacro<AttachmentPickerMacroParameters>
 {
     /**
-     * id parameter for the {@link Block}s returned by
+     * id parameter key for the {@link Block}s returned by
      * {@link #execute(AttachmentPickerMacroParameters, String, MacroTransformationContext)}.
      */
     private static final String BLOCK_PARAM_ID = "id";
 
     /**
-     * class parameter for the {@link Block}s returned by
+     * class parameter key for the {@link Block}s returned by
      * {@link #execute(AttachmentPickerMacroParameters, String, MacroTransformationContext)}.
      */
     private static final String BLOCK_PARAM_CLASS = "class";
@@ -78,6 +80,9 @@ public class AttachmentPickerMacro extends AbstractMacro<AttachmentPickerMacroPa
     @Named("jsfx")
     private SkinExtension jsfx;
 
+    @Inject
+    private ContextualLocalizationManager l10n;
+
     /**
      * Default constructor.
      */
@@ -96,25 +101,27 @@ public class AttachmentPickerMacro extends AbstractMacro<AttachmentPickerMacroPa
     public List<Block> execute(AttachmentPickerMacroParameters parameters, String content,
         MacroTransformationContext context)
     {
-        // TODO: add data-* attributes to pass the other configurations (or a single json serialized data)?
-        // TODO: verify that the minified versions are actually loaded in the browser. 
         Map<String, Object> forceSkinAction = Map.of("forceSkinAction", true);
         this.jsfx.use("uicomponents/widgets/attachmentPicker.js", forceSkinAction);
         this.ssfx.use("uicomponents/widgets/attachmentPicker.css", forceSkinAction);
+        Map<String, String> attachmentPickerParameters = new HashMap<>(Map.ofEntries(
+            entry(BLOCK_PARAM_ID, parameters.getId()),
+            entry(BLOCK_PARAM_CLASS, ATTACHMENT_PICKER_CLASSES),
+            entry("data-xwiki-lightbox", "false"),
+            entry("data-xwiki-attachment-picker-filter", String.join(",", parameters.getFilter()))
+        ));
+        if (parameters.getLimit() != null) {
+            attachmentPickerParameters.put("data-xwiki-attachment-picker-limit", String.valueOf(parameters.getLimit()));
+        }
+
         return List.of(new GroupBlock(List.of(
             // Search block.
             new GroupBlock(List.of(), Map.of(BLOCK_PARAM_CLASS, "attachmentPickerSearch")),
             // Results block.
             new GroupBlock(Map.of(BLOCK_PARAM_CLASS, "attachmentPickerResults")),
             // No results block.
-            // TODO: localization
-            new GroupBlock(List.of(new WordBlock("No results.")),
+            new GroupBlock(List.of(this.l10n.getTranslation("attachment.picker.macro.notResult.message").render()),
                 Map.of(BLOCK_PARAM_CLASS, "attachmentPickerNoResults hidden box warningmessage"))
-        ), Map.ofEntries(
-            entry(BLOCK_PARAM_ID, parameters.getId()),
-            entry(BLOCK_PARAM_CLASS, ATTACHMENT_PICKER_CLASSES),
-            entry("data-xwiki-lightbox", "false"),
-            entry("data-xwiki-attachment-picker-filter", String.join(",", parameters.getFilter()))
-        )));
+        ), attachmentPickerParameters));
     }
 }

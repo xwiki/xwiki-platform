@@ -33,6 +33,7 @@
   <!-- We need this module because we're missing a skin extension plugin to load JavaScript code from a WebJar.
     See XWIKI-12788 (Introduce skin extension plugins for webjar resources) -->
   <description>Velocity macros and JavaScript files that can't be packaged in the Attachment Picker WebJar.</description>
+  <!-- TODO: exo metadata category, name...-->
   <build>
     <plugins>
       <!-- Javascript compression -->

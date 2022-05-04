@@ -22,6 +22,7 @@ define('xwiki-attachment-picker', ['jquery', 'xwiki-attachments-icon'], function
   'use strict';
 
   const ATTACHMENT_PICKER_INITIALIZED_CLASS = 'initialized';
+  // TODO: make constants for other classes!
 
   /**
    * Utility function to debounce an event. The callback is delayed until no similar event is received before the end
@@ -43,7 +44,6 @@ define('xwiki-attachment-picker', ['jquery', 'xwiki-attachments-icon'], function
     constructor(options) {
       const doc = new XWiki.Document(XWiki.Model.resolve('XWiki.SuggestSolrService', XWiki.EntityType.DOCUMENT));
       this.sugestSolrServiceURL = doc.getURL('get');
-      // TODO: make this configurable.
       this.options = options || {};
       this.limit = options.limit || 20;
       this.solrOptions = this.options.solrOptions || {};
@@ -58,6 +58,7 @@ define('xwiki-attachment-picker', ['jquery', 'xwiki-attachments-icon'], function
         ]
       }));
       const globalSearch = this.searchSolr(query, this.solrOptions);
+      // TODO: Make this algorithm configurable through an macro parameter.
       return Promise.all([localDocumentOnly, globalSearch]).then(results => {
         /*
          * Take the attachments from the current document first. Then take the attachments from the global search that
@@ -120,6 +121,7 @@ define('xwiki-attachment-picker', ['jquery', 'xwiki-attachments-icon'], function
       this.searchBlock.addClass('xform');
       this.searchBlock.html("<input type='text' />");
       this.solrSearch = new SolrSearch({
+        limit: parseInt(this.rootBlock.data('xwiki-attachment-picker-limit')),
         solrOptions: {
           filter: this.rootBlock.data('xwiki-attachment-picker-filter')
         }

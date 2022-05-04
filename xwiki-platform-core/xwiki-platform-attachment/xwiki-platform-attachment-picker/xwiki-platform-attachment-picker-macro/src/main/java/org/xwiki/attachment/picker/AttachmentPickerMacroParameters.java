@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.attachment.picker.internal.AttachmentPickerMacro;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -38,6 +41,8 @@ public class AttachmentPickerMacroParameters
 
     private List<String> filter = new ArrayList<>();
 
+    private Integer limit;
+
     /**
      * @return the id of the attachment picker macro
      */
@@ -49,6 +54,9 @@ public class AttachmentPickerMacroParameters
     /**
      * @param id the id of the attachment picker macro
      */
+    @PropertyMandatory
+    @PropertyName("Id")
+    @PropertyDescription("The id of the attachment picker macro")
     public void setId(String id)
     {
         this.id = id;
@@ -65,8 +73,28 @@ public class AttachmentPickerMacroParameters
     /**
      * @param filter the supported types of attachments
      */
+    @PropertyName("Filter")
+    @PropertyDescription("A list of mimetypes to filter the attachments by (e.g. image/*,image/jpeg)")
     public void setFilter(List<String> filter)
     {
         this.filter = filter;
+    }
+
+    /**
+     * @return the maximum number of attachments to display
+     */
+    public Integer getLimit()
+    {
+        return this.limit;
+    }
+
+    /**
+     * @param limit the maximum number of attachments to display
+     */
+    @PropertyName("Limit")
+    @PropertyDescription("The maximum number of attachments to display")
+    public void setLimit(Integer limit)
+    {
+        this.limit = limit;
     }
 }

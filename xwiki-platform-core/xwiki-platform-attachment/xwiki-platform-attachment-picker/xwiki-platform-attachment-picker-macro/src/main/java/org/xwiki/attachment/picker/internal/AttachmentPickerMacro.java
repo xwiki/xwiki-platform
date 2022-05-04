@@ -30,7 +30,6 @@ import org.xwiki.attachment.picker.AttachmentPickerMacroParameters;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -99,8 +98,9 @@ public class AttachmentPickerMacro extends AbstractMacro<AttachmentPickerMacroPa
     {
         // TODO: add data-* attributes to pass the other configurations (or a single json serialized data)?
         // TODO: verify that the minified versions are actually loaded in the browser. 
-        this.jsfx.use("uicomponents/widgets/attachmentPicker.js", Map.of("forceSkinAction", true));
-        this.ssfx.use("uicomponents/widgets/attachmentPicker.css");
+        Map<String, Object> forceSkinAction = Map.of("forceSkinAction", true);
+        this.jsfx.use("uicomponents/widgets/attachmentPicker.js", forceSkinAction);
+        this.ssfx.use("uicomponents/widgets/attachmentPicker.css", forceSkinAction);
         return List.of(new GroupBlock(List.of(
             // Search block.
             new GroupBlock(List.of(), Map.of(BLOCK_PARAM_CLASS, "attachmentPickerSearch")),
@@ -109,13 +109,7 @@ public class AttachmentPickerMacro extends AbstractMacro<AttachmentPickerMacroPa
             // No results block.
             // TODO: localization
             new GroupBlock(List.of(new WordBlock("No results.")),
-                Map.of(BLOCK_PARAM_CLASS, "attachmentPickerNoResults hidden box warningmessage")),
-            // Attachments preview carousel.
-            // TODO: add an explicit runtime dependency to the lighbox-ui module. 
-            new MacroBlock("include", Map.of("reference", "XWiki.Lightbox.Code.BlueImpScripts"), false),
-            // TODO: check XSS.
-            new MacroBlock("velocity", Map.of(),
-                "{{html}}#lightboxHTMLTemplate('" + parameters.getId() + "-gallery'){{/html}}", false)
+                Map.of(BLOCK_PARAM_CLASS, "attachmentPickerNoResults hidden box warningmessage"))
         ), Map.ofEntries(
             entry(BLOCK_PARAM_ID, parameters.getId()),
             entry(BLOCK_PARAM_CLASS, ATTACHMENT_PICKER_CLASSES),

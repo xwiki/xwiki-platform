@@ -56,8 +56,7 @@
 })*/
 // ;
 
-define('xwiki-attachment-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-description'],
-  function ($, gallery, lightboxDescription, iconsClient) {
+define('xwiki-attachment-picker', ['jquery', 'xwiki-attachments-icon'], function ($, attachmentsIcon) {
     'use strict';
 
     const ATTACHMENT_PICKER_INITIALIZED_CLASS = 'initialized';
@@ -110,7 +109,6 @@ define('xwiki-attachment-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-
       }
 
       searchSolr(input, options) {
-        console.log('searchSolr');
         options = options || {};
         const optionsFqs = options.fqs || [];
         const types = options.types;
@@ -196,7 +194,6 @@ define('xwiki-attachment-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-
       initialize() {
         if (!this.attachmentPicker.hasClass(ATTACHMENT_PICKER_INITIALIZED_CLASS)) {
           this.searchBlock.initialize((results) => {
-            // TODO: display results
             this.resultsBlock.empty();
             this.noResultsBlock.addClass('hidden');
             if (results.length > 0) {
@@ -211,37 +208,51 @@ define('xwiki-attachment-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-
 
       initializeWhenHasResults(results) {
         var index = 0;
-        const attachmentPickerId = this.attachmentPicker.attr('id');
+        
         for (let result of results) {
           this.addAttachment(result, index);
           index = index + 1;
         }
+
+      // const attachmentPickerId = this.attachmentPicker.attr('id');
+        // const galleryId = `#${attachmentPickerId}-gallery`;
+        // const lightboxOptions = {rootSelector: galleryId};
+
+        var selected;
         const attachments = this.resultsBlock.find('a');
+        attachments.on('click', (event) => {
+          event.preventDefault();
+          if(selected !== undefined) {
+            selected.removeClass('selected');
+          }
 
-        const galleryId = `#${attachmentPickerId}-gallery`;
-        const lightboxOptions = {rootSelector: galleryId};
+          console.log("CLICKED");
 
-        $(document).on('click', lightboxOptions.rootSelector + ' .slides',
-          () => lightboxDescription.toggleDescription(lightboxOptions));
-
-        attachments.on('click', function (e) {
-          const slideParams = {
-            href: $(this).attr('href'),
-            // thumbnail: createThumbnailURL(attachmentURL),
-            // caption: caption,
-            fileName: $(this).attr('title'),
-            alt: $(this).attr('alt'),
-            title: $(this).attr('title'),
-            // id: getAttachmentId(this)
-          };
-
-          lightboxDescription.addSlideDescription(slideParams, lightboxOptions);
-          e.preventDefault();
-          gallery(attachments, {
-            container: galleryId,
-            index: parseInt($(this).data('index')),
-          });
+          const parent = $(event.currentTarget).parents('.attachmentGroup');
+          parent.addClass('selected');
+          selected = parent;
         });
+        // $(document).on('click', lightboxOptions.rootSelector + ' .slides',
+        //   () => lightboxDescription.toggleDescription(lightboxOptions));
+
+        // attachments.on('click', function (e) {
+        //   const slideParams = {
+        //     href: $(this).attr('href'),
+        //     // thumbnail: createThumbnailURL(attachmentURL),
+        //     // caption: caption,
+        //     fileName: $(this).attr('title'),
+        //     alt: $(this).attr('alt'),
+        //     title: $(this).attr('title'),
+        //     // id: getAttachmentId(this)
+        //   };
+        //
+        //   lightboxDescription.addSlideDescription(slideParams, lightboxOptions);
+        //   e.preventDefault();
+        //   gallery(attachments, {
+        //     container: galleryId,
+        //     index: parseInt($(this).data('index')),
+        //   });
+        // });
       }
 
       addAttachment(result, index) {
@@ -250,7 +261,8 @@ define('xwiki-attachment-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-
         const filename = result.filename[0];
         var preview;
         var downloadURL = `${downloadDocumentURL}/${encodeURIComponent(attachmentReference.name)}`;
-        if (result.mimetype && result.mimetype[0].startsWith("image/")) {
+        const mimeType = result.mimetype[0];
+        if (result.mimetype && mimeType.startsWith("image/")) {
           preview = $(`<img />`)
             .prop('loading', 'lazy')
             .prop('width', 150)
@@ -258,13 +270,19 @@ define('xwiki-attachment-picker', ['jquery', 'blueimp-gallery', 'xwiki-lightbox-
             .prop('src', `${downloadURL}?width=150&height=150`)
             .prop('alt', filename);
         } else {
-          console.log("HERE");
-          iconsClient.getIcon({});
-          preview = $("<img/>");
+          const icon = attachmentsIcon.getIcon({
+            mimeType: mimeType,
+            name: filename
+          });
+          if(icon.iconSetType === 'FONT') {
+            preview = $('<span />').prop('class', icon.cssClass + ' attachmentIcon');  
+          } else {
+            preview = $('<img />').prop('src', icon.url);
+          }
+          
         }
-        console.log('HERE');
 
-        const textSpan = $('<span>').text(filename).prop('title', filename);
+        const textSpan = $('<span>').text(filename).prop('title', filename).addClass('attachmentTitle');
         const link = $(`<a></a>`)
           .append(preview)
           .prop('title', filename)

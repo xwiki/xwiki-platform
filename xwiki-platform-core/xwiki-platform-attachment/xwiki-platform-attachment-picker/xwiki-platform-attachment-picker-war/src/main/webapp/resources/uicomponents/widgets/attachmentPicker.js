@@ -22,17 +22,18 @@
 ## #set ($attachmentPickerPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-attachment-picker-webjar', 
 ##   $attachmentPickerEntry))
 #set ($attachmentPickerPath = $xwiki.getSkinFile('uicomponents/attachmentPicker/attachmentPicker.js'))
-#set ($blueimpGalleryPath = $services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 
-  'js/blueimp-gallery-bundle.min'))
-#set ($lightboxPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-image-lightbox-webjar', "lightbox"))
+## #set ($blueimpGalleryPath = $services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 
+##   'js/blueimp-gallery-bundle.min'))
+## #set ($lightboxPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-image-lightbox-webjar', "lightbox"))
+## 'blueimp-gallery-bundle': $blueimpGalleryPath,
+## 'xwiki-lightbox-description': $lightboxPath,
+## $services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'css/blueimp-gallery.min.css')
 #set ($paths = {
   'js': {
     'xwiki-attachment-picker': $attachmentPickerPath,
-    'blueimp-gallery-bundle': $blueimpGalleryPath,
-    'xwiki-lightbox-description': $lightboxPath,
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true) 
   },
-  'css': [$services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'css/blueimp-gallery.min.css')]
+  'css': []
 })
 #[[*/
 // Start JavaScript-only code.
@@ -45,15 +46,15 @@
     paths: paths.js,
   });
 
-  require(['jquery'], function ($) {
-    paths.css.forEach(function (url) {
-      $('<link/>').attr({
-        type: 'text/css',
-        rel: 'stylesheet',
-        href: url
-      }).appendTo('head');
-    });
-  });
+  // require(['jquery'], function ($) {
+  //   paths.css.forEach(function (url) {
+  //     $('<link/>').attr({
+  //       type: 'text/css',
+  //       rel: 'stylesheet',
+  //       href: url
+  //     }).appendTo('head');
+  //   });
+  // });
 
   // Bootstrap the attachment picker, all the business code is located in the module initialization.
   require(['xwiki-attachment-picker'], function () {});

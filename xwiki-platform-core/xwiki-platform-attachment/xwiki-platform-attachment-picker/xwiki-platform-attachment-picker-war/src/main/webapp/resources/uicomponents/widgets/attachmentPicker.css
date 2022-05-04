@@ -1,3 +1,5 @@
+#template('colorThemeInit.vm')
+
 .attachmentGroup {
   display: inline-block;
   max-width: 150px;
@@ -22,6 +24,11 @@
   position: relative;
 }
 
+.attachmentGroup .selected {
+  background-color: $theme.highlightColor;
+  border: 1px dotted #CCC;
+}
+
 .attachmentGroup input[type='radio'] {
   position: absolute;
   top: 0;
@@ -30,4 +37,12 @@
 
 .attachmentPickerSearch {
   margin-bottom: 1em;
+}
+
+.attachmentGroup span.attachmentIcon {
+  text-align: center;
+  display: block;
+  font-size: 8em;
+  vertical-align: middle;
+  width: 150px;
 }

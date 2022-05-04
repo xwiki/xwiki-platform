@@ -29,7 +29,6 @@ import org.mockito.Mock;
 import org.xwiki.attachment.picker.AttachmentPickerMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
@@ -75,10 +74,7 @@ class AttachmentPickerMacroTest
             new GroupBlock(List.of(), Map.of("class", "attachmentPickerSearch")),
             new GroupBlock(Map.of("class", "attachmentPickerResults")),
             new GroupBlock(List.of(new WordBlock("No results.")),
-                Map.of("class", "attachmentPickerNoResults hidden box warningmessage")),
-            new MacroBlock("include", Map.of("reference", "XWiki.Lightbox.Code.BlueImpScripts"), false),
-            new MacroBlock("velocity", Map.of(),
-                "{{html}}#lightboxHTMLTemplate('my-id-gallery'){{/html}}", false)
+                Map.of("class", "attachmentPickerNoResults hidden box warningmessage"))
         ), Map.ofEntries(
             entry("id", "my-id"),
             entry("class", "attachmentPicker"),

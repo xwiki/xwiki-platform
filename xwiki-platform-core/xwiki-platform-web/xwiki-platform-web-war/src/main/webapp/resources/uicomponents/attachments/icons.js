@@ -29,10 +29,10 @@
 #end
 #[[*/
 // Start JavaScript-only code.
-(function () {
+(function (mimeTypeMap, extensionMap) {
   'use strict';
 
-  define('xwiki-attachments-icon', [], function (mimeTypeMap, extensionMap) {
+  define('xwiki-attachments-icon', [], function () {
     var getAttachmentIcon = function (attachment) {
       if (typeof attachment.mimeType === 'string' && attachment.mimeType.substring(0, 6) === 'image/') {
         var url = attachment.xwikiRelativeUrl;

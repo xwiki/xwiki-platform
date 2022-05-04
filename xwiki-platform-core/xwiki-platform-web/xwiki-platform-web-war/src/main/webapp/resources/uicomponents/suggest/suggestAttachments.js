@@ -19,7 +19,8 @@
  */
 /*!
 #set ($paths = {
-  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
+  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true),
+  'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true)
 })
 #set ($l10nBundle = {
   'upload': $services.localization.render('web.uicomponents.suggest.attachments.upload'),

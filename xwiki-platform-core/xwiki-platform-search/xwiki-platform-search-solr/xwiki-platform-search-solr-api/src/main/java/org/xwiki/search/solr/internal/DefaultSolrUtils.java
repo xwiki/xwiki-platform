@@ -522,6 +522,10 @@ public class DefaultSolrUtils implements SolrUtils
         // ClientUtils does not escape OR/AND/NOT
         escaped = PATTERN_OR_AND_NOT.matcher(escaped).replaceAll("\\\\$1");
 
+        if ("".equals(escaped)) {
+            escaped = "\"\"";
+        }
+
         return escaped;
     }
 

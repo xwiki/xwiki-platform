@@ -676,7 +676,14 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         switch (condition.getType()) {
             case EQUALS:
-                builder.append(toFilterQueryString(condition.getProperty(), condition.getValue()));
+                String queryString = toFilterQueryString(condition.getProperty(), condition.getValue());
+                if (queryString == null) {
+                    // See https://stackoverflow.com/a/28859224.
+                    builder.insert(0, "(*:* NOT ");
+                    builder.append("*)");
+                } else {
+                    builder.append(queryString);
+                }
                 break;
 
             case LESS:

@@ -24,12 +24,14 @@ import java.util.Map;
 
 import javax.inject.Named;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.attachment.picker.AttachmentPickerMacroParameters;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.Translation;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -38,7 +40,9 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test of {@link AttachmentPickerMacro}.
@@ -60,8 +64,22 @@ class AttachmentPickerMacroTest
     @Named("ssfx")
     private SkinExtension ssfx;
 
+    @MockComponent
+    private ContextualLocalizationManager l10n;
+
     @Mock
     private MacroTransformationContext macroTransformationContext;
+
+    @Mock
+    private Block translationRenderBlock;
+
+    @BeforeEach
+    void setUp()
+    {
+        Translation translation = mock(Translation.class);
+        when(this.l10n.getTranslation("attachment.picker.macro.notResult.message")).thenReturn(translation);
+        when(translation.render()).thenReturn(this.translationRenderBlock);
+    }
 
     @Test
     void execute()
@@ -72,7 +90,7 @@ class AttachmentPickerMacroTest
         assertEquals(List.of(new GroupBlock(List.of(
             new GroupBlock(List.of(), Map.of("class", "attachmentPickerSearch")),
             new GroupBlock(Map.of("class", "attachmentPickerResults")),
-            new GroupBlock(List.of(new WordBlock("No results.")),
+            new GroupBlock(List.of(this.translationRenderBlock),
                 Map.of("class", "attachmentPickerNoResults hidden box warningmessage"))
         ), Map.ofEntries(
             entry("id", "my-id"),
@@ -82,6 +100,16 @@ class AttachmentPickerMacroTest
         ))), actual);
         verify(this.jsfx).use("uicomponents/widgets/attachmentPicker.js", Map.of("forceSkinAction", true));
         verify(this.ssfx).use("uicomponents/widgets/attachmentPicker.css", Map.of("forceSkinAction", true));
+    }
+
+    @Test
+    void executeWithLimit()
+    {
+        AttachmentPickerMacroParameters params = new AttachmentPickerMacroParameters();
+        params.setId("my-id");
+        params.setLimit(10);
+        List<Block> actual = this.attachmentPickerMacro.execute(params, null, this.macroTransformationContext);
+        assertEquals("10", actual.get(0).getParameter("data-xwiki-attachment-picker-limit"));
     }
 
     @Test

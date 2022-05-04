@@ -19,42 +19,22 @@
  */
 /*!
 #set ($attachmentPickerEntry = 'attachmentPicker.min')
-## #set ($attachmentPickerPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-attachment-picker-webjar', 
-##   $attachmentPickerEntry))
-#set ($attachmentPickerPath = $xwiki.getSkinFile('uicomponents/attachmentPicker/attachmentPicker.js'))
-## #set ($blueimpGalleryPath = $services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 
-##   'js/blueimp-gallery-bundle.min'))
-## #set ($lightboxPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-image-lightbox-webjar', "lightbox"))
-## 'blueimp-gallery-bundle': $blueimpGalleryPath,
-## 'xwiki-lightbox-description': $lightboxPath,
-## $services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery', 'css/blueimp-gallery.min.css')
+#set ($attachmentPickerPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-attachment-picker-webjar', 
+  $attachmentPickerEntry))
 #set ($paths = {
   'js': {
     'xwiki-attachment-picker': $attachmentPickerPath,
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true) 
-  },
-  'css': []
+  }
 })
 #[[*/
 // Start JavaScript-only code.
 (function (paths) {
   "use strict";
 
-  // TODO: add blueimp? how to factorize it with the dependencies from lightbox? Is it ok to redeclare blueimp twice 
-  // (possibly with different bundles) in require.config?
   require.config({
     paths: paths.js,
   });
-
-  // require(['jquery'], function ($) {
-  //   paths.css.forEach(function (url) {
-  //     $('<link/>').attr({
-  //       type: 'text/css',
-  //       rel: 'stylesheet',
-  //       href: url
-  //     }).appendTo('head');
-  //   });
-  // });
 
   // Bootstrap the attachment picker, all the business code is located in the module initialization.
   require(['xwiki-attachment-picker'], function () {});

@@ -681,6 +681,8 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                     // See https://stackoverflow.com/a/28859224.
                     builder.insert(0, "(*:* NOT ");
                     builder.append("*)");
+                } else if ("".equals(queryString)) {
+                    builder.append("\"\"");
                 } else {
                     builder.append(queryString);
                 }

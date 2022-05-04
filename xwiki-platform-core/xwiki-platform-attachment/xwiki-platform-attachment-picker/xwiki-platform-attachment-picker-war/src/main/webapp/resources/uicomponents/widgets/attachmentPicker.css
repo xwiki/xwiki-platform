@@ -1,16 +1,36 @@
 #template('colorThemeInit.vm')
 
+.attachmentPicker {
+  margin-top: 7px;
+  margin-bottom: 7px;
+}
+
 .attachmentGroup {
   display: inline-block;
-  max-width: 150px;
+  vertical-align: top;
+  height: 200px;
+  padding: 10px;
+}
+
+.attachmentGroup .attachmentTitle {
+  width: 150px;
+  display: inline-block;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  margin: 5px;
 }
 
 .attachmentGroup a {
   color: inherit;
+  display: block;
+  text-align: center;
+}
+
+.attachmentGroup .previewWrapper {
+  display: flex;
+  align-items: flex-end;
+  height: 150px;
+  justify-content: center;
 }
 
 .attachmentGroup img {
@@ -20,13 +40,14 @@
   margin-bottom: 5px;
 }
 
-.attachmentGroup > div {
-  position: relative;
+.attachmentGroup img, .attachmentGroup span.attachmentIcon {
+  max-height: 150px;
 }
 
-.attachmentGroup .selected {
+.attachmentGroup.selected {
   background-color: $theme.highlightColor;
-  border: 1px dotted #CCC;
+  outline: 1px dotted #CCC;
+  border-radius: 5px;
 }
 
 .attachmentGroup input[type='radio'] {
@@ -40,9 +61,5 @@
 }
 
 .attachmentGroup span.attachmentIcon {
-  text-align: center;
-  display: block;
   font-size: 8em;
-  vertical-align: middle;
-  width: 150px;
 }

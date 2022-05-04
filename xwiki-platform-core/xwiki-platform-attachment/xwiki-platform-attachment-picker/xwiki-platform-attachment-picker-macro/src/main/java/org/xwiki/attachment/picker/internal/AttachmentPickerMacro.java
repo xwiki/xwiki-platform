@@ -114,7 +114,7 @@ public class AttachmentPickerMacro extends AbstractMacro<AttachmentPickerMacroPa
             entry(BLOCK_PARAM_ID, parameters.getId()),
             entry(BLOCK_PARAM_CLASS, ATTACHMENT_PICKER_CLASSES),
             entry("data-xwiki-lightbox", "false"),
-            entry("data-xwiki-attachment-picker-types", String.join(",", parameters.getTypes()))
+            entry("data-xwiki-attachment-picker-filter", String.join(",", parameters.getFilter()))
         )));
     }
 }

@@ -68,8 +68,7 @@ class AttachmentPickerMacroTest
     {
         AttachmentPickerMacroParameters params = new AttachmentPickerMacroParameters();
         params.setId("my-id");
-        List<Block> actual =
-            this.attachmentPickerMacro.execute(params, null, this.macroTransformationContext);
+        List<Block> actual = this.attachmentPickerMacro.execute(params, null, this.macroTransformationContext);
         assertEquals(List.of(new GroupBlock(List.of(
             new GroupBlock(List.of(), Map.of("class", "attachmentPickerSearch")),
             new GroupBlock(Map.of("class", "attachmentPickerResults")),
@@ -79,20 +78,20 @@ class AttachmentPickerMacroTest
             entry("id", "my-id"),
             entry("class", "attachmentPicker"),
             entry("data-xwiki-lightbox", "false"),
-            entry("data-xwiki-attachment-picker-types", "")
+            entry("data-xwiki-attachment-picker-filter", "")
         ))), actual);
         verify(this.jsfx).use("uicomponents/widgets/attachmentPicker.js", Map.of("forceSkinAction", true));
-        verify(this.ssfx).use("uicomponents/widgets/attachmentPicker.css");
+        verify(this.ssfx).use("uicomponents/widgets/attachmentPicker.css", Map.of("forceSkinAction", true));
     }
 
     @Test
-    void executeWithTypes()
+    void executeWithFilter()
     {
         AttachmentPickerMacroParameters params = new AttachmentPickerMacroParameters();
         params.setId("my-id");
-        params.setTypes(List.of("image/png", "image/jpeg"));
+        params.setFilter(List.of("image/*", "image/jpeg"));
         List<Block> actual =
             this.attachmentPickerMacro.execute(params, null, this.macroTransformationContext);
-        assertEquals("image/png,image/jpeg", actual.get(0).getParameter("data-xwiki-attachment-picker-types"));
+        assertEquals("image/*,image/jpeg", actual.get(0).getParameter("data-xwiki-attachment-picker-filter"));
     }
 }

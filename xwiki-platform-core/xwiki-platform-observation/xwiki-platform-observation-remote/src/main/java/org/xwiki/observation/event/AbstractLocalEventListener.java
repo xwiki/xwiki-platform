@@ -40,7 +40,7 @@ import org.xwiki.stability.Unstable;
 public abstract class AbstractLocalEventListener extends AbstractEventListener
 {
     @Inject
-    private RemoteObservationManagerContext remoteObservationManagerContext;
+    protected RemoteObservationManagerContext remoteObservationManagerContext;
 
     /**
      * @param name the listener's name. It's a free form text identifying this listener instance in a unique manner.

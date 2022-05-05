@@ -35,7 +35,8 @@
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Attachment Picker Macro</xwiki.extension.name>
-    <!-- TOOD: description, category... -->
+    <!-- Category to display in the Extension Manager. -->
+    <xwiki.extension.category>macro</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

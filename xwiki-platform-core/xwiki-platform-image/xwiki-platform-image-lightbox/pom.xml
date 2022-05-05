@@ -31,24 +31,10 @@
   <name>XWiki Platform - Image - Lightbox - Parent POM</name>
   <description>Display images from the page content in a lightbox</description>
   <packaging>pom</packaging>
-  <properties>
-    <gallery.version>3.4.0</gallery.version>
-  </properties>
   <modules>
     <module>xwiki-platform-image-lightbox-ui</module>
     <module>xwiki-platform-image-lightbox-webjar</module>
-    <module>xwiki-platform-image-lightbox-attachment-picker-webjar</module>
   </modules>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.xwiki.contrib</groupId>
-        <artifactId>webjar-blueimp-gallery</artifactId>
-        <version>${gallery.version}</version>
-        <scope>runtime</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <profiles>
     <profile>
       <id>integration-tests</id>

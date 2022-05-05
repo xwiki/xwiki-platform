@@ -34,8 +34,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Attachment Picker WebJar</xwiki.extension.name>
-    <!-- TODO: duplicated from xwiki-platform-image-lightbox-webjar -->
-    <gallery.version>3.4.0</gallery.version>
+    <!-- Category to display in the Extension Manager. -->
+    <xwiki.extension.category>other</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>
@@ -51,8 +51,6 @@
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>webjar-blueimp-gallery</artifactId>
-      <version>${gallery.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

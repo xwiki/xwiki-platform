@@ -931,6 +931,14 @@
         <artifactId>annotations</artifactId>
         <version>19.0.0</version>
       </dependency>
+        
+      <!-- Blueimp javascript library, used to display galleries of images (for instance for the lightbox). -->
+      <dependency>
+        <groupId>org.xwiki.contrib</groupId>
+        <artifactId>webjar-blueimp-gallery</artifactId>
+        <version>3.4.0</version>
+        <scope>runtime</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

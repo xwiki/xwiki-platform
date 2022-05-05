@@ -52,23 +52,15 @@ define('xwiki-lightbox-description', [
   /**
    * Hide or display the lightbox description.
    */
-  var toggleDescription = function(options) {
-    var rootSelector = options.rootSelector || '#blueimp-gallery';
-    // var hasControls = $('.blueimp-gallery-controls').length > 0;
-    // var nonEmptyElements = $(rootSelector).find('.caption, .title, .publisher, .date')
-    //   .filter((i, el) => !$(el).is(':empty'));
-    //
-    // if (hasControls && nonEmptyElements.length > 0) {
-    //   $('.lightboxDescription').css('display', 'flex');
-    // } else {
-    //   $('.lightboxDescription').css('display', 'none');
-    // }
+  var toggleDescription = function() {
+    var hasControls = $('.blueimp-gallery-controls').length > 0;
+    var nonEmptyElements = $('#blueimp-gallery').find('.caption, .title, .publisher, .date')
+      .filter((i, el) => !$(el).is(':empty'));
 
-    const description = $(rootSelector).find('.lightboxDescription');
-    if(description.css('display') === 'none') {
-      description.css('display', 'flex');
+    if (hasControls && nonEmptyElements.length > 0) {
+      $('.lightboxDescription').css('display', 'flex');
     } else {
-      description.css('display', 'none');
+      $('.lightboxDescription').css('display', 'none');
     }
   };
 
@@ -144,17 +136,16 @@ define('xwiki-lightbox-description', [
     return deferred.promise();
   };
 
-  var addSlideDescription = function(imageData, options) {
-    options = options || {};
+  var addSlideDescription = function(imageData) {
     clearDescription();
-    toggleDescription(options);
+    toggleDescription();
 
     getAttachmentInfo(imageData.href, imageData.fileName).done(function(attachmentData) {
       updateDescriptionData(imageData, attachmentData);
-      toggleDescription(options);
+      toggleDescription();
     }).fail(function() {
       updateDescriptionData(imageData);
-      toggleDescription(options);
+      toggleDescription();
     });
   };
 
@@ -162,8 +153,7 @@ define('xwiki-lightbox-description', [
 
   return {
     invalidateCachedAttachments: invalidateCachedAttachments,
-    addSlideDescription: addSlideDescription,
-    toggleDescription: toggleDescription
+    addSlideDescription: addSlideDescription
   };
 });
 

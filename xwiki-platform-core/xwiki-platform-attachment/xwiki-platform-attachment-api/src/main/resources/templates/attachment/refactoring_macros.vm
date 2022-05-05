@@ -22,8 +22,12 @@
 ###
 #macro (displaySourceAttachment) 
 <dt>
-  <label>$services.localization.render('attachment.move.source.label')</label>
-  <span class="xHint">$services.localization.render('attachment.move.source.hint')</span>
+  <label>
+    $escapetool.xml($services.localization.render('attachment.move.source.label'))
+  </label>
+  <span class="xHint">
+    $escapetool.xml($services.localization.render('attachment.move.source.hint'))
+  </span>
 </dt>
 <dd>
   #hierarchy($attachment)
@@ -41,7 +45,7 @@
   <label>
     #set ($checked = !$request.updateReferences || $request.updateReferences == 'true')
     <input type="checkbox" name="updateReferences" value="true" #if ($checked)checked="checked"#end />
-    $services.localization.render('attachment.move.links.label')
+    $escapetool.xml($services.localization.render('attachment.move.links.label'))
   </label>
   ## The value submitted when the checkbox is not checked, used to preserve the form state.
   <input type="hidden" name="updateReferences" value="false"/>
@@ -50,7 +54,7 @@
   #set ($backLinksCount = $services.attachment.backlinksCount($attachment))
   #set ($backLinksURL = '')
   <span class="xHint">
-    $services.localization.render('attachment.move.links.hint', [$backLinksCount])
+  $escapetool.xml($services.localization.render('attachment.move.links.hint', [$backLinksCount]))
   </span>
 </dd>
 #end

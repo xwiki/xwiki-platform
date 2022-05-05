@@ -151,15 +151,25 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("error: attachment.move.targetNotWritable [Space.Target]",
+        assertEquals("error: attachment.move.targetNotWritable",
             render.getElementsByClass("errormessage").get(0).text());
+    }
+
+    @Test
+    void submitTargetAttachmentNameEmpty() throws Exception
+    {
+        this.context.setDoc(this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Source"), this.context));
+        this.request.put("step", "2");
+        this.request.put("form_token", "a6DSv7pKWcPargoTvyx2Ww");
+        Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
+        assertEquals("error: attachment.move.emptyName", render.select(".errormessage").text());
     }
 
     @Test
     void submitMoveTargetAlreadyExists() throws Exception
     {
         DocumentReference sourceDocumentReference = new DocumentReference("xwiki", "Space", "Source");
-        DocumentReference targetDocumentReference = new DocumentReference("xwiki", "Space", "Target");
+        DocumentReference targetDocumentReference = new DocumentReference("xwiki", "Space", "Target\"'");
         this.context.setDoc(this.xwiki.getDocument(sourceDocumentReference, this.context));
 
         // Allow the user to edit the source and target documents.
@@ -178,12 +188,12 @@ class MovePageTest extends PageTest
         this.request.put("sourceAttachmentName", "oldname.txt");
         this.request.put("autoRedirect", "true");
         this.request.put("targetAttachmentName", ATTACHMENT_NAME);
-        this.request.put("targetLocation", "Space.Target");
+        this.request.put("targetLocation", "Space.Target\"'");
         this.request.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals(
-            "error: attachment.move.alreadyExists [attachment.txt, Space.Target, /xwiki/bin/view/Space/Target]",
+        assertEquals("error: attachment.move.alreadyExists "
+                + "[attachment.txt, Space.Target\"', /xwiki/bin/view/Space/Target%22%27]",
             render.getElementsByClass("errormessage").get(0).text());
     }
 }

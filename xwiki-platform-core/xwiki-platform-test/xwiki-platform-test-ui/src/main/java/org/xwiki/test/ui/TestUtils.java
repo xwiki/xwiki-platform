@@ -2094,11 +2094,12 @@ public class TestUtils
 
     /**
      * Extended version to work in a docker context.
-     * @param path
-     * @param queryParams
-     * @param baseURL
-     * @return
-     * @throws Exception
+     *
+     * @param baseURL the base url
+     * @param path an additional path added after the base url
+     * @param queryParams additional query parameter added to the computed url
+     * @return the context of the computed url
+     * @throws Exception in case of error when executing the request
      */
     public String getString(String baseURL, String path, Map<String, ?> queryParams) throws Exception
     {

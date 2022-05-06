@@ -34,6 +34,7 @@
   <properties>
     <!-- Name to display in the Extension Manager -->
     <xwiki.extension.name>Image Lightbox WebJar</xwiki.extension.name>
+    <gallery.version>3.4.0</gallery.version>
   </properties>
   <dependencies>
     <dependency>
@@ -47,6 +48,8 @@
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>webjar-blueimp-gallery</artifactId>
+      <version>${gallery.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

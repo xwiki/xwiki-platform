@@ -34,20 +34,34 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class AttachmentPicker extends BaseElement
 {
-    private final WebElement attachmentPicker;
+    private WebElement attachmentPickerElement;
 
+    /**
+     * Default constructor.
+     *
+     * @param id the id of the attachment picker
+     */
     public AttachmentPicker(String id)
     {
-        this.attachmentPicker = getDriver().findElement(By.id(id));
+        this.attachmentPickerElement = getDriver().findElement(By.id(id));
     }
 
+    /**
+     * Wait until the picker is ready.
+     *
+     * @return the current page object
+     */
     public AttachmentPicker waitUntilReady()
     {
-
-        getDriver().waitUntilCondition(driver -> !this.attachmentPicker.getAttribute("class").contains("loading"));
+        // The picker is ready when the loading class is not present.
+        getDriver()
+            .waitUntilCondition(driver -> !this.attachmentPickerElement.getAttribute("class").contains("loading"));
         return this;
     }
 
+    /**
+     * @return the list of the titles of the attachments
+     */
     public List<String> getAttachmentTitles()
     {
         return getAllAttachments().stream()
@@ -55,26 +69,40 @@ public class AttachmentPicker extends BaseElement
             .collect(Collectors.toList());
     }
 
-    public AttachmentPicker setSearch(String image)
+    /**
+     * Define the search query of the attachment picker.
+     *
+     * @param searchQuery the search query, for instance the name of an attachment
+     * @return the current page object
+     */
+    public AttachmentPicker setSearch(String searchQuery)
     {
-        WebElement input = this.attachmentPicker.findElement(By.cssSelector(".attachmentPickerSearch input"));
+        WebElement input = this.attachmentPickerElement.findElement(By.cssSelector(".attachmentPickerSearch input"));
         input.clear();
-        input.sendKeys(image);
+        input.sendKeys(searchQuery);
         return this;
     }
 
+    /**
+     * Wait until the expected number of attachments is displayed in the picker.
+     *
+     * @param expectedCount the expected number of attachments
+     */
     public void waitUntilAttachmentsCount(int expectedCount)
     {
         getDriver().waitUntilCondition(driver -> getAllAttachments().size() == expectedCount);
     }
 
+    /**
+     * @return {@code true} when the warning message is displayed, {@code false} otherwise
+     */
     public boolean isNoResultMessageDisplayed()
     {
-        return this.attachmentPicker.findElement(By.className("attachmentPickerNoResults")).isDisplayed();
+        return this.attachmentPickerElement.findElement(By.className("attachmentPickerNoResults")).isDisplayed();
     }
 
     private List<WebElement> getAllAttachments()
     {
-        return this.attachmentPicker.findElements(By.className("attachmentTitle"));
+        return this.attachmentPickerElement.findElements(By.className("attachmentTitle"));
     }
 }

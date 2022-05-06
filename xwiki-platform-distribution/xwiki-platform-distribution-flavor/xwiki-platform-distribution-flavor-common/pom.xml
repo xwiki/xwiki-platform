@@ -207,12 +207,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-lightbox-attachment-picker-webjar</artifactId>
-      <version>${project.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-image-style-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>

@@ -36,5 +36,6 @@
     <module>xwiki-platform-attachment-picker-test</module>
     <module>xwiki-platform-attachment-picker-ui</module>
     <module>xwiki-platform-attachment-picker-webjar</module>
+    <module>xwiki-platform-attachment-picker-test</module>
   </modules>
 </project>

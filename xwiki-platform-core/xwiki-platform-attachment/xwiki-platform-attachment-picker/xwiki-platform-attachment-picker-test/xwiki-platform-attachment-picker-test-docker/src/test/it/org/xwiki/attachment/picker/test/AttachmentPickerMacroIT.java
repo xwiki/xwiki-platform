@@ -73,8 +73,6 @@ class AttachmentPickerMacroIT
         attachmentsPane.waitForUploadToFinish("textcontent.txt");
 
         // Waits for the uploaded files to be indexed before continuing.
-        // TODO: find out why test utils not working with external servlet!
-
         new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmpyQueue();
 
         // Reload the page to see the file after the uploads and solr indexing.
@@ -107,7 +105,7 @@ class AttachmentPickerMacroIT
         List<String> picker3Attachments = testPicker3.getAttachmentTitles();
         assertTrue(picker3Attachments.size() >= 2);
         assertEquals(List.of("image1.png", "image2.png"), picker3Attachments.subList(0, 2));
-        testPicker3.setSearch("textcontent").waitUntilAttachmentsCount(1);
+        testPicker3.setSearch("textcontent").waitUntilAttachmentsCount(0);
         assertTrue(testPicker3.isNoResultMessageDisplayed());
     }
 

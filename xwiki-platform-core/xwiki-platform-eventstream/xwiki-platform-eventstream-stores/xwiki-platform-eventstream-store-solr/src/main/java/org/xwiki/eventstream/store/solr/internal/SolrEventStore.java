@@ -584,7 +584,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         } else {
             builder.append('(');
             builder.append(StringUtils
-                .join(condition.getValues().stream().map(this.utils::toFilterQueryString).iterator(), " OR "));
+                .join(condition.getValues().stream().map(this.utils::toCompleteFilterQueryString).iterator(), " OR "));
             builder.append(')');
 
             return builder.toString();
@@ -676,13 +676,11 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         switch (condition.getType()) {
             case EQUALS:
-                String queryString = toFilterQueryString(condition.getProperty(), condition.getValue());
+                String queryString = toCompleteFilterQueryString(condition.getProperty(), condition.getValue());
                 if (queryString == null) {
                     // See https://stackoverflow.com/a/28859224, -myfield:* is not composable thus combine with *:*.
                     builder.insert(0, "(*:* NOT ");
                     builder.append("*)");
-                } else if ("".equals(queryString)) {
-                    builder.append("\"\"");
                 } else {
                     builder.append(queryString);
                 }
@@ -718,14 +716,14 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         return builder.toString();
     }
 
-    private String toFilterQueryString(String propertyName, Object propertyValue)
+    private String toCompleteFilterQueryString(String propertyName, Object propertyValue)
     {
         SearchFieldMapping mapping = SEARCH_FIELD_MAPPING.get(propertyName);
 
         if (mapping != null && mapping.type != null) {
-            return this.utils.toFilterQueryString(propertyValue, mapping.type);
+            return this.utils.toCompleteFilterQueryString(propertyValue, mapping.type);
         } else {
-            return this.utils.toFilterQueryString(propertyValue);
+            return this.utils.toCompleteFilterQueryString(propertyValue);
         }
     }
 
@@ -751,7 +749,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 builder.append('[');
             }
 
-            builder.append(this.utils.toFilterQueryString(greater.getValue()));
+            builder.append(this.utils.toCompleteFilterQueryString(greater.getValue()));
         } else {
             builder.append("[*");
         }
@@ -759,7 +757,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         builder.append(" TO ");
 
         if (less != null) {
-            builder.append(this.utils.toFilterQueryString(less.getValue()));
+            builder.append(this.utils.toCompleteFilterQueryString(less.getValue()));
 
             if (less.getType() == CompareType.LESS) {
                 builder.append('}');

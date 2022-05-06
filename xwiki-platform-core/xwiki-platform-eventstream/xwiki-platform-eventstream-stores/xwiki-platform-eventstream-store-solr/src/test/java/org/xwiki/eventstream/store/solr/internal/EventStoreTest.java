@@ -476,6 +476,13 @@ public class EventStoreTest
             new SimpleEventQuery().startsWith(Event.FIELD_DOCUMENTVERSION, ""));
         assertSearch(Collections.singletonList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENTVERSION, null));
 
+        assertSearch(Collections.singletonList(EVENT3), new SimpleEventQuery().eq(Event.FIELD_DOCUMENTVERSION, ""));
+        assertSearch(Arrays.asList(EVENT1, EVENT3, EVENT4),
+            new SimpleEventQuery().startsWith(Event.FIELD_DOCUMENTVERSION, ""));
+        assertSearch(Collections.singletonList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENTVERSION, null));
+        assertSearch(Collections.singletonList(EVENT1),
+            new SimpleEventQuery().greaterOrEq(Event.FIELD_DOCUMENTVERSION, ""));
+
         assertSearch(Arrays.asList(EVENT1, EVENT2),
             new SimpleEventQuery().in(Event.FIELD_ID, EVENT1.getId(), EVENT2.getId()));
 

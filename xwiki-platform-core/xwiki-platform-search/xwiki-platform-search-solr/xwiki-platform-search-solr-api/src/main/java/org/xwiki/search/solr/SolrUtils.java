@@ -259,6 +259,38 @@ public interface SolrUtils
     }
 
     /**
+     * Serialize the value into a string that is a complete query string, i.e., cannot be combined with other strings.
+     * <p>
+     * For example, this serializes the empty string as "".
+     *
+     * @param fieldValue the value of a field
+     * @return the Solr query version of the passed value
+     * @since 13.10.6
+     * @since 14.4RC1
+     */
+    default String toCompleteFilterQueryString(Object fieldValue)
+    {
+        return toFilterQueryString(fieldValue);
+    }
+
+    /**
+     * Serialize the value into a string that is a complete query string, i.e., cannot be combined with other strings.
+     * <p>
+     * For example, this serializes the empty string as "".
+     *
+     * @param fieldValue the value of a field
+     * @param valueType the type to use as reference to serialize the value
+     * @return the Solr query version of the passed value
+     * @since 13.10.6
+     * @since 14.4RC1
+     */
+    default String toCompleteFilterQueryString(Object fieldValue, Type valueType)
+    {
+        return toFilterQueryString(fieldValue, valueType);
+    }
+
+
+    /**
      * Extract from the document the value associated with the passed field name.
      * 
      * @param <T> the of the value to return

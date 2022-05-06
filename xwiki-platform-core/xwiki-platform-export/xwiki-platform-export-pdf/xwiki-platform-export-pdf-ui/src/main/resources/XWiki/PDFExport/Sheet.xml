@@ -467,6 +467,15 @@
   a:link::after, a:visited::after {
     content: none;
   }
+
+  table {
+    /* Tables need to fit the available page width otherwise paged.js has a hard time splitting them on multiple print
+      pages. Tables that exceed both the page width and the page height cause an infinite loop in paged.js (leads to the
+      creation of an infinite number of print pages). Tables that exceed only the page height are fine. The solution we
+      choose is to make sure that the table text can always be split (hyphenate) on multiple lines. This is not a
+      complete solution but it should cover most of the large tables. */
+    .hyphenate();
+  }
 }</code>
     </property>
     <property>

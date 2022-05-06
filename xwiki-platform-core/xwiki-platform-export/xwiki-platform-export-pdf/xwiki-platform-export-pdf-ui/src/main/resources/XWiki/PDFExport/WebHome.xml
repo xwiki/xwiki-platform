@@ -249,7 +249,9 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
         // Asynchronous rendering is disabled by default on the export action so we need to force it.
         async: true,
         sheet: 'XWiki.PDFExport.Sheet'
-      })) + '&amp;' + extraQueryString;
+      // We add the hash (document fragment) because it can contain information used by the JavaScript code (e.g. the
+      // state of the live table component).
+      })) + '&amp;' + extraQueryString + window.location.hash;
       iframe.attr('src', exportURL).appendTo($('body'));
     });
   };
@@ -259,7 +261,10 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
     $('body').css('cursor', 'wait');
     const notification = new XWiki.widgets.Notification(l10n['export.pdf.inProgress'], 'inprogress');
     pdfExportOptionsModal.find('input[type=submit]').prop('disabled', true);
-    exportToPDF(pdfExportOptionsModal.serialize()).finally(() =&gt; {
+    // We add the current value of the query string after the PDF export options because we want to export the current
+    // state of the page (the query string can hold for instance the state of the live data component).
+    const queryString = pdfExportOptionsModal.serialize() + '&amp;' + window.location.search.substring(1);
+    exportToPDF(queryString).finally(() =&gt; {
       pdfExportOptionsModal.find('input[type=submit]').prop('disabled', false);
       notification.hide();
       $('body').css('cursor', '');
@@ -279,7 +284,12 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
     $('#exportModal').one('hidden.bs.modal', () =&gt; {
       // Enable the animation back for the next time the Export modal is shown.
       $('#exportModal').addClass('fade');
-      openPDFOptionsModal($(event.target).attr('href'));
+      // Remove the qs parameter because:
+      // * the PDF export options modal is loaded only once (per page load) and the query string can change afterwards
+      // * the query string can change after the page is loaded (e.g. that's how the live data component saves its state
+      //   in the URL) and we want to use the query string value at the moment when the PDF export is triggered
+      const url = $(event.target).attr('href').replace(/([?&amp;])qs=[^&amp;#]*/, '$1');
+      openPDFOptionsModal(url);
     // Disable the animation when moving to the next step (PDF Export Options) in order to have a smooth transition.
     }).removeClass('fade').modal('hide');
   });

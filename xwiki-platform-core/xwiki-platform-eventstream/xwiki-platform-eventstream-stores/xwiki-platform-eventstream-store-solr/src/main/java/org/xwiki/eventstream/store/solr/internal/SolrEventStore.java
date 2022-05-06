@@ -678,7 +678,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             case EQUALS:
                 String queryString = toFilterQueryString(condition.getProperty(), condition.getValue());
                 if (queryString == null) {
-                    // See https://stackoverflow.com/a/28859224.
+                    // See https://stackoverflow.com/a/28859224, -myfield:* is not composable thus combine with *:*.
                     builder.insert(0, "(*:* NOT ");
                     builder.append("*)");
                 } else if ("".equals(queryString)) {

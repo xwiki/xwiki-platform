@@ -48,9 +48,21 @@
       <artifactId>jquery</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- Provides XWiki.SuggestSolrService required to search for the attachments through solr. -->
     <dependency>
-      <groupId>org.xwiki.contrib</groupId>
-      <artifactId>webjar-blueimp-gallery</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Solr backend implementation. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <!-- TODO: test with -api if the rest is working. -->
+      <artifactId>xwiki-platform-search-solr-query</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -2089,7 +2089,20 @@ public class TestUtils
 
     public String getString(String path, Map<String, ?> queryParams) throws Exception
     {
-        try (InputStream inputStream = getInputStream(getBaseURL(), path, queryParams)) {
+        return getString(getBaseURL(), path, queryParams);
+    }
+
+    /**
+     * Extended version to work in a docker context.
+     * @param path
+     * @param queryParams
+     * @param baseURL
+     * @return
+     * @throws Exception
+     */
+    public String getString(String baseURL, String path, Map<String, ?> queryParams) throws Exception
+    {
+        try (InputStream inputStream = getInputStream(baseURL, path, queryParams)) {
             return IOUtils.toString(inputStream);
         }
     }

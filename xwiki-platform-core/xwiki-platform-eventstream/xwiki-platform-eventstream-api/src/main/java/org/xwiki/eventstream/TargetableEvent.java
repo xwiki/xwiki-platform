@@ -27,7 +27,7 @@ import java.util.Set;
  * @version $Id$
  * @since 9.2RC1
  */
-public interface TargetableEvent extends org.xwiki.observation.event.Event
+public interface TargetableEvent extends RecordableEvent
 {
     /**
      * @return the list of users and groups represented by their id that are targeted by this event

@@ -34,7 +34,7 @@ class AllITs
 {
     @Nested
     @DisplayName("Attachment Picker Macro test")
-    class NestedAttachmentPickerMacroIT extends AttachmentPickerMacroIT
+    class NestedAttachmentGalleryPickerMacroIT extends AttachmentGalleryPickerMacroIT
     {
     }
 }

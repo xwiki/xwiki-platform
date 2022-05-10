@@ -27,7 +27,7 @@ import javax.inject.Named;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.attachment.picker.AttachmentPickerMacroParameters;
+import org.xwiki.attachment.picker.AttachmentGalleryPickerMacroParameters;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.rendering.block.Block;
@@ -45,24 +45,24 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of {@link AttachmentPickerMacro}.
+ * Test of {@link AttachmentGalleryPickerMacro}.
  *
  * @version $Id$
  * @since 14.4RC1
  */
 @ComponentTest
-class AttachmentPickerMacroTest
+class AttachmentGalleryPickerMacroTest
 {
     @InjectMockComponents
-    private AttachmentPickerMacro attachmentPickerMacro;
+    private AttachmentGalleryPickerMacro attachmentGalleryPickerMacro;
 
     @MockComponent
-    @Named("jsfx")
-    private SkinExtension jsfx;
+    @Named("ssx")
+    private SkinExtension ssx;
 
     @MockComponent
-    @Named("ssfx")
-    private SkinExtension ssfx;
+    @Named("jsx")
+    private SkinExtension jsx;
 
     @MockComponent
     private ContextualLocalizationManager l10n;
@@ -84,9 +84,9 @@ class AttachmentPickerMacroTest
     @Test
     void execute()
     {
-        AttachmentPickerMacroParameters params = new AttachmentPickerMacroParameters();
+        AttachmentGalleryPickerMacroParameters params = new AttachmentGalleryPickerMacroParameters();
         params.setId("my-id");
-        List<Block> actual = this.attachmentPickerMacro.execute(params, null, this.macroTransformationContext);
+        List<Block> actual = this.attachmentGalleryPickerMacro.execute(params, null, this.macroTransformationContext);
         assertEquals(List.of(new GroupBlock(List.of(
             new GroupBlock(List.of(), Map.of("class", "attachmentPickerSearch")),
             new GroupBlock(Map.of("class", "attachmentPickerResults")),
@@ -94,32 +94,33 @@ class AttachmentPickerMacroTest
                 Map.of("class", "attachmentPickerNoResults hidden box warningmessage"))
         ), Map.ofEntries(
             entry("id", "my-id"),
-            entry("class", "attachmentPicker"),
+            entry("class", "attachmentGalleryPicker"),
             entry("data-xwiki-lightbox", "false"),
-            entry("data-xwiki-attachment-picker-filter", "")
+            entry("data-xwiki-attachment-picker-filter", ""),
+            entry("data-xwiki-attachment-picker-limit", "20")
         ))), actual);
-        verify(this.jsfx).use("uicomponents/widgets/attachmentPicker.js", Map.of("forceSkinAction", true));
-        verify(this.ssfx).use("uicomponents/widgets/attachmentPicker.css", Map.of("forceSkinAction", true));
+        verify(this.jsx).use("Attachment.Picker.Code.AttachmentGalleryPicker");
+        verify(this.ssx).use("Attachment.Picker.Code.AttachmentGalleryPicker");
     }
 
     @Test
     void executeWithLimit()
     {
-        AttachmentPickerMacroParameters params = new AttachmentPickerMacroParameters();
+        AttachmentGalleryPickerMacroParameters params = new AttachmentGalleryPickerMacroParameters();
         params.setId("my-id");
         params.setLimit(10);
-        List<Block> actual = this.attachmentPickerMacro.execute(params, null, this.macroTransformationContext);
+        List<Block> actual = this.attachmentGalleryPickerMacro.execute(params, null, this.macroTransformationContext);
         assertEquals("10", actual.get(0).getParameter("data-xwiki-attachment-picker-limit"));
     }
 
     @Test
     void executeWithFilter()
     {
-        AttachmentPickerMacroParameters params = new AttachmentPickerMacroParameters();
+        AttachmentGalleryPickerMacroParameters params = new AttachmentGalleryPickerMacroParameters();
         params.setId("my-id");
         params.setFilter(List.of("image/*", "image/jpeg"));
         List<Block> actual =
-            this.attachmentPickerMacro.execute(params, null, this.macroTransformationContext);
+            this.attachmentGalleryPickerMacro.execute(params, null, this.macroTransformationContext);
         assertEquals("image/*,image/jpeg", actual.get(0).getParameter("data-xwiki-attachment-picker-filter"));
     }
 }

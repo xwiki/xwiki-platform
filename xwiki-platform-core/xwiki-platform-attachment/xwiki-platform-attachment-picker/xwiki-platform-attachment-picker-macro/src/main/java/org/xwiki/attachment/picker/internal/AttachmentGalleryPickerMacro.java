@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.attachment.picker.AttachmentPickerMacroParameters;
+import org.xwiki.attachment.picker.AttachmentGalleryPickerMacroParameters;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.block.Block;
@@ -39,56 +39,50 @@ import org.xwiki.skinx.SkinExtension;
 import static java.util.Map.entry;
 
 /**
- * Display an attachment picker with a search field and a grid preview of the attachments. This widget is adapted to
- * UIs where vertical space usage is not an issue.
+ * Display an attachment picker with a search field and a grid preview of the attachments. This widget is adapted to UIs
+ * where vertical space usage is not an issue.
  *
  * @version $Id$
  * @since 14.4RC1
  */
 @Component
-@Named("attachmentPicker")
+@Named("attachmentGalleryPicker")
 @Singleton
-public class AttachmentPickerMacro extends AbstractMacro<AttachmentPickerMacroParameters>
+public class AttachmentGalleryPickerMacro extends AbstractMacro<AttachmentGalleryPickerMacroParameters>
 {
     /**
      * id parameter key for the {@link Block}s returned by
-     * {@link #execute(AttachmentPickerMacroParameters, String, MacroTransformationContext)}.
+     * {@link #execute(AttachmentGalleryPickerMacroParameters, String, MacroTransformationContext)}.
      */
     private static final String BLOCK_PARAM_ID = "id";
 
     /**
      * class parameter key for the {@link Block}s returned by
-     * {@link #execute(AttachmentPickerMacroParameters, String, MacroTransformationContext)}.
+     * {@link #execute(AttachmentGalleryPickerMacroParameters, String, MacroTransformationContext)}.
      */
     private static final String BLOCK_PARAM_CLASS = "class";
 
-    private static final String ATTACHMENT_PICKER_CLASSES = "attachmentPicker";
+    private static final String ATTACHMENT_GALLERY_PICKER_CLASSES = "attachmentGalleryPicker";
 
-    /**
-     * CSS file skin extension, to include the attachment picker css.
-     */
+    private static final String SKIN_RESOURCES_DOCUMENT_REFERENCE = "Attachment.Picker.Code.AttachmentGalleryPicker";
+
     @Inject
-    @Named("ssfx")
-    private SkinExtension ssfx;
+    @Named("ssx")
+    private SkinExtension ssx;
 
-    /**
-     * JS file skin extension, to include the attachment picker javascript. A single javascript file provided by the war
-     * module is required. This file has some velocity to define the other webjar dependencies dynamically, all the rest
-     * is provided by the webjar module and its dependencies.
-     */
     @Inject
-    @Named("jsfx")
-    private SkinExtension jsfx;
-
+    @Named("jsx")
+    private SkinExtension jsx;
+    
     @Inject
     private ContextualLocalizationManager l10n;
 
     /**
      * Default constructor.
      */
-    public AttachmentPickerMacro()
+    public AttachmentGalleryPickerMacro()
     {
-        super("Attachment Picker", "Grid based attachment picker.", AttachmentPickerMacroParameters.class);
+        super("Attachment Picker", "Grid based attachment picker.", AttachmentGalleryPickerMacroParameters.class);
     }
 
     @Override
@@ -98,18 +92,19 @@ public class AttachmentPickerMacro extends AbstractMacro<AttachmentPickerMacroPa
     }
 
     @Override
-    public List<Block> execute(AttachmentPickerMacroParameters parameters, String content,
+    public List<Block> execute(AttachmentGalleryPickerMacroParameters parameters, String content,
         MacroTransformationContext context)
     {
-        Map<String, Object> forceSkinAction = Map.of("forceSkinAction", true);
-        this.jsfx.use("uicomponents/widgets/attachmentPicker.js", forceSkinAction);
-        this.ssfx.use("uicomponents/widgets/attachmentPicker.css", forceSkinAction);
+        this.jsx.use(SKIN_RESOURCES_DOCUMENT_REFERENCE);
+        this.ssx.use(SKIN_RESOURCES_DOCUMENT_REFERENCE);
         Map<String, String> attachmentPickerParameters = new HashMap<>(Map.ofEntries(
-            entry(BLOCK_PARAM_ID, parameters.getId()),
-            entry(BLOCK_PARAM_CLASS, ATTACHMENT_PICKER_CLASSES),
+            entry(BLOCK_PARAM_CLASS, ATTACHMENT_GALLERY_PICKER_CLASSES),
             entry("data-xwiki-lightbox", "false"),
             entry("data-xwiki-attachment-picker-filter", String.join(",", parameters.getFilter()))
         ));
+        if (parameters.getId() != null) {
+            attachmentPickerParameters.put(BLOCK_PARAM_ID, parameters.getId());
+        }
         if (parameters.getLimit() != null) {
             attachmentPickerParameters.put("data-xwiki-attachment-picker-limit", String.valueOf(parameters.getLimit()));
         }

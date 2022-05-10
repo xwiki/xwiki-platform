@@ -213,6 +213,12 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.contrib.templates</groupId>
       <artifactId>application-templates-ui</artifactId>
       <version>1.0.7</version>

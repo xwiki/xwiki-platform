@@ -32,18 +32,18 @@ import org.xwiki.test.ui.po.BaseElement;
  * @version $Id$
  * @since 14.4RC1
  */
-public class AttachmentPicker extends BaseElement
+public class AttachmentGalleryPicker extends BaseElement
 {
-    private WebElement attachmentPickerElement;
+    private WebElement attachmentGalleryPickerElement;
 
     /**
      * Default constructor.
      *
      * @param id the id of the attachment picker
      */
-    public AttachmentPicker(String id)
+    public AttachmentGalleryPicker(String id)
     {
-        this.attachmentPickerElement = getDriver().findElement(By.id(id));
+        this.attachmentGalleryPickerElement = getDriver().findElement(By.id(id));
     }
 
     /**
@@ -51,11 +51,12 @@ public class AttachmentPicker extends BaseElement
      *
      * @return the current page object
      */
-    public AttachmentPicker waitUntilReady()
+    public AttachmentGalleryPicker waitUntilReady()
     {
         // The picker is ready when the loading class is not present.
         getDriver()
-            .waitUntilCondition(driver -> !this.attachmentPickerElement.getAttribute("class").contains("loading"));
+            .waitUntilCondition(
+                driver -> !this.attachmentGalleryPickerElement.getAttribute("class").contains("loading"));
         return this;
     }
 
@@ -75,9 +76,10 @@ public class AttachmentPicker extends BaseElement
      * @param searchQuery the search query, for instance the name of an attachment
      * @return the current page object
      */
-    public AttachmentPicker setSearch(String searchQuery)
+    public AttachmentGalleryPicker setSearch(String searchQuery)
     {
-        WebElement input = this.attachmentPickerElement.findElement(By.cssSelector(".attachmentPickerSearch input"));
+        WebElement input =
+            this.attachmentGalleryPickerElement.findElement(By.cssSelector(".attachmentPickerSearch input"));
         input.clear();
         input.sendKeys(searchQuery);
         return this;
@@ -98,11 +100,11 @@ public class AttachmentPicker extends BaseElement
      */
     public boolean isNoResultMessageDisplayed()
     {
-        return this.attachmentPickerElement.findElement(By.className("attachmentPickerNoResults")).isDisplayed();
+        return this.attachmentGalleryPickerElement.findElement(By.className("attachmentPickerNoResults")).isDisplayed();
     }
 
     private List<WebElement> getAllAttachments()
     {
-        return this.attachmentPickerElement.findElements(By.className("attachmentTitle"));
+        return this.attachmentGalleryPickerElement.findElements(By.className("attachmentTitle"));
     }
 }

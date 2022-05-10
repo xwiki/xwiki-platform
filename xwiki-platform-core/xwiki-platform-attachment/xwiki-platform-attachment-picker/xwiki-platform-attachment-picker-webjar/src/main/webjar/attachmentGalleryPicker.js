@@ -120,7 +120,7 @@ define('xwiki-attachment-picker',
     }
 
     /**
-     * Handle the rendering and the events of the search box in the attachment picker/
+     * Handle the rendering and the events of the search box in the attachment picker.
      */
     class SearchBlock {
       constructor(rootBlock, searchBlock) {
@@ -161,10 +161,10 @@ define('xwiki-attachment-picker',
     /**
      * Main class of the attachment picker. Initialize and plug together the other classes of this module.
      */
-    class AttachmentPicker {
+    class AttachmentGalleryPicker {
 
-      constructor(attachmentPicker) {
-        this.attachmentPicker = attachmentPicker;
+      constructor(attachmentGalleryPicker) {
+        this.attachmentPicker = attachmentGalleryPicker;
         const attachmentPickerSearch = this.attachmentPicker.find('.attachmentPickerSearch');
         this.searchBlock = new SearchBlock(this.attachmentPicker, attachmentPickerSearch);
         this.resultsBlock = this.attachmentPicker.find('.attachmentPickerResults');
@@ -185,24 +185,17 @@ define('xwiki-attachment-picker',
               this.unselect();
             }
           });
+          this.initSelectedAttachment();
           this.attachmentPicker.addClass(ATTACHMENT_PICKER_INITIALIZED_CLASS);
         }
       }
 
       initializeWhenHasResults(results) {
-        var index = 0;
-
-        for (let result of results) {
-          this.addAttachment(result, index);
-          index = index + 1;
-        }
-        
-        this.initSelectedAttachment();
+        results.forEach(this.addAttachment.bind(this));
       }
 
       initSelectedAttachment() {
-        const attachments = this.resultsBlock.find('a');
-        attachments.on('click', (event) => {
+        this.resultsBlock.on('click', 'a', (event) => {
           event.preventDefault();
           const parent = $(event.currentTarget).parents('.attachmentGroup');
 
@@ -212,7 +205,7 @@ define('xwiki-attachment-picker',
             this.resultsBlock.find('.attachmentGroup').removeClass('selected');
             parent.addClass('selected');
             this.selected = parent.data('id');
-            this.attachmentPicker.trigger('xwiki:attachmentPicker:selected', this.selected);
+            this.attachmentPicker.trigger('xwiki:attachmentGalleryPicker:selected', this.selected);
           }
         });
       }
@@ -222,7 +215,7 @@ define('xwiki-attachment-picker',
         if (parent) {
           parent.removeClass('selected');
         }
-        this.attachmentPicker.trigger('xwiki:attachmentPicker:unselected');
+        this.attachmentPicker.trigger('xwiki:attachmentGalleryPicker:unselected');
       }
 
       addAttachment(result, index) {
@@ -269,16 +262,15 @@ define('xwiki-attachment-picker',
       }
     }
 
-    $.fn.attachmentPicker = function () {
+    $.fn.attachmentGalleryPicker = function () {
       return this.each(function () {
-        const attachmentPicker = new AttachmentPicker($(this));
-        attachmentPicker.initialize();
+        new AttachmentGalleryPicker($(this)).initialize();
       });
     };
 
     function init(_event, data) {
       var container = $((data && data.elements) || document);
-      container.find('.attachmentPicker').attachmentPicker();
+      container.find('.attachmentGalleryPicker').attachmentGalleryPicker();
     }
 
     $(document).on('xwiki:dom:updated', init);

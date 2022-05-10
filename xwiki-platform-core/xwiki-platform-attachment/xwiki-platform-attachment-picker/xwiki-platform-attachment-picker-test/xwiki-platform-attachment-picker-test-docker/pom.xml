@@ -43,7 +43,8 @@
     <!-- Runtime dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-attachment-picker-macro</artifactId>
+      <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
+      <type>xar</type>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

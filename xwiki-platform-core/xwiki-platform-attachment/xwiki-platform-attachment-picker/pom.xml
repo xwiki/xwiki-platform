@@ -33,8 +33,8 @@
   <packaging>pom</packaging>
   <modules>
     <module>xwiki-platform-attachment-picker-macro</module>
-    <module>xwiki-platform-attachment-picker-war</module>
     <module>xwiki-platform-attachment-picker-webjar</module>
     <module>xwiki-platform-attachment-picker-test</module>
+    <module>xwiki-platform-attachment-picker-ui</module>
   </modules>
 </project>

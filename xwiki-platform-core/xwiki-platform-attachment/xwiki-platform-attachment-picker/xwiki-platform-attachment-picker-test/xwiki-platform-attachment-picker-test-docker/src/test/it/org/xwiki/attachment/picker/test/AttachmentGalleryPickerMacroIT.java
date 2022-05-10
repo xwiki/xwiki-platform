@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.xwiki.attachment.picker.test.po.AttachmentPicker;
+import org.xwiki.attachment.picker.test.po.AttachmentGalleryPicker;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -46,21 +46,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(extraJARs = {
     "org.xwiki.platform:xwiki-platform-search-solr-query"
+}, properties = {
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,"
+        + "com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
 })
-class AttachmentPickerMacroIT
+class AttachmentGalleryPickerMacroIT
 {
     @Test
     @Order(1)
-    void insertMacro(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration) throws Exception
+    void attachmentGallertPickerMacro(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
     {
         // Login to be able to delete the page.
         setup.loginAsSuperAdmin();
         setup.deletePage(testReference);
-        ViewPage page = setup.createPage(testReference, "{{attachmentPicker id='testPicker1' /}}\n"
+        ViewPage page = setup.createPage(testReference, "{{attachmentGalleryPicker id='testPicker1' /}}\n"
             + "\n"
-            + "{{attachmentPicker id='testPicker2' limit=2 /}}\n"
+            + "{{attachmentGalleryPicker id='testPicker2' limit=2 /}}\n"
             + "\n"
-            + "{{attachmentPicker id='testPicker3' filter='image/*' /}}\n");
+            + "{{attachmentGalleryPicker id='testPicker3' filter='image/*' /}}\n");
         AttachmentsPane attachmentsPane = page.openAttachmentsDocExtraPane();
         attachmentsPane.setFileToUpload(
             new File(testConfiguration.getBrowser().getTestResourcesPath(), "image1.png").getAbsolutePath());
@@ -79,7 +83,7 @@ class AttachmentPickerMacroIT
         setup.getDriver().navigate().refresh();
 
         // Test initial display
-        AttachmentPicker testPicker1 = new AttachmentPicker("testPicker1").waitUntilReady();
+        AttachmentGalleryPicker testPicker1 = new AttachmentGalleryPicker("testPicker1").waitUntilReady();
         List<String> picker1Attachments = testPicker1.getAttachmentTitles();
         assertTrue(picker1Attachments.size() >= 3);
         assertEquals(List.of("image1.png", "image2.png", "textcontent.txt"), picker1Attachments.subList(0, 3));
@@ -97,11 +101,11 @@ class AttachmentPickerMacroIT
         assertEquals(List.of("textcontent.txt"), testPicker1.getAttachmentTitles());
 
         // Validate that the limit is taken into account.
-        AttachmentPicker testPicker2 = new AttachmentPicker("testPicker2").waitUntilReady();
+        AttachmentGalleryPicker testPicker2 = new AttachmentGalleryPicker("testPicker2").waitUntilReady();
         assertEquals(List.of("image1.png", "image2.png"), testPicker2.getAttachmentTitles());
 
         // Validate that only images are returned.
-        AttachmentPicker testPicker3 = new AttachmentPicker("testPicker3").waitUntilReady();
+        AttachmentGalleryPicker testPicker3 = new AttachmentGalleryPicker("testPicker3").waitUntilReady();
         List<String> picker3Attachments = testPicker3.getAttachmentTitles();
         assertTrue(picker3Attachments.size() >= 2);
         assertEquals(List.of("image1.png", "image2.png"), picker3Attachments.subList(0, 2));

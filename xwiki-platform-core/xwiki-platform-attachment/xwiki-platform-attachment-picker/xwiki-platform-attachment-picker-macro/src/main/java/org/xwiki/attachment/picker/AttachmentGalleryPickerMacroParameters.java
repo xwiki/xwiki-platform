@@ -22,26 +22,25 @@ package org.xwiki.attachment.picker;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xwiki.attachment.picker.internal.AttachmentPickerMacro;
+import org.xwiki.attachment.picker.internal.AttachmentGalleryPickerMacro;
 import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.stability.Unstable;
 
 /**
- * Parameters for the {@link AttachmentPickerMacro} Macro.
+ * Parameters for the {@link AttachmentGalleryPickerMacro} Macro.
  *
  * @version $Id$
  * @since 14.4RC1
  */
 @Unstable
-public class AttachmentPickerMacroParameters
+public class AttachmentGalleryPickerMacroParameters
 {
     private String id;
 
     private List<String> filter = new ArrayList<>();
 
-    private Integer limit;
+    private Integer limit = 20;
 
     /**
      * @return the id of the attachment picker macro
@@ -54,7 +53,6 @@ public class AttachmentPickerMacroParameters
     /**
      * @param id the id of the attachment picker macro
      */
-    @PropertyMandatory
     @PropertyName("Id")
     @PropertyDescription("The id of the attachment picker macro")
     public void setId(String id)

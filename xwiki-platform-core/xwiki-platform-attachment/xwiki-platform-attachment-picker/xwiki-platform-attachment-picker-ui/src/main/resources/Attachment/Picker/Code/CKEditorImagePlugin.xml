@@ -1,19 +1,37 @@
-<?xml version='1.1' encoding='UTF-8'?>
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc version="1.5" reference="Attachment.Picker.Code.CKEditorImagePlugin" locale="">
   <web>Attachment.Picker.Code</web>
   <name>CKEditorImagePlugin</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>XWiki.Admin</creator>
-  <creationDate>1651666198000</creationDate>
+  <creator>xwiki:XWiki.Admin</creator>
   <parent>WebHome</parent>
-  <author>XWiki.Admin</author>
-  <originalMetadataAuthor>XWiki.Admin</originalMetadataAuthor>
-  <contentAuthor>XWiki.Admin</contentAuthor>
-  <date>1651847843000</date>
-  <contentUpdateDate>1651668025000</contentUpdateDate>
-  <version>3.1</version>
+  <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
   <title>CKEditorAttachmentPicker</title>
   <comment/>
   <minorEdit>false</minorEdit>
@@ -107,19 +125,19 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'imageSelector'], function($, imageSelector) {&#xd;
-   const picker = $('#attachmentPickerCKEditor')&#xd;
-   picker.on('xwiki:attachmentPicker:selected', function(_target, attachmentReference) {&#xd;
-     imageSelector.saveSelectedImageReference(attachmentReference);&#xd;
-   });&#xd;
-&#xd;
-  picker.on('xwiki:attachmentPicker:unselected', function() {&#xd;
-    imageSelector.removeSelectedImageReference();&#xd;
-  });&#xd;
+      <code>require(['jquery', 'imageSelector'], function($, imageSelector) {
+   const picker = $('#attachmentPickerCKEditor')
+   picker.on('xwiki:attachmentGalleryPicker:selected', function(_target, attachmentReference) {
+     imageSelector.updateSelectedImageReferences([attachmentReference]);
+   });
+
+  picker.on('xwiki:attachmentGalleryPicker:unselected', function() {
+    imageSelector.updateSelectedImageReferences([]);
+  });
 });</code>
     </property>
     <property>
-      <name></name>
+      <name/>
     </property>
     <property>
       <parse>0</parse>
@@ -252,21 +270,21 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content>{{velocity output='false'}}&#xd;
-#set ($discard = $xwiki.jsx.use('XWiki.CKEditorAttachmentPicker'))&#xd;
-{{/velocity}}&#xd;
-&#xd;
+      <content>{{velocity output='false'}}
+#set ($discard = $xwiki.jsx.use('Attachment.Picker.Code.CKEditorImagePlugin'))
+{{/velocity}}
+
 {{attachmentGalleryPicker id='attachmentPickerCKEditor' filter="image/*"/}}</content>
     </property>
     <property>
-      <extensionPointId>org.xwiki.contrib.ckeditor.pluginsImageSelector</extensionPointId>
+      <extensionPointId>org.xwiki.contrib.ckeditor.plugins.imageSelector</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.contrib.ckeditor.pluginsImageSelector.gallery</name>
+      <name>org.xwiki.platform.attachment.picker.ckeditor.plugins.imageSelector.gallery</name>
     </property>
     <property>
-      <parameters>priority=100&#xd;
-title=$services.localization.render('attachment.picker.ckeditor.pluginsImageSelector.title')&#xd;
+      <parameters>priority=100
+title=$services.localization.render('attachment.picker.ckeditor.pluginsImageSelector.title')
 id=ckEditorattachmentPickerTab</parameters>
     </property>
     <property>

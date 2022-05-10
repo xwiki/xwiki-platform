@@ -50,7 +50,7 @@ import org.xwiki.observation.event.Event;
  */
 @Component
 @Singleton
-@Named("ActiveInstallsInitializerListener")
+@Named("ActiveInstalls2InitializerListener")
 public class ActiveInstallsInitializerListener implements EventListener, Initializable, Disposable
 {
     private static final long PERIOD = 1;
@@ -119,7 +119,7 @@ public class ActiveInstallsInitializerListener implements EventListener, Initial
     @Override
     public String getName()
     {
-        return "ActiveInstallsInitializerListener";
+        return "ActiveInstalls2InitializerListener";
     }
 
     @Override
@@ -134,7 +134,7 @@ public class ActiveInstallsInitializerListener implements EventListener, Initial
         if (this.executorService == null) {
             // Start a thread to regularly send pings to the active installs server.
             BasicThreadFactory factory = new BasicThreadFactory.Builder()
-                .namingPattern("Active Installs Ping Thread")
+                .namingPattern("Active Installs 2 Ping Thread")
                 .daemon(true)
                 .priority(Thread.MIN_PRIORITY)
                 .build();

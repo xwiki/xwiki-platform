@@ -226,7 +226,7 @@ define('xwiki-attachment-picker',
         var downloadURL = `${downloadDocumentURL}/${encodeURIComponent(attachmentReference.name)}`;
         const mimeType = result.mimetype[0];
         if (result.mimetype && mimeType.startsWith("image/")) {
-          preview = $(`<img />`)
+          preview = $('<img />')
             .prop('loading', 'lazy')
             .prop('src', `${downloadURL}?width=150&height=150`)
             .prop('alt', filename);
@@ -244,7 +244,7 @@ define('xwiki-attachment-picker',
         }
 
         const textSpan = $('<span>').text(filename).prop('title', filename).addClass('attachmentTitle');
-        const link = $(`<a></a>`)
+        const link = $('<a></a>')
           .prop('title', filename)
           .prop('href', downloadURL)
           .data('index', index)

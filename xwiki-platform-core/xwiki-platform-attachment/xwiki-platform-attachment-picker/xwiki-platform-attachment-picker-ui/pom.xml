@@ -48,6 +48,8 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- CKEditor is required for the integration of the attachment picker with the image picker dialog.
+         It is an optional dependency and can be safely uninstalled if CKEditor is not required. -->
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>application-ckeditor-ui</artifactId>

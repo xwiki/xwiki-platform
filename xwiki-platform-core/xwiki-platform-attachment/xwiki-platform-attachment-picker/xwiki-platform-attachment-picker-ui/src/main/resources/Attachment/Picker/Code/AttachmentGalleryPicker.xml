@@ -130,7 +130,6 @@
 
   // Bootstrap the attachment picker, all the business code is located in the module initialization.
   require(['xwiki-attachment-picker'], function () {});
-// End JavaScript-only code.
 })()</code>
     </property>
     <property>

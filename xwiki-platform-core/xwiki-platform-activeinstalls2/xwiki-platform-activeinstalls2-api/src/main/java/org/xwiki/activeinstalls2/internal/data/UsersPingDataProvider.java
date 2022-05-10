@@ -40,7 +40,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import co.elastic.clients.elasticsearch._types.mapping.Property;
 
 /**
- * Provide number of users in the XWiki instance.
+ * Provide the number of users in the XWiki instance.
  *
  * @version $Id$
  * @since 14.4RC1

@@ -201,7 +201,7 @@ class PingSenderIT
         Collection<InstalledExtension> installedExtensions = List.of(extension1, extension2);
         when(this.installedExtensionRepository.getInstalledExtensions()).thenReturn(installedExtensions);
 
-        // User Ping Data Provider setup
+        // Users Ping Data Provider setup (and Wikis Ping Data Provider)
         when(this.wikiDescriptorManager.getAllIds()).thenReturn(List.of("wiki1", "xwiki", "wiki2"));
         when(this.wikiDescriptorManager.isMainWiki("xwiki")).thenReturn(true);
         Query usersQuery = mock(Query.class);
@@ -308,5 +308,8 @@ class PingSenderIT
         assertEquals(2, ping.getUsers().getWikis().size());
         assertEquals(10, ping.getUsers().getWikis().get(0));
         assertEquals(1000, ping.getUsers().getWikis().get(1));
+
+        // Wikis Ping Data Provider Test
+        assertEquals(3, ping.getWikis().getTotal());
     }
 }

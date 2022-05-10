@@ -45,6 +45,8 @@ public class Ping
 
     private ServletContainerPing servletContainer;
 
+    private UsersPing users;
+
     /**
      * Empty constructor, you need to call setters to set ping data to send.
      */
@@ -179,5 +181,21 @@ public class Ping
     public void setOS(OSPing os)
     {
         this.os = os;
+    }
+
+    /**
+     * @return the users-related ping data, see {@link UsersPing}
+     */
+    public UsersPing getUsers()
+    {
+        return this.users;
+    }
+
+    /**
+     * @param users see {@link #getUsers()}
+     */
+    public void setUsers(UsersPing users)
+    {
+        this.users = users;
     }
 }

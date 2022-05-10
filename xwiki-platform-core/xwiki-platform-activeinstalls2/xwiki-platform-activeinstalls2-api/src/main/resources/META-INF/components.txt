@@ -8,6 +8,7 @@ org.xwiki.activeinstalls2.internal.data.JavaPingDataProvider
 org.xwiki.activeinstalls2.internal.data.OsPingDataProvider
 org.xwiki.activeinstalls2.internal.data.DatabasePingDataProvider
 org.xwiki.activeinstalls2.internal.data.ServletContainerPingDataProvider
+org.xwiki.activeinstalls2.internal.data.UsersPingDataProvider
 org.xwiki.activeinstalls2.internal.DefaultElasticsearchClientManager
 org.xwiki.activeinstalls2.internal.DefaultActiveInstallsConfiguration
 org.xwiki.activeinstalls2.internal.DefaultDataManager

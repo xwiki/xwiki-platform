@@ -51,12 +51,16 @@ import org.xwiki.extension.repository.internal.installed.DefaultInstalledExtensi
 import org.xwiki.instance.InstanceId;
 import org.xwiki.instance.InstanceIdManager;
 import org.xwiki.instance.internal.DefaultInstanceIdManager;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
+import org.xwiki.query.internal.DefaultQueryManager;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -64,6 +68,9 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -80,7 +87,8 @@ import static org.mockito.Mockito.when;
     DefaultActiveInstallsConfiguration.class,
     DefaultInstanceIdManager.class,
     DefaultInstalledExtensionRepository.class,
-    DefaultCoreExtensionRepository.class
+    DefaultCoreExtensionRepository.class,
+    DefaultQueryManager.class
 })
 class PingSenderIT
 {
@@ -98,6 +106,12 @@ class PingSenderIT
 
     @MockComponent
     private CoreExtensionRepository coreExtensionRepository;
+
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @MockComponent
+    private QueryManager queryManager;
 
     @Inject
     private PingSender pingSender;
@@ -187,6 +201,21 @@ class PingSenderIT
         Collection<InstalledExtension> installedExtensions = List.of(extension1, extension2);
         when(this.installedExtensionRepository.getInstalledExtensions()).thenReturn(installedExtensions);
 
+        // User Ping Data Provider setup
+        when(this.wikiDescriptorManager.getAllIds()).thenReturn(List.of("wiki1", "xwiki", "wiki2"));
+        when(this.wikiDescriptorManager.isMainWiki("xwiki")).thenReturn(true);
+        Query usersQuery = mock(Query.class);
+        when(this.queryManager.createQuery(startsWith("SELECT COUNT(DISTINCT doc.fullName) FROM Document doc"),
+            eq(Query.XWQL))).thenReturn(usersQuery);
+        when(usersQuery.setWiki(any())).thenReturn(usersQuery);
+        when(usersQuery.execute())
+            // For wiki1
+            .thenReturn(List.of(10))
+            // For xwiki (main wiki)
+            .thenReturn(List.of(100))
+            // For wiki2
+            .thenReturn(List.of(1000));
+
         // Send a ping
         this.pingSender.sendPing();
 
@@ -272,5 +301,12 @@ class PingSenderIT
         assertEquals("extensionVersion2", extensionPing2.getVersion());
         assertEquals(1, extensionPing2.getFeatures().size());
         assertEquals("featureId2/featureVersion2", extensionPing2.getFeatures().iterator().next());
+
+        // Users Ping Data Provider Test
+        assertEquals(1110, ping.getUsers().getTotal());
+        assertEquals(100, ping.getUsers().getMain());
+        assertEquals(2, ping.getUsers().getWikis().size());
+        assertEquals(10, ping.getUsers().getWikis().get(0));
+        assertEquals(1000, ping.getUsers().getWikis().get(1));
     }
 }

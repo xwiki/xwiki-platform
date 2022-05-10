@@ -256,7 +256,7 @@
 #set ($discard = $xwiki.jsx.use('XWiki.CKEditorAttachmentPicker'))&#xd;
 {{/velocity}}&#xd;
 &#xd;
-{{attachmentPicker id='attachmentPickerCKEditor' filter="image/*"/}}</content>
+{{attachmentGalleryPicker id='attachmentPickerCKEditor' filter="image/*"/}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.contrib.ckeditor.pluginsImageSelector</extensionPointId>

@@ -52,13 +52,13 @@ public class DistributionPingDataProvider extends AbstractPingDataProvider
 {
     static final String PROPERTY_INSTANCE_ID = "instanceId";
 
+    static final String PROPERTY_DISTRIBUTION = "distribution";
+
     private static final String PROPERTY_DISTRIBUTION_VERSION = "version";
 
     private static final String PROPERTY_DISTRIBUTION_ID = "id";
 
     private static final String PROPERTY_DISTRIBUTION_FEATURES = "features";
-
-    private static final String PROPERTY_DISTRIBUTION = "distribution";
 
     private static final String PROPERTY_EXTENSION = "extension";
 

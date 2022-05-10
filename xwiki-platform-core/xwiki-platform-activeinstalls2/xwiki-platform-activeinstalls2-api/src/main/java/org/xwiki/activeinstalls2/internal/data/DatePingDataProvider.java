@@ -79,14 +79,14 @@ public class DatePingDataProvider extends AbstractPingDataProvider
         // Note: if the pipeline already exists, it'll be overwritten or ignored.
         Processor processor1 = Processor.of(b0 -> b0
             .set(b1 -> b1
-                .field(getFormattedDateKey(PROPERTY_PING_DATE))
+                .field(getDateKey(PROPERTY_PING_DATE))
                 .value(JsonData.of("{{{_ingest.timestamp}}}"))));
         Processor processor2 = Processor.of(b0 -> b0
             .set(b3 -> b3
                 // Don't overwrite if a first ping date is set
                 .override(false)
-                .field(getFormattedDateKey(PROPERTY_FIRST_PING_DATE))
-                .value(JsonData.of(String.format("{{{%s}}}", getFormattedDateKey(PROPERTY_PING_DATE))))));
+                .field(getDateKey(PROPERTY_FIRST_PING_DATE))
+                .value(JsonData.of(String.format("{{{%s}}}", getDateKey(PROPERTY_PING_DATE))))));
         client.ingest().putPipeline(b0 -> b0
             .id(PIPELINE_NAME)
             .description("Set current date to be the server date/time and fill first ping date if empty")
@@ -131,19 +131,19 @@ public class DatePingDataProvider extends AbstractPingDataProvider
                 .index(ElasticsearchClientManager.INDEX)
                 .query(q -> q
                     .term(t -> t
-                        .field(DistributionPingDataProvider.PROPERTY_INSTANCE_ID)
+                        .field(getDistributionKey(DistributionPingDataProvider.PROPERTY_INSTANCE_ID))
                         .value(v -> v.stringValue(this.instanceIdManager.getInstanceId().toString()))
                     ))
-                .aggregations(PROPERTY_SERVER_TIME, a1 -> a1
+                .aggregations(getDateKey(PROPERTY_SERVER_TIME), a1 -> a1
                     .min(m -> m.script(s2 -> s2.inline(i -> i.source("new Date().getTime()")))))
-                .aggregations(PROPERTY_FIRST_PING_DATE, a2 -> a2
-                    .min(m2 -> m2.field(PROPERTY_FIRST_PING_DATE))),
+                .aggregations(getDateKey(PROPERTY_FIRST_PING_DATE), a2 -> a2
+                    .min(m2 -> m2.field(getDateKey(PROPERTY_FIRST_PING_DATE)))),
                 Ping.class);
 
             DatePing datePing = new DatePing();
             if (!search.hits().hits().isEmpty()) {
-                Aggregate serverTimeAggregate = search.aggregations().get(PROPERTY_SERVER_TIME);
-                Aggregate firstPingDateAggregate = search.aggregations().get(PROPERTY_FIRST_PING_DATE);
+                Aggregate serverTimeAggregate = search.aggregations().get(getDateKey(PROPERTY_SERVER_TIME));
+                Aggregate firstPingDateAggregate = search.aggregations().get(getDateKey(PROPERTY_FIRST_PING_DATE));
                 // If firstPingDateAggregate min value is 0 then we consider it means there's no hit found.
                 if (firstPingDateAggregate != null && serverTimeAggregate != null) {
                     double serverTime = serverTimeAggregate.min().value();
@@ -163,14 +163,24 @@ public class DatePingDataProvider extends AbstractPingDataProvider
             }
             ping.setDate(datePing);
         } catch (Exception e) {
-            // If this fails we just don't send this information but we still send the other piece of information.
+            // If this fails we just don't send this information, but we still send the other piece of information.
             // However, we log a warning since it's a problem that needs to be seen and looked at.
             logWarning("Failed to compute the first ping date and the number of elapsed days since the first ping", e);
         }
     }
 
-    private String getFormattedDateKey(String keySuffix)
+    private String getDateKey(String suffix)
     {
-        return String.format("%s.%s", PROPERTY_DATE, keySuffix);
+        return getKey(PROPERTY_DATE, suffix);
+    }
+
+    private String getDistributionKey(String suffix)
+    {
+        return getKey(DistributionPingDataProvider.PROPERTY_DISTRIBUTION, suffix);
+    }
+
+    private String getKey(String prefix, String suffix)
+    {
+        return String.format("%s.%s", prefix, suffix);
     }
 }

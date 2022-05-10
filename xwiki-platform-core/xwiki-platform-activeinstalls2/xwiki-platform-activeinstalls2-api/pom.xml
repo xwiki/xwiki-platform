@@ -98,7 +98,7 @@
         <!-- Functional tests are allowed to output content to the console -->
         <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
         <!-- Overridden to include coverage from IT tests -->
-        <xwiki.jacoco.instructionRatio>0.88</xwiki.jacoco.instructionRatio>
+        <xwiki.jacoco.instructionRatio>0.90</xwiki.jacoco.instructionRatio>
       </properties>
       <build>
         <plugins>

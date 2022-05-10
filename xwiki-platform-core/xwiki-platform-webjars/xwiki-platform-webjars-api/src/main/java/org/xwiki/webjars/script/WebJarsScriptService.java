@@ -46,7 +46,7 @@ import org.xwiki.url.ExtendedURL;
 import org.xwiki.webjars.internal.WebJarsResourceReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-    /**
+/**
  * Make it easy to use WebJars in scripts. For example it can compute an XWiki WebJars URL.
  * 
  * @version $Id$

@@ -326,28 +326,6 @@
                       <resource>META-INF/BCKEY.SF</resource>
                     </resources>
                   </exception>
-                  <!-- XStream includes both xapp and xmlpull and XAPP bundle somes classes of xmlpull.
-                       See http://x-stream.github.io/jira/689/ for more.
-                   -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>xmlpull</groupId>
-                        <artifactId>xmlpull</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3_min</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <packages>
-                      <package>org.xmlpull</package>
-                    </packages>
-                  </exception>
                   <!-- Does not seems to be an issue -->
                   <exception>
                     <conflictingDependencies>

@@ -1,4 +1,5 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,37 +17,27 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
+-->
 
-define('imageWizard', ['imageSelector', 'imageEditor'], function(imageSelector, imageEditor) {
-  'use strict';
-
-  function backToSelectionOrFinish(data) {
-    if (data.action === 'selectImage') {
-      return selectAndEdit(data);
-    } else {
-      return data;
-    }
-  }
-
-  function editOnly(params) {
-    return imageEditor(params)
-      .then(backToSelectionOrFinish);
-  }
-
-  function selectAndEdit(params) {
-    params = params || {};
-    params.newImage = true;
-    return imageSelector.open(params)
-      .then(imageEditor)
-      .then(backToSelectionOrFinish);
-  }
-
-  return function(params) {
-    if (params.imageData && params.imageData.resourceReference) {
-      return editOnly(params);
-    } else {
-      return selectAndEdit(params);
-    }
-  };
-});
+<xwikidoc version="1.5" reference="CKEditor.ImageSelectorServiceUIX.WebHome" locale="">
+  <web>CKEditor.ImageSelectorServiceUIX</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1650619491000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <originalMetadataAuthor>XWiki.Admin</originalMetadataAuthor>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1650619491000</date>
+  <contentUpdateDate>1650619491000</contentUpdateDate>
+  <version>1.1</version>
+  <title>ImageSelectorServiceUIX</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content> </content>
+</xwikidoc>

@@ -47,57 +47,30 @@
 
 {{velocity}}
 #if ($xcontext.action == 'get')
+#set ($selectorUIXs = $services.uix.getExtensions('org.xwiki.contrib.ckeditor.plugins.imageSelector', 
+  {'sortByParameter' : 'priority'}))
 {{html clean='false'}}
 &lt;div&gt;
-  &lt;!-- Nav tabs --&gt;
   &lt;ul class="nav nav-tabs" role="tablist"&gt;
-    &lt;li role="presentation" class="active"&gt;
-      &lt;a href="#documentTree" aria-controls="documentTree" role="tab" data-toggle="tab"&gt;
-        $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageSelector.documentTreeTab.title'))
-      &lt;/a&gt;
-    &lt;/li&gt;
-    &lt;li role="presentation"&gt;
-      &lt;a href="#upload" aria-controls="upload" role="tab" data-toggle="tab"&gt;
-        $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageSelector.uploadTab.title'))
-      &lt;/a&gt;
-    &lt;/li&gt;
+    &lt;!-- Nav tabs --&gt;
+    #foreach ($uix in $selectorUIXs)
+      &lt;li role="presentation" #if($foreach.index == 0)class="active"#end&gt;
+        &lt;a href="#$escapetool.url($uix.parameters.id)"
+          aria-controls="$escapetool.xml($uix.parameters.id)"
+          role="tab" data-toggle="tab"&gt;
+          $escapetool.xml($services.localization.render($uix.parameters.title))
+        &lt;/a&gt;
+      &lt;/li&gt;
+    #end
   &lt;/ul&gt;
 
   &lt;!-- Tab panes --&gt;
   &lt;div class="tab-content"&gt;
-    &lt;div role="tabpanel" class="tab-pane active" id="documentTree"&gt;
-      #template('documentTree_macros.vm')
-      #documentTree({
-        'class': 'attachments-tree',
-        'finder': true,
-        'openTo': "document:$services.model.serialize($doc.documentReference, 'default')",
-        'showWikis': true,
-        'showTranslations': false
-      })
-    &lt;/div&gt;
-    &lt;div role="tabpanel" class="tab-pane" id="upload"&gt;
-      &lt;form class="xform"&gt;
-        &lt;dl&gt;
-          &lt;dt&gt;
-            &lt;label for="fileUploadField"&gt;
-              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageSelector.uploadTab.file.title'))
-            &lt;/label&gt;
-            &lt;span class="xHint"&gt;
-              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageSelector.uploadTab.file.hint'))
-            &lt;/span&gt;
-          &lt;/dt&gt;
-          &lt;dd&gt;
-            &lt;input id="fileUploadField" name="fileUploadField" type="file" accept="image/*"/&gt;
-          &lt;/dd&gt;
-        &lt;/dl&gt;
-        &lt;p&gt;
-          &lt;span class="buttonwrapper"&gt;
-            &lt;input class="button" type="submit"
-              value="$escapetool.xml($services.localization.render('ckeditor.plugin.image.imageSelector.uploadTab.uploadButton'))"/&gt;
-          &lt;/span&gt;
-        &lt;/p&gt;
-      &lt;/form&gt;
-    &lt;/div&gt;
+    #foreach ($uix in $selectorUIXs)
+      &lt;div role="tabpanel" class="tab-pane#if($foreach.index == 0) active#end" id="$escapetool.url($uix.parameters.id)"&gt;
+      $services.rendering.render($uix.execute(), 'xhtml/1.0')
+      &lt;/div&gt;
+    #end
   &lt;/div&gt;
 &lt;/div&gt;
 {{/html}}

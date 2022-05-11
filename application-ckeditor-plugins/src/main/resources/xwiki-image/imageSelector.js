@@ -32,63 +32,6 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
   function($, $modal, resource, translations) {
     'use strict';
 
-    function getSelected(instance) {
-      /* jshint camelcase: false */
-      return instance.get_selected(false)[0];
-    }
-
-    function validateSelection(instance) {
-      var selected = getSelected(instance);
-      return selected && selected.startsWith("attachment:");
-    }
-
-    // TODO: should be loaded modularily and provided by the UIX for the image selector tab.
-    function initDocumentTree(modal) {
-      $('.attachments-tree').xtree()
-        .one('ready.jstree', function(event, data) {
-          data.instance.openTo("document:" + XWiki.Model.serialize(XWiki.currentDocument.getDocumentReference()));
-        })
-        .on('changed.jstree', function(event, data) {
-          if (validateSelection(data.instance)) {
-            saveSelectedImageReference(getSelected(data.instance), modal);
-          } else {
-            removeSelectedImageReference(modal);
-          }
-        });
-    }
-
-    function initDocumentUpload(editor, modal) {
-      $("#upload form input.button").on('click', function(event) {
-        event.preventDefault();
-        var loader = editor.uploadRepository.create($("#fileUploadField").prop('files')[0]);
-        var imageSelector = $('.image-selector');
-        loader.on('uploaded', function(evt) {
-          var resourceReference = evt.sender.responseData.message.resourceReference;
-          var entityReference = resource.convertResourceReferenceToEntityReference(resourceReference);
-          var serialized = XWiki.Model.serialize(entityReference);
-          saveSelectedImageReference(serialized, modal);
-          imageSelector.removeClass('loading');
-          new XWiki.widgets.Notification(translations.get('modal.fileUpload.success'), 'done');
-        });
-
-        // Return non-false value will disable fileButton in dialogui,
-        // below listeners takes care of such situation and re-enable "send" button.
-        loader.on('error', function(error) {
-          console.log('Failed to upload a file', error);
-          new XWiki.widgets.Notification(translations.get('modal.fileUpload.fail'), 'error');
-          imageSelector.removeClass('loading');
-        });
-        loader.on('abort', function(error) {
-          console.log('Failed to upload a file', error);
-          new XWiki.widgets.Notification(translations.get('modal.fileUpload.abort'), 'error');
-          imageSelector.removeClass('loading');
-        });
-
-        imageSelector.addClass('loading');
-        loader.loadAndUpload(editor.config.filebrowserUploadUrl);
-      });
-    }
-
     function getEntityReference(referenceStr) {
       var reference;
       if (referenceStr.startsWith("attachment:")) {
@@ -101,21 +44,29 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
       return XWiki.Model.resolve(reference, XWiki.EntityType.ATTACHMENT);
     }
 
-    function saveSelectedImageReference(imageReference, modal) {
-      modal.data('imageReference', {
-        value: resource.convertEntityReferenceToResourceReference(getEntityReference(imageReference))
-      });
-      $('.image-selector-modal button.btn-primary').prop('disabled', false);
-    }
-
-    function removeSelectedImageReference(modal) {
-      modal.data('imageReference', {});
-      $('.image-selector-modal button.btn-primary').prop('disabled', true);
+    /**
+     * Can be called by the image selector tab UIXs. Indicates the list of  slected images.
+     * Passing an empty array indicates that not images are currently selected.
+     * Note: Currently, only the first image of the list is taken into account.
+     *
+     * @param imageReferences the selected image references
+     */
+    function updateSelectedImageReferences(imageReferences) {
+      imageReferences = imageReferences || [];
+      if(imageReferences.length > 0) {
+        // TODO:  Support the selection of several images (see CKEDITOR-445).
+        var imageReference = imageReferences[0];
+        modal.data('imageReference', {
+          value: resource.convertEntityReferenceToResourceReference(getEntityReference(imageReference))
+        });
+        $('.image-selector-modal button.btn-primary').prop('disabled', false);
+      } else {
+        modal.data('imageReference', {});
+        $('.image-selector-modal button.btn-primary').prop('disabled', true);  
+      }
     }
 
     function initialize(modal) {
-      var params = modal.data('input');
-
       if (!modal.data('initialized')) {
         var url = new XWiki.Document(XWiki.Model.resolve('CKEditor.ImageSelectorService', XWiki.EntityType.DOCUMENT))
           .getURL('get');
@@ -126,8 +77,7 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
             $(document).loadRequiredSkinExtensions(requiredSkinExtensions);
             imageSelector.html(html);
             imageSelector.removeClass('loading');
-            initDocumentTree(modal);
-            initDocumentUpload(params.editor, modal);
+
             modal.data('initialized', true);
           }).fail(function(error) {
           console.log('Failed to retrieve the image selection form.', error);
@@ -137,18 +87,21 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
       }
     }
 
+    // Defined once the modal is initialized.
+    var modal;
+
     // Initialize the modal.
-    return $modal.createModalStep({
+    var createModal = $modal.createModalStep({
       'class': 'image-selector-modal',
       title: translations.get('modal.title'),
       acceptLabel: translations.get('modal.selectButton'),
       content: '<div class="image-selector loading"></div>',
       onLoad: function() {
-        var modal = this;
+        modal = this;
         var selectButton = modal.find('.modal-footer .btn-primary');
         // Make the modal larger.
         modal.find('.modal-dialog').addClass('modal-lg');
-        
+
         modal.on('shown.bs.modal', function() {
           initialize(modal);
         });
@@ -167,4 +120,48 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
         });
       }
     });
+
+
+    /**
+     * Initialize a loader for the provided upload field. Three optional callbacks can be provided in the options 
+     * object:
+     * - onSuccess is called when the upload is successful, the entity reference is passed as argument.
+     * - onError is called when the upload fails
+     * - onAbort is called when the upload is aborted
+     * @param uploadField the upload field to create the loader for
+     * @param options an option object with callback actions
+     */
+    function createLoader(uploadField, options) {
+      options = options || {};
+      var editor = modal.data('input').editor;
+      var loader = editor.uploadRepository.create(uploadField);
+      loader.on('uploaded', function(evt) {
+        var resourceReference = evt.sender.responseData.message.resourceReference;
+        var entityReference = resource.convertResourceReferenceToEntityReference(resourceReference);
+        if (options.onSuccess) {
+          options.onSuccess(entityReference);
+        }
+      });
+
+      loader.on('error', function(error) {
+        console.log('Failed to upload a file', error);
+        if (options.onError) {
+          options.onError();
+        }
+      });
+      loader.on('abort', function(error) {
+        console.log('Failed to upload a file', error);
+        if (options.onAbort) {
+          options.onAbort();
+        }
+      });
+
+      loader.loadAndUpload(editor.config.filebrowserUploadUrl);
+    }
+    
+    return {
+      open: createModal,
+      updateSelectedImageReferences: updateSelectedImageReferences,
+      createLoader: createLoader
+    };
   });

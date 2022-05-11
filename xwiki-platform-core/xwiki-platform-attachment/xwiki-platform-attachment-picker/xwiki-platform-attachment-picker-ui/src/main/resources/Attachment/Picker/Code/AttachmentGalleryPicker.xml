@@ -129,7 +129,7 @@
   "use strict";
 
   // Bootstrap the attachment picker, all the business code is located in the module initialization.
-  require(['xwiki-attachment-picker'], function () {});
+  require(['xwiki-attachment-picker']);
 })()</code>
     </property>
     <property>

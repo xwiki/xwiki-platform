@@ -33,7 +33,7 @@
   <description>Parent POM for the Active Installs 2 modules</description>
   <properties>
     <!-- Note: if modified, you also need to update PingSenderIT which contains a hardcoded version -->
-    <elasticsearch.version>7.17.3</elasticsearch.version>
+    <elasticsearch.version>8.2.0</elasticsearch.version>
   </properties>
   <modules>
     <!-- Sorted Alphabetically -->

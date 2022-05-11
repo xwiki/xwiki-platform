@@ -62,6 +62,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -134,8 +135,15 @@ class PingSenderIT
     static void initialize()
     {
         DockerImageName imageName =
-            DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch").withTag("7.17.3");
-        container = new ElasticsearchContainer(imageName);
+            DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch").withTag("8.2.0");
+        container = new ElasticsearchContainer(imageName) {
+            // TODO: Remove once we upgrade to a TC version > 1.17.1 (i.e. when
+            //  https://github.com/testcontainers/testcontainers-java/pull/5265#issuecomment-1123867922 is in)
+            @Override
+            protected void containerIsStarted(InspectContainerResponse containerInfo)
+            {
+            }
+        };
         // - single node since we don't need a cluster for testing
         // - disabled security to avoid the warning messages and because security is not needed for testing as
         //   the data is discarded and the testing environment is secure.

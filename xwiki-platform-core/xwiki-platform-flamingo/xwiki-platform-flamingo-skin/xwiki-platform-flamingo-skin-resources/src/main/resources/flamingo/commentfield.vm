@@ -26,7 +26,6 @@
 #set ($number = $numbertool.toNumber($request.number).intValue())
 
 #set ($xCommentClass = 'XWiki.XWikiComments')
-#set ($commentClass = $xwiki.getDocument($xCommentClass).getxWikiClass())
 
 ## If a content is provided, we use it. If a comment number is provided, we use the content of the corresponding 
 ## comment. Otherwise, the content is an empty string.
@@ -45,24 +44,19 @@
 <input type='hidden' name='defaultEditorId' value="$escapetool.xml($defaultEditorId)" />
 
 #if ($number && $number > -1)
-  #set ($commentPrefix = "XWiki.XWikiComments_${number}")
+  #set ($commentPrefix = "XWiki.XWikiComments_${number}_")
 #else
-  #set ($commentPrefix = 'XWiki.XWikiComments')
+  #set ($commentPrefix = 'XWiki.XWikiComments_')
 #end
-<label for="${commentPrefix}_comment">$services.localization.render('core.viewers.comments.add.comment.label')</label>
+<label for="${commentPrefix}comment">$services.localization.render('core.viewers.comments.add.comment.label')</label>
 #initRequiredSkinExtensions()
 ## Display of the comment field.
-#set ($commentProperty = $commentClass.get('comment'))
-#set ($properties = {
-  'id': "${commentPrefix}_comment",
-  'name': "${commentPrefix}_comment",
-  'rows': $commentProperty.getProperty('rows').value,
-  'cols': $commentProperty.getProperty('cols').value
-})
-#if ($commentProperty.getPropertyClass().isWysiwyg($xcontext.context))
-  $services.edit.syntaxContent.wysiwyg($value, $doc.syntax, $properties)
-#else
-  $services.edit.syntaxContent.text($value, $doc.syntax, $properties)
-#end
+#set ($xWikiCommentsClass = $xwiki.getClass($xCommentClass))
+### Creates a new in-memory object, then use it to render the comment field in edit mode.
+#set ($newObj = $xWikiCommentsClass.newObject())
+## Having an owner document is required to set a property value.
+#set ($discard = $newObj.getXWikiObject().setOwnerDocument($doc))
+#set ($discard = $newObj.set('comment', $value))
+$doc.displayEdit($xwiki.getClass($xCommentClass).get('comment'), $commentPrefix, $newObj)
 #getRequiredSkinExtensions($requiredSkinExtensions)
 #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))

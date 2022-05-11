@@ -216,6 +216,19 @@ class PingSenderIT
             // For wiki2
             .thenReturn(List.of(1000));
 
+        // Documents Ping Data Provider setup
+        Query documentsQuery = mock(Query.class);
+        when(this.queryManager.createQuery(eq(""), eq(Query.XWQL))).thenReturn(documentsQuery);
+        when(documentsQuery.setWiki(any())).thenReturn(documentsQuery);
+        when(documentsQuery.addFilter(any())).thenReturn(documentsQuery);
+        when(documentsQuery.execute())
+            // For wiki1
+            .thenReturn(List.of(1000))
+            // For xwiki (main wiki)
+            .thenReturn(List.of(10000))
+            // For wiki2
+            .thenReturn(List.of(100000));
+
         // Send a ping
         this.pingSender.sendPing();
 
@@ -311,5 +324,12 @@ class PingSenderIT
 
         // Wikis Ping Data Provider Test
         assertEquals(3, ping.getWikis().getTotal());
+
+        // Documents Ping Data Provider Test
+        assertEquals(111000, ping.getDocuments().getTotal());
+        assertEquals(10000, ping.getDocuments().getMain());
+        assertEquals(2, ping.getDocuments().getWikis().size());
+        assertEquals(1000, ping.getDocuments().getWikis().get(0));
+        assertEquals(100000, ping.getDocuments().getWikis().get(1));
     }
 }

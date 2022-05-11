@@ -49,6 +49,8 @@ public class Ping
 
     private WikisPing wikis;
 
+    private DocumentsPing documents;
+
     /**
      * Empty constructor, you need to call setters to set ping data to send.
      */
@@ -215,5 +217,21 @@ public class Ping
     public void setWikis(WikisPing wikis)
     {
         this.wikis = wikis;
+    }
+
+    /**
+     * @return the documents-related ping data, see {@link DocumentsPing}
+     */
+    public DocumentsPing getDocuments()
+    {
+        return this.documents;
+    }
+
+    /**
+     * @param documents see {@link #getDocuments()}
+     */
+    public void setDocuments(DocumentsPing documents)
+    {
+        this.documents = documents;
     }
 }

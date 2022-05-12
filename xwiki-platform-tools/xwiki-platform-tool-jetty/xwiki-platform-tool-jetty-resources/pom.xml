@@ -147,6 +147,8 @@
     <dependency>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>apache-el</artifactId>
+      <optional>true</optional>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <build>

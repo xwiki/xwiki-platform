@@ -387,7 +387,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
             selectButton.click();
           }).attr('data-syntaxId', input.syntaxId);
           macroSelectorAPI = macroSelector.xwikiMacroSelector();
-        } else if (input.reload || macroSelector.attr('data-syntaxId') !== input.syntaxId) {
+        } else if (input.updateMacros || macroSelector.attr('data-syntaxId') !== input.syntaxId) {
           // Update the list of macros.
           macroSelectorAPI.update(input.syntaxId);
         } else {

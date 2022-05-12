@@ -58,7 +58,7 @@
     <dependency>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>apache-el</artifactId>
-      <scope>test</scope>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- To be removed as soon as we get rid of AbstractXWikiComponentTestCase -->

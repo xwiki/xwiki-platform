@@ -56,7 +56,23 @@
 ##       'id': (macro id),
 ##       'name': (translated macro name),
 ##       'description': (translated macro description),
-##       'defaultCategory': (translated macro category),
+##       'defaultCategory': (translated macro category)
+##     },
+##     ...
+##   ],
+##   'notinstalled': [
+##     {
+##       'id': (macro id),
+##       'name': (translated macro name),
+##       'description': (translated macro description),
+##       'defaultCategory': '_notinstalled',
+##       'extensionId':	(extension id)
+##       'extensionVersion': (extension version)
+##       'extensionType': (extension type)
+##       'extensionRecommended': (is extension recommended)
+##       'extensionName': (extension name)
+##       'extensionSummary': (extension summary)
+##       ]
 ##     },
 ##     ...
 ##   ]
@@ -94,6 +110,44 @@
   #end
   #set ($macroList = $resolvedSortTool.sort($macroList, 'name'))
   #set ($discard = $data.put('list', $macroList))
+  ## Get macros provided by compatible available extensions
+  #set ($macroExtensionsList = [])
+  #set($extensionQuery = $services.extension.index.newQuery("$!request.search"))
+  #set ($discard = $extensionQuery.addFilter('components__org.xwiki.rendering.macro.Macro', '', 'MATCH'))
+  #if ($xcontext.isMainWiki())
+    #set ($discard = $extensionQuery.setCompatible(true, '', "wiki:$xcontext.database"))
+  #else
+    #set ($discard = $extensionQuery.setCompatible(true, "wiki:$xcontext.database"))
+  #end
+  #set ($extensions = $services.extension.index.repository.search($extensionQuery))
+  #set ($macroExtensionCategory = $services.localization.render('ckeditor.plugin.macro.notinstalled'))
+  #if ($extensions.size &gt; 0)
+    #set ($macroExtensionsMap = {})
+    #foreach ($extension in $extensions)
+      ## TODO: move to a proper generic API to check if an extension can be installed by a given user
+      #if ($services.security.authorization.hasAccess('programming') || (($extension.type == 'xar' || $extension.type == 'webjar') &amp;&amp;  $services.security.authorization.hasAccess('admin', "wiki:$xcontext.database" &amp;&amp; $services.extension.isAllowed($extension, "wiki:$xcontext.database"))))
+        #foreach ($extensionComponent in $extension.getComponents())
+          #if ($extensionComponent.roleType == 'org.xwiki.rendering.macro.Macro')
+            #set ($discard = $macroExtensionsList.add({
+                'id' : {
+                    'id' : $extensionComponent.roleHint
+                  },
+                'name': $extensionComponent.roleHint,
+                'description': $extension.summary,
+                'defaultCategory': '_notinstalled',
+                'extensionId' : $extension.id.id,
+                'extensionVersion' : $extension.id.version.value,
+                'extensionType' : $extension.type,
+                'extensionRecommended': $extension.recommended,
+                'extensionName': $extension.name,
+                'extensionSummary': $extension.summary
+              }))
+          #end
+        #end
+      #end
+    #end
+    #set ($discard = $data.put('notinstalled', $macroExtensionsList))
+  #end
 #end
 
 #macro (maybeGetMacroDescriptor $macroIdAsString)
@@ -334,6 +388,30 @@
     $!defaultValue##
   #end
 #end
+
+#macro (installMacroExtension $extensionId, $extensionVersion)
+  ## Make the install non interractive
+  #set ($installRequest = $services.extension.createInstallRequest($extensionId, $extensionVersion, $extensionNamespace))
+  #set ($discard = $installRequest.setInteractive(false))
+  ## Start the install non interractive
+  #set ($job = $services.extension.install($installRequest))
+  ## Wait for the job to finish
+  #set ($discard = $job.join())
+  #if ($job.status.error)
+    #set ($data = {
+      'extensionId': $extensionId,
+      'extensionVersion': $extensionVersion,
+      'extensionNamespace': $extensionNamespace,
+      'jobErrorRootCause': $exceptiontool.getRootCauseMessage($job.status.error)
+    })
+  #else
+    #set ($data = {
+      'extensionId': $extensionId,
+      'extensionVersion': $extensionVersion,
+      'extensionNamespace': $extensionNamespace
+    })
+  #end
+#end
 {{/velocity}}
 
 {{velocity wiki="false"}}
@@ -343,6 +421,8 @@
     #getMacroList($request.syntaxId)
   #elseif ($request.data == 'descriptor')
     #maybeGetMacroDescriptor($request.macroId)
+  #elseif ($request.data == 'install')
+    #installMacroExtension($request.extensionId, $request.extensionVersion)
   #end
   #if ($data)
     #set ($discard = $response.setContentType('application/json'))

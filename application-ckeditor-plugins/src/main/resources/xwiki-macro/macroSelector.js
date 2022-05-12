@@ -21,9 +21,11 @@ define('macroSelectorTranslationKeys', [], [
   'title',
   'filter.text.placeholder',
   'filter.category.all',
+  'filter.category.notinstalled',
   'filter.category.other',
   'failedToRetrieveMacros',
-  'select'
+  'select',
+  'install'
 ]);
 
 define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $modal, translations) {
@@ -44,9 +46,13 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
       $.get(url, {data: 'list', syntaxId: syntaxId}).done(function(macros) {
         // Bulletproofing: check if the returned data is json since it could some HTML representing an error
         if (typeof macros === 'object' && Array.isArray(macros.list)) {
-          macrosBySyntax[syntaxId || ''] = macros.list;
+          var macroList = macros.list;
+          if (Array.isArray(macros.notinstalled)) {
+            macroList = macroList.concat(macros.notinstalled);
+          }
+          macrosBySyntax[syntaxId || ''] = macroList;
           allMacrosExcludedCategories = macros.options.allMacrosExcludedCategories;
-          deferred.resolve(macros.list);
+          deferred.resolve(macroList);
         } else {
           deferred.reject.apply(deferred, arguments);
         }
@@ -59,8 +65,12 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
 
   macroListTemplate = '<ul class="macro-list form-control" tabindex="0"></ul>',
   macroListItemTemplate =
-    '<li data-macroCategory="" data-macroId="">' +
-      '<div class="macro-name"></div>' +
+    '<li data-macroCategory="" data-macroId="" data-extensionId="" data-extensionVersion="">' +
+      '<div>' +
+        '<span class="macro-name"></span>' +
+        '<span class="macro-notinstalled-extension"></span>' +
+        '<span class="macro-notinstalled-badge badge"></span>' +
+      '</div>' +
       '<div class="macro-description"></div>' +
     '</li>',
 
@@ -75,6 +85,17 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
         'data-macroCategory': macroCategory
       }).appendTo(list);
       macroListItem.find('.macro-name').text(macro.name);
+      if (macro.extensionName) {
+        var extensionName = ' - ' + macro.extensionName + ' ' + macro.extensionVersion;
+        macroListItem.find('.macro-notinstalled-extension').text(extensionName);
+        macroListItem.attr({
+          'data-extensionId': macro.extensionId,
+          'data-extensionVersion': macro.extensionVersion
+        });
+      }
+      if (macro.defaultCategory == '_notinstalled') {
+        macroListItem.find('.macro-notinstalled-badge').text(translations.get('filter.category.notinstalled'));
+      }
       macroListItem.find('.macro-description').text(macro.description);
     });
     var categoryFilter = createCategoryFilter(sortCategories(categories));
@@ -95,7 +116,12 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
   sortCategories = function(categories) {
     var otherCategoryCount = categories[''];
     var allCategoryCount = otherCategoryCount || 0;
+    var notinstalledCategoryCount = categories._notinstalled;
+    if (notinstalledCategoryCount) {
+      allCategoryCount += notinstalledCategoryCount;
+    }
     delete categories[''];
+    delete categories._notinstalled;
     var categoryList = $.map(categories, function(categoryCount, categoryName) {
       if (allMacrosExcludedCategories.indexOf(categoryName) < 0) {
         allCategoryCount += categoryCount;
@@ -113,12 +139,20 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
       name: translations.get('filter.category.all'),
       count: allCategoryCount
     });
-    // Put "Other" category last.
+    // Put "Other" category after other categories.
     if (otherCategoryCount) {
       categoryList.push({
         id: '',
         name: translations.get('filter.category.other'),
         count: otherCategoryCount
+      });
+    }
+    // Put "Not installed" category last.
+    if (notinstalledCategoryCount) {
+      categoryList.push({
+        id: '_notinstalled',
+        name: translations.get('filter.category.notinstalled'),
+        count: notinstalledCategoryCount
       });
     }
     return categoryList;
@@ -152,6 +186,8 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
     }
     // Add separator before "Other" category.
     categoryFilter.find('.macro-category[data-category=""]').before(separator);
+    // Add separator before "Not installed" category.
+    categoryFilter.find('.macro-category[data-category="_notinstalled"]').before(separator);
     // Select "All Macros" by default.
     categoryFilter.find('.caret').before(document.createTextNode(categories[0].name + ' '));
     return categoryFilter;
@@ -290,6 +326,18 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
       getSelectedMacro: function() {
         return macroSelector.find('.macro-list > li.selected').attr('data-macroId');
       },
+      getSelectedMacroCategory: function() {
+        return macroSelector.find('.macro-list > li.selected').attr('data-macroCategory');
+      },
+      getSelectedExtensionId: function() {
+        return macroSelector.find('.macro-list > li.selected').attr('data-extensionId');
+      },
+      getSelectedExtensionVersion: function() {
+        return macroSelector.find('.macro-list > li.selected').attr('data-extensionVersion');
+      },
+      isInstalledMacro: function() {
+        return this.getSelectedMacroCategory() != '_notinstalled';
+      },
       reset: function(macroId) {
         this.filter('');
         this.select(macroId);
@@ -330,11 +378,16 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
             macroSelector.find('.macro-textFilter').focus();
           }).on('change', function() {
             selectButton.prop('disabled', !macroSelectorAPI.getSelectedMacro());
+            if (macroSelectorAPI.isInstalledMacro()) {
+              selectButton.text(translations.get('select'));
+            } else {
+              selectButton.text(translations.get('install'));
+            }
           }).on('xwiki:macro:selected', function(event, macroIds) {
             selectButton.click();
           }).attr('data-syntaxId', input.syntaxId);
           macroSelectorAPI = macroSelector.xwikiMacroSelector();
-        } else if (macroSelector.attr('data-syntaxId') !== input.syntaxId) {
+        } else if (input.reload || macroSelector.attr('data-syntaxId') !== input.syntaxId) {
           // Update the list of macros.
           macroSelectorAPI.update(input.syntaxId);
         } else {
@@ -346,6 +399,10 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
         var macroSelectorAPI = modal.find('.macro-selector').xwikiMacroSelector();
         var output = modal.data('input') || {};
         output.macroId = macroSelectorAPI.getSelectedMacro();
+        output.macroCategory = macroSelectorAPI.getSelectedMacroCategory();
+        output.extensionId = macroSelectorAPI.getSelectedExtensionId();
+        output.extensionVersion = macroSelectorAPI.getSelectedExtensionVersion();
+        output.extensionNamespace = macroSelectorAPI.getSelectedExtensionNamespace();
         modal.data('output', output).modal('hide');
       });
     }

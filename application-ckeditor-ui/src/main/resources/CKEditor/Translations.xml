@@ -72,6 +72,7 @@ ckeditor.plugin.macro.buttonHint=XWiki Macro
 ckeditor.plugin.macro.editButtonHint=Edit Macro
 ckeditor.plugin.macro.refreshFailed=Failed to refresh the edited content.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insert {0} macro
+ckeditor.plugin.macro.notinstalled=Not installed
 
 ckeditor.plugin.office.importer.title=Import Office File
 ckeditor.plugin.office.importer.filePath=File Path
@@ -186,8 +187,10 @@ macroSelector.title=Select Macro
 macroSelector.filter.text.placeholder=Type to filter
 macroSelector.filter.category.all=All Macros
 macroSelector.filter.category.other=Other
+macroSelector.filter.category.notinstalled=Not installed
 macroSelector.failedToRetrieveMacros=Failed to retrieve the list of available macros.
 macroSelector.select=Select
+macroSelector.install=Install
 
 macroEditor.title=Edit Macro
 macroEditor.more=More

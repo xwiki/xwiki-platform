@@ -70,7 +70,7 @@ define('macroService', ['jquery'], function($) {
     $.get(url, {data: 'install', extensionId: extensionId, extensionVersion: extensionVersion, namespace: namespace})
       .done(function(jobStatus) {
         deferred.resolve(jobStatus);
-      }).fail(function(jobStatus) {
+      }).fail(function() {
         deferred.reject.apply(deferred, arguments);
       });
 

@@ -28,7 +28,7 @@
     all the Advanced Panels default behavior
   -->
   <LivedataBaseAdvancedPanel
-      :class="['livedata-advanced-panel-extension', 'livedata-advanced-panel-' + extension.id]"
+      :class="['livedata-advanced-panel-extension', `livedata-advanced-panel-${extension.id}`]"
       :panel-id="extension.id"
       ref="basePanel"
   >

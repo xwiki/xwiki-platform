@@ -112,7 +112,7 @@
   #set ($discard = $data.put('list', $macroList))
   ## Get macros provided by compatible available extensions
   #set ($macroExtensionsList = [])
-  #set($extensionQuery = $services.extension.index.newQuery("$!request.search"))
+  #set ($extensionQuery = $services.extension.index.newQuery("$!request.search"))
   #set ($discard = $extensionQuery.addFilter('components__org.xwiki.rendering.macro.Macro', '', 'MATCH'))
   #if ($xcontext.isMainWiki())
     #set ($discard = $extensionQuery.setCompatible(true, '', "wiki:$xcontext.database"))

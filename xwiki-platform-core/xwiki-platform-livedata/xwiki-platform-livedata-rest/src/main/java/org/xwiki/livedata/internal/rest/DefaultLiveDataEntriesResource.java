@@ -149,10 +149,11 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
         Filter filter = new Filter();
         filter.setProperty(property);
         filter.setMatchAll(matchAll);
+        String operatorSeparator = ":";
         for (String constraint : constraints) {
             // All constraint should have an operator.
-            if (constraint.contains(":")) {
-                String[] parts = constraint.split(":", 2);
+            if (constraint.contains(operatorSeparator)) {
+                String[] parts = constraint.split(operatorSeparator, 2);
                 String value = parts[1];
                 String operator = StringUtils.isBlank(parts[0]) ? null : parts[0];
                 filter.getConstraints().add(new Constraint(value, operator));

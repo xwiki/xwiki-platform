@@ -143,7 +143,7 @@
       <version>${jetty.version}</version>
       <optional>true</optional>
     </dependency>
-    <!-- We need a EL implementation for Hiberate Validator -->
+    <!-- We need a EL implementation for Hibernate Validator -->
     <dependency>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>apache-el</artifactId>

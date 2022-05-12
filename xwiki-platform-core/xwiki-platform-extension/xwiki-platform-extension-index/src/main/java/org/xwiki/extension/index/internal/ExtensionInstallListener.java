@@ -73,9 +73,9 @@ public class ExtensionInstallListener extends AbstractEventListener
         // TODO: make that asynchronous
         try {
             if (event instanceof ExtensionUninstalledEvent) {
-                onInstalled(((ExtensionEvent) event).getExtensionId(), (((ExtensionEvent) event).getNamespace()));
-            } else if (event instanceof ExtensionInstalledEvent || event instanceof ExtensionUpgradedEvent) {
                 onUninstalled(((ExtensionEvent) event).getExtensionId(), (((ExtensionEvent) event).getNamespace()));
+            } else if (event instanceof ExtensionInstalledEvent || event instanceof ExtensionUpgradedEvent) {
+                onInstalled(((ExtensionEvent) event).getExtensionId(), (((ExtensionEvent) event).getNamespace()));
             }
         } catch (Exception e) {
             this.logger.error("Failed to update the local extension store", e);

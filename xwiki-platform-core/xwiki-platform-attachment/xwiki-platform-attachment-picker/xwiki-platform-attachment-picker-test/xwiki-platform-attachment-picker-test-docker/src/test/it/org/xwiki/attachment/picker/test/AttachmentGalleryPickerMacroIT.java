@@ -35,7 +35,8 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -54,7 +55,7 @@ class AttachmentGalleryPickerMacroIT
 {
     @Test
     @Order(1)
-    void attachmentGallertPickerMacro(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    void attachmentGalleryPickerMacro(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
         throws Exception
     {
         // Login to be able to delete the page.
@@ -86,11 +87,11 @@ class AttachmentGalleryPickerMacroIT
         AttachmentGalleryPicker testPicker1 = new AttachmentGalleryPicker("testPicker1").waitUntilReady();
         List<String> picker1Attachments = testPicker1.getAttachmentTitles();
         assertTrue(picker1Attachments.size() >= 3);
-        assertEquals(List.of("image1.png", "image2.png", "textcontent.txt"), picker1Attachments.subList(0, 3));
+        assertThat(picker1Attachments.subList(0, 3), containsInAnyOrder("image1.png", "image2.png", "textcontent.txt"));
 
         // Test on a first filter matching two attachments.
         testPicker1.setSearch("image").waitUntilAttachmentsCount(2);
-        assertEquals(List.of("image1.png", "image2.png"), testPicker1.getAttachmentTitles());
+        assertThat(testPicker1.getAttachmentTitles(), containsInAnyOrder("image1.png", "image2.png"));
 
         // Test on a filter matching no attachment, a warning message is expected.
         testPicker1.setSearch("doesnotexists").waitUntilAttachmentsCount(0);
@@ -98,17 +99,17 @@ class AttachmentGalleryPickerMacroIT
 
         // Test with another filter.
         testPicker1.setSearch("textcontent").waitUntilAttachmentsCount(1);
-        assertEquals(List.of("textcontent.txt"), testPicker1.getAttachmentTitles());
+        assertThat(testPicker1.getAttachmentTitles(), containsInAnyOrder("textcontent.txt"));
 
         // Validate that the limit is taken into account.
         AttachmentGalleryPicker testPicker2 = new AttachmentGalleryPicker("testPicker2").waitUntilReady();
-        assertEquals(List.of("image1.png", "image2.png"), testPicker2.getAttachmentTitles());
+        assertThat(testPicker2.getAttachmentTitles(), containsInAnyOrder("image1.png", "image2.png"));
 
         // Validate that only images are returned.
         AttachmentGalleryPicker testPicker3 = new AttachmentGalleryPicker("testPicker3").waitUntilReady();
         List<String> picker3Attachments = testPicker3.getAttachmentTitles();
         assertTrue(picker3Attachments.size() >= 2);
-        assertEquals(List.of("image1.png", "image2.png"), picker3Attachments.subList(0, 2));
+        assertThat(picker3Attachments.subList(0, 2), containsInAnyOrder("image1.png", "image2.png"));
         testPicker3.setSearch("textcontent").waitUntilAttachmentsCount(0);
         assertTrue(testPicker3.isNoResultMessageDisplayed());
     }

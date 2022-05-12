@@ -54,9 +54,9 @@ public class AttachmentGalleryPicker extends BaseElement
     public AttachmentGalleryPicker waitUntilReady()
     {
         // The picker is ready when the loading class is not present.
-        getDriver()
-            .waitUntilCondition(
-                driver -> !this.attachmentGalleryPickerElement.getAttribute("class").contains("loading"));
+        WebElement attachmentPickerResults =
+            this.attachmentGalleryPickerElement.findElement(By.className("attachmentPickerResults"));
+        getDriver().waitUntilCondition(driver -> !attachmentPickerResults.getAttribute("class").contains("loading"));
         return this;
     }
 
@@ -92,6 +92,8 @@ public class AttachmentGalleryPicker extends BaseElement
      */
     public void waitUntilAttachmentsCount(int expectedCount)
     {
+        // Waits for the search to be finished before counting the number of results.
+        waitUntilReady();
         getDriver().waitUntilCondition(driver -> getAllAttachments().size() == expectedCount);
     }
 

@@ -21,7 +21,8 @@
 define('xwiki-attachment-picker-translation-keys', {
   prefix: 'attachment.picker.',
   keys: [
-    'solrSearch.query.errorMessage'
+    'solrSearch.query.errorMessage',
+    'searchField.placeholder',
   ]
 });
 
@@ -123,14 +124,17 @@ define('xwiki-attachment-picker',
      * Handle the rendering and the events of the search box in the attachment picker.
      */
     class SearchBlock {
-      constructor(rootBlock, searchBlock) {
+      constructor(rootBlock, searchBlock, resultsBlock) {
         this.rootBlock = rootBlock;
         this.searchBlock = searchBlock;
+        this.resultsBlock = resultsBlock;
       }
 
       initialize(cb) {
         this.searchBlock.addClass('xform');
-        this.searchBlock.html("<input type='text' />");
+        this.searchBlock.append($("<input/>")
+          .prop("type", "text")
+          .prop('placeholder', translations.get('searchField.placeholder')));
         this.solrSearch = new SolrSearch({
           limit: parseInt(this.rootBlock.data('xwiki-attachment-picker-limit')),
           solrOptions: {
@@ -147,13 +151,14 @@ define('xwiki-attachment-picker',
 
       search(query) {
         const loadingClass = 'loading';
-        this.rootBlock.addClass(loadingClass);
+        this.resultsBlock.empty();
+        this.resultsBlock.addClass(loadingClass);
         return this.solrSearch.search(query).then(this.cb)
           .catch((error) => {
             console.log(error);
             new XWiki.widgets.Notification(translations.get('solrSearch.query.errorMessage'), 'error');
           }).finally(() => {
-            this.rootBlock.removeClass(loadingClass);
+            this.resultsBlock.removeClass(loadingClass);
           });
       }
     }
@@ -166,8 +171,8 @@ define('xwiki-attachment-picker',
       constructor(attachmentGalleryPicker) {
         this.attachmentPicker = attachmentGalleryPicker;
         const attachmentPickerSearch = this.attachmentPicker.find('.attachmentPickerSearch');
-        this.searchBlock = new SearchBlock(this.attachmentPicker, attachmentPickerSearch);
         this.resultsBlock = this.attachmentPicker.find('.attachmentPickerResults');
+        this.searchBlock = new SearchBlock(this.attachmentPicker, attachmentPickerSearch, this.resultsBlock);
         this.noResultsBlock = this.attachmentPicker.find('.attachmentPickerNoResults');
       }
 

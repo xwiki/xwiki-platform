@@ -31,7 +31,7 @@ define('macroEditorTranslationKeys', [], [
 /**
  * Macro Service
  */
-define('macroService', ['jquery'], function($) {
+define('macroService', ['jquery', 'xwiki-meta'], function($, xcontext) {
   'use strict';
 
   var macroDescriptors = {},
@@ -67,7 +67,9 @@ define('macroService', ['jquery'], function($) {
       outputSyntax: 'plain',
       language: $('html').attr('lang')
     }));
-    $.get(url, {data: 'install', extensionId: extensionId, extensionVersion: extensionVersion, namespace: namespace})
+    $.post(url, {action: 'install', extensionId: extensionId, extensionVersion: extensionVersion,
+        /*jshint camelcase: false */
+    	'form_token': xcontext.form_token})
       .done(function(jobStatus) {
         deferred.resolve(jobStatus);
       }).fail(function() {

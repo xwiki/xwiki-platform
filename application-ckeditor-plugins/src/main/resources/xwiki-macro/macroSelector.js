@@ -68,8 +68,8 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
     '<li data-macroCategory="" data-macroId="" data-extensionId="" data-extensionVersion="">' +
       '<div>' +
         '<span class="macro-name"></span>' +
-        '<span class="macro-notinstalled-extension"></span>' +
-        '<span class="macro-notinstalled-badge badge"></span>' +
+        '<span class="macro-extension"></span>' +
+        '<span class="macro-category badge"></span>' +
       '</div>' +
       '<div class="macro-description"></div>' +
     '</li>',
@@ -87,14 +87,14 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
       macroListItem.find('.macro-name').text(macro.name);
       if (macro.extensionName) {
         var extensionName = ' - ' + macro.extensionName + ' ' + macro.extensionVersion;
-        macroListItem.find('.macro-notinstalled-extension').text(extensionName);
+        macroListItem.find('.macro-extension').text(extensionName);
         macroListItem.attr({
           'data-extensionId': macro.extensionId,
           'data-extensionVersion': macro.extensionVersion
         });
       }
       if (macro.defaultCategory === '_notinstalled') {
-        macroListItem.find('.macro-notinstalled-badge').text(translations.get('filter.category.notinstalled'));
+        macroListItem.find('.macro-category').text(translations.get('filter.category.notinstalled'));
       }
       macroListItem.find('.macro-description').text(macro.description);
     });
@@ -402,7 +402,6 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
         output.macroCategory = macroSelectorAPI.getSelectedMacroCategory();
         output.extensionId = macroSelectorAPI.getSelectedExtensionId();
         output.extensionVersion = macroSelectorAPI.getSelectedExtensionVersion();
-        output.extensionNamespace = macroSelectorAPI.getSelectedExtensionNamespace();
         modal.data('output', output).modal('hide');
       });
     }

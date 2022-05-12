@@ -158,7 +158,7 @@ class DefaultLiveDataEntriesResourceTest
         MultivaluedMapImpl<String, String> multivaluedMap = new MultivaluedMapImpl<>();
         multivaluedMap.putSingle("filters.age", "18");
         multivaluedMap.putSingle("filters.other", "contains:xwiki:XWiki.Admin");
-        multivaluedMap.putSingle("filters.author", "xwiki:XWiki.Author");
+        multivaluedMap.putSingle("filters.author", ":xwiki:XWiki.Author");
         multivaluedMap.putSingle("notfilter.unused", "abcd");
         when(this.uriInfo.getQueryParameters()).thenReturn(multivaluedMap);
         when(this.defaultLiveDataConfigResolver.resolve(any())).thenReturn(config);
@@ -182,7 +182,7 @@ class DefaultLiveDataEntriesResourceTest
             + "\"properties\":[\"prop1\",\"prop2\"],"
             + "\"source\":{\"id\":\"sourceId\"},"
             + "\"filters\":["
-            + "{\"property\":\"age\",\"constraints\":[{\"value\":\"18\"}]},"
+            + "{\"property\":\"age\"},"
             + "{\"property\":\"other\",\"matchAll\":true,\"constraints\":"
             + "[{\"operator\":\"contains\",\"value\":\"xwiki:XWiki.Admin\"}]"
             + "},"

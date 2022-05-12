@@ -93,7 +93,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
           'data-extensionVersion': macro.extensionVersion
         });
       }
-      if (macro.defaultCategory == '_notinstalled') {
+      if (macro.defaultCategory === '_notinstalled') {
         macroListItem.find('.macro-notinstalled-badge').text(translations.get('filter.category.notinstalled'));
       }
       macroListItem.find('.macro-description').text(macro.description);

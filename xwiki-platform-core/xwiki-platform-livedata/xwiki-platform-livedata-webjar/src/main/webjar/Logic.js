@@ -118,6 +118,7 @@ define('xwiki-livedata', [
     };
     this.openedPanels = [];
     this.footnotes = new FootnotesService();
+    this.extensionPanels = [];
 
     element.removeAttribute("data-config");
 
@@ -1451,6 +1452,23 @@ define('xwiki-livedata', [
 
     getEditBus() {
       return editBus;
+    },
+
+    /**
+     * Adds an extension panel.
+     *
+     * The panel must have the following attributes:
+     * * id: the id of the panel, must be unique among all panels, also used as suffix of the class on the panel
+     * * name: the name that shall be shown in the menu
+     * * title: the title that shall be displayed in the title bar of the panel
+     * * icon: the name of the icon for the menu and the title of the panel
+     * * bodyElement: the Element that shall be attached to the panel's body, this should contain the main UI
+     *
+     * @param {Object} panel the panel to add
+     */
+    addExtensionPanel(panel)
+    {
+      this.extensionPanels.push(panel);
     }
   };
 

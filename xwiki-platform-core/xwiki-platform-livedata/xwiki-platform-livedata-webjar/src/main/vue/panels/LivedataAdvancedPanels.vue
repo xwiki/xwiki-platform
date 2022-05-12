@@ -39,6 +39,10 @@
     <!-- Filter Panel -->
     <LivedataAdvancedPanelFilter/>
 
+    <!-- Extension Panels -->
+    <LiveDataAdvancedPanelExtension v-for="extension in logic.extensionPanels" :key="extension.id"
+                                    :extension="extension"/>
+
   </div>
 </template>
 
@@ -47,6 +51,7 @@
 import LivedataAdvancedPanelProperties from "./LivedataAdvancedPanelProperties.vue";
 import LivedataAdvancedPanelSort from "./LivedataAdvancedPanelSort.vue";
 import LivedataAdvancedPanelFilter from "./LivedataAdvancedPanelFilter.vue";
+import LiveDataAdvancedPanelExtension from "./LiveDataAdvancedPanelExtension";
 
 export default {
 
@@ -56,6 +61,7 @@ export default {
     LivedataAdvancedPanelProperties,
     LivedataAdvancedPanelSort,
     LivedataAdvancedPanelFilter,
+    LiveDataAdvancedPanelExtension,
   },
 
   inject: ["logic"],

@@ -103,6 +103,13 @@
         </a>
       </li>
 
+      <li v-for="extensionPanel in logic.extensionPanels" :key="extensionPanel.id">
+        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, extensionPanel.id)">
+          <XWikiIcon :icon-descriptor="{name: extensionPanel.icon}"/>
+          {{ extensionPanel.name }}
+        </a>
+      </li>
+
     </ul>
 
   </div>

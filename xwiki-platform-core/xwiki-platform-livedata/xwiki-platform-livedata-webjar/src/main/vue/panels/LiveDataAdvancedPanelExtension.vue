@@ -64,34 +64,34 @@ export default {
   props: {'extension': Object},
 
   methods: {
-    attachBodyElement()
+    attachContainer()
     {
       // Make sure nothing happens if this method is called several times or at the wrong time.
       if ('bodyContainer' in this.$refs) {
         const bodyContainer = this.$refs.bodyContainer;
         if (!bodyContainer.hasChildNodes()) {
-          bodyContainer.appendChild(this.extension.bodyElement);
-        } else if (bodyContainer.firstChild !== this.extension.bodyElement) {
-          bodyContainer.firstChild.replaceWith(this.extension.bodyElement);
+          bodyContainer.appendChild(this.extension.container);
+        } else if (bodyContainer.firstChild !== this.extension.container) {
+          bodyContainer.firstChild.replaceWith(this.extension.container);
         }
       }
     }
   },
 
   watch: {
-    'extension.bodyElement': function () {
-      this.attachBodyElement();
+    'extension.container': function () {
+      this.attachContainer();
     }
   },
 
   mounted()
   {
-    this.attachBodyElement();
+    this.attachContainer();
     // Watch the child's collapsed property to re-attach the body element when the body is rendered again.
     this.$watch("$refs.basePanel.collapsed", function (newValue) {
       if (!newValue) {
         // Wait for the next tick such that the change has been applied in the DOM.
-        this.$nextTick(this.attachBodyElement);
+        this.$nextTick(this.attachContainer);
       }
     });
   }

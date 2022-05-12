@@ -1462,11 +1462,11 @@ define('xwiki-livedata', [
      * * name: the name that shall be shown in the menu
      * * title: the title that shall be displayed in the title bar of the panel
      * * icon: the name of the icon for the menu and the title of the panel
-     * * bodyElement: the Element that shall be attached to the panel's body, this should contain the main UI
+     * * container: the Element that shall be attached to the panel's body, this should contain the main UI
      *
      * @param {Object} panel the panel to add
      */
-    addExtensionPanel(panel)
+    registerExtensionPanel(panel)
     {
       this.extensionPanels.push(panel);
     }

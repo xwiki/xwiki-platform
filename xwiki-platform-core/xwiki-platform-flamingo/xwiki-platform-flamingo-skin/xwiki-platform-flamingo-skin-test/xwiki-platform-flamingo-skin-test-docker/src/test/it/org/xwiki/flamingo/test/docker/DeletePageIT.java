@@ -34,6 +34,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -614,8 +615,8 @@ class DeletePageIT
         List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
 
         // there is a single node for the xclass:
-        //  1. to represent free pages
-        //  2. to represent classes with associated objects
+        // 1. to represent free pages
+        // 2. to represent classes with associated objects
         assertEquals(1, topLevelNodes.size());
 
         TreeNodeElement classPage = topLevelNodes.get(0);
@@ -647,5 +648,121 @@ class DeletePageIT
         setup.gotoPage(frenchXClassTranslation);
         deletePageOutcomePage = new DeletePageOutcomePage();
         assertEquals("Impossible de trouver ce document.", deletePageOutcomePage.getMessage());
+    }
+
+    /**
+     * Check that when a new target document is selected, the backlinks are updated to the new value and the redirect is
+     * working when accessing the old page.
+     *
+     * @since 14.4RC1
+     */
+    @Test
+    @Order(13)
+    void deleteWithUpdateLinksAndAutoRedirect(TestUtils testUtils, TestReference reference) throws Exception
+    {
+        DocumentReference backlinkDocumentReference = new DocumentReference("xwiki", "Backlink", "WebHome");
+        DocumentReference newTargetReference = new DocumentReference("xwiki", "NewTarget", "WebHome");
+
+        testUtils.createPage(reference, PAGE_CONTENT, PAGE_TITLE);
+        // Create backlink.
+        testUtils.createPage(backlinkDocumentReference,
+            String.format("[[Link>>doc:%s]]", testUtils.serializeReference(reference)), "Backlink document");
+        testUtils.createPage(newTargetReference, "", "New target");
+
+        // Delete page and provide a new target, with updateLinks and autoRedirect enabled.
+        ViewPage viewPage = testUtils.gotoPage(reference);
+        DeletePageConfirmationPage confirmationPage = viewPage.deletePage();
+        confirmationPage.getBacklinkPanelExpandButton().click();
+        confirmationPage.setNewTarget(testUtils.serializeReference(newTargetReference));
+        confirmationPage.setUpdateLinks(true);
+        confirmationPage.setAutoRedirect(true);
+        confirmationPage.clickYes();
+        DeletingPage deletingPage = new DeletingPage();
+        deletingPage.waitUntilFinished();
+
+        // Verify that a redirect was added and the link was updated.
+        viewPage = testUtils.gotoPage(reference);
+        assertEquals("New target", this.viewPage.getDocumentTitle());
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals("[[Link>>doc:NewTarget.WebHome]]",
+            testUtils.rest().<Page>get(backlinkDocumentReference).getContent());
+    }
+
+    /**
+     * Check that if a new target is not selected, the backlinks are not altered and no redirect is added.
+     *
+     * @since 14.4RC1
+     */
+    @Test
+    @Order(14)
+    void deleteWithoutNewTarget(TestUtils testUtils, TestReference reference) throws Exception
+    {
+        DocumentReference backlinkDocReference = new DocumentReference("xwiki", "Backlink", "WebHome");
+        String backlinkDocContent = String.format("[[Link>>doc:%s]]", testUtils.serializeReference(reference));
+
+        testUtils.createPage(reference, PAGE_CONTENT, PAGE_TITLE);
+        // Create backlink.
+        testUtils.createPage(backlinkDocReference, backlinkDocContent, "Backlink document");
+
+        // Delete page without specifying a new target.
+        ViewPage viewPage = testUtils.gotoPage(reference);
+        DeletePageConfirmationPage confirmationPage = viewPage.deletePage();
+        confirmationPage.clickYes();
+        DeletingPage deletingPage = new DeletingPage();
+        deletingPage.waitUntilFinished();
+
+        // Verify that there is no redirect and the links were not altered.
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
+        assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
+        assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
+        assertEquals(String.format("[[Link>>doc:%s]]", testUtils.serializeReference(reference).split(":")[1]),
+            testUtils.rest().<Page>get(backlinkDocReference).getContent());
+    }
+
+    /**
+     * Test that when you delete a page and you select "affect children" along with a new target document, only the
+     * parent page has the backlinks updated a the redirect added.
+     *
+     * @since 14.4RC1
+     */
+    @Test
+    @Order(15)
+    void deleteWithAffectChildrenAndNewTarget(TestUtils testUtils, TestReference parentReference) throws Exception
+    {
+        DocumentReference childReference = new DocumentReference("Child", parentReference.getLastSpaceReference());
+        String childFullName = testUtils.serializeReference(childReference).split(":")[1];
+        DocumentReference backlinkDocReference = new DocumentReference("xwiki", "Backlink", "WebHome");
+        DocumentReference newTargetReference = new DocumentReference("xwiki", "NewTarget", "WebHome");
+
+        testUtils.createPage(parentReference, "Content", "Parent");
+        testUtils.createPage(childReference, "", "Child");
+        testUtils.createPage(newTargetReference, "", "New target");
+        // Create backlinks to the parent and the child page.
+        String format = "[[Parent>>doc:%s]] [[Child>>doc:%s]]";
+        testUtils.createPage(backlinkDocReference,
+            String.format(format, testUtils.serializeReference(parentReference), childFullName), "Backlink document");
+
+        // Delete parent page with affectChildren and newTarget (updateLinks and autoRedirect enabled).
+        ViewPage parentPage = testUtils.gotoPage(parentReference);
+        DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
+        confirmationPage.setAffectChildren(true);
+        confirmationPage.getBacklinkPanelExpandButton().click();
+        confirmationPage.setNewTarget(testUtils.serializeReference(newTargetReference));
+        confirmationPage.setUpdateLinks(true);
+        confirmationPage.setAutoRedirect(true);
+        confirmationPage.clickYes();
+        DeletingPage deletingPage = new DeletingPage();
+        deletingPage.waitUntilFinished();
+
+        // Verify that there is no redirect on the child page and backlink was not altered.
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        String newContent =
+            String.format(format, testUtils.serializeReference(newTargetReference).split(":")[1], childFullName);
+        assertEquals(newContent, testUtils.rest().<Page>get(backlinkDocReference).getContent());
+        parentPage = testUtils.gotoPage(parentReference);
+        assertEquals("New target", parentPage.getDocumentTitle());
+        ViewPage childPage = testUtils.gotoPage(childReference);
+        assertEquals("Child", childPage.getDocumentTitle());
     }
 }

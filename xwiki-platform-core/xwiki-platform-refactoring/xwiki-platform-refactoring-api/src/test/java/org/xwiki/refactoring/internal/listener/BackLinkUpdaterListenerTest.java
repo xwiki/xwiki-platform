@@ -19,17 +19,29 @@
  */
 package org.xwiki.refactoring.internal.listener;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.job.JobContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.job.DeleteJob;
 import org.xwiki.refactoring.internal.job.RenameJob;
+import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -39,13 +51,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link BackLinkUpdaterListener}.
@@ -70,8 +75,14 @@ public class BackLinkUpdaterListenerTest
     @MockComponent
     private ContextualAuthorizationManager authorization;
 
+    @MockComponent
+    private JobContext jobContext;
+
     @Mock
     private RenameJob renameJob;
+
+    @Mock
+    private DeleteJob deleteJob;
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
@@ -86,7 +97,11 @@ public class BackLinkUpdaterListenerTest
 
     private DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(aliceReference, bobReference);
 
+    private DocumentDeletedEvent documentDeletedEvent = new DocumentDeletedEvent(aliceReference);
+
     private MoveRequest renameRequest = new MoveRequest();
+
+    private DeleteRequest deleteRequest = new DeleteRequest();
 
     @BeforeEach
     public void configure() throws Exception
@@ -94,6 +109,11 @@ public class BackLinkUpdaterListenerTest
         when(wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("foo", "bar"));
         when(this.modelBridge.getBackLinkedReferences(aliceReference, "foo")).thenReturn(Arrays.asList(carolReference));
         when(this.modelBridge.getBackLinkedReferences(aliceReference, "bar")).thenReturn(Arrays.asList(denisReference));
+
+        when(this.jobContext.getCurrentJob()).thenReturn(deleteJob);
+        when(this.deleteJob.getRequest()).thenReturn(deleteRequest);
+        deleteRequest.setNewTarget(bobReference);
+        when(this.deleteJob.getCommonParent()).thenReturn(aliceReference);
     }
 
     @Test
@@ -187,6 +207,97 @@ public class BackLinkUpdaterListenerTest
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
+    }
+
+    @Test
+    public void onDocumentDeletedWithUpdateLinksOnFarm()
+    {
+        deleteRequest.setUpdateLinks(true);
+        deleteRequest.setUpdateLinksOnFarm(true);
+
+        when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
+        when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
+
+        this.listener.onEvent(documentDeletedEvent, null, null);
+
+        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
+        verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
+    }
+    
+    @Test
+    public void onDocumentDeletedWithUpdateLinksOnFarmOnChildDoc()
+    {
+        deleteRequest.setUpdateLinks(true);
+        deleteRequest.setUpdateLinksOnFarm(true);
+
+        SpaceReference parentReference = new SpaceReference("foo", "Users");
+        when(this.deleteJob.getCommonParent()).thenReturn(parentReference);
+        when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
+        when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
+
+        this.listener.onEvent(documentDeletedEvent, null, null);
+
+        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
+    }
+
+    @Test
+    public void onDocumentDeleteWithUpdateLinksOnFarmAndNoEditRight()
+    {
+        deleteRequest.setUpdateLinks(true);
+        deleteRequest.setUpdateLinksOnFarm(true);
+
+        when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
+        when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(false);
+
+        this.listener.onEvent(documentDeletedEvent, null, null);
+
+        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
+        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
+
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
+    }
+
+    @Test
+    public void onDocumentDeleteWithUpdateLinksOnWiki()
+    {
+        deleteRequest.setUpdateLinks(true);
+        deleteRequest.setUpdateLinksOnFarm(false);
+
+        when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
+
+        this.listener.onEvent(documentDeletedEvent, null, null);
+
+        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
+        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
+
+        assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
+    }
+
+    @Test
+    public void onDocumentDeletedWithoutUpdateLinks()
+    {
+        deleteRequest.setUpdateLinks(false);
+        deleteRequest.setUpdateLinksOnFarm(true);
+
+        this.listener.onEvent(documentDeletedEvent, null, null);
+
+        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
+    }
+
+    @Test
+    public void onDocumentDeletedWithoutDeleteJob()
+    {
+        when(this.jobContext.getCurrentJob()).thenReturn(null);
+        when(this.authorization.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
+
+        this.listener.onEvent(documentDeletedEvent, null, null);
+
+        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
     }
 
     @Test

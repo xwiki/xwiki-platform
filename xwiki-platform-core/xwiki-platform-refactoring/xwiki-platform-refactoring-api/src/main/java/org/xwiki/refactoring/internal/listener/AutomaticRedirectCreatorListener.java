@@ -24,15 +24,23 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.JobContext;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.job.DeleteJob;
+import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 
 /**
- * Creates an automatic redirect from the old location to the new location after a document has been renamed.
+ * Creates an automatic redirect from the old location to the new location after a document has been renamed or deleted.
  * 
  * @version $Id$
  * @since 11.1RC1
@@ -47,18 +55,23 @@ public class AutomaticRedirectCreatorListener extends AbstractEventListener
      */
     public static final String NAME = "refactoring.automaticRedirectCreator";
 
+    private static final String CREATING_AUTOMATIC_REDIRECT_FROM_TO = "Creating automatic redirect from [{}] to [{}].";
+
     @Inject
     private Logger logger;
 
     @Inject
     private ModelBridge modelBridge;
 
+    @Inject
+    private JobContext jobContext;
+
     /**
      * Default constructor.
      */
     public AutomaticRedirectCreatorListener()
     {
-        super(NAME, new DocumentRenamedEvent());
+        super(NAME, new DocumentRenamedEvent(), new DocumentDeletedEvent());
     }
 
     @Override
@@ -71,11 +84,34 @@ public class AutomaticRedirectCreatorListener extends AbstractEventListener
             }
             if (autoRedirect) {
                 DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
-                this.logger.info("Creating automatic redirect from [{}] to [{}].",
-                    documentRenamedEvent.getSourceReference(), documentRenamedEvent.getTargetReference());
+                this.logger.info(CREATING_AUTOMATIC_REDIRECT_FROM_TO, documentRenamedEvent.getSourceReference(),
+                    documentRenamedEvent.getTargetReference());
                 this.modelBridge.createRedirect(documentRenamedEvent.getSourceReference(),
                     documentRenamedEvent.getTargetReference());
             }
+        } else if (event instanceof DocumentDeletedEvent && this.jobContext.getCurrentJob() instanceof DeleteJob) {
+            DeleteJob job = (DeleteJob) this.jobContext.getCurrentJob();
+            DeleteRequest request = (DeleteRequest) job.getRequest();
+            DocumentDeletedEvent documentDeletedEvent = (DocumentDeletedEvent) event;
+
+            // For case when the delete affects also the child pages, only the root document should have a redirect
+            // created.
+            if (request.isAutoRedirect()
+                && isRootDoc(job.getCommonParent(), documentDeletedEvent.getSourceReference())) {
+                this.logger.info(CREATING_AUTOMATIC_REDIRECT_FROM_TO, documentDeletedEvent.getSourceReference(),
+                    request.getNewTarget());
+                this.modelBridge.createRedirect(documentDeletedEvent.getSourceReference(), request.getNewTarget());
+            }
         }
+    }
+
+    private boolean isRootDoc(EntityReference commonParent, DocumentReference deletedDocReference)
+    {
+        if (commonParent.getType() == EntityType.SPACE) {
+            DocumentReference spaceWebHomeReference =
+                new DocumentReference("WebHome", new SpaceReference(commonParent));
+            return spaceWebHomeReference.equals(deletedDocReference);
+        }
+        return true;
     }
 }

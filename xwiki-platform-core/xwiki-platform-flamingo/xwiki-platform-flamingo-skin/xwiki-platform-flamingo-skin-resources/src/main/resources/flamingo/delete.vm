@@ -32,7 +32,10 @@
 #######################################################
 ##                     DISPLAY
 #######################################################
+#set ($discard = $xwiki.jsfx.use('js/xwiki/delete.js'))
 #template('refactoringStatus_macros.vm')
+#template('refactoring_macros.vm')
+#template('xwikivars.vm')
 
 #controller()
 #macro(displayContent $deletecontent)
@@ -117,7 +120,7 @@
 ##            DISPLAY CONFIRMATION PAGE
 #######################################################
 #macro(displayConfirmationPage)
-  <form action="$doc.getURL('delete', "$!{languageparams}")" method="post">
+  <form id="delete" class="xform" action="$doc.getURL('delete', "$!{languageparams}")" method="post">
     #getChildren()
     #getBacklinks()
     #getChildren_legacy()
@@ -228,7 +231,36 @@
       #end
       </ul>
     #end
-    #set($body = $services.localization.render('core.delete.backlinksWarning', [$message]))
+    #define($body)
+      <p class="noitems">
+        $services.localization.render('core.delete.backlinksInfo', [$doc.backlinks.size()])
+      </p>
+      <dl>
+        <dt>
+          <label for="newTarget">$services.localization.render('core.delete.target.label')</label>
+          <span class="xHint">$services.localization.render('core.delete.target.hint')</span>
+        </dt>
+        <dd>
+          #set ($pagePickerParams = {
+            'id': 'newTarget',
+            'name': 'newTarget'
+          })
+          #pagePicker($pagePickerParams)
+        </dd>
+        ##------------
+        ## Links field
+        ##------------
+        #displayLinksCheckbox({
+          'label': 'core.delete.updateLinks.label',
+          'hint': 'core.delete.updateLinks.hint',
+          'hidden': true
+        })
+        #displayAutoRedirectCheckbox({
+          'label': 'core.delete.autoRedirect.label',
+          'hint': 'core.delete.autoRedirect.hint',
+          'hidden': true
+        })
+    #end
     #displayPanel('panel-backlinks', 'panel-default', $heading, $body)
     #set($hasInlinks = true)
   #end

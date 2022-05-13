@@ -30,18 +30,7 @@
 <template>
   <div class="livedata-advanced-panels">
 
-    <!-- Properties Panel -->
-    <LivedataAdvancedPanelProperties/>
-
-    <!-- Sort Panel -->
-    <LivedataAdvancedPanelSort/>
-
-    <!-- Filter Panel -->
-    <LivedataAdvancedPanelFilter/>
-
-    <!-- Extension Panels -->
-    <LiveDataAdvancedPanelExtension v-for="extension in logic.extensionPanels" :key="extension.id"
-                                    :extension="extension"/>
+    <component v-for="panel in logic.panels" :is="panel.component" :key="panel.id" :panel="panel"/>
 
   </div>
 </template>

@@ -28,15 +28,15 @@
     all the Advanced Panels default behavior
   -->
   <LivedataBaseAdvancedPanel
-      :class="['livedata-advanced-panel-extension', `livedata-advanced-panel-${extension.id}`]"
-      :panel-id="extension.id"
+      :class="['livedata-advanced-panel-extension', `livedata-advanced-panel-${panel.id}`]"
+      :panel-id="panel.id"
       ref="basePanel"
   >
 
     <!-- Provide the panel title and icon to the `header` slot -->
     <template #header>
-      <XWikiIcon :icon-descriptor="{name: extension.icon}"/>
-      {{ extension.title }}
+      <XWikiIcon :icon-descriptor="{name: panel.icon}"/>
+      {{ panel.title }}
     </template>
 
     <!-- Define panel content inside the `body` slot -->
@@ -61,7 +61,7 @@ export default {
 
   inject: ["logic"],
 
-  props: {'extension': Object},
+  props: {'panel': Object},
 
   methods: {
     attachContainer()
@@ -70,16 +70,16 @@ export default {
       if ('bodyContainer' in this.$refs) {
         const bodyContainer = this.$refs.bodyContainer;
         if (!bodyContainer.hasChildNodes()) {
-          bodyContainer.appendChild(this.extension.container);
-        } else if (bodyContainer.firstChild !== this.extension.container) {
-          bodyContainer.firstChild.replaceWith(this.extension.container);
+          bodyContainer.appendChild(this.panel.container);
+        } else if (bodyContainer.firstChild !== this.panel.container) {
+          bodyContainer.firstChild.replaceWith(this.panel.container);
         }
       }
     }
   },
 
   watch: {
-    'extension.container': function () {
+    'panel.container': function () {
       this.attachContainer();
     }
   },

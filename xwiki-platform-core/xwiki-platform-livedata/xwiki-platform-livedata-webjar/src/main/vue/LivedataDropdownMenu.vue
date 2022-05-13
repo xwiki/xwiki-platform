@@ -82,31 +82,10 @@
 
       <li class="dropdown-header">{{ $t('livedata.dropdownMenu.panels') }}</li>
 
-      <!-- Properties Panel -->
-      <li>
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'propertiesPanel')">
-          <XWikiIcon :icon-descriptor="{name: 'list-bullets'}" /> {{ $t('livedata.dropdownMenu.panels.properties') }}
-        </a>
-      </li>
-
-      <!-- Sort Panel -->
-      <li>
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'sortPanel')">
-          <XWikiIcon :icon-descriptor="{name: 'table_sort'}"/> {{ $t('livedata.dropdownMenu.panels.sort') }}
-        </a>
-      </li>
-
-      <!-- Filter Panel -->
-      <li>
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'filterPanel')">
-          <XWikiIcon :icon-descriptor="{name: 'filter'}"/> {{ $t('livedata.dropdownMenu.panels.filter') }}
-        </a>
-      </li>
-
-      <li v-for="extensionPanel in logic.extensionPanels" :key="extensionPanel.id">
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, extensionPanel.id)">
-          <XWikiIcon :icon-descriptor="{name: extensionPanel.icon}"/>
-          {{ extensionPanel.name }}
+      <li v-for="panel in logic.panels" :key="panel.id">
+        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, panel.id)">
+          <XWikiIcon :icon-descriptor="{name: panel.icon}"/>
+          {{ panel.name }}
         </a>
       </li>
 

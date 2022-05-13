@@ -118,7 +118,7 @@ define('xwiki-livedata', [
     };
     this.openedPanels = [];
     this.footnotes = new FootnotesService();
-    this.extensionPanels = [];
+    this.panels = [];
 
     element.removeAttribute("data-config");
 
@@ -248,6 +248,34 @@ define('xwiki-livedata', [
     this.translationsLoaded = async() => {
       await translationsPromise;
     }
+
+    // Registers panels once the translations have been loadded as they are otherwise hard to update.
+    this.translationsLoaded().then(() => {
+      this.registerPanel({
+        id: 'propertiesPanel',
+        title: vue.$t('livedata.panel.properties.title'),
+        name: vue.$t('livedata.dropdownMenu.panels.properties'),
+        icon: 'list-bullets',
+        component: 'LivedataAdvancedPanelProperties',
+        order: 1000
+      });
+      this.registerPanel({
+        id: 'sortPanel',
+        title: vue.$t('livedata.panel.sort.title'),
+        name: vue.$t('livedata.dropdownMenu.panels.sort'),
+        icon: 'table_sort',
+        component: 'LivedataAdvancedPanelSort',
+        order: 2000
+      });
+      this.registerPanel({
+        id: 'filterPanel',
+        title: vue.$t('livedata.panel.filter.title'),
+        name: vue.$t('livedata.dropdownMenu.panels.filter'),
+        icon: 'filter',
+        component: 'LivedataAdvancedPanelFilter',
+        order: 3000
+      });
+    });
   };
 
 
@@ -1455,20 +1483,28 @@ define('xwiki-livedata', [
     },
 
     /**
-     * Adds an extension panel.
+     * Registers a panel.
      *
      * The panel must have the following attributes:
      * * id: the id of the panel, must be unique among all panels, also used as suffix of the class on the panel
      * * name: the name that shall be shown in the menu
      * * title: the title that shall be displayed in the title bar of the panel
      * * icon: the name of the icon for the menu and the title of the panel
-     * * container: the Element that shall be attached to the panel's body, this should contain the main UI
+     * * container: the Element that shall be attached to the extension panel's body, this should contain the main UI
+     * * component: the component of the panel, should be "LiveDataAdvancedPanelExtension" for extension panels
+     * * order: the ordering number, panels are sorted by this number in ascending order
      *
      * @param {Object} panel the panel to add
      */
-    registerExtensionPanel(panel)
+    registerPanel(panel)
     {
-      this.extensionPanels.push(panel);
+      // Basic insertion sorting to avoid shuffling the (reactive) array.
+      const index = this.panels.findIndex(p => p.order > panel.order);
+      if (index === -1) {
+        this.panels.push(panel);
+      } else {
+        this.panels.splice(index, 0, panel);
+      }
     }
   };
 

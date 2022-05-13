@@ -132,9 +132,13 @@ define('xwiki-livedata', [
       silentFallbackWarn: true,
     });
 
+    // Vue.js replaces the container - prevent this by creating a placeholder for Vue.js to replace.
+    const placeholderElement = document.createElement('div');
+    this.element.appendChild(placeholderElement);
+
     // create Vuejs instance
     const vue = new Vue({
-      el: this.element,
+      el: placeholderElement,
       components: {
         "XWikiLivedata": XWikiLivedata,
       },
@@ -143,6 +147,10 @@ define('xwiki-livedata', [
       data: {
         logic: this
       },
+      mounted()
+      {
+        element.classList.remove('loading');
+      }
     });
 
     // Fetch the data if we don't have any. This call must be made just after the main Vue component is initialized as 

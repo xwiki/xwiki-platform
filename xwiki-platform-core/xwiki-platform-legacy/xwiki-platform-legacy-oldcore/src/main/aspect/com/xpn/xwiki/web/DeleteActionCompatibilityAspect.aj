@@ -58,6 +58,6 @@ public privileged aspect DeleteActionCompatibilityAspect
     public boolean DeleteAction.deleteToRecycleBin(EntityReference entityReference, XWikiContext context)
         throws XWikiException
     {
-        return this.deleteDocument(entityReference, context, false);
+        return this.deleteDocument(entityReference, context, false, null, false, false);
     }
 }

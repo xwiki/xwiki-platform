@@ -19,22 +19,30 @@
  */
 package org.xwiki.refactoring.internal.listener;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mock;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.job.JobContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.job.DeleteJob;
+import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for {@link AutomaticRedirectCreatorListener}.
@@ -50,8 +58,14 @@ class AutomaticRedirectCreatorListenerTest
     @MockComponent
     private ModelBridge modelBridge;
 
+    @MockComponent
+    private JobContext jobContext;
+
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+
+    @Mock
+    private DeleteJob deleteJob;
 
     private DocumentReference oldReference = new DocumentReference("wiki", "Users", "Alice");
 
@@ -59,7 +73,20 @@ class AutomaticRedirectCreatorListenerTest
 
     private DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(oldReference, newReference);
 
+    private DocumentDeletedEvent documentDeletedEvent = new DocumentDeletedEvent(oldReference);
+
     private MoveRequest renameRequest = new MoveRequest();
+
+    private DeleteRequest deleteRequest = new DeleteRequest();
+
+    @BeforeEach
+    public void configure() throws Exception
+    {
+        when(this.jobContext.getCurrentJob()).thenReturn(deleteJob);
+        when(this.deleteJob.getRequest()).thenReturn(deleteRequest);
+        deleteRequest.setNewTarget(newReference);
+        when(this.deleteJob.getCommonParent()).thenReturn(oldReference);
+    }
 
     @Test
     void onDocumentRenamedWithAutomaticRedirect()
@@ -93,5 +120,51 @@ class AutomaticRedirectCreatorListenerTest
 
         assertEquals("Creating automatic redirect from [wiki:Users.Alice] to [wiki:Users.Bob].",
             logCapture.getMessage(0));
+    }
+
+    @Test
+    void onDocumentDeletedWithAutomaticRedirect()
+    {
+        deleteRequest.setAutoRedirect(true);
+
+        this.listener.onEvent(documentDeletedEvent, null, null);
+
+        verify(this.modelBridge).createRedirect(oldReference, newReference);
+
+        assertEquals("Creating automatic redirect from [wiki:Users.Alice] to [wiki:Users.Bob].",
+            logCapture.getMessage(0));
+    }
+
+    @Test
+    void onDocumentDeletedWithAutomaticRedirectOnChildDoc()
+    {
+        deleteRequest.setAutoRedirect(true);
+
+        SpaceReference parentReference = new SpaceReference("wiki", "Users");
+        when(this.deleteJob.getCommonParent()).thenReturn(parentReference);
+
+        this.listener.onEvent(documentDeletedEvent, null, null);
+
+        verify(this.modelBridge, never()).createRedirect(any(), any());
+    }
+
+    @Test
+    void onDocumentDeletedWithoutAutomaticRedirect()
+    {
+        deleteRequest.setAutoRedirect(false);
+
+        this.listener.onEvent(documentDeletedEvent, null, deleteRequest);
+
+        verify(this.modelBridge, never()).createRedirect(any(), any());
+    }
+
+    @Test
+    void onDocumentDeletedWithoutDeleteJob()
+    {
+        when(this.jobContext.getCurrentJob()).thenReturn(null);
+
+        this.listener.onEvent(documentDeletedEvent, null, null);
+
+        verify(this.modelBridge, never()).createRedirect(any(), any());
     }
 }

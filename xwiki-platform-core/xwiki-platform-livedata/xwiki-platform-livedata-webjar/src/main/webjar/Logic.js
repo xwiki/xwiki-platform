@@ -147,6 +147,11 @@ define('xwiki-livedata', [
       mounted()
       {
         element.classList.remove('loading');
+        // Trigger the "instanceCreated" event on the next tick to ensure that the constructor has returned and thus
+        // all references to the logic instance have been initialized.
+        this.$nextTick(function () {
+          this.logic.triggerEvent('instanceCreated', {});
+        });
       }
     });
 

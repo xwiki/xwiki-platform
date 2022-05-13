@@ -250,7 +250,7 @@ define('xwiki-livedata', [
     }
 
     // Registers panels once the translations have been loadded as they are otherwise hard to update.
-    this.translationsLoaded().then(() => {
+    this.translationsLoaded().finally(() => {
       this.registerPanel({
         id: 'propertiesPanel',
         title: vue.$t('livedata.panel.properties.title'),

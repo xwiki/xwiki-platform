@@ -33,15 +33,9 @@
   <description>Tests for the Extension Manager Application</description>
   <properties>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <!-- Notes:
-         - Exclude the ExtensionTest.Service page created by the test so that the PR checker doesn't check it since
-           the test creates this page with Groovy code and thus requires PR FTM
-         - Exclude XWiki.Extensions since it requires PR to provide a JobStatus that is not a SafeJobRequest.
-           Using a SafeJobRequest is a problem since it wraps an InstallRequest and thus the
-           ExtensionManagerScriptService#install(InstallRequest) fails to be called from Velocity (since Velocity
-           looks for a method having a parameter of type SafeRequest, which doesn't exist.
-     -->
-    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:ExtensionTest\.Service|.*:XWiki\.Extensions</xwikiPropertiesAdditionalProperties>
+    <!-- Exclude the ExtensionTest.Service page created by the test so that the PR checker doesn't check it since
+         the test creates this page with Groovy code and thus requires PR FTM -->
+    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:ExtensionTest\.Service</xwikiPropertiesAdditionalProperties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

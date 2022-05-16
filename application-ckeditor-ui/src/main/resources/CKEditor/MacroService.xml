@@ -56,7 +56,23 @@
 ##       'id': (macro id),
 ##       'name': (translated macro name),
 ##       'description': (translated macro description),
-##       'defaultCategory': (translated macro category),
+##       'defaultCategory': (translated macro category)
+##     },
+##     ...
+##   ],
+##   'notinstalled': [
+##     {
+##       'id': (macro id),
+##       'name': (translated macro name),
+##       'description': (translated macro description),
+##       'defaultCategory': '_notinstalled',
+##       'extensionId':	(extension id)
+##       'extensionVersion': (extension version)
+##       'extensionType': (extension type)
+##       'extensionRecommended': (is extension recommended)
+##       'extensionName': (extension name)
+##       'extensionSummary': (extension summary)
+##       ]
 ##     },
 ##     ...
 ##   ]
@@ -94,6 +110,47 @@
   #end
   #set ($macroList = $resolvedSortTool.sort($macroList, 'name'))
   #set ($discard = $data.put('list', $macroList))
+  ## Get macros provided by compatible available extensions
+  #set ($macroExtensionsList = [])
+  #set($extensionQuery = $services.extension.index.newQuery("$!request.search"))
+  #set ($discard = $extensionQuery.addFilter('components__org.xwiki.rendering.macro.Macro', '', 'MATCH'))
+  #if ($xcontext.isMainWiki())
+    #set ($discard = $extensionQuery.setCompatible(true, '', "wiki:$xcontext.database"))
+  #else
+    #set ($discard = $extensionQuery.setCompatible(true, "wiki:$xcontext.database"))
+  #end
+  #set ($discard = $extensionQuery.setInstalled(false, '', "wiki:$xcontext.database"))
+  #set ($extensions = $services.extension.index.repository.search($extensionQuery))
+  #set ($macroExtensionCategory = $services.localization.render('ckeditor.plugin.macro.notinstalled'))
+  #if ($extensions.size &gt; 0)
+    #set ($macroExtensionsMap = {})
+    #foreach ($extension in $extensions)
+      ## TODO: move to a proper generic API to check if an extension can be installed by a given user
+      #if ($services.security.authorization.hasAccess('programming')
+        || (($extension.type == 'xar' || $extension.type == 'webjar')
+            &amp;&amp; $services.security.authorization.hasAccess('admin', "wiki:$xcontext.database") &amp;&amp; $services.extension.isAllowed($extension, "wiki:$xcontext.database")))
+        #foreach ($extensionComponent in $extension.getComponents())
+          #if ($extensionComponent.roleType == 'org.xwiki.rendering.macro.Macro')
+            #set ($discard = $macroExtensionsList.add({
+                'id' : {
+                    'id' : $extensionComponent.roleHint
+                  },
+                'name': $extensionComponent.roleHint,
+                'description': $extension.summary,
+                'defaultCategory': '_notinstalled',
+                'extensionId' : $extension.id.id,
+                'extensionVersion' : $extension.id.version.value,
+                'extensionType' : $extension.type,
+                'extensionRecommended': $extension.recommended,
+                'extensionName': $extension.name,
+                'extensionSummary': $extension.summary
+              }))
+          #end
+        #end
+      #end
+    #end
+    #set ($discard = $data.put('notinstalled', $macroExtensionsList))
+  #end
 #end
 
 #macro (maybeGetMacroDescriptor $macroIdAsString)
@@ -334,10 +391,58 @@
     $!defaultValue##
   #end
 #end
+
+#macro (installMacroExtension $extensionId, $extensionVersion)
+  #set ($extension = $services.extension.index.repository.resolve("$extensionId/$extensionVersion"))
+  #if ($extension)
+    ## Find where to install it
+    ## 1) Check if a diffferent version is already installed
+    ## 2) Check if it's allowed to install it at current wiki level
+    #set ($rootNamespace = $NULL)
+    #set ($currentWikiNamespace = "wiki:$xcontext.database")
+    #if ($services.extension.installed.getInstalledExtension($extensionId, $rootNamespace))
+      #set ($extensionNamespace = $rootNamespace)
+    #elseif ($services.extension.installed.getInstalledExtension($extensionId, $currentWikiNamespace))
+      #set ($extensionNamespace = $currentWikiNamespace)
+    #else
+      #if ($services.extension.isAllowed($extension, "wiki:$xcontext.database"))
+        #set ($extensionNamespace = $currentWikiNamespace)
+      #else
+        #set ($extensionNamespace = $NULL)
+      #end
+    #end
+    ## Make the install non interractive
+    #set ($installRequest = $services.extension.createInstallRequest($extensionId, $extensionVersion, $extensionNamespace))
+    #set ($discard = $installRequest.setInteractive(false))
+    ## Start the install
+    #set ($job = $services.extension.install($installRequest))
+    ## Wait for the job to finish
+    #set ($discard = $job.join())
+    #if ($job.status.error)
+      ## The install failed
+      $response.sendError(500, $exceptiontool.getRootCauseMessage($job.status.error))
+    #else
+      ## The install succeeded
+      #set ($data = {
+        'extensionId': $extensionId,
+        'extensionVersion': $extensionVersion,
+        'extensionNamespace': $extensionNamespace
+      })
+    #end
+  #else
+    $response.sendError(404, $exceptiontool.getRootCauseMessage($job.status.error))
+  #end
+#end
 {{/velocity}}
 
 {{velocity wiki="false"}}
-#if ("$!request.data" != '')
+#if ("$!request.action" == 'install')
+  #if ($services.csrf.isTokenValid($request.form_token))
+    #installMacroExtension($request.extensionId, $request.extensionVersion)
+  #else
+    $response.sendError(403)
+  #end
+#elseif ("$!request.data" != '')
   #set ($data = $NULL)
   #if ($request.data == 'list')
     #getMacroList($request.syntaxId)

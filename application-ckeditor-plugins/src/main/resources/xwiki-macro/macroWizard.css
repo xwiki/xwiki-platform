@@ -34,6 +34,7 @@ ul.macro-parameters .macro-parameter-name {
 }
 
 ul.macro-list .macro-description,
+ul.macro-list .macro-extension,
 .macro-editor .macro-description,
 ul.macro-parameters .macro-parameter-description,
 ul.macro-parameters > li.more,
@@ -42,6 +43,11 @@ ul.macro-parameter-group-members > li.more {
   color: #656565;
   color: $theme.textSecondaryColor;
   font-size: smaller;
+}
+
+
+ul.macro-list .macro-extension {
+  margin-right: 1em;
 }
 
 .macro-name::first-letter,

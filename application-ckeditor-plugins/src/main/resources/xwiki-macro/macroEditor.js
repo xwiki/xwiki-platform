@@ -22,6 +22,7 @@ define('macroEditorTranslationKeys', [], [
   'changeMacro',
   'submit',
   'descriptorRequestFailed',
+  'installRequestFailed',
   'noParameters',
   'content',
   'more'
@@ -30,7 +31,7 @@ define('macroEditorTranslationKeys', [], [
 /**
  * Macro Service
  */
-define('macroService', ['jquery'], function($) {
+define('macroService', ['jquery', 'xwiki-meta'], function($, xcontext) {
   'use strict';
 
   var macroDescriptors = {},
@@ -57,10 +58,25 @@ define('macroService', ['jquery'], function($) {
       });
     }
     return deferred.promise();
+  },
+
+  installMacro = function(extensionId, extensionVersion) {
+    var deferred = $.Deferred();
+
+    var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', $.param({
+      outputSyntax: 'plain',
+      language: $('html').attr('lang')
+    }));
+    return $.post(url, {action: 'install', extensionId: extensionId, extensionVersion: extensionVersion,
+        /*jshint camelcase: false */
+    	'form_token': xcontext.form_token});
+
+    return deferred.promise();
   };
 
   return {
-    getMacroDescriptor: getMacroDescriptor
+    getMacroDescriptor: getMacroDescriptor,
+    installMacro: installMacro
   };
 });
 
@@ -587,12 +603,12 @@ define(
     }
   },
 
-  maybeShowError = function(requestNumber) {
+  maybeShowError = function(requestNumber, messageKey) {
     // Check if the error corresponds to the last request.
     if (this.prop('requestNumber') === requestNumber) {
       this.removeClass('loading').append(
         '<div class="box errormessage">' +
-          translations.get('descriptorRequestFailed', '<strong></strong>') +
+          translations.get(messageKey, '<strong></strong>') +
         '</div>'
       ).find('strong').text(this.attr('data-macroId'));
     }
@@ -683,11 +699,55 @@ define(
         macroEditor.empty().addClass('loading')
           .attr('data-macroId', macroId)
           .prop('requestNumber', requestNumber);
+
+        // Load the macro descriptor
         macroService.getMacroDescriptor(macroId)
           .done(maybeCreateMacroEditor.bind(macroEditor, requestNumber, macroCall))
-          .fail(maybeShowError.bind(macroEditor, requestNumber));
+          .fail(maybeShowError.bind(macroEditor, requestNumber, 'descriptorRequestFailed'));
       }
     };
+  },
+
+  load = function(input, macroEditor) {
+    var macroEditorAPI = macroEditor.data('macroEditorAPI');
+    macroEditor.data('hiddenMacroParameters', input.hiddenMacroParameters || []);
+    var macroCall = input.macroCall || {
+      name: input.macroId,
+      parameters: {}
+    };
+    // We need to obey the specified macro identifier in case the user has just changed the macro.
+    macroCall.name = input.macroId || macroCall.name;
+    if (!macroEditorAPI) {
+      // Initialize the macro editor.
+      macroEditor.on('ready', function(event) {
+        macroEditorAPI.focus();
+        submitButton.prop('disabled', false);
+      });
+      macroEditorAPI = macroEditor.xwikiMacroEditor(macroCall, input.syntaxId);
+    } else {
+      macroEditorAPI.update(macroCall, input.syntaxId);
+    }
+  },
+
+  onInstall = function(input, macroEditor) {
+    // Indicate that the list of macros should be updated
+    macroEditor.data('updateMacros', true);
+
+    // Load the macro descriptor
+    load(input, macroEditor);
+  },
+
+  install = function(input, macroEditor) {
+    var macroId = input.macroId + '' + input.syntaxId;
+    var requestNumber = (macroEditor.prop('requestNumber') || 0) + 1;
+
+    macroEditor.empty().addClass('loading')
+      .attr('data-macroId', macroId)
+      .prop('requestNumber', requestNumber);
+
+    macroService.installMacro(input.extensionId, input.extensionVersion)
+      .done(onInstall.bind(null, input, macroEditor))
+      .fail(maybeShowError.bind(macroEditor, requestNumber, 'installRequestFailed'));
   },
 
   editMacro = $modal.createModalStep({
@@ -702,24 +762,13 @@ define(
         submitButton.prop('disabled', true);
       }).on('shown.bs.modal', function(event) {
         var macroEditor = modal.find('.macro-editor');
-        var macroEditorAPI = macroEditor.data('macroEditorAPI');
         var input = modal.data('input');
-        macroEditor.data('hiddenMacroParameters', input.hiddenMacroParameters || []);
-        var macroCall = input.macroCall || {
-          name: input.macroId,
-          parameters: {}
-        };
-        // We need to obey the specified macro identifier in case the user has just changed the macro.
-        macroCall.name = input.macroId || macroCall.name;
-        if (!macroEditorAPI) {
-          // Initialize the macro editor.
-          macroEditor.on('ready', function(event) {
-            macroEditorAPI.focus();
-            submitButton.prop('disabled', false);
-          });
-          macroEditorAPI = macroEditor.xwikiMacroEditor(macroCall, input.syntaxId);
+
+        // Install the macro extension (if not already installed)
+        if (input.macroCategory == '_notinstalled') {
+          install(input, macroEditor);
         } else {
-          macroEditorAPI.update(macroCall, input.syntaxId);
+          load(input, macroEditor);
         }
       });
       submitButton.on('click', function(event) {
@@ -743,13 +792,16 @@ define(
         .text(translations.get('changeMacro'))
         .prependTo(submitButton.parent());
       changeMacroButton.on('click', function(event) {
-        var macroEditorAPI = modal.find('.macro-editor').xwikiMacroEditor();
+        var macroEditor = modal.find('.macro-editor');
+        var macroEditorAPI = macroEditor.xwikiMacroEditor();
         var output = modal.data('input');
         output.action = 'changeMacro';
         // Preserve the in-line/block mode if possible.
         var inline = output.macroCall ? output.macroCall.inline : undefined;
         output.macroCall = macroEditorAPI.getMacroCall();
         output.macroCall.inline = inline;
+        output.updateMacros = macroEditor.data('updateMacros');
+        macroEditor.removeData('updateMacros');
         modal.data('output', output).modal('hide');
       });
     }

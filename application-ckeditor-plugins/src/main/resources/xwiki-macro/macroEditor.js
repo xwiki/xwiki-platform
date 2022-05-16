@@ -67,14 +67,9 @@ define('macroService', ['jquery', 'xwiki-meta'], function($, xcontext) {
       outputSyntax: 'plain',
       language: $('html').attr('lang')
     }));
-    $.post(url, {action: 'install', extensionId: extensionId, extensionVersion: extensionVersion,
+    return $.post(url, {action: 'install', extensionId: extensionId, extensionVersion: extensionVersion,
         /*jshint camelcase: false */
-    	'form_token': xcontext.form_token})
-      .done(function(jobStatus) {
-        deferred.resolve(jobStatus);
-      }).fail(function() {
-        deferred.reject.apply(deferred, arguments);
-      });
+    	'form_token': xcontext.form_token});
 
     return deferred.promise();
   };

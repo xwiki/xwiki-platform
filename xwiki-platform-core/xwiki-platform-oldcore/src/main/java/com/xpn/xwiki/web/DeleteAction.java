@@ -324,7 +324,7 @@ public class DeleteAction extends XWikiAction
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
         DeleteRequest deleteRequest =
-            refactoring.getRequestFactory().createDeleteRequest(Arrays.asList(entityReference));
+            (DeleteRequest) refactoring.getRequestFactory().createDeleteRequest(Arrays.asList(entityReference));
         deleteRequest.setInteractive(isAsync(context.getRequest()));
         deleteRequest.setCheckAuthorRights(false);
         deleteRequest.setShouldSkipRecycleBin(shouldSkipRecycleBin);

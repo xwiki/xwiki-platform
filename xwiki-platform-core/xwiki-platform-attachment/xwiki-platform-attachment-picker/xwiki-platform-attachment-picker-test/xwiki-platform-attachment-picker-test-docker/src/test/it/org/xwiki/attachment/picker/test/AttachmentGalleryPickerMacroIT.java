@@ -37,6 +37,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -103,7 +104,12 @@ class AttachmentGalleryPickerMacroIT
 
         // Validate that the limit is taken into account.
         AttachmentGalleryPicker testPicker2 = new AttachmentGalleryPicker("testPicker2").waitUntilReady();
-        assertThat(testPicker2.getAttachmentTitles(), containsInAnyOrder("image1.png", "image2.png"));
+        assertEquals(2, testPicker2.getAttachmentTitles().size());
+        // We can't guarantee the order of the results returned by solr. Since the results for the current document are
+        // returned first, we check that the returned attachments are part of the attachments from the current document.
+        List<String> localAttachments = List.of("image1.png", "image2.png", "textcontent.txt");
+        assertTrue(localAttachments.contains(testPicker2.getAttachmentTitles().get(0)));
+        assertTrue(localAttachments.contains(testPicker2.getAttachmentTitles().get(1)));
 
         // Validate that only images are returned.
         AttachmentGalleryPicker testPicker3 = new AttachmentGalleryPicker("testPicker3").waitUntilReady();

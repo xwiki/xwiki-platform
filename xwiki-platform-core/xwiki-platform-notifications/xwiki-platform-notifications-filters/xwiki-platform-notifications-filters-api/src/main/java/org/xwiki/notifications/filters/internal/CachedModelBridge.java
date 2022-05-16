@@ -156,6 +156,15 @@ public class CachedModelBridge implements ModelBridge, Initializable
     }
 
     @Override
+    public void deleteFilterPreference(WikiReference wikiReference)
+        throws NotificationException
+    {
+        // Remove the preferences from the database, then remove the preferences from the cache.
+        this.modelBridge.deleteFilterPreference(wikiReference);
+        invalidatePreferencefilter(wikiReference);
+    }
+
+    @Override
     public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
         throws NotificationException
     {

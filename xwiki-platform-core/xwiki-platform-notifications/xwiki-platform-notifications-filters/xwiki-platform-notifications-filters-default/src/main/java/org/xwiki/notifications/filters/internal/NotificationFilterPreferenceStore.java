@@ -208,6 +208,43 @@ public class NotificationFilterPreferenceStore
     }
 
     /**
+     * Delete all the filter preferences from a wiki.
+     *
+     * @param wikiReference the reference of a wiki
+     * @throws NotificationException in case of error during the hibernate operations
+     */
+    public void deleteFilterPreference(WikiReference wikiReference) throws NotificationException
+    {
+        XWikiContext context = this.contextProvider.get();
+
+        String oriDatabase = context.getWikiId();
+
+        context.setWikiId(context.getMainXWiki());
+        XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+
+        try {
+            hibernateStore.beginTransaction(context);
+            Session session = hibernateStore.getSession(context);
+            session.createQuery("delete from DefaultNotificationFilterPreference "
+                    + "where page like :wikiPrefix "
+                    + "or pageOnly like :wikiPrefix "
+                    + "or user like :wikiPrefix "
+                    + "or wiki = :wikiId")
+                .setParameter("wikiPrefix", wikiReference.getName() + ":%")
+                .setParameter("wikiId", wikiReference.getName())
+                .executeUpdate();
+            hibernateStore.endTransaction(context, true);
+        } catch (XWikiException e) {
+            hibernateStore.endTransaction(context, false);
+            throw new NotificationException(
+                String.format("Failed to delete the notification preferences for wiki [%s]", wikiReference.getName()),
+                e);
+        } finally {
+            context.setWikiId(oriDatabase);
+        }
+    }
+
+    /**
      * Delete a filter preference.
      *
      * @param preference the preference to delete.

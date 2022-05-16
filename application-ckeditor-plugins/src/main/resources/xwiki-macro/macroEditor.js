@@ -61,17 +61,14 @@ define('macroService', ['jquery', 'xwiki-meta'], function($, xcontext) {
   },
 
   installMacro = function(extensionId, extensionVersion) {
-    var deferred = $.Deferred();
-
     var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', $.param({
       outputSyntax: 'plain',
       language: $('html').attr('lang')
     }));
+
     return $.post(url, {action: 'install', extensionId: extensionId, extensionVersion: extensionVersion,
         /*jshint camelcase: false */
     	'form_token': xcontext.form_token});
-
-    return deferred.promise();
   };
 
   return {

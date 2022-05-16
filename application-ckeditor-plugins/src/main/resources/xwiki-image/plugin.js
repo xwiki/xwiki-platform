@@ -21,6 +21,19 @@
   'use strict';
 
   function showImageWizard(editor, widget) {
+
+    /**
+     * Only called to unwrap the centered images inserted by the old image dialog.
+     */
+    function unwrapFromCentering(element) {
+      var imageOrLink = element.findOne('a,img');
+
+      imageOrLink.replace(element);
+
+      return imageOrLink;
+    }
+
+
     require(['imageWizard'], function(imageWizard) {
       imageWizard({
         editor: editor,
@@ -28,6 +41,14 @@
       }).done(function(data) {
         if (widget && widget.element) {
           widget.setData(data);
+
+          // With the old image dialog, image were wrapped in a p to be centered. We need to unwrap them to make them
+          // compliant with the new image dialog.
+          if (widget.element.getName() === 'p') {
+            widget.element = unwrapFromCentering(widget.element);
+            widet.element.setAttribute('data-widget', widget.name);
+          }
+
         } else {
           var element = CKEDITOR.dom.element.createFromHtml(widget.template.output(), editor.document);
           var wrapper = editor.widgets.wrapElement(element, widget.name);
@@ -84,7 +105,7 @@
         this.setData('imageStyle', this.parts.image.getAttribute('data-xwiki-image-style') || '');
 
         this.setData('border', this.parts.image.getAttribute('data-xwiki-image-style-border'));
-        this.setData('alignment', this.parts.image.getAttribute('data-xwiki-image-style-alignment') || 'none');
+        this.setData('alignment', this.parts.image.getAttribute('data-xwiki-image-style-alignment'));
         this.setData('textWrap', this.parts.image.getAttribute('data-xwiki-image-style-text-wrap'));
       };
 
@@ -130,6 +151,14 @@
           removeAttribute(this, 'data-xwiki-image-style-border');
         }
 
+        // If alignment is undefined, try to convert from the legacy align data property.
+        var mapping = {left: 'start', right: 'end', center: 'center'};
+        this.data.alignment = mapping[this.data.align] || 'none';
+
+        // The old align needs to be undefined otherwise it's not removed when re-inserting the image after the edition,
+        // add deprecated attributes to the image.
+        this.data.align = 'none';
+        
         if (this.data.alignment && this.data.alignment !== 'none') {
           setAttribute(this, 'data-xwiki-image-style-alignment', this.data.alignment);
         } else {

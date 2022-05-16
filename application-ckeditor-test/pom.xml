@@ -61,31 +61,6 @@
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
-  <dependencyManagement>
-    <!-- Force a newer version in order to pass the RequireUpperBoundDeps enforcer rule -->
-    <dependencies>
-      <dependency>
-        <groupId>cglib</groupId>
-        <artifactId>cglib-nodep</artifactId>
-        <version>3.2.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-io</artifactId>
-        <version>9.4.3.v20170317</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-util</artifactId>
-        <version>9.4.3.v20170317</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>3.1.0</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <modules>
     <module>application-ckeditor-test-pageobjects</module>
   </modules>

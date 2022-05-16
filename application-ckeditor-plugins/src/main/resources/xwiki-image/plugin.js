@@ -91,32 +91,55 @@
       var originalData = imageWidget.data;
       imageWidget.data = function() {
 
+        /**
+         * Update the given attribute at two locations in the widget, the image tag and the widget itself.
+         *
+         * @param widget the widget to update
+         * @param key the attribute key
+         * @param value the attribute value
+         */
+        function setAttribute(widget, key, value) {
+          widget.parts.image.setAttribute(key, value);
+          widget.wrapper.setAttribute(key, value);
+        }
+
+        /**
+         * Remove the given attribute at two locations on the widget, the image tag and the widget itself.
+         *
+         * @param widget the widget to update
+         * @param key the property key to removew
+         */
+        function removeAttribute(widget, key) {
+          widget.parts.image.removeAttribute(key);
+          widget.wrapper.removeAttribute(key);
+        }
+
         // Caption
         // TODO: Add support for editing the caption directly from the dialog (see CKEDITOR-435)
 
         // Style
         if (this.data.imageStyle) {
-          this.parts.image.setAttribute('data-xwiki-image-style', this.data.imageStyle);
+          setAttribute(this, 'data-xwiki-image-style', this.data.imageStyle);
         } else {
-          this.parts.image.removeAttribute('data-xwiki-image-style');
+          removeAttribute(this, 'data-xwiki-image-style');
         }
 
         if (this.data.border) {
-          this.parts.image.setAttribute('data-xwiki-image-style-border', this.data.border);
+          setAttribute(this, 'data-xwiki-image-style-border', this.data.border);
         } else {
-          this.parts.image.removeAttribute('data-xwiki-image-style-border');
+          removeAttribute(this, 'data-xwiki-image-style-border');
         }
 
         if (this.data.alignment && this.data.alignment !== 'none') {
-          this.parts.image.setAttribute('data-xwiki-image-style-alignment', this.data.alignment);
+          setAttribute(this, 'data-xwiki-image-style-alignment', this.data.alignment);
         } else {
-          this.parts.image.removeAttribute('data-xwiki-image-style-alignment');
+          removeAttribute(this, 'data-xwiki-image-style-alignment');
         }
 
         if (this.data.textWrap) {
-          this.parts.image.setAttribute('data-xwiki-image-style-text-wrap', this.data.textWrap);
+          setAttribute(this, 'data-xwiki-image-style-text-wrap', this.data.textWrap);
         } else {
-          this.parts.image.removeAttribute('data-xwiki-image-style-text-wrap');
+          removeAttribute(this, 'data-xwiki-image-style-text-wrap');
         }
 
         originalData.call(this);

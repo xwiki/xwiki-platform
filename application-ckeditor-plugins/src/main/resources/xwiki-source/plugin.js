@@ -19,6 +19,7 @@
  */
 (function() {
   'use strict';
+  var $ = jQuery;
 
   // Declare the configuration namespace.
   CKEDITOR.config['xwiki-source'] = CKEDITOR.config['xwiki-source'] || {
@@ -27,8 +28,7 @@
 
   CKEDITOR.plugins.xwikiSource = {
     convertHTML: function(editor, params) {
-      var htmlConverterURL = (editor.config['xwiki-source'] || {}).htmlConverter;
-      return jQuery.post(htmlConverterURL, jQuery.extend({
+      return $.post(editor.config['xwiki-source'].htmlConverter, $.extend({
         // Make sure we use the syntax specified when the editor was loaded. This is especially important when the
         // edited document is new (unsaved) because we want the converter to use the syntax specified by the template
         // rather than the default wiki syntax.
@@ -52,6 +52,18 @@
     requires: 'notification,xwiki-loading,xwiki-localization,xwiki-selection,xwiki-sourcearea',
 
     init: function(editor) {
+      // Fill missing configuration with default values.
+      var sourceDocument = editor.config.sourceDocument || XWiki.currentDocument;
+      editor.config['xwiki-source'] = $.extend({
+        // We need the source document to be the current document when the HTML conversion is performed in order to make
+        // sure relative references within the edited content are properly resolved and serialized.
+        htmlConverter: sourceDocument.getURL('get', $.param({
+          sheet: 'CKEditor.HTMLConverter',
+          outputSyntax: 'plain',
+          language: $('html').attr('lang') || ''
+        }))
+      }, editor.config['xwiki-source']);
+
       // The source command is not registered if the editor is loaded in-line.
       var sourceCommand = editor.getCommand('source');
       if (sourceCommand) {
@@ -112,7 +124,7 @@
         // Convert from HTML to wiki syntax.
         promise = this.maybeConvertHTML(editor, false);
       } else if (this.isModeSupported(editor.mode)) {
-        promise = jQuery.Deferred().resolve(editor);
+        promise = $.Deferred().resolve(editor);
       }
       if (promise) {
         promise.always(this.endLoading.bind(this)).done(editor.fire.bind(editor, 'modeReady'));
@@ -125,7 +137,7 @@
       if (oldMode.dirty || typeof newMode.data !== 'string') {
         return this.convertHTML(editor, toHTML);
       } else {
-        var deferred = jQuery.Deferred();
+        var deferred = $.Deferred();
         editor.setData(newMode.data, {
           callback: deferred.resolve.bind(deferred, editor)
         });
@@ -134,7 +146,7 @@
     },
 
     convertHTML: function(editor, toHTML) {
-      var deferred = jQuery.Deferred();
+      var deferred = $.Deferred();
       CKEDITOR.plugins.xwikiSource.convertHTML(editor, {
         fromHTML: !toHTML,
         toHTML: toHTML,
@@ -175,7 +187,7 @@
         editor.fire('lockSnapshot');
       }
       if (editor.editable()) {
-        jQuery(editor.container.$).find('.cke_button__source_icon').first().addClass('loading');
+        $(editor.container.$).find('.cke_button__source_icon').first().addClass('loading');
       }
       // A bug in Internet Explorer 11 prevents the user from typing into the Source text area if the WYSIWYG text
       // area is focused and the selection is collapsed before switching to Source mode. In order to avoid this
@@ -195,7 +207,7 @@
 
     endLoading: function(editor) {
       if (editor.editable()) {
-        jQuery(editor.container.$).find('.cke_button__source_icon').first().removeClass('loading');
+        $(editor.container.$).find('.cke_button__source_icon').first().removeClass('loading');
       }
       if (editor.mode === 'wysiwyg') {
         // Unlock the undo history after the conversion is done and the WYSIWYG mode data is set.

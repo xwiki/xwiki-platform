@@ -18,7 +18,56 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 CKEDITOR.editorConfig = function(config) {
+  const $ = jQuery;
+
+  // See http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
+  const allowedContentBySyntax = {
+    'xwiki/2.1': {
+      '$1': {
+        elements: {
+          // Elements required because the editor input is a full HTML page.
+          html: true, head: true, link: true, script: true, body: true,
+          // Headings
+          h1: true, h2: true, h3: true, h4: true, h5: true, h6: true,
+          // Lists
+          dl: true, ol: true, ul: true,
+          // Tables
+          table: true, tr: true, th: true, td: true,
+          // Formatting
+          span: true, strong: true, em: true, ins: true, del: true, sub: true, sup: true, tt: true, pre: true,
+          // Others
+          div: true, hr: true, p: true, a: true, img: true, blockquote: true, figure: true
+        },
+        // The elements above can have any attribute, through the parameter (%%) syntax.
+        attributes: '*',
+        styles: '*',
+        classes: '*'
+      },
+      '$2': {
+        // The XWiki syntax doesn't support parameters for the following elements.
+        elements: {br: true, dd: true, dt: true, li: true, tbody: true, figcaption: true}
+      },
+      '$3': {
+        // Wiki syntax macros can output any HTML.
+        match: CKEDITOR.plugins.xwikiMacro.isMacroOutput,
+        attributes: '*',
+        styles: '*',
+        classes: '*'
+      }
+    },
+    'plain/1.0': ';'
+  };
+  allowedContentBySyntax['xwiki/2.0'] = allowedContentBySyntax['xwiki/2.1'];
+  // This is a hack, increasing the technical debt since the CKEditor module should not know about the Markdown
+  // syntax. Actually it should not know either about the xwiki/2.0 and xwiki/2.1 syntaxes ;)
+  // This should be fixed by implementing https://jira.xwiki.org/browse/CKEDITOR-319
+  allowedContentBySyntax['markdown/1.2'] = $.extend(true, {}, allowedContentBySyntax['xwiki/2.1']);
+  // Markdown doesn't allow figures at the moment.
+  delete allowedContentBySyntax['markdown/1.2']['$1'].elements.figure;
+  delete allowedContentBySyntax['markdown/1.2']['$2'].elements.figcaption;
+
   CKEDITOR.tools.extend(config, {
+    allowedContentBySyntax: allowedContentBySyntax,
     // It's not the case by default.
     // https://dev.ckeditor.com/ticket/13093
     applyPasteFilterAfterPasteFromWord: true,
@@ -33,10 +82,13 @@ CKEDITOR.editorConfig = function(config) {
       overrides: 'u'
     },
     // Add support for overwriting the default configuration from a wiki page.
-    customConfig: new XWiki.Document('Config', 'CKEditor').getURL('get', 'outputSyntax=plain&sheet=CKEditor.ConfigSheet'),
+    customConfig: new XWiki.Document('Config', 'CKEditor').getURL('get',
+      'outputSyntax=plain&sheet=CKEditor.ConfigSheet'),
     // Enable the native (in-browser) spell checker because we don't bundle any spell checker plugin. Most of the spell
     // checker plugins are relying on an external service which leads to security and privacy concerns.
     disableNativeSpellChecker: false,
+    // This is used in CKEditor.FileUploader so we must keep them in sync.
+    fileTools_defaultFileName: '__fileCreatedFromDataURI__',
     // The editor input is a full HTML page because we need to include the XWiki skin (in order to achieve WYSIWYG).
     fullPage: true,
     // The maximum image width is limited from the skin to 100% of the available page width (responsive images).

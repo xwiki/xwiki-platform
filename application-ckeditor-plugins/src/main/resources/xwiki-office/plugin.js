@@ -54,8 +54,17 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
     requires: 'uploadwidget,notification,xwiki-localization,xwiki-macro,xwiki-dialog',
 
     init : function(editor) {
-      var officeImporterURL = (editor.config['xwiki-office'] || {}).importer;
-      this.enableOfficeImporter(editor, officeImporterURL);
+      // Fill missing configuration with default values.
+      var sourceDocument = editor.config.sourceDocument || XWiki.currentDocument;
+      editor.config['xwiki-office'] = $.extend({
+        enabled: false,
+        importer: sourceDocument.getURL('get', $.param({
+          sheet: 'CKEditor.OfficeImporter',
+          language: $('html').attr('lang') || ''
+        }))
+      }, editor.config['xwiki-office']);
+
+      this.initOfficeImporter(editor);
 
       if (editor.config.applyPasteFilterAfterPasteFromWord) {
         this.applyPasteFilterAfterPasteFromWord(editor);
@@ -79,8 +88,9 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
       });
     },
 
-    enableOfficeImporter: function(editor, officeImporterURL) {
+    initOfficeImporter: function(editor) {
       var thisPlugin = this;
+      var officeConfig = editor.config['xwiki-office'];
 
       editor.ui.addButton('officeImporter', {
         label: editor.localization.get('xwiki-office.importer.title'),
@@ -92,12 +102,12 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
       editor.addCommand('officeImporter', {
         async: true,
         contextSensitive: false,
-        startDisabled: !officeImporterURL,
+        startDisabled: !officeConfig.enabled,
         exec: function(editor) {
           var command = this;
           require(['officeImporterModal'], function(officeImporterModal) {
             officeImporterModal({
-              formURL: officeImporterURL,
+              formURL: officeConfig.importer,
               localization: editor.localization
             }).done(function(formData) {
               thisPlugin.importOfficeFile(editor, formData);
@@ -113,7 +123,7 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
           var notification = editor.showNotification(editor.localization.get('xwiki-office.importer.inProgress'),
             'progress');
           var widget = this;
-          $.get(officeImporterURL, {
+          $.get(officeConfig.importer, {
             fileName: upload.fileName,
             filterStyles: upload.file.filterStyles,
             useOfficeViewer: upload.file.useOfficeViewer,

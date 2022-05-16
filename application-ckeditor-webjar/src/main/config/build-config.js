@@ -122,6 +122,7 @@ var CKBUILDER_CONFIG = {
     uploadfile: 1,
     uploadimage: 1,
     wysiwygarea: 1,
+    'xwiki-config': 1,
     'xwiki-filter': 1,
     'xwiki-image-old': 1,
     'xwiki-image': 1,

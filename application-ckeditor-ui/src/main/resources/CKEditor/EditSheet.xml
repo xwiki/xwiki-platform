@@ -217,56 +217,6 @@ define('xwiki-ckeditor', [
   "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"
 ], function($, ckeditor, xwikiMeta) {
   var deferred = $.Deferred();
-
-  var loadJavaScriptSkinExtensions = $jsontool.serialize($xwiki.getDocument('CKEditor.Config'
-    ).getValue('loadJavaScriptSkinExtensions')) === 1;
-
-  // See http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
-  var allowedContentBySyntax = {
-    'xwiki/2.1': {
-      '$1': {
-        elements: {
-          // Elements required because the editor input is a full HTML page.
-          html: true, head: true, link: true, script: loadJavaScriptSkinExtensions, body: true,
-          // Headings
-          h1: true, h2: true, h3: true, h4: true, h5: true, h6: true,
-          // Lists
-          dl: true, ol: true, ul: true,
-          // Tables
-          table: true, tr: true, th: true, td: true,
-          // Formatting
-          span: true, strong: true, em: true, ins: true, del: true, sub: true, sup: true, tt: true, pre: true,
-          // Others
-          div: true, hr: true, p: true, a: true, img: true, blockquote: true, figure: true
-        },
-        // The elements above can have any attribute, through the parameter (%%) syntax.
-        attributes: '*',
-        styles: '*',
-        classes: '*'
-      },
-      '$2': {
-        // The XWiki syntax doesn't support parameters for the following elements.
-        elements: {br: true, dd: true, dt: true, li: true, tbody: true, figcaption: true}
-      },
-      '$3': {
-        // Wiki syntax macros can output any HTML.
-        match: CKEDITOR.plugins.xwikiMacro.isMacroOutput,
-        attributes: '*',
-        styles: '*',
-        classes: '*'
-      }
-    },
-    'plain/1.0': ';'
-  };
-  allowedContentBySyntax['xwiki/2.0'] = allowedContentBySyntax['xwiki/2.1'];
-  // This is a hack, increasing the technical debt since the CKEditor module should not know about the Markdown
-  // syntax. Actually it should not know either about the xwiki/2.0 and xwiki/2.1 syntaxes ;)
-  // This should be fixed by implementing https://jira.xwiki.org/browse/CKEDITOR-319
-  allowedContentBySyntax['markdown/1.2'] = $.extend(true, {}, allowedContentBySyntax['xwiki/2.1']);
-  // Markdown doesn't allow figures at the moment.
-  delete allowedContentBySyntax['markdown/1.2']['$1'].elements.figure;
-  delete allowedContentBySyntax['markdown/1.2']['$2'].elements.figcaption;
-
   var currentLocale = $('html').attr('lang') || '';
 
   // We have to pass the plugin that makes the request (the initiator) because the expected response can be different
@@ -275,6 +225,7 @@ define('xwiki-ckeditor', [
     return document.getURL('get', $.param({
       sheet: 'CKEditor.FileUploader',
       outputSyntax: 'plain',
+      // The syntax and language are important especially when the upload request creates a new document.
       syntax: document.syntax,
       language: currentLocale,
       form_token: xwikiMeta.form_token,
@@ -290,64 +241,14 @@ define('xwiki-ckeditor', [
       sourceDocument = new XWiki.Document(XWiki.Model.resolve(sourceDocumentReference, XWiki.EntityType.DOCUMENT));
     }
     sourceDocument.syntax = $(element).attr('data-sourceDocumentSyntax');
-    var isHTML5 = $(element).data('syntax') !== 'annotatedxhtml/1.0';
-
-    var allowedContent;
-    var allowedContentWithoutFigure;
-    if (sourceDocument.syntax in allowedContentBySyntax) {
-      allowedContent = allowedContentBySyntax[sourceDocument.syntax];
-      // Try removing the figure/figcaption tags for caption content to forbid nested figures.
-      allowedContentWithoutFigure = $.extend(true, {}, allowedContent);
-      if ('$1' in allowedContentWithoutFigure &amp;&amp; 'elements' in allowedContentWithoutFigure['$1']) {
-        delete allowedContentWithoutFigure['$1'].elements.figure;
-      }
-      if ('$2' in allowedContentWithoutFigure &amp;&amp; 'elements' in allowedContentWithoutFigure['$2']) {
-        delete allowedContentWithoutFigure['$2'].elements.figcaption;
-      }
-
-      // Disable figure support if the syntax isn't HTML 5.
-      if (!isHTML5) {
-        allowedContent = allowedContentWithoutFigure;
-      }
-    }
 
     var config = {
-      allowedContent: allowedContent,
-      editorplaceholder: $jsontool.serialize($services.localization.render('ckeditor.content.placeholder')),
       filebrowserUploadUrl: getUploadURL(sourceDocument, 'filebrowser'),
-      // This is used in CKEditor.FileUploader so we must keep them in sync.
-      fileTools_defaultFileName: '__fileCreatedFromDataURI__',
       height: $(element).height(),
-      // CKEditor uses '-' (dash) as locale separator (between the language code and the country code).
-      language: currentLocale.toLowerCase().replace('_', '-'),
-      uploadUrl: getUploadURL(sourceDocument, 'filetools'),
-      stylesSet: isHTML5 ? 'html5' : 'html4',
-      'xwiki-image' : {
-        captionAllowedContent: allowedContentWithoutFigure
-      },
-      'xwiki-link': {
-        labelGenerator: sourceDocument.getURL('get', $.param({
-          sheet: 'CKEditor.LinkLabelGenerator',
-          outputSyntax: 'plain',
-          language: currentLocale
-        }))
-      },
-      'xwiki-resource': {
-        dispatcher: sourceDocument.getURL('get', $.param({
-          sheet: 'CKEditor.ResourceDispatcher',
-          outputSyntax: 'plain',
-          language: currentLocale
-        }))
-      },
-      'xwiki-source': {
-        htmlConverter: sourceDocument.getURL('get', $.param({
-          sheet: 'CKEditor.HTMLConverter',
-          outputSyntax: 'plain',
-          language: currentLocale
-        }))
-      },
       mentions: [
         {
+          // We use the source document to compute the feed URL because we want the suggested link references to be
+          // relative to the edited document (we want the editor to output relative references as much as possible).
           feed: sourceDocument.getURL('get', $.param({
             sheet: 'CKEditor.LinkSuggestions',
             outputSyntax: 'plain',
@@ -372,16 +273,19 @@ define('xwiki-ckeditor', [
           minChars: 0,
           itemsLimit: 6
         }
-      ]
-    };
-    if ($(element).attr('data-officeImporterSupported') === 'true') {
-      config['xwiki-office'] = {
-        importer: sourceDocument.getURL('get', $.param({
-          sheet: 'CKEditor.OfficeImporter',
+      ],
+      sourceDocument: sourceDocument,
+      uploadUrl: getUploadURL(sourceDocument, 'filetools'),
+      'xwiki-link': {
+        // We use the source document to compute the link label generator URL because we want the link references to be
+        // resolved relative to the edited document (as they were inserted).
+        labelGenerator: sourceDocument.getURL('get', $.param({
+          sheet: 'CKEditor.LinkLabelGenerator',
+          outputSyntax: 'plain',
           language: currentLocale
         }))
-      };
-    }
+      }
+    };
     return config;
   };
 

@@ -159,9 +159,7 @@
   var createEditors = function(ckeditor, container, config) {
     container.attr({
       'data-sourceDocumentReference': XWiki.Model.serialize(config.document.documentReference),
-      'data-sourceDocumentSyntax': config.document.syntax,
-      'data-officeImporterSupported': config.enableOfficeImport,
-      'data-syntax': 'syntax' in config ? config['syntax'] : 'annotatedxhtml/1.0'
+      'data-sourceDocumentSyntax': config.document.syntax
     }).each(function() {
       try {
         createEditor(ckeditor, this, config).done(config.deferred.resolve.bind(config.deferred, config.document));

@@ -102,6 +102,12 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
+    public Set<NotificationFilterPreference> getAllFilterPreferences() throws NotificationException
+    {
+        return this.notificationFilterPreferenceStore.getAllFilterPreferences();
+    }
+
+    @Override
     public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user) throws NotificationException
     {
         XWikiContext context = contextProvider.get();

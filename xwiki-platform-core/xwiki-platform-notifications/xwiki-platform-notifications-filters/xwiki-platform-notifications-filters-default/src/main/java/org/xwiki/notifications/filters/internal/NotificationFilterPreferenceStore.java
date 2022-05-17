@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -150,6 +151,17 @@ public class NotificationFilterPreferenceStore
                 "Error while loading the notification filter preferences of the wiki [%s].", wikiReference.getName()),
                 e);
         }
+    }
+
+    /**
+     * @return all the notification filter preferences
+     * @since 14.4
+     * @since 13.10.6
+     */
+    public Set<NotificationFilterPreference> getAllFilterPreferences()
+    {
+        // TODO: run a query to get all the preferences?
+        return null;
     }
 
     private List<DefaultNotificationFilterPreference> getPreferencesOfEntity(EntityReference entityReference,

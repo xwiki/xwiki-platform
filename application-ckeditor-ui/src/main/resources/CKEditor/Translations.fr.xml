@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -67,6 +67,7 @@ ckeditor.plugin.macro.buttonHint=Macro XWiki
 ckeditor.plugin.macro.editButtonHint=Modifier la Macro
 ckeditor.plugin.macro.refreshFailed=La réactualisation du contenu édité a échoué.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insérer macro {0}
+ckeditor.plugin.macro.notinstalled=Non installée
 ckeditor.plugin.office.importer.title=Importer un document Office
 ckeditor.plugin.office.importer.filePath=Emplacement du fichier
 ckeditor.plugin.office.importer.filePath.hint=Sélectionnez le fichier Office à importer. Ce fichier sera téléchargé, attaché à la page et son contenu ajouté comme contenu à la page.
@@ -166,14 +167,16 @@ macroSelector.title=Sélectionner la Macro
 macroSelector.filter.text.placeholder=Saisir le filtre
 macroSelector.filter.category.all=Toutes les macros
 macroSelector.filter.category.other=Autre
-macroSelector.failedToRetrieveMacros=Lister toutes les macros disponibles a échoué.
+macroSelector.filter.category.notinstalled=Non installée
+macroSelector.failedToRetrieveMacros=Impossible de récupérer la liste des macros disponibles.
 macroSelector.select=Sélectionner
-macroEditor.title=Editer Macro
+macroSelector.install=Installer
+macroEditor.title=Modifier la Macro
 macroEditor.more=Plus
-macroEditor.changeMacro=Changer de Macro
+macroEditor.changeMacro=Modifier la Macro
 macroEditor.submit=Envoyer
 macroEditor.content=Contenu
-macroEditor.noParameters=Cette macro n'a aucun paramètres.
+macroEditor.noParameters=Cette macro ne possède aucun paramètre.
 macroEditor.descriptorRequestFailed=La recherche du descripteur de la macro {0} a échoué.
 
 
@@ -182,11 +185,11 @@ imageEditor.modal.loadFail.message=Impossible d'afficher le formulaire de modifi
 imageEditor.modal.title=Modifier l'image
 imageEditor.modal.insertButton=Insérer
 imageEditor.modal.initialization.fail=Impossible d'afficher le formulaire de sélection de l'image.
-imageSelector.modal.title=Sélectionnez l'image
+imageSelector.modal.title=Sélectionner l'image
 imageSelector.modal.selectButton=Sélectionnez
 imageSelector.modal.loadFail.message=Impossible d'afficher le formulaire de sélection de l'image.
 imageSelector.modal.fileUpload.success=Fichier envoyé avec succès
-imageSelector.modal.fileUpload.fail=Échec de l'envoi du fichier
+imageSelector.modal.fileUpload.fail=Échec d'envoi du fichier
 imageSelector.modal.fileUpload.abort=Envoi du fichier annulé
 imageSelector.modal.initialization.fail=Impossible d'afficher le formulaire de sélection de l'image.
 </content>

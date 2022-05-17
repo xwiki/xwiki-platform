@@ -20,9 +20,12 @@
 package org.xwiki.notifications.filters;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.stability.Unstable;
 
 /**
  * Define the preference of a notification filter.
@@ -138,4 +141,24 @@ public interface NotificationFilterPreference
      * @since 9.11.8
      */
     void setEnabled(boolean enabled);
+
+    /**
+     * Return {@code true} if the filter preference is related to a given wiki. This is the case if {@link #getWiki()}
+     * returns {@code wikiId}, or if {@link #getPage()}, {@link #getPageOnly()} or {@link #getUser()} are contained in
+     * the wiki.
+     *
+     * @param wikiId a wiki identifier
+     * @return {@code true} if the notification filter preference is related to a given wiki, {@code false} otherwise
+     * @since 14.4
+     * @since 13.10.6
+     */
+    @Unstable
+    default boolean isFromWiki(String wikiId)
+    {
+        String wikiIdWithSeparator = wikiId + ":";
+        return Objects.equals(getWiki(), wikiId)
+            || StringUtils.startsWith(getPage(), wikiIdWithSeparator)
+            || StringUtils.startsWith(getPageOnly(), wikiIdWithSeparator)
+            || StringUtils.startsWith(getUser(), wikiIdWithSeparator);
+    }
 }

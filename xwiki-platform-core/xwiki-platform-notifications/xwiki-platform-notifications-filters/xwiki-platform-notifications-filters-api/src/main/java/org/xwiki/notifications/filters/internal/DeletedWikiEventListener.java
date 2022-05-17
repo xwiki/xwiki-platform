@@ -23,12 +23,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Cleanup the notifications when a wiki is deleted.
@@ -39,28 +42,33 @@ import org.xwiki.observation.event.Event;
  */
 @Component
 @Singleton
-@Named("org.xwiki.notifications.filters.internal.DeleteWikiEventListener")
-public class DeleteWikiEventListener extends AbstractEventListener
+@Named("org.xwiki.notifications.filters.internal.DeletedWikiEventListener")
+public class DeletedWikiEventListener extends AbstractEventListener
 {
     @Named("cached")
     @Inject
     private ModelBridge modelBridge;
 
+    @Inject
+    private Logger logger;
+
     /**
      * Default constructor.
      */
-    public DeleteWikiEventListener()
+    public DeletedWikiEventListener()
     {
-        super(DeleteWikiEventListener.class.getName(), new WikiDeletedEvent());
+        super(DeletedWikiEventListener.class.getName(), new WikiDeletedEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        String wikiId = (String) source;
         try {
-            this.modelBridge.deleteFilterPreference(new WikiReference((String) source));
+            this.modelBridge.deleteFilterPreference(new WikiReference(wikiId));
         } catch (NotificationException e) {
-            // TODO: log the exception
+            this.logger.warn("Failed to delete notification preferences for wiki [{}]. Cause: [{}].", wikiId,
+                getRootCauseMessage(e));
         }
     }
 }

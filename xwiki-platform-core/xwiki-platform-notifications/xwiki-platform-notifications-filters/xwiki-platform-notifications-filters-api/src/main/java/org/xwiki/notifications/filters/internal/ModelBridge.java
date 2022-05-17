@@ -70,6 +70,17 @@ public interface ModelBridge
     }
 
     /**
+     * Get all the notification filter preferences.
+     *
+     * @return the list of all the notification filter preferences
+     * @throws NotificationException if an error happens
+     * @since 14.4
+     * @since 13.10.6
+     */
+    @Unstable
+    Set<NotificationFilterPreference> getAllFilterPreferences() throws NotificationException; // TODO: make default
+
+    /**
      * For all toggeable notification filters, get if the filter is enabled regarding the user profile.
      *
      * @param user the user to use
@@ -205,4 +216,5 @@ public interface ModelBridge
     void createScopeFilterPreference(WikiReference wikiReference, NotificationFilterType type,
         Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
         throws NotificationException;
+
 }

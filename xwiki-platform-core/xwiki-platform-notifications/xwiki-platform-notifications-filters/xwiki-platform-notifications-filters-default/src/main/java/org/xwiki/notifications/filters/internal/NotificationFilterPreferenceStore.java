@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -158,10 +159,19 @@ public class NotificationFilterPreferenceStore
      * @since 14.4
      * @since 13.10.6
      */
-    public Set<NotificationFilterPreference> getAllFilterPreferences()
+    public Set<NotificationFilterPreference> getAllFilterPreferences() throws NotificationException
     {
-        // TODO: run a query to get all the preferences?
-        return null;
+        try {
+            // TODO: find out how to steam things...
+            List<NotificationFilterPreference> list =
+                this.queryManager.createQuery("select nfp from DefaultNotificationFilterPreference nfp", Query.HQL)
+                    .execute();
+            return new HashSet<>(list);
+        } catch (QueryException e) {
+            throw new NotificationException(
+                String.format("Error while loading all the notification filter preferences on wiki [%s].",
+                    this.contextProvider.get().getWikiId()), e);
+        }
     }
 
     private List<DefaultNotificationFilterPreference> getPreferencesOfEntity(EntityReference entityReference,

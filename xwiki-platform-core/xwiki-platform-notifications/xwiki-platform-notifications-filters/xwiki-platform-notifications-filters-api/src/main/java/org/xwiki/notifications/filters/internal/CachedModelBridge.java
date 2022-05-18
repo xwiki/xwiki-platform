@@ -127,13 +127,6 @@ public class CachedModelBridge implements ModelBridge, Initializable
     }
 
     @Override
-    public Set<NotificationFilterPreference> getAllFilterPreferences() throws NotificationException
-    {
-        // TODO: find out if the cache can at least partially be used to avoid fetching all the preferences from the db.
-        return this.modelBridge.getAllFilterPreferences();
-    }
-    
-    @Override
     public Map<String, Boolean> getToggeableFilterActivations(DocumentReference userReference)
         throws NotificationException
     {

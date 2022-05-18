@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.migration;
+package org.xwiki.notifications.filters.migration;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -27,11 +27,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -53,13 +55,18 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Component
 @Singleton
 @Named("R140400000XWIKI1546")
+@Unstable
+// TODO: move to the -default module
 public class R140400000XWIKI15460DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
-    private ModelBridge modelBridge;
+    private NotificationFilterPreferenceStore store;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public XWikiDBVersion getVersion()
@@ -76,22 +83,23 @@ public class R140400000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-// TODO: check if main wiki, skip otherwise
         XWikiContext context = getXWikiContext();
         if (!Objects.equals(context.getWikiId(), context.getMainXWiki())) {
-            // TODO: log skipped because not the main wiki
+            this.logger.info("Skipping, this migration only applies to the main wiki.");
             return;
         }
         
-        // TODO: skip if already migrated in 13.10.6
-        
-        
+        int version = this.manager.get().getDBVersion().getVersion();
+        if (version >= 131006000 && version < 140000000) {
+            this.logger.info("Skipping, this migration has already been performed in 13.10.6+.");
+            return;
+        }
+
         try {
             Collection<String> wikiIds = this.wikiDescriptorManager.getAllIds();
 
-            // TODO: replace by a call to get all the notification filter preferences!
             // TODO: do we want to execute this for each kind of existing model bridge?
-            Set<NotificationFilterPreference> allNotificationFilterPreferences = this.modelBridge
+            Stream<NotificationFilterPreference> allNotificationFilterPreferences = this.store
                 .getAllFilterPreferences();
             for (NotificationFilterPreference filterPreference : allNotificationFilterPreferences) {
                 boolean isFromExistingWiki = wikiIds.stream().anyMatch(filterPreference::isFromWiki);

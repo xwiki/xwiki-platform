@@ -31,20 +31,19 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.internal.ModelBridge;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
- * Cleanup the notification filters preferences remaining on the main wiki from previously removed sub-wikis.
+ * Cleanup the notification filters preferences remaining on the main wiki from previously removed sub-wikis. Note: this
+ * class is named {@code R131006000XWIKI1546} in branch {@code 13.10.6+}.
  *
  * @version $Id$
  * @see <a href="https://jira.xwiki.org/browse/XWIKI-15460">XWIKI-15460: Notification filter preferences are not cleaned
@@ -56,7 +55,6 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Singleton
 @Named("R140400000XWIKI1546")
 @Unstable
-// TODO: move to the -default module
 public class R140400000XWIKI15460DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
@@ -81,14 +79,14 @@ public class R140400000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     }
 
     @Override
-    protected void hibernateMigrate() throws DataMigrationException, XWikiException
+    protected void hibernateMigrate() throws DataMigrationException
     {
         XWikiContext context = getXWikiContext();
         if (!Objects.equals(context.getWikiId(), context.getMainXWiki())) {
             this.logger.info("Skipping, this migration only applies to the main wiki.");
             return;
         }
-        
+
         int version = this.manager.get().getDBVersion().getVersion();
         if (version >= 131006000 && version < 140000000) {
             this.logger.info("Skipping, this migration has already been performed in 13.10.6+.");
@@ -97,22 +95,28 @@ public class R140400000XWIKI15460DataMigration extends AbstractHibernateDataMigr
 
         try {
             Collection<String> wikiIds = this.wikiDescriptorManager.getAllIds();
-
-            // TODO: do we want to execute this for each kind of existing model bridge?
-            Stream<NotificationFilterPreference> allNotificationFilterPreferences = this.store
-                .getAllFilterPreferences();
-            for (NotificationFilterPreference filterPreference : allNotificationFilterPreferences) {
-                boolean isFromExistingWiki = wikiIds.stream().anyMatch(filterPreference::isFromWiki);
-                if (!isFromExistingWiki) {
-                    // TODO: remove filter preference
+            // TODO: setting the limit to 3 for the tests, but must be moved back to 1000 afterwards
+            int limit = 3;
+            int offset = 0;
+            Set<NotificationFilterPreference> allNotificationFilterPreferences = this.store
+                .getPaginatedFilterPreferences(limit, offset);
+            while (!allNotificationFilterPreferences.isEmpty()) {
+                // We count the deleted filter preferences and adapt the next offset accordingly.
+                int removed = 0;
+                for (NotificationFilterPreference filterPreference : allNotificationFilterPreferences) {
+                    boolean isFromExistingWiki = wikiIds.stream().anyMatch(filterPreference::isFromWiki);
+                    if (!isFromExistingWiki) {
+                        removed++;
+                        this.store.deleteFilterPreference(filterPreference);
+                    }
                 }
+                offset += limit - removed;
+                allNotificationFilterPreferences = this.store.getPaginatedFilterPreferences(limit, offset);
             }
         } catch (NotificationException e) {
-            // TODO: handle exceptions
-            throw new RuntimeException(e);
+            throw new DataMigrationException("Failed to retrieve the notification filters preferences.", e);
         } catch (WikiManagerException e) {
-            // TODO: handle exceptions
-            throw new RuntimeException(e);
+            throw new DataMigrationException("Failed to retrieve the ids of wikis of the farm.", e);
         }
     }
 }

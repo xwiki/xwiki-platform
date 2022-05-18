@@ -155,22 +155,27 @@ public class NotificationFilterPreferenceStore
     }
 
     /**
+     * @param limit the maximum number of results to return
+     * @param offset the offset of the first result to return
      * @return all the notification filter preferences
      * @since 14.4
      * @since 13.10.6
      */
-    public Set<NotificationFilterPreference> getAllFilterPreferences() throws NotificationException
+    public Set<NotificationFilterPreference> getPaginatedFilterPreferences(int limit, int offset)
+        throws NotificationException
     {
         try {
-            // TODO: find out how to steam things...
-            List<NotificationFilterPreference> list =
-                this.queryManager.createQuery("select nfp from DefaultNotificationFilterPreference nfp", Query.HQL)
-                    .execute();
+            List<NotificationFilterPreference> list = this.queryManager
+                .createQuery("select nfp from DefaultNotificationFilterPreference nfp "
+                    + "order by nfp.internalId", Query.HQL)
+                .setLimit(limit)
+                .setOffset(offset)
+                .execute();
             return new HashSet<>(list);
         } catch (QueryException e) {
-            throw new NotificationException(
-                String.format("Error while loading all the notification filter preferences on wiki [%s].",
-                    this.contextProvider.get().getWikiId()), e);
+            String message = String.format("Error while loading all the notification filter preferences on wiki [%s].",
+                this.contextProvider.get().getWikiId());
+            throw new NotificationException(message, e);
         }
     }
 
@@ -271,7 +276,7 @@ public class NotificationFilterPreferenceStore
      *
      * @param preference the preference to delete.
      */
-    private void deleteFilterPreference(NotificationFilterPreference preference)
+    public void deleteFilterPreference(NotificationFilterPreference preference)
     {
         if (preference == null) {
             return;

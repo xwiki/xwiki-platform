@@ -629,8 +629,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
     private String getMapFieldName(String key, Type type)
     {
-        return this.utils.getMapFieldName(key, EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES,
-            type != null ? type : String.class);
+        return this.utils.getMapFieldName(key, EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES, type);
     }
 
     private String toSolrFieldName(AbstractPropertyQueryCondition condition)

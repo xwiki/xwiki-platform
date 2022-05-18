@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.junit.jupiter.api.Test;
@@ -263,10 +264,11 @@ public class EventStoreTest
         event.setUser(USER_REFERENCE);
         event.setWiki(WIKI2_REFERENCE);
 
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("param1", "value1");
-        parameters.put("param2", "value2");
-        event.setParameters(parameters);
+        Map<String, Object> custom = new HashMap<>();
+        custom.put("param1", "value1");
+        custom.put("param2", "value2");
+        custom.put("list", List.of(1, 2));
+        event.setCustom(custom);
 
         this.eventStore.saveEvent(event).get();
 
@@ -485,10 +487,10 @@ public class EventStoreTest
             new SimpleEventQuery().startsWith(Event.FIELD_ID, "id"));
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().endsWith(Event.FIELD_ID, "1"));
 
-        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().contains(Event.FIELD_ID,
-            ""));
-        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().contains(Event.FIELD_ID,
-            "d"));
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4),
+            new SimpleEventQuery().contains(Event.FIELD_ID, ""));
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4),
+            new SimpleEventQuery().contains(Event.FIELD_ID, "d"));
         assertSearch(List.of(EVENT1), new SimpleEventQuery().contains(Event.FIELD_ID, "d1"));
     }
 
@@ -505,8 +507,8 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().custom().eq("param", "value1"));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().custom().eq("param", "value2"));
 
-        EVENT1.setCustom(Collections.singletonMap("param", 1));
-        EVENT2.setCustom(Collections.singletonMap("param", 2));
+        EVENT1.setCustom(Map.of("param", 1, "list", List.of("l0", "l1"), "listint", List.of(0, 1)));
+        EVENT2.setCustom(Map.of("param", 2, "list", List.of("l2"), "listint", List.of(2)));
 
         this.eventStore.saveEvent(EVENT1);
         this.eventStore.saveEvent(EVENT2).get();
@@ -515,6 +517,17 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().custom().eq("param", 1));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().custom().eq("param", 2));
         assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().custom().greater("param", 0));
+
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().custom(List.class).eq("list", "l0"));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().custom(List.class).eq("list", "l1"));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().custom(List.class).eq("list", "l2"));
+
+        assertSearch(Arrays.asList(EVENT1),
+            new SimpleEventQuery().custom(TypeUtils.parameterize(List.class, Integer.class)).eq("listint", 0));
+        assertSearch(Arrays.asList(EVENT1),
+            new SimpleEventQuery().custom(TypeUtils.parameterize(List.class, Integer.class)).eq("listint", 1));
+        assertSearch(Arrays.asList(EVENT2),
+            new SimpleEventQuery().custom(TypeUtils.parameterize(List.class, Integer.class)).eq("listint", 2));
     }
 
     @Test
@@ -634,8 +647,8 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, documentString1));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "document2"));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document2"));
-        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document2")
-            .and().eq(Event.FIELD_WIKI, WIKI_REFERENCE));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document2").and()
+            .eq(Event.FIELD_WIKI, WIKI_REFERENCE));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, documentString2));
         assertSearch(Arrays.asList(EVENT1),
             new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, new EntityReference(SPACE1_REFERENCE)));
@@ -644,8 +657,8 @@ public class EventStoreTest
             new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, new EntityReference(SPACE2_REFERENCE)));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, SPACE2_REFERENCE));
         assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().startsWith(Event.FIELD_SPACE, "space"));
-        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().in(Event.FIELD_DOCUMENT,
-            Arrays.asList("space.document1", "space.document2")));
+        assertSearch(Arrays.asList(EVENT1, EVENT2),
+            new SimpleEventQuery().in(Event.FIELD_DOCUMENT, Arrays.asList("space.document1", "space.document2")));
     }
 
     private void searchStatus()

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -67,6 +67,7 @@ ckeditor.plugin.macro.buttonHint=XWiki Makro
 ckeditor.plugin.macro.editButtonHint=Makro bearbeiten
 ckeditor.plugin.macro.refreshFailed=Fehler beim Aktualisieren des bearbeiteten Inhalts.
 ckeditor.plugin.macro.dedicatedInsertButtonHint={0} Makro einfügen
+ckeditor.plugin.macro.notinstalled=Nicht installiert
 ckeditor.plugin.office.importer.title=Office-Datei importieren
 ckeditor.plugin.office.importer.filePath=Dateipfad
 ckeditor.plugin.office.importer.filePath.hint=Wählen Sie die zu importierende Office-Datei. Die Datei wird hochgeladen und an diese Seite anhängt und ihr Inhalt wird in den Inhalt der Seite eingefügt.
@@ -166,8 +167,10 @@ macroSelector.title=Makro auswählen
 macroSelector.filter.text.placeholder=Zum Filtern tippen
 macroSelector.filter.category.all=Alle Makros
 macroSelector.filter.category.other=Andere
+macroSelector.filter.category.notinstalled=Nicht installiert
 macroSelector.failedToRetrieveMacros=Fehler beim Abrufen der Liste verfügbarer Makros.
 macroSelector.select=Auswählen
+macroSelector.install=Installieren
 macroEditor.title=Makro bearbeiten
 macroEditor.more=Mehr
 macroEditor.changeMacro=Makro ändern

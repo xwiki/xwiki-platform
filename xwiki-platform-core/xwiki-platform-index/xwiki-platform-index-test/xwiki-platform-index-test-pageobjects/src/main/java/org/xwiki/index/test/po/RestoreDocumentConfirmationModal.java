@@ -20,33 +20,31 @@
 package org.xwiki.index.test.po;
 
 import org.openqa.selenium.By;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.ConfirmationModal;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * Represents the actions possible on the restore document confirmation modal.
+ * Represents the actions possible on the restore document confirmation modal. The modal is displayed on the Deleted
+ * Pages tab from the Page Index when restoring a document after delete and recreation.
  *
  * @version $Id$
- * @since 14.4RC1
+ * @since 14.4.1
+ * @since 14.5RC1
  */
+@Unstable
 public class RestoreDocumentConfirmationModal extends ConfirmationModal
 {
     public RestoreDocumentConfirmationModal()
     {
         super(By.id("restoreDocumentConfirmModal"));
-        waitUntilReady();
-    }
-
-    private void waitUntilReady()
-    {
-        getDriver().waitUntilElementIsVisible(RestoreDocumentConfirmationModal.this.container,
-            By.cssSelector(".modal-footer .btn-danger"));
     }
 
     public ViewPage clickReplace()
     {
         getDriver().findElementWithoutWaiting(this.container,
             By.cssSelector(".modal-footer .btn-primary, .modal-footer .btn-danger")).click();
+        getDriver().waitUntilPageIsReloaded();
         return new ViewPage();
     }
 }

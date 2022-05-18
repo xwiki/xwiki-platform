@@ -219,7 +219,8 @@ public class LiveTableElement extends BaseElement
      *
      * @param by the selector of the searched element
      * @return the row index where the element was found
-     * @since 14.4RC1
+     * @since 14.4.1
+     * @since 14.5RC1
      */
     public int getRowNumberForElement(By by)
     {

@@ -654,7 +654,8 @@ class DeletePageIT
      * Check that when a new target document is selected, the backlinks are updated to the new value and the redirect is
      * working when accessing the old page.
      *
-     * @since 14.4RC1
+     * @since 14.4.1
+     * @since 14.5RC1
      */
     @Test
     @Order(13)
@@ -672,18 +673,18 @@ class DeletePageIT
         // Delete page and provide a new target, with updateLinks and autoRedirect enabled.
         ViewPage viewPage = testUtils.gotoPage(reference);
         DeletePageConfirmationPage confirmationPage = viewPage.deletePage();
-        confirmationPage.getBacklinkPanelExpandButton().click();
-        confirmationPage.setNewTarget(testUtils.serializeReference(newTargetReference));
+        confirmationPage.toggleBacklinksPanel();
+        confirmationPage.setNewBacklinkTarget(testUtils.serializeReference(newTargetReference));
         confirmationPage.setUpdateLinks(true);
         confirmationPage.setAutoRedirect(true);
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilFinished();
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
 
         // Verify that a redirect was added and the link was updated.
         viewPage = testUtils.gotoPage(reference);
         assertEquals("New target", this.viewPage.getDocumentTitle());
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
         assertEquals("[[Link>>doc:NewTarget.WebHome]]",
             testUtils.rest().<Page>get(backlinkDocumentReference).getContent());
     }
@@ -691,7 +692,8 @@ class DeletePageIT
     /**
      * Check that if a new target is not selected, the backlinks are not altered and no redirect is added.
      *
-     * @since 14.4RC1
+     * @since 14.4.1
+     * @since 14.5RC1
      */
     @Test
     @Order(14)
@@ -724,7 +726,8 @@ class DeletePageIT
      * Test that when you delete a page and you select "affect children" along with a new target document, only the
      * parent page has the backlinks updated a the redirect added.
      *
-     * @since 14.4RC1
+     * @since 14.4.1
+     * @since 14.5RC1
      */
     @Test
     @Order(15)
@@ -747,8 +750,8 @@ class DeletePageIT
         ViewPage parentPage = testUtils.gotoPage(parentReference);
         DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
         confirmationPage.setAffectChildren(true);
-        confirmationPage.getBacklinkPanelExpandButton().click();
-        confirmationPage.setNewTarget(testUtils.serializeReference(newTargetReference));
+        confirmationPage.toggleBacklinksPanel();
+        confirmationPage.setNewBacklinkTarget(testUtils.serializeReference(newTargetReference));
         confirmationPage.setUpdateLinks(true);
         confirmationPage.setAutoRedirect(true);
         confirmationPage.clickYes();

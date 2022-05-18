@@ -122,7 +122,6 @@ $response.setContentType('application/json')
      "canRestore" : #if($originalDocument)$ddoc.canUndelete()#{else}false#end,
      #set ($exists = $xwiki.exists($ddoc.documentReference))
      "alreadyExists" : ${exists},
-     "deleteExistingDocUrl": "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'delete'))",
      ## If a document to be undeleted is a translation and the main document of that translation is not yet created or undeleted, restoring this translation 
      ## will leave it inaccessible from the UI, thus "orphaned", until the main document is created or undeleted.
      #set ($causesOrphanedTranslation = false)

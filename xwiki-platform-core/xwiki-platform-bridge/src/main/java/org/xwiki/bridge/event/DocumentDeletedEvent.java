@@ -43,19 +43,16 @@ public class DocumentDeletedEvent extends AbstractDocumentEvent
      */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * The reference of the deleted document.
-     */
-    private final DocumentReference sourceReference;
+    
 
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other document delete event.
+     * other document delete event. Since listeners may expect to find the document reference in the event, it is
+     * recommended to use the constructor with the explicit parameter when generating the event.
      */
     public DocumentDeletedEvent()
     {
-        this.sourceReference = null;
     }
 
     /**
@@ -67,7 +64,6 @@ public class DocumentDeletedEvent extends AbstractDocumentEvent
     public DocumentDeletedEvent(DocumentReference documentReference)
     {
         super(documentReference);
-        this.sourceReference = documentReference;
     }
 
     /**
@@ -78,15 +74,5 @@ public class DocumentDeletedEvent extends AbstractDocumentEvent
     public DocumentDeletedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
-        this.sourceReference = null;
     }
-
-    /**
-     * @return the reference of the deleted document
-     */
-    public DocumentReference getSourceReference()
-    {
-        return this.sourceReference;
-    }
-
 }

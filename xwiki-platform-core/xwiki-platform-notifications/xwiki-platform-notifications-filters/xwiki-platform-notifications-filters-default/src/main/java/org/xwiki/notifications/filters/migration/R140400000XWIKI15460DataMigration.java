@@ -95,8 +95,7 @@ public class R140400000XWIKI15460DataMigration extends AbstractHibernateDataMigr
 
         try {
             Collection<String> wikiIds = this.wikiDescriptorManager.getAllIds();
-            // TODO: setting the limit to 3 for the tests, but must be moved back to 1000 afterwards
-            int limit = 3;
+            int limit = 1000;
             int offset = 0;
             Set<NotificationFilterPreference> allNotificationFilterPreferences = this.store
                 .getPaginatedFilterPreferences(limit, offset);

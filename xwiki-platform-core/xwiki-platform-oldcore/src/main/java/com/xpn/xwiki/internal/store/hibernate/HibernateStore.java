@@ -33,6 +33,7 @@ import java.sql.Statement;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
@@ -695,6 +696,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
                         }
                     });
                 }
+
+                session.setProperty("xwiki.database", databaseName);
             }
 
             getDataMigrationManager().checkDatabase();
@@ -805,6 +808,18 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         }
 
         if (session != null) {
+            String sessionDatabase = (String) session.getProperties().get("xwiki.database");
+            String contextWikiId = this.wikis.getCurrentWikiId();
+            String contextDatabase = getDatabaseFromWikiName(contextWikiId);
+
+            // The current context is trying to manipulate a database different from the one in the current session
+            if (!Objects.equals(sessionDatabase, contextDatabase)) {
+                Object[] args = {contextWikiId};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
+                    "Cannot switch to database {0} in an existing session", null, args);
+            }
+
             this.logger.debug("Taking session from context [{}]", session);
             this.logger.debug("Taking transaction from context [{}]", transaction);
 

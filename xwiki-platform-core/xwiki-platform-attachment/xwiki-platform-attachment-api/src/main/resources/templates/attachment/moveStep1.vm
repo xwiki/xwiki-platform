@@ -23,8 +23,11 @@
 
 #set ($discard = $xwiki.ssrx.use('css/attachment/move.css'))
 #set ($discard = $xwiki.jsrx.use('js/attachment/move.js'))
-#set($titleToDisplay = $services.localization.render('attachment.move.title', 
-  [$attachment.name, $escapetool.xml($doc.plainTitle), $doc.getURL()]))
+#set($titleToDisplay = $services.localization.render('attachment.move.title', [
+  $escapetool.xml($attachment.name), 
+  $escapetool.xml($doc.plainTitle), 
+  $escapetool.xml($doc.getURL())
+]))
 <div class="xcontent">
 #template('contentheader.vm')
 #template('attachment/refactoring_macros.vm')
@@ -63,16 +66,18 @@
         ## In the future we'll offer a config option to define the default behavior, see
         ## http://jira.xwiki.org/browse/XWIKI-13384
         #set ($checked = $request.autoRedirect == 'true')
-        <dt>
+        <dt class="autoRedirect">
           <label>
             <input type="checkbox" name="autoRedirect" value="true" #if ($checked)checked="checked"#end />
-            $services.localization.render('attachment.move.autoRedirect.label')
+            $escapetool.xml($services.localization.render('attachment.move.autoRedirect.label'))
           </label>
           ## The value submitted when the checkbox is not checked, used to preserve the form state.
           <input type="hidden" name="autoRedirect" value="false" />
         </dt>
-        <dd>
-          <span class="xHint">$services.localization.render('attachment.move.autoRedirect.hint')</span>
+        <dd class="autoRedirect">
+          <span class="xHint">
+            $escapetool.xml($services.localization.render('attachment.move.autoRedirect.hint'))
+          </span>
         </dd>
       </dl>
     </div>
@@ -81,21 +86,32 @@
         ##------------
         ## Target attachment
         ##------------
-        <dt>
-          <label for="targetAttachmentName">$services.localization.render('attachment.move.newName.label')</label>
-          <span class="xHint">$!services.localization.render('attachment.move.newName.hint')</span>
+        <dt class="targetAttachmentName">
+          <label for="targetAttachmentNameTitle">
+            $escapetool.xml($services.localization.render('attachment.move.newName.label'))
+          </label>
+          <span class="xHint">
+            $escapetool.xml($services.localization.render('attachment.move.newName.hint'))
+          </span>
         </dt>
         <dd>
-          <input type="text" id="targetAttachmentNameTitle" name="targetAttachmentName" value="$escapetool.xml($attachment.name)"
+          <input type="text" 
+                 id="targetAttachmentNameTitle" 
+                 name="targetAttachmentName" 
+                 value="$escapetool.xml($attachment.name)"
                  class="location-title-field" 
-                 placeholder="$!services.localization.render('attachment.move.newName.placeholder')" /> 
+                 placeholder="$escapetool.xml($services.localization.render('attachment.move.newName.placeholder'))" /> 
         </dd>
         ##------------
         ## Target Page
         ##------------
         <dt>
-          <label for="$!{options.id}Title">$services.localization.render('attachment.move.newLocation.label')</label>
-          <span class="xHint">$!services.localization.render('attachment.move.newLocation.hint')</span>
+          <label for="targetLocation">
+              $escapetool.xml($services.localization.render('attachment.move.newLocation.label'))
+          </label>
+          <span class="xHint">
+            $escapetool.xml($services.localization.render('attachment.move.newLocation.hint'))
+          </span>
         </dt>
         <dd>
           #set ($targetRef = $doc.documentReference)
@@ -110,7 +126,9 @@
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
-                  <h5 class="modal-title">Modal title</h5>
+                  <h5 class="modal-title">
+                    $escapetool.xml($services.localization.render('attachment.move.targetLocation.modal.title'))
+                  </h5>
                 </div>
                 <div class="modal-body">
                   #template("documentTree_macros.vm")
@@ -124,8 +142,12 @@
                   })
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary">Select</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">
+                    $escapetool.xml($services.localization.render('attachment.move.targetLocation.modal.closeButton'))
+                  </button>
+                  <button type="button" class="btn btn-primary">
+                    $escapetool.xml($services.localization.render('attachment.move.targetLocation.modal.selectButton'))
+                  </button>
                 </div>
               </div>
             </div>
@@ -150,10 +172,14 @@
   </div>
   <div class="buttons">
     <span class="buttonwrapper">
-      <input type="submit" value="$services.localization.render('attachment.move.submit')" class="button" />
+      <input type="submit" 
+             value="$escapetool.xml($services.localization.render('attachment.move.submit'))" 
+             class="button" />
     </span>
     <span class="buttonwrapper">
-      <a class="secondary button" href="$doc.getURL()">$services.localization.render('cancel')</a>
+      <a class="secondary button" href="$doc.getURL()">
+        $escapetool.xml($services.localization.render('cancel'))
+      </a>
     </span>
   </div>
 </form>

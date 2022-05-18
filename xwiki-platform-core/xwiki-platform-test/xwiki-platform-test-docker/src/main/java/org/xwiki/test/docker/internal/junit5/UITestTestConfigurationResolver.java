@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.Extension;
-import org.xwiki.test.docker.internal.junit5.configuration.PropertiesMerger;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.browser.Browser;
@@ -74,8 +73,6 @@ public class UITestTestConfigurationResolver
     private static final String PROFILES_PROPERTY = "xwiki.test.ui.profiles";
 
     private static final String OFFICE_PROPERTY = "xwiki.test.ui.office";
-
-    private PropertiesMerger propertiesMerger = new PropertiesMerger();
 
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration

@@ -53,6 +53,8 @@
         <!-- lib/websocket -->
         <exclude>org.eclipse.jetty.websocket:*</exclude>
         <exclude>*:jetty-javax-websocket-api</exclude>
+        <!-- lib/apache-jsp -->
+        <exclude>org.mortbay.jasper:apache-el</exclude>
       </excludes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
       <useProjectArtifact>false</useProjectArtifact>

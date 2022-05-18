@@ -100,14 +100,17 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     var parentField = picker.find('input.location-parent-field');
 
     picker.find('.location-action-pick').on('click', function(event) {
-      var selectedValue = parentField.val();
-      if (selectedValue) {
-        var wiki = wikiField.val() || xm.wiki;
-        var spaceReference = XWiki.Model.resolve(selectedValue, XWiki.EntityType.SPACE, [wiki]);
+      // Open to the parent wiki, by default. The wiki node should be visible in the tree, otherwise we wouldn't be able
+      // to move pages to top level, under the wiki node.
+      var wiki = wikiField.val() || xm.wiki;
+      var openToNodeId = 'wiki:' + wiki;
+      if (parentField.val()) {
+        // Open to the parent document, if specified.
+        var spaceReference = XWiki.Model.resolve(parentField.val(), XWiki.EntityType.SPACE, [wiki]);
         var documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, spaceReference);
-        var openToNodeId = 'document:' + XWiki.Model.serialize(documentReference);
-        $(this).attr('data-openTo', openToNodeId);
+        openToNodeId = 'document:' + XWiki.Model.serialize(documentReference);
       }
+      $(this).attr('data-openTo', openToNodeId);
     });
 
     picker.find('.modal').on('xwiki:locationTreePicker:select', function(event, data) {

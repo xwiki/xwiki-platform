@@ -980,6 +980,20 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Check if the given wiki initialization has been performed and is finished.
+     *
+     * @param wikiId the identifier of the wiki
+     * @return {@code true} if the wiki has been initialized and the initialization is finished.
+     * @since 14.4RC1
+     */
+    @Unstable
+    public boolean isWikiInitialized(String wikiId)
+    {
+        Job wikiInitializerJob = getWikiInitializerJob(wikiId);
+        return wikiInitializerJob != null && wikiInitializerJob.getStatus().getState() == State.FINISHED;
+    }
+
+    /**
      * Make sure the wiki is initializing or wait for it.
      * 
      * @param wikiId the identifier of the wiki to initialize

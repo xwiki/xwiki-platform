@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>14.4-SNAPSHOT</version>
+    <version>14.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -167,18 +167,18 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>14.4-SNAPSHOT</version>
+        <version>14.5-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-security-authorization-script</artifactId>
-        <version>14.4-SNAPSHOT</version>
+        <version>14.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-webjars-api</artifactId>
-        <version>14.4-SNAPSHOT</version>
+        <version>14.5-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>
@@ -189,7 +189,7 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tree-webjar</artifactId>
-        <version>14.4-SNAPSHOT</version>
+        <version>14.5-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -325,28 +325,6 @@
                       <resource>META-INF/BCKEY.DSA</resource>
                       <resource>META-INF/BCKEY.SF</resource>
                     </resources>
-                  </exception>
-                  <!-- XStream includes both xapp and xmlpull and XAPP bundle somes classes of xmlpull.
-                       See http://x-stream.github.io/jira/689/ for more.
-                   -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>xmlpull</groupId>
-                        <artifactId>xmlpull</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3_min</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <packages>
-                      <package>org.xmlpull</package>
-                    </packages>
                   </exception>
                   <!-- Does not seems to be an issue -->
                   <exception>

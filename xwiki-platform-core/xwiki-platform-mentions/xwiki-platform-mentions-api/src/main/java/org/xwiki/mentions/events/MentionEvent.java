@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.TargetableEvent;
 import org.xwiki.text.XWikiToStringBuilder;
 
@@ -33,7 +32,7 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 12.5RC1
  */
-public class MentionEvent implements RecordableEvent, TargetableEvent
+public class MentionEvent implements TargetableEvent
 {
     /**
      * Name of the mention event.

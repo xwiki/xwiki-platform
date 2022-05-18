@@ -327,7 +327,7 @@ public class XWikiDockerExtension extends AbstractExtension
         // annotation then it means all containers have already been started and the servlet engine is supported.
         if (!hasParentTestContainingUITestAnnotation(extensionContext)) {
             // Create & save the test configuration so that we can access it in afterAll()
-            TestConfiguration testConfiguration = testConfigurationMerger.resolve(extensionContext);
+            TestConfiguration testConfiguration = this.testConfigurationMerger.resolve(extensionContext);
             saveTestConfiguration(extensionContext, testConfiguration);
             // Skip the test if the Servlet Engine selected is in the forbidden list
             if (isServletEngineForbidden(testConfiguration)) {

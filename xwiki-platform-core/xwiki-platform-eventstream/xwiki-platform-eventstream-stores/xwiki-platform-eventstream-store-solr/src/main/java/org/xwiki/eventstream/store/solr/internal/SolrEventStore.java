@@ -699,6 +699,12 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 builder.append('*');
                 builder.append(this.utils.toFilterQueryString(condition.getValue()));
                 break;
+
+            case CONTAINS:
+                builder.append('*');
+                builder.append(this.utils.toFilterQueryString(condition.getValue()));
+                builder.append('*');
+                break;
         }
 
         return builder.toString();

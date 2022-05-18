@@ -155,10 +155,10 @@ public interface NotificationFilterPreference
     @Unstable
     default boolean isFromWiki(String wikiId)
     {
-        String wikiIdWithSeparator = wikiId + ":";
+        String wikiIdWithPrefix = wikiId + ":";
         return Objects.equals(getWiki(), wikiId)
-            || StringUtils.startsWith(getPage(), wikiIdWithSeparator)
-            || StringUtils.startsWith(getPageOnly(), wikiIdWithSeparator)
-            || StringUtils.startsWith(getUser(), wikiIdWithSeparator);
+            || StringUtils.startsWith(getPage(), wikiIdWithPrefix)
+            || StringUtils.startsWith(getPageOnly(), wikiIdWithPrefix)
+            || StringUtils.startsWith(getUser(), wikiIdWithPrefix);
     }
 }

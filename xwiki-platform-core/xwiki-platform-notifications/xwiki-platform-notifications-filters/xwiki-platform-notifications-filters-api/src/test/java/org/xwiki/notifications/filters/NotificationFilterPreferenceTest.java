@@ -19,10 +19,13 @@
  */
 package org.xwiki.notifications.filters;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.spy;
@@ -66,7 +69,6 @@ class NotificationFilterPreferenceTest
         assertTrue(this.notificationFilterPreference.isFromWiki("wikiid"));
     }
 
-
     @Test
     void isFromWikiPageDefined()
     {
@@ -79,5 +81,39 @@ class NotificationFilterPreferenceTest
     {
         when(this.notificationFilterPreference.getPageOnly()).thenReturn("wikiid:XWiki.Page");
         assertTrue(this.notificationFilterPreference.isFromWiki("wikiid"));
+    }
+
+    @Test
+    void getWikIdWikiDefined()
+    {
+        when(this.notificationFilterPreference.getWiki()).thenReturn("wikiid");
+        assertEquals(Optional.of("wikiid"), this.notificationFilterPreference.getWikiId());
+    }
+
+    @Test
+    void getWikIdUserDefined()
+    {
+        when(this.notificationFilterPreference.getUser()).thenReturn("wikiid:XWiki.User");
+        assertEquals(Optional.of("wikiid"), this.notificationFilterPreference.getWikiId());
+    }
+
+    @Test
+    void getWikIdPageDefined()
+    {
+        when(this.notificationFilterPreference.getPage()).thenReturn("wikiid:XWiki.Page");
+        assertEquals(Optional.of("wikiid"), this.notificationFilterPreference.getWikiId());
+    }
+
+    @Test
+    void getWikIdPageOnlyDefined()
+    {
+        when(this.notificationFilterPreference.getPageOnly()).thenReturn("wikiid:XWiki.Page");
+        assertEquals(Optional.of("wikiid"), this.notificationFilterPreference.getWikiId());
+    }
+
+    @Test
+    void getWikIdUnknownWikiId()
+    {
+        assertEquals(Optional.empty(), this.notificationFilterPreference.getWikiId());
     }
 }

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.migration;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -29,6 +30,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
@@ -36,7 +38,6 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
@@ -79,38 +80,47 @@ public class R140400000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     }
 
     @Override
+    public boolean shouldExecute(XWikiDBVersion startupVersion)
+    {
+        boolean shouldExecute = super.shouldExecute(startupVersion);
+        if (shouldExecute) {
+            shouldExecute = Objects.equals(this.wikiDescriptorManager.getCurrentWikiId(),
+                this.wikiDescriptorManager.getMainWikiId());
+        }
+
+        if (shouldExecute) {
+            int version = startupVersion.getVersion();
+            shouldExecute = !(version >= 131006000 && version < 140000000);
+        }
+        return shouldExecute;
+    }
+
+    @Override
     protected void hibernateMigrate() throws DataMigrationException
     {
-        XWikiContext context = getXWikiContext();
-        if (!Objects.equals(context.getWikiId(), context.getMainXWiki())) {
-            this.logger.info("Skipping, this migration only applies to the main wiki.");
-            return;
-        }
-
-        int version = this.manager.get().getDBVersion().getVersion();
-        if (version >= 131006000 && version < 140000000) {
-            this.logger.info("Skipping, this migration has already been performed in 13.10.6+.");
-            return;
-        }
-
         try {
-            Collection<String> wikiIds = this.wikiDescriptorManager.getAllIds();
+            Collection<String> knownWikiIds = this.wikiDescriptorManager.getAllIds();
+            Set<String> unknownWikiIds = new HashSet<>();
+
             int limit = 1000;
             int offset = 0;
             Set<NotificationFilterPreference> allNotificationFilterPreferences = this.store
                 .getPaginatedFilterPreferences(limit, offset);
             while (!allNotificationFilterPreferences.isEmpty()) {
                 // We count the deleted filter preferences and adapt the next offset accordingly.
-                int removed = 0;
                 for (NotificationFilterPreference filterPreference : allNotificationFilterPreferences) {
-                    boolean isFromExistingWiki = wikiIds.stream().anyMatch(filterPreference::isFromWiki);
-                    if (!isFromExistingWiki) {
-                        removed++;
-                        this.store.deleteFilterPreference(filterPreference);
-                    }
+                    filterPreference.getWikiId().ifPresent(wikiId -> {
+                        if (!knownWikiIds.contains(wikiId)) {
+                            unknownWikiIds.add(wikiId);
+                        }
+                    });
                 }
-                offset += limit - removed;
+                offset += limit;
                 allNotificationFilterPreferences = this.store.getPaginatedFilterPreferences(limit, offset);
+            }
+
+            for (String unknownWikiId : unknownWikiIds) {
+                this.store.deleteFilterPreference(new WikiReference(unknownWikiId));
             }
         } catch (NotificationException e) {
             throw new DataMigrationException("Failed to retrieve the notification filters preferences.", e);

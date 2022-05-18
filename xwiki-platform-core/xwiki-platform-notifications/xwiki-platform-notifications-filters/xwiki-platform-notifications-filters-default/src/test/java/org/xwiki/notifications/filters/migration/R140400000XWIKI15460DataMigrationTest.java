@@ -20,16 +20,12 @@
 package org.xwiki.notifications.filters.migration;
 
 import java.util.HashSet;
-
-import javax.inject.Named;
-import javax.inject.Provider;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mock;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
@@ -41,22 +37,17 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
-import com.xpn.xwiki.store.migration.DataMigrationManager;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
-import ch.qos.logback.classic.Level;
-
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -78,58 +69,34 @@ class R140400000XWIKI15460DataMigrationTest
     @MockComponent
     private NotificationFilterPreferenceStore store;
 
-    @MockComponent
-    private Execution execution;
-
-    @MockComponent
-    @Named(XWikiHibernateBaseStore.HINT)
-    protected Provider<DataMigrationManager> manager;
-
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
-
-    @Mock
-    private XWikiContext context;
-
-    @Mock
-    private DataMigrationManager dataMigrationManager;
 
     @BeforeEach
     void setUp() throws Exception
     {
-        ExecutionContext executionContext = new ExecutionContext();
-        executionContext.setProperty("xwikicontext", this.context);
-        when(this.execution.getContext()).thenReturn(executionContext);
-        when(this.context.getMainXWiki()).thenReturn("mainwikiid");
-        when(this.context.getWikiId()).thenReturn("mainwikiid");
-        when(this.manager.get()).thenReturn(this.dataMigrationManager);
-        when(this.dataMigrationManager.getDBVersion()).thenReturn(new XWikiDBVersion(0));
         when(this.wikiDescriptorManager.getAllIds()).thenReturn(asList("mainwikiid", "wikiA"));
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("mainwikiid");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainwikiid");
     }
 
     @Test
-    void hibernateMigrateNotMainWiki() throws Exception
+    void shouldExecuteNotMainWiki()
     {
-        when(this.context.getWikiId()).thenReturn("subwikiid");
-        this.dataMigration.hibernateMigrate();
-        assertEquals(1, this.logCapture.size());
-        assertEquals("Skipping, this migration only applies to the main wiki.", this.logCapture.getMessage(0));
-        assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());
-        verifyNoInteractions(this.manager);
-        verifyNoInteractions(this.wikiDescriptorManager);
-        verifyNoInteractions(this.store);
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwikiid");
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(0)));
     }
 
     @Test
-    void hibernateMigrateAlreadyExecuted() throws Exception
+    void shouldExecuteAlreadyExecuted()
     {
-        when(this.dataMigrationManager.getDBVersion()).thenReturn(new XWikiDBVersion(131006001));
-        this.dataMigration.hibernateMigrate();
-        assertEquals(1, this.logCapture.size());
-        assertEquals("Skipping, this migration has already been performed in 13.10.6+.", this.logCapture.getMessage(0));
-        assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());
-        verifyNoInteractions(this.wikiDescriptorManager);
-        verifyNoInteractions(this.store);
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(131006001)));
+    }
+
+    @Test
+    void shouldExecute()
+    {
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(0)));
     }
 
     @Test
@@ -139,22 +106,21 @@ class R140400000XWIKI15460DataMigrationTest
         // nfp1 is from a removed wiki
         // nfp2 is from wikiA
         NotificationFilterPreference nfp0 = mock(NotificationFilterPreference.class);
-        when(nfp0.isFromWiki("mainwikiid")).thenReturn(true);
+        when(nfp0.getWikiId()).thenReturn(Optional.of("mainwikiid"));
         NotificationFilterPreference nfp1 = mock(NotificationFilterPreference.class);
+        when(nfp1.getWikiId()).thenReturn(Optional.of("unknownikiid"));
         NotificationFilterPreference nfp2 = mock(NotificationFilterPreference.class);
-        when(nfp2.isFromWiki("wikiA")).thenReturn(true);
+        when(nfp2.getWikiId()).thenReturn(Optional.of("wikiA"));
         when(this.store.getPaginatedFilterPreferences(1000, 0)).thenReturn(new HashSet<>(asList(
             nfp0,
             nfp1,
             nfp2
         )));
         this.dataMigration.hibernateMigrate();
-        verify(this.store, never()).deleteFilterPreference(nfp0);
-        verify(this.store).deleteFilterPreference(nfp1);
-        verify(this.store, never()).deleteFilterPreference(nfp2);
+        verify(this.store).deleteFilterPreference(new WikiReference("unknownikiid"));
         verify(this.store).getPaginatedFilterPreferences(1000, 0);
         // The offset is lowered by once since nfp1 was deleted.
-        verify(this.store).getPaginatedFilterPreferences(1000, 999);
+        verify(this.store).getPaginatedFilterPreferences(1000, 1000);
     }
 
     @Test

@@ -276,7 +276,7 @@ public class NotificationFilterPreferenceStore
      *
      * @param preference the preference to delete.
      */
-    public void deleteFilterPreference(NotificationFilterPreference preference)
+    private void deleteFilterPreference(NotificationFilterPreference preference)
     {
         if (preference == null) {
             return;

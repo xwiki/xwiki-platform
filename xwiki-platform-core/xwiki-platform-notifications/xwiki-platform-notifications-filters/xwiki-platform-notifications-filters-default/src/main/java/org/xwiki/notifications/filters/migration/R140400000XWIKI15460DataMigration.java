@@ -54,7 +54,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  */
 @Component
 @Singleton
-@Named("R140400000XWIKI1546")
+@Named("R140400000XWIKI15460")
 @Unstable
 public class R140400000XWIKI15460DataMigration extends AbstractHibernateDataMigration
 {

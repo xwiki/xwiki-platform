@@ -97,10 +97,11 @@ public class AutomaticRedirectCreatorListener extends AbstractLocalEventListener
             // For case when the delete affects also the child pages, only the root document should have a redirect
             // created.
             if (request.isAutoRedirect()
-                && isRootDoc(job.getCommonParent(), documentDeletedEvent.getSourceReference())) {
-                this.logger.info(CREATING_AUTOMATIC_REDIRECT_FROM_TO, documentDeletedEvent.getSourceReference(),
-                    request.getNewTarget());
-                this.modelBridge.createRedirect(documentDeletedEvent.getSourceReference(), request.getNewTarget());
+                && isRootDoc(job.getCommonParent(), documentDeletedEvent.getDocumentReference())) {
+                this.logger.info(CREATING_AUTOMATIC_REDIRECT_FROM_TO, documentDeletedEvent.getDocumentReference(),
+                    request.getNewBacklinkTarget());
+                this.modelBridge.createRedirect(documentDeletedEvent.getDocumentReference(),
+                    request.getNewBacklinkTarget());
             }
         }
     }

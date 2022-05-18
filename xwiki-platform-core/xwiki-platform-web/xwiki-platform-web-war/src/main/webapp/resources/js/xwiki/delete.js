@@ -18,16 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 require(['jquery'], function($) {
-    $('#delete #newTarget').on('keyup change', function() {
-        let updateLinksContainer = $("#delete input[name=updateLinks]").closest('dt');
-        let autoRedirectContainer = $("#delete input[name=autoRedirect]").closest('dt');
-        let elements= updateLinksContainer.add(updateLinksContainer.next('dd'))
-            .add(autoRedirectContainer).add(autoRedirectContainer.next('dd'));
+  $('#delete #newBacklinkTarget').on('keyup change', function() {
+    let updateLinksContainer = $("#delete input[name=updateLinks]").closest('dt');
+    let autoRedirectContainer = $("#delete input[name=autoRedirect]").closest('dt');
+    let elements = updateLinksContainer.add(updateLinksContainer.next('dd'))
+      .add(autoRedirectContainer).add(autoRedirectContainer.next('dd'));
 
-        if ($(this).val() != '') {
-            elements.removeClass('hidden');
-        } else {
-            elements.addClass('hidden');
-        }
-    });
+    elements.toggleClass('hidden', $(this).val() === '');
+  });
 });

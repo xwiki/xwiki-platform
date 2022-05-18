@@ -19,13 +19,9 @@
  */
 package org.xwiki.index.test.po;
 
-import java.util.Optional;
-
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -33,37 +29,24 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the actions possible on the Deleted Pages page.
  *
  * @version $Id$
- * @since 14.4RC1
+ * @since 14.4.1
+ * @since 14.5RC1
  */
+@Unstable
 public class DeletedDocsPage extends ViewPage
 {
     private LiveTableElement documentsTrashLivetable;
 
-    DeletedDocsPage()
+    public DeletedDocsPage()
     {
         this.documentsTrashLivetable = new LiveTableElement("documentsTrash");
-        waitForDeletedDocumentsLivetable();
+        this.documentsTrashLivetable.waitUntilReady();
     }
 
     public static DeletedDocsPage gotoPage()
     {
         getUtil().gotoPage("Main", "AllDocs", "view", "view=deletedDocs");
         return new DeletedDocsPage();
-    }
-
-    /**
-     * Wait for the deleted documents livetable to be ready.
-     */
-    public void waitForDeletedDocumentsLivetable()
-    {
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                return documentsTrashLivetable.isReady();
-            }
-        });
     }
 
     public int getRowIndexByDocName(String docName)
@@ -77,15 +60,10 @@ public class DeletedDocsPage extends ViewPage
             .findElement(By.className("replace"));
     }
 
-    public Optional<RestoreDocumentConfirmationModal> tryReplaceDoc(String docName)
+    public RestoreDocumentConfirmationModal tryReplaceDoc(String docName)
     {
-        try {
-            getReplaceAction(docName).click();
-            RestoreDocumentConfirmationModal restoreModal = new RestoreDocumentConfirmationModal();
-            return Optional.of(restoreModal);
-        } catch (TimeoutException e) {
-            return Optional.empty();
-        }
+        getReplaceAction(docName).click();
+        RestoreDocumentConfirmationModal restoreModal = new RestoreDocumentConfirmationModal();
+        return restoreModal;
     }
-
 }

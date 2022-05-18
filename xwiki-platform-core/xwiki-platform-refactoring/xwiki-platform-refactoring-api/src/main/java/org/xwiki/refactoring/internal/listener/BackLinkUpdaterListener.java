@@ -114,8 +114,8 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
         DocumentDeletedEvent deletedEvent = (DocumentDeletedEvent) event;
 
         // In case the delete affected the child pages too, only the root document should have the links updated.
-        if (request.isUpdateLinks() && isRootDoc(job.getCommonParent(), deletedEvent.getSourceReference())) {
-            updateBackLinks(deletedEvent.getSourceReference(), request.getNewTarget(), canEdit,
+        if (request.isUpdateLinks() && isRootDoc(job.getCommonParent(), deletedEvent.getDocumentReference())) {
+            updateBackLinks(deletedEvent.getDocumentReference(), request.getNewBacklinkTarget(), canEdit,
                 request.isUpdateLinksOnFarm());
         }
     }

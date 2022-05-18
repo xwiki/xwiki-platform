@@ -19,13 +19,6 @@
  */
 package org.xwiki.refactoring.internal.listener;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +44,13 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link BackLinkUpdaterListener}.
@@ -112,7 +112,7 @@ class BackLinkUpdaterListenerTest
 
         when(this.jobContext.getCurrentJob()).thenReturn(deleteJob);
         when(this.deleteJob.getRequest()).thenReturn(deleteRequest);
-        deleteRequest.setNewTarget(bobReference);
+        deleteRequest.setNewBacklinkTarget(bobReference);
         when(this.deleteJob.getCommonParent()).thenReturn(aliceReference);
     }
 
@@ -226,7 +226,7 @@ class BackLinkUpdaterListenerTest
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
     }
-    
+
     @Test
     void onDocumentDeletedWithUpdateLinksOnFarmOnChildDoc()
     {

@@ -22,8 +22,6 @@ package org.xwiki.index.test.ui.docker;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -37,13 +35,14 @@ import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * Tests for Deleted Pages page.
+ * Tests for Deleted Pages tab from Page Index (XWiki.AllDocs).
  *
  * @version $Id$
- * @since 14.4RC1
+ * @since 14.4.1
+ * @since 14.5RC1
  */
 @UITest
-public class DeletedDocsIT
+class DeletedDocsIT
 {
     @BeforeEach
     void setUp(TestUtils setup)
@@ -53,7 +52,7 @@ public class DeletedDocsIT
 
     @Test
     @Order(1)
-    void restoreAfterDocumentWasReacreated(TestUtils testUtils, TestReference reference) throws Exception
+    void restoreOriginalDocumentAfterDeletionAndRecreation(TestUtils testUtils, TestReference reference)
     {
         // Delete and create a new version of a document.
         ViewPage viewPage = testUtils.createPage(reference, "original", "Original page");
@@ -66,10 +65,10 @@ public class DeletedDocsIT
 
         // Go to deleted pages and try to restore the original document.
         DeletedDocsPage deletedDocs = DeletedDocsPage.gotoPage();
-        Optional<RestoreDocumentConfirmationModal> confirmationModal =
+        RestoreDocumentConfirmationModal confirmationModal =
             deletedDocs.tryReplaceDoc(reference.toString().split(":")[1]);
-        assertTrue(confirmationModal.isPresent());
-        viewPage = confirmationModal.get().clickReplace();
+        assertTrue(confirmationModal.isDisplayed());
+        viewPage = confirmationModal.clickReplace();
 
         assertEquals("Original page", viewPage.getDocumentTitle());
         assertEquals("original", viewPage.getContent());

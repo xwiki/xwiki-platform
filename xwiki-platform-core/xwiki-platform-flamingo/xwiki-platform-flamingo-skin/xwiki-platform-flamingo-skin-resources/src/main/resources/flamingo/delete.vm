@@ -237,13 +237,13 @@
       </p>
       <dl>
         <dt>
-          <label for="newTarget">$services.localization.render('core.delete.target.label')</label>
-          <span class="xHint">$services.localization.render('core.delete.target.hint')</span>
+          <label for="newBacklinkTarget">$services.localization.render('core.delete.backlinkTarget.label')</label>
+          <span class="xHint">$services.localization.render('core.delete.backlinkTarget.hint')</span>
         </dt>
         <dd>
           #set ($pagePickerParams = {
-            'id': 'newTarget',
-            'name': 'newTarget'
+            'id': 'newBacklinkTarget',
+            'name': 'newBacklinkTarget'
           })
           #pagePicker($pagePickerParams)
         </dd>
@@ -260,6 +260,7 @@
           'hint': 'core.delete.autoRedirect.hint',
           'hidden': true
         })
+      </dl>
     #end
     #displayPanel('panel-backlinks', 'panel-default', $heading, $body)
     #set($hasInlinks = true)

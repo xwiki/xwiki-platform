@@ -20,13 +20,16 @@
 package org.xwiki.refactoring.job;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Job request for deleting a page.
  * 
  * @version $Id$
- * @since 14.4RC1
+ * @since 14.4.1
+ * @since 14.5RC1
  */
+@Unstable
 public class DeleteRequest extends EntityRequest
 {
     /**
@@ -36,9 +39,9 @@ public class DeleteRequest extends EntityRequest
     public static final String SHOULD_SKIP_RECYCLE_BIN = "shouldSkipRecycleBin";
 
     /**
-     * @see #getNewTarget()
+     * @see #getNewBacklinkTarget()
      */
-    public static final String NEW_TARGET = "newTarget";
+    public static final String NEW_BACKLINK_TARGET = "newBacklinkTarget";
 
     /**
      * @see #isUpdateLinks()
@@ -78,21 +81,21 @@ public class DeleteRequest extends EntityRequest
     }
 
     /**
-     * @return the document to be used as the new target after the delete
+     * @return the document to be used as the new backlink target after delete
      */
-    public DocumentReference getNewTarget()
+    public DocumentReference getNewBacklinkTarget()
     {
-        return getProperty(NEW_TARGET);
+        return getProperty(NEW_BACKLINK_TARGET);
     }
 
     /**
-     * Sets a document to be used as the new target after the delete.
+     * Sets a document to be used as the new backlink target after delete.
      *
-     * @param newTarget reference to the new target document
+     * @param newBacklinkTarget reference to the new target document
      */
-    public void setNewTarget(DocumentReference newTarget)
+    public void setNewBacklinkTarget(DocumentReference newBacklinkTarget)
     {
-        setProperty(NEW_TARGET, newTarget);
+        setProperty(NEW_BACKLINK_TARGET, newBacklinkTarget);
     }
 
     /**

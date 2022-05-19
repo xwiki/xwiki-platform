@@ -149,7 +149,7 @@ public class DefaultTemporaryAttachmentSessionsManager
             xWikiAttachment = new XWikiAttachment();
             xWikiAttachment.setFilename(part.getSubmittedFileName());
             xWikiAttachment.setContent(part.getInputStream());
-            xWikiAttachment.setAuthorReference(context.getAuthorReference());
+            xWikiAttachment.setAuthorReference(context.getUserReference());
             temporaryAttachmentSession.addAttachment(documentReference, xWikiAttachment);
         } catch (IOException e) {
             throw new TemporaryAttachmentException("Error while reading the content of a request part", e);

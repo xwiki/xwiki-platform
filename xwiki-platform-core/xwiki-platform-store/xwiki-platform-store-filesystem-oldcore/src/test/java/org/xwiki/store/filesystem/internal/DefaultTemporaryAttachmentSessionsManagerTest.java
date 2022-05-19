@@ -100,7 +100,7 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     void uploadAttachment() throws Exception
     {
         String sessionId = "mySession";
-        when(httpSession.getId()).thenReturn(sessionId);
+        when(this.httpSession.getId()).thenReturn(sessionId);
 
         DocumentReference documentReference = mock(DocumentReference.class);
         SpaceReference spaceReference = mock(SpaceReference.class);
@@ -113,14 +113,17 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         when(part.getInputStream()).thenReturn(inputStream);
 
         XWiki xwiki = mock(XWiki.class);
-        when(context.getWiki()).thenReturn(xwiki);
-        when(xwiki.getSpacePreference(FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER, spaceReference, context))
+        when(this.context.getWiki()).thenReturn(xwiki);
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "User");
+        when(this.context.getUserReference()).thenReturn(userReference);
+        when(xwiki.getSpacePreference(FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER, spaceReference, this.context))
             .thenReturn("42");
         when(part.getSize()).thenReturn(41L);
 
         XWikiAttachment attachment = this.attachmentManager.uploadAttachment(documentReference, part);
         assertNotNull(attachment);
         assertEquals(filename, attachment.getFilename());
+        assertEquals(userReference, attachment.getAuthorReference());
 
         Map<String, TemporaryAttachmentSession> attachmentSessionMap =
             this.attachmentManager.getTemporaryAttachmentSessionMap();

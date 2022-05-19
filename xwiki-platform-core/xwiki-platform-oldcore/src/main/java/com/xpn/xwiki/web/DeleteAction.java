@@ -251,13 +251,6 @@ public class DeleteAction extends XWikiAction
             autoRedirect);
     }
 
-    protected boolean deleteDocument(EntityReference entityReference, XWikiContext context,
-        boolean shouldSkipRecycleBin) throws XWikiException
-    {
-        return deleteDocument(entityReference, context, shouldSkipRecycleBin,
-            getCurrentStringDocumentReferenceResolver().resolve(""), false, false);
-    }
-
     /**
      * Create a job to delete an entity.
      *

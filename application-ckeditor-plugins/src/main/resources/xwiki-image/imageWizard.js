@@ -43,7 +43,7 @@ define('imageWizard', ['imageSelector', 'imageEditor'], function(imageSelector, 
   }
 
   return function(params) {
-    if (params.imageData && params.imageData.resourceReference) {
+    if (params.isInsert === false) {
       return editOnly(params);
     } else {
       return selectAndEdit(params);

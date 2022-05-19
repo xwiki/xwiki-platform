@@ -20,7 +20,7 @@
 (function() {
   'use strict';
 
-  function showImageWizard(editor, widget) {
+  function showImageWizard(editor, widget, isInsert) {
 
     /**
      * Only called to unwrap the centered images inserted by the old image dialog.
@@ -37,7 +37,8 @@
     require(['imageWizard'], function(imageWizard) {
       imageWizard({
         editor: editor,
-        imageData: widget.data
+        imageData: widget.data,
+        isInsert: isInsert
       }).done(function(data) {
         if (widget && widget.element) {
           widget.setData(data);
@@ -78,12 +79,12 @@
       this.overrideImageWidget(editor, imageWidget);
 
       imageWidget.insert = function() {
-        showImageWizard(editor, this);
+        showImageWizard(editor, this, true);
       };
       imageWidget.edit = function(event) {
         // Prevent the default behavior because we want to use our custom image dialog.
         event.cancel();
-        showImageWizard(editor, this);
+        showImageWizard(editor, this, false);
       };
     },
     overrideImageWidget: function(editor, imageWidget) {

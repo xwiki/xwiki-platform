@@ -33,10 +33,10 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
   var macrosBySyntax = {},
   allMacrosExcludedCategories = [],
 
-  getMacros = function(syntaxId) {
+  getMacros = function(syntaxId, force) {
     var deferred = $.Deferred();
     var macros = macrosBySyntax[syntaxId || ''];
-    if (macros) {
+    if (macros && !force) {
       deferred.resolve(macros);
     } else {
       var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', $.param({
@@ -347,13 +347,13 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
           return $(this).attr('data-macroId') === macroId;
         }).click();
       },
-      update: function(syntaxId) {
+      update: function(syntaxId, force) {
         syntaxId = syntaxId || macroSelector.attr('data-syntaxId');
         var requestNumber = (macroSelector.prop('requestNumber') || 0) + 1;
         macroSelector.empty().addClass('loading')
           .attr('data-syntaxId', syntaxId)
           .prop('requestNumber', requestNumber);
-        getMacros(syntaxId).done(maybeDisplayMacros.bind(macroSelector, requestNumber))
+        getMacros(syntaxId, force).done(maybeDisplayMacros.bind(macroSelector, requestNumber))
           .fail(maybeShowError.bind(macroSelector, requestNumber));
       }
     };
@@ -387,12 +387,9 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
             selectButton.click();
           }).attr('data-syntaxId', input.syntaxId);
           macroSelectorAPI = macroSelector.xwikiMacroSelector();
-        } else if (input.updateMacros || macroSelector.attr('data-syntaxId') !== input.syntaxId) {
-          // Update the list of macros.
-          macroSelectorAPI.update(input.syntaxId);
         } else {
-          macroSelectorAPI.reset(input.macroId);
-          macroSelector.find('.macro-textFilter').focus();
+          // Always update the list of macros since macros might have been installed or uninstalled in the meantime
+          macroSelectorAPI.update(input.syntaxId, true);
         }
       });
       selectButton.on('click', function() {

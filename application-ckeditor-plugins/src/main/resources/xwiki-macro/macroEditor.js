@@ -716,6 +716,7 @@ define(
     macroCall.name = input.macroId || macroCall.name;
     if (!macroEditorAPI) {
       // Initialize the macro editor.
+      var submitButton = $(this).find('.modal-footer .btn-primary');
       macroEditor.on('ready', function(event) {
         macroEditorAPI.focus();
         submitButton.prop('disabled', false);
@@ -724,14 +725,6 @@ define(
     } else {
       macroEditorAPI.update(macroCall, input.syntaxId);
     }
-  },
-
-  onInstall = function(input, macroEditor) {
-    // Indicate that the list of macros should be updated
-    macroEditor.data('updateMacros', true);
-
-    // Load the macro descriptor
-    load(input, macroEditor);
   },
 
   install = function(input, macroEditor) {
@@ -743,7 +736,7 @@ define(
       .prop('requestNumber', requestNumber);
 
     macroService.installMacro(input.extensionId, input.extensionVersion)
-      .done(onInstall.bind(null, input, macroEditor))
+      .done(load.bind(this, input, macroEditor))
       .fail(maybeShowError.bind(macroEditor, requestNumber, 'installRequestFailed'));
   },
 
@@ -763,9 +756,9 @@ define(
 
         // Install the macro extension (if not already installed)
         if (input.macroCategory == '_notinstalled') {
-          install(input, macroEditor);
+          install.call(this, input, macroEditor);
         } else {
-          load(input, macroEditor);
+          load.call(this, input, macroEditor);
         }
       });
       submitButton.on('click', function(event) {
@@ -796,9 +789,9 @@ define(
         // Preserve the in-line/block mode if possible.
         var inline = output.macroCall ? output.macroCall.inline : undefined;
         output.macroCall = macroEditorAPI.getMacroCall();
-        output.macroCall.inline = inline;
-        output.updateMacros = macroEditor.data('updateMacros');
-        macroEditor.removeData('updateMacros');
+        if (output.macroCall) {
+          output.macroCall.inline = inline;
+        }
         modal.data('output', output).modal('hide');
       });
     }

@@ -199,6 +199,7 @@ macroEditor.submit=Submit
 macroEditor.content=Content
 macroEditor.noParameters=This macro has no parameters.
 macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
+macroEditor.installRequestFailed=Failed to install the {0} macro.
 
 
 imageEditor.modal.backToEditor.button=Back

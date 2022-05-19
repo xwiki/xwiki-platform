@@ -46,7 +46,7 @@
           // compliant with the new image dialog.
           if (widget.element.getName() === 'p') {
             widget.element = unwrapFromCentering(widget.element);
-            widet.element.setAttribute('data-widget', widget.name);
+            widget.element.setAttribute('data-widget', widget.name);
           }
 
         } else {
@@ -153,7 +153,7 @@
 
         // If alignment is undefined, try to convert from the legacy align data property.
         var mapping = {left: 'start', right: 'end', center: 'center'};
-        this.data.alignment = mapping[this.data.align] || 'none';
+        this.data.alignment = this.data.alignment || mapping[this.data.align] || 'none';
 
         // The old align needs to be undefined otherwise it's not removed when re-inserting the image after the edition,
         // add deprecated attributes to the image.

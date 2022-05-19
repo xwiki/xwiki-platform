@@ -272,7 +272,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
       $('#imageBorder').prop('checked', imageData.border);
 
       // Alignment
-      $('#advanced [name="alignment"]').val([imageData.alignment]);
+      $('#advanced [name="alignment"]').val([imageData.alignment || 'none']);
 
       // Text Wrap
       $('#advanced [name="textWrap"]').prop('checked', imageData.textWrap);

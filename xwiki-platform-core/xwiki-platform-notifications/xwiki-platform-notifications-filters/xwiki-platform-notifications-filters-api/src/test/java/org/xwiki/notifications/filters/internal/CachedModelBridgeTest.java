@@ -41,6 +41,7 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
@@ -159,5 +160,35 @@ class CachedModelBridgeTest
         assertNotNull(this.toggleCache.get(WIKI));
         assertNotNull(this.preferenceFilterCache.get(USER));
         assertNotNull(this.toggleCache.get(USER));
+    }
+
+    @Test
+    void deleteFilterPreferences() throws Exception
+    {
+        WikiReference wikiReference = new WikiReference("wikiId");
+
+        NotificationFilterPreference notificationFilterPreference0 = mock(NotificationFilterPreference.class);
+        NotificationFilterPreference notificationFilterPreference1 = mock(NotificationFilterPreference.class);
+        NotificationFilterPreference notificationFilterPreference2 = mock(NotificationFilterPreference.class);
+        NotificationFilterPreference notificationFilterPreference3 = mock(NotificationFilterPreference.class);
+
+        when(notificationFilterPreference0.isFromWiki("wikiId")).thenReturn(true);
+        when(notificationFilterPreference1.isFromWiki("wikiId")).thenReturn(false);
+        when(notificationFilterPreference2.isFromWiki("wikiId")).thenReturn(false);
+        when(notificationFilterPreference3.isFromWiki("wikiId")).thenReturn(true);
+
+        this.preferenceFilterCache.put(USER,
+            new HashSet<>(Set.of(notificationFilterPreference0, notificationFilterPreference1)));
+        this.preferenceFilterCache.put(WIKI,
+            new HashSet<>(Set.of(notificationFilterPreference2, notificationFilterPreference3)));
+
+        this.cachedModelBridge.deleteFilterPreferences(wikiReference);
+
+        assertEquals(Map.of(
+                USER, Set.of(notificationFilterPreference1),
+                WIKI, Set.of(notificationFilterPreference2)),
+            this.preferenceFilterCache);
+
+        verify(this.modelBridge).deleteFilterPreferences(wikiReference);
     }
 }

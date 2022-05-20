@@ -409,7 +409,7 @@ blockquote.mention-quote {
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>12</number>
+        <number>13</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -422,14 +422,14 @@ blockquote.mention-quote {
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>13</number>
+        <number>14</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -438,7 +438,7 @@ blockquote.mention-quote {
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>11</number>
+        <number>12</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -543,6 +543,16 @@ blockquote.mention-quote {
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -595,7 +605,9 @@ blockquote.mention-quote {
 #end
 #set ($link = $xwiki.getURL($reference.reference, 'view'))
 {{html}}
-&lt;a id="$anchor" class="$stringtool.join($cssClasses, ' ')" data-reference="$services.model.serialize($reference.reference, 'default')" href="$link"&gt;$content&lt;/a&gt;
+&lt;a id="$escapetool.xml($anchor)" class="$stringtool.join($cssClasses, ' ')" data-reference="$escapetool.xml($services.model.serialize($reference.reference, 'default'))" href="$escapetool.xml($link)"&gt;
+  $escapetool.xml($content)
+&lt;/a&gt;
 {{/html}}
 {{/velocity}}</code>
     </property>
@@ -619,6 +631,9 @@ blockquote.mention-quote {
     </property>
     <property>
       <name>User Mention</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>1</supportsInlineMode>

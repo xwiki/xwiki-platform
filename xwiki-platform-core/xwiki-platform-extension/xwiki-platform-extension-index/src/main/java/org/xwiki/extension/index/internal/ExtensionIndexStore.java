@@ -22,6 +22,7 @@ package org.xwiki.extension.index.internal;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -525,12 +526,18 @@ public class ExtensionIndexStore implements Initializable
         // Set installed state
         InstalledExtension installedExtension = this.installedExtensions.getInstalledExtension(extension.getId());
         if (installedExtension != null) {
+            List<String> installedNamespaces;
             if (installedExtension.getNamespaces() == null) {
-                this.utils.set(Extension.FIELD_ALLOWEDNAMESPACES, toStoredNamespace((String) null), document);
+                installedNamespaces = Collections.singletonList(toStoredNamespace((String) null));
             } else {
-                this.utils.set(Extension.FIELD_ALLOWEDNAMESPACES, installedExtension.getNamespaces().stream()
-                    .map(this::toStoredNamespace).collect(Collectors.toList()), document);
+                installedNamespaces = installedExtension.getNamespaces().stream().map(this::toStoredNamespace)
+                    .collect(Collectors.toList());
             }
+            this.utils.set(InstalledExtension.FIELD_INSTALLED_NAMESPACES, installedNamespaces, document);
+
+            // We can already set those extensions as "incompatible" with those namespaces
+            this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES, installedNamespaces,
+                document);
         }
 
         add(document);

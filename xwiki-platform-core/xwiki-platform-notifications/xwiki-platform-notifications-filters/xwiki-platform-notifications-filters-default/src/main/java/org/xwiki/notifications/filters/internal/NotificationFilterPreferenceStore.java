@@ -158,7 +158,7 @@ public class NotificationFilterPreferenceStore
      * @param limit the maximum number of results to return
      * @param offset the offset of the first result to return
      * @return all the notification filter preferences
-     * @since 14.4
+     * @since 14.5RC1
      * @since 13.10.6
      */
     public Set<NotificationFilterPreference> getPaginatedFilterPreferences(int limit, int offset)
@@ -239,6 +239,8 @@ public class NotificationFilterPreferenceStore
      *
      * @param wikiReference the reference of a wiki
      * @throws NotificationException in case of error during the hibernate operations
+     * @since 14.5RC1
+     * @since 13.10.6
      */
     public void deleteFilterPreference(WikiReference wikiReference) throws NotificationException
     {

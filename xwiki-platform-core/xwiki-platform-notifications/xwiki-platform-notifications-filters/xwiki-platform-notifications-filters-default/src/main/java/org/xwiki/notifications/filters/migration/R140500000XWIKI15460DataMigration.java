@@ -49,14 +49,14 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * @version $Id$
  * @see <a href="https://jira.xwiki.org/browse/XWIKI-15460">XWIKI-15460: Notification filter preferences are not cleaned
  *     when a wiki is deleted</a>
- * @since 14.4
+ * @since 14.5RC1
  * @since 13.10.6
  */
 @Component
 @Singleton
-@Named("R140400000XWIKI15460")
+@Named("R140500000XWIKI15460")
 @Unstable
-public class R140400000XWIKI15460DataMigration extends AbstractHibernateDataMigration
+public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -70,7 +70,7 @@ public class R140400000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(140400000);
+        return new XWikiDBVersion(140500000);
     }
 
     @Override

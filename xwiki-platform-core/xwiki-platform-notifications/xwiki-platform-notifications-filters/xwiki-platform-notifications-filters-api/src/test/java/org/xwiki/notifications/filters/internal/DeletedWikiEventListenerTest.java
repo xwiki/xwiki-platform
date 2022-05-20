@@ -40,7 +40,7 @@ import static org.mockito.Mockito.verify;
  * Test of {@link DeletedWikiEventListener}.
  *
  * @version $Id$
- * @since 14.4
+ * @since 14.5RC1
  * @since 13.10.6
  */
 @ComponentTest

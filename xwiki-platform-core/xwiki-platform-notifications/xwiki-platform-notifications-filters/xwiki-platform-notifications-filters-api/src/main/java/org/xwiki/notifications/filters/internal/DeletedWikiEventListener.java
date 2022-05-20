@@ -37,7 +37,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  * Cleanup the notifications when a wiki is deleted.
  *
  * @version $Id$
- * @since 14.4
+ * @since 14.5RC1
  * @since 13.10.6
  */
 @Component

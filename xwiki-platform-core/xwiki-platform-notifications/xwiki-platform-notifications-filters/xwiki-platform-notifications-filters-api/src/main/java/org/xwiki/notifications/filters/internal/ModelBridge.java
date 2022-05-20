@@ -105,7 +105,7 @@ public interface ModelBridge
      * @param wikiReference a wiki reference
      * @throws NotificationException in case of error while deleting the preferences
      * 
-     * @since 14.4
+     * @since 14.5RC1
      * @since 13.10.6
      */
     @Unstable

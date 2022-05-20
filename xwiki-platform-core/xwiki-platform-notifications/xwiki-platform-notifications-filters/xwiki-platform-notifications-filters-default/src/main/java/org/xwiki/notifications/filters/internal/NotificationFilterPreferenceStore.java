@@ -22,7 +22,9 @@ package org.xwiki.notifications.filters.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -152,6 +154,32 @@ public class NotificationFilterPreferenceStore
         }
     }
 
+    /**
+     * @param limit the maximum number of results to return
+     * @param offset the offset of the first result to return
+     * @return all the notification filter preferences
+     * @since 14.5RC1
+     * @since 14.4.1
+     * @since 13.10.7
+     */
+    public Set<NotificationFilterPreference> getPaginatedFilterPreferences(int limit, int offset)
+        throws NotificationException
+    {
+        try {
+            List<NotificationFilterPreference> list = this.queryManager
+                .createQuery("select nfp from DefaultNotificationFilterPreference nfp "
+                    + "order by nfp.internalId", Query.HQL)
+                .setLimit(limit)
+                .setOffset(offset)
+                .execute();
+            return new HashSet<>(list);
+        } catch (QueryException e) {
+            String message = String.format("Error while loading all the notification filter preferences on wiki [%s].",
+                this.contextProvider.get().getWikiId());
+            throw new NotificationException(message, e);
+        }
+    }
+
     private List<DefaultNotificationFilterPreference> getPreferencesOfEntity(EntityReference entityReference,
         String providerHint) throws QueryException
     {
@@ -205,6 +233,46 @@ public class NotificationFilterPreferenceStore
     {
         NotificationFilterPreference preference = getFilterPreference(wikiReference, filterPreferenceId);
         this.deleteFilterPreference(preference);
+    }
+
+    /**
+     * Delete all the filter preferences from a wiki.
+     *
+     * @param wikiReference the reference of a wiki
+     * @throws NotificationException in case of error during the hibernate operations
+     * @since 14.5RC1
+     * @since 14.4.1
+     * @since 13.10.7
+     */
+    public void deleteFilterPreference(WikiReference wikiReference) throws NotificationException
+    {
+        XWikiContext context = this.contextProvider.get();
+
+        String oriDatabase = context.getWikiId();
+
+        context.setWikiId(context.getMainXWiki());
+        XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+
+        try {
+            hibernateStore.beginTransaction(context);
+            Session session = hibernateStore.getSession(context);
+            session.createQuery("delete from DefaultNotificationFilterPreference "
+                    + "where page like :wikiPrefix "
+                    + "or pageOnly like :wikiPrefix "
+                    + "or user like :wikiPrefix "
+                    + "or wiki = :wikiId")
+                .setParameter("wikiPrefix", wikiReference.getName() + ":%")
+                .setParameter("wikiId", wikiReference.getName())
+                .executeUpdate();
+            hibernateStore.endTransaction(context, true);
+        } catch (XWikiException e) {
+            hibernateStore.endTransaction(context, false);
+            throw new NotificationException(
+                String.format("Failed to delete the notification preferences for wiki [%s]", wikiReference.getName()),
+                e);
+        } finally {
+            context.setWikiId(oriDatabase);
+        }
     }
 
     /**

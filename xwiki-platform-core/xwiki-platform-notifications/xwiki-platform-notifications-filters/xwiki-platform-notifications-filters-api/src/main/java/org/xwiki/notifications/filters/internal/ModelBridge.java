@@ -100,6 +100,21 @@ public interface ModelBridge
     void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId) throws NotificationException;
 
     /**
+     * Delete all the filter preferences of a wiki.
+     *
+     * @param wikiReference a wiki reference
+     * @throws NotificationException in case of error while deleting the preferences
+     * @since 14.5RC1
+     * @since 14.4.1
+     * @since 13.10.7
+     */
+    @Unstable
+    default void deleteFilterPreferences(WikiReference wikiReference) throws NotificationException
+    {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /**
      * Enable or disable a filter preference.
      * @param user reference of the user concerned by the filter preference
      * @param filterPreferenceId name of the filter preference

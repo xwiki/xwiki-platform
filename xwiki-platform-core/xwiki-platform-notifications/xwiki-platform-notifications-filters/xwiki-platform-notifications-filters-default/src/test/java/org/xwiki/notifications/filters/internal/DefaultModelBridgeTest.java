@@ -132,4 +132,11 @@ public class DefaultModelBridgeTest
         verify(this.notificationFilterPreferenceStore)
             .saveFilterPreferences(this.wikiReference, Collections.singletonList(filterPreference));
     }
+
+    @Test
+    void deleteFilterPreference() throws Exception
+    {
+        this.defaultModelBridge.deleteFilterPreference(this.wikiReference);
+        verify(this.notificationFilterPreferenceStore).deleteFilterPreference(this.wikiReference);
+    }
 }

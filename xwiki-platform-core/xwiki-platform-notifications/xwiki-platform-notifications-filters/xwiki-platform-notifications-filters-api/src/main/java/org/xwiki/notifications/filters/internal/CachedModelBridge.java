@@ -156,6 +156,15 @@ public class CachedModelBridge implements ModelBridge, Initializable
     }
 
     @Override
+    public void deleteFilterPreference(WikiReference wikiReference)
+        throws NotificationException
+    {
+        // Remove the preferences from the database, then remove the preferences from the cache.
+        this.modelBridge.deleteFilterPreference(wikiReference);
+        invalidateWikiPreferenceFilters(wikiReference);
+    }
+
+    @Override
     public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
         throws NotificationException
     {
@@ -214,5 +223,17 @@ public class CachedModelBridge implements ModelBridge, Initializable
     {
         this.preferenceFilterCache.clear();
         this.toggleCache.clear();
+    }
+
+    /**
+     * Remove all the {@link NotificationFilterPreference}s related to entities from {@code wikiReference} from the
+     * cache.
+     *
+     * @param wikiReference the wiki reference to invalidate
+     */
+    private void invalidateWikiPreferenceFilters(WikiReference wikiReference)
+    {
+        this.preferenceFilterCache.values()
+            .forEach(set -> set.removeIf(filter -> filter.isFromWiki(wikiReference.getName())));
     }
 }

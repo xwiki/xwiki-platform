@@ -178,6 +178,7 @@ macroEditor.submit=Übernehmen
 macroEditor.content=Inhalt
 macroEditor.noParameters=Dieses Makro hat keine Parameter.
 macroEditor.descriptorRequestFailed=Fehler beim Abrufen des {0} Makro Deskriptors.
+macroEditor.installRequestFailed=Das Makro {0} konnte nicht installiert werden.
 
 
 imageEditor.modal.backToEditor.button=Zurück

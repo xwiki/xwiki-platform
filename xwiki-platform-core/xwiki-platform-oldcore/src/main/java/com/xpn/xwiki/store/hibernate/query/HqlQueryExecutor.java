@@ -232,7 +232,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     /**
      * @deprecated since 13.10.6, 14.4, use {@link #createQuery(Session, Query)} instead
      */
-    @Deprecated(since = "13.10.6")
+    @Deprecated
     protected <T> org.hibernate.query.Query<T> createHibernateQuery(Session session, Query query)
     {
         return createQuery(session, filterQuery(query));

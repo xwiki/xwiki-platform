@@ -151,7 +151,7 @@ $services.template.execute('logging_macros.vm')
 #end
 
 #macro (displayJobStatus $jobStatus $translationPrefix $jobStatusURL $showLogs)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
   #set ($jobState = $jobStatus.state)
   #set ($finished = $jobState == 'FINISHED')
   #set ($jobRequest = $jobStatus.request)

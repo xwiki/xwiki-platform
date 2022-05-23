@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>parent-platform</artifactId>
-    <version>8.4-11</version>
+    <version>14.3.1</version>
   </parent>
   <artifactId>application-ckeditor-pom</artifactId>
   <packaging>pom</packaging>
@@ -45,38 +45,24 @@
     <tag>HEAD</tag>
   </scm>
   <properties>
+    <minimum.platform.version>8.4</minimum.platform.version>
+    <minimum.rendering.version>8.4</minimum.rendering.version>
     <ckeditor.version>4.19.0</ckeditor.version>
+
     <!-- The path to the folder where we clone the CKEditor sources. -->
     <ckeditor.path>${project.build.directory}/ckeditor4-${ckeditor.version}</ckeditor.path>
     <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>
     <ckeditor.plugins.path>${ckeditor.path}/plugins</ckeditor.plugins.path>
-    <!-- Follow the specifications regarding the WebJar content path.
-      (this property is defined in platform-core pom; remove this when the CKEditor is integrated in platform)-->
-    <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
+
+    <!-- Disabled the enforcer because it complain about a lot of dependencies which are supposed
+         to be avoided in more recent versions of XWiki -->
+    <xwiki.enforcer.skip>true</xwiki.enforcer.skip>
+    <xwiki.enforcer.enforce-plugins.skip>false</xwiki.enforcer.enforce-plugins.skip>
+
     <xwiki.issueManagement.jira.id>CKEDITOR</xwiki.issueManagement.jira.id>
     <!-- Release automatically on JIRA when performing the Maven release. -->
     <xwiki.release.jira.skip>false</xwiki.release.jira.skip>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.webjars</groupId>
-        <artifactId>requirejs</artifactId>
-        <!-- RequireJS is a core extension in the default XWiki distribution and so it's not easy to upgrade it.
-          Don't increase the version unless we also increase the required XWiki platform version. -->
-        <version>2.1.15</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars</groupId>
-        <artifactId>jquery</artifactId>
-        <!-- jQuery is a core extension in the default XWiki distribution and so it's not easy to upgrade it.
-          Don't increase the version unless we also increase the required XWiki platform version. -->
-        <version>1.11.1</version>
-        <scope>runtime</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <build>
     <pluginManagement>
       <plugins>
@@ -101,8 +87,21 @@
           </executions>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <executions>
+            <!-- Copy the WebJar resources to the right path before packing the jar. -->
+            <execution>
+              <id>copy-webjar-resources</id>
+              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
+              <phase>none</phase>
+              <goals>
+                <goal>resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${webjar.outputDirectory}</outputDirectory>
+              </configuration>
+            </execution>
             <!-- Copy the build configuration to the CKEditor sources. -->
             <execution>
               <id>copy-ckeditor-build-config</id>
@@ -129,7 +128,7 @@
                 <goal>copy-resources</goal>
               </goals>
               <configuration>
-                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+                <outputDirectory>${webjar.outputDirectory}</outputDirectory>
                 <resources>
                   <resource>
                     <directory>${ckeditor.builder.path}/release/ckeditor</directory>
@@ -178,8 +177,58 @@
             </execution>
           </executions>
         </plugin>
+        <!-- We want to build the tests module but we don't want to run actual test during releases -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <arguments>-Pintegration-tests -DskipTests=true</arguments>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <!-- Verify that all org.xwiki.commons dependencies have a version specified either as:
+               - ${commons.version}
+               - ${minimum.commons.version}
+               Also verifies that all org.xwiki.rendering dependencies have a version specified either as:
+               - ${rendering.version}
+               - ${minimum.rendering.version}
+               Also verifies that all org.xwiki.platform dependencies have a version specified either as:
+               - ${platform.version}
+               - ${minimum.rendering.version}
+          -->
+          <execution>
+            <id>check-dependency-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.ValidateDependencyVersion">
+                  <versionCheck>
+                    <groupIdPrefix>org.xwiki.commons</groupIdPrefix>
+                    <allowedVersionRegex>\$\{commons.version\}|\$\{minimum.commons.version\}</allowedVersionRegex>
+                  </versionCheck>
+                  <versionCheck>
+                    <groupIdPrefix>org.xwiki.rendering</groupIdPrefix>
+                    <allowedVersionRegex>\$\{rendering.version\}|\$\{minimum.rendering.version\}</allowedVersionRegex>
+                  </versionCheck>
+                  <versionCheck>
+                    <groupIdPrefix>org.xwiki.platform</groupIdPrefix>
+                    <allowedVersionRegex>\$\{platform.version\}|\$\{minimum.platform.version\}</allowedVersionRegex>
+                  </versionCheck>
+                </validateDependencyVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
   <modules>
     <module>application-ckeditor-base</module>

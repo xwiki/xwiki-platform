@@ -63,6 +63,12 @@
         <version>${platform.version}</version>
         <type>xar</type>
       </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tree</artifactId>
+        <version>${platform.version}</version>
+        <type>xar</type>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
@@ -80,6 +86,7 @@
       <version>${platform.version}</version>
       <type>xar</type>
     </dependency>
+
     <!-- Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

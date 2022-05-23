@@ -37,7 +37,40 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content/>
+  <content>{{velocity output="false"}}
+#macro (returnPDFExportJobStatusJSON $pdfExportJobId)
+  #set ($pdfExportJobStatus = $services.job.getJobStatus($pdfExportJobId))
+  #set ($pdfExportJobStatusJSON = {
+    'id': $pdfExportJobStatus.request.id,
+    'state': $pdfExportJobStatus.state,
+    'progress': {
+      'offset': $pdfExportJobStatus.progress.offset
+    }
+  })
+  #if ($pdfExportJobStatus.state == 'FINISHED' &amp;&amp; $pdfExportJobStatus.request.isServerSide())
+    #set ($pdfExportJobStatusJSON.pdfFileURL = $services.resource.temporary.getURL(
+      $pdfExportJobStatus.getPDFFileReference()))
+  #end
+  #jsonResponse($pdfExportJobStatusJSON)
+#end
+{{/velocity}}
+
+{{velocity wiki="false"}}
+#if ($xcontext.action == 'get')
+  #if ("$!request.action" != '' &amp;&amp; !$services.csrf.isTokenValid($request.form_token))
+    #set ($discard = $response.sendError(401, 'CSRF token verification failed!'))
+  #elseif ($request.action == 'export')
+    #set ($pdfExportJobRequest = $services.export.pdf.createRequest())
+    ## TODO: Remove the following line after implementing Docker-based export.
+    #set ($discard = $pdfExportJobRequest.setServerSide(false))
+    #set ($pdfExportJob = $services.export.pdf.execute($pdfExportJobRequest))
+    #returnPDFExportJobStatusJSON($pdfExportJobRequest.id)
+  #elseif ($request.data == 'jobStatus')
+    #set ($pdfExportJobId = $request.jobId.split('/'))
+    #returnPDFExportJobStatusJSON($pdfExportJobId)
+  #end
+#end
+{{/velocity}}</content>
   <object>
     <name>XWiki.PDFExport.WebHome</name>
     <number>0</number>
@@ -132,7 +165,8 @@
     'export.pdf.options.template.hint',
     'export.pdf.options.loadFailure',
     'export.pdf.modal.close',
-    'export.pdf.inProgress'
+    'export.pdf.inProgress',
+    'export.pdf.failed'
   ]
 });
 
@@ -145,7 +179,14 @@ define('xwiki-pdf-export-config', ['jquery'], function($) {
   }
 });
 
-require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messages', 'bootstrap'], function($, config, l10n) {
+require([
+  'jquery',
+  'xwiki-meta',
+  'xwiki-pdf-export-config',
+  'xwiki-l10n!xwiki-pdf-export-messages',
+  'xwiki-job-runner',
+  'bootstrap'
+], function($, xwikiMeta, config, l10n, JobRunner) {
   const pdfExportOptionsModal = $(`
     &lt;form class="modal xform" id="pdfExportOptions" tabindex="-1" role="dialog"
         aria-labelledby="pdfExportOptionsTitle"&gt;
@@ -197,7 +238,9 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
     select.find('option').first().attr('selected', 'selected');
   }
 
-  const openPDFOptionsModal = function(url) {
+  const openPDFOptionsModal = function(url, data) {
+    // Store the document selection so it can be used later when the modal is submitted.
+    pdfExportOptionsModal.data('selection', data);
     // Disable the animation on show in order to have a smooth transition from the previous modal.
     pdfExportOptionsModal.removeClass('fade').modal();
     if (!pdfExportOptionsModal.find('.modal-body').hasClass('loading')) {
@@ -221,7 +264,35 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
     });
   };
 
-  const exportToPDF = function(extraQueryString) {
+  const runPDFExportJob = function(data) {
+    data.push(
+      {name: 'outputSyntax', value: 'plain'},
+      {name: 'sheet', value: 'XWiki.PDFExport.WebHome'},
+      {name: 'action', value: 'export'},
+      {name: 'form_token', value: xwikiMeta.form_token},
+      // We add the current value of the query string because we want to export the current state of the page (the query
+      // string can hold for instance the state of the live data component).
+      {name: 'pdfQueryString', value: window.location.search.substring(1)},
+      // We add the hash (document fragment) because it can contain information used by the JavaScript code (e.g. the
+      // state of the live table component).
+      {name: 'pdfHash', value: window.location.hash.substring(1)}
+    );
+    return Promise.resolve(new JobRunner({
+      createStatusRequest: function(jobId) {
+        return {
+          url: XWiki.currentDocument.getURL('get'),
+          data: {
+            outputSyntax: 'plain',
+            sheet: 'XWiki.PDFExport.WebHome',
+            data: 'jobStatus',
+            jobId: jobId.join('/')
+          }
+        };
+      }
+    }).run(XWiki.currentDocument.getURL('get'), data));
+  };
+
+  const showPrintPreviewModal = function(jobId) {
     return new Promise((resolve, reject) =&gt; {
       const iframe = $('&lt;iframe/&gt;').css({
         // The load event is not fired if we hide it completely with display:none.
@@ -248,12 +319,23 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
         outputSyntax: 'plain',
         // Asynchronous rendering is disabled by default on the export action so we need to force it.
         async: true,
-        sheet: 'XWiki.PDFExport.Sheet'
-      // We add the hash (document fragment) because it can contain information used by the JavaScript code (e.g. the
-      // state of the live table component).
-      })) + '&amp;' + extraQueryString + window.location.hash;
+        sheet: 'XWiki.PDFExport.Sheet',
+        jobId: jobId.join('/')
+      }));
       iframe.attr('src', exportURL).appendTo($('body'));
     });
+  };
+
+  const exportToPDF = function(data) {
+    return runPDFExportJob(data).then(job =&gt; {
+      if (job.pdfFileURL) {
+        // The PDF file was generated on the server-side. The user just needs to download it.
+        window.location.href = job.pdfFileURL;
+      } else {
+        // Show the Print Preview modal in order for the user to be able to save the result as PDF.
+        return showPrintPreviewModal(job.id);
+      }
+    })
   };
 
   pdfExportOptionsModal.on('submit', event =&gt; {
@@ -261,12 +343,14 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
     $('body').css('cursor', 'wait');
     const notification = new XWiki.widgets.Notification(l10n['export.pdf.inProgress'], 'inprogress');
     pdfExportOptionsModal.find('input[type=submit]').prop('disabled', true);
-    // We add the current value of the query string after the PDF export options because we want to export the current
-    // state of the page (the query string can hold for instance the state of the live data component).
-    const queryString = pdfExportOptionsModal.serialize() + '&amp;' + window.location.search.substring(1);
-    exportToPDF(queryString).finally(() =&gt; {
-      pdfExportOptionsModal.find('input[type=submit]').prop('disabled', false);
+    // Concatenate the PDF export options with the document selection.
+    const data = pdfExportOptionsModal.serializeArray().concat(pdfExportOptionsModal.data('selection'));
+    exportToPDF(data).then(() =&gt; {
       notification.hide();
+    }).catch(() =&gt; {
+      notification.replace(new XWiki.widgets.Notification(l10n['export.pdf.failed'], 'error'));
+    }).finally(() =&gt; {
+      pdfExportOptionsModal.find('input[type=submit]').prop('disabled', false);
       $('body').css('cursor', '');
     });
   });
@@ -276,7 +360,7 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
     pdfExportOptionsModal.modal('hide');
   });
 
-  $('#exportModal a[href*="xpage=pdfoptions"]').on('click', event =&gt; {
+  const switchToPDFOptionsModal = function(event, url, data) {
     event.preventDefault();
     // Show the PDF Export Options modal only after the Export modal is completely hidden, otherwise the code that hides
     // the Export modal can revert changes done by the code that shows the PDF Export Options modal (e.g. we loose the
@@ -284,15 +368,57 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
     $('#exportModal').one('hidden.bs.modal', () =&gt; {
       // Enable the animation back for the next time the Export modal is shown.
       $('#exportModal').addClass('fade');
-      // Remove the qs parameter because:
-      // * the PDF export options modal is loaded only once (per page load) and the query string can change afterwards
-      // * the query string can change after the page is loaded (e.g. that's how the live data component saves its state
-      //   in the URL) and we want to use the query string value at the moment when the PDF export is triggered
-      const url = $(event.target).attr('href').replace(/([?&amp;])qs=[^&amp;#]*/, '$1');
-      openPDFOptionsModal(url);
+      openPDFOptionsModal(url, data);
     // Disable the animation when moving to the next step (PDF Export Options) in order to have a smooth transition.
     }).removeClass('fade').modal('hide');
-  });
+  };
+
+  const customizeExportModal = function() {
+    const exportButton = $('#exportModelOfficeCollapse a[href*="xpage=pdfoptions"]');
+
+    // Move the "Export as PDF" button to the Other category in order to enable multiple page selection.
+    exportButton.prependTo('#exportModalOtherCollapse .export-buttons');
+
+    // Remove the accordion if the Office category is empty.
+    if (!$('#exportModelOfficeCollapse .pane-body').children().length) {
+      // We need to keep the '#exportModalOtherCollapse' element because it is used by exporter.js
+      $('#exportModalAccordion').replaceWith($('#exportModalOtherCollapse'));
+      $('#exportModalOtherCollapse').attr({
+        'class': 'xform',
+        'role': null,
+        'aria-labeledby': null,
+        'aria-expanded': null
+      }).children('.panel-body').children().unwrap();
+    }
+
+    // Remove the qs parameter because:
+    // * the PDF export options modal is loaded only once (per page load) and the query string can change afterwards
+    // * the query string can change after the page is loaded (e.g. that's how the live data component saves its state
+    //   in the URL) and we want to use the query string value at the moment when the PDF export is triggered
+    const exportOptionsURL = exportButton.attr('href').replace(/([?&amp;])qs=[^&amp;#]*/, '$1');
+
+    const exportTree = $('#exportModalOtherCollapse').find('.export-tree');
+    if (exportTree.length) {
+      // Multiple selection.
+      $(document).on('submit', 'form#export-modal-form', event =&gt; {
+        const form = $(event.target);
+        if (form.attr('action').indexOf('xpage=pdfoptions') &gt; 0) {
+          // Pass the document selection to the PDF export options modal.
+          switchToPDFOptionsModal(event, exportOptionsURL, form.serializeArray());
+        }
+      });
+    } else {
+      // Single selection. Only the current page is exported.
+      exportButton.on('click', event =&gt; {
+        switchToPDFOptionsModal(event, exportOptionsURL, [{
+          name: 'pages',
+          value: XWiki.Model.serialize(XWiki.currentDocument.documentReference)
+        }]);
+      });
+    }
+  };
+
+  $(customizeExportModal);
 });</code>
     </property>
     <property>
@@ -460,7 +586,7 @@ require(['jquery', 'xwiki-pdf-export-config', 'xwiki-l10n!xwiki-pdf-export-messa
       <name>org.xwiki.platform.export.pdf.buttons</name>
     </property>
     <property>
-      <parameters>category=office</parameters>
+      <parameters/>
     </property>
     <property>
       <scope>wiki</scope>

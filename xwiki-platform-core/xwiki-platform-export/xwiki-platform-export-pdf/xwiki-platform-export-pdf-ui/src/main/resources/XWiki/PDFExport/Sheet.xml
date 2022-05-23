@@ -40,14 +40,28 @@
   <content>{{velocity output="false"}}
 #set ($sheetReference = 'XWiki.PDFExport.Sheet')
 #set ($pdfElements = ['cover', 'header', 'footer', 'toc'])
+#set ($pdfExportJobId = $request.jobId.split('/'))
 
 #macro (getPDFExportConfigFromRequest $pdfExportConfig)
-  #if ("$!request.pdftemplate" != '')
-    #set ($pdfExportConfig.template = $request.pdftemplate)
-  #end
-  #foreach ($param in $pdfElements)
-    #if ("$!request.getParameter(""pdf$param"")" != '')
-      #set ($discard = $pdfExportConfig.put($param, $request.getParameter("pdf$param") != '0'))
+  #if ($pdfExportJobId)
+    #set ($pdfExportJobRequest = $services.job.getJobStatus($pdfExportJobId).request)
+    #if ($pdfExportJobRequest)
+      #set ($discard = $pdfExportConfig.putAll({
+        'template': $pdfExportJobRequest.template,
+        'cover': $pdfExportJobRequest.isWithCover(),
+        'toc': $pdfExportJobRequest.isWithToc(),
+        'header': $pdfExportJobRequest.isWithHeader(),
+        'footer': $pdfExportJobRequest.isWithFooter()
+      }))
+    #end
+  #else
+    #if ("$!request.pdftemplate" != '')
+      #set ($pdfExportConfig.template = $request.pdftemplate)
+    #end
+    #foreach ($param in $pdfElements)
+      #if ("$!request.getParameter(""pdf$param"")" != '')
+        #set ($discard = $pdfExportConfig.put($param, $request.getParameter("pdf$param") != '0'))
+      #end
     #end
   #end
 #end
@@ -74,12 +88,7 @@
     #end
   #end
   &lt;div id="xwikicontent"&gt;
-    ## We want to render the current document without applying the sheet specified on the HTTP request (which is this
-    ## page). We basically want to render the current document using its default sheet. For this we need to use a
-    ## different document instance (e.g. a clone) than the one on the context. By setting the comment we force the
-    ## current document to be cloned and thus we end up with a different document instance to render.
-    #set ($discard = $tdoc.setComment(''))
-    $tdoc.renderedContent
+    #renderPDFContent()
   &lt;/div&gt;
   ## Close the tags opened in htmlheader.vm
     &lt;/body&gt;
@@ -91,6 +100,22 @@
   #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
   #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
   $!output
+#end
+
+#macro (renderPDFContent)
+  #if ($pdfExportJobId)
+    #set ($renderingResults = $services.job.getJobStatus($pdfExportJobId).documentRenderingResults)
+    #foreach ($renderingResult in $renderingResults)
+      $renderingResult.getHTML()
+    #end
+  #else
+    ## We want to render the current document without applying the sheet specified on the HTTP request (which is this
+    ## page). We basically want to render the current document using its default sheet. For this we need to use a
+    ## different document instance (e.g. a clone) than the one on the context. By setting the comment we force the
+    ## current document to be cloned and thus we end up with a different document instance to render.
+    #set ($discard = $tdoc.setComment(''))
+    $tdoc.renderedContent
+  #end
 #end
 {{/velocity}}
 

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,22 +16,32 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.export.pdf.job;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-export</artifactId>
-    <version>14.5-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-export-pdf</artifactId>
-  <name>XWiki Platform - Export - PDF</name>
-  <packaging>pom</packaging>
-  <description>Top level POM for the PDF Export module</description>
-  <modules>
-    <module>xwiki-platform-export-pdf-api</module>
-    <module>xwiki-platform-export-pdf-default</module>
-    <module>xwiki-platform-export-pdf-ui</module>
-  </modules>
-</project>
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
+
+/**
+ * Used to create and initialize {@link PDFExportJobRequest} instances.
+ * 
+ * @version $Id$
+ * @since 14.4
+ */
+@Role
+@Unstable
+public interface PDFExportJobRequestFactory
+{
+    /**
+     * @return a new PDF export request
+     * @throws Exception if creating the request fails
+     */
+    PDFExportJobRequest createRequest() throws Exception;
+
+    /**
+     * Sets the access rights related properties on the given PDF export request.
+     * 
+     * @param request the PDF export request to set the access rights properties on
+     */
+    void setRightsProperties(PDFExportJobRequest request);
+}

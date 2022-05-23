@@ -24,9 +24,11 @@ You need the following in order to build this extension:
 ## Release Steps
 
 * Create the next version in JIRA and release the current version.
-* Prepare the tag for the new version: `mvn release:prepare -Pintegration-tests,docker`
-* Perform the release: `mvn release:perform -Pintegration-tests,docker`
-* Update the documentation page on http://extensions.xwiki.org
-* Keep the release notes (the list of JIRA issues) only for the 2 most recent releases.
+* Maven release:
+```
+mvn release:prepare -Pintegration-tests,docker
+mvn release:perform -Pintegration-tests,docker
+```
+* Update the documentation page on http://extensions.xwiki.org (keep the release notes (the list of JIRA issues) only for the 2 most recent releases)
 * Announce the release on https://forum.xwiki.org/c/News
 * Update the version used in XWiki Standard Flavor

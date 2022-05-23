@@ -39,7 +39,7 @@
   <content>{{template name="job_macros.vm"/}}
 
 {{velocity output="false"}}
-#set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+#set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
 {{/velocity}}
 
 {{velocity}}

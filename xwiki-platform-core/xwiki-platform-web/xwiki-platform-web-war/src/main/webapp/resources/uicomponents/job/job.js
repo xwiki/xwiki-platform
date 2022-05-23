@@ -17,26 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($jsExtension = '.min')
-#if (!$services.debug.minify)
-  #set ($jsExtension = '')
-#end
-#set ($paths = {
-  'JobRunner': $services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', "jobRunner$jsExtension")
-})
-#set ($l10n = {
-  'answering': $services.localization.render('job.question.notification.answering'),
-  'canceling': $services.localization.render('job.question.notification.canceling')
-})
-#[[*/
-// Start JavaScript-only code.
-(function(paths, contextPath, l10n) {
-  "use strict";
+define('xwiki-job-messages', {
+  prefix: 'job.question.notification.',
+  keys: [
+    'answering',
+    'canceling'
+  ]
+});
 
-require.config({paths});
-
-require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
+require([
+  'jquery',
+  'xwiki-meta',
+  'xwiki-job-runner',
+  'xwiki-l10n!xwiki-pdf-export-messages'
+], function($, xm, JobRunner, l10n) {
   var updateProgress = function(jobUI, job) {
     jobUI.find('.ui-progress-background').toggle(job.state !== 'NONE');
     jobUI.find('.ui-progress-message').toggle(job.state === 'NONE');
@@ -60,7 +54,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
 
     if (typeof answerCallback === 'function') {
       // Display the question
-      var displayerURL = contextPath + '/job/wiki/' + xm.wiki + '/question/' + job.id.join('/');
+      var displayerURL = XWiki.contextPath + '/job/wiki/' + xm.wiki + '/question/' + job.id.join('/');
 
       // Remember the answer callback
       jobQuestion.data('answerCallback', answerCallback);
@@ -244,7 +238,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
           if (typeof data === 'function') {
             return data();
           } else {
-            var answerURL = contextPath + '/job/question/' + jobId.join('/');
+            var answerURL = XWiki.contextPath + '/job/question/' + jobId.join('/');
 
             return {
               url: answerURL,
@@ -260,6 +254,3 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
     }
   });
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $request.contextPath, $l10n]));

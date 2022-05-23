@@ -25,30 +25,32 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export-pdf</artifactId>
-    <version>14.4.2-SNAPSHOT</version>
+    <version>14.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-export-pdf-ui</artifactId>
-  <name>XWiki Platform - Export - PDF - UI</name>
-  <packaging>xar</packaging>
-  <description>Adds support for exporting wiki pages to PDF on the client-side using the web browser.</description>
+  <artifactId>xwiki-platform-export-pdf-api</artifactId>
+  <name>XWiki Platform - Export - PDF - API</name>
+  <packaging>jar</packaging>
+  <description>API for multipage PDF export using a headless Chrome browser running inside a Docker container.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>PDF Export Application</xwiki.extension.name>
+    <xwiki.extension.name>PDF Export API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-export-pdf-api</artifactId>
+      <artifactId>xwiki-platform-export-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Multipage PDF export is performed asynchronously in a background job. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+      <artifactId>xwiki-platform-job-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed in order to generate the table of contents for the PDF export. -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <artifactId>xwiki-rendering-api</artifactId>
       <version>${rendering.version}</version>
     </dependency>
     <dependency>
@@ -56,69 +58,30 @@
       <artifactId>xwiki-rendering-macro-toc</artifactId>
       <version>${rendering.version}</version>
     </dependency>
+    <!-- Used to render the XWiki documents before generating the PDF. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-skin-skinx</artifactId>
+      <artifactId>xwiki-platform-display-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- The generated PDF file is saved as a temporary resource. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <artifactId>xwiki-platform-resource-temporary</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Used to resolve the current user reference. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-localization-macro</artifactId>
+      <artifactId>xwiki-platform-user-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Test dependencies -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-localization-source-wiki</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-localization-rest-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-xclass-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- JavaScript dependencies -->
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>requirejs</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>jquery</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>bootstrap</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>pagedjs</artifactId>
-      <version>0.2.0</version>
-      <scope>runtime</scope>
-      <!-- Exclude all transitive dependencies because they aren't really needed and, what's worse, they fail the build. -->
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-localization-webjar</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

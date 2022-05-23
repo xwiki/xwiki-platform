@@ -25,15 +25,21 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export</artifactId>
-    <version>14.4.2-SNAPSHOT</version>
+    <version>14.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-export-pdf</artifactId>
-  <name>XWiki Platform - Export - PDF</name>
-  <packaging>pom</packaging>
-  <description>Top level POM for the PDF Export module</description>
-  <modules>
-    <module>xwiki-platform-export-pdf-api</module>
-    <module>xwiki-platform-export-pdf-default</module>
-    <module>xwiki-platform-export-pdf-ui</module>
-  </modules>
+  <artifactId>xwiki-platform-export-api</artifactId>
+  <name>XWiki Platform - Export - API</name>
+  <packaging>jar</packaging>
+  <description>Generic export API</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Export API</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+  </dependencies>
 </project>

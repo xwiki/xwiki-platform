@@ -72,7 +72,6 @@ ckeditor.plugin.macro.buttonHint=XWiki Macro
 ckeditor.plugin.macro.editButtonHint=Edit Macro
 ckeditor.plugin.macro.refreshFailed=Failed to refresh the edited content.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insert {0} macro
-ckeditor.plugin.macro.notinstalled=Not installed
 
 ckeditor.plugin.office.importer.title=Import Office File
 ckeditor.plugin.office.importer.filePath=File Path

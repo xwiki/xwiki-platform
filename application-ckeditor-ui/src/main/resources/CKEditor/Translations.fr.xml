@@ -67,7 +67,6 @@ ckeditor.plugin.macro.buttonHint=Macro XWiki
 ckeditor.plugin.macro.editButtonHint=Modifier la Macro
 ckeditor.plugin.macro.refreshFailed=La réactualisation du contenu édité a échoué.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insérer macro {0}
-ckeditor.plugin.macro.notinstalled=Non installée
 ckeditor.plugin.office.importer.title=Importer un document Office
 ckeditor.plugin.office.importer.filePath=Emplacement du fichier
 ckeditor.plugin.office.importer.filePath.hint=Sélectionnez le fichier Office à importer. Ce fichier sera téléchargé, attaché à la page et son contenu ajouté comme contenu à la page.

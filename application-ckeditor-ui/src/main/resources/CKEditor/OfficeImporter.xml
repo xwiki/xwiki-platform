@@ -69,10 +69,14 @@
     &lt;dl&gt;
       &lt;dt&gt;
         &lt;label&gt;
-          $services.localization.render('ckeditor.plugin.office.importer.filePath')
-          &lt;span class="xRequired"&gt;($services.localization.render('ckeditor.plugin.office.importer.required'))&lt;/span&gt;
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filePath'))
+          &lt;span class="xRequired"&gt;
+            ($escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.required')))
+          &lt;/span&gt;
         &lt;/label&gt;
-        &lt;span class="xHint"&gt;$services.localization.render('ckeditor.plugin.office.importer.filePath.hint')&lt;/span&gt;
+        &lt;span class="xHint"&gt;
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filePath.hint'))
+        &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         &lt;input type="file" name="filePath" /&gt;
@@ -80,17 +84,21 @@
       &lt;dt&gt;
         &lt;label&gt;
           &lt;input type="checkbox" name="filterStyles" value="true" checked="checked" /&gt;
-          $services.localization.render('ckeditor.plugin.office.importer.filterStyles')
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filterStyles'))
         &lt;/label&gt;
-        &lt;span class="xHint"&gt;$services.localization.render('ckeditor.plugin.office.importer.filterStyles.hint')&lt;/span&gt;
+        &lt;span class="xHint"&gt;
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filterStyles.hint'))
+        &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;&lt;/dd&gt;
       &lt;dt&gt;
         &lt;label&gt;
           &lt;input type="checkbox" name="useOfficeViewer" value="true" /&gt;
-          $services.localization.render('ckeditor.plugin.office.importer.useOfficeViewer')
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.useOfficeViewer'))
         &lt;/label&gt;
-        &lt;span class="xHint"&gt;$services.localization.render('ckeditor.plugin.office.importer.useOfficeViewer.hint')&lt;/span&gt;
+        &lt;span class="xHint"&gt;
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.useOfficeViewer.hint'))
+        &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;&lt;/dd&gt;
     &lt;/dl&gt;

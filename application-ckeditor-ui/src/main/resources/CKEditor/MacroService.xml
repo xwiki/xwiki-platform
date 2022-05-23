@@ -121,7 +121,6 @@
   #end
   #set ($discard = $extensionQuery.setInstalled(false, '', "wiki:$xcontext.database"))
   #set ($extensions = $services.extension.index.repository.search($extensionQuery))
-  #set ($macroExtensionCategory = $services.localization.render('ckeditor.plugin.macro.notinstalled'))
   #if ($extensions.size &gt; 0)
     #set ($macroExtensionsMap = {})
     #foreach ($extension in $extensions)

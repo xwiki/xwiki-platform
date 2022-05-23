@@ -216,7 +216,7 @@
 #macro (displayCKEditorConfigProperty $configDoc $propName $action)
   &lt;dt&gt;
     &lt;label&gt;$configDoc.displayPrettyName($propName)&lt;/label&gt;
-    &lt;span class="xHint"&gt;$services.localization.render("CKEditor.ConfigClass_${propName}.hint")&lt;/span&gt;
+    &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("CKEditor.ConfigClass_${propName}.hint"))&lt;/span&gt;
   &lt;/dt&gt;
   &lt;dd&gt;#displayCKEditorConfigPropertyValue($configDoc $propName $action)&lt;/dd&gt;
 #end
@@ -227,7 +227,7 @@
       #displayCKEditorConfigPropertyValue($configDoc $propName $action)
       $configDoc.displayPrettyName($propName)
     &lt;/label&gt;
-    &lt;span class="xHint"&gt;$services.localization.render("CKEditor.ConfigClass_${propName}.hint")&lt;/span&gt;
+    &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("CKEditor.ConfigClass_${propName}.hint"))&lt;/span&gt;
   &lt;/dt&gt;
   &lt;dd&gt;&lt;/dd&gt;
 #end
@@ -251,8 +251,11 @@
     #displayCKEditorConfigBooleanProperty($configDoc 'loadJavaScriptSkinExtensions' $action)
     &lt;dt&gt;
       &lt;label&gt;$configDoc.displayPrettyName('advanced')&lt;/label&gt;
-      &lt;span class="xHint"&gt;$services.localization.render('CKEditor.ConfigClass_advanced.hint',
-        ['&lt;a href="http://docs.ckeditor.com/#!/api/CKEDITOR.config"&gt;', '&lt;/a&gt;'])&lt;/span&gt;
+      #set ($advancedHint = $escapetool.xml(
+        $services.localization.render('CKEditor.ConfigClass_advanced.hint', ['__linkStart__', '__linkEnd__'])
+        ).replace('__linkStart__', '&lt;a href="http://docs.ckeditor.com/#!/api/CKEDITOR.config"&gt;'
+        ).replace('__linkEnd__', '&lt;/a&gt;'))
+      &lt;span class="xHint"&gt;$advancedHint&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;#displayCKEditorConfigPropertyValue($configDoc 'advanced' $action)&lt;/dd&gt;
   &lt;/dl&gt;

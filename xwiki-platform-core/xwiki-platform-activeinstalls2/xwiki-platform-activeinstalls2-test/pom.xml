@@ -24,42 +24,24 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-activeinstalls2</artifactId>
     <version>14.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-activeinstalls2</artifactId>
-  <name>XWiki Platform - Active Installs 2 - Parent POM</name>
+  <artifactId>xwiki-platform-activeinstalls2-test</artifactId>
+  <name>XWiki Platform - Active Installs 2 - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Parent POM for the Active Installs 2 modules</description>
+  <description>Tests for the Active Installs 2 feature</description>
   <properties>
-    <!-- Tag for the ElasticSearch docker image to use from https://hub.docker.com/_/elasticsearch -->
-    <elasticsearch.version>8.2.0</elasticsearch.version>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <configuration>
-            <systemPropertyVariables>
-              <!-- Pass the ES version to avoid hard-coding it in the test -->
-              <elasticsearch.version>${elasticsearch.version}</elasticsearch.version>
-            </systemPropertyVariables>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-activeinstalls2-api</module>
-  </modules>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <id>docker</id>
       <modules>
-        <module>xwiki-platform-activeinstalls2-test</module>
+        <module>xwiki-platform-activeinstalls2-test-docker</module>
       </modules>
     </profile>
   </profiles>

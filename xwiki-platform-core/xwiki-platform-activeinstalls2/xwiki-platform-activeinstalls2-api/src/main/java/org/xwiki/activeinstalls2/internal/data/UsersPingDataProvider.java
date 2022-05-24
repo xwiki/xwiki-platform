@@ -89,11 +89,11 @@ public class UsersPingDataProvider extends AbstractPingDataProvider
             return;
         }
 
-        List<Integer> allWikiCount = new ArrayList<>();
-        int total = 0;
+        List<Long> allWikiCount = new ArrayList<>();
+        long total = 0;
         for (String wikiId : wikiIds) {
             try {
-                int wikiCount = getUserCountInWiki(wikiId);
+                long wikiCount = getUserCountInWiki(wikiId);
                 total += wikiCount;
                 if (this.wikiDescriptorManager.isMainWiki(wikiId)) {
                     usersPing.setMain(wikiCount);
@@ -112,14 +112,14 @@ public class UsersPingDataProvider extends AbstractPingDataProvider
         ping.setUsers(usersPing);
     }
 
-    private int getUserCountInWiki(String wikiId) throws QueryException
+    private long getUserCountInWiki(String wikiId) throws QueryException
     {
         Query query = this.queryManager.createQuery("SELECT COUNT(DISTINCT doc.fullName) FROM Document doc, "
             + "doc.object(XWiki.XWikiUsers) AS obj WHERE doc.fullName NOT IN ("
             + "SELECT doc.fullName FROM XWikiDocument doc, BaseObject objLimit, IntegerProperty propActive "
             + "WHERE objLimit.name = doc.fullName AND propActive.id.id = objLimit.id AND propActive.id.name = 'active' "
             + "AND propActive.value = 0)", Query.XWQL).setWiki(wikiId);
-        List<Integer> results = query.execute();
-        return results.get(0).intValue();
+        List<Long> results = query.execute();
+        return results.get(0).longValue();
     }
 }

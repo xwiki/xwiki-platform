@@ -122,8 +122,7 @@ public class XWikiDockerExtension extends AbstractExtension
             return;
         }
 
-        // Note: TestConfiguration is created in evaluateExecutionCondition() which executes before beforeAll()
-        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+        TestConfiguration testConfiguration = computeTestConfiguration(extensionContext);
 
         // Programmatically enable logging for TestContainers code when verbose is on so that we can get the maximum
         // of debugging information.
@@ -208,6 +207,15 @@ public class XWikiDockerExtension extends AbstractExtension
         } catch (Exception e) {
             raiseException(e);
         }
+    }
+
+    private TestConfiguration computeTestConfiguration(ExtensionContext extensionContext)
+    {
+        // Note: TestConfiguration is created in evaluateExecutionCondition() which executes before beforeAll()
+        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+        mergeTestConfigurationInGlobalContext(testConfiguration, extensionContext);
+        saveTestConfiguration(extensionContext, testConfiguration);
+        return testConfiguration;
     }
 
     private void beforeEachInternal(ExtensionContext extensionContext)

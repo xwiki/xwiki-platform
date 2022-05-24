@@ -28,11 +28,9 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
-import org.testcontainers.utility.DockerImageName;
 import org.xwiki.activeinstalls2.ActiveInstallsConfiguration;
 import org.xwiki.activeinstalls2.DataManager;
 import org.xwiki.activeinstalls2.internal.data.ExtensionPing;
@@ -62,7 +60,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -82,6 +79,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 14.4RC1
  */
+@ExtendWith(XWikiElasticSearchExtension.class)
 @ComponentTest
 @AllComponents(excludes = {
     // Excluded since we want to mock them as our goal is not to test them (we only want to test ES interactions)
@@ -129,39 +127,16 @@ class PingSenderIT
     @Inject
     private Execution execution;
 
-    private static ElasticsearchContainer container;
-
-    @BeforeAll
-    static void initialize()
-    {
-        DockerImageName imageName =
-            DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch").withTag("8.2.0");
-        container = new ElasticsearchContainer(imageName) {
-            // TODO: Remove once we upgrade to a TC version > 1.17.1 (i.e. when
-            //  https://github.com/testcontainers/testcontainers-java/pull/5265#issuecomment-1123867922 is in)
-            @Override
-            protected void containerIsStarted(InspectContainerResponse containerInfo)
-            {
-            }
-        };
-        // - single node since we don't need a cluster for testing
-        // - disabled security to avoid the warning messages and because security is not needed for testing as
-        //   the data is discarded and the testing environment is secure.
-        container.setEnv(List.of("discovery.type=single-node", "xpack.security.enabled=false"));
-        container.start();
-    }
-
-    @AfterAll
-    static void dispose()
-    {
-        container.stop();
-    }
+    @InjectElasticSearchContainer
+    private ElasticsearchContainer container;
 
     @BeforeComponent
     void beforeComponentInitialize()
     {
+        // We need to configure ActiveInstallsConfiguration before DefaultElasticsearchClientManager is looked up,
+        // since it's using that component in its Initializable#initialize() method.
         when(this.configuration.getPingInstanceURL()).thenReturn(
-            String.format("http://%s", container.getHttpHostAddress()));
+            String.format("http://%s", this.container.getHttpHostAddress()));
     }
 
     @Test
@@ -231,11 +206,11 @@ class PingSenderIT
         when(documentsQuery.addFilter(any())).thenReturn(documentsQuery);
         when(documentsQuery.execute())
             // For wiki1
-            .thenReturn(List.of(1000))
+            .thenReturn(List.of(1000L))
             // For xwiki (main wiki)
-            .thenReturn(List.of(10000))
+            .thenReturn(List.of(10000L))
             // For wiki2
-            .thenReturn(List.of(100000));
+            .thenReturn(List.of(100000L));
 
         // Send a ping
         this.pingSender.sendPing();

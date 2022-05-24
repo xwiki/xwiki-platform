@@ -26,6 +26,8 @@ import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -65,6 +67,9 @@ class NotificationFilterPreferenceStoreTest
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Mock
     private XWikiContext context;
@@ -125,6 +130,44 @@ class NotificationFilterPreferenceStoreTest
             notificationException.getMessage());
         assertEquals(XWikiException.class, notificationException.getCause().getClass());
 
+        verify(this.context).setWikiId(MAIN_WIKI_ID);
+        verify(this.hibernateStore).beginTransaction(this.context);
+        verify(this.hibernateStore).endTransaction(this.context, false);
+        verify(this.context).setWikiId(PREVIOUS_WIKI_ID);
+    }
+
+    @Test
+    void deleteFilterPreferences() throws Exception
+    {
+        DocumentReference unknownUserDocumentReference = new DocumentReference("xwiki", "XWiki", "UnknownUser");
+        when(this.entityReferenceSerializer.serialize(unknownUserDocumentReference))
+            .thenReturn("xwiki:XWiki.UnknownUser");
+        this.notificationFilterPreferenceStore.deleteFilterPreferences(unknownUserDocumentReference);
+        verify(this.context).setWikiId(MAIN_WIKI_ID);
+        verify(this.hibernateStore).beginTransaction(this.context);
+        verify(this.session).createQuery("delete from DefaultNotificationFilterPreference where owner = :owner");
+        verify(this.query).setParameter("owner", "xwiki:XWiki.UnknownUser");
+        verify(this.query).executeUpdate();
+        verify(this.hibernateStore).endTransaction(this.context, true);
+        verify(this.context).setWikiId(PREVIOUS_WIKI_ID);
+    }
+
+    @Test
+    void deleteFilterPreferencesHibernateException() throws Exception
+    {
+        DocumentReference unknownUserDocumentReference = new DocumentReference("xwiki", "XWiki", "UnknownUser");
+        
+        when(this.entityReferenceSerializer.serialize(unknownUserDocumentReference))
+            .thenReturn("xwiki:XWiki.UnknownUser");
+        when(this.hibernateStore.beginTransaction(this.context)).thenThrow(XWikiException.class);
+        
+        NotificationException notificationException = assertThrows(NotificationException.class,
+            () -> this.notificationFilterPreferenceStore.deleteFilterPreferences(unknownUserDocumentReference));
+        
+        assertEquals("Failed to delete the notification preferences for user [xwiki:XWiki.UnknownUser]",
+            notificationException.getMessage());
+        assertEquals(XWikiException.class, notificationException.getCause().getClass());
+        
         verify(this.context).setWikiId(MAIN_WIKI_ID);
         verify(this.hibernateStore).beginTransaction(this.context);
         verify(this.hibernateStore).endTransaction(this.context, false);

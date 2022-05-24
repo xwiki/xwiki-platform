@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link CachedModelBridge}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
@@ -163,7 +163,7 @@ class CachedModelBridgeTest
     }
 
     @Test
-    void deleteFilterPreferences() throws Exception
+    void deleteFilterPreferencesWiki() throws Exception
     {
         WikiReference wikiReference = new WikiReference("wikiId");
 
@@ -190,5 +190,22 @@ class CachedModelBridgeTest
             this.preferenceFilterCache);
 
         verify(this.modelBridge).deleteFilterPreferences(wikiReference);
+    }
+
+    @Test
+    void deleteFilterPreferencesUser() throws Exception
+    {
+        DocumentReference deleteUserDocumentReference = new DocumentReference("xwiki", "XWiki", "DeleteUser");
+
+        this.preferenceFilterCache.put(deleteUserDocumentReference, new HashSet<>());
+        this.preferenceFilterCache.put(new DocumentReference("xwiki", "XWiki", "OtherUser"), new HashSet<>());
+
+        this.cachedModelBridge.deleteFilterPreferences(deleteUserDocumentReference);
+        
+        Map<Object, Object> expected = new HashMap<>();
+        expected.put(new DocumentReference("xwiki", "XWiki", "OtherUser"), new HashSet<>());
+        assertEquals(expected, this.preferenceFilterCache);
+        
+        verify(this.modelBridge).deleteFilterPreferences(deleteUserDocumentReference);
     }
 }

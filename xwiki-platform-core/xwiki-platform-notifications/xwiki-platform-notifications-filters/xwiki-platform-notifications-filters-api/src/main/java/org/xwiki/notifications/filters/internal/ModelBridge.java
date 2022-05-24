@@ -90,6 +90,22 @@ public interface ModelBridge
     void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
 
     /**
+     * Delete all the filter preferences related to a given user.
+     *
+     * @param user the document reference of a wiki user
+     * @throws NotificationException in case of error when deleting the filter preferences
+     * @since 14.5RC1
+     * @since 14.4.1
+     * @since 13.10.7
+     */
+    @Unstable
+    default void deleteFilterPreferences(DocumentReference user) throws NotificationException
+    {
+        throw new UnsupportedOperationException(
+            "ModelBridge.deleteFilterPreferences(DocumentReference) Not implemented");
+    }
+
+    /**
      * Delete a filter preference.
      * @param wikiReference reference of the wiki concerned by the filter preference
      * @param filterPreferenceId name of the filter preference
@@ -111,7 +127,7 @@ public interface ModelBridge
     @Unstable
     default void deleteFilterPreferences(WikiReference wikiReference) throws NotificationException
     {
-        throw new UnsupportedOperationException("Not implemented");
+        throw new UnsupportedOperationException("ModelBridge.deleteFilterPreference(WikiReference) Not implemented");
     }
 
     /**

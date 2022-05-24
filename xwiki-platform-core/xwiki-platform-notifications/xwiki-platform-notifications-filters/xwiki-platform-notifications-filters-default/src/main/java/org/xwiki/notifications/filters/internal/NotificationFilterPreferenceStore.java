@@ -63,6 +63,8 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 @Singleton
 public class NotificationFilterPreferenceStore
 {
+    private static final String OWNER_QUERY_PARAM = "owner";
+
     @Inject
     private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
 
@@ -162,16 +164,18 @@ public class NotificationFilterPreferenceStore
      * @since 14.4.1
      * @since 13.10.7
      */
-    public Set<NotificationFilterPreference> getPaginatedFilterPreferences(int limit, int offset)
+    public Set<DefaultNotificationFilterPreference> getPaginatedFilterPreferences(int limit, int offset)
         throws NotificationException
     {
         try {
-            List<NotificationFilterPreference> list = this.queryManager
+            List<DefaultNotificationFilterPreference> list = this.queryManager
                 .createQuery("select nfp from DefaultNotificationFilterPreference nfp "
                     + "order by nfp.internalId", Query.HQL)
                 .setLimit(limit)
                 .setOffset(offset)
                 .execute();
+            // We return DefaultNotificationFilterPreference instead of NotificationFilterPreference because we need to 
+            // have access to the owner of the notification filter preferences.
             return new HashSet<>(list);
         } catch (QueryException e) {
             String message = String.format("Error while loading all the notification filter preferences on wiki [%s].",
@@ -194,7 +198,7 @@ public class NotificationFilterPreferenceStore
         Query query = queryManager.createQuery(
             "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = :owner " + "order by nfp.id",
             Query.HQL);
-        query.bindValue("owner", serializedEntity);
+        query.bindValue(OWNER_QUERY_PARAM, serializedEntity);
         if (filterPreferenceConfiguration.useMainStore()) {
             query.setWiki(context.getMainXWiki());
         }
@@ -218,6 +222,43 @@ public class NotificationFilterPreferenceStore
     {
         NotificationFilterPreference preference = getFilterPreference(user, filterPreferenceId);
         this.deleteFilterPreference(preference);
+    }
+
+    /**
+     * Delete all to notification preferences where the given user is the owner.
+     *
+     * @param user the document reference of a user
+     * @throws NotificationException in case of error during the hibernate operations
+     * @since 14.5RC1
+     * @since 14.4.1
+     * @since 13.10.7
+     */
+    public void deleteFilterPreferences(DocumentReference user) throws NotificationException
+    {
+        XWikiContext context = this.contextProvider.get();
+
+        String oriDatabase = context.getWikiId();
+
+        context.setWikiId(context.getMainXWiki());
+        XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+
+        String serializedUser = this.entityReferenceSerializer.serialize(user);
+
+        try {
+            hibernateStore.beginTransaction(context);
+            Session session = hibernateStore.getSession(context);
+            session.createQuery("delete from DefaultNotificationFilterPreference where owner = :owner")
+                .setParameter(OWNER_QUERY_PARAM, serializedUser)
+                .executeUpdate();
+            hibernateStore.endTransaction(context, true);
+        } catch (XWikiException e) {
+            hibernateStore.endTransaction(context, false);
+            throw new NotificationException(
+                String.format("Failed to delete the notification preferences for user [%s]", user),
+                e);
+        } finally {
+            context.setWikiId(oriDatabase);
+        }
     }
 
     /**

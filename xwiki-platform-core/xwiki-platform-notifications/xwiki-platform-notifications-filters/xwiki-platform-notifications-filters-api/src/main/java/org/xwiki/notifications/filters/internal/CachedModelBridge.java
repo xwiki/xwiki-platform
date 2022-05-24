@@ -149,6 +149,13 @@ public class CachedModelBridge implements ModelBridge, Initializable
     }
 
     @Override
+    public void deleteFilterPreferences(DocumentReference user) throws NotificationException
+    {
+        this.modelBridge.deleteFilterPreferences(user);
+        invalidateUserPreferencesFilters(user);
+    }
+
+    @Override
     public void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
         throws NotificationException
     {
@@ -235,5 +242,15 @@ public class CachedModelBridge implements ModelBridge, Initializable
     {
         this.preferenceFilterCache.values()
             .forEach(set -> set.removeIf(filter -> filter.isFromWiki(wikiReference.getName())));
+    }
+
+    /**
+     * Remove all the {@link  NotificationFilterPreference}s related to the given user form the coche.
+     *
+     * @param user the document reference of the user to remove from the cache
+     */
+    private void invalidateUserPreferencesFilters(DocumentReference user)
+    {
+        this.preferenceFilterCache.remove(user);
     }
 }

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal;
+package org.xwiki.notifications.filters.internal.listener;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,6 +28,7 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.filters.internal.ModelBridge;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
@@ -43,7 +44,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  */
 @Component
 @Singleton
-@Named("org.xwiki.notifications.filters.internal.DeletedWikiEventListener")
+@Named("org.xwiki.notifications.filters.internal.listener.DeletedWikiEventListener")
 public class DeletedWikiEventListener extends AbstractEventListener
 {
     @Named("cached")

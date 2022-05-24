@@ -1,2 +1,3 @@
 org.xwiki.export.pdf.internal.job.DefaultPDFExportJobRequestFactory
 org.xwiki.export.pdf.internal.job.PDFExportContextStore
+org.xwiki.export.pdf.internal.DefaultRequiredSkinExtensionsRecorder

@@ -321,7 +321,9 @@ require([
         async: true,
         sheet: 'XWiki.PDFExport.Sheet',
         jobId: jobId.join('/')
-      }));
+      // We add the query string and hash (fragment identifier) from the current URL because they can contain
+      // information used by the JavaScript code (e.g. the state of the live table and live data components).
+      }) + '&amp;' + window.location.search.substring(1)) + window.location.hash;
       iframe.attr('src', exportURL).appendTo($('body'));
     });
   };

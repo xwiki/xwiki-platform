@@ -81,6 +81,23 @@ public class SafePDFExportJobStatus extends SafeJobStatus<PDFExportJobStatus>
     }
 
     /**
+     * @return the HTML that needs to be placed in the page head in order to pull the resources (JavaScript, CSS) that
+     *         were asked during the rendering of the documents specified in the PDF export job request
+     */
+    public String getRequiredSkinExtensions()
+    {
+        // Expose the required skin extensions only to the user that triggered the export in order to prevent a data
+        // leak. The user that triggered the export was set as context user during the export, when the documents were
+        // rendered, so the output may be specific to this user (e.g. it may contain information that only this user
+        // should see).
+        if (currentUserTriggeredTheExport()) {
+            return getWrapped().getRequiredSkinExtensions();
+        } else {
+            return "";
+        }
+    }
+
+    /**
      * @return the reference of the generated temporary PDF file
      */
     public TemporaryResourceReference getPDFFileReference()

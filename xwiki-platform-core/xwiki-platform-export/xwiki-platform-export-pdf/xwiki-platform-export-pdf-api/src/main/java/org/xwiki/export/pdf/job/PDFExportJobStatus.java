@@ -100,6 +100,8 @@ public class PDFExportJobStatus extends DefaultJobStatus<PDFExportJobRequest>
 
     private final TemporaryResourceReference pdfFileReference;
 
+    private String requiredSkinExtensions;
+
     /**
      * Create a new PDF export job status.
      * 
@@ -136,5 +138,25 @@ public class PDFExportJobStatus extends DefaultJobStatus<PDFExportJobRequest>
     public TemporaryResourceReference getPDFFileReference()
     {
         return this.pdfFileReference;
+    }
+
+    /**
+     * @return the HTML that needs to be placed in the page head in order to pull the resources (JavaScript, CSS) that
+     *         were asked during the rendering of the documents specified in the PDF export job request
+     */
+    public String getRequiredSkinExtensions()
+    {
+        return requiredSkinExtensions;
+    }
+
+    /**
+     * Sets the skin extensions required by the rendered documents.
+     *
+     * @param requiredSkinExtensions the HTML that needs to be placed in the page head in order to pull the skin
+     *            extensions (JavaScript, CSS) required by the rendered documents
+     */
+    public void setRequiredSkinExtensions(String requiredSkinExtensions)
+    {
+        this.requiredSkinExtensions = requiredSkinExtensions;
     }
 }

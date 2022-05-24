@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link CachedModelBridge}.
- *
+ * 
  * @version $Id$
  */
 @ComponentTest

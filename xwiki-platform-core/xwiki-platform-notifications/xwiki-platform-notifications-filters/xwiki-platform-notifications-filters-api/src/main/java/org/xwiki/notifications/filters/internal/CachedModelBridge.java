@@ -245,7 +245,7 @@ public class CachedModelBridge implements ModelBridge, Initializable
     }
 
     /**
-     * Remove all the {@link  NotificationFilterPreference}s related to the given user form the coche.
+     * Remove all the {@link  NotificationFilterPreference}s related to the given user form the cache.
      *
      * @param user the document reference of the user to remove from the cache
      */

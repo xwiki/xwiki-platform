@@ -52,7 +52,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
  * Cleanup the notification filters preferences remaining on the main wiki from previously removed sub-wikis and users.
- * Note: this class is named {@code R131006000XWIKI1546} in branch {@code 13.10.6+}. This class also covers
+ * Note: this class is named {@code R131007000XWIKI1546} in branch {@code 13.10.7+}. This class also covers
  * {@code XWIKI-18397} to prevent having an almost identical migration executed again.
  *
  * @version $Id$
@@ -142,7 +142,7 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
                 this.store.deleteFilterPreference(new WikiReference(unknownWikiId));
             }
 
-            // Keep the user that where not found on the wiki.
+            // List the users that were not found on the wiki.
             Set<String> unknownUsers = usersStatus.entrySet().stream()
                     .filter(entry -> !entry.getValue())
                     .map(Map.Entry::getKey)

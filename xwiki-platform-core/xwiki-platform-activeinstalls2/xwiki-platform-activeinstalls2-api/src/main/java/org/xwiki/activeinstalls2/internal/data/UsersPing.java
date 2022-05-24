@@ -29,16 +29,16 @@ import java.util.List;
  */
 public class UsersPing
 {
-    private List<Integer> all;
+    private List<Long> all;
 
-    private int main;
+    private long main;
 
-    private int total;
+    private long total;
 
     /**
      * @return the number of active users in the main wiki (a.k.a global users)
      */
-    public int getMain()
+    public long getMain()
     {
         return this.main;
     }
@@ -46,7 +46,7 @@ public class UsersPing
     /**
      * @param userCount see {@link #getMain()}
      */
-    public void setMain(int userCount)
+    public void setMain(long userCount)
     {
         this.main = userCount;
     }
@@ -55,7 +55,7 @@ public class UsersPing
      * @return the total number of active users in the main wiki and all the sub wikis (i.e. global users + local
      *         users)
      */
-    public int getTotal()
+    public long getTotal()
     {
         return this.total;
     }
@@ -63,7 +63,7 @@ public class UsersPing
     /**
      * @param userCount see {@link #getTotal()}
      */
-    public void setTotal(int userCount)
+    public void setTotal(long userCount)
     {
         this.total = userCount;
     }
@@ -72,7 +72,7 @@ public class UsersPing
      * @return the number of active users in each subwiki (a.k.a local users), excluding the main wiki, as an array
      *         (we don't want to expose wiki names since that would contain private information)
      */
-    public List<Integer> getWikis()
+    public List<Long> getWikis()
     {
         return this.all;
     }
@@ -80,7 +80,7 @@ public class UsersPing
     /**
      * @param userCount see {@link #getWikis()}
      */
-    public void setWikis(List<Integer> userCount)
+    public void setWikis(List<Long> userCount)
     {
         this.all = userCount;
     }

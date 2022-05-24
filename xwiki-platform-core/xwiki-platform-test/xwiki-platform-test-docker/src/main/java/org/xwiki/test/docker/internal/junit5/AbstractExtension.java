@@ -32,6 +32,7 @@ import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.VncRecordingContainer;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
+import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.AbstractTest;
@@ -166,4 +167,18 @@ public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCa
         }
     }
 
+    protected void mergeTestConfigurationInGlobalContext(TestConfiguration testConfiguration, ExtensionContext context)
+    {
+        // Allow extensions to contribute a dynamically-generated TestConfiguration by storing it in the GLOBAL
+        // test context. This allows test writers to provide dynamically-generated configuration before XWiki is
+        // started (e.g. to set the URL and port for an ElasticSearch instance for active installs).
+        ExtensionContext.Store globalStore = context.getStore(ExtensionContext.Namespace.GLOBAL);
+        if (globalStore.get(TestConfiguration.class) != null) {
+            try {
+                testConfiguration.merge((TestConfiguration) globalStore.get(TestConfiguration.class));
+            } catch (DockerTestException e) {
+                throw new RuntimeException("Failed to merge Test Configuration from the global test context store", e);
+            }
+        }
+    }
 }

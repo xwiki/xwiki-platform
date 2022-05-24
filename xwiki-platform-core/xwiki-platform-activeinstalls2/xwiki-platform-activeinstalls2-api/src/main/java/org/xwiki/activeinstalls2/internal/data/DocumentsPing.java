@@ -29,16 +29,16 @@ import java.util.List;
  */
 public class DocumentsPing
 {
-    private List<Integer> all;
+    private List<Long> all;
 
-    private int main;
+    private long main;
 
-    private int total;
+    private long total;
 
     /**
      * @return the number of documents in the main wiki
      */
-    public int getMain()
+    public long getMain()
     {
         return this.main;
     }
@@ -46,7 +46,7 @@ public class DocumentsPing
     /**
      * @param documentCount see {@link #getMain()}
      */
-    public void setMain(int documentCount)
+    public void setMain(long documentCount)
     {
         this.main = documentCount;
     }
@@ -54,7 +54,7 @@ public class DocumentsPing
     /**
      * @return the total number of documents in the main wiki and all the sub wikis
      */
-    public int getTotal()
+    public long getTotal()
     {
         return this.total;
     }
@@ -62,7 +62,7 @@ public class DocumentsPing
     /**
      * @param documentCount see {@link #getTotal()}
      */
-    public void setTotal(int documentCount)
+    public void setTotal(long documentCount)
     {
         this.total = documentCount;
     }
@@ -71,7 +71,7 @@ public class DocumentsPing
      * @return the number of documents in each subwiki, excluding the main wiki, as an array
      *         (we don't want to expose wiki names since that would contain private information)
      */
-    public List<Integer> getWikis()
+    public List<Long> getWikis()
     {
         return this.all;
     }
@@ -79,7 +79,7 @@ public class DocumentsPing
     /**
      * @param documentCount see {@link #getWikis()}
      */
-    public void setWikis(List<Integer> documentCount)
+    public void setWikis(List<Long> documentCount)
     {
         this.all = documentCount;
     }

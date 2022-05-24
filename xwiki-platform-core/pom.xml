@@ -147,8 +147,9 @@
     </plugins>
   </build>
   <modules>
-      <!-- Sorted Alphabetically -->
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-activeinstalls</module>
+    <module>xwiki-platform-activeinstalls2</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-alerts</module>
     <module>xwiki-platform-annotation</module>

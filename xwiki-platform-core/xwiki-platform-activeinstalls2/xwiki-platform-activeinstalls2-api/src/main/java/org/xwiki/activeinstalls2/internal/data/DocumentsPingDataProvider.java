@@ -94,11 +94,11 @@ public class DocumentsPingDataProvider extends AbstractPingDataProvider
             return;
         }
 
-        List<Integer> allWikiCount = new ArrayList<>();
-        int total = 0;
+        List<Long> allWikiCount = new ArrayList<>();
+        long total = 0;
         for (String wikiId : wikiIds) {
             try {
-                int wikiCount = getDocumentsCountInWiki(wikiId);
+                long wikiCount = getDocumentsCountInWiki(wikiId);
                 total += wikiCount;
                 if (this.wikiDescriptorManager.isMainWiki(wikiId)) {
                     documentsPing.setMain(wikiCount);
@@ -117,12 +117,12 @@ public class DocumentsPingDataProvider extends AbstractPingDataProvider
         ping.setDocuments(documentsPing);
     }
 
-    private int getDocumentsCountInWiki(String wikiId) throws QueryException
+    private long getDocumentsCountInWiki(String wikiId) throws QueryException
     {
-        List<Integer> results = this.queryManager.createQuery("", Query.XWQL)
+        List<Long> results = this.queryManager.createQuery("", Query.XWQL)
             .setWiki(wikiId)
             .addFilter(this.countFilter)
             .execute();
-        return results.get(0).intValue();
+        return results.get(0).longValue();
     }
 }

@@ -55,7 +55,7 @@
 |Saite uz e-pastu|{{{[janis@test.lv&gt;mailto:janis@test.lv]}}}|[[janis@test.lv&gt;&gt;mailto:janis@test.lv]]
 |Saite ar attēlu|{{{&lt;a href="$xwiki.getURL("Vieta1.Lapa1")"&gt;{image:attels.png|document=Vieta2.Lapa2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
 |Saite uz pielikumu|(((
-{{info}}Skatīt papildu informāciju par [[//Attach// makrosu&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/AttachMacro]].{{/info}}
+{{info}}Skatīt papildu informāciju par [[//Attach// makrosu&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]].{{/info}}
 
 {{{{attach:pielikums|file=attels.png}}}}
 )))|[[pielikums&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
@@ -72,7 +72,7 @@ Pilnais saites formāts ir: ##(nosaukums[|&gt;])+(saite)(@citaVikiAliase)+([|&gt
 ** ##reference##: Saites reference. Tā var būt URI formā ##{{{protokols:ceļš}}}## (piemēram: {{{"http://xwiki.org"}}}, {{{"mailto:john@smith.com"}}}) vai arī viki lapas nosaukums(piemēram: "WebHome").
 ** ##pieprasījums##: Neobligāts vietrāža (URL) pieprasījums aiz jautājuma zīmes. Piemēram: {{{"?parametrs_1=5&amp;amp;parametrs_2=Sveiki"}}}.
 ** ##enkurs##: Neobligāts vietas nosaukums mērķa lapā (enkurs). Ņemiet vērā, ka XWiki automatiski izveido enkurus priekš virsrakstiem. Piemēram: "TableOfContentAnchor".
-* ##citaVikiAliase##: Neobligāta [[cita viki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] aliase, kas definēta InterWiki sarakstā (skatiet [[Administratora rokasgrāmatu&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Piemēram: "vikipēdija"
+* ##citaVikiAliase##: Neobligāta [[cita viki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] aliase, kas definēta InterWiki sarakstā (skatiet [[Administratora rokasgrāmatu&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Piemēram: "vikipēdija"
 * ##mērķis##: Neobligāts HTML ##mērķa## atribūts ko izmanto HTML saites ##a## elementā. Šo parametru izmanto, apstrādājot saiti. Pēc noklusēšanas to atver tekošajā logā. Piemēri: "_self", "_blank"
 
 === 2.0 Links ===

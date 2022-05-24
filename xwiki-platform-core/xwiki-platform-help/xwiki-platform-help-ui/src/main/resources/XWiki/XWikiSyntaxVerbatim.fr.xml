@@ -46,7 +46,7 @@
 Vous permet d'avoir un contenu qui ne sera pas formaté . En d'autres termes, la syntaxe wiki ne sera pas prise en compte.
 
 {{info}}
-En syntaxe XWiki 1.0 la [[macro Pre&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/PreMacro]] préserve seulement la syntaxe wiki et les macros Radeox. Cependant, les fragments HTML et les scripts Groovy/Velocity sont toujours exécutés. 
+En syntaxe XWiki 1.0 la [[macro Pre&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Pre%20Macro%20%28Radeox%29]] préserve seulement la syntaxe wiki et les macros Radeox. Cependant, les fragments HTML et les scripts Groovy/Velocity sont toujours exécutés.
 {{/info}}
 
 |=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
@@ -59,7 +59,7 @@ Du contenu
 sur plusieurs lignes
 {/pre}
 }}}
-{{info}}Il est aussi possible d'utiliser la [[macro Code&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/CodeMacro]] mais celle-ci affiche son contenu dans une boîte par défaut..{{/info}}
+{{info}}Il est aussi possible d'utiliser la [[macro Code&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Code%20Macro%20%28Radeox%29]] mais celle-ci affiche son contenu dans une boîte par défaut..{{/info}}
 )))|(((
 {{{Du contenu
 *verbatim*

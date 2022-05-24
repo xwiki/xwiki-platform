@@ -57,11 +57,11 @@
 |Link ad un'immagine|{{{&lt;a href="$xwiki.getURL("Space1.Page1")"&gt;{image:img.png|document=Space2.Page2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
 |Link ad un'immagine con parametri|{{{&lt;a href="$xwiki.getURL("Space1.Page1")"&gt;{image:img.png|document=Space2.Page2|width=26|height=26}&lt;/a&gt;}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
 |Link ad un allegato nella pagina corrente|(((
-{{info}}Vedere [[Attach Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] per ulteriori dettagli{{/info}}
+{{info}}Vedere [[Attach Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] per ulteriori dettagli{{/info}}
 {{{{attach:text|file=img.png}}}}
 )))|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Link ad un allegato in una pagina diversa|(((
-{{info}}Vedere [[Attach Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] per ulteriori dettagli{{/info}}
+{{info}}Vedere [[Attach Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] per ulteriori dettagli{{/info}}
 {{{{attach:text|document=Space.Page|file=img.png}}}}
 )))|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Link ad una Ancora in una pagina|{{{[label&gt;Space.Page#anchor]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=HLinks]]
@@ -90,7 +90,7 @@ Il formato completo di un link è **##[etichetta {&gt; o |}] (risorsa) [@interWi
 **** **##pagina##**: Stringa obbligatoria che contiene il nome della pagina del wiki da collegare. Esempio: ##WebHome##
 ** **##Stringaquery##**: Stringa opzionale di query per specificare dei parametri che saranno usati nel rendering dell'URL. Esempio: ##mydata1=5&amp;mydata2=Hello##
 ** **##ancora##**: Nome opzionale di un'ancora che punta ad un'altra ancora definita nel link in oggetto. Notare che in XWiki le ancore sono create automaticamente per i titoli. Esempio: ##HTableOfContents##
-* **##interWikiAlias##**: Un alias opzionale [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] come definito nella InterWiki Map (vedere la  [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]).Questo vale solo per i nomi delle pagine wiki. Esempio: ##wikipedia##
+* **##interWikiAlias##**: Un alias opzionale [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] come definito nella InterWiki Map (vedere la  [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]).Questo vale solo per i nomi delle pagine wiki. Esempio: ##wikipedia##
 * **##obbiettivo##**: Stringa opzionale che corrisponde all'atttributo HTML ##target## per un elemento link HTML ##A## . Questo elemento viene usato quando si fa il render del link. Di default apre il link nella pagina corrente. Esempi: ##_self##, ##_blank##
 
 === 2.0 Links ===
@@ -131,7 +131,7 @@ Le parti tra ##( )## sono richieste, le parti tra ##[ ]## sono opzionali.
 
 Il formato completo di un link è **##[etichetta&gt;&gt;] (risorsa) [@interWikiAlias] [||parametri]##**
 
-* **##etichetta##**: Stringa opzionale che sarà mostrata all'utente dopo il render del link. L'etichetta può contenere della sintassi XWiki. Se non viene specificata un'etichetta sarà generata un'etichetta predefinita. Il modello di generazione può essere cambiato, vedere la [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Esempio: ##My Page##
+* **##etichetta##**: Stringa opzionale che sarà mostrata all'utente dopo il render del link. L'etichetta può contenere della sintassi XWiki. Se non viene specificata un'etichetta sarà generata un'etichetta predefinita. Il modello di generazione può essere cambiato, vedere la [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Esempio: ##My Page##
 * **##risorsa##**: Il riferimento completo al link con la sintassi seguente: **##(riferimento) [?Stringaquery] [#ancora]##**
 ** **##riferimento##**: Il riferimento al collegamento in una delle forme seguenti:
 *** **URL**: qualsiasi URL nella forma **##protocollo:~/~/percorso##**. Esempi: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##
@@ -148,7 +148,7 @@ Il formato completo di un link è **##[etichetta&gt;&gt;] (risorsa) [@interWikiA
 **** **##emailAddress##**: Indirizzo del destinatario dell'email. Esempio: "##john@smith.com##"
 ** **##Stringaquery##**: Stringa opzionale di query per specificare parametri che saranno usati nel rendering dell'URL. Esempio: ##mydata1=5&amp;mydata2=Hello##
 ** **##anchra##**: Nome di un'ancora opzionale che punta ad un'ancora definita nel link cui si fa riferimento. Notare che in XWiki le ancore sono create automaticamente per i titoli. Esempio: ##HTableOfContents##
-* **##interWikiAlias##**: Alias opzionale [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] come definito nella InterWiki Map (vedere la [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Questo vale solo per i nomi delle pagine wiki. Esempio: ##wikipedia##
+* **##interWikiAlias##**: Alias opzionale [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] come definito nella InterWiki Map (vedere la [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Questo vale solo per i nomi delle pagine wiki. Esempio: ##wikipedia##
 * **##parametri##**: elenco opzionale di parametri che si possono passare al link. Esempio: ##rel="~_~_blank"## (apri in una nuova finestra)
 
 
@@ -186,7 +186,7 @@ Le parti tra ##( )## sono richieste, le parti tra ##[ ]## sono opzionali.
 
 Il formato completo di un link è **##[etichetta&gt;&gt;] (risorsa) [||parametri]##**
 
-* **##etichetta##**: Stringa opzionale che sarà mostrata all'utente dopo il render del link. L'etichetta può contenere della sintassi XWiki. Se non viene specificata un'etichetta sarà generata un'etichetta predefinita. Il modello di generazione può essere cambiato, vedere la [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Esempio: ##My Page##
+* **##etichetta##**: Stringa opzionale che sarà mostrata all'utente dopo il render del link. L'etichetta può contenere della sintassi XWiki. Se non viene specificata un'etichetta sarà generata un'etichetta predefinita. Il modello di generazione può essere cambiato, vedere la [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Esempio: ##My Page##
 * **##risorsa##**: Stringa richiesta con il riferimento al link in una delle forma seguenti
 ** **URL**: qualsiasi URL nella forma **##[url:] (protocollo:~/~/percorso)##**. Esempi: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
 *** **##url:##** Stringa opzionale che identifica la risorsa come un URL.
@@ -197,7 +197,7 @@ Il formato completo di un link è **##[etichetta&gt;&gt;] (risorsa) [||parametri
 *** **##pagina##**: Stringa richiesta con il nome della pagina wiki cui punta il link. Esempio: ##WebHome##
 ** **InterWiki page name** Nome pagina Interwiki, riferimento nella forma **##interwiki: {{{(interWikiAlias:)}}} (page)##**. Esempio: ##interwiki:wikipedia:XWiki##
 *** **##interwiki:##** Stringa richiesta che identifica la risorsa come un link InterWiki.
-*** **##interWikiAlias##**: Alias opzionale dell'[[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] come definito dall'InterWiki Map (vedere la [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Esempio: ##wikipedia##
+*** **##interWikiAlias##**: Alias opzionale dell'[[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] come definito dall'InterWiki Map (vedere la [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Esempio: ##wikipedia##
 *** **##pagina##**: Stringa richiesta con il nome della pagina wiki cui punta il link. Esempio:: ##XWiki##
 ** **Allegato** Allegato, riferimento nella forma **##attach~: [wikiPageName@] (attachmentName)##**. Esempi: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
 *** **##attach~:##**: Stringa richiesta che identifica la risorsa come un allegato.

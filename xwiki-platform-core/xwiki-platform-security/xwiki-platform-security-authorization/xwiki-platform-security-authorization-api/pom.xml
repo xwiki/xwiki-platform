@@ -32,8 +32,6 @@
   <description>Controls permissions to all the wiki elements</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
-    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Authorization API</xwiki.extension.name>
   </properties>

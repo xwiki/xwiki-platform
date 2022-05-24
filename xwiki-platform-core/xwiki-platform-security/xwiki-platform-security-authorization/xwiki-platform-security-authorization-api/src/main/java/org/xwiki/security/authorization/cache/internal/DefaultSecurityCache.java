@@ -30,6 +30,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -43,6 +44,7 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.GroupSecurityReference;
@@ -75,10 +77,6 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /** Escaped separator used for composing key for the cache. */
     private static final String KEY_CACHE_SEPARATOR_ESCAPED = KEY_CACHE_SEPARATOR + KEY_CACHE_SEPARATOR;
 
-    /** Logger. **/
-    @Inject
-    private Logger logger;
-
     /** Fair read-write lock used for fair scheduling of cache access. */
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
@@ -94,6 +92,10 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
     private final Lock invalidationWriteLock = invalidationReadWriteLock.writeLock();
 
+    /** Logger. **/
+    @Inject
+    private Logger logger;
+
     /** The keys in the cache are generated from instances of {@link org.xwiki.model.reference.EntityReference}. */
     @Inject
     private EntityReferenceSerializer<String> keySerializer;
@@ -101,6 +103,11 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /** Cache manager to create the cache. */
     @Inject
     private CacheManager cacheManager;
+
+    /** Obtain configuration from the xwiki.properties file. */
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource configuration;
 
     /** The cache instance. */
     private Cache<SecurityCacheEntry> cache;
@@ -117,7 +124,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         CacheConfiguration cacheConfig = new CacheConfiguration();
         cacheConfig.setConfigurationId("platform.security.authorization.cache");
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-        lru.setMaxEntries(DEFAULT_CAPACITY);
+        int cacheCapacity = configuration.getProperty("security.authorization.cache.capacity", DEFAULT_CAPACITY);
+        logger.debug("creating security entries cache with capacity of [{}]", cacheCapacity);
+        lru.setMaxEntries(cacheCapacity);
         cacheConfig.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
         try {
             return cacheManager.createNewCache(cacheConfig);

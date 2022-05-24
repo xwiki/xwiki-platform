@@ -666,6 +666,14 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# The default is:
 # security.authorization.settler = default
 
+#-# [Since 14.5]
+#-# Define the maximal number of entries of the cache which caches the results of security checks.
+#-# If the wiki has a lot of users and/or local right assignments the capacity can be increased
+#-# to improve performance.
+#-#
+#-# The default is:
+# security.authorization.cache.capacity = 10000
+
 #-# [Since 13.0]
 #-# Control if document save API should also check the right of the script author when saving a document.
 #-# When false only the current user right is checked.

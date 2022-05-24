@@ -34,6 +34,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
@@ -67,6 +68,8 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -115,6 +118,9 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             final CacheManager cacheManager = securityCacheMocker.getInstance(CacheManager.class);
             when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cache);
         }
+
+        final ConfigurationSource cs = securityCacheMocker.getInstance(ConfigurationSource.class, "xwikiproperties");
+        when(cs.getProperty(eq("security.authorization.cache.capacity"), anyInt())).thenReturn(0);
 
         XWikiBridge xwikiBridge = securityReferenceFactoryMocker.getInstance(XWikiBridge.class);
         when(xwikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));

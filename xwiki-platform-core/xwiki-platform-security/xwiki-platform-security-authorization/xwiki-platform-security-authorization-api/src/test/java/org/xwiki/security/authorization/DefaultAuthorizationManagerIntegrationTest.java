@@ -32,6 +32,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
@@ -83,6 +84,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.security.authorization.Right.ADMIN;
@@ -157,6 +159,17 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             });
 
         when(xWikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));
+
+        final ConfigurationSource configurationSource = componentManager.registerMockComponent(ConfigurationSource.class, "xwikiproperties");
+        when(configurationSource.getProperty(anyString(), any(Object.class)))
+            .thenAnswer(new Answer<Object>()
+            {
+                @Override
+                public Object answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return invocation.getArgument(1);
+                }
+            });
     }
 
     @BeforeEach

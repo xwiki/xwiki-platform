@@ -55,7 +55,8 @@ import com.xpn.xwiki.web.XWikiRequest;
  * Default implementation of {@link PDFExportJobRequestFactory}.
  * 
  * @version $Id$
- * @since 14.4
+ * @since 14.4.1
+ * @since 14.5RC1
  */
 @Component
 @Singleton

@@ -42,7 +42,8 @@ import org.xwiki.rendering.transformation.RenderingContext;
  * Component used to render documents.
  * 
  * @version $Id$
- * @since 14.4
+ * @since 14.4.1
+ * @since 14.5RC1
  */
 @Component(roles = DocumentRenderer.class)
 @Singleton

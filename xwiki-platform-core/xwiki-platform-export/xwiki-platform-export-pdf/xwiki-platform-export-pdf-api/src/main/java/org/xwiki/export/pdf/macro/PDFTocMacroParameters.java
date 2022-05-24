@@ -30,7 +30,8 @@ import org.xwiki.stability.Unstable;
  * The parameters supported by {@link PDFTocMacro}.
  * 
  * @version $Id$
- * @since 14.4
+ * @since 14.4.1
+ * @since 14.5RC1
  */
 @Unstable
 public class PDFTocMacroParameters

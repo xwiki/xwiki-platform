@@ -134,9 +134,9 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    void deleteFilterPreference() throws Exception
+    void deleteFilterPreferences() throws Exception
     {
-        this.defaultModelBridge.deleteFilterPreference(this.wikiReference);
+        this.defaultModelBridge.deleteFilterPreferences(this.wikiReference);
         verify(this.notificationFilterPreferenceStore).deleteFilterPreference(this.wikiReference);
     }
 }

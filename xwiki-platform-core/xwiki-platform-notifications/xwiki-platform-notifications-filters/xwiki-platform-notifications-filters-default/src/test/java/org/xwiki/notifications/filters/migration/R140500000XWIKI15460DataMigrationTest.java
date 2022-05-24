@@ -55,7 +55,8 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  * @since 14.5RC1
- * @since 13.10.6
+ * @since 14.4.1
+ * @since 13.10.7
  */
 @ComponentTest
 class R140500000XWIKI15460DataMigrationTest

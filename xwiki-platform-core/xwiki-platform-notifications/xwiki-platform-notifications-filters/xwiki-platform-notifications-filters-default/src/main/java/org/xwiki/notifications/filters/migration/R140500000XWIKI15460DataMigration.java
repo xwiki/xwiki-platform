@@ -50,7 +50,8 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * @see <a href="https://jira.xwiki.org/browse/XWIKI-15460">XWIKI-15460: Notification filter preferences are not cleaned
  *     when a wiki is deleted</a>
  * @since 14.5RC1
- * @since 13.10.6
+ * @since 14.4.1
+ * @since 13.10.7
  */
 @Component
 @Singleton
@@ -107,7 +108,6 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
             Set<NotificationFilterPreference> allNotificationFilterPreferences = this.store
                 .getPaginatedFilterPreferences(limit, offset);
             while (!allNotificationFilterPreferences.isEmpty()) {
-                // We count the deleted filter preferences and adapt the next offset accordingly.
                 for (NotificationFilterPreference filterPreference : allNotificationFilterPreferences) {
                     filterPreference.getWikiId().ifPresent(wikiId -> {
                         if (!knownWikiIds.contains(wikiId)) {

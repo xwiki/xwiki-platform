@@ -147,7 +147,7 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void deleteFilterPreference(WikiReference wikiReference) throws NotificationException
+    public void deleteFilterPreferences(WikiReference wikiReference) throws NotificationException
     {
         this.notificationFilterPreferenceStore.deleteFilterPreference(wikiReference);
     }

@@ -104,12 +104,12 @@ public interface ModelBridge
      *
      * @param wikiReference a wiki reference
      * @throws NotificationException in case of error while deleting the preferences
-     * 
      * @since 14.5RC1
-     * @since 13.10.6
+     * @since 14.4.1
+     * @since 13.10.7
      */
     @Unstable
-    default void deleteFilterPreference(WikiReference wikiReference) throws NotificationException
+    default void deleteFilterPreferences(WikiReference wikiReference) throws NotificationException
     {
         throw new UnsupportedOperationException("Not implemented");
     }

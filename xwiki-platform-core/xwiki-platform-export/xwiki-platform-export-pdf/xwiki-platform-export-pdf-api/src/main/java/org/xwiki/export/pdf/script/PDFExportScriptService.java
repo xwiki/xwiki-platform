@@ -40,7 +40,8 @@ import org.xwiki.stability.Unstable;
  * Scripting API to export documents as PDF.
  * 
  * @version $Id$
- * @since 14.4
+ * @since 14.4.1
+ * @since 14.5RC1
  */
 @Component
 @Named(PDFExportScriptService.ROLE_HINT)

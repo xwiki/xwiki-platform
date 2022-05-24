@@ -130,9 +130,9 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
                 for (DefaultNotificationFilterPreference filterPreference : allNotificationFilterPreferences) {
                     // Filters remaining from previously removed wikis can only be found on the main wiki.
                     if (isMainWiki) {
-                        identifyFiltersFromRemovedWikis(knownWikiIds, unknownWikiIds, filterPreference);
+                        identifyRemovedWikis(knownWikiIds, unknownWikiIds, filterPreference);
                     }
-                    identifyFiltersFromRemovedUsers(usersStatus, filterPreference);
+                    identifiyRemovedUsers(usersStatus, filterPreference);
                 }
                 offset += limit;
                 allNotificationFilterPreferences = this.store.getPaginatedFilterPreferences(limit, offset);
@@ -157,7 +157,7 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
         }
     }
 
-    private void identifyFiltersFromRemovedWikis(Collection<String> knownWikiIds, Set<String> unknownWikiIds,
+    private void identifyRemovedWikis(Collection<String> knownWikiIds, Set<String> unknownWikiIds,
         DefaultNotificationFilterPreference filterPreference)
     {
         filterPreference.getWikiId().ifPresent(wikiId -> {
@@ -167,7 +167,7 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
         });
     }
 
-    private void identifyFiltersFromRemovedUsers(Map<String, Boolean> usersStatus,
+    private void identifiyRemovedUsers(Map<String, Boolean> usersStatus,
         DefaultNotificationFilterPreference filterPreference)
     {
         String owner = filterPreference.getOwner();

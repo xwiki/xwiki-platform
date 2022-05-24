@@ -41,7 +41,8 @@ import static org.mockito.Mockito.verify;
  *
  * @version $Id$
  * @since 14.5RC1
- * @since 13.10.6
+ * @since 14.4.1
+ * @since 13.10.7
  */
 @ComponentTest
 class DeletedWikiEventListenerTest
@@ -60,13 +61,14 @@ class DeletedWikiEventListenerTest
     void onEvent() throws Exception
     {
         this.listener.onEvent(null, "wikiid", null);
-        verify(this.modelBridge).deleteFilterPreference(new WikiReference("wikiid"));
+        verify(this.modelBridge).deleteFilterPreferences(new WikiReference("wikiid"));
     }
 
     @Test
     void onEventException() throws Exception
     {
-        doThrow(NotificationException.class).when(this.modelBridge).deleteFilterPreference(new WikiReference("wikiid"));
+        doThrow(NotificationException.class).when(this.modelBridge)
+            .deleteFilterPreferences(new WikiReference("wikiid"));
         this.listener.onEvent(null, "wikiid", null);
         assertEquals(1, this.logCapture.size());
         assertEquals("Failed to delete notification preferences for wiki [wikiid]. Cause: [NotificationException: ].",

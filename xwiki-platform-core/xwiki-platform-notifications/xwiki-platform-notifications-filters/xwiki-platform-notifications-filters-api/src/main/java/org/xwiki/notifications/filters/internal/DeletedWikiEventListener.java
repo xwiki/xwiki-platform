@@ -38,7 +38,8 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  *
  * @version $Id$
  * @since 14.5RC1
- * @since 13.10.6
+ * @since 14.4.1
+ * @since 13.10.7
  */
 @Component
 @Singleton
@@ -65,7 +66,7 @@ public class DeletedWikiEventListener extends AbstractEventListener
     {
         String wikiId = (String) source;
         try {
-            this.modelBridge.deleteFilterPreference(new WikiReference(wikiId));
+            this.modelBridge.deleteFilterPreferences(new WikiReference(wikiId));
         } catch (NotificationException e) {
             this.logger.warn("Failed to delete notification preferences for wiki [{}]. Cause: [{}].", wikiId,
                 getRootCauseMessage(e));

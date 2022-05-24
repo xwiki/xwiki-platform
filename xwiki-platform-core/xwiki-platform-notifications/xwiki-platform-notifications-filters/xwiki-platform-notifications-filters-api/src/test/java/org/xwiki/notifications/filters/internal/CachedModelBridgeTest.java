@@ -163,7 +163,7 @@ class CachedModelBridgeTest
     }
 
     @Test
-    void deleteFilterPreference() throws Exception
+    void deleteFilterPreferences() throws Exception
     {
         WikiReference wikiReference = new WikiReference("wikiId");
 
@@ -182,13 +182,13 @@ class CachedModelBridgeTest
         this.preferenceFilterCache.put(WIKI,
             new HashSet<>(Set.of(notificationFilterPreference2, notificationFilterPreference3)));
 
-        this.cachedModelBridge.deleteFilterPreference(wikiReference);
+        this.cachedModelBridge.deleteFilterPreferences(wikiReference);
 
         assertEquals(Map.of(
                 USER, Set.of(notificationFilterPreference1),
                 WIKI, Set.of(notificationFilterPreference2)),
             this.preferenceFilterCache);
 
-        verify(this.modelBridge).deleteFilterPreference(wikiReference);
+        verify(this.modelBridge).deleteFilterPreferences(wikiReference);
     }
 }

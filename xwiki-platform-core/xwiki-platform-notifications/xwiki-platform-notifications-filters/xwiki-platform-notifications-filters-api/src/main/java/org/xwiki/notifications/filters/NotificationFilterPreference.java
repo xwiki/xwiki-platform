@@ -147,13 +147,14 @@ public interface NotificationFilterPreference
 
     /**
      * Return {@code true} if the filter preference is related to a given wiki. This is the case if {@link #getWiki()}
-     * returns {@code wikiId}, or if {@link #getPage()}, {@link #getPageOnly()} or {@link #getUser()} are contained in
-     * the wiki.
+     * returns {@code wikiId}, or if {@link #getPage()}, {@link #getPageOnly()} or {@link #getUser()} are containing the
+     * wiki identifier.
      *
      * @param wikiId a wiki identifier
      * @return {@code true} if the notification filter preference is related to a given wiki, {@code false} otherwise
      * @since 14.5RC1
-     * @since 13.10.6
+     * @since 14.4.1
+     * @since 13.10.7
      */
     @Unstable
     default boolean isFromWiki(String wikiId)
@@ -172,7 +173,8 @@ public interface NotificationFilterPreference
      * @return the wiki identifier of the resource concerned by the filter preference, {@link Optional#empty()} if no
      *     wiki identifier can be found
      * @since 14.5RC1
-     * @since 13.10.6
+     * @since 14.4.1
+     * @since 13.10.7
      */
     @Unstable
     default Optional<String> getWikiId()

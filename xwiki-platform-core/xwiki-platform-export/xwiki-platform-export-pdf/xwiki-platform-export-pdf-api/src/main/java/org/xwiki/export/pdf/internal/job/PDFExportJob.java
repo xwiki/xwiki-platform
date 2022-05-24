@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.export.pdf.internal.RequiredSkinExtensionsRecorder;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobStatus;
 import org.xwiki.job.AbstractJob;
@@ -60,6 +61,9 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     @Inject
     private DocumentRenderer documentRenderer;
 
+    @Inject
+    private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
+
     @Override
     public String getType()
     {
@@ -76,7 +80,11 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     protected void runInternal() throws Exception
     {
         if (!this.request.getDocuments().isEmpty()) {
+            this.requiredSkinExtensionsRecorder.start();
             render(this.request.getDocuments());
+            if (!this.status.isCanceled()) {
+                this.status.setRequiredSkinExtensions(this.requiredSkinExtensionsRecorder.stop());
+            }
 
             if (this.request.isServerSide() && !this.status.isCanceled()) {
                 saveAsPDF();

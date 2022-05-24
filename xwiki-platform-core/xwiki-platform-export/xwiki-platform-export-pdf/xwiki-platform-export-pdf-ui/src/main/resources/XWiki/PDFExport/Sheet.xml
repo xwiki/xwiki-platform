@@ -74,9 +74,16 @@
   #set ($discard = $xwiki.jsx.use($sheetReference))
   ## Output the HTML header but without the garbage from the start of the BODY tag.
   #set ($htmlHeader = "#template('htmlheader.vm')")
+  #set ($headTagEnd = $htmlHeader.indexOf('&lt;/head&gt;'))
   #set ($bodyTagStart = $htmlHeader.indexOf('&lt;body'))
   #set ($bodyContentStart = $htmlHeader.indexOf('&gt;', $bodyTagStart) + 1)
-  $htmlHeader.substring(0, $bodyContentStart)
+  $htmlHeader.substring(0, $headTagEnd)
+  ## Inject the required skin extensions.
+  #if ($pdfExportJobId)
+    $!services.job.getJobStatus($pdfExportJobId).requiredSkinExtensions
+  #end
+  ## Start the BODY tag.
+  $htmlHeader.substring($headTagEnd, $bodyContentStart)
   #set ($pdfTemplateObj = $xwiki.getDocument($pdfExportConfig.template).getObject('XWiki.PDFExport.TemplateClass'))
   #foreach ($element in $pdfElements)
     #if ($pdfExportConfig.get($element))

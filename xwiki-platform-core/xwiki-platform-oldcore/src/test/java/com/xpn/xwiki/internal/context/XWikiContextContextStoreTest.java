@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.context;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -212,6 +213,21 @@ class XWikiContextContextStoreTest
         assertEquals(this.wikiURL.toString(), this.oldcore.getXWikiContext().getRequest().getRequestURL().toString());
         assertFalse(((XWikiServletRequestStub) this.oldcore.getXWikiContext().getRequest()).isDaemon());
         assertNull(this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC));
+    }
+
+    @Test
+    void restoreRequestURL() throws MalformedURLException, URISyntaxException
+    {
+        assertNull(this.oldcore.getXWikiContext().getURL());
+
+        URL url = new URL("http://host:80/path?param=value#hash");
+
+        Map<String, Serializable> contextStore = new HashMap<>();
+        contextStore.put(XWikiContextContextStore.PROP_REQUEST_URL, url);
+
+        this.store.restore(contextStore);
+
+        assertEquals(url.toURI(), this.oldcore.getXWikiContext().getURL().toURI());
     }
 
     @Test

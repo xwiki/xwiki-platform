@@ -193,11 +193,11 @@ class PingSenderIT
         when(usersQuery.setWiki(any())).thenReturn(usersQuery);
         when(usersQuery.execute())
             // For wiki1
-            .thenReturn(List.of(10))
+            .thenReturn(List.of(10L))
             // For xwiki (main wiki)
-            .thenReturn(List.of(100))
+            .thenReturn(List.of(100L))
             // For wiki2
-            .thenReturn(List.of(1000));
+            .thenReturn(List.of(1000L));
 
         // Documents Ping Data Provider setup
         Query documentsQuery = mock(Query.class);

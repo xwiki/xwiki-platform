@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,12 +40,14 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobRequestFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.context.XWikiContextContextStore;
@@ -64,6 +67,8 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
 {
     private static final String EXPORT = "export";
 
+    private static final String UTF_8 = "UTF-8";
+
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
@@ -73,6 +78,10 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localStringEntityReferenceSerializer;
 
     @Inject
     private ContextStoreManager contextStoreManager;
@@ -107,23 +116,11 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
         Map<String, Serializable> pdfExportContext =
             this.contextStoreManager.save(this.contextStoreManager.getSupportedEntries());
 
-        XWikiContext xcontext = this.xcontextProvider.get();
-        XWikiRequest httpRequest = xcontext.getRequest();
-        String queryString = Objects.toString(httpRequest.get("pdfQueryString"), "");
-        // The request URL hash (fragment identifier) is not sent to the server but in the case of server-side PDF
-        // export we need it as it can influence the behavior of the JavaScript code when the PDF template is loaded in
-        // the headless web browser. In order to overcome this we receive the hash as a request parameter.
-        String hash = Objects.toString(httpRequest.get("pdfHash"), "");
-
+        URL printPreviewURL = getPrintPreviewURL(request.getId());
         pdfExportContext.put(XWikiContextContextStore.PROP_ACTION, EXPORT);
         pdfExportContext.put(XWikiContextContextStore.PROP_REQUEST_PARAMETERS,
-            (Serializable) getRequestParameters(queryString));
-
-        // We want the documents to be rendered with the same parameters (query string) and hash (anchor or fragment
-        // identifier) as in view mode. For this the saved request URL should use the specified query string and hash.
-        URL requestURL =
-            new URL(HttpServletUtils.getSourceURL(httpRequest), String.format("?%s#%s", queryString, hash));
-        pdfExportContext.put(XWikiContextContextStore.PROP_REQUEST_URL, requestURL);
+            (Serializable) getRequestParameters(printPreviewURL.getQuery()));
+        pdfExportContext.put(XWikiContextContextStore.PROP_REQUEST_URL, printPreviewURL);
 
         request.setContext(pdfExportContext);
     }
@@ -149,7 +146,7 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
     private Map<String, String[]> getRequestParameters(String queryString)
     {
         Map<String, List<String>> params = new LinkedHashMap<>();
-        for (NameValuePair pair : URLEncodedUtils.parse(queryString, Charset.forName("UTF-8"))) {
+        for (NameValuePair pair : URLEncodedUtils.parse(queryString, Charset.forName(UTF_8))) {
             List<String> values = params.getOrDefault(pair.getName(), new ArrayList<>());
             values.add(pair.getValue());
             params.put(pair.getName(), values);
@@ -161,5 +158,42 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
         }
 
         return parameters;
+    }
+
+    private URL getPrintPreviewURL(List<String> jobId)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWikiRequest httpRequest = xcontext.getRequest();
+
+        String originalQueryString = Objects.toString(httpRequest.get("pdfQueryString"), "");
+        String queryString = getPrintPreviewQueryString(jobId, originalQueryString);
+
+        // The request URL hash (fragment identifier) is not sent to the server but in the case of server-side PDF
+        // export we need it as it can influence the behavior of the JavaScript code when the PDF template is loaded in
+        // the headless web browser. In order to overcome this we receive the hash as a request parameter.
+        String hash = Objects.toString(httpRequest.get("pdfHash"), "");
+
+        // We want the documents to be rendered with the same parameters (query string) and hash (anchor or fragment
+        // identifier) as in print preview mode (what is used to generate the PDF in the end). For this the saved
+        // request URL should use the specified query string and hash.
+        DocumentReference documentReference = xcontext.getDoc().getDocumentReference();
+        return xcontext.getURLFactory().createExternalURL(
+            this.localStringEntityReferenceSerializer.serialize(documentReference.getLastSpaceReference()),
+            documentReference.getName(), EXPORT, queryString, hash, documentReference.getWikiReference().getName(),
+            xcontext);
+    }
+
+    private String getPrintPreviewQueryString(List<String> jobId, String originalQueryString)
+    {
+        List<NameValuePair> printPreviewParams = Arrays.asList(
+            new BasicNameValuePair("format", "html-print"),
+            new BasicNameValuePair("xpage", "get"),
+            new BasicNameValuePair("outputSyntax", "plain"),
+            // Asynchronous rendering is disabled by default on the export action so we need to force it.
+            new BasicNameValuePair("async", "true"),
+            new BasicNameValuePair("sheet", "XWiki.PDFExport.Sheet"),
+            new BasicNameValuePair("jobId", StringUtils.join(jobId, '/'))
+        );
+        return URLEncodedUtils.format(printPreviewParams, Charset.forName(UTF_8)) + '&' + originalQueryString;
     }
 }

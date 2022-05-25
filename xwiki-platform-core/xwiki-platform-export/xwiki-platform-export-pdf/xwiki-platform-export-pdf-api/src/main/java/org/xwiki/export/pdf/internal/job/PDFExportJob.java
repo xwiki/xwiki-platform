@@ -19,18 +19,22 @@
  */
 package org.xwiki.export.pdf.internal.job;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.RequiredSkinExtensionsRecorder;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobStatus;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -63,6 +67,13 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
 
     @Inject
     private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
+
+    @Inject
+    @Named("docker")
+    private PDFPrinter<URL> pdfPrinter;
+
+    @Inject
+    private TemporaryResourceStore temporaryResourceStore;
 
     @Override
     public String getType()
@@ -131,8 +142,10 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
                 || this.authorization.hasAccess(right, this.request.getAuthorReference(), reference)));
     }
 
-    private void saveAsPDF()
+    private void saveAsPDF() throws Exception
     {
-        // TODO
+        URL printPreviewURL = (URL) this.request.getContext().get("request.url");
+        InputStream pdfContent = this.pdfPrinter.print(printPreviewURL);
+        this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
     }
 }

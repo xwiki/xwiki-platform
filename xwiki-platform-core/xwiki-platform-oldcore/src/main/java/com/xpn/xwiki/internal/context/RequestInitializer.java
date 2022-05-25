@@ -167,5 +167,7 @@ public class RequestInitializer
             xcontext.setURLFactory(urlFactory);
         }
         urlFactory.init(xcontext);
+
+        xcontext.setURL(url);
     }
 }

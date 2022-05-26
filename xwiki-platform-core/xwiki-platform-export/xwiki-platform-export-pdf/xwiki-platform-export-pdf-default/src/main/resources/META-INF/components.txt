@@ -1,4 +1,5 @@
+org.xwiki.export.pdf.internal.docker.ContainerManager
+org.xwiki.export.pdf.internal.docker.DockerURL2PDFPrinter
 org.xwiki.export.pdf.internal.job.DefaultPDFExportJobRequestFactory
 org.xwiki.export.pdf.internal.job.PDFExportContextStore
 org.xwiki.export.pdf.internal.DefaultRequiredSkinExtensionsRecorder
-org.xwiki.export.pdf.internal.DockerURL2PDFPrinter

@@ -21,7 +21,7 @@ package org.xwiki.export.pdf.internal.job;
 
 import java.io.Serializable;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -66,8 +66,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFactory
 {
     private static final String EXPORT = "export";
-
-    private static final String UTF_8 = "UTF-8";
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -146,7 +144,7 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
     private Map<String, String[]> getRequestParameters(String queryString)
     {
         Map<String, List<String>> params = new LinkedHashMap<>();
-        for (NameValuePair pair : URLEncodedUtils.parse(queryString, Charset.forName(UTF_8))) {
+        for (NameValuePair pair : URLEncodedUtils.parse(queryString, StandardCharsets.UTF_8)) {
             List<String> values = params.getOrDefault(pair.getName(), new ArrayList<>());
             values.add(pair.getValue());
             params.put(pair.getName(), values);
@@ -194,6 +192,6 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
             new BasicNameValuePair("sheet", "XWiki.PDFExport.Sheet"),
             new BasicNameValuePair("jobId", StringUtils.join(jobId, '/'))
         );
-        return URLEncodedUtils.format(printPreviewParams, Charset.forName(UTF_8)) + '&' + originalQueryString;
+        return URLEncodedUtils.format(printPreviewParams, StandardCharsets.UTF_8) + '&' + originalQueryString;
     }
 }

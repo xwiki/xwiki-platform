@@ -34,6 +34,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>PDF Export Default API Implementation</xwiki.extension.name>
+    <dockerJava.version>3.2.13</dockerJava.version>
   </properties>
   <dependencies>
     <dependency>
@@ -55,6 +56,23 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <!-- Used for running a headless Chrome web browser inside a Docker container. -->
+    <dependency>
+      <groupId>com.github.docker-java</groupId>
+      <artifactId>docker-java-core</artifactId>
+      <version>${dockerJava.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.docker-java</groupId>
+      <artifactId>docker-java-transport-httpclient5</artifactId>
+      <version>${dockerJava.version}</version>
+    </dependency>
+    <!-- Used for interacting with the headless Chrome web browser. -->
+    <dependency>
+      <groupId>com.github.kklisura.cdt</groupId>
+      <artifactId>cdt-java-client</artifactId>
+      <version>4.0.0</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

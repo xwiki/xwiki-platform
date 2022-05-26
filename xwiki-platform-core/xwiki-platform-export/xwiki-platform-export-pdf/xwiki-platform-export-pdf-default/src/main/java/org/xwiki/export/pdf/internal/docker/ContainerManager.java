@@ -36,8 +36,6 @@ import com.github.dockerjava.api.async.ResultCallbackTemplate;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.github.dockerjava.api.command.PullImageResultCallback;
-import com.github.dockerjava.api.command.WaitContainerResultCallback;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.Container;
@@ -78,10 +76,16 @@ public class ContainerManager implements Initializable
         this.client = DockerClientImpl.getInstance(config, httpClient);
     }
 
+    /**
+     * Attempts to reuse the container with the specified name.
+     * 
+     * @param containerName the name of the container to reuse
+     * @return the container id, if a container with the specified name exists and can be reused, otherwise {@code null}
+     */
     public String maybeReuseContainerByName(String containerName)
     {
         List<Container> containers =
-            this.client.listContainersCmd().withNameFilter(Arrays.asList(containerName)).exec();
+            this.client.listContainersCmd().withNameFilter(Arrays.asList(containerName)).withShowAll(true).exec();
         if (containers.isEmpty()) {
             // There's no container with the specified name.
             return null;
@@ -119,15 +123,13 @@ public class ContainerManager implements Initializable
     }
 
     /**
-     * Docker-pull the passed image.
+     * Pull the specified Docker image.
      *
      * @param imageName the image to pull
      */
     public void pullImage(String imageName)
     {
-        PullImageResultCallback pullImageResultCallback =
-            this.client.pullImageCmd(imageName).exec(new PullImageResultCallback());
-        wait(pullImageResultCallback);
+        wait(this.client.pullImageCmd(imageName).start());
     }
 
     /**
@@ -156,19 +158,13 @@ public class ContainerManager implements Initializable
     }
 
     /**
-     * Start the specified container and wait until it is ready.
+     * Start the specified container.
      *
      * @param containerId the id of the container to start
      */
     public void startContainer(String containerId)
     {
-        // Start (and stop and remove automatically when the conversion is finished, thanks to the autoremove above).
         this.client.startContainerCmd(containerId).exec();
-
-        // Wait for the container to be ready before continuing.
-        WaitContainerResultCallback resultCallback = new WaitContainerResultCallback();
-        this.client.waitContainerCmd(containerId).exec(resultCallback);
-        wait(resultCallback);
     }
 
     /**
@@ -182,9 +178,7 @@ public class ContainerManager implements Initializable
             this.client.stopContainerCmd(containerId).exec();
 
             // Wait for the container to be fully stopped before continuing.
-            WaitContainerResultCallback resultCallback = new WaitContainerResultCallback();
-            this.client.waitContainerCmd(containerId).exec(resultCallback);
-            wait(resultCallback);
+            wait(this.client.waitContainerCmd(containerId).start());
         }
     }
 
@@ -195,7 +189,7 @@ public class ContainerManager implements Initializable
         } catch (InterruptedException e) {
             this.logger.warn("Interrupted thread [{}]. Root cause: [{}]", Thread.currentThread().getName(),
                 ExceptionUtils.getRootCauseMessage(e));
-            // Restore interrupted state to be a good citizen...
+            // Restore interrupted state to be a good citizen.
             Thread.currentThread().interrupt();
         }
     }

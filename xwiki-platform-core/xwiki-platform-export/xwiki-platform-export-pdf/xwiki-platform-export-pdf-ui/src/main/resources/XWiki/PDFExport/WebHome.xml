@@ -61,8 +61,6 @@
     #set ($discard = $response.sendError(401, 'CSRF token verification failed!'))
   #elseif ($request.action == 'export')
     #set ($pdfExportJobRequest = $services.export.pdf.createRequest())
-    ## TODO: Remove the following line after implementing Docker-based export.
-    #set ($discard = $pdfExportJobRequest.setServerSide(false))
     #set ($pdfExportJob = $services.export.pdf.execute($pdfExportJobRequest))
     #returnPDFExportJobStatusJSON($pdfExportJobRequest.id)
   #elseif ($request.data == 'jobStatus')

@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.slf4j.Logger;
 import org.xwiki.activeinstalls2.ActiveInstallsConfiguration;
 import org.xwiki.component.annotation.Component;
@@ -69,7 +70,12 @@ public class DefaultElasticsearchClientManager implements ElasticsearchClientMan
         String pingURL = this.configuration.getPingInstanceURL();
         if (!StringUtils.isEmpty(pingURL)) {
             // Create the low-level client
-            RestClient restClient = RestClient.builder(getPingHost(pingURL))
+            RestClientBuilder restClientBuilder = RestClient.builder(getPingHost(pingURL));
+            String path = getPingPath(pingURL);
+            if (StringUtils.isNotEmpty(path)) {
+                restClientBuilder = restClientBuilder.setPathPrefix(path);
+            }
+            RestClient restClient = restClientBuilder
                 .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
                     .useSystemProperties()
                     .setUserAgent(this.configuration.getUserAgent()))
@@ -105,6 +111,12 @@ public class DefaultElasticsearchClientManager implements ElasticsearchClientMan
     {
         URI pingURL = getPingURL(pingURLString);
         return new HttpHost(pingURL.getHost(), pingURL.getPort(), pingURL.getScheme());
+    }
+
+    private String getPingPath(String pingURLString) throws InitializationException
+    {
+        URI pingURL = getPingURL(pingURLString);
+        return pingURL.getPath();
     }
 
     private URI getPingURL(String pingURLString) throws InitializationException

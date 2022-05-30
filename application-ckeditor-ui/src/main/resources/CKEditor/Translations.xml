@@ -144,6 +144,10 @@ ckeditor.plugin.image.imageSelector.uploadTab.title=Upload
 ckeditor.plugin.image.imageSelector.uploadTab.file.title=File
 ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Select a local file to add to the page.
 ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=Upload
+ckeditor.plugin.image.imageSelector.iconTab.title=Icon
+ckeditor.plugin.image.imageSelector.iconTab.icon.title=Icon
+ckeditor.plugin.image.imageSelector.iconTab.icon.hint=The identifier of the icon to display as an image.
+ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=accept
 
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 

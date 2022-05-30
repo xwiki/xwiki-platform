@@ -45,8 +45,9 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
     }
 
     /**
-     * Can be called by the image selector tab UIXs. Indicates the list of  slected images.
-     * Passing an empty array indicates that not images are currently selected.
+     * Can be called by the image selector tab UIXs. Indicates the list of selected images. Passing an empty array 
+     * indicates that not images are currently selected. The images can either be a string that will be parsed to a 
+     * resource reference, or a reference object (e.g., "{type: 'icon', reference: 'accept'}");
      * Note: Currently, only the first image of the list is taken into account.
      *
      * @param imageReferences the selected image references
@@ -56,13 +57,20 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
       if(imageReferences.length > 0) {
         // TODO:  Support the selection of several images (see CKEDITOR-445).
         var imageReference = imageReferences[0];
+        var value;
+        if (typeof imageReference === 'string') {
+          value = resource.convertEntityReferenceToResourceReference(getEntityReference(imageReference));
+        } else {
+          value = imageReference;
+          value.typed = true;
+        }
         modal.data('imageReference', {
-          value: resource.convertEntityReferenceToResourceReference(getEntityReference(imageReference))
+          value: value
         });
         $('.image-selector-modal button.btn-primary').prop('disabled', false);
       } else {
         modal.data('imageReference', {});
-        $('.image-selector-modal button.btn-primary').prop('disabled', true);  
+        $('.image-selector-modal button.btn-primary').prop('disabled', true);
       }
     }
 
@@ -108,9 +116,6 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
         selectButton.on('click', function() {
           var imageData = modal.data('input').imageData || {};
           imageData.resourceReference = modal.data('imageReference').value;
-          if (imageData.resourceReference) {
-            imageData.resourceReference.typed = false;
-          }
           var output = {
             imageData: imageData,
             editor: modal.data('input').editor,

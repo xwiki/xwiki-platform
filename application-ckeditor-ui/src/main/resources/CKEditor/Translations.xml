@@ -148,6 +148,10 @@ ckeditor.plugin.image.imageSelector.iconTab.title=Icon
 ckeditor.plugin.image.imageSelector.iconTab.icon.title=Icon
 ckeditor.plugin.image.imageSelector.iconTab.icon.hint=The identifier of the icon to display as an image.
 ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=accept
+ckeditor.plugin.image.imageSelector.urlTab.title=Url
+ckeditor.plugin.image.imageSelector.urlTab.url.title=Url
+ckeditor.plugin.image.imageSelector.urlTab.url.hint=The url of the image to display.
+ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
 
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 

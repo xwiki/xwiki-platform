@@ -1722,6 +1722,10 @@ $displayName##
   ## When the total number of rows is not bigger than the limit, we remove the obfuscated results from the response since
   ## this has no impact on the pagination.
   #set ($rows = $map.get('rows'))
+  #set ($offset = 0)
+  #if($map.get('offset'))
+    #set ($offset = $mathtool.sub($map.get('offset'), 1))
+  #end
   #if ($map.get('totalrows') <= $map.get('returnedrows'))
     #set ($filteredRows = [])
     #foreach ($row in $rows)
@@ -1729,7 +1733,9 @@ $displayName##
         #set ($discard = $filteredRows.add($row))
       #end
     #end
-    #set($discard = $map.put('totalrows', $filteredRows.size()))
+    ## The offset needs to be taken into account when returning the total number of pages otherwise, client-side can
+    ## consider that previsouly returned results have been removed (e.g., in case of page size change).
+    #set($discard = $map.put('totalrows', $mathtool.add($filteredRows.size(), $offset)))
     #set($discard = $map.put('returnedrows', $filteredRows.size()))
   #else
     #set ($filteredRows = $rows)

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.velocity.tools.generic.MathTool;
 import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,6 +64,7 @@ class MacrosTest extends PageTest
         registerVelocityTool("datetool", this.componentManager.getInstance(XWikiDateTool.class));
         registerVelocityTool("numbertool", new NumberTool());
         registerVelocityTool("stringtool", new StringUtils());
+        registerVelocityTool("mathtool", new MathTool());
     }
 
     @Test
@@ -151,6 +153,27 @@ class MacrosTest extends PageTest
         assertEquals(1, map.get("returnedrows"));
         assertEquals(1, ((List<?>) map.get("rows")).size());
         assertTrue(((List<Map<String, Boolean>>) map.get("rows")).get(0).get("doc_viewable"));
+    }
+
+    @Test
+    void livetableFilterObfuscatedTotalrowsWithOffset() throws Exception
+    {
+        Map<Object, Object> mapParameter = new HashMap<>();
+        mapParameter.put("offset", "3");
+        mapParameter.put("totalrows", 2);
+        mapParameter.put("returnedrows", 2);
+        List<Map<Object, Object>> dummyRows = asList(
+            singletonMap("doc_viewable", true),
+            singletonMap("doc_viewable", true)
+        );
+        mapParameter.put("rows", dummyRows);
+        this.velocityManager.getVelocityContext().put("map", mapParameter);
+        this.velocityManager.evaluate(new StringWriter(), "livetable",
+            new StringReader("#livetable_filterObfuscated($map)"));
+        Map<String, Object> map = (Map<String, Object>) this.velocityManager.getVelocityContext().get("map");
+        assertEquals(4, map.get("totalrows"));
+        assertEquals(2, map.get("returnedrows"));
+        assertEquals(2, ((List<?>) map.get("rows")).size());
     }
 
     @Test

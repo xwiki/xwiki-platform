@@ -147,6 +147,27 @@ class MacrosTest extends PageTest
     }
 
     @Test
+    void livetableFilterObfuscatedTotalrowsWithOffset() throws Exception
+    {
+        Map<Object, Object> mapParameter = new HashMap<>();
+        mapParameter.put("offset", "3");
+        mapParameter.put("totalrows", 2);
+        mapParameter.put("returnedrows", 2);
+        List<Map<Object, Object>> dummyRows = asList(
+            singletonMap("doc_viewable", true),
+            singletonMap("doc_viewable", true)
+        );
+        mapParameter.put("rows", dummyRows);
+        this.velocityManager.getVelocityContext().put("map", mapParameter);
+        this.velocityManager.evaluate(new StringWriter(), "livetable",
+            new StringReader("#livetable_filterObfuscated($map)"));
+        Map<String, Object> map = (Map<String, Object>) this.velocityManager.getVelocityContext().get("map");
+        assertEquals(4, map.get("totalrows"));
+        assertEquals(2, map.get("returnedrows"));
+        assertEquals(2, ((List<?>) map.get("rows")).size());
+    }
+
+    @Test
     void parseDateRangeAfter() throws Exception
     {
         this.velocityManager.getVelocityContext().put("dateRange", new HashMap<>());

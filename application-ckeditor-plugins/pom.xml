@@ -125,7 +125,6 @@
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>1.3.2</version>
         <executions>
           <execution>
             <!-- Minify the WebJar resources before packing the jar. -->

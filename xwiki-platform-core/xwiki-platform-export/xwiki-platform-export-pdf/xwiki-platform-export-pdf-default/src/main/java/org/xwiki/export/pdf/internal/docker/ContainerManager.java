@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.export.pdf.PDFExportConfiguration;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallbackTemplate;
@@ -65,11 +66,15 @@ public class ContainerManager implements Initializable
     @Inject
     private Logger logger;
 
+    @Inject
+    private PDFExportConfiguration configuration;
+
     private DockerClient client;
 
     @Override
     public void initialize() throws InitializationException
     {
+        this.logger.debug("Initializing the Docker client.");
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
         DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder().dockerHost(config.getDockerHost())
             .sslConfig(config.getSSLConfig()).build();
@@ -84,22 +89,29 @@ public class ContainerManager implements Initializable
      */
     public String maybeReuseContainerByName(String containerName)
     {
+        this.logger.debug("Looking for an existing Docker container with name [{}].", containerName);
         List<Container> containers =
             this.client.listContainersCmd().withNameFilter(Arrays.asList(containerName)).withShowAll(true).exec();
         if (containers.isEmpty()) {
+            this.logger.debug("Could not find any Docker container with name [{}].", containerName);
             // There's no container with the specified name.
             return null;
         }
 
+        this.logger.debug("Inspecting the state of the Docker container [{}].", containers.get(0).getId());
         InspectContainerResponse container = this.client.inspectContainerCmd(containers.get(0).getId()).exec();
         if (container.getState().getDead() == Boolean.TRUE) {
+            this.logger.debug("Docker container [{}] is dead. Removing it.", container.getId());
             // The container is not reusable. Try to remove it so it can be recreated.
             this.client.removeContainerCmd(container.getId()).exec();
             return null;
         } else if (container.getState().getPaused() == Boolean.TRUE) {
+            this.logger.debug("Docker container [{}] is paused. Unpausing it.", container.getId());
             this.client.unpauseContainerCmd(container.getId()).exec();
         } else if (container.getState().getRunning() != Boolean.TRUE
             && container.getState().getRestarting() != Boolean.TRUE) {
+            this.logger.debug("Docker container [{}] is neither running nor restarting. Starting it.",
+                container.getId());
             this.startContainer(container.getId());
         }
 
@@ -129,6 +141,7 @@ public class ContainerManager implements Initializable
      */
     public void pullImage(String imageName)
     {
+        this.logger.debug("Pulling the Docker image [{}].", imageName);
         wait(this.client.pullImageCmd(imageName).start());
     }
 
@@ -144,16 +157,23 @@ public class ContainerManager implements Initializable
     public String createContainer(String imageName, String containerName, int remoteDebuggingPort,
         List<String> parameters)
     {
+        this.logger.debug("Creating a Docker container with name [{}] using image [{}], remote debugging port [{}]"
+            + " and parameters [{}].", containerName, imageName, remoteDebuggingPort, parameters);
         ExposedPort exposedPort = ExposedPort.tcp(remoteDebuggingPort);
         Ports portBindings = new Ports();
         portBindings.bind(exposedPort, Ports.Binding.bindPort(remoteDebuggingPort));
 
         CreateContainerCmd command = this.client.createContainerCmd(imageName);
         CreateContainerResponse container = command.withCmd(parameters).withExposedPorts(exposedPort)
-            .withHostConfig(HostConfig.newHostConfig().withBinds(
-                // Make sure it also works when XWiki is running in Docker.
-                new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK))).withPortBindings(portBindings))
+            // The extra host is needed in order to be able to access the XWiki instance running on the same machine as
+            // the Docker container itself.
+            .withHostConfig(HostConfig.newHostConfig()
+                .withExtraHosts(this.configuration.getChromeDockerHostName() + ":host-gateway").withBinds(
+                    // Make sure it also works when XWiki is running in Docker.
+                    new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK)))
+                .withPortBindings(portBindings))
             .withName(containerName).exec();
+        this.logger.debug("Created the Docker container with id [{}].", container.getId());
         return container.getId();
     }
 
@@ -164,6 +184,7 @@ public class ContainerManager implements Initializable
      */
     public void startContainer(String containerId)
     {
+        this.logger.debug("Starting the Docker container with id [{}].", containerId);
         this.client.startContainerCmd(containerId).exec();
     }
 
@@ -175,9 +196,11 @@ public class ContainerManager implements Initializable
     public void stopContainer(String containerId)
     {
         if (containerId != null) {
+            this.logger.debug("Stopping the Docker container with id [{}].", containerId);
             this.client.stopContainerCmd(containerId).exec();
 
             // Wait for the container to be fully stopped before continuing.
+            this.logger.debug("Wait for the Docker container [{}] to stop.", containerId);
             wait(this.client.waitContainerCmd(containerId).start());
         }
     }
@@ -187,9 +210,9 @@ public class ContainerManager implements Initializable
         try {
             template.awaitCompletion();
         } catch (InterruptedException e) {
-            this.logger.warn("Interrupted thread [{}]. Root cause: [{}]", Thread.currentThread().getName(),
+            this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
                 ExceptionUtils.getRootCauseMessage(e));
-            // Restore interrupted state to be a good citizen.
+            // Restore the interrupted state.
             Thread.currentThread().interrupt();
         }
     }

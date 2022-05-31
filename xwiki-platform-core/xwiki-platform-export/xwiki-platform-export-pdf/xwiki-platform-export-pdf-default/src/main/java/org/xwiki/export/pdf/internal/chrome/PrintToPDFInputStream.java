@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.export.pdf.internal.docker;
+package org.xwiki.export.pdf.internal.chrome;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,16 +46,20 @@ public class PrintToPDFInputStream extends InputStream
 
     private byte[] buffer = new byte[] {};
 
+    private Runnable closeCallback;
+
     /**
      * Creates a new instance for reading the specified PDF stream.
      * 
      * @param io the service used to read the PDF data
      * @param stream a handle of the stream that holds the PDF data
+     * @param closeCallback the code to execute when this input stream is closed
      */
-    public PrintToPDFInputStream(IO io, String stream)
+    public PrintToPDFInputStream(IO io, String stream, Runnable closeCallback)
     {
         this.io = io;
         this.stream = stream;
+        this.closeCallback = closeCallback;
     }
 
     @Override
@@ -65,7 +69,6 @@ public class PrintToPDFInputStream extends InputStream
             this.bufferOffset = 0;
             this.buffer = readBuffer();
             if (this.buffer.length == 0) {
-                io.close(stream);
                 return -1;
             }
         }
@@ -79,12 +82,22 @@ public class PrintToPDFInputStream extends InputStream
             return new byte[] {};
         }
 
-        Read read = io.read(stream);
+        Read read = this.io.read(this.stream);
         this.finished = read.getEof() == Boolean.TRUE;
+        String data = read.getData();
         if (read.getBase64Encoded() == Boolean.TRUE) {
-            return Base64.getDecoder().decode(read.getData());
-        } else {
-            return read.getData().getBytes(StandardCharsets.UTF_8);
+            data = new String(Base64.getDecoder().decode(data));
+        }
+
+        return data.getBytes(StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        this.io.close(this.stream);
+        if (this.closeCallback != null) {
+            this.closeCallback.run();
         }
     }
 }

@@ -19,6 +19,7 @@
  */
 package org.xwiki.export.pdf.internal.docker;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
@@ -27,19 +28,20 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
+import org.xwiki.export.pdf.internal.chrome.ChromeManager;
 
 import com.github.kklisura.cdt.protocol.commands.Page;
-import com.github.kklisura.cdt.protocol.types.page.PrintToPDF;
-import com.github.kklisura.cdt.protocol.types.page.PrintToPDFTransferMode;
+import com.github.kklisura.cdt.protocol.commands.Runtime;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.github.kklisura.cdt.services.ChromeService;
-import com.github.kklisura.cdt.services.impl.ChromeServiceImpl;
 import com.github.kklisura.cdt.services.types.ChromeTab;
 
 /**
@@ -54,44 +56,57 @@ import com.github.kklisura.cdt.services.types.ChromeTab;
 @Named("docker")
 public class DockerURL2PDFPrinter implements PDFPrinter<URL>, Initializable, Disposable
 {
-    private static final String CHROME_IMAGE = "zenika/alpine-chrome:latest";
+    @Inject
+    private Logger logger;
 
-    private static final String CONTAINER_NAME = "headless-chrome-pdf-printer";
+    @Inject
+    private PDFExportConfiguration configuration;
 
-    private static final int REMOTE_DEBUGGING_PORT = 9222;
+    @Inject
+    private ChromeManager chromeManager;
 
     @Inject
     private ContainerManager containerManager;
 
     private String containerId;
 
-    private ChromeService chromeService;
-
     @Override
     public void initialize() throws InitializationException
     {
-        initializeDockerContainer();
-        this.chromeService = new ChromeServiceImpl(REMOTE_DEBUGGING_PORT);
+        initializeChromeDockerContainer(this.configuration.getChromeDockerImage(),
+            this.configuration.getChromeDockerContainerName(), this.configuration.getChromeRemoteDebuggingPort());
+        initializeChromeService(this.configuration.getChromeRemoteDebuggingPort());
     }
 
-    private void initializeDockerContainer() throws InitializationException
+    private void initializeChromeDockerContainer(String imageName, String containerName, int remoteDebuggingPort)
+        throws InitializationException
     {
+        this.logger.debug("Initializing the Docker container running the headless Chrome web browser.");
         try {
-            this.containerId = this.containerManager.maybeReuseContainerByName(CONTAINER_NAME);
+            this.containerId = this.containerManager.maybeReuseContainerByName(containerName);
             if (this.containerId == null) {
                 // The container doesn't exist so we have to create it.
                 // But first we need to pull the image used to create the container, if we don't have it already.
-                if (!this.containerManager.isLocalImagePresent(CHROME_IMAGE)) {
-                    this.containerManager.pullImage(CHROME_IMAGE);
+                if (!this.containerManager.isLocalImagePresent(imageName)) {
+                    this.containerManager.pullImage(imageName);
                 }
 
-                this.containerId = this.containerManager.createContainer(CHROME_IMAGE, CONTAINER_NAME,
-                    REMOTE_DEBUGGING_PORT, Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
-                        "--remote-debugging-port=" + REMOTE_DEBUGGING_PORT));
+                this.containerId = this.containerManager.createContainer(imageName, containerName, remoteDebuggingPort,
+                    Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
+                        "--remote-debugging-port=" + remoteDebuggingPort));
                 this.containerManager.startContainer(containerId);
             }
         } catch (Exception e) {
             throw new InitializationException("Failed to initialize the Docker container for the PDF export.", e);
+        }
+    }
+
+    private void initializeChromeService(int remoteDebuggingPort) throws InitializationException
+    {
+        try {
+            this.chromeManager.connect(remoteDebuggingPort);
+        } catch (Exception e) {
+            throw new InitializationException("Failed to initialize the Chrome remote debugging service.", e);
         }
     }
 
@@ -101,51 +116,37 @@ public class DockerURL2PDFPrinter implements PDFPrinter<URL>, Initializable, Dis
         try {
             this.containerManager.stopContainer(this.containerId);
         } catch (Exception e) {
-            throw new ComponentLifecycleException("Failed to stop the Docker container used for PDF export.", e);
+            throw new ComponentLifecycleException(
+                String.format("Failed to stop the Docker container [%s] used for PDF export.", this.containerId), e);
         }
     }
 
     @Override
-    public InputStream print(URL input)
+    public InputStream print(URL input) throws IOException
     {
+        this.logger.debug("Printing [{}]", input);
+
+        // The headless Chrome web browser runs inside a Docker container where 'localhost' refers to the container
+        // itself. We have to update the domain from the given URL to point to the host running both the XWiki instance
+        // and the Docker container.
+        URL printPreviewURL =
+            new URL(input.toString().replace("://localhost", "://" + this.configuration.getChromeDockerHostName()));
+
+        ChromeService chromeService = this.chromeManager.getChromeService();
         ChromeTab tab = chromeService.createTab();
         ChromeDevToolsService devToolsService = chromeService.createDevToolsService(tab);
 
         Page page = devToolsService.getPage();
         page.enable();
-        page.navigate(input.toString());
+        page.navigate(printPreviewURL.toString());
 
-        InputStream[] pdfStreams = new InputStream[] {null};
+        Runtime runtime = devToolsService.getRuntime();
+        runtime.enable();
+        this.chromeManager.waitForPageReady(runtime);
 
-        page.onLoadEventFired(loadEventFired -> {
-            Boolean landscape = false;
-            Boolean displayHeaderFooter = false;
-            Boolean printBackground = false;
-            Double scale = 1d;
-            // A4 paper format
-            Double paperWidth = 8.27d;
-            Double paperHeight = 11.7d;
-            Double marginTop = 0d;
-            Double marginBottom = 0d;
-            Double marginLeft = 0d;
-            Double marginRight = 0d;
-            String pageRanges = "";
-            Boolean ignoreInvalidPageRanges = false;
-            String headerTemplate = "";
-            String footerTemplate = "";
-            Boolean preferCSSPageSize = false;
-            PrintToPDFTransferMode mode = PrintToPDFTransferMode.RETURN_AS_STREAM;
-
-            PrintToPDF printToPDF = devToolsService.getPage().printToPDF(landscape, displayHeaderFooter,
-                printBackground, scale, paperWidth, paperHeight, marginTop, marginBottom, marginLeft, marginRight,
-                pageRanges, ignoreInvalidPageRanges, headerTemplate, footerTemplate, preferCSSPageSize, mode);
-            pdfStreams[0] = new PrintToPDFInputStream(devToolsService.getIO(), printToPDF.getStream());
-
+        return this.chromeManager.printToPDF(devToolsService, () -> {
             devToolsService.close();
+            chromeService.closeTab(tab);
         });
-
-        devToolsService.waitUntilClosed();
-
-        return pdfStreams[0];
     }
 }

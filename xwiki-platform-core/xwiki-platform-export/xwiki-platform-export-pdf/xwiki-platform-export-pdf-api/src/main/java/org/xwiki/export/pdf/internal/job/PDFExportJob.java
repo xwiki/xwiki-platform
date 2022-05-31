@@ -19,6 +19,7 @@
  */
 package org.xwiki.export.pdf.internal.job;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
@@ -142,10 +143,11 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
                 || this.authorization.hasAccess(right, this.request.getAuthorReference(), reference)));
     }
 
-    private void saveAsPDF() throws Exception
+    private void saveAsPDF() throws IOException
     {
         URL printPreviewURL = (URL) this.request.getContext().get("request.url");
-        InputStream pdfContent = this.pdfPrinter.print(printPreviewURL);
-        this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
+        try (InputStream pdfContent = this.pdfPrinter.print(printPreviewURL)) {
+            this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
+        }
     }
 }

@@ -17,31 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.export.pdf;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-
-/**
- * Generic interface to print some data as PDF.
- * 
- * @version $Id$
- * @param <T> the input data type
- * @since 14.4.1
- * @since 14.5RC1
- */
-@Role
-@Unstable
-public interface PDFPrinter<T>
-{
-    /**
-     * Prints the specified data as PDF.
-     * 
-     * @param input the data to be printed as PDF
-     * @return the PDF input stream
-     */
-    InputStream print(T input) throws IOException;
-}
+new Promise((resolve, reject) => {
+  const waitForPageReady = () => {
+    require(['xwiki-page-ready'], function(pageReady) {
+      pageReady.afterPageReady(() => {
+        // Print to PDF only after all page ready callbacks were executed,
+        // because the print preview is initialized as a page ready callback.
+        pageReady.afterPageReady(resolve.bind(null, 'Page ready.'));
+      });
+    }, reject.bind(null, 'Failed to load the xwiki-page-ready module.'));
+  };
+  let retryCount = 0;
+  const maybeWaitForPageReady = () => {
+    if (typeof require === 'function') {
+      waitForPageReady();
+    } else {
+      retryCount++;
+      if (retryCount > 10) {
+        reject('Timeout waiting for RequireJS to be available.');
+      } else {
+        setTimeout(maybeWaitForPageReady, 1000);
+      }
+    }
+  };
+  maybeWaitForPageReady();
+});

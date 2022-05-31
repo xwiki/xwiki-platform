@@ -19,29 +19,38 @@
  */
 package org.xwiki.export.pdf;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Generic interface to print some data as PDF.
+ * PDF export configuration options.
  * 
  * @version $Id$
- * @param <T> the input data type
  * @since 14.4.1
  * @since 14.5RC1
  */
 @Role
 @Unstable
-public interface PDFPrinter<T>
+public interface PDFExportConfiguration
 {
     /**
-     * Prints the specified data as PDF.
-     * 
-     * @param input the data to be printed as PDF
-     * @return the PDF input stream
+     * @return the Docker image used to create the Docker container running the headless Chrome web browser
      */
-    InputStream print(T input) throws IOException;
+    String getChromeDockerImage();
+
+    /**
+     * @return the name of the Docker container running the headless Chrome web browser used to print web pages to PDF
+     */
+    String getChromeDockerContainerName();
+
+    /**
+     * @return the domain used to access the host running the Docker container, from within the Docker container (i.e.
+     *         by the headless Chrome web browser)
+     */
+    String getChromeDockerHostName();
+
+    /**
+     * @return the port number used for communicating with the headless Chrome web browser
+     */
+    int getChromeRemoteDebuggingPort();
 }

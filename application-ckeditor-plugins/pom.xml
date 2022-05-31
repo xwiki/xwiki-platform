@@ -235,10 +235,18 @@
               </execution>
             </executions>
           </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- We don't use the 'integration-tests' profile because we cannot run the tests on CI (Chrome is not installed)
+        and we're waiting for this issue https://github.com/searls/jasmine-maven-plugin/issues/349 to use docker. -->
+      <id>integration-tests-chrome</id>
+      <build>
+        <plugins>
           <plugin>
             <groupId>com.github.searls</groupId>
             <artifactId>jasmine-maven-plugin</artifactId>
-            <!-- We want a more recent version of Jasmine because we want to use the (headless) Chrome driver. -->
             <version>3.0-alpha-01</version>
             <executions>
               <execution>

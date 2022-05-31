@@ -57,9 +57,8 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
  */
 @Component
 @Singleton
-public class DefaultTemporaryAttachmentSessionsManager
-    implements TemporaryAttachmentSessionsManager, Initializable, Disposable,
-    HttpSessionListener
+public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttachmentSessionsManager, Initializable,
+    Disposable
 {
     private Map<String, TemporaryAttachmentSession> temporaryAttachmentSessionMap;
 

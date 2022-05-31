@@ -22,6 +22,7 @@ package org.xwiki.store;
 import java.util.Collection;
 import java.util.Optional;
 
+import javax.servlet.http.HttpSessionListener;
 import javax.servlet.http.Part;
 
 import org.xwiki.component.annotation.Role;
@@ -36,13 +37,15 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * The idea of this API is to allow obtaining directly a temporary {@link XWikiAttachment} from a {@link Part} and to
  * keep it in cache until it's saved.
  * The manager is handling a separated map of attachments for each {@link javax.servlet.http.HttpSession}.
+ * Note that this manager extends an {@link HttpSessionListener} so that the session destruction can be listen to,
+ * in order to clean the temporary attachments.
  *
  * @version $Id$
  * @since 14.3RC1
  */
 @Unstable
 @Role
-public interface TemporaryAttachmentSessionsManager
+public interface TemporaryAttachmentSessionsManager extends HttpSessionListener
 {
     /**
      * Temporary store the given {@link Part} to a cached {@link XWikiAttachment} attached to the given

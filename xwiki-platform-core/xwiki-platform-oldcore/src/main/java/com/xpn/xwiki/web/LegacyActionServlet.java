@@ -38,6 +38,7 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.stability.Unstable;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.url.ExtendedURL;
 
 import com.xpn.xwiki.internal.web.LegacyAction;
@@ -85,6 +86,14 @@ public class LegacyActionServlet extends HttpServlet
             throw new ServletException("Failed to lookup the resource reference resolve for ExtendedURL", e);
         }
 
+        // Note that this might need to be done in ResourceReferenceHandlerServlet in the future.
+        try {
+            TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager =
+                this.rootComponentManager.getInstance(TemporaryAttachmentSessionsManager.class);
+            getServletContext().addListener(temporaryAttachmentSessionsManager);
+        } catch (ComponentLookupException e) {
+            throw new ServletException("Error when trying to add a listener in the servlet context.", e);
+        }
     }
 
     @Override

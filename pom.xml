@@ -45,8 +45,9 @@
     <tag>HEAD</tag>
   </scm>
   <properties>
-    <minimum.platform.version>8.4</minimum.platform.version>
-    <minimum.rendering.version>8.4</minimum.rendering.version>
+    <minimum.commons.version>8.4</minimum.commons.version>
+    <minimum.rendering.version>${minimum.commons.version}</minimum.rendering.version>
+    <minimum.platform.version>${minimum.commons.version}</minimum.platform.version>
     <ckeditor.version>4.19.0</ckeditor.version>
 
     <!-- The path to the folder where we clone the CKEditor sources. -->

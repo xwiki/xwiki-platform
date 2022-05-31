@@ -124,6 +124,101 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
       });
     }
 
+    function addToggleImageWidthLock(modal) {
+      var imageSizeLocked = modal.find('.image-size-locked');
+      var imageSizeUnlocked = modal.find('.image-size-unlocked');
+      var imageWidthField = modal.find('[name="imageWidth"]');
+      var imageHeightField = modal.find('[name="imageHeight"]');
+      var hiddenClass = 'hidden';
+      var locked = !imageSizeLocked.hasClass(hiddenClass);
+      modal.find('.image-size-lock').on('click', function () {
+        imageSizeLocked.toggleClass(hiddenClass);
+        imageSizeUnlocked.toggleClass(hiddenClass);
+        locked = !locked;
+      });
+
+      /**
+       * Compute the new size of the image size fields. The size is computed by computing the image size ratio, and
+       * applying it on the inputvalue. If the input value has a suffix (e.g., 20px), the number part is extracted and
+       * and the ratio is applied to it, and the suffix is concatenated to the result. For instance, for the value 30px
+       * and a ratio of 0.5, the result is 15px.
+       * @param field the field type ('width' or 'height')
+       * @param inputvalue the input value of the updated field (e.g., 100, or 33px)
+       * @returns {*|jQuery} a Defered, resolved with the computed value
+       */
+      function updateRatio(field, inputvalue) {
+        var promise = $.Deferred();
+        var img = new Image();
+        img.onload = function () {
+          var width = this.width;
+          var height = this.height;
+
+          var extract = /^(\d+)(.*)/.exec(inputvalue);
+
+          var resvalue;
+          var suffix;
+          if (extract === null) {
+            resvalue = '';
+            suffix = '';
+          } else {
+
+            var value = parseInt(extract[1], 10);
+            suffix = extract[2];
+
+            if (field === 'width') {
+              resvalue = Math.round(height * (value / width));
+            } else {
+              // Height
+              resvalue = Math.round(width * (value / height));
+            }
+          }
+
+          var result;
+          if (resvalue === 0) {
+            result = '';
+          } else {
+            result = resvalue + suffix;
+          }
+
+          promise.resolve(result);
+
+        };
+        var data = modal.data('input');
+        // Resolve the image url and assign it to a transient image object to be able to access its width and height.
+        img.src = CKEDITOR.plugins.xwikiResource.getResourceURL(data.imageData.resourceReference, data.editor);
+        return promise;
+      }
+
+      /**
+       * Update the size fields using the image ratio. Disabled the image size fields until the computation is done
+       * (since the image must be fetched, which is can take an undetermined time due to image weight and network
+       * speed).
+       * @param field the name of the change field, can be either 'width' or 'height'
+       * @param inputValue the value of the update field (e.g., 100, or 33px)
+       * @param targetField the field to update with the computed dimension (height for the width field, and width for
+       *  the height field)
+       */
+      function updateSize(field, inputValue, targetField) {
+        if (locked) {
+          imageWidthField.prop('disabled', true);
+          imageHeightField.prop('disabled', true);
+          $.when(updateRatio(field, inputValue)).then(function (value) {
+            targetField.val(value);
+            imageWidthField.prop('disabled', false);
+            imageHeightField.prop('disabled', false);
+          });
+        }
+      }
+
+      imageWidthField.on('input', function () {
+        updateSize('width', $(this).val(), imageHeightField);
+      });
+
+      imageHeightField.on('input', function () {
+        updateSize('height', $(this).val(), imageWidthField);
+      });
+    }
+
     // Fetch modal content from a remote template the first time the image dialog editor is opened.
     function initialize(modal) {
       var params = modal.data('input');
@@ -147,7 +242,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
               modal.data('initialized', true);
             });
 
-
+            addToggleImageWidthLock(modal);
           }).fail(function(error) {
             new XWiki.widgets.Notification(translations.get('modal.initialization.fail'), 'error');
             console.log('Failed to retrieve the image edition form.', error);

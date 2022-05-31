@@ -92,7 +92,7 @@
           #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'), 
             {'type': 'text/css', 'rel': 'stylesheet'}))
           #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
-          #set ($discard = $xwiki.jsx.use('CKEditor.ImageEditorService'))
+          #set ($discard = $xwiki.ssx.use('CKEditor.ImageEditorService'))
           &lt;select id="imageStyles"&gt;&lt;/select&gt;
         &lt;/dd&gt;
        #end
@@ -141,12 +141,18 @@
           &lt;dd&gt;
             &lt;label&gt;
               $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.size.width.label'))
-              &lt;input type="number" name="imageWidth" id="imageWidth" /&gt;
+              &lt;input type="text" name="imageWidth" id="imageWidth" /&gt;
             &lt;/label&gt;
             &lt;label&gt;
               $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.size.height.label'))
-              &lt;input type="number" name="imageHeight" id="imageHeight" /&gt;
+              &lt;input type="text" name="imageHeight" id="imageHeight" /&gt;
             &lt;/label&gt;
+            &lt;button type="button" class="btn btn-default image-size-lock image-size-locked"&gt;
+                $services.icon.renderHTML('lock')
+            &lt;/button&gt;
+            &lt;button type="button" class="btn btn-default image-size-lock image-size-unlocked hidden"&gt;
+                $services.icon.renderHTML('unlock')
+            &lt;/button&gt;
           &lt;/dd&gt;
           &lt;dt&gt;
             &lt;label for="imageBorder"&gt;
@@ -215,4 +221,126 @@
   #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
 #end
 {{/velocity}}</content>
+  <object>
+    <name>CKEditor.ImageEditorService</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>800e4dc8-ee31-4b3c-a404-f68de85f06d5</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#advanced .image-size-lock {
+  margin-top: -2px;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
 </xwikidoc>

@@ -109,12 +109,7 @@
                 <item>
                   <ignore>true</ignore>
                   <code>java.method.addedToInterface</code>
-                  <new>method void javax.servlet.http.HttpSessionListener::sessionCreated(javax.servlet.http.HttpSessionEvent) @ org.xwiki.store.TemporaryAttachmentSessionsManager</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method void javax.servlet.http.HttpSessionListener::sessionDestroyed(javax.servlet.http.HttpSessionEvent) @ org.xwiki.store.TemporaryAttachmentSessionsManager</new>
+                  <new>method boolean org.xwiki.store.TemporaryAttachmentSessionsManager::removeUploadedAttachments(java.lang.String)</new>
                 </item>
               </differences>
             </revapi.differences>

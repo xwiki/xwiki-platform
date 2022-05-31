@@ -22,7 +22,6 @@ package org.xwiki.store;
 import java.util.Collection;
 import java.util.Optional;
 
-import javax.servlet.http.HttpSessionListener;
 import javax.servlet.http.Part;
 
 import org.xwiki.component.annotation.Role;
@@ -37,15 +36,13 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * The idea of this API is to allow obtaining directly a temporary {@link XWikiAttachment} from a {@link Part} and to
  * keep it in cache until it's saved.
  * The manager is handling a separated map of attachments for each {@link javax.servlet.http.HttpSession}.
- * Note that this manager extends an {@link HttpSessionListener} so that the session destruction can be listen to,
- * in order to clean the temporary attachments.
  *
  * @version $Id$
  * @since 14.3RC1
  */
 @Unstable
 @Role
-public interface TemporaryAttachmentSessionsManager extends HttpSessionListener
+public interface TemporaryAttachmentSessionsManager
 {
     /**
      * Temporary store the given {@link Part} to a cached {@link XWikiAttachment} attached to the given
@@ -111,4 +108,13 @@ public interface TemporaryAttachmentSessionsManager extends HttpSessionListener
      *          current user session, {@code false} if there was no matching temporary attachment in cache.
      */
     boolean removeUploadedAttachments(DocumentReference documentReference);
+
+    /**
+     * Clean all uploaded attachments in the given session.
+     * This method aims to be used when a {@link org.xwiki.container.servlet.events.SessionDestroyedEvent} is received.
+     *
+     * @param sessionId the identifier of the session for which to clean data.
+     * @return {@code true} if some data have been removed.
+     */
+    boolean removeUploadedAttachments(String sessionId);
 }

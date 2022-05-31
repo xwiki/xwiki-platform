@@ -142,16 +142,14 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     }
 
     @Test
-    void sessionDestroyed()
+    void removeUploadedAttachmentsForSession()
     {
         String sessionId = "fooo";
         when(httpSession.getId()).thenReturn(sessionId);
         TemporaryAttachmentSession temporaryAttachmentSession = mock(TemporaryAttachmentSession.class);
         this.attachmentManager.getTemporaryAttachmentSessionMap().put(sessionId, temporaryAttachmentSession);
 
-        HttpSessionEvent sessionEvent = mock(HttpSessionEvent.class);
-        when(sessionEvent.getSession()).thenReturn(this.httpSession);
-        this.attachmentManager.sessionDestroyed(sessionEvent);
+        this.attachmentManager.removeUploadedAttachments(sessionId);
         verify(temporaryAttachmentSession).dispose();
 
         assertTrue(this.attachmentManager.getTemporaryAttachmentSessionMap().isEmpty());

@@ -28,8 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
 import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -49,8 +47,6 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
 /**
  * Default implementation of {@link TemporaryAttachmentSessionsManager}.
- * Note that this component also implements {@link HttpSessionListener} so that the cache is properly clean up whenever
- * a session is destroyed.
  *
  * @version $Id$
  * @since 14.3RC1
@@ -77,12 +73,6 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
         this.temporaryAttachmentSessionMap.values().forEach(TemporaryAttachmentSession::dispose);
     }
 
-    @Override
-    public void sessionCreated(HttpSessionEvent httpSessionEvent)
-    {
-        // Nothing should be done here.
-    }
-
     /**
      * Accessor to the map of temporary attachment sessions. Mainly for test purpose.
      *
@@ -97,17 +87,6 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     {
         XWikiContext context = this.contextProvider.get();
         return context.getRequest().getSession().getId();
-    }
-
-    @Override
-    public void sessionDestroyed(HttpSessionEvent httpSessionEvent)
-    {
-        String sessionId = httpSessionEvent.getSession().getId();
-        if (this.temporaryAttachmentSessionMap.containsKey(sessionId)) {
-            TemporaryAttachmentSession temporaryAttachmentSession =
-                this.temporaryAttachmentSessionMap.remove(sessionId);
-            temporaryAttachmentSession.dispose();
-        }
     }
 
     private long getUploadMaxSize(DocumentReference documentReference)
@@ -182,5 +161,18 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     {
         TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
         return temporaryAttachmentSession.removeAttachments(documentReference);
+    }
+
+    @Override
+    public boolean removeUploadedAttachments(String sessionId)
+    {
+        boolean result = false;
+        if (this.temporaryAttachmentSessionMap.containsKey(sessionId)) {
+            TemporaryAttachmentSession temporaryAttachmentSession =
+                this.temporaryAttachmentSessionMap.remove(sessionId);
+            temporaryAttachmentSession.dispose();
+            result = true;
+        }
+        return result;
     }
 }

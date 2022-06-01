@@ -36,9 +36,6 @@
     <xwiki.extension.name>CKEditor Base</xwiki.extension.name>
     <!-- Explicitely indicate it's a webjar -->
     <xwiki.extension.jar.type>webjar</xwiki.extension.jar.type>
-    <!-- No Java code here -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>
   <build>
     <plugins>

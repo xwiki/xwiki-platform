@@ -24,7 +24,6 @@ You need the following in order to build this extension:
 
 ## Release Steps
 
-* Create the next version in JIRA and release the current version.
 * Maven release:
 ```
 mvn release:prepare -Pintegration-tests,docker

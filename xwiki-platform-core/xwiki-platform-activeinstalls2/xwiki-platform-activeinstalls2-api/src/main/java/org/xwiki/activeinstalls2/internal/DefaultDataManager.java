@@ -83,7 +83,7 @@ public class DefaultDataManager implements DataManager
         SearchResponse<Ping> search = this.clientManager.getClient().search(request, Ping.class);
 
         List<Ping> results = new ArrayList<>();
-        if (search.hits().hits().size() > 0) {
+        if (!search.hits().hits().isEmpty()) {
             for (Hit<Ping> hit : search.hits().hits()) {
                 results.add(hit.source());
             }

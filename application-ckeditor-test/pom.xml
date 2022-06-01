@@ -23,44 +23,62 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>14.3.1</version>
-    <!-- By using an empty value we force Maven to resolve the parent from the Maven repositories,
-      see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent -->
-    <relativePath />
+    <groupId>org.xwiki.contrib</groupId>
+    <artifactId>application-ckeditor-pom</artifactId>
+    <version>1.64-SNAPSHOT</version>
   </parent>
-  <groupId>org.xwiki.contrib</groupId>
   <artifactId>application-ckeditor-test</artifactId>
-  <version>1.64-SNAPSHOT</version>
   <name>CKEditor Integration Test Modules</name>
   <packaging>pom</packaging>
   <description>Functional tests for the CKEditor Integration</description>
-  <developers>
-    <developer>
-      <id>mflorea</id>
-      <name>Marius Dumitru Florea</name>
-    </developer>
-  </developers>
-  <scm>
-    <connection>scm:git:git://github.com/xwiki-contrib/application-ckeditor.git</connection>
-    <developerConnection>scm:git:git@github.com:xwiki-contrib/application-ckeditor.git</developerConnection>
-    <url>https://github.com/xwiki-contrib/application-ckeditor/tree/master</url>
-    <tag>HEAD</tag>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>https://jira.xwiki.org/browse/CKEDITOR</url>
-  </issueManagement>
   <properties>
-    <!-- Skip the ValidateDependencyVersion enforcer rule because we can't use ${project.version} for platform
-      dependencies) -->
-    <xwiki.enforcer.skip>true</xwiki.enforcer.skip>
     <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <!-- We don't want to use the minimum version during tests -->
+          <!-- Verify that all org.xwiki.commons dependencies have a version specified either as:
+               - ${commons.version}
+               Also verifies that all org.xwiki.rendering dependencies have a version specified either as:
+               - ${rendering.version}
+               Also verifies that all org.xwiki.platform dependencies have a version specified either as:
+               - ${platform.version}
+          -->
+          <execution>
+            <id>check-dependency-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.ValidateDependencyVersion">
+                  <versionCheck>
+                    <groupIdPrefix>org.xwiki.commons</groupIdPrefix>
+                    <allowedVersionRegex>\$\{commons.version\}</allowedVersionRegex>
+                  </versionCheck>
+                  <versionCheck>
+                    <groupIdPrefix>org.xwiki.rendering</groupIdPrefix>
+                    <allowedVersionRegex>\$\{rendering.version\}</allowedVersionRegex>
+                  </versionCheck>
+                  <versionCheck>
+                    <groupIdPrefix>org.xwiki.platform</groupIdPrefix>
+                    <allowedVersionRegex>\$\{platform.version\}</allowedVersionRegex>
+                  </versionCheck>
+                </validateDependencyVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <modules>
     <module>application-ckeditor-test-pageobjects</module>
   </modules>

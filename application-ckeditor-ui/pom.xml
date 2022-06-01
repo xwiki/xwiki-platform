@@ -35,7 +35,6 @@
     <!-- Point to the root of the sources since this artifact is the one loaded on extensions.xwiki.org and we want 
          that the sources button there points to the full sources for CKEditor -->
     <url>https://github.com/xwiki-contrib/application-ckeditor/tree/master</url>
-    <tag>HEAD</tag>
   </scm>
   <properties>
     <!-- Name to display by the Extension Manager -->
@@ -44,6 +43,18 @@
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <!-- Import XWiki dependencies from the minimum supported version -->
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-core</artifactId>
+        <version>${minimum.platform.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
@@ -62,7 +73,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-sheet-ui</artifactId>
-      <version>${platform.version}</version>
+      <version>${minimum.platform.version}</version>
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
@@ -70,13 +81,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${platform.version}</version>
+      <version>${minimum.platform.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-html</artifactId>
-      <version>${rendering.version}</version>
+      <version>${minimum.rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- Used by the configuration section. -->
@@ -89,7 +100,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-ui</artifactId>
-      <version>${platform.version}</version>
+      <version>${minimum.platform.version}</version>
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>

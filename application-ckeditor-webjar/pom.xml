@@ -34,17 +34,26 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor WebJar</xwiki.extension.name>
-    <!-- Explicitely indicate it's a webjar -->
+    <!-- Explicitly indicate it's a webjar -->
     <xwiki.extension.jar.type>webjar</xwiki.extension.jar.type>
-    <!-- No Java code here -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Where to unpack the WebJars with the custom CKEditor plugins. -->
     <webjars.unpack.directory>${project.build.directory}/webjars</webjars.unpack.directory>
     <webjars.unpack.contentDirectory>
       ${webjars.unpack.directory}/META-INF/resources/webjars/application-ckeditor-plugins/${project.version}
     </webjars.unpack.contentDirectory>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <!-- Import XWiki dependencies from the minimum supported version -->
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-core</artifactId>
+        <version>${minimum.platform.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <!-- Even though we bundle the custom plugins with the CKEditor code (the plugins WebJar is merged with the CKEditor
       WebJar) we still need to declare this dependency in order to brind the transitive dependencies that our custom
@@ -70,6 +79,7 @@
       </plugin>
       <!-- Unpack the WebJar with the custom CKEditor plugins that we want to include in the build. -->
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
@@ -93,6 +103,7 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
@@ -133,7 +144,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${webjar.contentDirectory}/plugins</outputDirectory>
+              <outputDirectory>${webjar.outputDirectory}/plugins</outputDirectory>
               <resources>
                 <resource>
                   <directory>${webjars.unpack.contentDirectory}</directory>
@@ -157,7 +168,7 @@
               <goal>resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+              <outputDirectory>${webjar.outputDirectory}</outputDirectory>
             </configuration>
           </execution>
         </executions>

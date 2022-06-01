@@ -34,12 +34,21 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor Plugins for XWiki</xwiki.extension.name>
-    <!-- Explicitely indicate it's a webjar -->
+    <!-- Explicitly indicate it's a webjar -->
     <xwiki.extension.jar.type>webjar</xwiki.extension.jar.type>
-    <!-- No Java code here -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <!-- Import XWiki dependencies from the minimum supported version -->
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-core</artifactId>
+        <version>${minimum.platform.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.webjars</groupId>
@@ -53,15 +62,12 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
-      <!-- This is the Bootstrap version available in XWiki 8.4. Don't increase this version unless you increase the
-        parent version. -->
-      <version>3.3.7-1</version>
     </dependency>
     <!-- This is used by the resource tree picker on the link modal. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tree-webjar</artifactId>
-      <version>${platform.version}</version>
+      <version>${minimum.platform.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- This is used by the resource suggest picker on the link modal. -->
@@ -78,6 +84,7 @@
       <version>1.2.0</version>
       <scope>runtime</scope>
     </dependency>
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
@@ -118,7 +125,6 @@
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>1.5.1</version>
         <executions>
           <execution>
             <!-- Minify the WebJar resources before packing the jar. -->
@@ -128,8 +134,8 @@
               <goal>compress</goal>
             </goals>
             <configuration>
-              <sourceDirectory>${webjar.contentDirectory}</sourceDirectory>
-              <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+              <sourceDirectory>${webjar.outputDirectory}</sourceDirectory>
+              <outputDirectory>${webjar.outputDirectory}</outputDirectory>
             </configuration>
           </execution>
         </executions>
@@ -138,7 +144,7 @@
             <!-- Aggregate the Resource Picker modules. -->
             <aggregation>
               <insertNewLine>true</insertNewLine>
-              <output>${webjar.contentDirectory}/xwiki-resource/resourcePicker.bundle.js</output>
+              <output>${webjar.outputDirectory}/xwiki-resource/resourcePicker.bundle.js</output>
               <includes>
                 <include>*.js</include>
               </includes>
@@ -149,7 +155,7 @@
             <!-- Aggregate the Macro Wizard modules. -->
             <aggregation>
               <insertNewLine>true</insertNewLine>
-              <output>${webjar.contentDirectory}/xwiki-macro/macroWizard.bundle.js</output>
+              <output>${webjar.outputDirectory}/xwiki-macro/macroWizard.bundle.js</output>
               <includes>
                 <include>*.js</include>
               </includes>
@@ -160,7 +166,7 @@
             <!-- Aggregate the Image Dialog modules. -->
             <aggregation>
               <insertNewLine>true</insertNewLine>
-              <output>${webjar.contentDirectory}/xwiki-image/imageWizard.bundle.js</output>
+              <output>${webjar.outputDirectory}/xwiki-image/imageWizard.bundle.js</output>
               <includes>
                 <include>*.js</include>
               </includes>
@@ -229,10 +235,18 @@
               </execution>
             </executions>
           </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- We don't use the 'integration-tests' profile because we cannot run the tests on CI (Chrome is not installed)
+        and we're waiting for this issue https://github.com/searls/jasmine-maven-plugin/issues/349 to use docker. -->
+      <id>integration-tests-chrome</id>
+      <build>
+        <plugins>
           <plugin>
             <groupId>com.github.searls</groupId>
             <artifactId>jasmine-maven-plugin</artifactId>
-            <!-- We want a more recent version of Jasmine because we want to use the (headless) Chrome driver. -->
             <version>3.0-alpha-01</version>
             <executions>
               <execution>

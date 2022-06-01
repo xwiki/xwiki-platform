@@ -27,16 +27,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.container.servlet.events.SessionCreatedEvent;
-import org.xwiki.container.servlet.events.SessionDestroyedEvent;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
@@ -55,7 +51,7 @@ import com.xpn.xwiki.internal.web.LegacyAction;
  * @since 13.0
  */
 @Unstable
-public class LegacyActionServlet extends HttpServlet implements HttpSessionListener
+public class LegacyActionServlet extends HttpServlet
 {
     private static final long serialVersionUID = 1L;
 
@@ -97,8 +93,6 @@ public class LegacyActionServlet extends HttpServlet implements HttpSessionListe
         } catch (ComponentLookupException e) {
             throw new ServletException("Failed to lookup the observation manager", e);
         }
-
-        getServletContext().addListener(this);
     }
 
     @Override
@@ -147,17 +141,5 @@ public class LegacyActionServlet extends HttpServlet implements HttpSessionListe
         } catch (Exception e) {
             throw new ServletException("Failed to extract the Entity Action from URL [" + url + "]", e);
         }
-    }
-
-    @Override
-    public void sessionCreated(HttpSessionEvent se)
-    {
-        this.observationManager.notify(new SessionCreatedEvent(), se.getSession().getId(), se.getSession());
-    }
-
-    @Override
-    public void sessionDestroyed(HttpSessionEvent se)
-    {
-        this.observationManager.notify(new SessionDestroyedEvent(), se.getSession().getId(), se.getSession());
     }
 }

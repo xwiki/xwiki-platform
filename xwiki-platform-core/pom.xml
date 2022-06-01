@@ -101,18 +101,46 @@
                  Don't forget to '\'-escape dots and other special characters in this case ;)
 
                  Common justification example:
-            -->
+
             <revapi.differences>
-              <justification>Unstable API for TemporaryAttachmentSessionManager.</justification>
-              <criticality>allowed</criticality>
+              <justification>This change is necessary to fix bug #1234</justification>
+              <criticality>highlight</criticality>
               <differences>
                 <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method boolean org.xwiki.store.TemporaryAttachmentSessionsManager::removeUploadedAttachments(java.lang.String)</new>
+                  <code>java.method.addToInterface</code>
+                  <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
+                  <new>method void com.acme.ToolInterface::setup()</new>
+                </item>
+                <item>
+                  <code>java.method.removed</code>
+                  <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
+                  <old>method void com.acme.ToolInterface::initialize()</old>
+                  <justification>...</justification>
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              ... other difference group here...
+            </revapi.differences>
+
+                 Single justification example:
+
+            <revapi.differences>
+              <differences>
+                <item>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.diff.xml.XMLDiff::xxx()</old>
+                  <justification>Unstable API added by mistake.</justification>
+                  <criticality>highlight</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
+            -->
+            <!-- Difference related to the Security refactoring. Start a new <revapi.differences> entry for other
+                 differences -->
+
+
+
           </analysisConfiguration>
         </configuration>
       </plugin>

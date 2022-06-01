@@ -108,13 +108,4 @@ public interface TemporaryAttachmentSessionsManager
      *          current user session, {@code false} if there was no matching temporary attachment in cache.
      */
     boolean removeUploadedAttachments(DocumentReference documentReference);
-
-    /**
-     * Clean all uploaded attachments in the given session.
-     * This method aims to be used when a {@link org.xwiki.container.servlet.events.SessionDestroyedEvent} is received.
-     *
-     * @param sessionId the identifier of the session for which to clean data.
-     * @return {@code true} if some data have been removed.
-     */
-    boolean removeUploadedAttachments(String sessionId);
 }

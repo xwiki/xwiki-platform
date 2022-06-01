@@ -145,8 +145,9 @@ class NotificationFilterPreferenceStoreTest
         this.notificationFilterPreferenceStore.deleteFilterPreferences(unknownUserDocumentReference);
         verify(this.context).setWikiId(MAIN_WIKI_ID);
         verify(this.hibernateStore).beginTransaction(this.context);
-        verify(this.session).createQuery("delete from DefaultNotificationFilterPreference where owner = :owner");
-        verify(this.query).setParameter("owner", "xwiki:XWiki.UnknownUser");
+        verify(this.session).createQuery("delete from DefaultNotificationFilterPreference where owner = :user " 
+            + "or user = :user");
+        verify(this.query).setParameter("user", "xwiki:XWiki.UnknownUser");
         verify(this.query).executeUpdate();
         verify(this.hibernateStore).endTransaction(this.context, true);
         verify(this.context).setWikiId(PREVIOUS_WIKI_ID);

@@ -34,6 +34,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -68,11 +69,14 @@ class CachedModelBridgeTest
     @MockComponent
     private ModelBridge modelBridge;
 
-    @InjectComponentManager
-    private ComponentManager componentManager;
-
     @MockComponent
     private DocumentReferenceResolver<String> resolver;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @InjectComponentManager
+    private ComponentManager componentManager;
 
     private Map<EntityReference, Set<NotificationFilterPreference>> preferenceFilterCache;
 
@@ -196,16 +200,28 @@ class CachedModelBridgeTest
     void deleteFilterPreferencesUser() throws Exception
     {
         DocumentReference deleteUserDocumentReference = new DocumentReference("xwiki", "XWiki", "DeleteUser");
+        Set<NotificationFilterPreference> otherUserSet = new HashSet<>();
+        NotificationFilterPreference preference0 = mock(NotificationFilterPreference.class);
+        NotificationFilterPreference preference1 = mock(NotificationFilterPreference.class);
+        otherUserSet.add(preference0);
+        otherUserSet.add(preference1);
+
+        when(preference0.getUser()).thenReturn("xwiki:XWiki.ExistingUser");
+        when(preference1.getUser()).thenReturn("xwiki:XWiki.DeletedUser");
+        when(this.entityReferenceSerializer.serialize(deleteUserDocumentReference))
+            .thenReturn("xwiki:XWiki.DeletedUser");
 
         this.preferenceFilterCache.put(deleteUserDocumentReference, new HashSet<>());
-        this.preferenceFilterCache.put(new DocumentReference("xwiki", "XWiki", "OtherUser"), new HashSet<>());
+        this.preferenceFilterCache.put(new DocumentReference("xwiki", "XWiki", "OtherUser"), otherUserSet);
 
         this.cachedModelBridge.deleteFilterPreferences(deleteUserDocumentReference);
-        
+
         Map<Object, Object> expected = new HashMap<>();
-        expected.put(new DocumentReference("xwiki", "XWiki", "OtherUser"), new HashSet<>());
+        Set<Object> expectedOtherUserSet = new HashSet<>();
+        expectedOtherUserSet.add(preference0);
+        expected.put(new DocumentReference("xwiki", "XWiki", "OtherUser"), expectedOtherUserSet);
         assertEquals(expected, this.preferenceFilterCache);
-        
+
         verify(this.modelBridge).deleteFilterPreferences(deleteUserDocumentReference);
     }
 }

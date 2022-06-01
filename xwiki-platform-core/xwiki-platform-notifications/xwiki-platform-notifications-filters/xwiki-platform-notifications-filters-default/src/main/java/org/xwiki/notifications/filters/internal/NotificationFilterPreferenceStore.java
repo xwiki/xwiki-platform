@@ -63,7 +63,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 @Singleton
 public class NotificationFilterPreferenceStore
 {
-    private static final String OWNER_QUERY_PARAM = "owner";
+    private static final String USER_QUERY_PARAM = "user";
 
     @Inject
     private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
@@ -198,7 +198,7 @@ public class NotificationFilterPreferenceStore
         Query query = queryManager.createQuery(
             "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = :owner " + "order by nfp.id",
             Query.HQL);
-        query.bindValue(OWNER_QUERY_PARAM, serializedEntity);
+        query.bindValue(USER_QUERY_PARAM, serializedEntity);
         if (filterPreferenceConfiguration.useMainStore()) {
             query.setWiki(context.getMainXWiki());
         }
@@ -247,8 +247,9 @@ public class NotificationFilterPreferenceStore
         try {
             hibernateStore.beginTransaction(context);
             Session session = hibernateStore.getSession(context);
-            session.createQuery("delete from DefaultNotificationFilterPreference where owner = :owner")
-                .setParameter(OWNER_QUERY_PARAM, serializedUser)
+            session.createQuery("delete from DefaultNotificationFilterPreference where owner = :user "
+                    + "or user = :user")
+                .setParameter(USER_QUERY_PARAM, serializedUser)
                 .executeUpdate();
             hibernateStore.endTransaction(context, true);
         } catch (XWikiException e) {

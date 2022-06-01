@@ -95,8 +95,7 @@ public class DefaultElasticsearchClientManager implements ElasticsearchClientMan
                 // Closes the REST Client too.
                 this.transport.close();
             } catch (IOException e) {
-                throw new ComponentLifecycleException(
-                    String.format("Failed to close the Active Installs transport layer"), e);
+                throw new ComponentLifecycleException("Failed to close the Active Installs transport layer", e);
             }
         }
     }

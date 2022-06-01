@@ -177,7 +177,7 @@
     var dialogDefinition = event.data.definition;
     if (dialogName === 'image2') {
       replaceWithResourcePicker(dialogDefinition, 'src', {
-        resourceTypes: (event.editor.config['xwiki-image'] || {}).resourceTypes || ['attach', 'icon', 'url'],
+        resourceTypes: (event.editor.config['xwiki-image'] || {}).resourceTypes || ['image', 'icon', 'url'],
         setup: function(widget) {
           this.setValue(widget.data.resourceReference);
         },

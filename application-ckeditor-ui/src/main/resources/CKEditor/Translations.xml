@@ -176,12 +176,15 @@ resource.url.label=URL
 resource.url.placeholder=http://www.example.org/image.png
 resource.user.label=User
 resource.user.placeholder=alias
+resource.image.label=Image
+resource.image.placeholder=image
 
 resourcePicker.attach.hint=Select an attachment
 resourcePicker.doc.hint=Select a page
 
 entityResourceSuggester.doc.placeholder=Find a page...
 entityResourceSuggester.attach.placeholder=Find an attachment...
+entityResourceSuggester.image.placeholder=Find an image...
 
 entityResourcePicker.select=Select
 entityResourcePicker.doc.title=Select Page

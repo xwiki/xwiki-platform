@@ -19,7 +19,8 @@
  */
 define('entityResourceSuggesterTranslationKeys', [], [
   'doc.placeholder',
-  'attach.placeholder'
+  'attach.placeholder',
+  'image.placeholder',
 ]);
 
 define('entityResourceSuggester', [
@@ -108,13 +109,14 @@ define('entityResourceSuggester', [
   };
 
   $resource.types.attach.placeholder = translations.get('attach.placeholder');
-  $resource.suggesters.attach = {
-    retrieve: function(resourceReference) {
+  var attachmentRetrieveBuilder = function (customQuery) {
+    return function (resourceReference) {
       var deferred = $.Deferred();
       var query = [
         'q=__INPUT__',
         'fq=type:ATTACHMENT'
-      ];
+      ].concat(customQuery || []);
+
       var input = resourceReference.reference.trim();
       if (input) {
         query.push('qf=filename');
@@ -128,7 +130,16 @@ define('entityResourceSuggester', [
       }
       search(query, input, deferred, XWiki.EntityType.ATTACHMENT);
       return deferred.promise();
-    },
+    };
+  };
+  $resource.suggesters.attach = {
+    retrieve: attachmentRetrieveBuilder(),
+    display: display
+  };
+
+  $resource.types.image.placeholder = translations.get('image.placeholder');
+  $resource.suggesters.image = {
+    retrieve: attachmentRetrieveBuilder(['fq=mimetype:image/*']),
     display: display
   };
 });

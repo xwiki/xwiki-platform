@@ -57,7 +57,7 @@ define('resourcePicker', [
     }
 
     // Initialize the layout.
-    if (resourceTypes.length === 0) {
+    if (resourceTypes.length === 0) { 
       resourcePicker.find('.input-group').attr('class', 'input-wrapper').children('.input-group-btn').hide();
     } else if (resourceTypes.length === 1) {
       var resourceTypeButton = resourcePicker.find('.resourceType');

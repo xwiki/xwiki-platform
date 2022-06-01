@@ -77,4 +77,4 @@ Mail.GeneralMailConfigClass_obfuscate.hint=Ini hanya memengaruhi alamat email ya
 ### Missing: mailSender.admin.resendSuccess=The mail has been resent successfully
 ### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.
 </content>
-  </xwikidoc>
+</xwikidoc>

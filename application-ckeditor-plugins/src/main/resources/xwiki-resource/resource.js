@@ -34,9 +34,7 @@ define('resourceTranslationKeys', [], [
   'url.label',
   'url.placeholder',
   'user.label',
-  'user.placeholder',
-  'image.label',
-  'image.placeholder'
+  'user.placeholder'
 ]);
 
 define('resource', ['l10n!resource'], function(translations) {
@@ -95,11 +93,6 @@ define('resource', ['l10n!resource'], function(translations) {
       label: translations.get('user.label'),
       icon: 'glyphicon glyphicon-user',
       placeholder: translations.get('user.placeholder')
-    },
-    image: {
-      label: translations.get('image.label'),
-      icon: 'glyphicon glyphicon-picture',
-      placeholder: translations.get('image.placeholder')
     }
   };
 

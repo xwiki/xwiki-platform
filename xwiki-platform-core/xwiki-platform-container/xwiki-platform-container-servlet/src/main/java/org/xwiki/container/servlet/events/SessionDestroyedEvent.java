@@ -34,8 +34,8 @@ import org.xwiki.stability.Unstable;
  *
  * The following information are also sent:
  * <ul>
- *     <li>source: the identifier of the session {@link HttpSession#getId()}</li>
- *     <li>data: the whole {@link HttpSession}</li>
+ *     <li>source: the {@link HttpSession} that has been destroyed</li>
+ *     <li>data: null</li>
  * </ul>
  *
  * @version $Id$

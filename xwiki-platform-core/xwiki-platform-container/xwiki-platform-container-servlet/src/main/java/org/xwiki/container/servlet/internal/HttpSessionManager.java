@@ -72,13 +72,13 @@ public class HttpSessionManager implements Initializable, Disposable, HttpSessio
     public void sessionCreated(HttpSessionEvent se)
     {
         this.sessionsList.add(se.getSession());
-        this.observationManager.notify(new SessionCreatedEvent(), se.getSession().getId(), se.getSession());
+        this.observationManager.notify(new SessionCreatedEvent(), se.getSession(), null);
     }
 
     @Override
     public void sessionDestroyed(HttpSessionEvent se)
     {
         this.sessionsList.remove(se.getSession());
-        this.observationManager.notify(new SessionDestroyedEvent(), se.getSession().getId(), se.getSession());
+        this.observationManager.notify(new SessionDestroyedEvent(), se.getSession(), null);
     }
 }

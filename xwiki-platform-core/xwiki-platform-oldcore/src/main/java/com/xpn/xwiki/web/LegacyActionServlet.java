@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
@@ -63,8 +62,6 @@ public class LegacyActionServlet extends HttpServlet
 
     private ComponentManager rootComponentManager;
 
-    private ObservationManager observationManager;
-
     @Override
     public void init() throws ServletException
     {
@@ -86,12 +83,6 @@ public class LegacyActionServlet extends HttpServlet
                 .getInstance(new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class));
         } catch (ComponentLookupException e) {
             throw new ServletException("Failed to lookup the resource reference resolve for ExtendedURL", e);
-        }
-
-        try {
-            this.observationManager = this.rootComponentManager.getInstance(ObservationManager.class);
-        } catch (ComponentLookupException e) {
-            throw new ServletException("Failed to lookup the observation manager", e);
         }
     }
 

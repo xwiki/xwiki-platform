@@ -34,7 +34,7 @@ import org.xwiki.stability.Unstable;
  *
  * The following information are also sent:
  * <ul>
- *     <li>source: the {@link HttpSession} that has been destroyed</li>
+ *     <li>source: the {@link HttpSession} that is about to be destroyed</li>
  *     <li>data: null</li>
  * </ul>
  *

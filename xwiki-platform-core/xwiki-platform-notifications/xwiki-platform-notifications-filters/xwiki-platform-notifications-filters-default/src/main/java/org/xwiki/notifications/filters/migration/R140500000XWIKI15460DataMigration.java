@@ -39,6 +39,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserManager;
@@ -85,6 +86,9 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     @Inject
+    private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
+
+    @Inject
     private UserManager userManager;
 
     @Inject
@@ -106,6 +110,11 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
         boolean shouldExecute = super.shouldExecute(startupVersion);
+
+        if (shouldExecute && this.filterPreferenceConfiguration.useMainStore() && !isMainWiki()) {
+            shouldExecute = false;
+        }
+
         if (shouldExecute) {
             int version = startupVersion.getVersion();
             shouldExecute = !(version >= 131006000 && version < 140000000);

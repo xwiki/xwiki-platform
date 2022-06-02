@@ -33,6 +33,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -89,6 +90,9 @@ class R140500000XWIKI15460DataMigrationTest
     @MockComponent
     private UserManager userManager;
 
+    @MockComponent
+    private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
+
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
@@ -110,6 +114,15 @@ class R140500000XWIKI15460DataMigrationTest
     void shouldExecute()
     {
         assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(0)));
+    }
+
+    @ParameterizedTest
+    @CsvSource({ "true,mainwikiid,true", "false,mainwikiid,true", "true,anotherwiki,false", "false,anotherwiki,true" })
+    void shouldExecutedConfiguration(boolean useMainStore, String currentWikiId, boolean expected)
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn(currentWikiId);
+        when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(useMainStore);
+        assertEquals(expected, this.dataMigration.shouldExecute(new XWikiDBVersion(0)));
     }
 
     /**

@@ -198,13 +198,23 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       if (event.type === 'input') {
         // Delay the update.
         titleInputTimeout = setTimeout(updateLocationAndNameFromTitleInput, inputDelay);
-      } else {
+      } else if (event.type === 'change') {
         // Update right away.
         updateLocationAndNameFromTitleInput();
+      } else if (event.type === 'keyup' && event.keyCode === 13) {
+        // Update right away and submit the form since the user hit enter, so he's expecting the form to be submitted.
+        // Note that the reason we need this is because we disable the submit button in
+        // updateLocationAndNameFromTitleInput: by default the event when clicking Enter on an text input field is
+        // to simulate a click button on the input submit button. But since the button is disabled, this submit
+        // cannot occur here.
+        // So we're actually actively listening on the enter input, to manually trigger the submit.
+        // Also note that we cannot perform a submit on each change event, since those are also triggered whenever
+        // the input text looses focus. And in such case, we don't want to trigger a submit.
+        updateLocationAndNameFromTitleInput(true);
       }
     };
 
-    var updateLocationAndNameFromTitleInput = function() {
+    var updateLocationAndNameFromTitleInput = function(submit) {
       // ensure the buttons are disabled before we got the name answer
       disableButtons();
       var titleInputVal = titleInput.val();
@@ -230,6 +240,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       }).finally(() => {
         // Enable back the buttons
         enableButtons();
+        if (submit) {
+          titleInput.closest('form').submit();
+        }
       });
     };
 
@@ -330,7 +343,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     // Synchronize the location fields while the user types.
     // We catch the change event because we want to make sure everything's updated when the user change fields
     // (particulary useful in our automated tests).
-    titleInput.on('input change', scheduleUpdateOfLocationAndNameFromTitleInput);
+    titleInput.on('input change keyup', scheduleUpdateOfLocationAndNameFromTitleInput);
     wikiField.on('change', updateLocationFromWikiField);
     nameInput.on('input change', updateLocationFromNameInput);
     spaceReferenceInput.on('input change xwiki:suggest:selected', updateLocationFromSpaceReference);

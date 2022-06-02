@@ -239,7 +239,9 @@ public class NotificationFilterPreferenceStore
 
         String oriDatabase = context.getWikiId();
 
-        context.setWikiId(context.getMainXWiki());
+        if (this.filterPreferenceConfiguration.useMainStore()) {
+            context.setWikiId(context.getMainXWiki());
+        }
         XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
 
         String serializedUser = this.entityReferenceSerializer.serialize(user);
@@ -292,7 +294,9 @@ public class NotificationFilterPreferenceStore
 
         String oriDatabase = context.getWikiId();
 
-        context.setWikiId(context.getMainXWiki());
+        if (this.filterPreferenceConfiguration.useMainStore()) {
+            context.setWikiId(context.getMainXWiki());
+        }
         XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
 
         try {

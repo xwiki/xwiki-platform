@@ -34,7 +34,6 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.stability.Unstable;
 
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
@@ -62,7 +61,6 @@ public interface ModelBridge
      * @throws NotificationException if an error happens
      * @since 13.3RC1
      */
-    @Unstable
     default Set<NotificationFilterPreference> getFilterPreferences(WikiReference wikiReference)
         throws NotificationException
     {
@@ -98,7 +96,6 @@ public interface ModelBridge
      * @since 14.4.1
      * @since 13.10.7
      */
-    @Unstable
     default void deleteFilterPreferences(DocumentReference user) throws NotificationException
     {
         throw new UnsupportedOperationException(
@@ -124,7 +121,6 @@ public interface ModelBridge
      * @since 14.4.1
      * @since 13.10.7
      */
-    @Unstable
     default void deleteFilterPreferences(WikiReference wikiReference) throws NotificationException
     {
         throw new UnsupportedOperationException("ModelBridge.deleteFilterPreference(WikiReference) Not implemented");

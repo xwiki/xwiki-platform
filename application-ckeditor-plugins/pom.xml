@@ -144,6 +144,7 @@
           <!-- TODO: move to a more standard webjar packaging -->
           <includes>
             <include>**/*.js</include>
+            <include>**/*.css</include>
           </includes>
           <nosuffix>false</nosuffix>
           <preProcessAggregates>true</preProcessAggregates>

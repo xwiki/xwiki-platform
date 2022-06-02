@@ -522,7 +522,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 builder.append(condition.getStatusRead() ? EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS
                     : EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
                 builder.append(':');
-                builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+                builder.append(this.utils.toCompleteFilterQueryString(condition.getStatusEntityId()));
             } else {
                 builder.append('(');
                 builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
@@ -541,11 +541,11 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             builder.append('(');
             builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
             builder.append(':');
-            builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+            builder.append(this.utils.toCompleteFilterQueryString(condition.getStatusEntityId()));
             builder.append(" OR ");
             builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
             builder.append(':');
-            builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+            builder.append(this.utils.toCompleteFilterQueryString(condition.getStatusEntityId()));
             builder.append(')');
 
             return builder.toString();
@@ -561,7 +561,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             StringBuilder builder = new StringBuilder();
             builder.append(EventsSolrCoreInitializer.SOLR_FIELD_MAILLISTENERS);
             builder.append(':');
-            builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+            builder.append(this.utils.toCompleteFilterQueryString(condition.getStatusEntityId()));
 
             return builder.toString();
         }

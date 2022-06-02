@@ -29,6 +29,7 @@ import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Various helpers around the Solr API.
@@ -268,6 +269,7 @@ public interface SolrUtils
      * @since 13.10.6
      * @since 14.4RC1
      */
+    @Unstable
     default String toCompleteFilterQueryString(Object fieldValue)
     {
         return toFilterQueryString(fieldValue);
@@ -284,6 +286,7 @@ public interface SolrUtils
      * @since 13.10.6
      * @since 14.4RC1
      */
+    @Unstable
     default String toCompleteFilterQueryString(Object fieldValue, Type valueType)
     {
         return toFilterQueryString(fieldValue, valueType);

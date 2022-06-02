@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.migration;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -116,7 +117,15 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     protected void hibernateMigrate() throws DataMigrationException
     {
         try {
-            Collection<String> knownWikiIds = this.wikiDescriptorManager.getAllIds();
+            boolean isMainWiki = isMainWiki();
+
+            Collection<String> knownWikiIds;
+            if (isMainWiki) {
+                // The know wikis are only initialized for the main wiki, as they are not needed for the sub-wikis.
+                knownWikiIds = this.wikiDescriptorManager.getAllIds();
+            } else {
+                knownWikiIds = Collections.emptyList();
+            }
             Set<String> unknownWikiIds = new HashSet<>();
             // The keys are user identifiers, the values are true if the user exists on the wiki, false otherwise.
             Map<String, Boolean> usersStatus = new HashMap<>();
@@ -125,14 +134,14 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
             int offset = 0;
             Set<DefaultNotificationFilterPreference> allNotificationFilterPreferences = this.store
                 .getPaginatedFilterPreferences(limit, offset);
-            boolean isMainWiki = isMainWiki();
+
             while (!allNotificationFilterPreferences.isEmpty()) {
                 for (DefaultNotificationFilterPreference filterPreference : allNotificationFilterPreferences) {
                     // Filters remaining from previously removed wikis can only be found on the main wiki.
                     if (isMainWiki) {
                         identifyRemovedWikis(knownWikiIds, unknownWikiIds, filterPreference);
                     }
-                    identifiyRemovedUsers(usersStatus, filterPreference);
+                    identifyRemovedUsers(usersStatus, filterPreference);
                 }
                 offset += limit;
                 allNotificationFilterPreferences = this.store.getPaginatedFilterPreferences(limit, offset);
@@ -144,9 +153,9 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
 
             // List the users that were not found on the wiki.
             Set<String> unknownUsers = usersStatus.entrySet().stream()
-                    .filter(entry -> !entry.getValue())
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toSet());
+                .filter(entry -> !entry.getValue())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
             for (String userReference : unknownUsers) {
                 this.store.deleteFilterPreferences(this.resolver.resolve(userReference));
             }
@@ -167,7 +176,7 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
         });
     }
 
-    private void identifiyRemovedUsers(Map<String, Boolean> usersStatus,
+    private void identifyRemovedUsers(Map<String, Boolean> usersStatus,
         DefaultNotificationFilterPreference filterPreference)
     {
         String owner = filterPreference.getOwner();

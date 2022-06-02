@@ -140,6 +140,13 @@
           </execution>
         </executions>
         <configuration>
+          <!-- We use it also for JavaScript for now. -->
+          <!-- TODO: move to a more standard webjar packaging -->
+          <includes>
+            <include>**/*.js</include>
+          </includes>
+          <nosuffix>false</nosuffix>
+          <preProcessAggregates>true</preProcessAggregates>
           <aggregations>
             <!-- Aggregate the Resource Picker modules. -->
             <aggregation>
@@ -175,13 +182,6 @@
               </excludes>
             </aggregation>
           </aggregations>
-          <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
-          <jswarn>false</jswarn>
-          <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
-            currently more widely used in the JavaScript world. -->
-          <suffix>.min</suffix>
-          <nosuffix>false</nosuffix>
-          <preProcessAggregates>true</preProcessAggregates>
         </configuration>
       </plugin>
       <plugin>

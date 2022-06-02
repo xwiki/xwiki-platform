@@ -84,7 +84,6 @@ public class LegacyActionServlet extends HttpServlet
         } catch (ComponentLookupException e) {
             throw new ServletException("Failed to lookup the resource reference resolve for ExtendedURL", e);
         }
-
     }
 
     @Override

@@ -83,7 +83,7 @@ import org.xwiki.search.solr.SolrUtils;
 
 /**
  * Solr based implementation of {@link EventStore}.
- * 
+ *
  * @version $Id$
  * @since 12.4RC1
  */
@@ -678,7 +678,9 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             case EQUALS:
                 String queryString = toCompleteFilterQueryString(condition.getProperty(), condition.getValue());
                 if (queryString == null) {
-                    // See https://stackoverflow.com/a/28859224, -myfield:* is not composable thus combine with *:*.
+                    // Negative queries in Solr can only remove results so a simple negative field existence query
+                    // doesn't match anything. Thus, use the more compatible query "all events except for those where
+                    // the field exists". See also https://stackoverflow.com/a/28859224
                     builder.insert(0, "(*:* NOT ");
                     builder.append("*)");
                 } else {

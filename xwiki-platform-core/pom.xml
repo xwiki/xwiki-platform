@@ -139,8 +139,8 @@
             <!-- Difference related to the Security refactoring. Start a new <revapi.differences> entry for other
                  differences -->
 
-            
-            
+
+
           </analysisConfiguration>
         </configuration>
       </plugin>

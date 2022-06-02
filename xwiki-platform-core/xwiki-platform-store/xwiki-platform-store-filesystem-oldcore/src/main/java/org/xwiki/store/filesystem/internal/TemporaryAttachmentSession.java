@@ -28,6 +28,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
@@ -43,7 +46,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * @version $Id$
  * @since 14.3RC1
  */
-public class TemporaryAttachmentSession
+public class TemporaryAttachmentSession implements HttpSessionBindingListener
 {
     private final String sessionId;
 
@@ -220,5 +223,17 @@ public class TemporaryAttachmentSession
     protected Map<DocumentReference, Map<String, XWikiAttachment>> getEditionsMap()
     {
         return editionsMap;
+    }
+
+    @Override
+    public void valueBound(HttpSessionBindingEvent event)
+    {
+        // Nothing to do.
+    }
+
+    @Override
+    public void valueUnbound(HttpSessionBindingEvent event)
+    {
+        this.dispose();
     }
 }

@@ -195,6 +195,7 @@ macroSelector.filter.category.notinstalled=Not installed
 macroSelector.failedToRetrieveMacros=Failed to retrieve the list of available macros.
 macroSelector.select=Select
 macroSelector.install=Install
+macroSelector.install.notAllowed=You are not allowed to install this extension
 
 macroEditor.title=Edit Macro
 macroEditor.more=More

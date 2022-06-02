@@ -25,7 +25,8 @@ define('macroSelectorTranslationKeys', [], [
   'filter.category.other',
   'failedToRetrieveMacros',
   'select',
-  'install'
+  'install',
+  'install.notAllowed'
 ]);
 
 define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $modal, translations) {
@@ -65,7 +66,8 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
 
   macroListTemplate = '<ul class="macro-list form-control" tabindex="0"></ul>',
   macroListItemTemplate =
-    '<li data-macroCategory="" data-macroId="" data-extensionId="" data-extensionVersion="">' +
+    '<li data-macroCategory="" data-macroId="" ' +
+        'data-extensionId="" data-extensionVersion="" data-extensionInstallAllowed="">' +
       '<div>' +
         '<span class="macro-name"></span>' +
         '<span class="macro-extension"></span>' +
@@ -90,7 +92,8 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
         macroListItem.find('.macro-extension').text(extensionName);
         macroListItem.attr({
           'data-extensionId': macro.extensionId,
-          'data-extensionVersion': macro.extensionVersion
+          'data-extensionVersion': macro.extensionVersion,
+          'data-extensionInstallAllowed': macro.extensionInstallAllowed
         });
       }
       if (macro.defaultCategory === '_notinstalled') {
@@ -338,6 +341,9 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
       isInstalledMacro: function() {
         return this.getSelectedMacroCategory() != '_notinstalled';
       },
+      isExtensionInstallAllowed: function() {
+        return macroSelector.find('.macro-list > li.selected').attr('data-extensionInstallAllowed') != 'false';
+      },
       reset: function(macroId) {
         this.filter('');
         this.select(macroId);
@@ -377,12 +383,21 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
             macroSelectorAPI.select(input.macroId);
             macroSelector.find('.macro-textFilter').focus();
           }).on('change', function() {
-            selectButton.prop('disabled', !macroSelectorAPI.getSelectedMacro());
+            var buttonText;
+            var buttonTitle;
+            var buttonDisabled = !macroSelectorAPI.getSelectedMacro();
             if (macroSelectorAPI.isInstalledMacro()) {
-              selectButton.text(translations.get('select'));
+              buttonText = translations.get('select');
             } else {
-              selectButton.text(translations.get('install'));
+              buttonText = translations.get('install');
+              if (!macroSelectorAPI.isExtensionInstallAllowed()) {
+                buttonTitle = translations.get('install.notAllowed');
+                buttonDisabled = true;
+              }
             }
+            selectButton.text(buttonText);
+            selectButton.prop('title', buttonTitle);
+            selectButton.prop('disabled', buttonDisabled);
           }).on('xwiki:macro:selected', function(event, macroIds) {
             selectButton.click();
           }).attr('data-syntaxId', input.syntaxId);

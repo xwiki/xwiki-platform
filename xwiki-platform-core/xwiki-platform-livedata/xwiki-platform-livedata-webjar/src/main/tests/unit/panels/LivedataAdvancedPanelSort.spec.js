@@ -77,11 +77,14 @@ describe('LivedataAdvancedPanelSort.vue', () => {
     expect(wrapper.element.querySelector('i')).toHaveTextContent('table_sort');
   });
 
-  it('Displays a message when no sortable properties exist', async () => {
-    let wrapper = initWrapper();
+  it('Displays no message when sortable properties exist', async () => {
+    const wrapper = initWrapper();
     expect(wrapper.element.querySelector('.text-muted')).toHaveTextContent('livedata.panel.sort.noneSortable');
     expect(wrapper.element.querySelector('.text-muted')).toHaveStyle({display: 'none'});
-    wrapper = initWrapper({
+  });
+
+  it('Displays a message when no sortable properties exist', async () => {
+    const wrapper = initWrapper({
       provide: {
         logic: {
           getSortableProperties() {
@@ -91,5 +94,5 @@ describe('LivedataAdvancedPanelSort.vue', () => {
       }
     });
     expect(wrapper.element.querySelector('.text-muted')).toHaveStyle({display: 'block'});
-  })
+  });
 });

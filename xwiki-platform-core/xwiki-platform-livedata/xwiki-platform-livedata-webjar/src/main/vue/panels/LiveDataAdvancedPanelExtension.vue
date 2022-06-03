@@ -64,8 +64,7 @@ export default {
   props: {'panel': Object},
 
   methods: {
-    attachContainer()
-    {
+    attachContainer() {
       // Make sure nothing happens if this method is called several times or at the wrong time.
       if ('bodyContainer' in this.$refs) {
         const bodyContainer = this.$refs.bodyContainer;
@@ -84,8 +83,7 @@ export default {
     }
   },
 
-  mounted()
-  {
+  mounted() {
     this.attachContainer();
     // Watch the child's collapsed property to re-attach the body element when the body is rendered again.
     this.$watch("$refs.basePanel.collapsed", function (newValue) {

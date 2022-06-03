@@ -57,12 +57,17 @@ public class DefaultActiveInstallsConfiguration implements ActiveInstallsConfigu
     @Override
     public String getPingInstanceURL()
     {
-        return this.configuration.getProperty(PREFIX + "pingURL", DEFAULT_PING_URL);
+        return getProperty("pingURL", DEFAULT_PING_URL);
     }
 
     @Override
     public String getUserAgent()
     {
-        return this.configuration.getProperty(PREFIX + "userAgent", DEFAULT_USER_AGENT);
+        return getProperty("userAgent", DEFAULT_USER_AGENT);
+    }
+
+    private String getProperty(String shortPropertyName, String defaultValue)
+    {
+        return this.configuration.getProperty(PREFIX + shortPropertyName, defaultValue);
     }
 }

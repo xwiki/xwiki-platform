@@ -521,7 +521,8 @@
       'canDelete': $canEditDoc,
       'canMove': $canEditDoc,
       'canCopy': true,
-      'deleteURL': $attachment.document.getAttachmentURL($attachment.filename, 'delattachment')
+      'deleteURL': $attachment.document.getAttachmentURL($attachment.filename, 'delattachment'),
+      'mimetype': $attachment.mimeType
     },
     'a_attr': {
       'href': $attachment.document.getAttachmentURL($attachment.filename)

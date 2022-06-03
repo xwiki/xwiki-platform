@@ -39,6 +39,7 @@ import org.suigeneris.jrcs.rcs.impl.TrunkNode;
 import org.suigeneris.jrcs.rcs.parse.ParseException;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -217,15 +218,34 @@ public class XWikiRCSArchive extends Archive
      * @throws PatchFailedException
      * @throws InvalidFileFormatException
      * @throws NodeNotFoundException
+     * @deprecated since 13.10.7, 14.4.1, 14.5RC1, use {@link #getNodes(WikiReference, long)} instead
      */
+    @Deprecated(since = "13.10.7")
     public Collection getNodes(long docId) throws NodeNotFoundException, InvalidFileFormatException,
+        PatchFailedException
+    {
+        return getNodes(null, docId);
+    }
+
+    /**
+     * @param wikiReference the wiki of the document
+     * @param docId the local identifier of the document
+     * @return Collection of pairs [{@link XWikiRCSNodeInfo}, {@link XWikiRCSNodeContent}]
+     * @throws PatchFailedException
+     * @throws InvalidFileFormatException
+     * @throws NodeNotFoundException
+     * @since 13.10.7
+     * @since 14.4.1
+     * @since 14.5RC1
+     */
+    public Collection getNodes(WikiReference wikiReference, long docId) throws NodeNotFoundException, InvalidFileFormatException,
         PatchFailedException
     {
         Collection result = new ArrayList(this.nodes.values().size());
         for (Iterator it = this.nodes.values().iterator(); it.hasNext(); ) {
             XWikiJRCSNode node = new XWikiJRCSNode((Node) it.next());
             XWikiRCSNodeInfo nodeInfo = new XWikiRCSNodeInfo();
-            nodeInfo.setId(new XWikiRCSNodeId(docId, node.getVersion()));
+            nodeInfo.setId(new XWikiRCSNodeId(wikiReference, docId, node.getVersion()));
             nodeInfo.setDiff(node.isDiff());
 
             if (!node.hasOldFormat()) {

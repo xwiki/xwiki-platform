@@ -134,7 +134,8 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                         // (that shouldn't happen but we've seen it happening).
                         // In this case just ignore the archive...
                         if (sArchive.trim().length() != 0) {
-                            XWikiDocumentArchive docArchive = new XWikiDocumentArchive(docId);
+                            XWikiDocumentArchive docArchive =
+                                new XWikiDocumentArchive(context.getWikiReference(), docId);
                             try {
                                 docArchive.setArchive(sArchive);
                             } catch (XWikiException e) {

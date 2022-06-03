@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.DocumentTreeMacros" locale="">
+<xwikidoc version="1.3" reference="XWiki.DocumentTreeMacros" locale="">
   <web>XWiki</web>
   <name>DocumentTreeMacros</name>
   <language/>
@@ -36,9 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="XWiki.SuggestSolrMacros"/}}
+  <content>{{include reference="XWiki.SuggestSolrMacros" /}}
 
-{{template name="documentTree_macros.vm"/}}
+{{template name="documentTree_macros.vm" /}}
 
 {{velocity output="false"}}
 #macro (updateDocTreeConfigFromRequest)

@@ -54,7 +54,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
  * Cleanup the notification filters preferences remaining on the main wiki from previously removed sub-wikis and users.
- * Note: this class is named {@code R131007000XWIKI1546} in branch {@code 13.10.7+}. This class also covers
+ * Note: this class is named {@code R140401000XWIKI1546} in branch {@code 14.4.1+}. This class also covers
  * {@code XWIKI-18397} to prevent having an almost identical migration executed again.
  *
  * @version $Id$
@@ -68,9 +68,9 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  */
 @Component
 @Singleton
-@Named("R140500000XWIKI15460")
+@Named("R131007000XWIKI15460")
 @Unstable
-public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigration
+public class R131007000XWIKI15460DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -97,7 +97,7 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(140500000);
+        return new XWikiDBVersion(131007000);
     }
 
     @Override
@@ -115,10 +115,6 @@ public class R140500000XWIKI15460DataMigration extends AbstractHibernateDataMigr
             shouldExecute = false;
         }
 
-        if (shouldExecute) {
-            int version = startupVersion.getVersion();
-            shouldExecute = !(version >= 131006000 && version < 140000000);
-        }
         return shouldExecute;
     }
 

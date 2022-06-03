@@ -61,7 +61,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of {@link R140500000XWIKI15460DataMigration}.
+ * Test of {@link R131007000XWIKI15460DataMigration}.
  *
  * @version $Id$
  * @since 14.5RC1
@@ -69,10 +69,10 @@ import static org.mockito.Mockito.when;
  * @since 13.10.7
  */
 @ComponentTest
-class R140500000XWIKI15460DataMigrationTest
+class R131007000XWIKI15460DataMigrationTest
 {
     @InjectMockComponents(role = HibernateDataMigration.class)
-    private R140500000XWIKI15460DataMigration dataMigration;
+    private R131007000XWIKI15460DataMigration dataMigration;
 
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
@@ -102,12 +102,6 @@ class R140500000XWIKI15460DataMigrationTest
         when(this.wikiDescriptorManager.getAllIds()).thenReturn(asList("mainwikiid", "wikiA"));
         when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("mainwikiid");
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainwikiid");
-    }
-
-    @Test
-    void shouldExecuteAlreadyExecuted()
-    {
-        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(131006001)));
     }
 
     @Test

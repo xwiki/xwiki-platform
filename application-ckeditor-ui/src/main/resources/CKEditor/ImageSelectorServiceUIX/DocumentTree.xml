@@ -119,26 +119,34 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'imageSelector'], function($, imageSelector) {
-   function getSelected(instance) {
-      /* jshint camelcase: false */
-      return instance.get_selected(false)[0];
-    }
-  
+      <code>require(['jquery', 'imageSelector'], function ($, imageSelector) {
+  function getSelected(instance) {
+    return instance.get_selected(false)[0];
+  }
+
   function validateSelection(instance) {
     var selected = getSelected(instance);
     return selected &amp;&amp; selected.startsWith("attachment:");
   }
 
   $('.attachments-tree').xtree()
-    .one('ready.jstree', function(event, data) {
+    .one('ready.jstree', function (event, data) {
       data.instance.openTo("document:" + XWiki.Model.serialize(XWiki.currentDocument.getDocumentReference()));
     })
-    .on('changed.jstree', function(event, data) {
+    .on('changed.jstree', function (event, data) {
       if (validateSelection(data.instance)) {
         imageSelector.updateSelectedImageReferences([getSelected(data.instance)]);
       } else {
-         imageSelector.updateSelectedImageReferences([]);
+        imageSelector.updateSelectedImageReferences([]);
+      }
+    })
+    .on('load_node.jstree', function (node, status) {
+      for (var child of status.node.children) {
+        var childNode = status.instance.get_node(child);
+        if (childNode.data.mimetype &amp;&amp; !childNode.data.mimetype.startsWith('image/')) {
+          // Disable the nodes instead of hiding them because they still can be search in the search field.
+          status.instance.disable_node(childNode);
+        }
       }
     });
 });</code>

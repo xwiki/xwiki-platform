@@ -628,6 +628,13 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- To be remove if we stop declaring hibernate validator as oldcore runtime dependency -->
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

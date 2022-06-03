@@ -77,11 +77,14 @@ describe('LivedataAdvancedPanelFilter.vue', () => {
     expect(wrapper.element.querySelector('i')).toHaveTextContent('filter');
   });
 
-  it('Displays a message when no filterable properties exist', async () => {
-    let wrapper = initWrapper();
+  it('Displays no message when filterable properties exist', async () => {
+    const wrapper = initWrapper();
     expect(wrapper.element.querySelector('.text-muted')).toHaveTextContent('livedata.panel.filter.noneFilterable');
     expect(wrapper.element.querySelector('.text-muted')).toHaveStyle({display: 'none'});
-    wrapper = initWrapper({
+  });
+
+  it('Displays a message when no filterable properties exist', async () => {
+    const wrapper = initWrapper({
       provide: {
         logic: {
           getFilterableProperties() {

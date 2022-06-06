@@ -21,7 +21,6 @@ package org.xwiki.export.pdf.internal.chrome;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import com.github.kklisura.cdt.protocol.commands.IO;
@@ -69,11 +68,14 @@ public class PrintToPDFInputStream extends InputStream
             this.bufferOffset = 0;
             this.buffer = readBuffer();
             if (this.buffer.length == 0) {
+                // Signal end of stream.
                 return -1;
             }
         }
 
-        return this.buffer[this.bufferOffset++];
+        // The value byte must be returned as an integer in the range 0 to 255. This is needed in order to avoid
+        // confusing the signed -1 byte (255 unsigned) with the end of stream (see above where we return -1).
+        return Byte.toUnsignedInt(this.buffer[this.bufferOffset++]);
     }
 
     private byte[] readBuffer()
@@ -84,12 +86,11 @@ public class PrintToPDFInputStream extends InputStream
 
         Read read = this.io.read(this.stream);
         this.finished = read.getEof() == Boolean.TRUE;
-        String data = read.getData();
         if (read.getBase64Encoded() == Boolean.TRUE) {
-            data = new String(Base64.getDecoder().decode(data));
+            return Base64.getDecoder().decode(read.getData());
+        } else {
+            return read.getData().getBytes();
         }
-
-        return data.getBytes(StandardCharsets.UTF_8);
     }
 
     @Override

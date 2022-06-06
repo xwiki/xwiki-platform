@@ -143,6 +143,7 @@ public class ChromeManager implements Initializable
             RemoteObject exception = evaluate.getExceptionDetails().getException();
             Object cause = exception.getDescription();
             if (cause == null) {
+                // When the page ready promise as rejected.
                 cause = exception.getValue();
             }
             throw new IOException("Failed to wait for page to be ready. Root cause: " + cause);
@@ -181,6 +182,7 @@ public class ChromeManager implements Initializable
         Boolean preferCSSPageSize = false;
         PrintToPDFTransferMode mode = PrintToPDFTransferMode.RETURN_AS_STREAM;
 
+        // See https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-printToPDF
         PrintToPDF printToPDF = devToolsService.getPage().printToPDF(landscape, displayHeaderFooter, printBackground,
             scale, paperWidth, paperHeight, marginTop, marginBottom, marginLeft, marginRight, pageRanges,
             ignoreInvalidPageRanges, headerTemplate, footerTemplate, preferCSSPageSize, mode);

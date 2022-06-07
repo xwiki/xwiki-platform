@@ -35,6 +35,8 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.export.pdf.job.PDFExportJobStatus;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
 import org.xwiki.export.pdf.macro.PDFTocMacroParameters;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.rendering.block.Block;
@@ -62,8 +64,17 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 @Singleton
 public class PDFTocMacro extends AbstractMacro<PDFTocMacroParameters>
 {
+    /**
+     * Used to retrieve the status of a finished job.
+     */
     @Inject
     private JobStatusStore jobStatusStore;
+
+    /**
+     * Used to retrieve the status of the job currently being executed.
+     */
+    @Inject
+    private JobExecutor jobExecutor;
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
@@ -121,9 +132,18 @@ public class PDFTocMacro extends AbstractMacro<PDFTocMacroParameters>
         return false;
     }
 
-    private PDFExportJobStatus getJobStatus(String jobId)
+    private PDFExportJobStatus getJobStatus(String jobIdString)
     {
-        JobStatus jobStatus = this.jobStatusStore.getJobStatus(Arrays.asList(jobId.split("/")));
+        List<String> jobId = Arrays.asList(jobIdString.split("/"));
+
+        JobStatus jobStatus;
+        Job job = this.jobExecutor.getJob(jobId);
+        if (job == null) {
+            jobStatus = this.jobStatusStore.getJobStatus(jobId);
+        } else {
+            jobStatus = job.getStatus();
+        }
+
         if (jobStatus instanceof PDFExportJobStatus) {
             return (PDFExportJobStatus) jobStatus;
         } else {

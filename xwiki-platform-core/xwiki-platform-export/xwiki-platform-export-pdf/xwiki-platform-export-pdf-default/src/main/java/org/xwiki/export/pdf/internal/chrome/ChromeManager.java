@@ -46,6 +46,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 
+import com.github.kklisura.cdt.protocol.commands.DOM;
 import com.github.kklisura.cdt.protocol.commands.Network;
 import com.github.kklisura.cdt.protocol.commands.Page;
 import com.github.kklisura.cdt.protocol.commands.Runtime;
@@ -195,18 +196,26 @@ public class ChromeManager implements Initializable
             /* generatePreview */ false, /* userGesture */ false, /* awaitPromise */ true,
             /* throwOnSideEffect */ false, /* timeout */ REMOTE_DEBUGGING_TIMEOUT * 1000.0, /* disableBreaks */ true,
             /* replMode */ false, /* allowUnsafeEvalBlockedByCSP */ false, /* uniqueContextId */ null);
+        checkEvaluation(evaluate, "Page ready.", "Failed to wait for page to be ready.",
+            "Timeout waiting for page to be ready.");
+    }
+
+    private void checkEvaluation(Evaluate evaluate, Object expectedValue, String evaluationException,
+        String unexpectedValueException) throws IOException
+    {
+        String messageTemplae = "%s Root cause: %s";
         if (evaluate.getExceptionDetails() != null) {
             RemoteObject exception = evaluate.getExceptionDetails().getException();
             Object cause = exception.getDescription();
             if (cause == null) {
-                // When the page ready promise as rejected.
+                // When the exception was thrown as a string or when a promise was rejected.
                 cause = exception.getValue();
             }
-            throw new IOException("Failed to wait for page to be ready. Root cause: " + cause);
+            throw new IOException(String.format(messageTemplae, evaluationException, cause));
         } else {
             RemoteObject result = evaluate.getResult();
-            if (!"Page ready.".equals(result.getValue())) {
-                throw new IOException("Timeout waiting for page to be ready. Root cause: " + result.getValue());
+            if (!Objects.equals(expectedValue, result.getValue())) {
+                throw new IOException(String.format(messageTemplae, unexpectedValueException, result.getValue()));
             }
         }
     }
@@ -364,5 +373,29 @@ public class ChromeManager implements Initializable
         } catch (WebSocketServiceException e) {
             throw new ChromeServiceException("Failed to connect to the browser web socket.", e);
         }
+    }
+
+    /**
+     * Sets the base URL for the page loaded on the specified browser tab.
+     * 
+     * @param tabDevToolsService the developer tools service associated with the target page
+     * @param baseURL the base URL to set
+     */
+    public void setBaseURL(ChromeDevToolsService tabDevToolsService, URL baseURL) throws IOException
+    {
+        Runtime runtime = tabDevToolsService.getRuntime();
+        runtime.enable();
+
+        // Add the BASE tag to the page head. I couldn't find a way to create this node using the DOM domain, so I'm
+        // using JavaScript instead (i.e. the runtime domain).
+        Evaluate evaluate = runtime.evaluate("jQuery('<base/>').prependTo('head').length");
+        checkEvaluation(evaluate, 1, "Failed to insert the BASE tag.", "Unexpected page HTML.");
+
+        DOM dom = tabDevToolsService.getDOM();
+        dom.enable();
+
+        // Look for the BASE tag we just added and set its href attribute in order to change the page base URL.
+        Integer baseNodeId = dom.querySelector(dom.getDocument().getNodeId(), "base");
+        dom.setAttributeValue(baseNodeId, "href", baseURL.toString());
     }
 }

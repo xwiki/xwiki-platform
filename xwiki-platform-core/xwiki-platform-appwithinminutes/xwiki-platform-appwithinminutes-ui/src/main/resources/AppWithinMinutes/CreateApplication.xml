@@ -321,6 +321,11 @@
         fetchPreviewUpdate();
       }
     });
+  submitButton.closest('form').on('submit', function (event) {
+    if (appNameInput.hasClass('xErrorField')) {
+      event.preventDefault();
+    }
+  });
 });</code>
     </property>
     <property>

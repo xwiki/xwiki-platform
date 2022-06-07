@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters.internal.listener;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -47,9 +48,13 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 @Named("org.xwiki.notifications.filters.internal.listener.DeletedWikiEventListener")
 public class DeletedWikiEventListener extends AbstractEventListener
 {
+    /**
+     * We use a provider to allow the api to be loaded without an implementation, which is useful on some test context
+     * where the listeners are not used.
+     */
     @Named("cached")
     @Inject
-    private ModelBridge modelBridge;
+    private Provider<ModelBridge> modelBridgeProvider;
 
     @Inject
     private Logger logger;
@@ -67,7 +72,7 @@ public class DeletedWikiEventListener extends AbstractEventListener
     {
         String wikiId = (String) source;
         try {
-            this.modelBridge.deleteFilterPreferences(new WikiReference(wikiId));
+            this.modelBridgeProvider.get().deleteFilterPreferences(new WikiReference(wikiId));
         } catch (NotificationException e) {
             this.logger.warn("Failed to delete notification preferences for wiki [{}]. Cause: [{}].", wikiId,
                 getRootCauseMessage(e));

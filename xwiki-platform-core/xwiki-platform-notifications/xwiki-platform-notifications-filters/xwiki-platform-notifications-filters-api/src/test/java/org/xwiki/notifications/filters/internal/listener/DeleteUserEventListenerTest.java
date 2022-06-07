@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal.listener;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,8 +60,11 @@ class DeleteUserEventListenerTest
     @InjectMockComponents
     private DeleteUserEventListener listener;
 
-    @Named("cached")
     @MockComponent
+    @Named("cached")
+    private Provider<ModelBridge> modelBridgeProvider;
+
+    @Mock
     private ModelBridge modelBridge;
 
     @RegisterExtension
@@ -72,6 +76,7 @@ class DeleteUserEventListenerTest
     @BeforeEach
     void setUp()
     {
+        when(this.modelBridgeProvider.get()).thenReturn(this.modelBridge);
         when(this.xWikiDocument.getDocumentReference()).thenReturn(REMOVED_USER_DOCUMENT_REFERENCE);
     }
 

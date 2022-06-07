@@ -20,9 +20,12 @@
 package org.xwiki.notifications.filters.internal.listener;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mock;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.ModelBridge;
@@ -36,6 +39,7 @@ import static ch.qos.logback.classic.Level.WARN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test of {@link DeletedWikiEventListener}.
@@ -53,10 +57,19 @@ class DeletedWikiEventListenerTest
 
     @Named("cached")
     @MockComponent
+    private Provider<ModelBridge> modelBridgeProvider;
+
+    @Mock
     private ModelBridge modelBridge;
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    @BeforeEach
+    void setUp()
+    {
+        when(this.modelBridgeProvider.get()).thenReturn(this.modelBridge);
+    }
 
     @Test
     void onEvent() throws Exception

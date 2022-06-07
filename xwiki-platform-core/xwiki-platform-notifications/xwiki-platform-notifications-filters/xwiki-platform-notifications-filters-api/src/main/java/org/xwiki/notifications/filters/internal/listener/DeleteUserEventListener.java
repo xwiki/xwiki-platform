@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters.internal.listener;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -51,9 +52,13 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 @Named("org.xwiki.notifications.filters.internal.listener.DeleteUserEventListener")
 public class DeleteUserEventListener extends AbstractEventListener
 {
+    /**
+     * We use a provider to allow the api to be loaded without an implementation, which is useful on some test context
+     * where the listeners are not used.
+     */
     @Named("cached")
     @Inject
-    private ModelBridge modelBridge;
+    private Provider<ModelBridge> modelBridgeProvider;
 
     @Inject
     private Logger logger;
@@ -72,7 +77,7 @@ public class DeleteUserEventListener extends AbstractEventListener
     {
         DocumentReference user = ((XWikiDocument) source).getDocumentReference();
         try {
-            this.modelBridge.deleteFilterPreferences(user);
+            this.modelBridgeProvider.get().deleteFilterPreferences(user);
         } catch (NotificationException e) {
             this.logger.warn("Failed to delete notification preferences for user [{}]. Cause: [{}].", user,
                 getRootCauseMessage(e));

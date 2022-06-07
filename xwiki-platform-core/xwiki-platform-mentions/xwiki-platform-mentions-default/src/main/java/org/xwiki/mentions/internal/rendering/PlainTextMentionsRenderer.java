@@ -57,12 +57,7 @@ public class PlainTextMentionsRenderer extends PlainTextRenderer implements Init
             String style = parameters.get("style");
             String type = parameters.get("type");
 
-            DisplayStyle displayStyle;
-            if (style != null) {
-                displayStyle = DisplayStyle.valueOf(style);
-            } else {
-                displayStyle = DisplayStyle.FULL_NAME;
-            }
+            DisplayStyle displayStyle = DisplayStyle.getOrDefault(style);
 
             // Uses the "user" type when the mention has an undefined type.
             String hint;

@@ -181,17 +181,25 @@ class CachedModelBridgeTest
         when(notificationFilterPreference2.isFromWiki("wikiId")).thenReturn(false);
         when(notificationFilterPreference3.isFromWiki("wikiId")).thenReturn(true);
 
-        this.preferenceFilterCache.put(USER,
-            new HashSet<>(Set.of(notificationFilterPreference0, notificationFilterPreference1)));
-        this.preferenceFilterCache.put(WIKI,
-            new HashSet<>(Set.of(notificationFilterPreference2, notificationFilterPreference3)));
+        Set<NotificationFilterPreference> filterPreferencesUser = new HashSet<>();
+        filterPreferencesUser.add(notificationFilterPreference0);
+        filterPreferencesUser.add(notificationFilterPreference1);
+        this.preferenceFilterCache.put(USER, new HashSet<>(filterPreferencesUser));
+        Set<NotificationFilterPreference> filterPreferencesWiki = new HashSet<>();
+        filterPreferencesWiki.add(notificationFilterPreference2);
+        filterPreferencesWiki.add(notificationFilterPreference3);
+        this.preferenceFilterCache.put(WIKI, new HashSet<>(filterPreferencesWiki));
 
         this.cachedModelBridge.deleteFilterPreferences(wikiReference);
 
-        assertEquals(Map.of(
-                USER, Set.of(notificationFilterPreference1),
-                WIKI, Set.of(notificationFilterPreference2)),
-            this.preferenceFilterCache);
+        Map<EntityReference, Set<NotificationFilterPreference>> expected = new HashMap<>();
+        Set<NotificationFilterPreference> expectedFilterPreferencesUser = new HashSet<>();
+        expectedFilterPreferencesUser.add(notificationFilterPreference1);
+        expected.put(USER, expectedFilterPreferencesUser);
+        Set<NotificationFilterPreference> expectedFilterPreferencesWiki = new HashSet<>();
+        expectedFilterPreferencesWiki.add(notificationFilterPreference2);
+        expected.put(WIKI, expectedFilterPreferencesWiki);
+        assertEquals(expected, this.preferenceFilterCache);
 
         verify(this.modelBridge).deleteFilterPreferences(wikiReference);
     }

@@ -124,23 +124,19 @@
             </revapi.differences>
 
                  Single justification example:
-
+            -->
             <revapi.differences>
               <differences>
                 <item>
-                  <code>java.method.removed</code>
-                  <old>method void org.xwiki.diff.xml.XMLDiff::xxx()</old>
-                  <justification>Unstable API added by mistake.</justification>
-                  <criticality>highlight</criticality>
+                  <criticality>allowed</criticality>
+                  <ignore>true</ignore>
+                  <code>java.class.defaultSerializationChanged</code>
+                  <old>class com.xpn.xwiki.doc.rcs.XWikiRCSNodeId</old>
+                  <new>class com.xpn.xwiki.doc.rcs.XWikiRCSNodeId</new>
+                  <justification>This change is about adding a new field which can be null, so deserializing an old version should still work.</justification>
                 </item>
               </differences>
             </revapi.differences>
-            -->
-            <!-- Difference related to the Security refactoring. Start a new <revapi.differences> entry for other
-                 differences -->
-
-
-
           </analysisConfiguration>
         </configuration>
       </plugin>

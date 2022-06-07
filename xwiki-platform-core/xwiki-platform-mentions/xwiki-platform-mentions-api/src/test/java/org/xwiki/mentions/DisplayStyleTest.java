@@ -19,44 +19,33 @@
  */
 package org.xwiki.mentions;
 
-import org.xwiki.stability.Unstable;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.xwiki.mentions.DisplayStyle.FIRST_NAME;
+import static org.xwiki.mentions.DisplayStyle.FULL_NAME;
+import static org.xwiki.mentions.DisplayStyle.LOGIN;
 
 /**
- * List of the different display style of the user mentions.
+ * Test of {@link DisplayStyle}.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 13.10.7
+ * @since 14.4.2
+ * @since 14.5RC1
  */
-public enum DisplayStyle
+@ComponentTest
+class DisplayStyleTest
 {
-    /**
-     * Displays the first and last name of the mentioned user.
-     */
-    FULL_NAME,
-
-    /**
-     * Displays only the first name of the mentioned user.
-     */
-    FIRST_NAME,
-
-    /**
-     * Displays the login of the mentioned user.
-     */
-    LOGIN;
-
-    /**
-     * @param style the display style (e.g., login)
-     * @return the result of {@link DisplayStyle#valueOf(String)} or {@link #FULL_NAME} if style is {@code null}
-     * @since 13.10.7
-     * @since 14.4.2
-     * @since 14.5RC1
-     */
-    @Unstable
-    public static DisplayStyle getOrDefault(String style)
+    @Test
+    void getOrDefault()
     {
-        if (style == null) {
-            return FULL_NAME;
-        }
-        return DisplayStyle.valueOf(style);
+        assertEquals(FULL_NAME, DisplayStyle.getOrDefault(null));
+        assertEquals(FULL_NAME, DisplayStyle.getOrDefault("FULL_NAME"));
+        assertEquals(FIRST_NAME, DisplayStyle.getOrDefault("FIRST_NAME"));
+        assertEquals(LOGIN, DisplayStyle.getOrDefault("LOGIN"));
+        assertThrows(IllegalArgumentException.class, () -> DisplayStyle.getOrDefault("UNKNOWN"));
     }
 }

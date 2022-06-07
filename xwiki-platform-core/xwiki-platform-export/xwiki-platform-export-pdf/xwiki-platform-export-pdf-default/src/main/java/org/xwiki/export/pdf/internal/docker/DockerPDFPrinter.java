@@ -129,15 +129,25 @@ public class DockerPDFPrinter implements PDFPrinter<PDFExportJobRequest>, Initia
         URL printPreviewURL = (URL) request.getContext().get(XWikiContextContextStore.PROP_REQUEST_URL);
         this.logger.debug("Printing [{}]", printPreviewURL);
 
+        validatePrintPreviewURL(printPreviewURL);
+
         // The headless Chrome web browser runs inside a Docker container where 'localhost' refers to the container
         // itself. We have to update the domain from the given URL to point to the host running both the XWiki instance
         // and the Docker container.
-        printPreviewURL = new URL(
+        URL dockerPrintPreviewURL = new URL(
             printPreviewURL.toString().replace("://localhost", "://" + this.configuration.getChromeDockerHostName()));
 
         ChromeDevToolsService devToolsService = this.chromeManager.createIncognitoTab();
-        this.chromeManager.setCookies(devToolsService, getCookies(request, printPreviewURL));
-        this.chromeManager.navigate(devToolsService, printPreviewURL);
+        this.chromeManager.setCookies(devToolsService, getCookies(request, dockerPrintPreviewURL));
+        this.chromeManager.navigate(devToolsService, dockerPrintPreviewURL);
+
+        if (!printPreviewURL.toString().equals(dockerPrintPreviewURL.toString())) {
+            // Make sure the relative URLs are resolved based on the original print preview URL otherwise the user won't
+            // be able to open the links from the generated PDF because they use a host name defined only inside the
+            // Docker container where the PDF was generated. See PDFExportConfiguration#getChromeDockerHostName()
+            this.chromeManager.setBaseURL(devToolsService, printPreviewURL);
+        }
+
         return this.chromeManager.printToPDF(devToolsService, () -> {
             this.chromeManager.closeIncognitoTab(devToolsService);
         });
@@ -150,5 +160,17 @@ public class DockerPDFPrinter implements PDFPrinter<PDFExportJobRequest>, Initia
         // Cookies must have either the URL or the domain set otherwise the browser rejects them.
         cookies.forEach(cookie -> cookie.setUrl(printPreviewURL.toString()));
         return cookies;
+    }
+
+    private void validatePrintPreviewURL(URL printPreviewURL) throws IOException
+    {
+        if (printPreviewURL == null) {
+            throw new IOException("Print preview URL missing.");
+        }
+
+        String protocol = printPreviewURL.getProtocol();
+        if (!"http".equals(protocol) && !"https".equals(protocol)) {
+            throw new IOException(String.format("Unsupported protocol [%s].", protocol));
+        }
     }
 }

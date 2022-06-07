@@ -23,10 +23,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.servlet.http.Cookie;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -37,12 +39,12 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.chrome.ChromeManager;
+import org.xwiki.export.pdf.internal.job.PDFExportContextStore;
+import org.xwiki.export.pdf.job.PDFExportJobRequest;
 
-import com.github.kklisura.cdt.protocol.commands.Page;
-import com.github.kklisura.cdt.protocol.commands.Runtime;
+import com.github.kklisura.cdt.protocol.types.network.CookieParam;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
-import com.github.kklisura.cdt.services.ChromeService;
-import com.github.kklisura.cdt.services.types.ChromeTab;
+import com.xpn.xwiki.internal.context.XWikiContextContextStore;
 
 /**
  * Prints the content of a given URL using a headless Chrome web browser running inside a Docker container.
@@ -54,7 +56,7 @@ import com.github.kklisura.cdt.services.types.ChromeTab;
 @Component
 @Singleton
 @Named("docker")
-public class DockerURL2PDFPrinter implements PDFPrinter<URL>, Initializable, Disposable
+public class DockerPDFPrinter implements PDFPrinter<PDFExportJobRequest>, Initializable, Disposable
 {
     @Inject
     private Logger logger;
@@ -122,31 +124,31 @@ public class DockerURL2PDFPrinter implements PDFPrinter<URL>, Initializable, Dis
     }
 
     @Override
-    public InputStream print(URL input) throws IOException
+    public InputStream print(PDFExportJobRequest request) throws IOException
     {
-        this.logger.debug("Printing [{}]", input);
+        URL printPreviewURL = (URL) request.getContext().get(XWikiContextContextStore.PROP_REQUEST_URL);
+        this.logger.debug("Printing [{}]", printPreviewURL);
 
         // The headless Chrome web browser runs inside a Docker container where 'localhost' refers to the container
         // itself. We have to update the domain from the given URL to point to the host running both the XWiki instance
         // and the Docker container.
-        URL printPreviewURL =
-            new URL(input.toString().replace("://localhost", "://" + this.configuration.getChromeDockerHostName()));
+        printPreviewURL = new URL(
+            printPreviewURL.toString().replace("://localhost", "://" + this.configuration.getChromeDockerHostName()));
 
-        ChromeService chromeService = this.chromeManager.getChromeService();
-        ChromeTab tab = chromeService.createTab();
-        ChromeDevToolsService devToolsService = chromeService.createDevToolsService(tab);
-
-        Page page = devToolsService.getPage();
-        page.enable();
-        page.navigate(printPreviewURL.toString());
-
-        Runtime runtime = devToolsService.getRuntime();
-        runtime.enable();
-        this.chromeManager.waitForPageReady(runtime);
-
+        ChromeDevToolsService devToolsService = this.chromeManager.createIncognitoTab();
+        this.chromeManager.setCookies(devToolsService, getCookies(request, printPreviewURL));
+        this.chromeManager.navigate(devToolsService, printPreviewURL);
         return this.chromeManager.printToPDF(devToolsService, () -> {
-            devToolsService.close();
-            chromeService.closeTab(tab);
+            this.chromeManager.closeIncognitoTab(devToolsService);
         });
+    }
+
+    private List<CookieParam> getCookies(PDFExportJobRequest request, URL printPreviewURL)
+    {
+        List<CookieParam> cookies =
+            this.chromeManager.toCookieParams((Cookie[]) request.getContext().get(PDFExportContextStore.ENTRY_COOKIES));
+        // Cookies must have either the URL or the domain set otherwise the browser rejects them.
+        cookies.forEach(cookie -> cookie.setUrl(printPreviewURL.toString()));
+        return cookies;
     }
 }

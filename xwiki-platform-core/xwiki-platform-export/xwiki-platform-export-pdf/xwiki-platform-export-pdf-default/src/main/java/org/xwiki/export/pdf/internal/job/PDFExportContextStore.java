@@ -52,7 +52,10 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
 @Named("export/pdf")
 public class PDFExportContextStore implements ContextStore
 {
-    private static final String ENTRY_COOKIES = "export.pdf.cookies";
+    /**
+     * The key used to save the cookies.
+     */
+    public static final String ENTRY_COOKIES = "export.pdf.cookies";
 
     @Inject
     private Provider<XWikiContext> writeProvider;

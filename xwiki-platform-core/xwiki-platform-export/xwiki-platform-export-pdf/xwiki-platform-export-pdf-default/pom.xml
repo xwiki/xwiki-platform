@@ -35,6 +35,7 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>PDF Export Default API Implementation</xwiki.extension.name>
     <dockerJava.version>3.2.13</dockerJava.version>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>

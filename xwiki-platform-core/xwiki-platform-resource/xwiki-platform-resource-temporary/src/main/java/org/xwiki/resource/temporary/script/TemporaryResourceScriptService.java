@@ -28,6 +28,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.script.ResourceScriptService;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
+import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
@@ -61,6 +62,9 @@ public class TemporaryResourceScriptService implements ScriptService
     @Inject
     @Named("standard/tmp")
     private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL> urlTempResourceReferenceSerializer;
+    
+    @Inject
+    private TemporaryResourceStore temporaryResourceStore;
 
     /**
      * Provides access to the current context, used to store and retrieve caught exceptions.
@@ -81,6 +85,21 @@ public class TemporaryResourceScriptService implements ScriptService
         } catch (Exception e) {
             setError(e);
             return null;
+        }
+    }
+
+    /**
+     * Check if a temporary resource exists.
+     * 
+     * @param tempResourceReference a temporary resource reference
+     * @return {@code true} if the specified temporary resource exists, {@code false} otherwise
+     */
+    public boolean exists(TemporaryResourceReference tempResourceReference)
+    {
+        try {
+            return this.temporaryResourceStore.getTemporaryFile(tempResourceReference).exists();
+        } catch (Exception e) {
+            return false;
         }
     }
 

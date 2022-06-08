@@ -56,6 +56,7 @@ import com.github.kklisura.cdt.protocol.types.page.PrintToPDF;
 import com.github.kklisura.cdt.protocol.types.page.PrintToPDFTransferMode;
 import com.github.kklisura.cdt.protocol.types.runtime.Evaluate;
 import com.github.kklisura.cdt.protocol.types.runtime.RemoteObject;
+import com.github.kklisura.cdt.protocol.types.target.TargetInfo;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.github.kklisura.cdt.services.ChromeService;
 import com.github.kklisura.cdt.services.WebSocketService;
@@ -127,7 +128,7 @@ public class ChromeManager implements Initializable
      */
     public void connect(int remoteDebuggingPort) throws TimeoutException
     {
-        this.logger.debug("Connecting to the Chrome remote debugging service.");
+        this.logger.debug("Connecting to the Chrome remote debugging service on [localhost:{}].", remoteDebuggingPort);
         this.webSocketServiceFactory = (webSocketURL -> WebSocketServiceImpl.create(URI.create(webSocketURL)));
         this.chromeService = new ChromeServiceImpl(remoteDebuggingPort, this.webSocketServiceFactory);
         waitForChromeService(REMOTE_DEBUGGING_TIMEOUT);
@@ -136,7 +137,7 @@ public class ChromeManager implements Initializable
 
     private void waitForChromeService(int timeoutSeconds) throws TimeoutException
     {
-        this.logger.debug("Wait for Chrome to accept remote debugging connections.");
+        this.logger.debug("Waiting [{}] seconds for Chrome to accept remote debugging connections.", timeoutSeconds);
 
         int timeoutMillis = timeoutSeconds * 1000;
         long start = System.currentTimeMillis();
@@ -296,7 +297,8 @@ public class ChromeManager implements Initializable
      */
     public void setCookies(ChromeDevToolsService tabDevToolsService, List<CookieParam> cookies)
     {
-        this.logger.debug("Setting cookies.");
+        this.logger.debug("Setting cookies [{}].",
+            cookies.stream().collect(Collectors.toMap(CookieParam::getName, CookieParam::getValue)));
         Network network = tabDevToolsService.getNetwork();
         network.enable();
         network.setCookies(cookies);
@@ -305,7 +307,7 @@ public class ChromeManager implements Initializable
     /**
      * @return a new incognito tab, using a separate browser context (profile)
      */
-    public ChromeDevToolsService createIncognitoTab()
+    public ChromeDevToolsService createIncognitoTab() throws IOException
     {
         this.logger.debug("Creating incognito tab.");
         Target browserTarget = this.browserDevToolsService.getTarget();
@@ -321,7 +323,7 @@ public class ChromeManager implements Initializable
         if (tab.isPresent()) {
             return this.chromeService.createDevToolsService(tab.get());
         } else {
-            return null;
+            throw new IOException(String.format("The incognito tab [%s] we just created is missing.", tabTargetId));
         }
     }
 
@@ -332,9 +334,11 @@ public class ChromeManager implements Initializable
      */
     public void closeIncognitoTab(ChromeDevToolsService tabDevToolsService)
     {
-        this.logger.debug("Closing incognito tab.");
-        String browserContextId = tabDevToolsService.getTarget().getTargetInfo().getBrowserContextId();
+        TargetInfo tabInfo = tabDevToolsService.getTarget().getTargetInfo();
+        this.logger.debug("Closing incognito tab [{}].", tabInfo.getTargetId());
+        String browserContextId = tabInfo.getBrowserContextId();
         tabDevToolsService.close();
+        this.logger.debug("Disposing browser context [{}].", browserContextId);
         this.browserDevToolsService.getTarget().disposeBrowserContext(browserContextId);
     }
 
@@ -383,6 +387,7 @@ public class ChromeManager implements Initializable
      */
     public void setBaseURL(ChromeDevToolsService tabDevToolsService, URL baseURL) throws IOException
     {
+        this.logger.debug("Setting base URL [{}].", baseURL);
         Runtime runtime = tabDevToolsService.getRuntime();
         runtime.enable();
 

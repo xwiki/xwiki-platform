@@ -135,14 +135,16 @@ class WizardIT
         // Step 1
         // Set the application location.
         appCreatePage.getLocationPicker().browseDocuments();
-        new DocumentPickerModal().selectDocument(getClass().getSimpleName(), testReference.getName(), "WebHome");
+        new DocumentPickerModal().selectDocument(getClass().getSimpleName(),
+            testReference.getLastSpaceReference().getName(), "WebHome");
         appCreatePage.getLocationPicker().waitForLocation(
-            Arrays.asList("", getClass().getSimpleName(), testReference.getName(), ""));
+            Arrays.asList("", getClass().getSimpleName(), testReference.getLastSpaceReference().getName(), ""));
 
         // Enter the application name, making sure we also use some special chars.
         // See XWIKI-11747: Impossible to create new entry with an application having UTF8 chars in its name
         String appName = "Cities âé";
-        String[] appPath = new String[] { getClass().getSimpleName(), testReference.getName(), appName };
+        String[] appPath = new String[] { getClass().getSimpleName(), testReference.getLastSpaceReference().getName(),
+            appName };
         appCreatePage.setApplicationName(appName);
 
         // Move to the next step.
@@ -221,9 +223,9 @@ class WizardIT
         childrenTableLayout.assertRow(LIVE_DATA_TITLE, firstEntryName);
 
         // Go back to the application home edit page.
-        testUtils
-            .gotoPage(Arrays.asList(getClass().getSimpleName(), testReference.getName(), appName), "WebHome", "edit",
-                "");
+        testUtils.gotoPage(
+            Arrays.asList(getClass().getSimpleName(), testReference.getLastSpaceReference().getName(), appName),
+            "WebHome", "edit", "");
         homeEditPage = new ApplicationHomeEditPage();
 
         // Change the application description.
@@ -347,8 +349,8 @@ class WizardIT
         String password = "SimplePassword";
         testUtils.createUserAndLogin(userName, password);
         // Make sure the application location exists so that we can select it with the location picker.
-        testUtils.createPage(Arrays.asList(getClass().getSimpleName(), testReference.getName()), "WebHome", null,
-            null);
+        testUtils.createPage(Arrays.asList(getClass().getSimpleName(), testReference.getLastSpaceReference().getName()),
+            "WebHome", null, null);
         AppWithinMinutesHomePage appWithinMinutesHomePage = AppWithinMinutesHomePage.gotoPage();
 
         // Click the Create Application button.

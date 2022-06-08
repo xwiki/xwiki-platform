@@ -47,9 +47,13 @@
       'offset': $pdfExportJobStatus.progress.offset
     }
   })
-  #if ($pdfExportJobStatus.state == 'FINISHED' &amp;&amp; $pdfExportJobStatus.request.isServerSide())
-    #set ($pdfExportJobStatusJSON.pdfFileURL = $services.resource.temporary.getURL(
-      $pdfExportJobStatus.getPDFFileReference()))
+  #if ($pdfExportJobStatus.state == 'FINISHED')
+    #if ($pdfExportJobStatus.request.isServerSide() &amp;&amp; $services.resource.temporary.exists(
+        $pdfExportJobStatus.getPDFFileReference()))
+      #set ($pdfExportJobStatusJSON.pdfFileURL = $services.resource.temporary.getURL(
+        $pdfExportJobStatus.getPDFFileReference()))
+    #end
+    #set ($pdfExportJobStatusJSON.failed = $pdfExportJobStatus.logTail.hasLogLevel('ERROR'))
   #end
   #jsonResponse($pdfExportJobStatusJSON)
 #end
@@ -331,6 +335,8 @@ require([
       if (job.pdfFileURL) {
         // The PDF file was generated on the server-side. The user just needs to download it.
         window.location.href = job.pdfFileURL;
+      } else if (job.failed) {
+        return Promise.reject();
       } else {
         // Show the Print Preview modal in order for the user to be able to save the result as PDF.
         return showPrintPreviewModal(job.id);

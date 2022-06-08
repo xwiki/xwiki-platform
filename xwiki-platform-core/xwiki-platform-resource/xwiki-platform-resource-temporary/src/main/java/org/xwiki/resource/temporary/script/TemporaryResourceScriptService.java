@@ -37,7 +37,7 @@ import org.xwiki.url.ExtendedURL;
  * Exposes the Temporary Resource API to server-side scripts.
  * 
  * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 @Component

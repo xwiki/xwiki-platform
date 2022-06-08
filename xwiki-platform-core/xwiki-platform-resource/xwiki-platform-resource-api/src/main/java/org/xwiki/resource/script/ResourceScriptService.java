@@ -32,7 +32,7 @@ import org.xwiki.stability.Unstable;
  * Exposes the Resource API to server-side scripts.
  * 
  * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 @Component

@@ -50,7 +50,7 @@ import com.xpn.xwiki.internal.context.XWikiContextContextStore;
  * Prints the content of a given URL using a headless Chrome web browser running inside a Docker container.
  * 
  * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 @Component

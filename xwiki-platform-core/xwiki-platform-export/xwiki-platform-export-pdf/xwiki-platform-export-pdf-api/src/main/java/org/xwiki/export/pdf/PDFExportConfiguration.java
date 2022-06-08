@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * PDF export configuration options.
  * 
  * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 @Role

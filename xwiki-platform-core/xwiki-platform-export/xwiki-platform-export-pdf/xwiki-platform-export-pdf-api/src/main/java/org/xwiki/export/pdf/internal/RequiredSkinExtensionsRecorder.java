@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
  * Used to record the skin extensions (JavaScript, CSS) required while rendering some content.
  * 
  * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 @Role

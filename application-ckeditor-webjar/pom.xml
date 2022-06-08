@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.contrib</groupId>
-    <artifactId>application-ckeditor-pom</artifactId>
+    <artifactId>application-ckeditor-runtime</artifactId>
     <version>1.65-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
@@ -42,18 +42,6 @@
       ${webjars.unpack.directory}/META-INF/resources/webjars/application-ckeditor-plugins/${project.version}
     </webjars.unpack.contentDirectory>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <!-- Import XWiki dependencies from the minimum supported version -->
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-core</artifactId>
-        <version>${minimum.platform.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
     <!-- Even though we bundle the custom plugins with the CKEditor code (the plugins WebJar is merged with the CKEditor
       WebJar) we still need to declare this dependency in order to brind the transitive dependencies that our custom

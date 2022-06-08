@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.contrib</groupId>
-    <artifactId>application-ckeditor-pom</artifactId>
+    <artifactId>application-ckeditor-runtime</artifactId>
     <version>1.65-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
@@ -37,18 +37,6 @@
     <!-- Explicitly indicate it's a webjar -->
     <xwiki.extension.jar.type>webjar</xwiki.extension.jar.type>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <!-- Import XWiki dependencies from the minimum supported version -->
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-core</artifactId>
-        <version>${minimum.platform.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.webjars</groupId>

@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.contrib</groupId>
-    <artifactId>application-ckeditor-pom</artifactId>
+    <artifactId>application-ckeditor-runtime</artifactId>
     <version>1.65-SNAPSHOT</version>
   </parent>
   <artifactId>application-ckeditor-ui</artifactId>
@@ -44,37 +44,7 @@
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <!-- Import XWiki dependencies from the minimum supported version -->
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-core</artifactId>
-        <version>${minimum.platform.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  <build>
-    <pluginManagement>
-      <plugins>
-        <!-- Use the XAR plugin which matches the minimum version -->
-        <plugin>
-          <groupId>org.xwiki.commons</groupId>
-          <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
-          <version>${minimum.commons.version}</version>
-        </plugin>
-        <!-- Use the version of the license plugin expected by the xar plugin -->
-        <plugin>
-          <groupId>com.mycila</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <!-- Lock down plugin version for build reproducibility -->
-          <version>2.11</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+
   <dependencies>
     <dependency>
       <groupId>org.xwiki.contrib</groupId>

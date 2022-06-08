@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>parent-platform</artifactId>
-    <version>14.3.1</version>
+    <version>13.10</version>
   </parent>
   <artifactId>application-ckeditor-pom</artifactId>
   <packaging>pom</packaging>
@@ -232,6 +232,7 @@
     </plugins>
   </build>
   <modules>
+    <module>application-ckeditor-runtime</module>
     <module>application-ckeditor-base</module>
     <module>application-ckeditor-plugins</module>
     <module>application-ckeditor-ui</module>

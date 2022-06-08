@@ -40,4 +40,4 @@
 ### Missing: captcha.admin.defaultCaptchaName.label=Default CAPTCHA
 ### Missing: captcha.admin.defaultCaptchaName.hint=The default CAPTCHA implementation to use. Use the Extension Manager to search for other implementations that you can install and use.
 </content>
-  </xwikidoc>
+</xwikidoc>

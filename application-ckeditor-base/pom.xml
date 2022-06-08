@@ -26,6 +26,7 @@
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>application-ckeditor-runtime</artifactId>
     <version>1.65-SNAPSHOT</version>
+    <relativePath>../application-ckeditor-runtime</relativePath>
   </parent>
   <packaging>jar</packaging>
   <artifactId>application-ckeditor-base</artifactId>

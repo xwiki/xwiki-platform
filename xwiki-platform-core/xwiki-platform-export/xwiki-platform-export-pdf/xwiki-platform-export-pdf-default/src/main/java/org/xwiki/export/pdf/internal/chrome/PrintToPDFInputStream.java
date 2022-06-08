@@ -35,6 +35,11 @@ import com.github.kklisura.cdt.protocol.types.io.Read;
  */
 public class PrintToPDFInputStream extends InputStream
 {
+    /**
+     * Read chunks of 1MB.
+     */
+    private static final int BUFFER_SIZE = 1 << 20;
+
     private IO io;
 
     private String stream;
@@ -84,7 +89,7 @@ public class PrintToPDFInputStream extends InputStream
             return new byte[] {};
         }
 
-        Read read = this.io.read(this.stream);
+        Read read = this.io.read(this.stream, null, BUFFER_SIZE);
         this.finished = read.getEof() == Boolean.TRUE;
         if (read.getBase64Encoded() == Boolean.TRUE) {
             return Base64.getDecoder().decode(read.getData());

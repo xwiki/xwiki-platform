@@ -40,7 +40,7 @@ import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
  * Default implementation of {@link RequiredSkinExtensionsRecorder}.
  * 
  * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 @Component

@@ -30,7 +30,7 @@ import com.github.kklisura.cdt.protocol.types.io.Read;
  * Input stream used to read the result of printing a web page to PDF.
  * 
  * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 public class PrintToPDFInputStream extends InputStream

@@ -54,7 +54,7 @@ import com.github.dockerjava.transport.DockerHttpClient;
  * Help perform various operations on Docker containers.
  * 
  * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 @Component(roles = ContainerManager.class)

@@ -74,7 +74,7 @@ import com.github.kklisura.cdt.services.utils.ProxyUtils;
  * Help interact with the headless Chrome web browser.
  * 
  * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 @Component(roles = ChromeManager.class)

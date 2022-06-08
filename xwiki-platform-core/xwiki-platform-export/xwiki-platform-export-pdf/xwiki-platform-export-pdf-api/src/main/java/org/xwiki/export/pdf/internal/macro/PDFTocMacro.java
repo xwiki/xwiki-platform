@@ -56,7 +56,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * Used to generate the table of contents for the PDF export.
  * 
  * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 @Component

@@ -1180,7 +1180,7 @@ public class TestUtils
      */
     public String getBaseBinURL()
     {
-        return getBaseURL() + "bin/";
+        return getBaseBinURL(this.currentWiki);
     }
 
     /**

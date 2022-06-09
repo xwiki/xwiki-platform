@@ -27,6 +27,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.xwiki.test.docker.internal.junit5.TestLocalReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
 import org.xwiki.test.docker.junit5.browser.Browser;
@@ -51,6 +52,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ExtendWith(ValidateConsoleExtension.class)
 @ExtendWith(XWikiDockerExtension.class)
 @ExtendWith(TestReferenceParameterResolver.class)
+@ExtendWith(TestLocalReferenceParameterResolver.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public @interface UITest

@@ -1,0 +1,66 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#set ($instances = $services.replication.getRegisteredInstances())
+#if (!$instances.isEmpty())
+  <div id="replication.docextracontent" class="xwikiintracontent">
+    #set ($resolvedInstances = $services.replication.document.getDocumentInstances($doc.documentReference))
+
+    #if ($resolvedInstances.size() > 0)
+      <dl>
+        <dt>$escapetool.xml($services.localization.render("replication.entity.docextra.owner"))</dt>
+        <dd data-key="owner">
+          #set ($ownerURI = $services.replication.document.getOwner($doc.documentReference))
+          #if ($ownerURI)
+            #set ($ownerInstance = $services.replication.getInstanceByURI($ownerURI))
+            #if ($ownerInstance)
+              #set ($currentInstance = $services.replication.getCurrentInstance())
+              #if ($ownerInstance == $currentInstance)
+                $escapetool.xml($services.localization.render("replication.admin.instance.CURRENT"))
+              #else
+                $escapetool.xml($ownerInstance.name) (<a href="$ownerInstance.uRI">$ownerInstance.uRI</a>)
+              #end
+            #else
+              $ownerURI
+            #end
+          #else
+            $escapetool.xml($services.localization.render("replication.entity.docextra.owner.unknown"))
+          #end
+        </dd>
+
+        <dt>$escapetool.xml($services.localization.render("replication.entity.docextra.instances"))</dt>
+        <dd><dl>
+        #foreach($resolvedInstance in $resolvedInstances)
+            <dt><label>$escapetool.xml($resolvedInstance.instance.name) (<a href="$resolvedInstance.instance.uRI">$resolvedInstance.instance.uRI</a>)</label></dt>
+            <dd>
+            #if ($resolvedInstance.level)
+              $escapetool.xml($services.localization.render("replication.entity.level.${resolvedInstance.level}.description"))
+            #else
+              $escapetool.xml($services.localization.render('replication.entity.docextra.notreplicated'))
+            #end
+            </dd>
+          </li>
+        #end
+        </dl></dd>
+      </dl>
+    #else
+      $escapetool.xml($services.localization.render("replication.entity.docextra.notreplicated"))
+    #end
+  </div>
+#end

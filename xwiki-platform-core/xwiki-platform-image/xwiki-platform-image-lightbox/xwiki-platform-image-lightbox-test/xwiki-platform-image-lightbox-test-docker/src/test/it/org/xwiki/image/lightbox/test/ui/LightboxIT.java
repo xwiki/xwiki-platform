@@ -59,9 +59,7 @@ class LightboxIT
 
     private static final String LIGHTBOX_CONFIGURATION_CLASSNAME = "XWiki.Lightbox.LightboxConfigurationClass";
 
-    private static final List<String> images = Arrays.asList("image1.png", "image2.png", "missingImage.png");
-
-    LightboxPage lightboxPage;
+    private static final List<String> IMAGES = Arrays.asList("image1.png", "image2.png", "missingImage.png");
 
     public static final String USER_NAME = "JohnDoe";
 
@@ -77,9 +75,9 @@ class LightboxIT
     {
         enableLightbox(testUtils, false);
 
-        testUtils.createPage(testReference, getSimpleImage(images.get(0)), "Disabled Lightbox");
-        lightboxPage = new LightboxPage();
-        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
+        testUtils.createPage(testReference, getSimpleImage(IMAGES.get(0)), "Disabled Lightbox");
+        LightboxPage lightboxPage = new LightboxPage();
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
@@ -91,15 +89,15 @@ class LightboxIT
     @Test
     @Order(2)
     void openImageWithoutDescription(TestUtils testUtils, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+        TestConfiguration testConfiguration)
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getSimpleImage(images.get(0)));
-        lightboxPage = new LightboxPage();
+        testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)));
+        LightboxPage lightboxPage = new LightboxPage();
 
         String lastUploadDate =
-            lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
+            lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
@@ -122,7 +120,7 @@ class LightboxIT
         assertTrue(lightbox.isDisplayed());
 
         assertEquals("0", lightbox.getSlideIndex());
-        assertEquals(images.get(0), lightbox.getCaption());
+        assertEquals(IMAGES.get(0), lightbox.getCaption());
         assertEquals("", lightbox.getTitle());
         assertEquals("Posted by JohnDoe", lightbox.getPublisher());
         assertEquals(lastUploadDate, lightbox.getDate());
@@ -132,15 +130,15 @@ class LightboxIT
     @Test
     @Order(3)
     void openImageWithCaptionAndManuallyAddedId(TestUtils testUtils, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+        TestConfiguration testConfiguration)
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getImageWithCaptionAndManuallyAddedId(images.get(0)));
-        lightboxPage = new LightboxPage();
+        testUtils.createPage(testReference, this.getImageWithCaptionAndManuallyAddedId(IMAGES.get(0)));
+        LightboxPage lightboxPage = new LightboxPage();
 
         String lastUploadDate =
-            lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
+            lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
@@ -164,7 +162,7 @@ class LightboxIT
 
         assertEquals("0", lightbox.getSlideIndex());
         assertEquals("Caption", lightbox.getCaption());
-        assertEquals(images.get(0), lightbox.getTitle());
+        assertEquals(IMAGES.get(0), lightbox.getTitle());
         assertEquals("Posted by JohnDoe", lightbox.getPublisher());
         assertEquals(lastUploadDate, lightbox.getDate());
         assertEquals("manuallyAddedImageId", lightbox.getImageId());
@@ -173,15 +171,14 @@ class LightboxIT
     @Test
     @Order(4)
     void openImageWithAlt(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
-        throws Exception
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getImageWithAlt(images.get(0)));
-        lightboxPage = new LightboxPage();
+        testUtils.createPage(testReference, this.getImageWithAlt(IMAGES.get(0)));
+        LightboxPage lightboxPage = new LightboxPage();
 
         String lastUploadDate =
-            lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
+            lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
@@ -199,12 +196,13 @@ class LightboxIT
 
     @Test
     @Order(5)
-    void openIconImage(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+    void openIconImage(TestUtils testUtils, TestReference testReference)
     {
         enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, "[[image:icon:accept]]");
 
+        LightboxPage lightboxPage = new LightboxPage();
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
 
@@ -222,10 +220,10 @@ class LightboxIT
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getSimpleImage(images.get(0)));
-        lightboxPage = new LightboxPage();
+        testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)));
+        LightboxPage lightboxPage = new LightboxPage();
 
-        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
@@ -243,11 +241,11 @@ class LightboxIT
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getSimpleImage(images.get(0)) + this.getSimpleImage(images.get(1)));
-        lightboxPage = new LightboxPage();
+        testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)) + this.getSimpleImage(IMAGES.get(1)));
+        LightboxPage lightboxPage = new LightboxPage();
 
-        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
-        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(1));
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(1));
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
@@ -274,12 +272,12 @@ class LightboxIT
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getSimpleImage(images.get(0)) + this.getSimpleImage(images.get(1))
-            + this.getSimpleImage(images.get(2)));
-        lightboxPage = new LightboxPage();
+        testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)) + this.getSimpleImage(IMAGES.get(1))
+            + this.getSimpleImage(IMAGES.get(2)));
+        LightboxPage lightboxPage = new LightboxPage();
 
-        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
-        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(1));
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(1));
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
@@ -300,12 +298,12 @@ class LightboxIT
 
     @Test
     @Order(9)
-    void openMissingImage(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+    void openMissingImage(TestUtils testUtils, TestReference testReference)
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getSimpleImage(images.get(2)));
-        lightboxPage = new LightboxPage();
+        testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(2)));
+        LightboxPage lightboxPage = new LightboxPage();
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
@@ -316,7 +314,7 @@ class LightboxIT
 
         assertTrue(lightbox.isImageMissing());
         assertEquals("0", lightbox.getSlideIndex());
-        assertEquals(images.get(2), lightbox.getCaption());
+        assertEquals(IMAGES.get(2), lightbox.getCaption());
         assertEquals("", lightbox.getTitle());
         assertEquals("", lightbox.getDate());
     }
@@ -327,10 +325,10 @@ class LightboxIT
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getSimpleImage(images.get(0)));
-        lightboxPage = new LightboxPage();
+        testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)));
+        LightboxPage lightboxPage = new LightboxPage();
 
-        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
@@ -349,10 +347,10 @@ class LightboxIT
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getSimpleImage(images.get(0)));
-        lightboxPage = new LightboxPage();
+        testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)));
+        LightboxPage lightboxPage = new LightboxPage();
 
-        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
@@ -374,18 +372,17 @@ class LightboxIT
         WebElement slide = lightbox.getSlideElement();
         WebElement lightboxDownload = lightbox.getDownloadButton();
         assertEquals(slide.findElement(By.tagName("img")).getAttribute("src"), lightboxDownload.getAttribute("href"));
-        assertEquals(images.get(0), lightboxDownload.getAttribute("download"));
+        assertEquals(IMAGES.get(0), lightboxDownload.getAttribute("download"));
     }
 
     @Test
     @Order(12)
-    void verifyPartiallyDisabledLightbox(TestUtils testUtils, TestReference testReference,
-        TestConfiguration testConfiguration)
+    void verifyPartiallyDisabledLightbox(TestUtils testUtils, TestReference testReference)
     {
         enableLightbox(testUtils, true);
 
         testUtils.createPage(testReference, this.getPartiallyDisabledLightboxContent());
-        lightboxPage = new LightboxPage();
+        LightboxPage lightboxPage = new LightboxPage();
 
         Optional<ImagePopover> imagePopover = lightboxPage.hoverImage(0);
         assertFalse(imagePopover.isPresent());
@@ -397,14 +394,13 @@ class LightboxIT
     @Test
     @Order(13)
     void openImageWithoutId(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
-        throws Exception
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getImageWithoutId(images.get(0)));
-        lightboxPage = new LightboxPage();
+        testUtils.createPage(testReference, this.getImageWithoutId(IMAGES.get(0)));
+        LightboxPage lightboxPage = new LightboxPage();
 
-        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), images.get(0));
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();

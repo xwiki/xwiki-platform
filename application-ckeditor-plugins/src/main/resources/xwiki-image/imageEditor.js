@@ -194,11 +194,12 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
        * (since the image must be fetched, which is can take an undetermined time due to image weight and network
        * speed).
        * @param field the name of the change field, can be either 'width' or 'height'
-       * @param inputValue the value of the update field (e.g., 100, or 33px)
+       * @param inputField the field to read the value from
        * @param targetField the field to update with the computed dimension (height for the width field, and width for
        *  the height field)
        */
-      function updateSize(field, inputValue, targetField) {
+      function updateSize(field, inputField, targetField) {
+        var inputValue = inputField.val();
         if (locked) {
           imageWidthField.prop('disabled', true);
           imageHeightField.prop('disabled', true);
@@ -206,16 +207,19 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
             targetField.val(value);
             imageWidthField.prop('disabled', false);
             imageHeightField.prop('disabled', false);
+            // In Edge, when the fields are disabled, the focus is lost and needs to be restored after the size is 
+            // updated.
+            inputField.focus();
           });
         }
       }
 
       imageWidthField.on('input', function () {
-        updateSize('width', $(this).val(), imageHeightField);
+        updateSize('width', $(this), imageHeightField);
       });
 
       imageHeightField.on('input', function () {
-        updateSize('height', $(this).val(), imageWidthField);
+        updateSize('height', $(this), imageWidthField);
       });
     }
 

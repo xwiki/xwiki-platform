@@ -218,6 +218,10 @@ public class ConfigurationFilesGenerator
                 this.testConfiguration.getServletEngine().getPermanentDirectory());
         }
 
+        // Disable the Distribution Wizard by default
+        props.setProperty("xwikiPropertiesAutomaticStartOnMainWiki", Boolean.FALSE.toString());
+        props.setProperty("xwikiPropertiesAutomaticStartOnWiki", Boolean.FALSE.toString());
+
         return props;
     }
 

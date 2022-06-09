@@ -330,13 +330,17 @@ var XWiki = (function(XWiki) {
       $$('input[name=mergeChoices]').forEach(function (item) {item.remove();});
       $$('input[name=customChoices]').forEach(function (item) {item.remove();});
 
+      var hasBeenSaved = false;
       if (state.isCreateFromTemplate) {
-        if (response.responseJSON) {
+        // We might have a responseJSON containing other information than links, if the template cannot be accessed.
+        if (response.responseJSON && response.responseJSON.links) {
           // Start the progress display.
           this.getStatus(response.responseJSON.links[0].href, state);
         } else {
           this.progressBox.hide();
           this.savingBox.replace(this.savedBox);
+          // in such case the page is saved, so we'll need to maybe redirect
+          hasBeenSaved = true;
         }
       } else {
         this.progressBox.hide();
@@ -345,11 +349,13 @@ var XWiki = (function(XWiki) {
         } else {
           this.savingBox.replace(this.savedBox);
         }
-        if (!state.isContinue || $('body').hasClassName('previewbody')) {
-          state.saveButton.fire("xwiki:document:saved", response.responseJSON);
-          if (this.maybeRedirect(state.isContinue)) {
-            return;
-          }
+        hasBeenSaved = true;
+      }
+
+      if (hasBeenSaved && !state.isContinue || $('body').hasClassName('previewbody')) {
+        state.saveButton.fire("xwiki:document:saved", response.responseJSON);
+        if (this.maybeRedirect(state.isContinue)) {
+          return;
         }
       }
 

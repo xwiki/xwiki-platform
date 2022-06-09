@@ -117,7 +117,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
   #set ($deleteURL = $targetAttachDocument.getAttachmentURL($attachment.filename, 'delattachment', "xredirect=${returnURL}&amp;form_token=$!{services.csrf.getToken()}") )
   #set ($viewURL = $targetAttachDocument.getAttachmentURL($attachment.filename) )##{'name' : 'download', 'url' : $viewURL, 'rel' : '__blank'}
-  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=${attachment.filename}&amp;form_token=$!{services.csrf.getToken()}"))
+  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, $escapetool.url({
+    "${options.get('classname')}_${options.get('object')}_${options.get('property')}": ${attachment.filename},
+    'form_token': $!{services.csrf.getToken()}
+  })))
   #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}, {'name' : 'delete', 'url' : $deleteURL}])
 #end
 
@@ -130,7 +133,9 @@ $xwiki.jsx.use($attachmentPickerDocName)
  *#
 #macro (attachmentPicker_displayStartFrame $boxOptions $currentValue)
   (% class="gallery_attachmentbox $!{boxOptions.cssClass} #if ("$!{boxOptions.value}" == $currentValue) current#{end}" %)(((
-    (% class="gallery_attachmenttitle" title="$!{boxOptions.value}" %)((($boxOptions.text)))
+    (% class="gallery_attachmenttitle" title="$services.rendering.escape($!{boxOptions.value}, 'xwiki/2.1')" %)(((
+      $services.rendering.escape($boxOptions.text, 'xwiki/2.1')
+    )))
     (% class="gallery_attachmentframe" %)(((
 #end
 
@@ -146,13 +151,13 @@ $xwiki.jsx.use($attachmentPickerDocName)
     ## Compute the attachment reference because there's no getter.
     #set ($attachmentReference = $services.model.createAttachmentReference($attachment.document.documentReference,
       $attachment.filename))
-    #set ($attachmentStringReference = $services.model.serialize($attachmentReference, 'default'))
+    #set ($attachmentStringReference = $services.rendering.escape($services.model.serialize($attachmentReference, 'default'), 'xwiki/2.1'))
     #if ($attachment.isImage() &amp;&amp; $options.displayImage)
       ## We add the version to the query string in order to invalidate the cache when an image attachment is replaced.
       #set ($queryString = $escapetool.url({'version': $attachment.version}))
       [[[[image:${attachmentStringReference}||width=180 queryString="$queryString"]]&gt;&gt;attach:$attachmentStringReference]]
     #else
-      * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$attachment.getFilename()(% %)
+      * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$services.rendering.escape($attachment.getFilename(), 'xwiki/2.1')(% %)
       * v$attachment.getVersion() (#dynamicsize($attachment.longSize))
       * $services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attachment.author, false)}]) $services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attachment.date, 'dd/MM/yyyy hh:mm')}])
       * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:${attachmentStringReference}||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
@@ -1417,9 +1422,18 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
   #set ($displayImage = false)
 #end
 #if ($displayImage)
-  #set ($alt = "$!{xcontext.macro.params.alternateText}")
-  #set ($width = "$!{xcontext.macro.params.width}")
-  #set ($height = "$!{xcontext.macro.params.height}")
+  #set ($alt = '')
+  #set ($width = '')
+  #set ($height = '')
+  #if ($xcontext.macro.params.alternateText)
+    #set ($alt = "$services.rendering.escape($!{xcontext.macro.params.alternateText}, 'xwiki/2.1')")
+  #end
+  #if ($xcontext.macro.params.width)
+    #set ($width = "$services.rendering.escape($!{xcontext.macro.params.width}, 'xwiki/2.1')")
+  #end
+  #if ($xcontext.macro.params.height)
+    #set ($height = "$services.rendering.escape($!{xcontext.macro.params.height}, 'xwiki/2.1')")
+  #end
   #set ($imageParams = '')
   #if ("${width}" != '')
     #set($imageParams = "$!{imageParams} width=${width}")
@@ -1484,9 +1498,9 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     #set ($attachmentResource = '')
   #end
   #if ($displayImage)
-    (% class="$!{cssClass}#if (!$attachment) hidden#end" %)(((#if ("$!{attachmentResource}" != '' || $forceElement)#if($withLink)[[#end[[image:${attachmentResource}$!{imageParams}]]#if($withLink)&gt;&gt;attach:${attachmentResource}||rel=lightbox]]#{end}#end)))##
+    (% class="$!{cssClass}#if (!$attachment) hidden#end" %)(((#if ("$!{attachmentResource}" != '' || $forceElement)#if($withLink)[[#end[[image:$services.rendering.escape(${attachmentResource}, 'xwiki/2.1')$!{imageParams}]]#if($withLink)&gt;&gt;attach:$services.rendering.escape(${attachmentResource},'xwiki/2.1')||rel=lightbox]]#{end}#end)))##
   #else
-    (% class="$!{cssClass}" %)#if ("$!{attachmentResource}" != '' || $forceElement)#if ($withLink)[[attach:${attachmentResource}||rel=__blank]]#{else}(% class="displayed" %)#if($targetPermView)$!{attachmentName}#{else}Access Denied#{end}(% %)#{end}#end(%%)##
+    (% class="$!{cssClass}" %)#if ("$!{attachmentResource}" != '' || $forceElement)#if ($withLink)[[attach:${attachmentResource}||rel=__blank]]#{else}(% class="displayed" %)#if($targetPermView)$services.rendering.escape($!{attachmentName}, 'xwiki/2.1')#{else}Access Denied#{end}(% %)#{end}#end(%%)##
   #end
 #end
 
@@ -1509,8 +1523,9 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     #if ($hasTargetDoc)
       #set ($queryString.targetdocname = $targetdoc.fullName)
     #end
-    (% class="buttonwrapper" %)[[$buttontext&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
-      class="attachment-picker-start button" title="$buttontext"]](%%)##
+    #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
+    (% class="buttonwrapper" %)[[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
+      class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')"]](%%)##
   #end
 #end
 {{/velocity}}

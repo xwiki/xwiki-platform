@@ -115,10 +115,12 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
             // Get the property group
             WikiTemplatePropertyGroup group = (WikiTemplatePropertyGroup) descriptor.getPropertyGroup(
                     WikiTemplatePropertyGroupProvider.GROUP_NAME);
-            // Set the value
-            group.setTemplate(value);
-            // Save the property groups
-            templateWikiPropertyGroupProvider.save(group, wikiId);
+            if (group != null) {
+                // Set the value
+                group.setTemplate(value);
+                // Save the property groups
+                templateWikiPropertyGroupProvider.save(group, wikiId);
+            }
         } catch (WikiPropertyGroupException e) {
             throw new WikiTemplateManagerException(String.format("Failed to save the property group [%s]",
                     WikiTemplatePropertyGroupProvider.GROUP_NAME), e);

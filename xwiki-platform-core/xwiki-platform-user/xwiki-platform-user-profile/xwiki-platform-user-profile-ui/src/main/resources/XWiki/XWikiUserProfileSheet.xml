@@ -37,9 +37,10 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ("$!request.userId" != "" &amp;&amp; ($request.action == "disable" || $request.action == "enable") &amp;&amp; $services.csrf.isTokenValid($request.csrf))
+#if ($hasAdmin &amp;&amp; "$!request.userId" != "" &amp;&amp; ($request.action == "disable" || $request.action == "enable") &amp;&amp; $services.csrf.isTokenValid($request.csrf))
 #set ($user = $xwiki.getUser($request.userId))
-#if ($user.getUser().exists($xcontext.context))
+#set ($isCurrentUser = $user.getUser().userReference.equals($xcontext.userReference))
+#if (!$isCurrentUser &amp;&amp; $user.getUser().exists($xcontext.context))
   #set ($disabled = ($request.action == "disable"))
   #set ($discard = $user.setDisabledStatus($disabled))
   #set ($success = ($disabled &amp;&amp; $user.isDisabled()) || (!$disabled &amp;&amp; !$user.isDisabled()))

@@ -116,6 +116,10 @@ public class PDFTocMacro extends AbstractMacro<PDFTocMacroParameters>
     public List<Block> execute(PDFTocMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
+        if (parameters.getJobId() == null) {
+            throw new MacroExecutionException("The mandatory job id parameter is missing.");
+        }
+
         PDFExportJobStatus jobStatus = getJobStatus(parameters.getJobId());
         if (jobStatus != null && Objects.equals(jobStatus.getRequest().getUserReference(),
             this.documentAccessBridge.getCurrentUserReference())) {

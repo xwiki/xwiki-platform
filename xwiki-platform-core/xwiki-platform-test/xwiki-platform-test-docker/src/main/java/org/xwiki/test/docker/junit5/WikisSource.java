@@ -45,6 +45,11 @@ public @interface WikisSource
     int value() default 1;
 
     /**
+     * @return true if the test should be executed with the main wiki too
+     */
+    boolean mainWiki() default true;
+
+    /**
      * @return the extensions to install on subwikis
      */
     String[] extensions() default {};

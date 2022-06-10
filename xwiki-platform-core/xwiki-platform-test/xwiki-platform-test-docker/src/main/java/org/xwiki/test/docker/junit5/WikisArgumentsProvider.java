@@ -56,7 +56,9 @@ class WikisArgumentsProvider implements ArgumentsProvider, AnnotationConsumer<Wi
         this.wikis = new ArrayList<>(source.value());
 
         // Add main wiki
-        this.wikis.add(new WikiReference(MAINWIKI));
+        if (source.mainWiki()) {
+            this.wikis.add(new WikiReference(MAINWIKI));
+        }
 
         // Add subwikis
         for (int i = 0; i < source.value(); ++i) {

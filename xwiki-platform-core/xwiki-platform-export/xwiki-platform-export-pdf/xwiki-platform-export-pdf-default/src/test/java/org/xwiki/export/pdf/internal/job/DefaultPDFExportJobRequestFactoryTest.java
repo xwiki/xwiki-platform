@@ -30,7 +30,9 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.model.reference.DocumentReference;
@@ -49,6 +51,9 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -80,39 +85,55 @@ class DefaultPDFExportJobRequestFactoryTest
     @MockComponent
     private ContextStoreManager contextStoreManager;
 
+    @Mock
+    private XWikiContext xcontext;
+
+    @Mock
+    private XWikiRequest httpRequest;
+
+    @BeforeEach
+    void configure()
+    {
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        when(this.xcontext.getRequest()).thenReturn(this.httpRequest);
+
+        XWikiDocument currentDocument = mock(XWikiDocument.class);
+        when(currentDocument.getDocumentReference()).thenReturn(new DocumentReference("test", "Some", "Page"));
+        when(this.xcontext.getDoc()).thenReturn(currentDocument);
+        when(this.localStringEntityReferenceSerializer
+            .serialize(currentDocument.getDocumentReference().getLastSpaceReference())).thenReturn("Some");
+
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        when(this.xcontext.getURLFactory()).thenReturn(urlFactory);
+    }
+
     @Test
     void createRequest() throws Exception
     {
         // Setup
 
         DocumentReference aliceReference = new DocumentReference("test", "Users", "Alice");
+        when(this.xcontext.getUserReference()).thenReturn(aliceReference);
+
         DocumentReference bobReference = new DocumentReference("test", "Users", "Bob");
+        when(this.xcontext.getAuthorReference()).thenReturn(bobReference);
 
-        XWikiContext xcontext = mock(XWikiContext.class);
-        when(xcontext.getUserReference()).thenReturn(aliceReference);
-        when(xcontext.getAuthorReference()).thenReturn(bobReference);
+        when(this.httpRequest.get("pdfQueryString")).thenReturn("color=red");
+        when(this.httpRequest.get("pdfHash")).thenReturn("foo");
 
-        XWikiRequest httpRequest = mock(XWikiRequest.class);
-        when(xcontext.getRequest()).thenReturn(httpRequest);
-        when(httpRequest.get("pdfQueryString")).thenReturn("color=red");
-        when(httpRequest.get("pdfHash")).thenReturn("foo");
+        when(this.httpRequest.get("pdfcover")).thenReturn("1");
+        when(this.httpRequest.get("pdftoc")).thenReturn("0");
+        when(this.httpRequest.get("pdfheader")).thenReturn("false");
 
-        XWikiDocument currentDocument = mock(XWikiDocument.class);
-        when(currentDocument.getDocumentReference()).thenReturn(new DocumentReference("test", "Some", "Page"));
-        when(xcontext.getDoc()).thenReturn(currentDocument);
-        when(this.localStringEntityReferenceSerializer
-            .serialize(currentDocument.getDocumentReference().getLastSpaceReference())).thenReturn("Some");
-
-        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
-        when(xcontext.getURLFactory()).thenReturn(urlFactory);
+        when(this.httpRequest.get("pdftemplate")).thenReturn("Some.Template");
+        DocumentReference templateReference = new DocumentReference("test", "Some", "Template");
+        when(this.currentDocumentReferenceResolver.resolve("Some.Template")).thenReturn(templateReference);
 
         URL printPreviewURL = new URL("http://localhost:8080/xwiki/bin/export/Some/Page?key=value#hash");
         String queryString = "format=html-print&xpage=get&outputSyntax=plain&async=true&"
             + "sheet=XWiki.PDFExport.Sheet&jobId=export%2Fpdf%2Ftest&color=red";
-        when(urlFactory.createExternalURL("Some", "Page", "export", queryString, "foo", "test", xcontext))
-            .thenReturn(printPreviewURL);
-
-        when(this.xcontextProvider.get()).thenReturn(xcontext);
+        when(this.xcontext.getURLFactory().createExternalURL("Some", "Page", "export", queryString, "foo", "test",
+            this.xcontext)).thenReturn(printPreviewURL);
 
         List<String> supportedContextEntries = Arrays.asList("one", "two");
         when(this.contextStoreManager.getSupportedEntries()).thenReturn(supportedContextEntries);
@@ -123,14 +144,6 @@ class DefaultPDFExportJobRequestFactoryTest
         List<DocumentReference> selectedDocuments = Arrays.asList(new DocumentReference("test", "First", "Page"),
             new DocumentReference("test", "Second", "Page"));
         when(this.documentSelectionResolver.getSelectedDocuments()).thenReturn(selectedDocuments);
-
-        when(httpRequest.get("pdftemplate")).thenReturn("Some.Template");
-        DocumentReference templateReference = new DocumentReference("test", "Some", "Template");
-        when(this.currentDocumentReferenceResolver.resolve("Some.Template")).thenReturn(templateReference);
-
-        when(httpRequest.get("pdfcover")).thenReturn("1");
-        when(httpRequest.get("pdftoc")).thenReturn("0");
-        when(httpRequest.get("pdfheader")).thenReturn("false");
 
         // Execution
 
@@ -159,5 +172,19 @@ class DefaultPDFExportJobRequestFactoryTest
         assertFalse(request.isWithToc());
         assertTrue(request.isWithHeader());
         assertTrue(request.isWithFooter());
+    }
+
+    @Test
+    void createRequestWithDefaultTemplate() throws Exception
+    {
+        DocumentReference templateReference =
+            new DocumentReference("test", Arrays.asList("XWiki", "PDFExport"), "Template");
+        when(this.currentDocumentReferenceResolver.resolve("XWiki.PDFExport.Template")).thenReturn(templateReference);
+
+        when(this.xcontext.getURLFactory().createExternalURL(eq("Some"), eq("Page"), eq("export"), anyString(), eq(""),
+            eq("test"), same(this.xcontext))).thenReturn(new URL("https://www.xwiki.org"));
+
+        PDFExportJobRequest request = this.requestFactory.createRequest();
+        assertEquals(templateReference, request.getTemplate());
     }
 }

@@ -35,14 +35,13 @@ import com.github.kklisura.cdt.protocol.types.io.Read;
  */
 public class PrintToPDFInputStream extends InputStream
 {
-    /**
-     * Read chunks of 1MB.
-     */
-    private static final int BUFFER_SIZE = 1 << 20;
+    private final IO io;
 
-    private IO io;
+    private final String stream;
 
-    private String stream;
+    private final Runnable closeCallback;
+
+    private final int bufferSize;
 
     private boolean finished;
 
@@ -50,7 +49,17 @@ public class PrintToPDFInputStream extends InputStream
 
     private byte[] buffer = new byte[] {};
 
-    private Runnable closeCallback;
+    /**
+     * Creates a new instance for reading the specified PDF stream.
+     * 
+     * @param io the service used to read the PDF data
+     * @param stream a handle of the stream that holds the PDF data
+     */
+    public PrintToPDFInputStream(IO io, String stream)
+    {
+        this(io, stream, () -> {
+        });
+    }
 
     /**
      * Creates a new instance for reading the specified PDF stream.
@@ -61,9 +70,24 @@ public class PrintToPDFInputStream extends InputStream
      */
     public PrintToPDFInputStream(IO io, String stream, Runnable closeCallback)
     {
+        // Read chunks of 1MB.
+        this(io, stream, closeCallback, 1 << 20);
+    }
+
+    /**
+     * Creates a new instance for reading the specified PDF stream.
+     * 
+     * @param io the service used to read the PDF data
+     * @param stream a handle of the stream that holds the PDF data
+     * @param closeCallback the code to execute when this input stream is closed
+     * @param bufferSize the maximum number of bytes to read at once from the specified stream
+     */
+    public PrintToPDFInputStream(IO io, String stream, Runnable closeCallback, int bufferSize)
+    {
         this.io = io;
         this.stream = stream;
         this.closeCallback = closeCallback;
+        this.bufferSize = bufferSize;
     }
 
     @Override
@@ -89,7 +113,7 @@ public class PrintToPDFInputStream extends InputStream
             return new byte[] {};
         }
 
-        Read read = this.io.read(this.stream, null, BUFFER_SIZE);
+        Read read = this.io.read(this.stream, null, this.bufferSize);
         this.finished = read.getEof() == Boolean.TRUE;
         if (read.getBase64Encoded() == Boolean.TRUE) {
             return Base64.getDecoder().decode(read.getData());

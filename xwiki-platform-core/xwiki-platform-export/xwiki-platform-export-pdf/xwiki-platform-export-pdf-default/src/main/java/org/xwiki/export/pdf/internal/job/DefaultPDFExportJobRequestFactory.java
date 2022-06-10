@@ -87,9 +87,13 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
     @Override
     public PDFExportJobRequest createRequest() throws Exception
     {
-        PDFExportJobRequest request = new PDFExportJobRequest();
-
         String suffix = new Date().getTime() + "-" + ThreadLocalRandom.current().nextInt(100, 1000);
+        return createRequest(suffix);
+    }
+
+    protected PDFExportJobRequest createRequest(String suffix) throws Exception
+    {
+        PDFExportJobRequest request = new PDFExportJobRequest();
         request.setId(EXPORT, "pdf", suffix);
 
         setRightsProperties(request);

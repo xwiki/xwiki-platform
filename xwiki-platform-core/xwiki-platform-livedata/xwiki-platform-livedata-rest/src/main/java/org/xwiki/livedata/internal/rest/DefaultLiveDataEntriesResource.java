@@ -138,7 +138,10 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
         this.uriInfo.getQueryParameters().forEach((key, values) -> {
             if (key.startsWith(FILTERS_PREFIX)) {
                 String property = key.substring(FILTERS_PREFIX.length());
-                filters.add(getFilter(property, matchAll.contains(property), values));
+                Filter filter = getFilter(property, matchAll.contains(property), values);
+                if (!filter.getConstraints().isEmpty()) {
+                    filters.add(filter);
+                }
             }
         });
         return filters;

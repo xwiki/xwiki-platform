@@ -266,8 +266,9 @@ public interface SolrUtils
      *
      * @param fieldValue the value of a field
      * @return the Solr query version of the passed value
-     * @since 13.10.6
-     * @since 14.4RC1
+     * @since 13.10.7
+     * @since 14.4.2
+     * @since 14.5RC1
      */
     @Unstable
     default String toCompleteFilterQueryString(Object fieldValue)
@@ -283,8 +284,9 @@ public interface SolrUtils
      * @param fieldValue the value of a field
      * @param valueType the type to use as reference to serialize the value
      * @return the Solr query version of the passed value
-     * @since 13.10.6
-     * @since 14.4RC1
+     * @since 13.10.7
+     * @since 14.4.2
+     * @since 14.5RC1
      */
     @Unstable
     default String toCompleteFilterQueryString(Object fieldValue, Type valueType)

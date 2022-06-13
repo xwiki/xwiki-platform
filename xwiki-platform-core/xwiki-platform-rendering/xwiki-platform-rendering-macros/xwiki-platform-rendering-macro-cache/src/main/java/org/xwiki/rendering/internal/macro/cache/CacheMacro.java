@@ -94,7 +94,8 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
      */
     public CacheMacro()
     {
-        super("Cache", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), CacheMacroParameters.class);
+        super("Cache", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, true, Block.LIST_BLOCK_TYPE),
+            CacheMacroParameters.class);
         setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 

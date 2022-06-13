@@ -25,6 +25,13 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Event fired after an attachment is moved.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the job which produced this event or null for a remote event</li>
+ * <li>data: the request of the job which  produced this event</li>
+ * </ul>
  *
  * @version $Id$
  * @since 14.2RC1

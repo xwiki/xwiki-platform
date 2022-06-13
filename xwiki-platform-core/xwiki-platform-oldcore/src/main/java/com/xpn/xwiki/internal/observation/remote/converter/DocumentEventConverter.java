@@ -38,6 +38,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
+import org.xwiki.refactoring.event.DocumentCopiedEvent;
+import org.xwiki.refactoring.event.DocumentCopyingEvent;
+import org.xwiki.refactoring.event.DocumentRenamedEvent;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -69,6 +73,10 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
             add(DocumentCreatedEvent.class);
             add(DocumentUpdatedEvent.class);
             add(DocumentVersionRangeDeletedEvent.class);
+            add(DocumentRenamingEvent.class);
+            add(DocumentRenamedEvent.class);
+            add(DocumentCopyingEvent.class);
+            add(DocumentCopiedEvent.class);
         }
     };
 

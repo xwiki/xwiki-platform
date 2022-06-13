@@ -47,6 +47,12 @@ class DefaultSolrUtilsTest
     }
 
     @Test
+    void toCompleteFilterQueryString()
+    {
+        assertEquals("\"\"", this.utils.toCompleteFilterQueryString(""));
+    }
+
+    @Test
     void getMapFieldName()
     {
         assertEquals("key__map_string", this.utils.getMapFieldName("key", "map", (Type) null));

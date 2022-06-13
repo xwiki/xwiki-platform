@@ -19,6 +19,8 @@
  */
 package org.xwiki.container.servlet.internal;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
@@ -64,21 +66,33 @@ public class HttpSessionManager implements Initializable, Disposable, HttpSessio
     public void dispose() throws ComponentLifecycleException
     {
         for (HttpSession httpSession : this.sessionsList) {
-            httpSession.invalidate();
+            if (!httpSession.isNew()) {
+                httpSession.invalidate();
+            }
         }
     }
 
     @Override
     public void sessionCreated(HttpSessionEvent se)
     {
-        this.sessionsList.add(se.getSession());
-        this.observationManager.notify(new SessionCreatedEvent(), se.getSession(), null);
+        HttpSession session = se.getSession();
+        this.sessionsList.add(session);
+        this.observationManager.notify(new SessionCreatedEvent(), session, null);
     }
 
     @Override
     public void sessionDestroyed(HttpSessionEvent se)
     {
-        this.sessionsList.remove(se.getSession());
-        this.observationManager.notify(new SessionDestroyedEvent(), se.getSession(), null);
+        HttpSession session = se.getSession();
+        this.sessionsList.remove(session);
+        this.observationManager.notify(new SessionDestroyedEvent(), session, null);
+    }
+
+    /**
+     * @return the list of created sessions not yet destroyed.
+     */
+    protected List<HttpSession> getSessionList()
+    {
+        return new ArrayList<>(this.sessionsList);
     }
 }

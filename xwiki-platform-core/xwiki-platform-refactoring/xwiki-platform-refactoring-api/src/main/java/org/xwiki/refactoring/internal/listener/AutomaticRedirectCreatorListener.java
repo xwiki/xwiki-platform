@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.ModelBridge;
@@ -40,7 +40,7 @@ import org.xwiki.refactoring.job.MoveRequest;
 @Component
 @Named(AutomaticRedirectCreatorListener.NAME)
 @Singleton
-public class AutomaticRedirectCreatorListener extends AbstractEventListener
+public class AutomaticRedirectCreatorListener extends AbstractLocalEventListener
 {
     /**
      * The name of this event listener.
@@ -62,20 +62,18 @@ public class AutomaticRedirectCreatorListener extends AbstractEventListener
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
-        if (event instanceof DocumentRenamedEvent) {
-            boolean autoRedirect = true;
-            if (data instanceof MoveRequest) {
-                autoRedirect = ((MoveRequest) data).isAutoRedirect();
-            }
-            if (autoRedirect) {
-                DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
-                this.logger.info("Creating automatic redirect from [{}] to [{}].",
-                    documentRenamedEvent.getSourceReference(), documentRenamedEvent.getTargetReference());
-                this.modelBridge.createRedirect(documentRenamedEvent.getSourceReference(),
-                    documentRenamedEvent.getTargetReference());
-            }
+        boolean autoRedirect = true;
+        if (data instanceof MoveRequest) {
+            autoRedirect = ((MoveRequest) data).isAutoRedirect();
+        }
+        if (autoRedirect) {
+            DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
+            this.logger.info("Creating automatic redirect from [{}] to [{}].",
+                documentRenamedEvent.getSourceReference(), documentRenamedEvent.getTargetReference());
+            this.modelBridge.createRedirect(documentRenamedEvent.getSourceReference(),
+                documentRenamedEvent.getTargetReference());
         }
     }
 }

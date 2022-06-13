@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class BackLinkUpdaterListenerTest
+class BackLinkUpdaterListenerTest
 {
     @InjectMockComponents
     private BackLinkUpdaterListener listener;
@@ -97,7 +97,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithUpdateLinksOnFarm()
+    void onDocumentRenamedWithUpdateLinksOnFarm()
     {
         renameRequest.setUpdateLinks(true);
         renameRequest.setUpdateLinksOnFarm(true);
@@ -115,7 +115,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithUpdateLinksOnFarmAndNoEditRight()
+    void onDocumentRenamedWithUpdateLinksOnFarmAndNoEditRight()
     {
         renameRequest.setUpdateLinks(true);
         renameRequest.setUpdateLinksOnFarm(true);
@@ -133,7 +133,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithUpdateLinksOnWiki()
+    void onDocumentRenamedWithUpdateLinksOnWiki()
     {
         renameRequest.setUpdateLinks(true);
         renameRequest.setUpdateLinksOnFarm(false);
@@ -149,7 +149,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutUpdateLinks()
+    void onDocumentRenamedWithoutUpdateLinks()
     {
         renameRequest.setUpdateLinks(false);
         renameRequest.setUpdateLinksOnFarm(true);
@@ -160,7 +160,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutRenameJob()
+    void onDocumentRenamedWithoutRenameJob()
     {
         when(this.authorization.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
@@ -175,7 +175,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutRenameJobAndNoEditRight()
+    void onDocumentRenamedWithoutRenameJobAndNoEditRight()
     {
         when(this.authorization.hasAccess(Right.EDIT, carolReference)).thenReturn(false);
         when(this.authorization.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
@@ -187,13 +187,5 @@ public class BackLinkUpdaterListenerTest
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
-    }
-
-    @Test
-    public void onOtherEvents()
-    {
-        this.listener.onEvent(null, null, null);
-
-        verify(this.linkRefactoring, never()).renameLinks(any(), any(), any());
     }
 }

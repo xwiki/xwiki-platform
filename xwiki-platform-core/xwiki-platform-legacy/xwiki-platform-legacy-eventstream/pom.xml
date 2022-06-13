@@ -24,37 +24,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-tag</artifactId>
+    <artifactId>xwiki-platform-legacy</artifactId>
     <version>14.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-tag-ui</artifactId>
-  <name>XWiki Platform - Tag - UI</name>
-  <packaging>xar</packaging>
-  <description>Tag application for XWiki</description>
-  <properties>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Tag Application</xwiki.extension.name>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tag-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Needed when viewing individual tags for the Activity Stream for the tag -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-message</artifactId>
-      <version>${rendering.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-legacy-eventstream</artifactId>
+  <name>XWiki Platform - Legacy - Event Stream</name>
+  <packaging>pom</packaging>
+  <description>Legacy package for xwiki-platform-eventstream</description>
+  <modules>
+    <module>xwiki-platform-legacy-eventstream-api</module>
+    <module>xwiki-platform-legacy-eventstream-stores</module>
+  </modules>
 </project>
+

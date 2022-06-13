@@ -24,11 +24,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-mentions</artifactId>
+    <artifactId>xwiki-platform-legacy-mentions</artifactId>
     <version>14.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-mentions-notifications</artifactId>
-  <name>XWiki Platform - Mentions - Notifications</name>
+  <artifactId>xwiki-platform-legacy-mentions-notifications</artifactId>
+  <name>XWiki Platform - Legacy - Mentions - Notifications</name>
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
@@ -41,42 +41,15 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mentions-api</artifactId>
+      <artifactId>xwiki-platform-mentions-notifications</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream-api</artifactId>
+      <artifactId>xwiki-platform-legacy-eventstream-store-hibernate</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-notifiers-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-    </dependency>
-    <!-- Templates Runtime dependencies. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-localization-script</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-date</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-icon-script</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
+
     <!-- Test dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -1,0 +1,2 @@
+org.xwiki.eventstream.internal.LegacyEventMigrationJob
+org.xwiki.eventstream.script.EventStreamScriptService

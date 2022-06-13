@@ -24,11 +24,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-eventstream-stores</artifactId>
+        <artifactId>xwiki-platform-legacy-eventstream-stores</artifactId>
         <version>14.5-SNAPSHOT</version>
     </parent>
-    <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
-    <name>XWiki Platform - Event Stream - Store - Hibernate</name>
+    <artifactId>xwiki-platform-legacy-eventstream-store-hibernate</artifactId>
+    <name>XWiki Platform - Legacy - Event Stream - Store - Hibernate</name>
     <description>Hibernate based events storage</description>
     <properties>
         <xwiki.jacoco.instructionRatio>0.18</xwiki.jacoco.instructionRatio>
@@ -38,13 +38,19 @@
         <xwiki.extension.features>
           <!-- Previous name of the module -->
           org.xwiki.platform:xwiki-platform-eventstream-store
+          org.xwiki.platform:xwiki-platform-legacy-eventstream-store-hibernate
 
-          <!-- Impossible to have both xwiki-platform-eventstream and xwiki-platform-activitystream-api
+          <!-- Impossible to have both xwiki-platform-legacy-eventstream-store-hibernate and xwiki-platform-activitystream-api
                because they use the same table name (activitystream_events) -->
           org.xwiki.platform:xwiki-platform-activitystream-api
         </xwiki.extension.features>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-legacy-eventstream-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.xwiki.platform</groupId>
             <artifactId>xwiki-platform-eventstream-store-common</artifactId>

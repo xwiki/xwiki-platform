@@ -24,37 +24,33 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-tag</artifactId>
+    <artifactId>xwiki-platform-legacy-eventstream</artifactId>
     <version>14.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-tag-ui</artifactId>
-  <name>XWiki Platform - Tag - UI</name>
-  <packaging>xar</packaging>
-  <description>Tag application for XWiki</description>
+  <artifactId>xwiki-platform-legacy-eventstream-api</artifactId>
+  <name>XWiki Platform - Legacy - Event Stream - API</name>
+  <description>API for Event Stream events</description>
   <properties>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Tag Application</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tag-api</artifactId>
+      <artifactId>xwiki-platform-eventstream-api</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
-    <!-- Needed when viewing individual tags for the Activity Stream for the tag -->
+
+    <!-- Test Dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-message</artifactId>
-      <version>${rendering.version}</version>
-      <scope>runtime</scope>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

@@ -33,7 +33,7 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -57,7 +57,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Component
 @Named(UpdateObjectsOnClassRenameListener.NAME)
 @Singleton
-public class UpdateObjectsOnClassRenameListener extends AbstractEventListener
+public class UpdateObjectsOnClassRenameListener extends AbstractLocalEventListener
 {
     /**
      * The name of this event listener.
@@ -96,17 +96,15 @@ public class UpdateObjectsOnClassRenameListener extends AbstractEventListener
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
-        if (event instanceof DocumentRenamedEvent) {
-            boolean updateLinks = true;
-            if (data instanceof MoveRequest) {
-                updateLinks = ((MoveRequest) data).isUpdateLinks();
-            }
-            if (updateLinks) {
-                DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
-                updateObjects(documentRenamedEvent.getSourceReference(), documentRenamedEvent.getTargetReference());
-            }
+        boolean updateLinks = true;
+        if (data instanceof MoveRequest) {
+            updateLinks = ((MoveRequest) data).isUpdateLinks();
+        }
+        if (updateLinks) {
+            DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
+            updateObjects(documentRenamedEvent.getSourceReference(), documentRenamedEvent.getTargetReference());
         }
     }
 

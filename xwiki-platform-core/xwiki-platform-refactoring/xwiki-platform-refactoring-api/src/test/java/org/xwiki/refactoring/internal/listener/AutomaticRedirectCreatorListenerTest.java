@@ -42,7 +42,7 @@ import static org.mockito.Mockito.verify;
  * @version $Id$
  */
 @ComponentTest
-public class AutomaticRedirectCreatorListenerTest
+class AutomaticRedirectCreatorListenerTest
 {
     @InjectMockComponents
     private AutomaticRedirectCreatorListener listener;
@@ -62,7 +62,7 @@ public class AutomaticRedirectCreatorListenerTest
     private MoveRequest renameRequest = new MoveRequest();
 
     @Test
-    public void onDocumentRenamedWithAutomaticRedirect()
+    void onDocumentRenamedWithAutomaticRedirect()
     {
         renameRequest.setAutoRedirect(true);
 
@@ -75,7 +75,7 @@ public class AutomaticRedirectCreatorListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutAutomaticRedirect()
+    void onDocumentRenamedWithoutAutomaticRedirect()
     {
         renameRequest.setAutoRedirect(false);
 
@@ -85,7 +85,7 @@ public class AutomaticRedirectCreatorListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutRenameRequest()
+    void onDocumentRenamedWithoutRenameRequest()
     {
         this.listener.onEvent(documentRenamedEvent, null, null);
 
@@ -93,13 +93,5 @@ public class AutomaticRedirectCreatorListenerTest
 
         assertEquals("Creating automatic redirect from [wiki:Users.Alice] to [wiki:Users.Bob].",
             logCapture.getMessage(0));
-    }
-
-    @Test
-    public void onOtherEvents()
-    {
-        this.listener.onEvent(null, null, null);
-
-        verify(this.modelBridge, never()).createRedirect(any(), any());
     }
 }

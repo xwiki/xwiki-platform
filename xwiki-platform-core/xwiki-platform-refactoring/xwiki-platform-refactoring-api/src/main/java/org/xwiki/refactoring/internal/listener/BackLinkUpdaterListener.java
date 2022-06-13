@@ -33,7 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.LinkRefactoring;
@@ -54,7 +54,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 @Component
 @Named(BackLinkUpdaterListener.NAME)
 @Singleton
-public class BackLinkUpdaterListener extends AbstractEventListener
+public class BackLinkUpdaterListener extends AbstractLocalEventListener
 {
     /**
      * The name of this event listener.
@@ -88,25 +88,23 @@ public class BackLinkUpdaterListener extends AbstractEventListener
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
-        if (event instanceof DocumentRenamedEvent) {
-            boolean updateLinks = true;
-            boolean updateLinksOnFarm = true;
-            Predicate<EntityReference> canEdit =
-                entityReference -> this.authorization.hasAccess(Right.EDIT, entityReference);
+        boolean updateLinks = true;
+        boolean updateLinksOnFarm = true;
+        Predicate<EntityReference> canEdit =
+            entityReference -> this.authorization.hasAccess(Right.EDIT, entityReference);
 
-            if (source instanceof MoveJob) {
-                MoveRequest request = (MoveRequest) data;
-                updateLinks = request.isUpdateLinks();
-                updateLinksOnFarm = request.isUpdateLinksOnFarm();
-                // Check access rights taking into account the move request.
-                canEdit = entityReference -> ((MoveJob) source).hasAccess(Right.EDIT, entityReference);
-            }
+        if (source instanceof MoveJob) {
+            MoveRequest request = (MoveRequest) data;
+            updateLinks = request.isUpdateLinks();
+            updateLinksOnFarm = request.isUpdateLinksOnFarm();
+            // Check access rights taking into account the move request.
+            canEdit = entityReference -> ((MoveJob) source).hasAccess(Right.EDIT, entityReference);
+        }
 
-            if (updateLinks) {
-                updateBackLinks((DocumentRenamedEvent) event, canEdit, updateLinksOnFarm);
-            }
+        if (updateLinks) {
+            updateBackLinks((DocumentRenamedEvent) event, canEdit, updateLinksOnFarm);
         }
     }
 

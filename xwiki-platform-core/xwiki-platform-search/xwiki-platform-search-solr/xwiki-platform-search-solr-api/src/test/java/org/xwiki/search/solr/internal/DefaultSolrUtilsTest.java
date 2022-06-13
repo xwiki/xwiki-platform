@@ -41,4 +41,10 @@ class DefaultSolrUtilsTest
     {
         assertEquals("\\OR", this.utils.toFilterQueryString("OR"));
     }
+
+    @Test
+    void toCompleteFilterQueryString()
+    {
+        assertEquals("\"\"", this.utils.toCompleteFilterQueryString(""));
+    }
 }

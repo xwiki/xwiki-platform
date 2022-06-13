@@ -227,7 +227,7 @@ public class ExtensionIndexStore implements Initializable
         SolrQuery solrQuery = new SolrQuery();
 
         solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
-            + this.utils.toFilterQueryString(toSolrId(extensionId)));
+            + this.utils.toCompleteFilterQueryString(toSolrId(extensionId)));
 
         if (local != null) {
             solrQuery.addFilterQuery(Extension.FIELD_REPOSITORY + ":local");
@@ -299,7 +299,7 @@ public class ExtensionIndexStore implements Initializable
         // Get the version to copy
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
-            + this.utils.toFilterQueryString(toSolrId(new ExtensionId(extensionId.getId(), copyVersion))));
+            + this.utils.toCompleteFilterQueryString(toSolrId(new ExtensionId(extensionId.getId(), copyVersion))));
         solrQuery.setFields(RemoteExtension.FIELD_RECOMMENDED, RatingExtension.FIELD_TOTAL_VOTES,
             RatingExtension.FIELD_AVERAGE_VOTE);
         solrQuery.setRows(1);
@@ -369,7 +369,7 @@ public class ExtensionIndexStore implements Initializable
         SolrQuery solrQuery = new SolrQuery();
 
         solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
-            + this.utils.toFilterQueryString(toSolrId(extensionId)));
+            + this.utils.toCompleteFilterQueryString(toSolrId(extensionId)));
 
         solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES,
             ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES);
@@ -665,7 +665,7 @@ public class ExtensionIndexStore implements Initializable
 
                 builder.append('(');
                 builder.append(StringUtils.join(indexedQuery.getCompatibleNamespaces().stream()
-                    .map(n -> this.utils.toFilterQueryString(toStoredNamespace(n))).iterator(), " OR "));
+                    .map(n -> this.utils.toCompleteFilterQueryString(toStoredNamespace(n))).iterator(), " OR "));
                 builder.append(')');
 
                 solrQuery.addFilterQuery(builder.toString());
@@ -700,10 +700,10 @@ public class ExtensionIndexStore implements Initializable
         builder.append(':');
         if (filter.getComparison() == COMPARISON.MATCH) {
             builder.append('*');
-        }
-        builder.append(toFilterQueryString(filter));
-        if (filter.getComparison() == COMPARISON.MATCH) {
+            builder.append(toFilterQueryString(filter));
             builder.append('*');
+        } else {
+            builder.append(toCompleteFilterQueryString(filter));
         }
 
         return builder.toString();
@@ -736,6 +736,17 @@ public class ExtensionIndexStore implements Initializable
             return this.utils.toFilterQueryString(filter.getValue(), mapping.type);
         } else {
             return this.utils.toFilterQueryString(filter.getValue());
+        }
+    }
+
+    private String toCompleteFilterQueryString(Filter filter)
+    {
+        SearchFieldMapping mapping = SEARCH_FIELD_MAPPING.get(filter.getField());
+
+        if (mapping != null && mapping.type != null) {
+            return this.utils.toCompleteFilterQueryString(filter.getValue(), mapping.type);
+        } else {
+            return this.utils.toCompleteFilterQueryString(filter.getValue());
         }
     }
 
@@ -790,7 +801,7 @@ public class ExtensionIndexStore implements Initializable
         solrQuery.setFields(Extension.FIELD_VERSION);
 
         solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':'
-            + this.utils.toFilterQueryString(extensionId));
+            + this.utils.toCompleteFilterQueryString(extensionId));
 
         QueryResponse response = search(solrQuery);
 
@@ -842,11 +853,11 @@ public class ExtensionIndexStore implements Initializable
         solrQuery.setFields(Extension.FIELD_VERSION);
 
         solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':'
-            + this.utils.toFilterQueryString(extensionId));
+            + this.utils.toCompleteFilterQueryString(extensionId));
 
         if (withNamespace) {
             solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES + ":"
-                + this.utils.toFilterQueryString(toStoredNamespace(namespace)));
+                + this.utils.toCompleteFilterQueryString(toStoredNamespace(namespace)));
         } else {
             solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES + ":[* TO *]");
         }

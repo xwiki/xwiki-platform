@@ -47,7 +47,7 @@ import org.xwiki.search.solr.SolrUtils;
 
 /**
  * Default implementation of {@link SolrUtils}.
- * 
+ *
  * @version $Id$
  * @since 12.3RC1
  */
@@ -145,6 +145,8 @@ public class DefaultSolrUtils implements SolrUtils
     public static final String SOLR_TYPE_TEXT_GENERALS = "text_generals";
 
     private static final String PATTERN_GROUP = "(.+)";
+
+    private static final String PATTERN_EMPTY_STRING = "\"\"";
 
     private static final Pattern PATTERN_OR_AND_NOT = Pattern.compile("(OR|AND|NOT)");
 
@@ -490,6 +492,30 @@ public class DefaultSolrUtils implements SolrUtils
         }
 
         return str;
+    }
+
+    @Override
+    public String toCompleteFilterQueryString(Object fieldValue)
+    {
+        String result = toFilterQueryString(fieldValue);
+
+        if ("".equals(result)) {
+            result = PATTERN_EMPTY_STRING;
+        }
+
+        return result;
+    }
+
+    @Override
+    public String toCompleteFilterQueryString(Object fieldValue, Type valueType)
+    {
+        String result = toFilterQueryString(fieldValue, valueType);
+
+        if ("".equals(result)) {
+            result = PATTERN_EMPTY_STRING;
+        }
+
+        return result;
     }
 
     @Override

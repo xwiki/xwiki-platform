@@ -85,6 +85,7 @@
     'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/drawer${jsExtension}""))",
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
     'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
+    'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true)
   },
   'shim': {

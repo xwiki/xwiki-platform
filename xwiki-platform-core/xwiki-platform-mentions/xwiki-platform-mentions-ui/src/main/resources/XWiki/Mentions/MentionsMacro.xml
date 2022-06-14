@@ -29,7 +29,6 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>XWiki.Mentions.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>MentionsMacro</title>
@@ -604,7 +603,9 @@ blockquote.mention-quote {
 #end
 #set ($link = $xwiki.getURL($reference.reference, 'view'))
 {{html}}
-&lt;a id="$anchor" class="$stringtool.join($cssClasses, ' ')" data-reference="$services.model.serialize($reference.reference, 'default')" href="$link"&gt;$content&lt;/a&gt;
+&lt;a id="$escapetool.xml($anchor)" class="$stringtool.join($cssClasses, ' ')" data-reference="$escapetool.xml($services.model.serialize($reference.reference, 'default'))" href="$escapetool.xml($link)"&gt;
+  $escapetool.xml($content)
+&lt;/a&gt;
 {{/html}}
 {{/velocity}}</code>
     </property>

@@ -31,7 +31,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.ModelBridge;
@@ -48,7 +48,7 @@ import org.xwiki.refactoring.job.MoveRequest;
 @Component
 @Named(AutomaticRedirectCreatorListener.NAME)
 @Singleton
-public class AutomaticRedirectCreatorListener extends AbstractEventListener
+public class AutomaticRedirectCreatorListener extends AbstractLocalEventListener
 {
     /**
      * The name of this event listener.
@@ -75,7 +75,7 @@ public class AutomaticRedirectCreatorListener extends AbstractEventListener
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
         if (event instanceof DocumentRenamedEvent) {
             boolean autoRedirect = true;

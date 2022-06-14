@@ -16,4 +16,6 @@ org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreferenceMana
 org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator
 org.xwiki.notifications.filters.internal.SystemUserNotificationFilter
 org.xwiki.notifications.filters.internal.UserProfileNotificationFilterPreferenceProvider
+org.xwiki.notifications.filters.internal.listener.DeletedWikiEventListener
+org.xwiki.notifications.filters.internal.listener.DeleteUserEventListener
 org.xwiki.notifications.filters.script.NotificationFiltersScriptService

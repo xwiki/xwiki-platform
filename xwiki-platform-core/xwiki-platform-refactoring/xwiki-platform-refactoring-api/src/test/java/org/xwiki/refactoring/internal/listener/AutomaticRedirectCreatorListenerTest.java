@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class AutomaticRedirectCreatorListenerTest
+class AutomaticRedirectCreatorListenerTest
 {
     @InjectMockComponents
     private AutomaticRedirectCreatorListener listener;
@@ -89,7 +89,7 @@ public class AutomaticRedirectCreatorListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithAutomaticRedirect()
+    void onDocumentRenamedWithAutomaticRedirect()
     {
         renameRequest.setAutoRedirect(true);
 
@@ -102,7 +102,7 @@ public class AutomaticRedirectCreatorListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutAutomaticRedirect()
+    void onDocumentRenamedWithoutAutomaticRedirect()
     {
         renameRequest.setAutoRedirect(false);
 
@@ -112,7 +112,7 @@ public class AutomaticRedirectCreatorListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutRenameRequest()
+    void onDocumentRenamedWithoutRenameRequest()
     {
         this.listener.onEvent(documentRenamedEvent, null, null);
 
@@ -123,7 +123,7 @@ public class AutomaticRedirectCreatorListenerTest
     }
 
     @Test
-    public void onDocumentDeletedWithAutomaticRedirect()
+    void onDocumentDeletedWithAutomaticRedirect()
     {
         deleteRequest.setAutoRedirect(true);
 
@@ -136,7 +136,7 @@ public class AutomaticRedirectCreatorListenerTest
     }
 
     @Test
-    public void onDocumentDeletedWithAutomaticRedirectOnChildDoc()
+    void onDocumentDeletedWithAutomaticRedirectOnChildDoc()
     {
         deleteRequest.setAutoRedirect(true);
 
@@ -149,7 +149,7 @@ public class AutomaticRedirectCreatorListenerTest
     }
 
     @Test
-    public void onDocumentDeletedWithoutAutomaticRedirect()
+    void onDocumentDeletedWithoutAutomaticRedirect()
     {
         deleteRequest.setAutoRedirect(false);
 
@@ -159,19 +159,11 @@ public class AutomaticRedirectCreatorListenerTest
     }
 
     @Test
-    public void onDocumentDeletedWithoutDeleteJob()
+    void onDocumentDeletedWithoutDeleteJob()
     {
         when(this.jobContext.getCurrentJob()).thenReturn(null);
 
         this.listener.onEvent(documentDeletedEvent, null, null);
-
-        verify(this.modelBridge, never()).createRedirect(any(), any());
-    }
-
-    @Test
-    public void onOtherEvents()
-    {
-        this.listener.onEvent(null, null, null);
 
         verify(this.modelBridge, never()).createRedirect(any(), any());
     }

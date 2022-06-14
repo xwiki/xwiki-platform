@@ -2214,6 +2214,16 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Renders the passed xproperty as HTML. Note that if you need the raw value, you should call 
+     * {@link #getValue(String)} instead. 
+     *
+     * @param classOrFieldName the xproperty (aka field) name to render or an xclass reference
+     * @return the rendered xproperty as HTML if an xobject exists with that xproperty. Otherwise considers that the
+     *         passed parameter is an xclass reference and return the xobject for it or null if none exist
+     * @see #getValue(String) 
+     * @see #getValue(String, Object) 
+     */
     public java.lang.Object get(String classOrFieldName)
     {
         if (this.currentObj != null) {
@@ -2226,6 +2236,12 @@ public class Document extends Api
         return this.getDoc().getObject(classOrFieldName);
     }
 
+    /**
+     * @param fieldName the xproperty (aka field) name for which to get the value
+     * @return the raw value of the passed xproperty found in the current xobject or in the first xobject containing
+     *         such a field
+     * @see #getValue(String, Object) 
+     */
     public java.lang.Object getValue(String fieldName)
     {
         Object object;
@@ -2237,6 +2253,12 @@ public class Document extends Api
         return getValue(fieldName, object);
     }
 
+    /**
+     * @param fieldName the xproperty (aka field) name for which to get the value
+     * @param object the specific xobject from which to get the xproperty value
+     * @return the raw value of the passed xproperty
+     * @see #getValue(String)
+     */
     public java.lang.Object getValue(String fieldName, Object object)
     {
         if (object != null) {

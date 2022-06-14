@@ -643,7 +643,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
                     // Make sure only one version is tagged as "last"
                     SolrQuery solrQuery = new SolrQuery();
                     solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':'
-                        + this.solrUtils.toFilterQueryString(extension.getId().getId()));
+                        + this.solrUtils.toCompleteFilterQueryString(extension.getId().getId()));
                     solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
                     for (ExtensionId extensionid : this.indexStore.searchExtensionIds(solrQuery)) {
                         boolean last =

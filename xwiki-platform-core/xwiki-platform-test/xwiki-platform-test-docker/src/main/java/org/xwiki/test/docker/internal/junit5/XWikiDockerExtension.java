@@ -122,8 +122,7 @@ public class XWikiDockerExtension extends AbstractExtension
             return;
         }
 
-        // Note: TestConfiguration is created in evaluateExecutionCondition() which executes before beforeAll()
-        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+        TestConfiguration testConfiguration = computeTestConfiguration(extensionContext);
 
         // Programmatically enable logging for TestContainers code when verbose is on so that we can get the maximum
         // of debugging information.
@@ -182,7 +181,7 @@ public class XWikiDockerExtension extends AbstractExtension
 
             // Provision XWiki by installing all required extensions.
             LOGGER.info("(*) Provision extensions for test...");
-            provisionExtensions(testConfiguration, artifactResolver, mavenResolver, extensionContext);
+            provisionExtensions(artifactResolver, mavenResolver, extensionContext);
         } else {
             // Set the IP/port for the container since startServletEngine() wasn't called and it's set there normally.
             testConfiguration.getServletEngine().setIP("localhost");
@@ -208,6 +207,15 @@ public class XWikiDockerExtension extends AbstractExtension
         } catch (Exception e) {
             raiseException(e);
         }
+    }
+
+    private TestConfiguration computeTestConfiguration(ExtensionContext extensionContext)
+    {
+        // Note: TestConfiguration is created in evaluateExecutionCondition() which executes before beforeAll()
+        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+        mergeTestConfigurationInGlobalContext(testConfiguration, extensionContext);
+        saveTestConfiguration(extensionContext, testConfiguration);
+        return testConfiguration;
     }
 
     private void beforeEachInternal(ExtensionContext extensionContext)
@@ -451,14 +459,15 @@ public class XWikiDockerExtension extends AbstractExtension
         }
     }
 
-    private void provisionExtensions(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
-        MavenResolver mavenResolver, ExtensionContext context) throws Exception
+    private void provisionExtensions(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
+        ExtensionContext context) throws Exception
     {
+        // Initialize an extension installer
+        ExtensionInstaller extensionInstaller = new ExtensionInstaller(context, artifactResolver, mavenResolver);
+        DockerTestUtils.setExtensionInstaller(context, extensionInstaller);
+
         // Install extensions in the running XWiki
-        String xwikiRESTURL = String.format("%s/rest", loadXWikiURL(context));
-        ExtensionInstaller extensionInstaller =
-            new ExtensionInstaller(testConfiguration, artifactResolver, mavenResolver);
-        extensionInstaller.installExtensions(xwikiRESTURL, SUPERADMIN, "pass", SUPERADMIN);
+        extensionInstaller.installExtensions(SUPERADMIN, "pass", SUPERADMIN);
     }
 
     private String computeXWikiURLPrefix(String ip, int port)
@@ -474,8 +483,7 @@ public class XWikiDockerExtension extends AbstractExtension
     private void saveScreenshotAndVideo(ExtensionContext extensionContext)
     {
         // Take screenshot
-        takeScreenshot(extensionContext, loadTestConfiguration(extensionContext),
-            loadXWikiWebDriver(extensionContext));
+        takeScreenshot(extensionContext, loadTestConfiguration(extensionContext), loadXWikiWebDriver(extensionContext));
 
         // Save the video
         saveVideo(extensionContext);

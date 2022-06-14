@@ -46,6 +46,9 @@ function initWrapper() {
     },
     mocks: {
       $t: (key) => key
+    },
+    stubs: {
+      XWikiIcon: true
     }
   });
   return {wrapper, changeLayout};

@@ -48,23 +48,26 @@
     <platform.version>${commons.version}</platform.version>
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>
-    <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
-    <hsqldb.version>2.6.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.63</ckeditor.version>
+    <ckeditor.version>1.64</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.14</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>2.4.0</tika.version>
     <pdfbox.version>2.0.26</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-
-    <!-- Jetty version -->
     <jetty.version>9.4.29.v20200521</jetty.version>
-
-    <!-- Netty version -->
     <netty.version>4.1.77.Final</netty.version>
+    <hibernate.version>5.6.9.Final</hibernate.version>
+    <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
+    <hsqldb.version>2.6.1</hsqldb.version>
+
+    <!-- Versions of other software we need in our functional tests -->
+    <testcontainers.version>1.17.2</testcontainers.version>
+    <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
+         sure the new version is available from https://downloadarchive.documentfoundation.org/libreoffice/old/ -->
+    <libreoffice.version>7.2.7.2</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -86,9 +89,6 @@
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
     <xwiki.enforcer.enforce-tika2-parsers.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-tika2-parsers.skip>
 
-    <!-- Hibernate -->
-    <hibernate.version>5.6.9.Final</hibernate.version>
-
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
@@ -97,21 +97,16 @@
     <mysql.version>8.0.29</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.0.4</mariadb.version>
+    <mariadb.version>3.0.5</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.3.5</pgsql.version>
+    <pgsql.version>42.4.0</pgsql.version>
     <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>
-
-    <!-- Versions of other software we need in our functional tests -->
-    <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
-         sure the new version is available from https://downloadarchive.documentfoundation.org/libreoffice/old/ -->
-    <libreoffice.version>7.2.6.2</libreoffice.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -166,7 +161,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.10.0</version>
+        <version>4.11.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>

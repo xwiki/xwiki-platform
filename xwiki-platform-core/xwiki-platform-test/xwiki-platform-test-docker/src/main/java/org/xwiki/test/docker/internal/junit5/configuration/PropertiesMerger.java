@@ -64,15 +64,17 @@ public class PropertiesMerger
         properties.putAll(originalProperties);
 
         // Add user-specified properties (with possible overrides for default properties)
-        for (String key : newProperties.stringPropertyNames()) {
-            String originalValue = properties.getProperty(key);
-            String newValue = newProperties.getProperty(key);
-            // If the property already exists and override is true then replace. Otherwise if the property is a list
-            // type, try to merge it.
-            if (properties.containsKey(key)) {
-                mergeExistingProperty(key, originalValue, newValue, properties, override);
-            } else {
-                properties.setProperty(key, newValue);
+        if (newProperties != null) {
+            for (String key : newProperties.stringPropertyNames()) {
+                String originalValue = properties.getProperty(key);
+                String newValue = newProperties.getProperty(key);
+                // If the property already exists and override is true then replace. Otherwise if the property is a list
+                // type, try to merge it.
+                if (properties.containsKey(key)) {
+                    mergeExistingProperty(key, originalValue, newValue, properties, override);
+                } else {
+                    properties.setProperty(key, newValue);
+                }
             }
         }
 

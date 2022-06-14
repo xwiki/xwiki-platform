@@ -576,8 +576,15 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# [Since 7.1RC1] Enable or disable the automatic start of Distribution Wizard on empty/outdated wiki.
 #-#
 #-# The default is:
+
 # distribution.automaticStartOnMainWiki=true
 # distribution.automaticStartOnWiki=true
+#if ($xwikiPropertiesAutomaticStartOnMainWiki)
+distribution.automaticStartOnMainWiki=$xwikiPropertiesAutomaticStartOnMainWiki
+#end
+#if ($xwikiPropertiesAutomaticStartOnWiki)
+distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
+#end
 
 #-# [Since 10.2RC1] Control if the Distribution Wizard should be automatic or interactive (the default)
 #-# 

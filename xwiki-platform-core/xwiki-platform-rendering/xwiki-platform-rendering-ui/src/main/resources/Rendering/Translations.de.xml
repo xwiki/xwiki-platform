@@ -41,4 +41,4 @@ admin.syntaxes.description=Wählen Sie die Standardseitensyntax und konfiguriere
 Rendering.RenderingConfigClass_disabledSyntaxes=Deaktivierte Syntaxen
 Rendering.RenderingConfigClass_disabledSyntaxes.hint=Die Liste der Markup-Syntaxen, in denen Seiten nicht geschrieben werden können
 </content>
-  </xwikidoc>
+</xwikidoc>

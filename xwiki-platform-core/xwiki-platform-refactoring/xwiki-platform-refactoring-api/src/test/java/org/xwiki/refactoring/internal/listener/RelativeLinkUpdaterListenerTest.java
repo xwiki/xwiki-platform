@@ -44,7 +44,7 @@ import static org.mockito.Mockito.verify;
  * @version $Id$
  */
 @ComponentTest
-public class RelativeLinkUpdaterListenerTest
+class RelativeLinkUpdaterListenerTest
 {
     @InjectMockComponents
     private RelativeLinkUpdaterListener listener;
@@ -68,7 +68,7 @@ public class RelativeLinkUpdaterListenerTest
     private CopyRequest copyRequest = new CopyRequest();
 
     @Test
-    public void onDocumentRenamedWithUpdateLinks()
+    void onDocumentRenamedWithUpdateLinks()
     {
         renameRequest.setUpdateLinks(true);
 
@@ -80,7 +80,7 @@ public class RelativeLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutUpdateLinks()
+    void onDocumentRenamedWithoutUpdateLinks()
     {
         renameRequest.setUpdateLinks(false);
 
@@ -90,7 +90,7 @@ public class RelativeLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutRenameRequest()
+    void onDocumentRenamedWithoutRenameRequest()
     {
         this.listener.onEvent(documentRenamedEvent, null, null);
 
@@ -100,7 +100,7 @@ public class RelativeLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentCopiedWithUpdateLinks()
+    void onDocumentCopiedWithUpdateLinks()
     {
         copyRequest.setUpdateLinks(true);
 
@@ -112,7 +112,7 @@ public class RelativeLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentCopiedWithoutUpdateLinks()
+    void onDocumentCopiedWithoutUpdateLinks()
     {
         copyRequest.setUpdateLinks(false);
 
@@ -122,20 +122,12 @@ public class RelativeLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentCopiedWithoutCopyRequest()
+    void onDocumentCopiedWithoutCopyRequest()
     {
         this.listener.onEvent(documentCopiedEvent, null, null);
 
         verify(this.linkRefactoring).updateRelativeLinks(oldReference, newReference);
 
         assertEquals("Updating the relative links from [wiki:Users.Bob].", logCapture.getMessage(0));
-    }
-
-    @Test
-    public void onOtherEvents()
-    {
-        this.listener.onEvent(null, null, null);
-
-        verify(this.linkRefactoring, never()).updateRelativeLinks(any(), any());
     }
 }

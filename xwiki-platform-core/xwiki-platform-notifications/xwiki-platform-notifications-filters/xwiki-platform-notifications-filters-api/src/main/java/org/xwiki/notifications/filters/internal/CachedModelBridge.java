@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -36,6 +37,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -67,6 +69,9 @@ public class CachedModelBridge implements ModelBridge, Initializable
 
     @Inject
     private EntityReferenceFactory referenceFactory;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     private Map<EntityReference, Set<NotificationFilterPreference>> preferenceFilterCache;
 
@@ -149,10 +154,26 @@ public class CachedModelBridge implements ModelBridge, Initializable
     }
 
     @Override
+    public void deleteFilterPreferences(DocumentReference user) throws NotificationException
+    {
+        this.modelBridge.deleteFilterPreferences(user);
+        invalidateUserPreferencesFilters(user);
+    }
+
+    @Override
     public void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
         throws NotificationException
     {
         this.modelBridge.deleteFilterPreference(wikiReference, filterPreferenceId);
+    }
+
+    @Override
+    public void deleteFilterPreferences(WikiReference wikiReference)
+        throws NotificationException
+    {
+        // Remove the preferences from the database, then remove the preferences from the cache.
+        this.modelBridge.deleteFilterPreferences(wikiReference);
+        invalidateWikiPreferenceFilters(wikiReference);
     }
 
     @Override
@@ -214,5 +235,32 @@ public class CachedModelBridge implements ModelBridge, Initializable
     {
         this.preferenceFilterCache.clear();
         this.toggleCache.clear();
+    }
+
+    /**
+     * Remove all the {@link NotificationFilterPreference}s related to entities from {@code wikiReference} from the
+     * cache.
+     *
+     * @param wikiReference the wiki reference to invalidate
+     */
+    private void invalidateWikiPreferenceFilters(WikiReference wikiReference)
+    {
+        this.preferenceFilterCache.values()
+            .forEach(set -> set.removeIf(filter -> filter.isFromWiki(wikiReference.getName())));
+    }
+
+    /**
+     * Remove all the {@link  NotificationFilterPreference}s related to the given user form the cache.
+     *
+     * @param user the document reference of the user to remove from the cache
+     */
+    private void invalidateUserPreferencesFilters(DocumentReference user)
+    {
+        String serializedUserReference = this.entityReferenceSerializer.serialize(user);
+        // Remove the filter preferences of the user from the cache.
+        this.preferenceFilterCache.remove(user);
+        // Remove the user from the filter preferences of the other entities of the cache. 
+        this.preferenceFilterCache.values()
+            .forEach(set -> set.removeIf(filter -> Objects.equals(filter.getUser(), serializedUserReference)));
     }
 }

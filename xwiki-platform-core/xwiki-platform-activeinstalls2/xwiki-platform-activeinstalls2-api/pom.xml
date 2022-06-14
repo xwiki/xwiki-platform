@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-activeinstalls2</artifactId>
-    <version>14.4-SNAPSHOT</version>
+    <version>14.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-activeinstalls2-api</artifactId>
   <name>XWiki Platform - Active Installs 2 - API</name>
@@ -33,7 +33,7 @@
   <description>API to send XWiki instance ping data and query it</description>
   <properties>
     <!-- See the overridden value in the integration-tests profile -->
-    <xwiki.jacoco.instructionRatio>0.09</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.07</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Active Installs 2 API</xwiki.extension.name>
     <!-- We want only a single ActiveInstalls extension on the root namespace (only a single ping thread per XWiki
@@ -81,7 +81,7 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>elasticsearch</artifactId>
-      <version>1.17.1</version>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -126,6 +126,25 @@
                   <sources>
                     <source>src/test/it</source>
                   </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+              <!-- Create a test JAR that can be reused for the docker functional tests module -->
+              <execution>
+                <id>test-jar</id>
+                <goals>
+                  <goal>test-jar</goal>
+                </goals>
+                <configuration>
+                  <includes>
+                    <include>**/InjectElasticSearchContainer.class</include>
+                    <include>**/XWikiElasticSearchExtension.class</include>
+                  </includes>
                 </configuration>
               </execution>
             </executions>

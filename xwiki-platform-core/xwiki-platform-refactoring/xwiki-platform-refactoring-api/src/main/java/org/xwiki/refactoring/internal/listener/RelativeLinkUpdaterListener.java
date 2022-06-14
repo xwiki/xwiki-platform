@@ -26,7 +26,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentCopiedEvent;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
@@ -43,7 +43,7 @@ import org.xwiki.refactoring.job.AbstractCopyOrMoveRequest;
 @Component
 @Named(RelativeLinkUpdaterListener.NAME)
 @Singleton
-public class RelativeLinkUpdaterListener extends AbstractEventListener
+public class RelativeLinkUpdaterListener extends AbstractLocalEventListener
 {
     /**
      * The name of this event listener.
@@ -65,15 +65,16 @@ public class RelativeLinkUpdaterListener extends AbstractEventListener
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
         boolean updateRelativeLinks =
             data instanceof AbstractCopyOrMoveRequest ? ((AbstractCopyOrMoveRequest) data).isUpdateLinks() : true;
-        if (updateRelativeLinks && (event instanceof DocumentCopiedEvent || event instanceof DocumentRenamedEvent)) {
+        if (updateRelativeLinks) {
             @SuppressWarnings("unchecked")
             AbstractEntityCopyOrRenameEvent<DocumentReference> copyOrRenameEvent =
                 (AbstractEntityCopyOrRenameEvent<DocumentReference>) event;
-            // Output at info level since this is executing inside a Job and will be captured in the jib logs that we
+            // Output at info level since this is executing inside a Job and will be captured in the jib logs that
+            // we
             // show to the users. It's thus important information for the users to see.
             this.logger.info("Updating the relative links from [{}].", copyOrRenameEvent.getTargetReference());
             this.linkRefactoring.updateRelativeLinks(copyOrRenameEvent.getSourceReference(),

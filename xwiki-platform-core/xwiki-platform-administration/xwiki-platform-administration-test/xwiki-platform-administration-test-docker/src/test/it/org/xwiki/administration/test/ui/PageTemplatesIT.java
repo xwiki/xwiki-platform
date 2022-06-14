@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.TemplateProviderInlinePage;
 import org.xwiki.administration.test.po.TemplatesAdministrationSectionPage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -320,6 +321,41 @@ class PageTemplatesIT
         assertEquals(templateContent, newPage.getContent());
         // and the parent, it should be the template provider, since that's where we created it from
         assertEquals("/" + testSpace.replace('.', '/') + "/NewPage", newPage.getBreadcrumbContent());
+    }
+
+    /**
+     * The goal of this test is to check that if a template is forbidden for a user then:
+     *   1. the template content won't be displayed in the editor
+     *   2. the page will still be created properly from an empty template
+     */
+    @Test
+    @Order(4)
+    void createPageFromForbiddenTemplate(TestUtils setup, TestReference testReference) throws Exception
+    {
+        cleanUp(setup, testReference);
+
+        DocumentReference templateReference = new DocumentReference("Template", testReference.getLastSpaceReference());
+        DocumentReference newDoc = new DocumentReference("Document", testReference.getLastSpaceReference());
+
+        setup.createPage(templateReference, "A forbidden template");
+        String userName = testReference.getLastSpaceReference().getName();
+        setup.createUser(userName, userName, "");
+
+        // Prevent the user to see the template
+        setup.setRights(templateReference, "", userName, "view", false);
+
+        setup.login(userName, userName);
+        ViewPage viewPage = setup.gotoPage(templateReference);
+        assertTrue(viewPage.isForbidden());
+
+        setup.gotoPage(newDoc, "edit", "template=" + templateReference.toString());
+        WikiEditPage wikiEditPage = new WikiEditPage();
+
+        assertTrue(wikiEditPage.getContent().isEmpty());
+        wikiEditPage.setContent("Some content in that page");
+
+        viewPage = wikiEditPage.clickSaveAndView();
+        assertEquals("Some content in that page", viewPage.getContent());
     }
 
     /**

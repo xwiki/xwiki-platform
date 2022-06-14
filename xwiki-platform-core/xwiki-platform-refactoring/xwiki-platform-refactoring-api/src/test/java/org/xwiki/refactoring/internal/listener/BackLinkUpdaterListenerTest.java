@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class BackLinkUpdaterListenerTest
+class BackLinkUpdaterListenerTest
 {
     @InjectMockComponents
     private BackLinkUpdaterListener listener;
@@ -117,7 +117,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithUpdateLinksOnFarm()
+    void onDocumentRenamedWithUpdateLinksOnFarm()
     {
         renameRequest.setUpdateLinks(true);
         renameRequest.setUpdateLinksOnFarm(true);
@@ -135,7 +135,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithUpdateLinksOnFarmAndNoEditRight()
+    void onDocumentRenamedWithUpdateLinksOnFarmAndNoEditRight()
     {
         renameRequest.setUpdateLinks(true);
         renameRequest.setUpdateLinksOnFarm(true);
@@ -153,7 +153,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithUpdateLinksOnWiki()
+    void onDocumentRenamedWithUpdateLinksOnWiki()
     {
         renameRequest.setUpdateLinks(true);
         renameRequest.setUpdateLinksOnFarm(false);
@@ -169,7 +169,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutUpdateLinks()
+    void onDocumentRenamedWithoutUpdateLinks()
     {
         renameRequest.setUpdateLinks(false);
         renameRequest.setUpdateLinksOnFarm(true);
@@ -180,7 +180,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutRenameJob()
+    void onDocumentRenamedWithoutRenameJob()
     {
         when(this.authorization.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
@@ -195,7 +195,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutRenameJobAndNoEditRight()
+    void onDocumentRenamedWithoutRenameJobAndNoEditRight()
     {
         when(this.authorization.hasAccess(Right.EDIT, carolReference)).thenReturn(false);
         when(this.authorization.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
@@ -210,7 +210,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentDeletedWithUpdateLinksOnFarm()
+    void onDocumentDeletedWithUpdateLinksOnFarm()
     {
         deleteRequest.setUpdateLinks(true);
         deleteRequest.setUpdateLinksOnFarm(true);
@@ -228,7 +228,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentDeletedWithUpdateLinksOnFarmOnChildDoc()
+    void onDocumentDeletedWithUpdateLinksOnFarmOnChildDoc()
     {
         deleteRequest.setUpdateLinks(true);
         deleteRequest.setUpdateLinksOnFarm(true);
@@ -244,7 +244,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentDeleteWithUpdateLinksOnFarmAndNoEditRight()
+    void onDocumentDeleteWithUpdateLinksOnFarmAndNoEditRight()
     {
         deleteRequest.setUpdateLinks(true);
         deleteRequest.setUpdateLinksOnFarm(true);
@@ -262,7 +262,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentDeleteWithUpdateLinksOnWiki()
+    void onDocumentDeleteWithUpdateLinksOnWiki()
     {
         deleteRequest.setUpdateLinks(true);
         deleteRequest.setUpdateLinksOnFarm(false);
@@ -278,7 +278,7 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentDeletedWithoutUpdateLinks()
+    void onDocumentDeletedWithoutUpdateLinks()
     {
         deleteRequest.setUpdateLinks(false);
         deleteRequest.setUpdateLinksOnFarm(true);
@@ -289,21 +289,13 @@ public class BackLinkUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentDeletedWithoutDeleteJob()
+    void onDocumentDeletedWithoutDeleteJob()
     {
         when(this.jobContext.getCurrentJob()).thenReturn(null);
         when(this.authorization.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
 
         this.listener.onEvent(documentDeletedEvent, null, null);
-
-        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
-    }
-
-    @Test
-    public void onOtherEvents()
-    {
-        this.listener.onEvent(null, null, null);
 
         verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
     }

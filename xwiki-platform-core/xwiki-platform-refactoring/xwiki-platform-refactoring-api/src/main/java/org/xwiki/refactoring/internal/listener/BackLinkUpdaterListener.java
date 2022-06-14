@@ -37,7 +37,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.LinkRefactoring;
@@ -60,7 +60,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 @Component
 @Named(BackLinkUpdaterListener.NAME)
 @Singleton
-public class BackLinkUpdaterListener extends AbstractEventListener
+public class BackLinkUpdaterListener extends AbstractLocalEventListener
 {
     /**
      * The name of this event listener.
@@ -97,7 +97,7 @@ public class BackLinkUpdaterListener extends AbstractEventListener
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
         if (event instanceof DocumentRenamedEvent) {
             maybeUpdateLinksAfterRename(event, source, data);

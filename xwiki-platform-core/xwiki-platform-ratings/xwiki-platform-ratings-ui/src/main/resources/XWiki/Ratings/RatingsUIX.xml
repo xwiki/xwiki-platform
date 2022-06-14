@@ -195,7 +195,7 @@
           'error'
         ));
       }
-    }).catch(error => {
+    }).catch(error =&gt; {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('rating.setvote.error')) + " " + error,
         'error'

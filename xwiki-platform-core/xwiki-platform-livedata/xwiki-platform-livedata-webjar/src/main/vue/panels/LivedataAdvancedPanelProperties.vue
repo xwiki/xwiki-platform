@@ -32,12 +32,12 @@
   -->
   <LivedataBaseAdvancedPanel
     class="livedata-advanced-panel-properties"
-    panel-id="propertiesPanel"
+    :panel-id="panel.id"
   >
     <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
-      <XWikiIcon :icon-descriptor="{name: 'list-bullets'}"/>
-      {{ $t('livedata.panel.properties.title') }}
+      <XWikiIcon :icon-descriptor="{name: panel.icon}"/>
+      {{ panel.title }}
     </template>
 
     <!-- Define panel content inside the `body` slot -->
@@ -105,6 +105,8 @@ export default {
   },
 
   inject: ["logic"],
+
+  props: {'panel': Object},
 
   computed: {
     data () { return this.logic.data; },

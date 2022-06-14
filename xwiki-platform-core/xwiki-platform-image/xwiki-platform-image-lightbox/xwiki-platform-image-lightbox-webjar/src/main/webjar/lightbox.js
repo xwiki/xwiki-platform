@@ -95,8 +95,8 @@ define('xwiki-lightbox-description', [
 
     if (attachmentData.date) {
       // This should be updated after fixing XWIKI-19808: Proper javascript API to perform Date Formatting.
-      var dateFormat = moment().toMomentFormatString($('.lightboxDescription .date').attr('data-dateFormat'));
-      var timezone = $('.lightboxDescription .date').attr('data-userTimezone');
+      var dateFormat = moment().toMomentFormatString($('.lightboxDescription .date').data('dateFormat'));
+      var timezone = $('.lightboxDescription .date').data('userTimeZone');
       $('.lightboxDescription .date')
         .text(l10n.get('date', moment(attachmentData.date).tz(timezone).format(dateFormat)));
     }

@@ -39,8 +39,8 @@ import org.xwiki.script.service.ScriptService;
  */
 @Component
 @Singleton
-@Named("event")
-public class EventScriptService implements ScriptService
+@Named("eventstream")
+public class EventStreamScriptService implements ScriptService
 {
     @Inject
     private RecordableEventDescriptorManager recordableEventDescriptorManager;

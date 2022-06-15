@@ -31,21 +31,15 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.RecordableEventDescriptor;
-import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.eventstream.internal.LegacyEventMigrationJob;
 import org.xwiki.eventstream.internal.LegacyEventMigrationRequest;
-import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.query.QueryException;
-import org.xwiki.script.service.ScriptService;
 
 /**
  * Script services for the Event Stream Module.
@@ -56,13 +50,9 @@ import org.xwiki.script.service.ScriptService;
 @Component
 @Singleton
 @Named("eventstream")
-@Deprecated
-public class EventStreamScriptService implements ScriptService
+public class LegacyEventStreamScriptService extends EventStreamScriptService
 {
     private static final List<String> LEGACY_MIGRATOR_ID = Arrays.asList("event", "legacy", "migrator");
-
-    @Inject
-    private RecordableEventDescriptorManager recordableEventDescriptorManager;
 
     @Inject
     private JobExecutor jobs;
@@ -71,40 +61,12 @@ public class EventStreamScriptService implements ScriptService
     private JobStatusStore statuses;
 
     @Inject
-    private EventStore eventStore;
-
-    @Inject
     private ComponentManager componentManager;
 
     @Inject
     private Logger logger;
 
     private EventStream eventStream;
-
-    /**
-     * @param allWikis load the descriptors from all the wikis of the farm if true
-     * @return the list of the available RecordableEventDescriptors
-     * @throws EventStreamException if an error happens
-     * @since 9.5.1
-     * @since 9.6RC1
-     */
-    public List<RecordableEventDescriptor> getRecordableEventDescriptors(boolean allWikis) throws EventStreamException
-    {
-        return recordableEventDescriptorManager.getRecordableEventDescriptors(allWikis);
-    }
-
-    /**
-     * @param eventType the type of the event
-     * @param allWikis load the descriptors from all the wikis of the farm if true
-     * @return the corresponding RecordableEventDescriptor or null if no one matches
-     * @throws EventStreamException if an error happens
-     * @since 9.10RC1
-     */
-    public RecordableEventDescriptor getDescriptorForEventType(String eventType, boolean allWikis)
-        throws EventStreamException
-    {
-        return recordableEventDescriptorManager.getDescriptorForEventType(eventType, allWikis);
-    }
 
     /**
      * Get the status of the job responsible for copying legacy event in the new store.
@@ -158,16 +120,5 @@ public class EventStreamScriptService implements ScriptService
     public long getLegacyEventCount() throws QueryException
     {
         return getEventStream() != null ? this.eventStream.countEvents() : 0;
-    }
-
-    /**
-     * @return the total number of event in the store
-     * @throws EventStreamException when failing to query the number of events
-     * @since 12.6.1
-     * @since 12.7RC1
-     */
-    public long getEventCount() throws EventStreamException
-    {
-        return this.eventStore.search(new SimpleEventQuery(0, 0)).getTotalHits();
     }
 }

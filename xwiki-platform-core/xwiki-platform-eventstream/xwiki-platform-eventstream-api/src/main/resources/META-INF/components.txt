@@ -2,4 +2,4 @@ org.xwiki.eventstream.internal.DefaultEventFactory
 org.xwiki.eventstream.internal.DefaultEventStore
 org.xwiki.eventstream.internal.DefaultRecordableEventDescriptorManager
 org.xwiki.eventstream.internal.EventStreamConfiguration
-org.xwiki.eventstream.script.EventScriptService
+org.xwiki.eventstream.script.EventStreamScriptService

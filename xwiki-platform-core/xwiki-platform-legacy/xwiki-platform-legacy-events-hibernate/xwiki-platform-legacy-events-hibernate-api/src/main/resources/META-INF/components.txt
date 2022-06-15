@@ -1,5 +1,5 @@
 org.xwiki.eventstream.internal.LegacyEventMigrationJob
-org.xwiki.eventstream.script.EventStreamScriptService
+500:org.xwiki.eventstream.script.LegacyEventStreamScriptService
 org.xwiki.eventstream.store.internal.EventStreamCleaner
 org.xwiki.eventstream.store.internal.EventStreamCleanerJobDocumentInitializer
 org.xwiki.eventstream.store.internal.EventStreamStoreInitializer

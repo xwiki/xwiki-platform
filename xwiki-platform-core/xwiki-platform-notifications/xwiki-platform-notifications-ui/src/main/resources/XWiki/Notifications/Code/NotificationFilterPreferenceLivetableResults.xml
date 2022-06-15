@@ -213,7 +213,7 @@ $jsontool.serialize({
     &lt;li&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.allEvents'))&lt;/li&gt;
   #else
     #set ($types = {})
-    #foreach ($descriptor in $services.event.getRecordableEventDescriptors($xcontext.isMainWiki()))
+    #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
       #set ($discard = $types.put($descriptor.eventType, "$!services.localization.render($descriptor.description)"))
     #end
     #foreach ($eventType in $list)

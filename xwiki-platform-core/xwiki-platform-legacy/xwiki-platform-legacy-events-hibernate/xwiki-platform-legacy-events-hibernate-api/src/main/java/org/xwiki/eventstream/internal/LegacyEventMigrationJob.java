@@ -53,7 +53,6 @@ import org.xwiki.wiki.manager.WikiManagerException;
  */
 @Component
 @Named(LegacyEventMigrationJob.JOBTYPE)
-@Deprecated
 public class LegacyEventMigrationJob
     extends AbstractJob<LegacyEventMigrationRequest, DefaultJobStatus<LegacyEventMigrationRequest>>
 {

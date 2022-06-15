@@ -31,7 +31,6 @@ import org.xwiki.job.Request;
  * @version $Id$
  * @since 12.6
  */
-@Deprecated
 public class LegacyEventMigrationRequest extends AbstractRequest
 {
     /**

@@ -31,7 +31,6 @@ import org.xwiki.eventstream.EventStatus;
  * @since 12.1RC1
  */
 @Role
-@Deprecated
 public interface LegacyEventConverter
 {
     /**

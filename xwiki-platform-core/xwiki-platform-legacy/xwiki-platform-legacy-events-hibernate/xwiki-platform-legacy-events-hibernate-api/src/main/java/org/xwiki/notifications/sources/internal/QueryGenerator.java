@@ -40,7 +40,6 @@ import org.xwiki.query.QueryManager;
  */
 @Component(roles = QueryGenerator.class)
 @Singleton
-@Deprecated
 public class QueryGenerator
 {
     @Inject

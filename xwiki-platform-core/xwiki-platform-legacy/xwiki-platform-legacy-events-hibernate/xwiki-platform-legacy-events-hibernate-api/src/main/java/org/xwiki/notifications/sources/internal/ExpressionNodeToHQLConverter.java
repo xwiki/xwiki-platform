@@ -64,7 +64,6 @@ import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
  */
 @Component(roles = ExpressionNodeToHQLConverter.class)
 @Singleton
-@Deprecated
 public class ExpressionNodeToHQLConverter
 {
     /**

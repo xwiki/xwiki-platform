@@ -34,7 +34,6 @@ import java.io.Serializable;
  * @version $Id$
  */
 // The class must be Serializable or Hibernate won't accept it
-@Deprecated
 public class LegacyEventStatus implements Serializable
 {
     private LegacyEvent activityEvent;

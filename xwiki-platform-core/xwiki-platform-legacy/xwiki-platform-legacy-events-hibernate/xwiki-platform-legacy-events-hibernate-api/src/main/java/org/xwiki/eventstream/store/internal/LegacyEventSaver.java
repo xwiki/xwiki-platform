@@ -43,7 +43,6 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
  */
 @Component(roles = LegacyEventSaver.class)
 @Singleton
-@Deprecated
 public class LegacyEventSaver
 {
     @Inject

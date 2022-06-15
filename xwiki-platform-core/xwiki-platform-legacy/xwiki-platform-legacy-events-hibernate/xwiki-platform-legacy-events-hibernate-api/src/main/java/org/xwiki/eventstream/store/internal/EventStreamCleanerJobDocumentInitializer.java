@@ -51,7 +51,6 @@ import javax.inject.Singleton;
 @Component
 @Singleton
 @Named(EventStreamCleanerJobDocumentInitializer.CLEANER_JOB_NAME)
-@Deprecated
 public class EventStreamCleanerJobDocumentInitializer extends AbstractEventListener
 {
     /**

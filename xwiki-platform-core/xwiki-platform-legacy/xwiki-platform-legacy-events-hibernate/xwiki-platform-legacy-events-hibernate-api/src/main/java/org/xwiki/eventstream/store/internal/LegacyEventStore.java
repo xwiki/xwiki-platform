@@ -35,7 +35,6 @@ import org.xwiki.eventstream.EventStore;
 @Component
 @Singleton
 @Named("legacy")
-@Deprecated
 public class LegacyEventStore extends AbstractLegacyEventStore
 {
     @Override

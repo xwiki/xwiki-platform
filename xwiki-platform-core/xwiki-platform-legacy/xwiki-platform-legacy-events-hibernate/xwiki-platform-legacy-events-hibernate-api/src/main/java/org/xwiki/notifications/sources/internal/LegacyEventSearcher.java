@@ -42,7 +42,6 @@ import org.xwiki.query.QueryException;
  */
 @Component(roles = EventSearcher.class)
 @Singleton
-@Deprecated
 public class LegacyEventSearcher extends EventSearcher
 {
     @Inject

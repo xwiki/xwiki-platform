@@ -45,7 +45,6 @@ import org.xwiki.query.QueryManager;
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named(EventStreamWikiCleanerJob.JOB_TYPE)
-@Deprecated
 public class EventStreamWikiCleanerJob
     extends AbstractJob<EventStreamWikiCleanerJobRequest, DefaultJobStatus<EventStreamWikiCleanerJobRequest>>
 {

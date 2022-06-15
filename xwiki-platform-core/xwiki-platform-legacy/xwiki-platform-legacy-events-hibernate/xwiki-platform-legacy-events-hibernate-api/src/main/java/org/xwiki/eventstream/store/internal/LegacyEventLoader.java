@@ -43,7 +43,6 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  */
 @Component(roles = LegacyEventLoader.class)
 @Singleton
-@Deprecated
 public class LegacyEventLoader
 {
     @Inject

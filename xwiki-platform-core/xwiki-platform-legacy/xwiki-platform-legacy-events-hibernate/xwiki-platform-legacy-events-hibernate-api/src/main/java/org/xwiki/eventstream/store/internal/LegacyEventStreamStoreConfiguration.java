@@ -34,7 +34,6 @@ import org.xwiki.configuration.ConfigurationSource;
  */
 @Component(roles = LegacyEventStreamStoreConfiguration.class)
 @Singleton
-@Deprecated
 public class LegacyEventStreamStoreConfiguration
 {
     private static final String LEGACY_PREFERENCE_PREFIX = "xwiki.plugin.activitystream.";

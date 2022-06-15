@@ -44,7 +44,6 @@ import org.xwiki.query.QueryException;
  * @version $Id$
  * @since 12.5RC1
  */
-@Deprecated
 public abstract class AbstractLegacyEventStore extends AbstractAsynchronousEventStore
 {
     @Inject

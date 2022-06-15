@@ -42,7 +42,6 @@ import org.xwiki.eventstream.EventStatus;
  */
 @Component
 @Singleton
-@Deprecated
 public class DefaultLegacyEventConverter extends AbstractLegacyEventConverter
 {
     @Inject

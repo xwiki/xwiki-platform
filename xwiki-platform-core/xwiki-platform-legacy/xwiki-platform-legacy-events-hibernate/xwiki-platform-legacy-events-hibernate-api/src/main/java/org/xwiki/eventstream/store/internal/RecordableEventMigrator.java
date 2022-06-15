@@ -48,7 +48,6 @@ import java.util.List;
 @Component
 @Named("R93000RecordableEventMigrator")
 @Singleton
-@Deprecated
 public class RecordableEventMigrator extends AbstractHibernateDataMigration
 {
     @Inject

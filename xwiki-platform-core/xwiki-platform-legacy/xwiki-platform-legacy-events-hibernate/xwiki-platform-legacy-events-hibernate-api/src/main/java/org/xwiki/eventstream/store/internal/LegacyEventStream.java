@@ -40,7 +40,6 @@ import java.util.List;
  */
 @Component
 @Singleton
-@Deprecated
 public class LegacyEventStream implements EventStream
 {
     @Inject

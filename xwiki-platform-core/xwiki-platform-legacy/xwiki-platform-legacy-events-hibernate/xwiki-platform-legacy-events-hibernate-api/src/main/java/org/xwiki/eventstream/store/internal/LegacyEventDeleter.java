@@ -43,7 +43,6 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
  */
 @Component(roles = LegacyEventDeleter.class)
 @Singleton
-@Deprecated
 public class LegacyEventDeleter
 {
     @Inject

@@ -30,7 +30,6 @@ import com.xpn.xwiki.plugin.scheduler.AbstractJob;
  *
  * @version $Id$
  */
-@Deprecated
 public class EventStreamCleanerJob extends AbstractJob implements Job
 {
     @Override

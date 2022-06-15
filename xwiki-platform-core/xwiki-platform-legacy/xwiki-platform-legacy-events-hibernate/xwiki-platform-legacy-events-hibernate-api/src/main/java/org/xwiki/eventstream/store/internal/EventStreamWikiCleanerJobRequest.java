@@ -29,7 +29,6 @@ import org.xwiki.job.AbstractRequest;
  * @since 10.8.4
  * @version $Id$
  */
-@Deprecated
 public class EventStreamWikiCleanerJobRequest extends AbstractRequest
 {
     private static final String WIKI_ID = "wikiId";

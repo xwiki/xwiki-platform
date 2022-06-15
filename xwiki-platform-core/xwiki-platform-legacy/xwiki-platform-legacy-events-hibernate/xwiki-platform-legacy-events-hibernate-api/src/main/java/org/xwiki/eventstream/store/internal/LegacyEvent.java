@@ -30,7 +30,6 @@ import java.util.Set;
  * @version $Id$
  * @since 11.1RC1
  */
-@Deprecated
 public class LegacyEvent
 {
     /**

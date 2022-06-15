@@ -54,7 +54,6 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
  */
 @Component
 @Singleton
-@Deprecated
 public class LegacyEventStatusManager implements EventStatusManager
 {
     @Inject

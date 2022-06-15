@@ -34,7 +34,6 @@ import org.xwiki.component.phase.InitializationException;
 @Component
 @Singleton
 @Named("legacy/verbose")
-@Deprecated
 public class VerboseLegacyEventStore extends AbstractLegacyEventStore
 {
     @Override

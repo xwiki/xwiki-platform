@@ -48,7 +48,6 @@ import com.xpn.xwiki.util.Util;
 @Component
 @Named("EventStreamStoreInitializer")
 @Singleton
-@Deprecated
 public class EventStreamStoreInitializer implements EventListener
 {
     @Inject

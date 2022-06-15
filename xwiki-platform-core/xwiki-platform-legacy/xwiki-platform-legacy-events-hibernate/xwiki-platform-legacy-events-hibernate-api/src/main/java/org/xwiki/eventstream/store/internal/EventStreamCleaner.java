@@ -42,7 +42,6 @@ import org.xwiki.query.QueryManager;
  */
 @Component(roles = EventStreamCleaner.class)
 @Singleton
-@Deprecated
 public class EventStreamCleaner
 {
     @Inject

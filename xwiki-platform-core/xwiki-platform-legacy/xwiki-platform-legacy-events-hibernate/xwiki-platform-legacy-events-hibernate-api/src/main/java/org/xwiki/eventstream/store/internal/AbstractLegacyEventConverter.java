@@ -43,7 +43,6 @@ import org.xwiki.model.reference.WikiReference;
  * @since 12.1RC1
  * @version $Id$
  */
-@Deprecated
 public abstract class AbstractLegacyEventConverter implements LegacyEventConverter
 {
     /** Needed for creating raw events. */

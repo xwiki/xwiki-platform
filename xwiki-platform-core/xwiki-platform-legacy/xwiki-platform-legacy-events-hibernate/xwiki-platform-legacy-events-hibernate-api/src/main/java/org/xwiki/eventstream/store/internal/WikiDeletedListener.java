@@ -43,7 +43,6 @@ import java.util.Arrays;
 @Component
 @Named(WikiDeletedListener.NAME)
 @Singleton
-@Deprecated
 public class WikiDeletedListener extends AbstractEventListener
 {
     /**

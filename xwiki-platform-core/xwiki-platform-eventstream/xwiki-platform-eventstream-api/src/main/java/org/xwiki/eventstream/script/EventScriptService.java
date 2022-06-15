@@ -35,7 +35,7 @@ import org.xwiki.script.service.ScriptService;
  * Script services for the Event Stream Module.
  *
  * @version $Id$
- * @since 9.2RC1
+ * @since 14.6RC1
  */
 @Component
 @Singleton
@@ -49,8 +49,6 @@ public class EventScriptService implements ScriptService
      * @param allWikis load the descriptors from all the wikis of the farm if true
      * @return the list of the available RecordableEventDescriptors
      * @throws EventStreamException if an error happens
-     * @since 9.5.1
-     * @since 9.6RC1
      */
     public List<RecordableEventDescriptor> getRecordableEventDescriptors(boolean allWikis) throws EventStreamException
     {
@@ -62,7 +60,6 @@ public class EventScriptService implements ScriptService
      * @param allWikis load the descriptors from all the wikis of the farm if true
      * @return the corresponding RecordableEventDescriptor or null if no one matches
      * @throws EventStreamException if an error happens
-     * @since 9.10RC1
      */
     public RecordableEventDescriptor getDescriptorForEventType(String eventType, boolean allWikis)
         throws EventStreamException

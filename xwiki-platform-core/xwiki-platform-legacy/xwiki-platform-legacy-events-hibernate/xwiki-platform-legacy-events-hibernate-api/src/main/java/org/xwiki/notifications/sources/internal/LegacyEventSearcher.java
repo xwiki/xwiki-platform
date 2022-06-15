@@ -38,7 +38,7 @@ import org.xwiki.query.QueryException;
  * Search {@link Event}.
  * 
  * @version $Id$
- * @since 12.5RC1
+ * @since 14.6RC1
  */
 @Component(roles = EventSearcher.class)
 @Singleton

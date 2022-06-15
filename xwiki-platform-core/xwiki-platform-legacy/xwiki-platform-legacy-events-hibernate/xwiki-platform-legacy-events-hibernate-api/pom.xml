@@ -38,7 +38,7 @@
           org.xwiki.platform:xwiki-platform-eventstream-store
           org.xwiki.platform:xwiki-platform-eventstream-store-hibernate
 
-          <!-- Impossible to have both xwiki-platform-legacy-eventstream-store-hibernate and xwiki-platform-activitystream-api
+          <!-- Impossible to have both xwiki-platform-legacy-events-hibernate-api and xwiki-platform-activitystream-api
                because they use the same table name (activitystream_events) -->
           org.xwiki.platform:xwiki-platform-activitystream-api
         </xwiki.extension.features>

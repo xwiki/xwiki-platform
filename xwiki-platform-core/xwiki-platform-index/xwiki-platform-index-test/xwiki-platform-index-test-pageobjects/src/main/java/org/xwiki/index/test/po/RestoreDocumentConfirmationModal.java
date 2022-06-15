@@ -27,8 +27,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the actions possible on the restore document confirmation modal. The modal is displayed on the Deleted
  * Pages tab from the Page Index when restoring a document after delete and recreation.
  *
- * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 public class RestoreDocumentConfirmationModal extends ConfirmationModal
@@ -42,6 +41,7 @@ public class RestoreDocumentConfirmationModal extends ConfirmationModal
     {
         getDriver().findElementWithoutWaiting(this.container,
             By.cssSelector(".modal-footer .btn-primary, .modal-footer .btn-danger")).click();
+        // We need to wait for the deletion of the old page before the redirect to the restored one will occur.
         getDriver().waitUntilPageIsReloaded();
         return new ViewPage();
     }

@@ -126,13 +126,13 @@
   <dt #if ($hidden) class="hidden"#end>
     <label>
       <input type="checkbox" name="autoRedirect" value="true" #if ($checked)checked="checked"#end />
-      $services.localization.render($options.label)
+      $escapetool.xml($services.localization.render($options.label))
     </label>
     ## The value submitted when the checkbox is not checked, used to preserve the form state.
     <input type="hidden" name="autoRedirect" value="false" />
   </dt>
   <dd #if ($hidden) class="hidden"#end>
-    <span class="xHint">$services.localization.render($options.hint)</span>
+    <span class="xHint">$escapetool.xml($services.localization.render($options.hint))</span>
   </dd>
 #end
 

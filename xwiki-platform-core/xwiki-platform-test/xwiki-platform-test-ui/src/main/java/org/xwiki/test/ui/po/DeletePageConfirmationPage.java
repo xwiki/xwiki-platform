@@ -71,17 +71,17 @@ public class DeletePageConfirmationPage extends ConfirmationPage
     /**
      * Toggle the backlinks panel
      *
-     * @since 14.4.1
+     * @since 14.4.2
      * @since 14.5RC1
      */
-    public void toggleBacklinksPanel()
+    public void toggleBacklinksPane()
     {
         getDriver().findElement(By.cssSelector("#delete .pull-right a[href='#panel-backlinks']")).click();
     }
 
     /**
      * @return {@code true} if a new target document was selected, {@code false} if the field is empty
-     * @since 14.4.1
+     * @since 14.4.2
      * @since 14.5RC1
      */
     public boolean hasNewBacklinkTargetAdded()
@@ -91,7 +91,7 @@ public class DeletePageConfirmationPage extends ConfirmationPage
 
     /**
      * @param target the new target document
-     * @since 14.4.1
+     * @since 14.4.2
      * @since 14.5RC1
      */
     public void setNewBacklinkTarget(String target)
@@ -103,7 +103,7 @@ public class DeletePageConfirmationPage extends ConfirmationPage
 
     /**
      * @return {@code true} if the backlinks to this document will be updated after delete, {@code false} otherwise
-     * @since 14.4.1
+     * @since 14.4.2
      * @since 14.5RC1
      */
     public boolean isUpdateLinks()
@@ -114,7 +114,7 @@ public class DeletePageConfirmationPage extends ConfirmationPage
     /**
      * @param updateLinks {@code true} if the backlinks to this document should be updated after delete, {@code false}
      *            otherwise
-     * @since 14.4.1
+     * @since 14.4.2
      * @since 14.5RC1
      */
     public void setUpdateLinks(boolean updateLinks)
@@ -126,7 +126,7 @@ public class DeletePageConfirmationPage extends ConfirmationPage
 
     /**
      * @return {@code true} if a redirect will be added for this document after delete, {@code false} otherwise
-     * @since 14.4.1
+     * @since 14.4.2
      * @since 14.5RC1
      */
     public boolean isAutoRedirect()
@@ -137,7 +137,7 @@ public class DeletePageConfirmationPage extends ConfirmationPage
     /**
      * @param autoRedirect {@code true} if a redirect should be added for this document after delete, {@code false}
      *            otherwise
-     * @since 14.4.1
+     * @since 14.4.2
      * @since 14.5RC1
      */
     public void setAutoRedirect(boolean autoRedirect)

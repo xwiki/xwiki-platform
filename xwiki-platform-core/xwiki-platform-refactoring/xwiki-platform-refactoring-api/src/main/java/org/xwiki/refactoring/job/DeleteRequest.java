@@ -24,9 +24,8 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Job request for deleting a page.
- * 
- * @version $Id$
- * @since 14.4.1
+ *
+ * @since 14.4.2
  * @since 14.5RC1
  */
 @Unstable
@@ -71,7 +70,7 @@ public class DeleteRequest extends EntityRequest
 
     /**
      * Sets whether the document should be send to the recycle bin or removed permanently.
-     * 
+     *
      * @param shouldSkipRecycleBin {@code true} if the document should be removed permanently, {@code false} if it
      *            should be send to recycle bin
      */
@@ -154,7 +153,7 @@ public class DeleteRequest extends EntityRequest
     /**
      * Sets whether the original pages should be redirected automatically to the new specified location when accessed by
      * the user, in order to preserve external links.
-     * 
+     *
      * @param autoRedirect {@code true} to automatically redirect the old pages to the new target, {@code false}
      *            otherwise
      */

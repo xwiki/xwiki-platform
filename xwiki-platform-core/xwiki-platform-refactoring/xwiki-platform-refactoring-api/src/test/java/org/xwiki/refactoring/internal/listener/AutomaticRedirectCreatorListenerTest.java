@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link AutomaticRedirectCreatorListener}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest

@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -39,7 +40,6 @@ import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -69,7 +69,9 @@ public class DeleteAction extends XWikiAction
 
     protected static final String EMPTY_RECYCLE_BIN = "emptybin";
 
-    private DocumentReferenceResolver<String> currentReferenceDocumentReferenceResolver;
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<String> currentStringDocumentReferenceResolver;
 
     private boolean isAsync(XWikiRequest request)
     {
@@ -164,7 +166,7 @@ public class DeleteAction extends XWikiAction
             // document is sent to the recycle bin.
             boolean shouldSkipRecycleBin =
                 Boolean.parseBoolean(request.getParameter(DeleteRequest.SHOULD_SKIP_RECYCLE_BIN));
-            DocumentReference newBacklinkTarget = getCurrentStringDocumentReferenceResolver()
+            DocumentReference newBacklinkTarget = currentStringDocumentReferenceResolver
                 .resolve(request.getParameter(DeleteRequest.NEW_BACKLINK_TARGET));
             boolean updateLinks = Boolean.parseBoolean(request.getParameter(DeleteRequest.UPDATE_LINKS));
             boolean autoRedirect = Boolean.parseBoolean(request.getParameter(DeleteRequest.AUTO_REDIRECT));
@@ -333,21 +335,5 @@ public class DeleteAction extends XWikiAction
         } catch (JobException e) {
             throw new XWikiException(String.format("Failed to schedule the delete job for [%s]", entityReference), e);
         }
-    }
-
-    /**
-     * @return the current document reference resolver to be used to resolve a string document into a
-     *         {@link org.xwiki.model.reference.DocumentReference}
-     * @since 14.4.1
-     * @since 14.5RC1
-     */
-    private DocumentReferenceResolver<String> getCurrentStringDocumentReferenceResolver()
-    {
-        if (this.currentReferenceDocumentReferenceResolver == null) {
-            this.currentReferenceDocumentReferenceResolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        }
-
-        return this.currentReferenceDocumentReferenceResolver;
     }
 }

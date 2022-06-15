@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 require(['jquery'], function($) {
-  $('#delete #newBacklinkTarget').on('keyup change', function() {
+  $(document).on('keyup change', '#delete #newBacklinkTarget', function() {
     let updateLinksContainer = $("#delete input[name=updateLinks]").closest('dt');
     let autoRedirectContainer = $("#delete input[name=autoRedirect]").closest('dt');
     let elements = updateLinksContainer.add(updateLinksContainer.next('dd'))

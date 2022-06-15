@@ -233,12 +233,14 @@
     #end
     #define($body)
       <p class="noitems">
-        $services.localization.render('core.delete.backlinksInfo', [$doc.backlinks.size()])
+        $escapetool.xml($services.localization.render('core.delete.backlinksInfo', [$doc.backlinks.size()]))
       </p>
       <dl>
         <dt>
-          <label for="newBacklinkTarget">$services.localization.render('core.delete.backlinkTarget.label')</label>
-          <span class="xHint">$services.localization.render('core.delete.backlinkTarget.hint')</span>
+          <label for="newBacklinkTarget">
+            $escapetool.xml($services.localization.render('core.delete.backlinkTarget.label'))
+          </label>
+          <span class="xHint">$escapetool.xml($services.localization.render('core.delete.backlinkTarget.hint'))</span>
         </dt>
         <dd>
           #set ($pagePickerParams = {

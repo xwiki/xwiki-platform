@@ -35,7 +35,7 @@ import org.xwiki.script.service.ScriptService;
  * Script services for the Event Stream Module.
  *
  * @version $Id$
- * @since 14.6RC1
+ * @since 9.2RC1
  */
 @Component
 @Singleton

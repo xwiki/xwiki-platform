@@ -48,7 +48,7 @@ public class DistributionPing
     }
 
     /**
-     * @return the list of Extensions installed (and their versions) in the current XWiki instance
+     * @return the current XWiki distribution (as an Extension)
      */
     public ExtensionPing getExtension()
     {

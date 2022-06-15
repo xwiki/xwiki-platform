@@ -43,7 +43,7 @@
 ## Get all event types and group them by applications
 ##
 #set ($types = [])
-#foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
+#foreach ($descriptor in $services.event.getRecordableEventDescriptors($xcontext.isMainWiki()))
   #set ($discard = $types.add({
     'applicationName' : "$!services.localization.render($descriptor.applicationName)",
     'applicationIcon' : "$!services.icon.renderHTML($descriptor.applicationIcon)",

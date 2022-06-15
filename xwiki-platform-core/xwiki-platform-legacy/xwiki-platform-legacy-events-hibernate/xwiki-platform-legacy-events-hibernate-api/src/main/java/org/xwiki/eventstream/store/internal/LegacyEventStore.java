@@ -17,48 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.messagestream;
+package org.xwiki.eventstream.store.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.eventstream.EventStore;
 
 /**
- * Descriptor for the personal messages (to the followers).
- *
+ * The default implementation of {@link EventStore} dispatching the event in the various enabled stores.
+ * 
  * @version $Id$
- * @since 10.5RC1
- * @since 9.11.6
+ * @since 12.4RC1
  */
 @Component
-@Named(PersonalMessageDescriptor.EVENT_TYPE)
 @Singleton
-public class PersonalMessageDescriptor extends AbstractMessageDescriptor
+@Named("legacy")
+@Deprecated
+public class LegacyEventStore extends AbstractLegacyEventStore
 {
-    /**
-     * Event type described by this descriptor.
-     */
-    public static final String EVENT_TYPE = "personalMessage";
-
-    /**
-     * Construct a PersonalMessageDescriptor.
-     */
-    public PersonalMessageDescriptor()
-    {
-        super("messagestream.descriptors.personalMessage.description");
-    }
-
     @Override
-    public String getEventType()
+    public void initialize() throws InitializationException
     {
-        return EVENT_TYPE;
-    }
-
-    @Override
-    public String getEventTypeIcon()
-    {
-        return "user";
+        initialize(100, false, false);
     }
 }

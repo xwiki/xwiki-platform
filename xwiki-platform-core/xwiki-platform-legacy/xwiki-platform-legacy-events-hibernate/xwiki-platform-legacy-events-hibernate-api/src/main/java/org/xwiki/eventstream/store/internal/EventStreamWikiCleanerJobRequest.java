@@ -17,48 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.messagestream;
+package org.xwiki.eventstream.store.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
+import org.xwiki.job.AbstractRequest;
 
 /**
- * Descriptor for the personal messages (to the followers).
+ * Request for the creation of a {@link EventStreamWikiCleanerJob}.
  *
+ * @since 11.3RC1
+ * @since 10.11.4
+ * @since 10.8.4
  * @version $Id$
- * @since 10.5RC1
- * @since 9.11.6
  */
-@Component
-@Named(PersonalMessageDescriptor.EVENT_TYPE)
-@Singleton
-public class PersonalMessageDescriptor extends AbstractMessageDescriptor
+@Deprecated
+public class EventStreamWikiCleanerJobRequest extends AbstractRequest
 {
-    /**
-     * Event type described by this descriptor.
-     */
-    public static final String EVENT_TYPE = "personalMessage";
+    private static final String WIKI_ID = "wikiId";
 
     /**
-     * Construct a PersonalMessageDescriptor.
+     * Create a request for the given wiki.
+     * @param wikiId the id of the wiki for which the event stream need to clean events
      */
-    public PersonalMessageDescriptor()
+    public EventStreamWikiCleanerJobRequest(String wikiId)
     {
-        super("messagestream.descriptors.personalMessage.description");
+        setWikiId(wikiId);
     }
 
-    @Override
-    public String getEventType()
+    /**
+     * @param wikiId the id of the wiki for which the event stream need to clean events
+     */
+    public void setWikiId(String wikiId)
     {
-        return EVENT_TYPE;
+        setProperty(WIKI_ID, wikiId);
     }
 
-    @Override
-    public String getEventTypeIcon()
+    /**
+     * @return the id of the wiki for which the event stream need to clean events
+     */
+    public String getWikiId()
     {
-        return "user";
+        return getProperty(WIKI_ID);
     }
 }

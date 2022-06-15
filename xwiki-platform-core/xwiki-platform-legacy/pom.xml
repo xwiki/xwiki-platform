@@ -40,12 +40,12 @@
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-legacy-annotation</module>
-    <module>xwiki-platform-legacy-eventstream</module>
+    <module>xwiki-platform-legacy-events-hibernate</module>
     <module>xwiki-platform-legacy-instance</module>
     <module>xwiki-platform-legacy-mail</module>
     <module>xwiki-platform-legacy-mentions</module>
     <module>xwiki-platform-legacy-model-api</module>
-    <module>xwiki-platform-legacy-notification-activitymacro</module>
+    <module>xwiki-platform-legacy-notifications</module>
     <module>xwiki-platform-legacy-observation</module>
     <module>xwiki-platform-legacy-office</module>
     <module>xwiki-platform-legacy-oldcore</module>

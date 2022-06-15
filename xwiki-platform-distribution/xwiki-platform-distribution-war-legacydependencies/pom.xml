@@ -241,12 +241,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-legacy-eventstream-store-hibernate</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-legacy-mentions-notifications</artifactId>
+      <artifactId>xwiki-platform-legacy-events-hibernate-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

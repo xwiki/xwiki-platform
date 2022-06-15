@@ -1,4 +1,6 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,43 +18,21 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.messagestream;
+-->
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-legacy</artifactId>
+    <version>14.5-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-legacy-notifications</artifactId>
+  <name>XWiki Platform - Legacy - Notifications</name>
+  <packaging>pom</packaging>
+  <description>Legacy package for xwiki-platform-eventstream</description>
+  <modules>
+    <module>xwiki-platform-legacy-notification-activitymacro</module>
+  </modules>
+</project>
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
-
-/**
- * Descriptor for the direct messages.
- *
- * @version $Id$
- * @since 10.5RC1
- * @since 9.11.6
- */
-@Component
-@Named(DirectMessageDescriptor.EVENT_TYPE)
-@Singleton
-public class DirectMessageDescriptor extends AbstractMessageDescriptor
-{
-    /**
-     * Event type described by this descriptor.
-     */
-    public static final String EVENT_TYPE = "directMessage";
-
-    /**
-     * Construct a DirectMessageDescriptor.
-     */
-    public DirectMessageDescriptor()
-    {
-        super("messagestream.descriptors.directMessage.description");
-    }
-
-    @Override
-    public String getEventType()
-    {
-        return EVENT_TYPE;
-    }
-}

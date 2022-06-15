@@ -15,6 +15,7 @@ org.xwiki.eventstream.store.internal.LegacyEventStreamStoreConfiguration
 org.xwiki.eventstream.store.internal.RecordableEventMigrator
 org.xwiki.eventstream.store.internal.VerboseLegacyEventStore
 org.xwiki.eventstream.store.internal.WikiDeletedListener
+org.xwiki.mentions.internal.MentionsLegacyEventConverter
 org.xwiki.notifications.sources.internal.ExpressionNodeToHQLConverter
 500:org.xwiki.notifications.sources.internal.LegacyEventSearcher
 org.xwiki.notifications.sources.internal.QueryGenerator

@@ -126,7 +126,7 @@
                  Single justification example:
             -->
             <revapi.differences>
-              <justification>Move to a legacy module</justification>
+              <justification>Moved to a legacy module</justification>
               <criticality>allowed</criticality>
               <differences>
                 <item>

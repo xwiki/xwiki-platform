@@ -19,6 +19,9 @@
  */
 package org.xwiki.refactoring.internal.listener;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -26,7 +29,6 @@ import org.mockito.Mock;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.job.JobContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.internal.job.DeleteJob;
@@ -40,6 +42,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -84,8 +87,7 @@ class AutomaticRedirectCreatorListenerTest
     {
         when(this.jobContext.getCurrentJob()).thenReturn(deleteJob);
         when(this.deleteJob.getRequest()).thenReturn(deleteRequest);
-        deleteRequest.setNewBacklinkTarget(newReference);
-        when(this.deleteJob.getCommonParent()).thenReturn(oldReference);
+        deleteRequest.setNewBacklinkTargets(Collections.singletonMap(oldReference, newReference));
     }
 
     @Test
@@ -136,16 +138,14 @@ class AutomaticRedirectCreatorListenerTest
     }
 
     @Test
-    void onDocumentDeletedWithAutomaticRedirectOnChildDoc()
+    void onDocumentDeletedWithAutomaticRedirectOnDocWithoutNewTarget()
     {
+        DocumentReference docReference = new DocumentReference("wiki", "Users", "Carol");
         deleteRequest.setAutoRedirect(true);
 
-        SpaceReference parentReference = new SpaceReference("wiki", "Users");
-        when(this.deleteJob.getCommonParent()).thenReturn(parentReference);
+        this.listener.onEvent(new DocumentDeletedEvent(docReference), null, null);
 
-        this.listener.onEvent(documentDeletedEvent, null, null);
-
-        verify(this.modelBridge, never()).createRedirect(any(), any());
+        verify(this.modelBridge, never()).createRedirect(eq(docReference), any(DocumentReference.class));
     }
 
     @Test

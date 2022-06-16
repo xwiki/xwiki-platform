@@ -166,8 +166,8 @@ public class DeleteAction extends XWikiAction
             // document is sent to the recycle bin.
             boolean shouldSkipRecycleBin =
                 Boolean.parseBoolean(request.getParameter(DeleteRequest.SHOULD_SKIP_RECYCLE_BIN));
-            DocumentReference newBacklinkTarget = currentStringDocumentReferenceResolver
-                .resolve(request.getParameter(DeleteRequest.NEW_BACKLINK_TARGET));
+            DocumentReference newBacklinkTarget =
+                currentStringDocumentReferenceResolver.resolve(request.getParameter("newBacklinkTarget"));
             boolean updateLinks = Boolean.parseBoolean(request.getParameter(DeleteRequest.UPDATE_LINKS));
             boolean autoRedirect = Boolean.parseBoolean(request.getParameter(DeleteRequest.AUTO_REDIRECT));
             return deleteDocument(context, shouldSkipRecycleBin, newBacklinkTarget, updateLinks, autoRedirect);
@@ -325,7 +325,8 @@ public class DeleteAction extends XWikiAction
         deleteRequest.setInteractive(isAsync(context.getRequest()));
         deleteRequest.setCheckAuthorRights(false);
         deleteRequest.setShouldSkipRecycleBin(shouldSkipRecycleBin);
-        deleteRequest.setNewBacklinkTarget(newBacklinkTarget);
+        deleteRequest.setNewBacklinkTargets(Collections.singletonMap(context.getDoc().getDocumentReference(),
+            newBacklinkTarget));
         deleteRequest.setUpdateLinks(updateLinks);
         deleteRequest.setAutoRedirect(autoRedirect);
 

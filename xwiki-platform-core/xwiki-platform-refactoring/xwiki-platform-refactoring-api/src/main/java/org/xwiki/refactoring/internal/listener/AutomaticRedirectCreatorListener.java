@@ -27,11 +27,8 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.JobContext;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.observation.event.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.ModelBridge;
@@ -93,26 +90,14 @@ public class AutomaticRedirectCreatorListener extends AbstractLocalEventListener
             DeleteJob job = (DeleteJob) this.jobContext.getCurrentJob();
             DeleteRequest request = (DeleteRequest) job.getRequest();
             DocumentDeletedEvent documentDeletedEvent = (DocumentDeletedEvent) event;
+            DocumentReference newTarget =
+                request.getNewBacklinkTargets().get(documentDeletedEvent.getDocumentReference());
 
-            // For case when the delete affects also the child pages, only the root document should have a redirect
-            // created.
-            if (request.isAutoRedirect()
-                && isRootDoc(job.getCommonParent(), documentDeletedEvent.getDocumentReference())) {
+            if (request.isAutoRedirect() && newTarget != null) {
                 this.logger.info(CREATING_AUTOMATIC_REDIRECT_FROM_TO, documentDeletedEvent.getDocumentReference(),
-                    request.getNewBacklinkTarget());
-                this.modelBridge.createRedirect(documentDeletedEvent.getDocumentReference(),
-                    request.getNewBacklinkTarget());
+                    newTarget);
+                this.modelBridge.createRedirect(documentDeletedEvent.getDocumentReference(), newTarget);
             }
         }
-    }
-
-    private boolean isRootDoc(EntityReference commonParent, DocumentReference deletedDocReference)
-    {
-        if (commonParent.getType() == EntityType.SPACE) {
-            DocumentReference spaceWebHomeReference =
-                new DocumentReference("WebHome", new SpaceReference(commonParent));
-            return spaceWebHomeReference.equals(deletedDocReference);
-        }
-        return true;
     }
 }

@@ -27,6 +27,7 @@ import org.xwiki.stability.Unstable;
 /**
  * Job request for deleting a page.
  *
+ * @version $Id$
  * @since 14.4.2
  * @since 14.5RC1
  */

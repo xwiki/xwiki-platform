@@ -27,6 +27,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the actions possible on the restore document confirmation modal. The modal is displayed on the Deleted
  * Pages tab from the Page Index when restoring a document after delete and recreation.
  *
+ * @version $Id$
  * @since 14.4.2
  * @since 14.5RC1
  */

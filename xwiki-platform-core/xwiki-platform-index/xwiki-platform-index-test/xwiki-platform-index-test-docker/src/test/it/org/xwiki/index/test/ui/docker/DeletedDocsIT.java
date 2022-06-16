@@ -37,6 +37,7 @@ import org.xwiki.test.ui.po.ViewPage;
 /**
  * Tests for Deleted Pages tab from Page Index (XWiki.AllDocs).
  *
+ * @version $Id$
  * @since 14.4.2
  * @since 14.5RC1
  */

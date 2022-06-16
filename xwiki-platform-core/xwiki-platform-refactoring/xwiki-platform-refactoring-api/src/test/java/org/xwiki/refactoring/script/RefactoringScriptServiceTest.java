@@ -40,6 +40,7 @@ import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.job.AbstractCopyOrMoveRequest;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
+import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
@@ -224,7 +225,7 @@ class RefactoringScriptServiceTest
     {
         WikiReference source = new WikiReference("math");
 
-        EntityRequest deleteRequest = new EntityRequest();
+        DeleteRequest deleteRequest = new DeleteRequest();
         this.fillEntityRequest(deleteRequest);
         when(this.requestFactory.createDeleteRequest(Arrays.asList(source))).thenReturn(deleteRequest);
 

@@ -215,6 +215,22 @@ public class LiveTableElement extends BaseElement
     }
 
     /**
+     * Get the row index of an element.
+     *
+     * @param by the selector of the searched element
+     * @return the row index where the element was found
+     * @since 14.4.2
+     * @since 14.5RC1
+     */
+    public int getRowNumberForElement(By by)
+    {
+        WebElement livetableRowElement =
+            getDriver().findElement(By.xpath("//tbody[@id='" + this.livetableId + "-display']/tr/td")).findElement(by);
+        return Integer
+            .parseInt(livetableRowElement.findElement(By.xpath("./ancestor::tr[1]")).getAttribute("data-index"));
+    }
+
+    /**
      * @since 5.3RC1
      */
     public WebElement getCell(WebElement rowElement, int columnNumber)

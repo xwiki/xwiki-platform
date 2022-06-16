@@ -255,14 +255,18 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
      * @param wikiReference the wiki to look for owner
      * @return a reference to the owner of the wiki or {@code null}
      */
-    private DocumentReference getWikiOwner(WikiReference wikiReference)
+    private DocumentReference getWikiOwner(WikiReference wikiReference) throws AuthorizationException
     {
         XWikiContext context = this.xcontextProvider.get();
-        String wikiOwner;
+        String wikiOwner = null;
         try {
             wikiOwner = context.getWiki().getWikiOwner(wikiReference.getName(), context);
         } catch (XWikiException e) {
-            wikiOwner = null;
+            if (e.getModule() != XWikiException.MODULE_XWIKI
+                || e.getCode() != XWikiException.ERROR_XWIKI_DOES_NOT_EXIST) {
+                throw new AuthorizationException(wikiReference,
+                    String.format("Could not retrieve the owner of the wiki [%s]", wikiReference.getName()), e);
+            }
         }
 
         if (wikiOwner == null) {

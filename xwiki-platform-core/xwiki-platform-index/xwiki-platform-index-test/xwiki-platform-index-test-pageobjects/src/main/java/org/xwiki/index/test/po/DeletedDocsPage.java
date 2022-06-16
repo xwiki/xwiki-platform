@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the actions possible on the Deleted Pages page.
  *
  * @version $Id$
- * @since 14.4.1
+ * @since 14.4.2
  * @since 14.5RC1
  */
 public class DeletedDocsPage extends ViewPage

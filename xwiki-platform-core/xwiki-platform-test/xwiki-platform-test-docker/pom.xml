@@ -37,6 +37,21 @@
          Spoon pass on it. -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
+  <dependencyManagement>
+    <!-- Force our version of Selenium (so that the one coming from TC isn't used for example) -->
+    <dependencies>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-chrome-driver</artifactId>
+        <version>${selenium.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-remote-driver</artifactId>
+        <version>${selenium.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

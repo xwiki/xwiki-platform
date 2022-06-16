@@ -19,7 +19,6 @@
  */
 package org.xwiki.refactoring.internal.listener;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;

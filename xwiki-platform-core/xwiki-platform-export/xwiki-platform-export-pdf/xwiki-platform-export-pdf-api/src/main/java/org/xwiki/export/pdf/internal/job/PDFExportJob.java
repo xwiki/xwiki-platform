@@ -21,6 +21,7 @@ package org.xwiki.export.pdf.internal.job;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -70,7 +71,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
 
     @Inject
     @Named("docker")
-    private PDFPrinter<PDFExportJobRequest> pdfPrinter;
+    private PDFPrinter<URL> pdfPrinter;
 
     @Inject
     private TemporaryResourceStore temporaryResourceStore;
@@ -144,7 +145,8 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
 
     private void saveAsPDF() throws IOException
     {
-        try (InputStream pdfContent = this.pdfPrinter.print(this.request)) {
+        URL printPreviewURL = (URL) this.request.getContext().get("request.url");
+        try (InputStream pdfContent = this.pdfPrinter.print(printPreviewURL)) {
             this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
         }
     }

@@ -20,8 +20,10 @@
 package org.xwiki.export.pdf.internal.job;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Named;
@@ -76,7 +78,7 @@ class PDFExportJobTest
 
     @MockComponent
     @Named("docker")
-    private PDFPrinter<PDFExportJobRequest> pdfPrinter;
+    private PDFPrinter<URL> pdfPrinter;
 
     @MockComponent
     private TemporaryResourceStore temporaryResourceStore;
@@ -105,6 +107,7 @@ class PDFExportJobTest
         DocumentReference fourthPageReference = new DocumentReference("test", "Fourth", "Page");
         when(this.authorization.hasAccess(Right.VIEW, this.bobReference, fourthPageReference)).thenReturn(true);
 
+        this.request.setContext(new HashMap<>());
         this.request.setCheckRights(true);
         this.request.setCheckAuthorRights(true);
         this.request.setUserReference(this.aliceReference);
@@ -128,7 +131,9 @@ class PDFExportJobTest
         when(this.requiredSkinExtensionsRecorder.stop()).thenReturn("required skin extensions");
 
         InputStream pdfContent = mock(InputStream.class);
-        when(this.pdfPrinter.print(this.request)).thenReturn(pdfContent);
+        URL printPreviewURL = new URL("http://www.xwiki.org");
+        this.request.getContext().put("request.url", printPreviewURL);
+        when(this.pdfPrinter.print(printPreviewURL)).thenReturn(pdfContent);
 
         this.pdfExportJob.initialize(this.request);
         this.pdfExportJob.runInternal();

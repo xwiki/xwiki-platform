@@ -21,23 +21,16 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
-import org.xwiki.component.phase.Disposable;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.store.TemporaryAttachmentException;
@@ -49,66 +42,23 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
 /**
  * Default implementation of {@link TemporaryAttachmentSessionsManager}.
- * Note that this component also implements {@link HttpSessionListener} so that the cache is properly clean up whenever
- * a session is destroyed.
  *
  * @version $Id$
  * @since 14.3RC1
  */
 @Component
 @Singleton
-public class DefaultTemporaryAttachmentSessionsManager
-    implements TemporaryAttachmentSessionsManager, Initializable, Disposable,
-    HttpSessionListener
+public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttachmentSessionsManager
 {
-    private Map<String, TemporaryAttachmentSession> temporaryAttachmentSessionMap;
+    private static final String ATTRIBUTE_KEY = "xwikiTemporaryAttachments";
 
     @Inject
     private Provider<XWikiContext> contextProvider;
 
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.temporaryAttachmentSessionMap = new ConcurrentHashMap<>();
-    }
-
-    @Override
-    public void dispose() throws ComponentLifecycleException
-    {
-        this.temporaryAttachmentSessionMap.values().forEach(TemporaryAttachmentSession::dispose);
-    }
-
-    @Override
-    public void sessionCreated(HttpSessionEvent httpSessionEvent)
-    {
-        // Nothing should be done here.
-    }
-
-    /**
-     * Accessor to the map of temporary attachment sessions. Mainly for test purpose.
-     *
-     * @return the map of temporary attachment session.
-     */
-    protected Map<String, TemporaryAttachmentSession> getTemporaryAttachmentSessionMap()
-    {
-        return temporaryAttachmentSessionMap;
-    }
-
-    private String getSessionId()
+    private HttpSession getSession()
     {
         XWikiContext context = this.contextProvider.get();
-        return context.getRequest().getSession().getId();
-    }
-
-    @Override
-    public void sessionDestroyed(HttpSessionEvent httpSessionEvent)
-    {
-        String sessionId = httpSessionEvent.getSession().getId();
-        if (this.temporaryAttachmentSessionMap.containsKey(sessionId)) {
-            TemporaryAttachmentSession temporaryAttachmentSession =
-                this.temporaryAttachmentSessionMap.remove(sessionId);
-            temporaryAttachmentSession.dispose();
-        }
+        return context.getRequest().getSession();
     }
 
     private long getUploadMaxSize(DocumentReference documentReference)
@@ -123,12 +73,11 @@ public class DefaultTemporaryAttachmentSessionsManager
     private TemporaryAttachmentSession getOrCreateSession()
     {
         TemporaryAttachmentSession temporaryAttachmentSession;
-        String sessionId = getSessionId();
-        if (this.temporaryAttachmentSessionMap.containsKey(sessionId)) {
-            temporaryAttachmentSession = this.temporaryAttachmentSessionMap.get(sessionId);
-        } else {
-            temporaryAttachmentSession = new TemporaryAttachmentSession(sessionId);
-            this.temporaryAttachmentSessionMap.put(sessionId, temporaryAttachmentSession);
+        HttpSession session = this.getSession();
+        temporaryAttachmentSession = (TemporaryAttachmentSession) session.getAttribute(ATTRIBUTE_KEY);
+        if (temporaryAttachmentSession == null) {
+            temporaryAttachmentSession = new TemporaryAttachmentSession(session.getId());
+            session.setAttribute(ATTRIBUTE_KEY, temporaryAttachmentSession);
         }
         return temporaryAttachmentSession;
     }

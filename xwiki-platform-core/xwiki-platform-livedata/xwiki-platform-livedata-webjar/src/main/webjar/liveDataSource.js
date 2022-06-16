@@ -39,6 +39,12 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
       }
       parameters['filters.' + filter.property] = filter.constraints
         .filter(constraint => constraint.value !== undefined)
+        .map(constraint => {
+          if (constraint.operator === undefined) {
+            constraint.operator = "";
+          }
+          return constraint;
+        })
         .map(constraint => constraint.operator + ':' + constraint.value);
     });
     // Add sort.

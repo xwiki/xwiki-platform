@@ -17,24 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal;
+package org.xwiki.notifications.filters.internal.listener;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.WikiReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.filters.internal.ModelBridge;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
- * Cleanup the notifications when a wiki is deleted.
+ * Delete the user preferences of the deleted users.
  *
  * @version $Id$
  * @since 14.5RC1
@@ -43,12 +49,16 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  */
 @Component
 @Singleton
-@Named("org.xwiki.notifications.filters.internal.DeletedWikiEventListener")
-public class DeletedWikiEventListener extends AbstractEventListener
+@Named("org.xwiki.notifications.filters.internal.listener.DeleteUserEventListener")
+public class DeleteUserEventListener extends AbstractEventListener
 {
+    /**
+     * We use a provider to allow the api to be loaded without an implementation, which is useful on some test context
+     * where the listeners are not used.
+     */
     @Named("cached")
     @Inject
-    private ModelBridge modelBridge;
+    private Provider<ModelBridge> modelBridgeProvider;
 
     @Inject
     private Logger logger;
@@ -56,19 +66,20 @@ public class DeletedWikiEventListener extends AbstractEventListener
     /**
      * Default constructor.
      */
-    public DeletedWikiEventListener()
+    public DeleteUserEventListener()
     {
-        super(DeletedWikiEventListener.class.getName(), new WikiDeletedEvent());
+        super(DeleteUserEventListener.class.getName(),
+            new XObjectDeletedEvent(BaseObjectReference.any(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING)));
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        String wikiId = (String) source;
+        DocumentReference user = ((XWikiDocument) source).getDocumentReference();
         try {
-            this.modelBridge.deleteFilterPreferences(new WikiReference(wikiId));
+            this.modelBridgeProvider.get().deleteFilterPreferences(user);
         } catch (NotificationException e) {
-            this.logger.warn("Failed to delete notification preferences for wiki [{}]. Cause: [{}].", wikiId,
+            this.logger.warn("Failed to delete notification preferences for user [{}]. Cause: [{}].", user,
                 getRootCauseMessage(e));
         }
     }

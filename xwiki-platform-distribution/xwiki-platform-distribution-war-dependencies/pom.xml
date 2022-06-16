@@ -424,10 +424,10 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Active Installs -->
+    <!-- Active Installs 2 -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-activeinstalls-client-api</artifactId>
+      <artifactId>xwiki-platform-activeinstalls2-api</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

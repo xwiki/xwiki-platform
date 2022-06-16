@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -52,6 +53,7 @@ import org.xwiki.user.UserReferenceResolver;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -302,5 +304,32 @@ class SaveActionTest
         assertFalse(this.saveAction.save(this.context));
 
         verify(this.mockClonedDocument).readFromTemplate(templateReference, this.context);
+    }
+
+    @Test
+    void saveSectionWithAttachmentUpload() throws Exception
+    {
+        when(mockRequest.getParameter("section")).thenReturn("2");
+        when(xWiki.hasSectionEdit(context)).thenReturn(true);
+        XWikiDocument sectionDoc = mock(XWikiDocument.class);
+        when(mockClonedDocument.clone()).thenReturn(sectionDoc);
+        String sectionContent = "Some content from the section";
+        when(sectionDoc.getContent()).thenReturn(sectionContent);
+        String fullContent = "Some previous content " + sectionContent + " some after content";
+        when(mockClonedDocument.updateDocumentSection(2, sectionContent + "\n")).thenReturn(fullContent);
+        List<XWikiAttachment> attachmentList = mock(List.class);
+        when(sectionDoc.getAttachmentList()).thenReturn(attachmentList);
+        String comment = "Some comment";
+        when(sectionDoc.getComment()).thenReturn(comment);
+        when(sectionDoc.isMinorEdit()).thenReturn(true);
+
+        assertFalse(this.saveAction.save(this.context));
+
+        verify(sectionDoc).readFromForm(any(), eq(context));
+        verify(mockClonedDocument).setAttachmentList(attachmentList);
+        verify(mockClonedDocument).setContent(fullContent);
+        verify(mockClonedDocument).setComment(comment);
+        verify(mockClonedDocument).setMinorEdit(true);
+        verify(mockClonedDocument, never()).readFromForm(any(), any());
     }
 }

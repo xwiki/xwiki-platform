@@ -58,12 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest(
     properties = {
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
-        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
-        // Prevent the DW from starting. This is needed because xwiki-platform-extension-distribution is provisioned
-        // transitively by org.xwiki.platform:xwiki-platform-wiki-creationjob and will cause a ClassNotFoundException
-        // since Struts is in the webapp CL and will not see the DistributionAction located in the extension CL. And
-        // even if the class was found the DW would start which is not something we want.
-        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false"
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus

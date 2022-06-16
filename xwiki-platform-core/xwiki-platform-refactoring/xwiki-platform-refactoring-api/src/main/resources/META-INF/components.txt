@@ -1,4 +1,5 @@
 org.xwiki.refactoring.internal.batch.DefaultBatchOperationExecutor
+org.xwiki.refactoring.internal.event.DocumentCopyOrMoveEventConverter
 org.xwiki.refactoring.internal.job.CreateJob
 org.xwiki.refactoring.internal.job.DeleteJob
 org.xwiki.refactoring.internal.job.MoveJob

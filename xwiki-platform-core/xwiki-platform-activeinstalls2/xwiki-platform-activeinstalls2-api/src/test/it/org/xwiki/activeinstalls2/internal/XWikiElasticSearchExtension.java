@@ -31,6 +31,8 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestInstances;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.xwiki.component.util.ReflectionUtils;
@@ -46,11 +48,10 @@ import org.xwiki.component.util.ReflectionUtils;
 public class XWikiElasticSearchExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver,
     BeforeEachCallback
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiElasticSearchExtension.class);
     private static final String ELASTICSEARCH_VERSION = System.getProperty("elasticsearch.version");
-
     private static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(XWikiElasticSearchExtension.class);
-
     @Override
     public void beforeAll(ExtensionContext extensionContext)
     {
@@ -64,7 +65,13 @@ public class XWikiElasticSearchExtension implements BeforeAllCallback, AfterAllC
         // - single node since we don't need a cluster for testing
         // - disabled security to avoid the warning messages and because security is not needed for testing as
         //   the data is discarded and the testing environment is secure.
-        container.setEnv(List.of("discovery.type=single-node", "xpack.security.enabled=false"));
+        container.setEnv(List.of(
+            "discovery.type=single-node",
+            "xpack.security.enabled=false",
+            // ES uses 50% of the available RAM by default. We don't need that much for our functional tests and this
+            // can bring the build machine to its knees. Thus, we force a max RAM limit.
+            "ES_JAVA_OPTS=-Xms256m -Xmx256m"));
+        LOGGER.info("(*) Starting Elasticsearch [{}]...", ELASTICSEARCH_VERSION);
         container.start();
 
         saveContainer(extensionContext, container);
@@ -96,6 +103,7 @@ public class XWikiElasticSearchExtension implements BeforeAllCallback, AfterAllC
 
         ElasticsearchContainer container = loadContainer(extensionContext);
         if (container != null) {
+            LOGGER.info("(*) Stopping Elasticsearch...");
             container.stop();
         }
     }

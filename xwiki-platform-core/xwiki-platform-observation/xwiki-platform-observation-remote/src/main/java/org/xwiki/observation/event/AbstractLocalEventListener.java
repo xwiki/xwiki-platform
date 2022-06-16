@@ -35,6 +35,7 @@ import org.xwiki.stability.Unstable;
  *
  * @version $Id$
  * @since 14.4RC1
+ * @since 13.10.7
  */
 @Unstable
 public abstract class AbstractLocalEventListener extends AbstractEventListener

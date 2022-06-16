@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultModelBridgeTest
+class DefaultModelBridgeTest
 {
     @InjectMockComponents
     private DefaultModelBridge defaultModelBridge;
@@ -134,9 +134,17 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    void deleteFilterPreferences() throws Exception
+    void deleteFilterPreferencesWiki() throws Exception
     {
         this.defaultModelBridge.deleteFilterPreferences(this.wikiReference);
         verify(this.notificationFilterPreferenceStore).deleteFilterPreference(this.wikiReference);
+    }
+
+    @Test
+    void deleteFilterPreferencesUser() throws Exception
+    {
+        DocumentReference deletedUserDocumentReference = new DocumentReference("xwiki", "wXWiki", "DeletedUser");
+        this.defaultModelBridge.deleteFilterPreferences(deletedUserDocumentReference);
+        verify(this.notificationFilterPreferenceStore).deleteFilterPreferences(deletedUserDocumentReference);
     }
 }

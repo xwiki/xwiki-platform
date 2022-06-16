@@ -77,4 +77,4 @@ Mail.SendMailStatus_livetable.resend=다시 보내기
 mailSender.admin.resendSuccess=메일이 성공적으로 재발송되었습니다
 mailSender.admin.resendFailure=재발송하지 못했습니다. 자세한 내용을 보려면 클릭하십시오.
 </content>
-  </xwikidoc>
+</xwikidoc>

@@ -92,7 +92,9 @@ public class User extends Api
      */
     public void setDisabledStatus(boolean disabledStatus)
     {
-        this.user.setDisabled(disabledStatus, getXWikiContext());
+        if (hasAdminRights()) {
+            this.user.setDisabled(disabledStatus, getXWikiContext());
+        }
     }
 
     /**

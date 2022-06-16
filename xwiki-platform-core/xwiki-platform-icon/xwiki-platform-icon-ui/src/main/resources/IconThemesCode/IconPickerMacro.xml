@@ -200,10 +200,10 @@
       options['prefix'] = '$escapetool.javascript($xcontext.macro.params.prefix)';
     #end
     #if("$!xcontext.macro.params.id" != '')
-      $('#${xcontext.macro.params.id}').xwikiIconPicker(options);
+      $('#${escapetool.javascript(${xcontext.macro.params.id})}').xwikiIconPicker(options);
     #end
     #if("$!xcontext.macro.params.get('class')" != '')
-      $('.${xcontext.macro.params.get('class')}').xwikiIconPicker(options);
+      $('.${escapetool.javascript(${xcontext.macro.params.get('class')})}').xwikiIconPicker(options);
     #end
   });
 &lt;/script&gt;

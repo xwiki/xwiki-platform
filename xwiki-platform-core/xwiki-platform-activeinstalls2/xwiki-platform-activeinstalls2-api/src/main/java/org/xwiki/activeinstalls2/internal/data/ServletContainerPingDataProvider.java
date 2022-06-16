@@ -89,7 +89,7 @@ public class ServletContainerPingDataProvider extends AbstractPingDataProvider
                     StringUtils.substringAfter(serverInfo, SERVLET_INFO_VERSION_SEPARATOR),
                     SERVLET_INFO_OPTIONALSEPARATOR)));
                 ping.setServletContainer(servletContainerPing);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // Ignore, we just don't save that information...
                 // However we log a warning since it's a problem that needs to be seen and looked at.
                 logWarning("Failed to compute Servlet container information", e);

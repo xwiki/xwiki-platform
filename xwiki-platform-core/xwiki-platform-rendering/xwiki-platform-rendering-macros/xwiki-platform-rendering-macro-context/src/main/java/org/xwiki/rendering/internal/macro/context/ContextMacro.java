@@ -95,7 +95,8 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
      */
     public ContextMacro()
     {
-        super("Context", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), ContextMacroParameters.class);
+        super("Context", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, true, Block.LIST_BLOCK_TYPE),
+            ContextMacroParameters.class);
 
         // The Context macro must execute early since it can contain include macros which can bring stuff like headings
         // for other macros (TOC macro, etc). Make it the same priority as the Include macro.

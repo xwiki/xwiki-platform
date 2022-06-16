@@ -36,6 +36,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobContext;
+import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -96,7 +99,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DefaultLinkRefactoring}.
+ * Unit tests for {@link DefaultReferenceUpdater}.
  *
  * @version $Id$
  */
@@ -107,7 +110,7 @@ import static org.mockito.Mockito.when;
     DefaultReferenceRenamer.class
 })
 // @formatter:on
-class DefaultLinkRefactoringTest
+class DefaultReferenceUpdaterTest
 {
     @MockComponent
     @Named("compact")
@@ -141,6 +144,15 @@ class DefaultLinkRefactoringTest
     @MockComponent
     private ContentParser contentParser;
 
+    @MockComponent
+    private JobContext jobContext;
+
+    @Mock
+    private Job job;
+
+    @Mock
+    private Request jobrequest;
+
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
@@ -152,7 +164,7 @@ class DefaultLinkRefactoringTest
     private JobProgressManager progressManager;
 
     @InjectMockComponents
-    private DefaultLinkRefactoring refactoring;
+    private DefaultReferenceUpdater updater;
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension();
@@ -180,6 +192,10 @@ class DefaultLinkRefactoringTest
 
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         when(this.componentManagerProvider.get()).thenReturn(this.componentManager);
+
+        when(this.jobContext.getCurrentJob()).thenReturn(this.job);
+        when(this.job.getRequest()).thenReturn(jobrequest);
+        when(this.jobrequest.isVerbose()).thenReturn(true);
     }
 
     private void setTextarea(XWikiDocument document, XDOM xdom)
@@ -269,7 +285,7 @@ class DefaultLinkRefactoringTest
 
         when(this.compactEntityReferenceSerializer.serialize(originalDocLinkReference, newReference)).thenReturn("A.C");
 
-        this.refactoring.updateRelativeLinks(oldReference, newReference);
+        updater.update(newReference, oldReference, newReference);
 
         // Document link block is updated.
         assertEquals("A.C", docLinkBlock.getReference().getReference());
@@ -334,7 +350,7 @@ class DefaultLinkRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(originalSpaceReference, newReference))
             .thenReturn("wiki1:Z");
 
-        this.refactoring.updateRelativeLinks(oldReference, newReference);
+        updater.update(newReference, oldReference, newReference);
 
         // Document link block is updated.
         assertEquals("wiki1:A.C", docLinkBlock.getReference().getReference());
@@ -346,7 +362,7 @@ class DefaultLinkRefactoringTest
     }
 
     @Test
-    void renameLinks() throws Exception
+    void update() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -377,7 +393,7 @@ class DefaultLinkRefactoringTest
 
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
 
-        this.refactoring.renameLinks(documentReference, oldLinkTarget, newLinkTarget);
+        updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
         assertEquals("X.Y", linkBlock.getReference().getReference());
         assertEquals("X.Y", xobjectLinkBlock.getReference().getReference());
@@ -415,7 +431,7 @@ class DefaultLinkRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(newImageTargetAttachment, documentReference))
             .thenReturn("X.Y@attachment.txt");
 
-        this.refactoring.renameLinks(documentReference, oldImageTarget, newImageTarget);
+        updater.update(documentReference, oldImageTarget, newImageTarget);
 
         assertEquals("X.Y@attachment.txt", imageBlock.getReference().getReference());
         assertEquals(ResourceType.ATTACHMENT, imageBlock.getReference().getType());
@@ -451,7 +467,7 @@ class DefaultLinkRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(newLinkTargetAttachment, documentReference))
             .thenReturn("X.Y@attachment.txt");
 
-        this.refactoring.renameLinks(documentReference, oldLinkTarget, newLinkTarget);
+        updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
         assertEquals("X.Y@attachment.txt", linkBlock.getReference().getReference());
         assertEquals(ResourceType.ATTACHMENT, linkBlock.getReference().getType());
@@ -497,7 +513,7 @@ class DefaultLinkRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget.getLastSpaceReference(), documentReference))
             .thenReturn("X");
 
-        this.refactoring.renameLinks(documentReference, oldLinkTarget, newLinkTarget);
+        updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
         assertEquals("X.WebHome", documentLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, documentLinkBlock.getReference().getType());
@@ -545,7 +561,7 @@ class DefaultLinkRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget.getLastSpaceReference(), documentReference))
             .thenReturn("X");
 
-        this.refactoring.renameLinks(documentReference, oldLinkTarget, newLinkTarget);
+        updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
         // Note that both resulting renamed back-links are of type document. (i.e. the space link was converted to a doc
         // link)
@@ -557,7 +573,7 @@ class DefaultLinkRefactoringTest
     }
 
     @Test
-    void renameLinksFromMacros(MockitoComponentManager componentManager) throws Exception
+    void updateFromMacros(MockitoComponentManager componentManager) throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -601,7 +617,7 @@ class DefaultLinkRefactoringTest
         when(displayMacroRefactoring.replaceReference(any(), any(), any(DocumentReference.class), any(), anyBoolean()))
             .thenReturn(Optional.of(displayMacroBlock));
         when(this.documentAccessBridge.getDocumentInstance(documentReference)).thenReturn(document);
-        this.refactoring.renameLinks(documentReference, oldLinkTarget, newLinkTarget);
+        updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
         verify(includeMacroRefactoring).replaceReference(includeMacroBlock1, documentReference, oldLinkTarget,
             newLinkTarget, false);
@@ -616,7 +632,7 @@ class DefaultLinkRefactoringTest
     }
 
     @Test
-    void renameLinksAttachments() throws Exception
+    void updateAttachments() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         DocumentReference sourceDocument = new DocumentReference("wiki", "Space", "Source");
@@ -640,14 +656,14 @@ class DefaultLinkRefactoringTest
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn(
             "newname.txt");
 
-        this.refactoring.renameLinks(documentReference, oldLinkTarget, newLinkTarget);
+        updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
-        verify(this.progressManager).pushLevelProgress(1, this.refactoring);
+        verify(this.progressManager).pushLevelProgress(1, updater);
         verify(document).setContent(xdom);
         verify(document).setContentDirty(false);
         verify(document).setMetaDataDirty(true);
         verify(this.xcontext.getWiki()).saveDocument(document, "Renamed back-links.", false, this.xcontext);
-        verify(this.progressManager).popLevelProgress(this.refactoring);
+        verify(this.progressManager).popLevelProgress(updater);
         assertEquals(1, this.logCapture.size());
         assertEquals(
             "The links from [null] that were targeting [Attachment wiki:Space.Source@oldname.txt] have "
@@ -656,7 +672,7 @@ class DefaultLinkRefactoringTest
     }
 
     @Test
-    void renameLinksFromLinksAndMacros(MockitoComponentManager componentManager) throws Exception
+    void updateFromLinksAndMacros(MockitoComponentManager componentManager) throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -689,7 +705,7 @@ class DefaultLinkRefactoringTest
         MacroRefactoring includeMacroRefactoring =
             componentManager.registerMockComponent(MacroRefactoring.class, "include");
         when(this.documentAccessBridge.getDocumentInstance(documentReference)).thenReturn(document);
-        this.refactoring.renameLinks(documentReference, oldLinkTarget, newLinkTarget);
+        updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
         verify(includeMacroRefactoring).replaceReference(includeMacroBlock, documentReference, oldLinkTarget,
             newLinkTarget, false);
@@ -717,7 +733,7 @@ class DefaultLinkRefactoringTest
     }
 
     @Test
-    void renameLinksAndTranslations() throws Exception
+    void updateAndTranslations() throws Exception
     {
         DocumentReference baseDocumentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument baseDocument = mock(XWikiDocument.class);
@@ -757,7 +773,7 @@ class DefaultLinkRefactoringTest
 
             when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
         }
-        this.refactoring.renameLinks(baseDocumentReference, oldLinkTarget, newLinkTarget);
+        updater.update(baseDocumentReference, oldLinkTarget, newLinkTarget);
 
         for (XWikiDocument xWikiDocument : documentsToUpdate) {
             verifyDocumentSave(xWikiDocument, "Renamed back-links.", false, false);
@@ -769,7 +785,7 @@ class DefaultLinkRefactoringTest
     }
 
     @Test
-    void renameLinksBlockRendererNotFound() throws XWikiException
+    void updateBlockRendererNotFound() throws XWikiException
     {
         DocumentReference newReference = new DocumentReference("xwiki", "XWiki", "new");
 
@@ -785,7 +801,7 @@ class DefaultLinkRefactoringTest
             .thenReturn(false);
 
         DocumentReference oldReference = new DocumentReference("xwiki", "XWiki", "old");
-        this.refactoring.updateRelativeLinks(oldReference, newReference);
+        updater.update(newReference, oldReference, newReference);
 
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());

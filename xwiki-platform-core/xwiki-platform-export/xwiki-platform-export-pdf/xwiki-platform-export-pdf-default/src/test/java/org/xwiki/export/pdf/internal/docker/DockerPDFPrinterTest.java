@@ -24,9 +24,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
+import javax.inject.Provider;
 import javax.servlet.http.Cookie;
 
 import org.junit.jupiter.api.Test;
@@ -35,8 +35,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.internal.chrome.ChromeManager;
-import org.xwiki.export.pdf.internal.job.PDFExportContextStore;
-import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -44,7 +42,10 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.kklisura.cdt.protocol.types.network.CookieParam;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
-import com.xpn.xwiki.internal.context.XWikiContextContextStore;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -76,17 +77,28 @@ class DockerPDFPrinterTest
     @MockComponent
     private ContainerManager containerManager;
 
+    @MockComponent
+    private Provider<XWikiContext> xcontextProvider;
+
     @Mock
     ChromeDevToolsService tabDevToolsService;
-
-    private PDFExportJobRequest request = new PDFExportJobRequest();
 
     private String containerId = "8f55a905efec";
 
     @BeforeComponent
     void configure()
     {
-        this.request.setContext(new HashMap<>());
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(xcontext);
+
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(xcontext.getRequest()).thenReturn(request);
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(xcontext.getDoc()).thenReturn(document);
+
+        XWiki xwiki = mock(XWiki.class);
+        when(xcontext.getWiki()).thenReturn(xwiki);
 
         when(this.configuration.getChromeDockerContainerName()).thenReturn("test-pdf-printer");
         when(this.configuration.getChromeDockerImage()).thenReturn("test/chrome:latest");
@@ -98,7 +110,7 @@ class DockerPDFPrinterTest
     void printWithoutPreviewURL()
     {
         try {
-            this.dockerPDFPrinter.print(this.request);
+            this.dockerPDFPrinter.print(null);
             fail();
         } catch (IOException e) {
             assertEquals("Print preview URL missing.", e.getMessage());
@@ -106,27 +118,18 @@ class DockerPDFPrinterTest
     }
 
     @Test
-    void printWithUnsupportedProtocol() throws Exception
-    {
-        this.request.getContext().put(XWikiContextContextStore.PROP_REQUEST_URL, new URL("file://some/file.txt"));
-
-        try {
-            this.dockerPDFPrinter.print(this.request);
-            fail();
-        } catch (IOException e) {
-            assertEquals("Unsupported protocol [file].", e.getMessage());
-        }
-    }
-
-    @Test
     void print() throws Exception
     {
-        URL printPreviewURL = new URL("http://localhost:8080/xwiki/bin/export/Some/Page");
-        URL dockerPrintPreviewURL = new URL("http://docker:8080/xwiki/bin/export/Some/Page");
+        XWikiContext xcontext = this.xcontextProvider.get();
 
-        this.request.getContext().put(XWikiContextContextStore.PROP_REQUEST_URL, printPreviewURL);
+        URL printPreviewURL = new URL("http://external:9293/xwiki/bin/export/Some/Page?x=y#z");
+        when(xcontext.getDoc().getURL("export", "x=y", "z", xcontext)).thenReturn("/xwiki/bin/export/Some/Page?x=y#z");
+        when(xcontext.getWikiId()).thenReturn("test");
+        when(xcontext.getWiki().getServerURL("test", xcontext)).thenReturn(new URL("http://localhost:8080"));
+        URL dockerPrintPreviewURL = new URL("http://docker:8080/xwiki/bin/export/Some/Page?x=y#z");
+
         Cookie[] cookies = new Cookie[] {};
-        this.request.getContext().put(PDFExportContextStore.ENTRY_COOKIES, cookies);
+        when(this.xcontextProvider.get().getRequest().getCookies()).thenReturn(cookies);
 
         CookieParam cookieParam = new CookieParam();
         List<CookieParam> cookieParams = Collections.singletonList(cookieParam);
@@ -148,7 +151,7 @@ class DockerPDFPrinterTest
                 }
             });
 
-        assertSame(pdfInputStream, this.dockerPDFPrinter.print(this.request));
+        assertSame(pdfInputStream, this.dockerPDFPrinter.print(printPreviewURL));
 
         verify(this.chromeManager).setCookies(this.tabDevToolsService, cookieParams);
         assertEquals(dockerPrintPreviewURL.toString(), cookieParam.getUrl());

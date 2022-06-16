@@ -75,7 +75,9 @@ public class DocumentRenderer
         Syntax targetSyntax = this.renderingContext.getTargetSyntax();
 
         DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
-        parameters.setExecutionContextIsolated(false);
+        // Each document is rendered in a separate execution context, as if it was the current document on the context,
+        // otherwise relative references used in the document content are badly resolved.
+        parameters.setExecutionContextIsolated(true);
         parameters.setTransformationContextIsolated(true);
         parameters.setTransformationContextRestricted(false);
         parameters.setContentTranslated(false);

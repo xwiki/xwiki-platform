@@ -24,24 +24,32 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-export</artifactId>
-    <version>14.4.2-SNAPSHOT</version>
+    <artifactId>xwiki-platform-export-pdf-test</artifactId>
+    <version>14.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-export-pdf</artifactId>
-  <name>XWiki Platform - Export - PDF</name>
-  <packaging>pom</packaging>
-  <description>Top level POM for the PDF Export module</description>
-  <modules>
-    <module>xwiki-platform-export-pdf-api</module>
-    <module>xwiki-platform-export-pdf-default</module>
-    <module>xwiki-platform-export-pdf-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-export-pdf-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-export-pdf-test-content</artifactId>
+  <name>XWiki Platform - Export - PDF - Test - Content</name>
+  <packaging>xar</packaging>
+  <description>Content used by the functional tests of the PDF export feature.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-skin-skinx</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- JavaScript dependencies -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
+  </dependencies>
 </project>

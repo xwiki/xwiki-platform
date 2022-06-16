@@ -24,24 +24,22 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-export</artifactId>
-    <version>14.4.2-SNAPSHOT</version>
+    <artifactId>xwiki-platform-export-pdf-test</artifactId>
+    <version>14.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-export-pdf</artifactId>
-  <name>XWiki Platform - Export - PDF</name>
-  <packaging>pom</packaging>
-  <description>Top level POM for the PDF Export module</description>
-  <modules>
-    <module>xwiki-platform-export-pdf-api</module>
-    <module>xwiki-platform-export-pdf-default</module>
-    <module>xwiki-platform-export-pdf-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-export-pdf-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-export-pdf-test-pageobjects</artifactId>
+  <name>XWiki Platform - Export - PDF - Test - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>Page Objects for PDF Export</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>pdfbox</artifactId>
+    </dependency>
+  </dependencies>
 </project>

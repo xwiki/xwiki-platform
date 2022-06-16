@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.job;
 
+import java.util.Map;
+
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
@@ -32,15 +34,15 @@ import org.xwiki.stability.Unstable;
 public class DeleteRequest extends EntityRequest
 {
     /**
-     * Key of the optional property that indicates whether the document should be send to the recycle bin or removed
+     * Key of the optional property that indicates whether the document should be sent to the recycle bin or removed
      * permanently.
      */
     public static final String SHOULD_SKIP_RECYCLE_BIN = "shouldSkipRecycleBin";
 
     /**
-     * @see #getNewBacklinkTarget()
+     * @see #getNewBacklinkTargets()
      */
-    public static final String NEW_BACKLINK_TARGET = "newBacklinkTarget";
+    public static final String NEW_BACKLINK_TARGETS = "newBacklinkTargets";
 
     /**
      * @see #isUpdateLinks()
@@ -72,7 +74,7 @@ public class DeleteRequest extends EntityRequest
      * Sets whether the document should be send to the recycle bin or removed permanently.
      *
      * @param shouldSkipRecycleBin {@code true} if the document should be removed permanently, {@code false} if it
-     *            should be send to recycle bin
+     *            should be sent to recycle bin
      */
     public void setShouldSkipRecycleBin(boolean shouldSkipRecycleBin)
     {
@@ -80,21 +82,22 @@ public class DeleteRequest extends EntityRequest
     }
 
     /**
-     * @return the document to be used as the new backlink target after delete
+     * @return a Map where the keys are the deleted documents and the values are the new target documents to be used
+     *         after delete
      */
-    public DocumentReference getNewBacklinkTarget()
+    public Map<DocumentReference, DocumentReference> getNewBacklinkTargets()
     {
-        return getProperty(NEW_BACKLINK_TARGET);
+        return getProperty(NEW_BACKLINK_TARGETS);
     }
 
     /**
-     * Sets a document to be used as the new backlink target after delete.
+     * Sets the new backlink target for documents after delete.
      *
-     * @param newBacklinkTarget reference to the new target document
+     * @param newBacklinkTargets a Map where the keys are the deleted documents and the values are new target documents
      */
-    public void setNewBacklinkTarget(DocumentReference newBacklinkTarget)
+    public void setNewBacklinkTargets(Map<DocumentReference, DocumentReference> newBacklinkTargets)
     {
-        setProperty(NEW_BACKLINK_TARGET, newBacklinkTarget);
+        setProperty(NEW_BACKLINK_TARGETS, newBacklinkTargets);
     }
 
     /**

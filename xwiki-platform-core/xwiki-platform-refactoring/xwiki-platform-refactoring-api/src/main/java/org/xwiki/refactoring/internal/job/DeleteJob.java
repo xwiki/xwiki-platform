@@ -147,14 +147,4 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
             this.logger.debug("[{}] has been successfully deleted.", documentReference);
         }
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.refactoring.internal.job.AbstractEntityJob#getCommonParent()
-     */
-    public EntityReference getCommonParent()
-    {
-        return getCommonParent(this.request.getEntityReferences());
-    }
 }

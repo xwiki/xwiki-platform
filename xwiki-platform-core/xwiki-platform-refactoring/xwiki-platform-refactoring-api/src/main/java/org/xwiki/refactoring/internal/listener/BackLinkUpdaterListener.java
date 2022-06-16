@@ -33,10 +33,8 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.event.status.JobProgressManager;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
@@ -113,21 +111,10 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
         Predicate<EntityReference> canEdit = entityReference -> (job.hasAccess(Right.EDIT, entityReference));
         DocumentDeletedEvent deletedEvent = (DocumentDeletedEvent) event;
 
-        // In case the delete affected the child pages too, only the root document should have the links updated.
-        if (request.isUpdateLinks() && isRootDoc(job.getCommonParent(), deletedEvent.getDocumentReference())) {
-            updateBackLinks(deletedEvent.getDocumentReference(), request.getNewBacklinkTarget(), canEdit,
-                request.isUpdateLinksOnFarm());
+        DocumentReference newTarget = request.getNewBacklinkTargets().get(deletedEvent.getDocumentReference());
+        if (request.isUpdateLinks() && newTarget != null) {
+            updateBackLinks(deletedEvent.getDocumentReference(), newTarget, canEdit, request.isUpdateLinksOnFarm());
         }
-    }
-
-    private boolean isRootDoc(EntityReference commonParent, DocumentReference deletedDocReference)
-    {
-        if (commonParent.getType() == EntityType.SPACE) {
-            DocumentReference spaceWebHomeReference =
-                new DocumentReference("WebHome", new SpaceReference(commonParent));
-            return spaceWebHomeReference.equals(deletedDocReference);
-        }
-        return true;
     }
 
     private void maybeUpdateLinksAfterRename(Event event, Object source, Object data)

@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.internal.listener;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,6 @@ import org.mockito.Mock;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.job.JobContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
@@ -112,8 +112,7 @@ class BackLinkUpdaterListenerTest
 
         when(this.jobContext.getCurrentJob()).thenReturn(deleteJob);
         when(this.deleteJob.getRequest()).thenReturn(deleteRequest);
-        deleteRequest.setNewBacklinkTarget(bobReference);
-        when(this.deleteJob.getCommonParent()).thenReturn(aliceReference);
+        deleteRequest.setNewBacklinkTargets(Collections.singletonMap(aliceReference, bobReference));
     }
 
     @Test
@@ -228,19 +227,19 @@ class BackLinkUpdaterListenerTest
     }
 
     @Test
-    void onDocumentDeletedWithUpdateLinksOnFarmOnChildDoc()
+    void onDocumentDeletedWithUpdateLinksOnFarmOnDocWithoutTarget()
     {
         deleteRequest.setUpdateLinks(true);
         deleteRequest.setUpdateLinksOnFarm(true);
 
-        SpaceReference parentReference = new SpaceReference("foo", "Users");
-        when(this.deleteJob.getCommonParent()).thenReturn(parentReference);
-        when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
-        when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
+        DocumentReference docReference = new DocumentReference("wiki", "Users", "Ana");
+        when(this.modelBridge.getBackLinkedReferences(docReference, "wiki")).thenReturn(Arrays.asList(aliceReference));
+        when(this.deleteJob.hasAccess(Right.EDIT, docReference)).thenReturn(true);
 
-        this.listener.onEvent(documentDeletedEvent, null, null);
+        this.listener.onEvent(new DocumentDeletedEvent(docReference), null, null);
 
-        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
+        verify(this.linkRefactoring, never()).renameLinks(eq(aliceReference), eq(docReference),
+            any(DocumentReference.class));
     }
 
     @Test

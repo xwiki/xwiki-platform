@@ -19,11 +19,31 @@
  */
 package org.xwiki.export.pdf.test.po;
 
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.interactive.action.PDAction;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
 
 /**
  * Utility class to verify the content of a PDF document.
@@ -59,5 +79,120 @@ public class PDFDocument implements AutoCloseable
     public int getNumberOfPages()
     {
         return this.document.getNumberOfPages();
+    }
+
+    /**
+     * @param pageNumber the page number
+     * @return the text from the specified page
+     */
+    public String getTextFromPage(int pageNumber) throws IOException
+    {
+        // The text stripper is using 1-based index.
+        int realPageNumber = pageNumber + 1;
+        PDFTextStripper textStripper = new PDFTextStripper();
+        textStripper.setStartPage(realPageNumber);
+        textStripper.setEndPage(realPageNumber);
+        return textStripper.getText(this.document);
+    }
+
+    /**
+     * @param pageNumber the page number
+     * @return a mapping between link labels and link targets
+     * @throws IOException if we fail to extract the links from the specified page
+     */
+    public Map<String, String> getLinksFromPage(int pageNumber) throws IOException
+    {
+        Map<String, String> links = new LinkedHashMap<String, String>();
+        for (Map.Entry<String, PDAction> entry : getLinksFromPage(this.document.getPage(pageNumber)).entrySet()) {
+            if (entry.getValue() instanceof PDActionGoTo) {
+                PDActionGoTo anchor = (PDActionGoTo) entry.getValue();
+                links.put(entry.getKey(), getDestinationText(anchor.getDestination()));
+            } else if (entry.getValue() instanceof PDActionURI) {
+                PDActionURI uri = (PDActionURI) entry.getValue();
+                links.put(entry.getKey(), uri.getURI());
+            }
+        }
+        return links;
+    }
+
+    /**
+     * Code adapted from http://www.docjar.com/html/api/org/apache/pdfbox/examples/pdmodel/PrintURLs.java.html
+     */
+    private Map<String, PDAction> getLinksFromPage(PDPage page) throws IOException
+    {
+        Map<String, PDAction> links = new LinkedHashMap<String, PDAction>();
+        PDFTextStripperByArea stripper = new PDFTextStripperByArea();
+        List<PDAnnotation> annotations = page.getAnnotations();
+        // First setup the text extraction regions.
+        for (int j = 0; j < annotations.size(); j++) {
+            PDAnnotation annotation = annotations.get(j);
+            if (annotation instanceof PDAnnotationLink) {
+                PDAnnotationLink link = (PDAnnotationLink) annotation;
+                PDRectangle rect = link.getRectangle();
+                // Need to reposition link rectangle to match text space.
+                float x = rect.getLowerLeftX();
+                float y = rect.getUpperRightY();
+                float width = rect.getWidth();
+                float height = rect.getHeight();
+                int rotation = page.getRotation();
+                if (rotation == 0) {
+                    PDRectangle pageSize = page.getMediaBox();
+                    y = pageSize.getHeight() - y;
+                } else if (rotation == 90) {
+                    // Do nothing.
+                }
+
+                Rectangle2D.Float awtRect = new Rectangle2D.Float(x, y, width, height);
+                stripper.addRegion(String.valueOf(j), awtRect);
+            }
+        }
+
+        stripper.extractRegions(page);
+
+        for (int j = 0; j < annotations.size(); j++) {
+            PDAnnotation annotation = annotations.get(j);
+            if (annotation instanceof PDAnnotationLink) {
+                PDAnnotationLink link = (PDAnnotationLink) annotation;
+                String label = stripper.getTextForRegion(String.valueOf(j)).trim();
+                links.put(label, link.getAction());
+            }
+        }
+
+        return links;
+    }
+
+    private String getDestinationText(PDDestination destination) throws IOException
+    {
+        if (destination instanceof PDPageXYZDestination) {
+            return getDestinationText((PDPageXYZDestination) destination);
+        } else if (destination instanceof PDPageDestination) {
+            return "Page " + ((PDPageDestination) destination).getPageNumber();
+        }
+        return destination.toString();
+    }
+
+    /**
+     * @param pageNumber the page number
+     * @return the images from the specified page
+     * @throws IOException if we fail to extract the images
+     */
+    public List<PDFImage> getImagesFromPage(int pageNumber) throws IOException
+    {
+        return getImagesFromPage(this.document.getPage(pageNumber)).values().stream().map(PDFImage::new)
+            .collect(Collectors.toList());
+    }
+
+    private Map<String, PDImageXObject> getImagesFromPage(PDPage page) throws IOException
+    {
+        Map<String, PDImageXObject> images = new LinkedHashMap<>();
+
+        PDResources pdResources = page.getResources();
+        for (COSName name : pdResources.getXObjectNames()) {
+            if (pdResources.isImageXObject(name)) {
+                PDImageXObject pdxObjectImage = (PDImageXObject) pdResources.getXObject(name);
+                images.put(name.getName(), pdxObjectImage);
+            }
+        }
+        return images;
     }
 }

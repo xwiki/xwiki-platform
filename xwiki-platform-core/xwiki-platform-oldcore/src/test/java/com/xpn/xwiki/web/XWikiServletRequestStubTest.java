@@ -24,6 +24,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,9 +61,12 @@ class XWikiServletRequestStubTest
     void constructorWithParameters() throws Exception
     {
         Map<String, String[]> parameters = new HashMap<>();
-        parameters.put("key", new String[] { "value" });
+        parameters.put("key", new String[] {"value"});
+        Cookie[] cookies = new Cookie[] {new Cookie("color", "red")};
         XWikiServletRequestStub request =
-            new XWikiServletRequestStub(new URL("https://xwiki.org"), parameters);
+            new XWikiServletRequestStub(new URL("https://xwiki.org"), "/test", parameters, cookies);
         assertEquals("value", request.getParameter("key"));
+        assertEquals("red", request.getCookie("color").getValue());
+        assertEquals("/test", request.getContextPath());
     }
 }

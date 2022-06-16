@@ -197,10 +197,10 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     private Cookie[] clone(Cookie[] cookies)
     {
-        if (cookies == null) {
-            return new Cookie[0];
+        if (cookies != null) {
+            return Stream.of(cookies).map(Cookie::clone).toArray(Cookie[]::new);
         } else {
-            return (Cookie[]) Stream.of(cookies).map(Cookie::clone).toArray();
+            return null;
         }
     }
 
@@ -296,8 +296,12 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public Cookie getCookie(String cookieName)
     {
-        return Stream.of(this.cookies).filter(cookie -> Objects.equals(cookieName, cookie.getName())).findFirst()
-            .orElse(null);
+        if (this.cookies != null) {
+            return Stream.of(this.cookies).filter(cookie -> Objects.equals(cookieName, cookie.getName())).findFirst()
+                .orElse(null);
+        } else {
+            return null;
+        }
     }
 
     @Override

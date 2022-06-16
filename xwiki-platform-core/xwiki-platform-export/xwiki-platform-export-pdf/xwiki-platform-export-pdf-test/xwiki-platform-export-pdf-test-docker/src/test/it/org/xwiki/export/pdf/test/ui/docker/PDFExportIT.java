@@ -21,10 +21,13 @@ package org.xwiki.export.pdf.test.ui.docker;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.export.pdf.test.po.PDFDocument;
 import org.xwiki.export.pdf.test.po.PDFExportOptionsModal;
+import org.xwiki.export.pdf.test.po.PDFImage;
 import org.xwiki.flamingo.skin.test.po.ExportModal;
 import org.xwiki.flamingo.skin.test.po.OtherFormatPane;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -35,6 +38,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for PDF export.
@@ -55,7 +59,31 @@ class PDFExportIT
             exportDocumentAsPDF(setup, new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
 
         try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
+            // We should have 3 pages: cover page, table of contents and the actual content.
             assertEquals(3, pdf.getNumberOfPages());
+
+            // Verify the cover page.
+
+            String coverPageText = pdf.getTextFromPage(0);
+            assertTrue(coverPageText.startsWith("Parent\nVersion 1.1 authored by superadmin"),
+                "Unexpected cover page text: " + coverPageText);
+
+            // Link to the author profile.
+            Map<String, String> coverPageLinks = pdf.getLinksFromPage(0);
+            assertEquals(1, coverPageLinks.size());
+            assertEquals(setup.getURL("XWiki", "superadmin"), coverPageLinks.get("superadmin"));
+
+            // Author image.
+            List<PDFImage> coverPageImages = pdf.getImagesFromPage(0);
+            assertEquals(1, coverPageImages.size());
+            assertEquals(160, coverPageImages.get(0).getWidth());
+            assertEquals(160, coverPageImages.get(0).getHeight());
+
+            // Verify the table of contents page.
+            // TODO
+
+            // Verify the content page.
+            // TODOo
         }
     }
 

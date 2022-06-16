@@ -325,13 +325,19 @@ public class XWikiContextContextStore extends AbstractContextStore
 
     private void saveRequestCookies(Map<String, Serializable> contextStore, XWikiRequest request)
     {
-        contextStore.put(PROP_REQUEST_COOKIES, Stream.of(request.getCookies()).map(Cookie::clone).toArray());
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            // Clone the cookies.
+            cookies = Stream.of(cookies).map(Cookie::clone).toArray(Cookie[]::new);
+        }
+        contextStore.put(PROP_REQUEST_COOKIES, cookies);
     }
 
     private void saveRequestAll(Map<String, Serializable> contextStore, String key, XWikiRequest request)
     {
         saveRequestURL(contextStore, request);
         saveRequestParameters(contextStore, request);
+        saveRequestCookies(contextStore, request);
     }
 
     @Override

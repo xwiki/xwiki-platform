@@ -27,6 +27,7 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.LifecycleMethodExecutionExceptionHandler;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.testcontainers.containers.BrowserWebDriverContainer;
@@ -46,7 +47,8 @@ import org.xwiki.test.ui.XWikiWebDriver;
  * @since 10.10RC1
  */
 public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCallback,
-    BeforeEachCallback, AfterEachCallback, ParameterResolver, TestExecutionExceptionHandler, ExecutionCondition
+    BeforeEachCallback, AfterEachCallback, ParameterResolver, TestExecutionExceptionHandler, ExecutionCondition,
+    LifecycleMethodExecutionExceptionHandler
 {
     protected void saveXWikiWebDriver(ExtensionContext context, XWikiWebDriver xwikiWebDriver)
     {

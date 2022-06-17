@@ -29,7 +29,7 @@ require([
   'jquery',
   'xwiki-meta',
   'xwiki-job-runner',
-  'xwiki-l10n!xwiki-pdf-export-messages'
+  'xwiki-l10n!xwiki-job-messages'
 ], function($, xm, JobRunner, l10n) {
   var updateProgress = function(jobUI, job) {
     jobUI.find('.ui-progress-background').toggle(job.state !== 'NONE');

@@ -267,21 +267,24 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        saveScreenshotAndVideoAfterException(extensionContext, throwable);
+        saveScreenshotAndVideoAfterException(extensionContext);
+        throw throwable;
     }
 
     @Override
     public void handleBeforeEachMethodExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        saveScreenshotAndVideoAfterException(extensionContext, throwable);
+        saveScreenshotAndVideoAfterException(extensionContext);
+        throw throwable;
     }
 
     @Override
     public void handleAfterEachMethodExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        saveScreenshotAndVideoAfterException(extensionContext, throwable);
+        saveScreenshotAndVideoAfterException(extensionContext);
+        throw throwable;
     }
 
     @Override
@@ -508,14 +511,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             String.format("Error setting up the XWiki testing environment%s", extraMessage), e);
     }
 
-    private void saveScreenshotAndVideoAfterException(ExtensionContext extensionContext, Throwable throwable)
-        throws Throwable
+    private void saveScreenshotAndVideoAfterException(ExtensionContext extensionContext)
     {
         saveScreenshotAndVideo(extensionContext);
 
         // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
         displayAgentName();
-
-        throw throwable;
     }
 }

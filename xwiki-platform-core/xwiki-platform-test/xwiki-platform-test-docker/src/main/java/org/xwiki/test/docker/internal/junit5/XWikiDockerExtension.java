@@ -25,6 +25,7 @@ import java.util.Arrays;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.LifecycleMethodExecutionExceptionHandler;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +92,7 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreensh
  * @version $Id$
  * @since 10.6RC1
  */
-public class XWikiDockerExtension extends AbstractExtension
+public class XWikiDockerExtension extends AbstractExtension implements LifecycleMethodExecutionExceptionHandler
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
 
@@ -262,12 +263,21 @@ public class XWikiDockerExtension extends AbstractExtension
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        saveScreenshotAndVideo(extensionContext);
+        saveScreenshotAndVideoAfterException(extensionContext, throwable);
+    }
 
-        // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
-        displayAgentName();
+    @Override
+    public void handleBeforeEachMethodExecutionException(ExtensionContext extensionContext, Throwable throwable)
+        throws Throwable
+    {
+        saveScreenshotAndVideoAfterException(extensionContext, throwable);
+    }
 
-        throw throwable;
+    @Override
+    public void handleAfterEachMethodExecutionException(ExtensionContext extensionContext, Throwable throwable)
+        throws Throwable
+    {
+        saveScreenshotAndVideoAfterException(extensionContext, throwable);
     }
 
     @Override
@@ -505,5 +515,16 @@ public class XWikiDockerExtension extends AbstractExtension
         String extraMessage = getAgentName() == null ? "" : String.format(" on agent [%s]", getAgentName());
         throw new RuntimeException(
             String.format("Error setting up the XWiki testing environment%s", extraMessage), e);
+    }
+
+    private void saveScreenshotAndVideoAfterException(ExtensionContext extensionContext, Throwable throwable)
+        throws Throwable
+    {
+        saveScreenshotAndVideo(extensionContext);
+
+        // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
+        displayAgentName();
+
+        throw throwable;
     }
 }

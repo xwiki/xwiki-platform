@@ -23,13 +23,13 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.export.pdf.test.po.ExportModal;
 import org.xwiki.export.pdf.test.po.PDFDocument;
 import org.xwiki.export.pdf.test.po.PDFExportOptionsModal;
 import org.xwiki.export.pdf.test.po.PDFImage;
-import org.xwiki.flamingo.skin.test.po.ExportModal;
-import org.xwiki.flamingo.skin.test.po.OtherFormatPane;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -55,14 +55,17 @@ class PDFExportIT
     {
         setup.createUserAndLogin("John", "pass");
 
-        PDFExportOptionsModal exportOptions =
-            exportDocumentAsPDF(setup, new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
+        PDFExportOptionsModal exportOptions = ExportModal.open(viewPage).clickExportAsPDFButton();
 
         try (PDFDocument pdf = exportOptions.export(getHostURL(testConfiguration))) {
             // We should have 3 pages: cover page, table of contents and the actual content.
             assertEquals(3, pdf.getNumberOfPages());
 
+            //
             // Verify the cover page.
+            //
 
             String coverPageText = pdf.getTextFromPage(0);
             assertTrue(coverPageText.startsWith("Parent\nVersion 1.1 authored by superadmin"),
@@ -79,11 +82,53 @@ class PDFExportIT
             assertEquals(160, coverPageImages.get(0).getWidth());
             assertEquals(160, coverPageImages.get(0).getHeight());
 
+            //
             // Verify the table of contents page.
-            // TODO
+            //
 
+            String tocPageText = pdf.getTextFromPage(1);
+            // The header shows the page title and the footer shows the page number and the page count.
+            assertTrue(tocPageText.startsWith("Parent\n2 / 3\n"),
+                "Unexpected header and footer on table of contents page: " + coverPageText);
+            // TODO: Fix the page order in DocumentSelectionResolver.
+            assertTrue(tocPageText.contains("Table of Contents\nSection 1\nChapter 1\n"),
+                "Unexpected table of contents: " + tocPageText);
+
+            // The table of contents should have internal links (anchors) to each section.
+            Map<String, String> tocPageLinks = pdf.getLinksFromPage(1);
+            assertEquals(2, tocPageLinks.size());
+            // TODO: Fix the page order in DocumentSelectionResolver.
+            assertEquals(Arrays.asList("HSection1", "HChapter1"),
+                tocPageLinks.values().stream().collect(Collectors.toList()));
+
+            // No images on the table of contents page.
+            assertEquals(0, pdf.getImagesFromPage(1).size());
+
+            //
             // Verify the content page.
-            // TODOo
+            //
+
+            String contentPageText = pdf.getTextFromPage(2);
+            assertTrue(contentPageText.startsWith("Parent\n3 / 3\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
+            assertTrue(
+                contentPageText.contains("Chapter 1\n"
+                    + "Content of first chapter. Current user is xwiki:XWiki.John.\nLink to child page.\nloaded!\n"),
+                "Parent page content missing: " + contentPageText);
+            assertTrue(contentPageText.contains("Section 1\nContent of first section.\n"),
+                "Child page content missing: " + contentPageText);
+
+            // The content of the parent page has a link to the child page.
+            Map<String, String> contentPageLinks = pdf.getLinksFromPage(2);
+            assertEquals(1, contentPageLinks.size());
+            assertEquals(setup.getURL(Arrays.asList("PDFExportIT", "Parent"), "Child") + "/",
+                contentPageLinks.get("child page."));
+
+            // The content of the child page shows an image.
+            List<PDFImage> contentPageImages = pdf.getImagesFromPage(2);
+            assertEquals(1, contentPageImages.size());
+            assertEquals(512, contentPageImages.get(0).getWidth());
+            assertEquals(512, contentPageImages.get(0).getHeight());
         }
     }
 
@@ -91,19 +136,5 @@ class PDFExportIT
     {
         return new URL(String.format("http://%s:%d", testConfiguration.getServletEngine().getHostIP(),
             testConfiguration.getServletEngine().getPort()));
-    }
-
-    private PDFExportOptionsModal exportDocumentAsPDF(TestUtils setup, LocalDocumentReference documentReference)
-    {
-        ViewPage viewPage = setup.gotoPage(documentReference);
-
-        // The export modal is present but hidden on page load. We instantiate the page object before opening the modal
-        // in order to prevent the fade effect (see BaseModal).
-        new ExportModal();
-        viewPage.clickMoreActionsSubMenuEntry("tmExport");
-
-        new OtherFormatPane().clickExportButton("Export as PDF");
-
-        return new PDFExportOptionsModal();
     }
 }

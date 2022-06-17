@@ -264,6 +264,9 @@ public class XWikiDockerExtension extends AbstractExtension
             // TestContainers. This allows the test to finish faster and thus provide faster results (because stopping
             // the container takes a bit of time).
         }
+
+        // Reset current wiki to main wiki
+        loadPersistentTestContext(extensionContext).getUtil().setCurrentWiki("xwiki");
     }
 
     @Override

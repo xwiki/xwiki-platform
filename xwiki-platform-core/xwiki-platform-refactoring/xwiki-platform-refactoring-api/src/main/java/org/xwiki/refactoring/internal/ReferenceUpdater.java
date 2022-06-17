@@ -33,10 +33,10 @@ import org.xwiki.model.reference.EntityReference;
 public interface ReferenceUpdater
 {
     /**
-     * @param documenttReference the reference of the document in which to update the references
+     * @param documentReference the reference of the document in which to update the references
      * @param oldTargetReference the previous reference of the renamed entity
      * @param newTargetReference the new reference of the renamed entity
      */
-    void update(DocumentReference documenttReference, EntityReference oldTargetReference,
+    void update(DocumentReference documentReference, EntityReference oldTargetReference,
         EntityReference newTargetReference);
 }

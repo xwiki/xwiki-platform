@@ -107,22 +107,23 @@ public class R131007000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     }
 
     @Override
-    public boolean shouldExecute(XWikiDBVersion startupVersion)
-    {
-        boolean shouldExecute = super.shouldExecute(startupVersion);
-
-        if (shouldExecute && this.filterPreferenceConfiguration.useMainStore() && !isMainWiki()) {
-            shouldExecute = false;
-        }
-
-        return shouldExecute;
-    }
-
-    @Override
     protected void hibernateMigrate() throws DataMigrationException
     {
+        boolean isMainWiki = isMainWiki();
+
+        // Stop the execution early if the configuration uses the main store and we are not upgrading the main wiki.
+        // This check cannot be done in #shouldExecute because possibly missing columns are not yet added to the 
+        // database.
+        if (this.filterPreferenceConfiguration.useMainStore() && !isMainWiki) {
+            return;
+        }
+
+        internalHibernateMigrate(isMainWiki);
+    }
+
+    private void internalHibernateMigrate(boolean isMainWiki) throws DataMigrationException
+    {
         try {
-            boolean isMainWiki = isMainWiki();
 
             Collection<String> knownWikiIds;
             if (isMainWiki) {

@@ -58,6 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -114,15 +115,6 @@ class R140401000XWIKI15460DataMigrationTest
     void shouldExecute()
     {
         assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(0)));
-    }
-
-    @ParameterizedTest
-    @CsvSource({ "true,mainwikiid,true", "false,mainwikiid,true", "true,anotherwiki,false", "false,anotherwiki,true" })
-    void shouldExecutedConfiguration(boolean useMainStore, String currentWikiId, boolean expected)
-    {
-        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn(currentWikiId);
-        when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(useMainStore);
-        assertEquals(expected, this.dataMigration.shouldExecute(new XWikiDBVersion(0)));
     }
 
     /**
@@ -190,6 +182,18 @@ class R140401000XWIKI15460DataMigrationTest
         // Verify that  the results are paginated.
         verify(this.store).getPaginatedFilterPreferences(1000, 0);
         verify(this.store).getPaginatedFilterPreferences(1000, 1000);
+    }
+
+    @Test
+    void hibernateMigrateSkipped() throws Exception
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("anotherwiki");
+        when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(true);
+        this.dataMigration.hibernateMigrate();
+
+        // The store is used on all execution path after the check of the first condition.
+        // If it is used, this means the migration is not skipped.
+        verifyNoInteractions(this.store);
     }
 
     @Test

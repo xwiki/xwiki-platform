@@ -144,7 +144,11 @@ $escapetool.xml($tdoc.plainTitle)
       <toc>= {{translation key="core.pdf.tableOfContents"/}} =
 
 {{velocity}}
-{{toc reference="$services.rendering.escape($doc.documentReference, 'xwiki/2.1')" depth="3" /}}
+#if ("$!request.jobId" != '')
+  {{pdftoc jobId="$services.rendering.escape($request.jobId, 'xwiki/2.1')" /}}
+#else
+  {{toc reference="$services.rendering.escape($doc.documentReference, 'xwiki/2.1')" depth="3" /}}
+#end
 {{/velocity}}</toc>
     </property>
   </object>

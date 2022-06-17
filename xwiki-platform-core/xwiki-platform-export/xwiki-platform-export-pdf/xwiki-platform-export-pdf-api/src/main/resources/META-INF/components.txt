@@ -1,0 +1,5 @@
+org.xwiki.export.pdf.internal.job.DocumentRenderer
+org.xwiki.export.pdf.internal.job.PDFExportJob
+org.xwiki.export.pdf.internal.macro.PDFTocMacro
+org.xwiki.export.pdf.internal.script.SafePDFExportJobStatusProvider
+org.xwiki.export.pdf.script.PDFExportScriptService

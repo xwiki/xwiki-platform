@@ -8,7 +8,7 @@ paths: {
 
   // Tree
   'jsTree': '/webjars/jstree.min',
-  'JobRunner': '/webjars/jobRunner.min',
+  'xwiki-job-runner': '/webjars/jobRunner.min',
   'tree-finder': '/webjars/finder.min',
   'tree': '/webjars/tree.min',
 

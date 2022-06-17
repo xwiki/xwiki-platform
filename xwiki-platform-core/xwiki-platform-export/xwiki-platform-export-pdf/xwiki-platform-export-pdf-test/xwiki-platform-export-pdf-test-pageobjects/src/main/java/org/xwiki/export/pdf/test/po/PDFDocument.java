@@ -40,6 +40,7 @@ import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDNamedDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -84,6 +85,7 @@ public class PDFDocument implements AutoCloseable
     /**
      * @param pageNumber the page number
      * @return the text from the specified page
+     * @throws IOException if we fail to extract the page text
      */
     public String getTextFromPage(int pageNumber) throws IOException
     {
@@ -96,39 +98,66 @@ public class PDFDocument implements AutoCloseable
     }
 
     /**
+     * @return the entire text from this PDF document
+     * @throws IOException if we fail to extract the text
+     */
+    public String getText() throws IOException
+    {
+        return new PDFTextStripper().getText(this.document);
+    }
+
+    /**
+     * @return a mapping between link labels and link targets
+     * @throws IOException if we fail to extract the links from this PDF document
+     */
+    public Map<String, String> getLinks() throws IOException
+    {
+        Map<String, String> links = new LinkedHashMap<>();
+        for (int i = 0; i < this.document.getNumberOfPages(); i++) {
+            links.putAll(getLinksFromPage(i));
+        }
+        return links;
+    }
+
+    /**
      * @param pageNumber the page number
      * @return a mapping between link labels and link targets
      * @throws IOException if we fail to extract the links from the specified page
      */
     public Map<String, String> getLinksFromPage(int pageNumber) throws IOException
     {
-        Map<String, String> links = new LinkedHashMap<String, String>();
-        for (Map.Entry<String, PDAction> entry : getLinksFromPage(this.document.getPage(pageNumber)).entrySet()) {
-            if (entry.getValue() instanceof PDActionGoTo) {
-                PDActionGoTo anchor = (PDActionGoTo) entry.getValue();
+        Map<String, String> links = new LinkedHashMap<>();
+        for (Map.Entry<String, PDAnnotationLink> entry : getLinksFromPage(this.document.getPage(pageNumber))
+            .entrySet()) {
+            PDAction action = entry.getValue().getAction();
+            PDDestination destination = entry.getValue().getDestination();
+            if (action instanceof PDActionGoTo) {
+                PDActionGoTo anchor = (PDActionGoTo) entry.getValue().getAction();
                 links.put(entry.getKey(), getDestinationText(anchor.getDestination()));
-            } else if (entry.getValue() instanceof PDActionURI) {
-                PDActionURI uri = (PDActionURI) entry.getValue();
+            } else if (action instanceof PDActionURI) {
+                PDActionURI uri = (PDActionURI) entry.getValue().getAction();
                 links.put(entry.getKey(), uri.getURI());
+            } else if (destination != null) {
+                links.put(entry.getKey(), getDestinationText(destination));
             }
         }
         return links;
     }
 
     /**
-     * Code adapted from http://www.docjar.com/html/api/org/apache/pdfbox/examples/pdmodel/PrintURLs.java.html
+     * Code adapted from
+     * https://github.com/apache/pdfbox/blob/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/PrintURLs.java
      */
-    private Map<String, PDAction> getLinksFromPage(PDPage page) throws IOException
+    private Map<String, PDAnnotationLink> getLinksFromPage(PDPage page) throws IOException
     {
-        Map<String, PDAction> links = new LinkedHashMap<String, PDAction>();
+        Map<String, PDAnnotationLink> links = new LinkedHashMap<>();
         PDFTextStripperByArea stripper = new PDFTextStripperByArea();
         List<PDAnnotation> annotations = page.getAnnotations();
         // First setup the text extraction regions.
         for (int j = 0; j < annotations.size(); j++) {
             PDAnnotation annotation = annotations.get(j);
             if (annotation instanceof PDAnnotationLink) {
-                PDAnnotationLink link = (PDAnnotationLink) annotation;
-                PDRectangle rect = link.getRectangle();
+                PDRectangle rect = annotation.getRectangle();
                 // Need to reposition link rectangle to match text space.
                 float x = rect.getLowerLeftX();
                 float y = rect.getUpperRightY();
@@ -137,9 +166,8 @@ public class PDFDocument implements AutoCloseable
                 int rotation = page.getRotation();
                 if (rotation == 0) {
                     PDRectangle pageSize = page.getMediaBox();
+                    // Area stripper uses java coordinates, not PDF coordinates.
                     y = pageSize.getHeight() - y;
-                } else if (rotation == 90) {
-                    // Do nothing.
                 }
 
                 Rectangle2D.Float awtRect = new Rectangle2D.Float(x, y, width, height);
@@ -154,7 +182,7 @@ public class PDFDocument implements AutoCloseable
             if (annotation instanceof PDAnnotationLink) {
                 PDAnnotationLink link = (PDAnnotationLink) annotation;
                 String label = stripper.getTextForRegion(String.valueOf(j)).trim();
-                links.put(label, link.getAction());
+                links.put(label, link);
             }
         }
 
@@ -167,8 +195,42 @@ public class PDFDocument implements AutoCloseable
             return getDestinationText((PDPageXYZDestination) destination);
         } else if (destination instanceof PDPageDestination) {
             return "Page " + ((PDPageDestination) destination).getPageNumber();
+        } else if (destination instanceof PDNamedDestination) {
+            return ((PDNamedDestination) destination).getNamedDestination();
         }
         return destination.toString();
+    }
+
+    private String getDestinationText(PDPageXYZDestination destination) throws IOException
+    {
+        PDFTextStripperByArea stripper = new PDFTextStripperByArea();
+        stripper.addRegion("destination", getRectangleBelowDestination(destination));
+        stripper.extractRegions(destination.getPage());
+        return stripper.getTextForRegion("destination").trim();
+    }
+
+    private Rectangle2D getRectangleBelowDestination(PDPageXYZDestination destination)
+    {
+        PDPage page = destination.getPage();
+        PDRectangle pageSize = page.getMediaBox();
+        float x = destination.getLeft();
+        float y = pageSize.getHeight() - destination.getTop();
+        float width = pageSize.getWidth();
+        float height = destination.getTop();
+        return new Rectangle2D.Float(x, y, width, height);
+    }
+
+    /**
+     * @return the images from this PDF document
+     * @throws IOException if we fail to extract the images
+     */
+    public List<PDFImage> getImages() throws IOException
+    {
+        Map<String, PDImageXObject> images = new LinkedHashMap<>();
+        for (PDPage page : this.document.getPages()) {
+            images.putAll(getImagesFromPage(page));
+        }
+        return images.values().stream().map(PDFImage::new).collect(Collectors.toList());
     }
 
     /**

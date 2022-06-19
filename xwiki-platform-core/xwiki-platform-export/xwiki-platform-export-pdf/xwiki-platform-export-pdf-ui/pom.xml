@@ -119,11 +119,5 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-localization-webjar</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
   </dependencies>
 </project>

@@ -99,7 +99,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
         /**
          * @param defaultCategories the macro default categories
          * @return this build
-         * @since 14.5RC1
+         * @since 14.6RC1
          */
         public Builder defaultCategories(Set<String> defaultCategories)
         {

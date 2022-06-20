@@ -132,21 +132,30 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
     {
         this.logger.debug("Printing [{}]", printPreviewURL);
 
-        ChromeDevToolsService devToolsService = this.chromeManager.createIncognitoTab();
         URL dockerPrintPreviewURL = getDockerPrintPreviewURL(printPreviewURL);
-        this.chromeManager.setCookies(devToolsService, getCookies(dockerPrintPreviewURL));
-        this.chromeManager.navigate(devToolsService, dockerPrintPreviewURL);
+        ChromeDevToolsService devToolsService = this.chromeManager.createIncognitoTab();
+        try {
+            this.chromeManager.setCookies(devToolsService, getCookies(dockerPrintPreviewURL));
+            this.chromeManager.navigate(devToolsService, dockerPrintPreviewURL);
 
-        if (!printPreviewURL.toString().equals(dockerPrintPreviewURL.toString())) {
-            // Make sure the relative URLs are resolved based on the original print preview URL otherwise the user won't
-            // be able to open the links from the generated PDF because they use a host name defined only inside the
-            // Docker container where the PDF was generated. See PDFExportConfiguration#getChromeDockerHostName()
-            this.chromeManager.setBaseURL(devToolsService, printPreviewURL);
+            if (!printPreviewURL.toString().equals(dockerPrintPreviewURL.toString())) {
+                // Make sure the relative URLs are resolved based on the original print preview URL otherwise the user
+                // won't be able to open the links from the generated PDF because they use a host name defined only
+                // inside the Docker container where the PDF was generated. See
+                // PDFExportConfiguration#getChromeDockerHostName()
+                this.chromeManager.setBaseURL(devToolsService, printPreviewURL);
+            }
+
+            return this.chromeManager.printToPDF(devToolsService, () -> {
+                this.chromeManager.closeIncognitoTab(devToolsService);
+            });
+        } catch (Exception e) {
+            // Close the developer tools associated with the opened incognito browser tab only if an exception is
+            // caught. Otherwise the developer tools will be closed after the PDF input stream is read and closed.
+            devToolsService.close();
+            // Propagate the caught exception.
+            throw e;
         }
-
-        return this.chromeManager.printToPDF(devToolsService, () -> {
-            this.chromeManager.closeIncognitoTab(devToolsService);
-        });
     }
 
     /**

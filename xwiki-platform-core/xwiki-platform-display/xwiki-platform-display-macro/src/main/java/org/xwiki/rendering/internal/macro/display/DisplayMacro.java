@@ -67,7 +67,7 @@ public class DisplayMacro extends AbstractIncludeMacro<DisplayMacroParameters>
         // The display macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the displayed page before the other macros are executed.
         setPriority(10);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(DEFAULT_CATEGORY_CONTENT);
     }
 
     @Override

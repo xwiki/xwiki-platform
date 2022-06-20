@@ -89,7 +89,7 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
         super("Office Document Viewer", "View office attachments (doc, ppt, xls, odt, odp, ods etc.) inside "
             + "wiki pages without downloading or importing them.", OfficeMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(DEFAULT_CATEGORY_CONTENT);
     }
 
     @Override

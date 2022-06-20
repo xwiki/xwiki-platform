@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro.wikibridge;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -86,10 +87,23 @@ public class WikiMacroDescriptor implements MacroDescriptor
         /**
          * @param defaultCategory the macro default category
          * @return this builder
+         * @deprecated since 14.6RC1, use {@link #defaultCategories(Set)} instead
          */
+        @Deprecated(since = "14.6RC1")
         public Builder defaultCategory(String defaultCategory)
         {
-            this.descriptor.defaultCategory = defaultCategory;
+            this.descriptor.defaultCategories = Set.of(defaultCategory);
+            return this;
+        }
+
+        /**
+         * @param defaultCategories the macro default categories
+         * @return this build
+         * @since 14.5RC1
+         */
+        public Builder defaultCategories(Set<String> defaultCategories)
+        {
+            this.descriptor.defaultCategories = defaultCategories;
             return this;
         }
 
@@ -158,9 +172,9 @@ public class WikiMacroDescriptor implements MacroDescriptor
     private String description;
 
     /**
-     * Default category under which this macro should be listed.
+     * Default categories under which this macro should be listed.
      */
-    private String defaultCategory;
+    private Set<String> defaultCategories;
 
     /**
      * Whether the macro is visible in the current wiki, for the current user or global.
@@ -201,7 +215,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
         this.description = descriptor.description;
         this.contentDescriptor = descriptor.contentDescriptor;
         this.parameterDescriptors = descriptor.parameterDescriptors;
-        this.defaultCategory = descriptor.defaultCategory;
+        this.defaultCategories = descriptor.defaultCategories;
         this.visibility = descriptor.visibility;
         this.supportsInlineMode = descriptor.supportsInlineMode;
     }
@@ -229,7 +243,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
         this.description = description;
         this.contentDescriptor = contentDescriptor;
         this.parameterDescriptors = parameterDescriptors;
-        this.defaultCategory = defaultCategory;
+        this.defaultCategories = Set.of(defaultCategory);
         this.visibility = visibility;
     }
 
@@ -255,7 +269,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
         this.description = description;
         this.contentDescriptor = contentDescriptor;
         this.parameterDescriptors = parameterDescriptors;
-        this.defaultCategory = defaultCategory;
+        this.defaultCategories = Set.of(defaultCategory);
         this.visibility = visibility;
     }
 
@@ -304,10 +318,17 @@ public class WikiMacroDescriptor implements MacroDescriptor
         return descriptors;
     }
 
+    // TODO: move to legacy
     @Override
     public String getDefaultCategory()
     {
-        return this.defaultCategory;
+        return this.getDefaultCategories().stream().findFirst().orElse(null);
+    }
+
+    @Override
+    public Set<String> getDefaultCategories()
+    {
+        return this.defaultCategories;
     }
 
     /**

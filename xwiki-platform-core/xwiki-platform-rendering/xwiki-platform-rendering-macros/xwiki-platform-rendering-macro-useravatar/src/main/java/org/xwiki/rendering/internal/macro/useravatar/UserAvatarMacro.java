@@ -117,7 +117,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     public UserAvatarMacro()
     {
         super("User Avatar", DESCRIPTION, UserAvatarMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(DEFAULT_CATEGORY_CONTENT);
     }
 
     @Override

@@ -100,7 +100,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     public CodeMacro()
     {
         super("Code", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false), CodeMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_FORMATTING);
+        setDefaultCategories(DEFAULT_CATEGORY_FORMATTING);
     }
 
     @Override

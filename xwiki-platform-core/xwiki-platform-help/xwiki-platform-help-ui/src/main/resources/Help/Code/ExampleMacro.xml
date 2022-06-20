@@ -213,7 +213,7 @@
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategory><!-- TODO: change XObject structure -->
         <disabled>0</disabled>
         <name>defaultCategory</name>
         <number>4</number>
@@ -326,7 +326,7 @@
       <contentType>Mandatory</contentType>
     </property>
     <property>
-      <defaultCategory>Formatting</defaultCategory>
+      <defaultCategory>Formatting</defaultCategory><!-- TODO: replace with defaultCategories -->
     </property>
     <property>
       <description>Shows an example and its source code.</description>

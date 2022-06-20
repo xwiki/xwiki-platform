@@ -24,7 +24,7 @@
   <web>PDFExportIT.Parent.Child</web>
   <name>WebHome</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <parent>PDFExportIT.Parent.WebHome</parent>
@@ -35,7 +35,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
   <content>== Section 1 ==
 
 Content of first section.

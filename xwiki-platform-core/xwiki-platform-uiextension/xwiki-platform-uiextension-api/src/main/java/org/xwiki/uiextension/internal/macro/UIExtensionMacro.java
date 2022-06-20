@@ -68,7 +68,7 @@ public class UIExtensionMacro extends AbstractMacro<UIExtensionMacroParameters>
         // The ui extensions macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the extension before the other macros are executed.
         setPriority(10);
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     @Override

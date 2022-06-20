@@ -91,7 +91,7 @@ public class GalleryMacro extends AbstractMacro<GalleryMacroParameters>
     public GalleryMacro()
     {
         super("Gallery", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), GalleryMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_LAYOUT);
+        setDefaultCategories(DEFAULT_CATEGORY_LAYOUT);
     }
 
     @Override

@@ -95,6 +95,7 @@ class DefaultWikiMacroFactoryTest
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_NAME_PROPERTY, "Test Macro");
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_DESCRIPTION_PROPERTY,
             "This is a macro used for testing purposes.");
+        // TOOD: update the test according to the new object definition.
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_DEFAULT_CATEGORY_PROPERTY, "Test");
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_VISIBILITY_PROPERTY, "Current User");
         this.macroObject.setIntValue(WikiMacroConstants.MACRO_INLINE_PROPERTY, 1);
@@ -129,6 +130,7 @@ class DefaultWikiMacroFactoryTest
         assertEquals("Test Macro", macro.getDescriptor().getName());
         assertEquals(42, macro.getPriority());
         assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());
+        // TODO: move this test to legacy and add a test with getDefaultCategories.
         assertEquals("Test", macro.getDescriptor().getDefaultCategory());
         assertEquals(WikiMacroVisibility.USER, ((WikiMacroDescriptor) macro.getDescriptor()).getVisibility());
         assertTrue(macro.supportsInlineMode());

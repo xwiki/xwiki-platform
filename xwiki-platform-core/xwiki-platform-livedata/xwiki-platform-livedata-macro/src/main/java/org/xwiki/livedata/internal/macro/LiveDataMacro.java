@@ -106,7 +106,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         super("Live Data", "Display dynamic lists of data.",
             new DefaultContentDescriptor("Advanced Live Data configuration (JSON)", false),
             LiveDataMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(DEFAULT_CATEGORY_CONTENT);
     }
 
     @Override

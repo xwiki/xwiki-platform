@@ -73,7 +73,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         // The include macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the included page before the other macros are executed.
         setPriority(10);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(DEFAULT_CATEGORY_CONTENT);
     }
 
     @Override

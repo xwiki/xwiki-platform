@@ -335,8 +335,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             .from(baseImageName)
                             .user("root")
                             .env("LIBREOFFICE_VERSION", officeVersion)
-                            .env("LIBREOFFICE_DOWNLOAD_URL", "https://downloadarchive.documentfoundation.org/"
-                                + "libreoffice/old/$LIBREOFFICE_VERSION/deb/x86_64/"
+                            // Note: we use https://download.documentfoundation.org/libreoffice/stable/ and not
+                            // https://downloadarchive.documentfoundation.org/libreoffice/old so that we can benefit
+                            // from automatic LTS updates without any maintenance on our side. This is because the
+                            // LTS version is exposed without the full versions, e.g. 7.2.7 instead of 7.2.7.2.
+                            .env("LIBREOFFICE_DOWNLOAD_URL",
+                                "https://download.documentfoundation.org/libreoffice/stable/"
+                                + "$LIBREOFFICE_VERSION/deb/x86_64/"
                                 + "LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb.tar.gz")
                             // Note that we expose libreoffice /usr/local/libreoffice so that it can be found by
                             // JODConverter: https://bit.ly/2w8B82Q
@@ -347,7 +352,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                                 + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
                                 + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz && "
-                                + "cd /tmp/LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb/DEBS && "
+                                + "cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
                                 + "dpkg -i *.deb && "
                                 + "ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
                             // Increment the image version whenever a change is brought to the image so that it can

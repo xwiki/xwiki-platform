@@ -1144,6 +1144,14 @@ public class TestUtils
     }
 
     /**
+     * @since 14.5RC1
+     */
+    public void setCurrentWiki(String currentWiki)
+    {
+        this.currentWiki = currentWiki;
+    }
+
+    /**
      * @since 7.3M1
      */
     public String getBaseURL()
@@ -1180,7 +1188,7 @@ public class TestUtils
      */
     public String getBaseBinURL()
     {
-        return getBaseURL() + "bin/";
+        return getBaseBinURL(this.currentWiki);
     }
 
     /**

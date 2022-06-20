@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.restlet.data.MediaType;
+import org.xwiki.job.JobException;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.model.jaxb.JobStatus;
 
@@ -44,13 +45,14 @@ import org.xwiki.rest.model.jaxb.JobStatus;
 public class JobExecutor
 {
     /**
+     * @param jobType the type of job to execute
      * @param request the Job request to send
      * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhsot:8080/xwiki/rest})
      * @param credentials the xwiki user and password to use to connect for the REST endpoint
      * @throws Exception if an error occured when connecting to the REST endpoint
      */
-    public void execute(JobRequest request, String xwikiRESTURL, UsernamePasswordCredentials credentials)
-        throws Exception
+    public void execute(String jobType, JobRequest request, String xwikiRESTURL,
+        UsernamePasswordCredentials credentials) throws Exception
     {
         JAXBContext context = JAXBContext.newInstance("org.xwiki.rest.model.jaxb");
         Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -60,23 +62,21 @@ public class JobExecutor
         httpClient.getState().setCredentials(AuthScope.ANY, credentials);
         httpClient.getParams().setAuthenticationPreemptive(true);
 
-        String uri = String.format("%s/jobs?jobType=install&async=false", xwikiRESTURL);
+        String uri = String.format("%s/jobs?jobType=%s&async=false", xwikiRESTURL, jobType);
         PutMethod putMethod = executePutXml(uri, request, marshaller, httpClient);
 
         // Verify results
         // Verify that we got a 200 response
         int statusCode = putMethod.getStatusCode();
         if (statusCode < 200 || statusCode >= 300) {
-            throw new Exception(
-                String.format("Job execution failed. Response status code [%s], reason [%s]", statusCode,
-                    putMethod.getResponseBodyAsString()));
+            throw new JobException(String.format("Job execution failed. Response status code [%s], reason [%s]",
+                statusCode, putMethod.getResponseBodyAsString()));
         }
 
         // Get the job status
         JobStatus jobStatus = (JobStatus) unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
         if (jobStatus.getErrorMessage() != null && jobStatus.getErrorMessage().length() > 0) {
-            throw new Exception(
-                String.format("Job execution failed. Reason [%s]", jobStatus.getErrorMessage()));
+            throw new JobException(String.format("Job execution failed. Reason [%s]", jobStatus.getErrorMessage()));
         }
 
         // Release connection

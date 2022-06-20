@@ -470,7 +470,7 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   }).appendTo("body");
 
   // Export modal submit.
-  $('#exportModalOtherCollapse a.btn-primary').on('click', function (event) {
+  $('#exportModalOtherCollapse').on('click', 'a.btn-primary', function (event) {
     var exportTree = $(this).closest('#exportModalOtherCollapse').find('.export-tree');
     if (exportTree.length > 0) {
       event.preventDefault();

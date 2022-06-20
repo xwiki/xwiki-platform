@@ -65,7 +65,12 @@ public class XWikiElasticSearchExtension implements BeforeAllCallback, AfterAllC
         // - single node since we don't need a cluster for testing
         // - disabled security to avoid the warning messages and because security is not needed for testing as
         //   the data is discarded and the testing environment is secure.
-        container.setEnv(List.of("discovery.type=single-node", "xpack.security.enabled=false"));
+        container.setEnv(List.of(
+            "discovery.type=single-node",
+            "xpack.security.enabled=false",
+            // ES uses 50% of the available RAM by default. We don't need that much for our functional tests and this
+            // can bring the build machine to its knees. Thus, we force a max RAM limit.
+            "ES_JAVA_OPTS=-Xms256m -Xmx256m"));
         LOGGER.info("(*) Starting Elasticsearch [{}]...", ELASTICSEARCH_VERSION);
         container.start();
 

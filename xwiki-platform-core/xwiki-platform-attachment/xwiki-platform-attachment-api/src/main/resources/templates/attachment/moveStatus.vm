@@ -43,7 +43,8 @@
   <h2>$escapetool.xml($services.localization.render('attachment.move.status.label'))</h2>
   <p class="text-muted small">
     $escapetool.xml($services.localization.render('attachment.move.status.hint', 
-      [$xwiki.getUserName($moveJobRequest.userReference), $xwiki.formatDate($moveJobStatus.startDate)]))
+      ['__username__', $xwiki.formatDate($moveJobStatus.startDate)])).replace('__username__', 
+        $xwiki.getUserName($moveJobRequest.userReference))
   </p>
   #displayMoveJobRequest($moveJobRequest)
   #template('job_macros.vm')

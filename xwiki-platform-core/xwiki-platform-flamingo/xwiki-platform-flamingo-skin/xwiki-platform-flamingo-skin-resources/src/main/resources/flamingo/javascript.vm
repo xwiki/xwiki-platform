@@ -72,21 +72,22 @@
     }
   ],
   'paths': {
+    'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
+    'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
+    'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/drawer${jsExtension}""))",
+    'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url('jquery-migrate', ""jquery-migrate${jsExtension}""))",
-    'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
-    'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
-    'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
-    'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
-    'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
-    'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
-    'xwiki-l10n': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-localization-webjar', ""l10n${jsExtension}""))",
-    'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
-    'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/drawer${jsExtension}""))",
-    'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
     'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
     'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
-    'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true)
+    'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
+    'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
+    'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
+    'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
+    'xwiki-job-runner': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', ""jobRunner${jsExtension}""))",
+    'xwiki-l10n': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-localization-webjar', ""l10n${jsExtension}""))",
+    'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
+    'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js')
   },
   'shim': {
     'prototype': {

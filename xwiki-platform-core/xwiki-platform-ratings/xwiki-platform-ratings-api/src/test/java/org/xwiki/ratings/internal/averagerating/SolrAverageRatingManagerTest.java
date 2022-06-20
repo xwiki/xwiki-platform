@@ -92,9 +92,9 @@ class SolrAverageRatingManagerTest
     @BeforeEach
     void setup()
     {
-        when(this.solrUtils.toFilterQueryString(any()))
+        when(this.solrUtils.toCompleteFilterQueryString(any()))
             .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
-        when(this.solrUtils.toFilterQueryString(any(), any()))
+        when(this.solrUtils.toCompleteFilterQueryString(any(), any()))
             .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
         when(this.solrUtils.getId(any()))
             .then(invocationOnMock -> ((SolrDocument) invocationOnMock.getArgument(0)).get("id"));

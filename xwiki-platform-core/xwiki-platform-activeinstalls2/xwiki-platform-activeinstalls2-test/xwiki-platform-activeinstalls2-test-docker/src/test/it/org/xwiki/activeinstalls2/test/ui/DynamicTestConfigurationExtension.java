@@ -44,11 +44,6 @@ public class DynamicTestConfigurationExtension implements BeforeAllCallback
     @Override
     public void beforeAll(ExtensionContext extensionContext)
     {
-        // We're able to get the TestConfiguration here because it's saved in the XWIKIDOCKEREXTENSION_NAMESPACE
-        // context in XWikiDockerExtension#evaluateExecutionCondition() which is executed for all extensions before
-        // anything else.
-        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
-
         // Get the Elasticsearch container set by XWikiElasticSearchExtension
         ExtensionContext.Store store = XWikiElasticSearchExtension.getStore(extensionContext);
         ElasticsearchContainer esContainer = (ElasticsearchContainer) store.get(ElasticsearchContainer.class);
@@ -57,31 +52,19 @@ public class DynamicTestConfigurationExtension implements BeforeAllCallback
         ExtensionContext.Store globalStore =  extensionContext.getRoot().getStore(ExtensionContext.Namespace.GLOBAL);
         TestConfiguration configuration = new TestConfiguration();
         Properties properties = new Properties();
-        // Depending on the Servlet engine used, the host ip is "localhost" (for jetty standalone which doesn't
-        // execute in a docker container) or "host.testcontainers.internal" (for all Servlet engines executing in a
-        // docker container).
-        String hostAddress = String.format("http://%s:%d", testConfiguration.getServletEngine().getHostIP(),
-            esContainer.getMappedPort(9200));
+        String hostAddress = String.format("http://%s:%d", esContainer.getHost(), esContainer.getMappedPort(9200));
         properties.setProperty("xwikiPropertiesAdditionalProperties",
             String.format("activeinstalls2.pingURL=%s", hostAddress));
         configuration.setProperties(properties);
         // When the Servlet engine is running inside docker, Active Installs (thus running inside docker) will need
         // access the socket of the Elasticsearch server running on the host. Thus, we need to expose the port, see
-        // https://www.testcontainers.org/features/networking/#exposing-host-ports-to-the-container
-        if (!testConfiguration.getServletEngine().isOutsideDocker()) {
-            configuration.setSSHPorts(List.of(esContainer.getMappedPort(9200)));
-        }
+        // https://www.testcontainers.org/features/networking/#exposing-host-ports-to-the-container.
+        configuration.setSSHPorts(List.of(esContainer.getMappedPort(9200)));
         globalStore.put(TestConfiguration.class, configuration);
     }
 
     private static ExtensionContext.Store getXWikiDockerExtensionStore(ExtensionContext context)
     {
         return context.getRoot().getStore(XWIKIDOCKEREXTENSION_NAMESPACE);
-    }
-
-    private TestConfiguration loadTestConfiguration(ExtensionContext context)
-    {
-        ExtensionContext.Store store = getXWikiDockerExtensionStore(context);
-        return store.get(TestConfiguration.class, TestConfiguration.class);
     }
 }

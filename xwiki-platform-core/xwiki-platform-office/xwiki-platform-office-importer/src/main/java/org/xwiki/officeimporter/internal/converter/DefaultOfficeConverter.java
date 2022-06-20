@@ -140,6 +140,6 @@ public class DefaultOfficeConverter implements OfficeConverter
     {
         String extension = officeFileName.substring(officeFileName.lastIndexOf('.') + 1);
         DocumentFormat format = this.converter.getFormatRegistry().getFormatByExtension(extension);
-        return new DefaultOfficeDocumentFormat(format);
+        return format != null ? new DefaultOfficeDocumentFormat(format) : null;
     }
 }

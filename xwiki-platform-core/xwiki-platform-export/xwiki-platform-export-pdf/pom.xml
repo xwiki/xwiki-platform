@@ -32,6 +32,16 @@
   <packaging>pom</packaging>
   <description>Top level POM for the PDF Export module</description>
   <modules>
+    <module>xwiki-platform-export-pdf-api</module>
+    <module>xwiki-platform-export-pdf-default</module>
     <module>xwiki-platform-export-pdf-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-export-pdf-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

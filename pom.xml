@@ -50,7 +50,7 @@
     <rendering.version>${platform.version}</rendering.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.64</ckeditor.version>
+    <ckeditor.version>1.64.1</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.14</batik.version>
     <restlet.version>2.3.12</restlet.version>
@@ -58,7 +58,7 @@
     <pdfbox.version>2.0.26</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.29.v20200521</jetty.version>
-    <netty.version>4.1.77.Final</netty.version>
+    <netty.version>4.1.78.Final</netty.version>
     <hibernate.version>5.6.9.Final</hibernate.version>
     <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
     <hsqldb.version>2.6.1</hsqldb.version>
@@ -103,7 +103,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.3.6</pgsql.version>
+    <pgsql.version>42.4.0</pgsql.version>
     <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>

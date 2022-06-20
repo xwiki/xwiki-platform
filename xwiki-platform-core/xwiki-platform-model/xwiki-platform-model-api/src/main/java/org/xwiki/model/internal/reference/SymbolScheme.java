@@ -19,6 +19,7 @@
  */
 package org.xwiki.model.internal.reference;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
@@ -37,6 +38,15 @@ public interface SymbolScheme
      * @return the character used for escaping characters in Entity Reference names
      */
     Character getEscapeSymbol();
+
+    /**
+     * @return the separator used to separate the entity type from the reference
+     * @since 14.8RC1
+     */
+    default Character getEntityTypeSeparator()
+    {
+        return ':';
+    }
 
     /**
      * @return the map containing all the symbols to separate Entity Types. The map's key is an Entity Type and the
@@ -93,6 +103,17 @@ public interface SymbolScheme
      * @return the various replacement strings to replace string that require escaping
      */
     String[] getParameterReplacementSymbols(EntityType type);
+
+    /**
+     * @param parameter the name of the parameter
+     * @param value the String value of the parameter
+     * @return the parameter converted in the expected type
+     * @since 14.8RC1
+     */
+    default Serializable resolveParameter(String parameter, String value)
+    {
+        return value;
+    }
 
     /**
      * @param type the Entity Type for which to get the current reference keyword or null if not supported

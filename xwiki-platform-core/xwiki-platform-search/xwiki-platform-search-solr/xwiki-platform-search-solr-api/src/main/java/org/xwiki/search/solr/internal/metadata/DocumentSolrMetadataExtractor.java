@@ -146,6 +146,9 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         // Add any extra fields (about objects, etc.) that can improve the findability of the document.
         setExtras(documentReference, solrDocument, locale);
 
+        // Extract more metadata
+        this.extractorUtils.extract(documentReference, translatedDocument, solrDocument);
+
         return true;
     }
 

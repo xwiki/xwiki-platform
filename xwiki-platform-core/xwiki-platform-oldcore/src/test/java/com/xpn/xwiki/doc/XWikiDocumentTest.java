@@ -38,11 +38,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
@@ -79,6 +79,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 /**
@@ -177,6 +178,14 @@ public class XWikiDocumentTest
         when(this.xWiki.getStore()).thenReturn(xWikiStoreInterface);
         when(this.xWiki.getDocument(any(DocumentReference.class), any())).thenReturn(this.document);
         when(this.xWiki.getDocumentReference(any(XWikiRequest.class), any())).thenReturn(documentReference);
+        when(this.xWiki.getDocumentReference((EntityReference) any(), any())).then(new Answer<DocumentReference>()
+        {
+            @Override
+            public DocumentReference answer(InvocationOnMock invocation) throws Throwable
+            {
+                return new DocumentReference(invocation.getArgument(0));
+            }
+        });
         when(this.xWiki.getLanguagePreference(any())).thenReturn("en");
         when(this.xWiki.getSectionEditingDepth()).thenReturn(2L);
         when(this.xWiki.getRightService()).thenReturn(this.xWikiRightService);
@@ -273,11 +282,8 @@ public class XWikiDocumentTest
         this.baseObject.setLargeStringValue("area", "[[TargetPage]][[ObjectTargetPage]]");
 
         // Simulate that "OtherPage.WebHome" exists
-        DocumentReferenceResolver<PageReference> currentPageReferenceDcoumentReferenceResolver =
-            this.oldcore.getMocker().registerMockComponent(
-                new DefaultParameterizedType(null, DocumentReferenceResolver.class, PageReference.class), "current");
-        when(currentPageReferenceDcoumentReferenceResolver.resolve(new PageReference("Wiki", "OtherPage")))
-            .thenReturn(new DocumentReference("Wiki", "OtherPage", "WebHome"));
+        doReturn(new DocumentReference("Wiki", "OtherPage", "WebHome")).when(this.xWiki)
+            .getDocumentReference(new PageReference("Wiki", "OtherPage"), this.oldcore.getXWikiContext());
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
 

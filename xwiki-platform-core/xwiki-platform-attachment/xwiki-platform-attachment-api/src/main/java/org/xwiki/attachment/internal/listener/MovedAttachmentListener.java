@@ -21,6 +21,7 @@ package org.xwiki.attachment.internal.listener;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -36,6 +37,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -94,21 +96,22 @@ public class MovedAttachmentListener implements EventListener
                 || this.authorization.hasAccess(Right.EDIT, moveAttachmentRequest.getUserReference(), reference))
                 && (!moveAttachmentRequest.isCheckAuthorRights() || this.authorization.hasAccess(Right.EDIT,
                     moveAttachmentRequest.getAuthorReference(), reference)));
-            // TODO: Make sure to apply the refactoring at farm level for attachments as part of XWIKI-8346.
-            updateBackLinks(attachmentMovedEvent, canEdit);
+            try {
+                updateBackLinks(attachmentMovedEvent, canEdit);
+            } catch (RefactoringException e) {
+                this.logger.error("Failed to update links backlinks", e);
+            }
         }
     }
 
     private void updateBackLinks(AttachmentMovedEvent event, Predicate<EntityReference> canEdit)
+        throws RefactoringException
     {
-        String wikiId = event.getSourceReference().getDocumentReference().getWikiReference().getName();
-        this.logger.info("Updating the back-links for attachment [{}] in wiki [{}].", event.getSourceReference(),
-            wikiId);
-        List<DocumentReference> documentsList =
-            this.modelBridge.getBackLinkedReferences(event.getSourceReference(), wikiId);
-        // Since the backlinks are not stored for the document containing the attachment, we need to add it to the
-        // list of documents.
-        documentsList.add(event.getSourceReference().getDocumentReference());
+        this.logger.info("Updating the back-links for attachment [{}].", event.getSourceReference());
+
+        // TODO: it's possible to optimize a bit the actual entities to modify (especially which translation of the
+        // document to load and parse) since we have the information in the store
+        Set<DocumentReference> documentsList = this.modelBridge.getBackLinkedDocuments(event.getSourceReference());
 
         this.progressManager.pushLevelProgress(documentsList.size(), this);
 

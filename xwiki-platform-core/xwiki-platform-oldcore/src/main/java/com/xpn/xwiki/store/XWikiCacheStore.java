@@ -648,12 +648,14 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public List<XWikiLink> loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         return this.store.loadLinks(docId, context, bTransaction);
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
@@ -661,6 +663,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public List<DocumentReference> loadBacklinks(AttachmentReference attachmentReference, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
@@ -668,18 +671,21 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
+    @Deprecated(since = "2.2M2")
     public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         return this.store.loadBacklinks(fullName, context, bTransaction);
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         this.store.saveLinks(doc, context, bTransaction);
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         this.store.deleteLinks(docId, context, bTransaction);

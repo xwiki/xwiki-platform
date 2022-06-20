@@ -19,8 +19,7 @@
  */
 package org.xwiki.attachment.internal.listener;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -29,6 +28,7 @@ import org.xwiki.attachment.refactoring.event.AttachmentMovedEvent;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -95,7 +95,7 @@ class MovedAttachmentListenerTest
     }
 
     @Test
-    void onEvent()
+    void onEvent() throws RefactoringException
     {
         MoveAttachmentRequest data = new MoveAttachmentRequest();
         AttachmentMovedEvent event = new AttachmentMovedEvent(SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
@@ -103,8 +103,7 @@ class MovedAttachmentListenerTest
         DocumentReference d2 = new DocumentReference("wiki", "space", "page2");
 
         when(this.authorization.hasAccess(eq(Right.EDIT), any(), any())).thenReturn(true);
-        when(this.modelBridge.getBackLinkedReferences(SOURCE_ATTACHMENT, "wiki"))
-            .thenReturn(new ArrayList<>(List.of(d1, d2)));
+        when(this.modelBridge.getBackLinkedDocuments(SOURCE_ATTACHMENT)).thenReturn(Set.of(d1, d2));
 
         this.listener.onEvent(event, null, data);
 

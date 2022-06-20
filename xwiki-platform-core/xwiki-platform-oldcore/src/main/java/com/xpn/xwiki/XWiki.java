@@ -470,6 +470,8 @@ public class XWiki implements EventListener
 
     private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
 
+    private DocumentReferenceResolver<PageReference> currentPageDocumentResolver;
+
     private PageReferenceResolver<EntityReference> currentgetpageResolver;
 
     private AttachmentReferenceResolver<EntityReference> currentAttachmentReferenceResolver;
@@ -673,6 +675,15 @@ public class XWiki implements EventListener
         }
 
         return this.currentgetdocumentResolver;
+    }
+
+    private DocumentReferenceResolver<PageReference> getCurrentPageDocumentResolver()
+    {
+        if (this.currentPageDocumentResolver == null) {
+            this.currentPageDocumentResolver = Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+        }
+
+        return this.currentPageDocumentResolver;
     }
 
     private PageReferenceResolver<EntityReference> getCurrentGetPageResolver()
@@ -2270,19 +2281,16 @@ public class XWiki implements EventListener
      */
     public DocumentReference getDocumentReference(EntityReference reference, XWikiContext context)
     {
-        DocumentReference documentReference = getCurrentGetDocumentResolver().resolve(reference);
+        DocumentReference documentReference;
 
-        // If the document has been found or it's top level space, return the reference
-        if (documentReference.getParent().getParent().getType() != EntityType.SPACE
-            || exists(documentReference, context)) {
-            return documentReference;
+        if (reference.getType() == EntityType.PAGE || reference.getType().isAllowedAncestor(EntityType.PAGE)) {
+            documentReference =
+                getCurrentPageDocumentResolver().resolve(getCurrentGetPageResolver().resolve(reference));
+        } else {
+            documentReference = getCurrentGetDocumentResolver().resolve(reference);
         }
 
-        // Try final page
-        DocumentReference finalPageReference = new DocumentReference(documentReference.getParent().getName(),
-            documentReference.getParent().getParent(), documentReference.getParameters());
-
-        return exists(finalPageReference, context) ? finalPageReference : documentReference;
+        return documentReference;
     }
 
     /**

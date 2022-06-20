@@ -124,6 +124,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.refactoring.RefactoringException;
+import org.xwiki.refactoring.link.LinkStore;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -416,15 +418,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private static UserConfiguration getUserConfiguration()
     {
         return Utils.getComponent(UserConfiguration.class);
-    }
-
-    /**
-     * Used to convert {@link PageReference} into {@link DocumentReference}.
-     */
-    private static DocumentReferenceResolver<PageReference> getCurrentPageReferenceDocumentReferenceResolver()
-    {
-        return Utils.getComponent(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
-            PageReference.class), "current");
     }
 
     private String title;
@@ -945,6 +938,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private UserReferenceSerializer<String> getUserReferenceCompactWikiSerializer()
     {
         return Utils.getComponent(UserReferenceSerializer.TYPE_STRING, "compactwiki/document");
+    }
+
+    private LinkStore getLinkStore()
+    {
+        return Utils.getComponent(LinkStore.class);        
     }
 
     public XWikiStoreInterface getStore(XWikiContext context)
@@ -5498,8 +5496,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Get the wiki document references pointing to this document.
      * <p>
-     * Theses links are stored to the database when documents are saved. You can use "backlinks" in XWikiPreferences or
-     * "xwiki.backlinks" in xwiki.cfg file to enable links storage in the database.
+     * Theses links are stored in the Solr search core when the document is indexed. You can use "backlinks" in
+     * XWikiPreferences or "xwiki.backlinks" in xwiki.cfg file to enable links storage in the database.
+     * <p>
+     * Since 14.8RC1, this method return all backlinked documents and not just those located in the context wiki.
      *
      * @param context the XWiki context.
      * @return the found wiki document references
@@ -5508,7 +5508,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public List<DocumentReference> getBackLinkedReferences(XWikiContext context) throws XWikiException
     {
-        return getStore(context).loadBacklinks(getDocumentReference(), true, context);
+        Set<EntityReference> references;
+        try {
+            references = getLinkStore().resolveBackLinkedEntities(getDocumentReference());
+        } catch (RefactoringException e) {
+            throw new XWikiException("Failed to load backlinks for reference [" + getDocumentReference() + "]", e);
+        }
+
+        Set<DocumentReference> documentReferences = new HashSet<>(references.size());
+        for (EntityReference entityReference : references) {
+            documentReferences.add(context.getWiki().getDocumentReference(entityReference, context));
+        }
+
+        return new ArrayList<>(documentReferences);
     }
 
     /**
@@ -5517,7 +5529,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated(since = "2.2M2")
     public List<String> getBackLinkedPages(XWikiContext context) throws XWikiException
     {
-        return getStore(context).loadBacklinks(getFullName(), context, true);
+        List<DocumentReference> references = getBackLinkedReferences(context);
+
+        EntityReferenceSerializer<String> serializer = getCompactWikiEntityReferenceSerializer();
+
+        List<String> documentNames = new ArrayList<>(references.size());
+        for (DocumentReference reference : references) {
+            // Serialize the reference
+            documentNames.add(serializer.serialize(reference));
+        }
+
+        return documentNames;
     }
 
     /**
@@ -5539,7 +5561,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         Set<XWikiLink> links;
 
         // We don't handle the links the same way in 1.0 syntax for retro-compatibility reason
-        // So here we explicitely get the link from the DB instead of looking inside the document.
+        // So here we explicitly get the link from the DB instead of looking inside the document.
         if (is10Syntax()) {
             links = new LinkedHashSet<>(getStore(context).loadLinks(getId(), context, true));
         } else {
@@ -5780,12 +5802,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             }
 
             for (EntityReference reference : references) {
-                // If the reference is a PageReference then we can't know if it points to a terminal page or a
-                // non-terminal one, and thus we need to resolve it.
-                if (reference instanceof PageReference) {
-                    reference = getCurrentPageReferenceDocumentReferenceResolver().resolve((PageReference) reference);
-                }
-                documentNames.add(serializer.serialize(reference));
+                // Get the reference of the document
+                DocumentReference linkDocumentReference = context.getWiki().getDocumentReference(reference, context);
+
+                // Serialize the reference
+                documentNames.add(serializer.serialize(linkDocumentReference));
             }
         } finally {
             context.setDoc(contextDoc);

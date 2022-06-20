@@ -12,6 +12,7 @@ org.xwiki.search.solr.internal.SolrIndexAvailableLocalesListener
 org.xwiki.search.solr.internal.SolrIndexEventListener
 org.xwiki.search.solr.internal.SolrIndexInitializeListener
 org.xwiki.search.solr.internal.SolrInstanceProvider
+org.xwiki.search.solr.internal.SolrSearchCoreUtils
 org.xwiki.search.solr.internal.job.IndexerJob
 org.xwiki.search.solr.internal.job.DatabaseDocumentIterator
 org.xwiki.search.solr.internal.job.SolrDocumentIterator
@@ -19,6 +20,7 @@ org.xwiki.search.solr.internal.metadata.AttachmentSolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.DocumentSolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.ObjectPropertySolrMetadataExtractor
 org.xwiki.search.solr.internal.metadata.ObjectSolrMetadataExtractor
+org.xwiki.search.solr.internal.metadata.SolrMetadataExtractorUtils
 org.xwiki.search.solr.internal.reference.AttachmentSolrReferenceResolver
 org.xwiki.search.solr.internal.reference.DefaultSolrReferenceResolver
 org.xwiki.search.solr.internal.reference.DocumentSolrReferenceResolver

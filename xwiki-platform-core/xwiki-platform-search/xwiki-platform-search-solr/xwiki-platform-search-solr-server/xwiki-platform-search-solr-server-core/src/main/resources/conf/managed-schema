@@ -163,6 +163,10 @@
     <!-- Whether the entity is hidden on not. Only documents can be made hidden explicitly.
          The attachments, objects and object properties are hidden if the document that holds them is hidden. -->
     <field name="hidden" type="boolean" indexed="true" stored="true" />
+    <!-- The references of the resources where the various links found in that entity are leading to -->
+    <field name="links" type="string" indexed="true" stored="true" multiValued="true" />
+    <!-- Contains links plus all the references parents to make easier to search for links from any entity level (per wiki, per space, per document, etc.) -->
+    <field name="links_extended" type="string" indexed="true" stored="false" multiValued="true" />
 
     <!-- Document static fields -->
 

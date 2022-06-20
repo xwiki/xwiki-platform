@@ -115,6 +115,18 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
     @Override
     public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {
+        // If the type is not provided, try to extract it from the string
+        if (type == null) {
+            Character entityTypeSeparator = getSymbolScheme().getEntityTypeSeparator();
+            if (entityTypeSeparator != null) {
+                type = Enum.valueOf(EntityType.class,
+                    StringUtils.substringBefore(entityReferenceRepresentation, entityTypeSeparator));
+                entityReferenceRepresentation =
+                    StringUtils.substringAfter(entityReferenceRepresentation, entityTypeSeparator);
+            }
+        }
+
+        // Get the type setup
         Map<Character, EntityType> typeSetup = getTypeSetup(type);
 
         // Check if the type require anything specific
@@ -371,7 +383,8 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
                 value = unescape(value);
             }
 
-            parsedParameters.put(key != null ? key : defaultParameter, value);
+            String parameterName = key != null ? key : defaultParameter;
+            parsedParameters.put(parameterName, getSymbolScheme().resolveParameter(parameterName, value));
         }
     }
 

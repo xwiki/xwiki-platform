@@ -43,10 +43,13 @@ import static org.xwiki.index.internal.DefaultLinksTaskConsumer.LINKS_TASK_TYPE;
  *
  * @version $Id$
  * @since 14.2RC1
+ * @deprecated links indexing move to Solr, see org.xwiki.refactoring.internal.solr.* in
+ *             xwiki-platform-refactoring-default module
  */
 @Component
 @Singleton
 @Named("LinksUpdateListener")
+@Deprecated(since = "14.8RC1")
 public class LinksUpdateListener extends AbstractEventListener
 {
     @Inject

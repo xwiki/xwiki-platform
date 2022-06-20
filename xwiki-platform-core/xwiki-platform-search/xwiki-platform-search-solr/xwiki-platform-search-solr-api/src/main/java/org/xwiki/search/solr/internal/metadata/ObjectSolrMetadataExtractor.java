@@ -77,6 +77,9 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
         setLocaleAndContentFields(documentReference, solrDocument, object);
 
+        // Extract more metadata
+        this.extractorUtils.extract(objectReference, object, solrDocument);
+
         return true;
     }
 

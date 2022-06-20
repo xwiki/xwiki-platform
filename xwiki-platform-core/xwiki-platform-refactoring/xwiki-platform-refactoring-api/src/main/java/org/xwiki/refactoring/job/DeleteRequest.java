@@ -145,10 +145,12 @@ public class DeleteRequest extends EntityRequest
      * @return {@code true} if the job should update the links that target the old entity reference (before the delete)
      *         from anywhere on the farm, {@code false} if the job should update only the links from the wiki where the
      *         entity was located before the delete
+     * @deprecated not taken into account anymore
      */
+    @Deprecated(since = "14.8RC1")
     public boolean isUpdateLinksOnFarm()
     {
-        return getProperty(UPDATE_LINKS_ON_FARM, false);
+        return true;
     }
 
     /**
@@ -159,10 +161,12 @@ public class DeleteRequest extends EntityRequest
      *
      * @param updateLinksOnFarm {@code true} to update the links from anywhere on the farm, {@code false} to update only
      *            the links from the wiki where the entity is located
+     * @deprecated not taken into account anymore
      */
+    @Deprecated(since = "14.8RC1")
     public void setUpdateLinksOnFarm(boolean updateLinksOnFarm)
     {
-        setProperty(UPDATE_LINKS_ON_FARM, updateLinksOnFarm);
+        // Ignored
     }
 
     /**

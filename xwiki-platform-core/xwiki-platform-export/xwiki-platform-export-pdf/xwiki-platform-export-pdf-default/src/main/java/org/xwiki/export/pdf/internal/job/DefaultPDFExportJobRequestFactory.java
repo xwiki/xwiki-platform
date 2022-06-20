@@ -45,6 +45,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobRequestFactory;
+import org.xwiki.model.internal.reference.comparator.DocumentReferenceComparator;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -83,6 +84,8 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
 
     @Inject
     private ContextStoreManager contextStoreManager;
+
+    private DocumentReferenceComparator documentReferenceComparator = new DocumentReferenceComparator(true);
 
     @Override
     public PDFExportJobRequest createRequest() throws Exception
@@ -141,8 +144,8 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
         request.setWithToc(!"0".equals(httpRequest.get("pdftoc")));
         request.setWithHeader(!"0".equals(httpRequest.get("pdfheader")));
         request.setWithFooter(!"0".equals(httpRequest.get("pdffooter")));
-        request
-            .setDocuments(this.documentSelectionResolver.getSelectedDocuments().stream().collect(Collectors.toList()));
+        request.setDocuments(this.documentSelectionResolver.getSelectedDocuments().stream()
+            .sorted(this.documentReferenceComparator).collect(Collectors.toList()));
     }
 
     private Map<String, String[]> getRequestParameters(String queryString)

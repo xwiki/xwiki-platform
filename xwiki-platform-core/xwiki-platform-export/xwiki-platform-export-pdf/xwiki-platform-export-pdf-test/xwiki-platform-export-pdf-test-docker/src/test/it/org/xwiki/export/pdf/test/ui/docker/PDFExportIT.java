@@ -90,15 +90,13 @@ class PDFExportIT
             // The header shows the page title and the footer shows the page number and the page count.
             assertTrue(tocPageText.startsWith("Parent\n2 / 3\n"),
                 "Unexpected header and footer on table of contents page: " + coverPageText);
-            // TODO: Fix the page order in DocumentSelectionResolver.
-            assertTrue(tocPageText.contains("Table of Contents\nSection 1\nChapter 1\n"),
+            assertTrue(tocPageText.contains("Table of Contents\nChapter 1\nSection 1\n"),
                 "Unexpected table of contents: " + tocPageText);
 
             // The table of contents should have internal links (anchors) to each section.
             Map<String, String> tocPageLinks = pdf.getLinksFromPage(1);
             assertEquals(2, tocPageLinks.size());
-            // TODO: Fix the page order in DocumentSelectionResolver.
-            assertEquals(Arrays.asList("HSection1", "HChapter1"),
+            assertEquals(Arrays.asList("HChapter1", "HSection1"),
                 tocPageLinks.values().stream().collect(Collectors.toList()));
 
             // No images on the table of contents page.

@@ -17,22 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal.job;
+package org.xwiki.model.internal.reference.comparator;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link DocumentReferenceComparator}.
  * 
  * @version $Id$
- * @since 5.4.5
+ * @since 14.4.2
+ * @since 14.5RC1
  */
 public class DocumentReferenceComparatorTest
 {
@@ -60,7 +62,7 @@ public class DocumentReferenceComparatorTest
     }
 
     @Test
-    public void compareNestedPages()
+    public void compareNestedSpaces()
     {
         assertTrue(compare(Arrays.asList("math", "Path", "To", "Page"), Arrays.asList("math", "Path", "Page")) > 0);
         assertTrue(compare(Arrays.asList("math", "Path", "Alice"), Arrays.asList("math", "Path", "To", "Bob")) < 0);
@@ -72,10 +74,32 @@ public class DocumentReferenceComparatorTest
             Arrays.asList("math", "Users", "Alice", "Files")));
     }
 
+    @Test
+    public void compareNestedPages()
+    {
+        this.comparator = new DocumentReferenceComparator(true);
+
+        assertTrue(compare(Arrays.asList("test", "Parent", "WebHome"), Arrays.asList("test", "Parent", "Child")) < 0);
+        assertTrue(compare(Arrays.asList("test", "Parent", "Child"), Arrays.asList("test", "Parent", "WebHome")) > 0);
+
+        assertTrue(compare(Arrays.asList("test", "Parent", "Web"), Arrays.asList("test", "Parent", "Child")) > 0);
+        assertTrue(compare(Arrays.asList("test", "Parent", "Child"), Arrays.asList("test", "Parent", "Web")) < 0);
+
+        assertTrue(compare(Arrays.asList("test", "Parent", "WebHome"),
+            Arrays.asList("test", "Parent", "Child", "WebHome")) < 0);
+        assertTrue(compare(Arrays.asList("test", "Parent", "Child", "WebHome"),
+            Arrays.asList("test", "Parent", "WebHome")) > 0);
+
+        assertTrue(
+            compare(Arrays.asList("test", "Parent", "Alice", "WebHome"), Arrays.asList("test", "Parent", "Bob")) < 0);
+        assertTrue(
+            compare(Arrays.asList("test", "Parent", "Bob"), Arrays.asList("test", "Parent", "Alice", "WebHome")) > 0);
+    }
+
     private int compare(List<String> alice, List<String> bob)
     {
-        assertTrue("Invalid document reference!", alice.size() >= 3);
-        assertTrue("Invalid document reference!", bob.size() >= 3);
+        assertTrue(alice.size() >= 3, "Invalid document reference!");
+        assertTrue(bob.size() >= 3, "Invalid document reference!");
         DocumentReference aliceReference =
             new DocumentReference(alice.get(0), alice.subList(1, alice.size() - 1), alice.get(alice.size() - 1));
         DocumentReference bobReference =

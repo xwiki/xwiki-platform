@@ -33,10 +33,10 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.async.ResultCallbackTemplate;
-import com.github.dockerjava.api.command.CreateContainerCmd;
+import com.github.dockerjava.api.command.AsyncDockerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.api.command.SyncDockerCmd;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.Container;
@@ -91,7 +91,7 @@ public class ContainerManager implements Initializable
     {
         this.logger.debug("Looking for an existing Docker container with name [{}].", containerName);
         List<Container> containers =
-            this.client.listContainersCmd().withNameFilter(Arrays.asList(containerName)).withShowAll(true).exec();
+            exec(this.client.listContainersCmd().withNameFilter(Arrays.asList(containerName)).withShowAll(true));
         if (containers.isEmpty()) {
             this.logger.debug("Could not find any Docker container with name [{}].", containerName);
             // There's no container with the specified name.
@@ -99,15 +99,15 @@ public class ContainerManager implements Initializable
         }
 
         this.logger.debug("Inspecting the state of the Docker container [{}].", containers.get(0).getId());
-        InspectContainerResponse container = this.client.inspectContainerCmd(containers.get(0).getId()).exec();
+        InspectContainerResponse container = exec(this.client.inspectContainerCmd(containers.get(0).getId()));
         if (container.getState().getDead() == Boolean.TRUE) {
             this.logger.debug("Docker container [{}] is dead. Removing it.", container.getId());
             // The container is not reusable. Try to remove it so it can be recreated.
-            this.client.removeContainerCmd(container.getId()).exec();
+            exec(this.client.removeContainerCmd(container.getId()));
             return null;
         } else if (container.getState().getPaused() == Boolean.TRUE) {
             this.logger.debug("Docker container [{}] is paused. Unpausing it.", container.getId());
-            this.client.unpauseContainerCmd(container.getId()).exec();
+            exec(this.client.unpauseContainerCmd(container.getId()));
         } else if (container.getState().getRunning() != Boolean.TRUE
             && container.getState().getRestarting() != Boolean.TRUE) {
             this.logger.debug("Docker container [{}] is neither running nor restarting. Starting it.",
@@ -127,7 +127,7 @@ public class ContainerManager implements Initializable
     public boolean isLocalImagePresent(String imageName)
     {
         try {
-            this.client.inspectImageCmd(imageName).exec();
+            exec(this.client.inspectImageCmd(imageName));
             return true;
         } catch (NotFoundException e) {
             return false;
@@ -142,7 +142,7 @@ public class ContainerManager implements Initializable
     public void pullImage(String imageName)
     {
         this.logger.debug("Pulling the Docker image [{}].", imageName);
-        wait(this.client.pullImageCmd(imageName).start());
+        wait(this.client.pullImageCmd(imageName));
     }
 
     /**
@@ -163,16 +163,16 @@ public class ContainerManager implements Initializable
         Ports portBindings = new Ports();
         portBindings.bind(exposedPort, Ports.Binding.bindPort(remoteDebuggingPort));
 
-        CreateContainerCmd command = this.client.createContainerCmd(imageName);
-        CreateContainerResponse container = command.withCmd(parameters).withExposedPorts(exposedPort)
-            // The extra host is needed in order to be able to access the XWiki instance running on the same machine as
-            // the Docker container itself.
-            .withHostConfig(HostConfig.newHostConfig()
-                .withExtraHosts(this.configuration.getChromeDockerHostName() + ":host-gateway").withBinds(
-                    // Make sure it also works when XWiki is running in Docker.
-                    new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK)))
-                .withPortBindings(portBindings))
-            .withName(containerName).exec();
+        CreateContainerResponse container =
+            exec(this.client.createContainerCmd(imageName).withCmd(parameters).withExposedPorts(exposedPort)
+                // The extra host is needed in order to be able to access the XWiki instance running on the same machine
+                // as the Docker container itself.
+                .withHostConfig(HostConfig.newHostConfig()
+                    .withExtraHosts(this.configuration.getChromeDockerHostName() + ":host-gateway").withBinds(
+                        // Make sure it also works when XWiki is running in Docker.
+                        new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK)))
+                    .withPortBindings(portBindings))
+                .withName(containerName));
         this.logger.debug("Created the Docker container with id [{}].", container.getId());
         return container.getId();
     }
@@ -185,7 +185,7 @@ public class ContainerManager implements Initializable
     public void startContainer(String containerId)
     {
         this.logger.debug("Starting the Docker container with id [{}].", containerId);
-        this.client.startContainerCmd(containerId).exec();
+        exec(this.client.startContainerCmd(containerId));
     }
 
     /**
@@ -197,23 +197,34 @@ public class ContainerManager implements Initializable
     {
         if (containerId != null) {
             this.logger.debug("Stopping the Docker container with id [{}].", containerId);
-            this.client.stopContainerCmd(containerId).exec();
+            exec(this.client.stopContainerCmd(containerId));
 
             // Wait for the container to be fully stopped before continuing.
             this.logger.debug("Wait for the Docker container [{}] to stop.", containerId);
-            wait(this.client.waitContainerCmd(containerId).start());
+            wait(this.client.waitContainerCmd(containerId));
         }
     }
 
-    private void wait(ResultCallbackTemplate<?, ?> template)
+    private void wait(AsyncDockerCmd<?, ?> command)
     {
-        try {
-            template.awaitCompletion();
+        // Can't write simply try(command) because spoon complains about "Variable resource not allowed here for source
+        // level below 9".
+        try (AsyncDockerCmd<?, ?> cmd = command) {
+            cmd.start().awaitCompletion();
         } catch (InterruptedException e) {
             this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
                 ExceptionUtils.getRootCauseMessage(e));
             // Restore the interrupted state.
             Thread.currentThread().interrupt();
+        }
+    }
+
+    private <T> T exec(SyncDockerCmd<T> command)
+    {
+        // Can't write simply try(command) because spoon complains about "Variable resource not allowed here for source
+        // level below 9".
+        try (SyncDockerCmd<T> cmd = command) {
+            return cmd.exec();
         }
     }
 }

@@ -91,7 +91,7 @@
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategory><!-- TODO: change XObject structure -->
         <disabled>0</disabled>
         <name>defaultCategory</name>
         <number>4</number>
@@ -168,7 +168,7 @@
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Navigation</defaultCategory>
+      <defaultCategory>Navigation</defaultCategory><!-- TODO: replace with defaultCategories -->
     </property>
     <property>
       <description>Displays a tree of children pages of the current page</description>

@@ -1297,7 +1297,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategory><!-- TODO: change XObject structure -->
         <disabled>0</disabled>
         <name>defaultCategory</name>
         <number>4</number>
@@ -1553,7 +1553,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Development</defaultCategory>
+      <defaultCategory>Development</defaultCategory><!-- TODO: replace with defaultCategories -->
     </property>
     <property>
       <description>A control to be used for object properties of the current document that are supposed to contain the name of an attachment from the current (or target) document. Allows uploading new attachments, and deleting attachments from the target document.  If no target document is specified, the current document will be used. Object properties are only saved to the current document.</description>

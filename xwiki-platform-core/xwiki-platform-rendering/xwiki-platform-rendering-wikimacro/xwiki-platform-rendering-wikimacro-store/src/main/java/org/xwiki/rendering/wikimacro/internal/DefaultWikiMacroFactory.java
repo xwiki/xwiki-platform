@@ -22,6 +22,7 @@ package org.xwiki.rendering.wikimacro.internal;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -145,6 +146,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         // The macro description as plain text
         String macroDescription = macroDefinition.getStringValue(MACRO_DESCRIPTION_PROPERTY);
         String macroDefaultCategory = macroDefinition.getStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY);
+        List<String> macroDefaultCategories = macroDefinition.getListValue(MACRO_DEFAULT_CATEGORIES_PROPERTY);
         WikiMacroVisibility macroVisibility =
             WikiMacroVisibility.fromString(macroDefinition.getStringValue(MACRO_VISIBILITY_PROPERTY));
         boolean macroSupportsInlineMode = macroDefinition.getIntValue(MACRO_INLINE_PROPERTY) != 0;
@@ -155,8 +157,8 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         }
 
         // Verify default macro category.
-        if (StringUtils.isEmpty(macroDefaultCategory)) {
-            macroDefaultCategory = null;
+        if (macroDefaultCategories == null || macroDefaultCategories.isEmpty()) {
+            macroDefaultCategories = List.of();
             this.logger.debug("Incomplete macro definition in [{}], default macro category is empty",
                 documentReference);
         }
@@ -174,10 +176,16 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         // Note that we register wiki macros for all syntaxes FTM and there's currently no way to restrict a wiki
         // macro for a given syntax only.
         MacroId id = new MacroId(macroId);
-        MacroDescriptor macroDescriptor = new WikiMacroDescriptor.Builder().id(id).name(macroName)
-            .description(macroDescription).defaultCategory(macroDefaultCategory).visibility(macroVisibility)
-            .supportsInlineMode(macroSupportsInlineMode).contentDescriptor(contentDescriptor)
-            .parameterDescriptors(parameterDescriptors).build();
+        MacroDescriptor macroDescriptor = new WikiMacroDescriptor.Builder()
+            .id(id)
+            .name(macroName)
+            .description(macroDescription)
+            .defaultCategories(new HashSet<>(macroDefaultCategories))
+            .visibility(macroVisibility)
+            .supportsInlineMode(macroSupportsInlineMode)
+            .contentDescriptor(contentDescriptor)
+            .parameterDescriptors(parameterDescriptors)
+            .build();
 
         // Create & return the macro.
         return new DefaultWikiMacro(macroDefinition, macroDescriptor, this.componentManager);

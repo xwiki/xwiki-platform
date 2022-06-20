@@ -77,7 +77,7 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
     {
         super("Container", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false, Block.LIST_BLOCK_TYPE),
             ContainerMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_LAYOUT);
+        setDefaultCategories(DEFAULT_CATEGORY_LAYOUT);
     }
 
     @Override

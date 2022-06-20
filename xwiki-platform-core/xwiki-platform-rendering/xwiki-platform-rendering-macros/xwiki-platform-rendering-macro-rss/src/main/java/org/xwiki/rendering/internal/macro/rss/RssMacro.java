@@ -112,7 +112,7 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
     public RssMacro()
     {
         super("RSS", DESCRIPTION, new DefaultContentDescriptor(DESCRIPTION, false), RssMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(DEFAULT_CATEGORY_CONTENT);
     }
 
     @Override

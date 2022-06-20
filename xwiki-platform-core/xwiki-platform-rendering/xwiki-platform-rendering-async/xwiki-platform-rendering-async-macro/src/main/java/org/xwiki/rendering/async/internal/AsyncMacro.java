@@ -91,7 +91,7 @@ public class AsyncMacro extends AbstractMacro<AsyncMacroParameters>
         super("Async", DESCRIPTION, new DefaultContentDescriptor("Content to execute", true, Block.LIST_BLOCK_TYPE),
             AsyncMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(DEFAULT_CATEGORY_CONTENT);
     }
 
     @Override

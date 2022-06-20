@@ -449,7 +449,7 @@ return XWiki;
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategory><!-- TODO: change XObject structure -->
         <disabled>0</disabled>
         <name>defaultCategory</name>
         <number>4</number>
@@ -719,7 +719,7 @@ return XWiki;
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Social</defaultCategory>
+      <defaultCategory>Social</defaultCategory><!-- TODO: replace with defaultCategories -->
     </property>
     <property>
       <description>A control that allows users to enter messages that are handled by the MessageStream module.</description>

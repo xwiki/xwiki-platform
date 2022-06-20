@@ -111,7 +111,7 @@
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategory><!-- TODO: change XObject structure -->
         <disabled>0</disabled>
         <name>defaultCategory</name>
         <number>4</number>
@@ -217,7 +217,7 @@
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Development</defaultCategory>
+      <defaultCategory>Development</defaultCategory><!-- TODO: replace with defaultCategories -->
     </property>
     <property>
       <description>Select an icon within the XWiki icon set.</description>

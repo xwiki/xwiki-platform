@@ -735,7 +735,7 @@ require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategory><!-- TODO: change XObject structure -->
         <disabled>0</disabled>
         <name>defaultCategory</name>
         <number>4</number>
@@ -891,7 +891,7 @@ require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Notifications</defaultCategory>
+      <defaultCategory>Notifications</defaultCategory><!-- TODO: replace with defaultCategories -->
     </property>
     <property>
       <description>Display the preferences of the given user about system notification filters.</description>

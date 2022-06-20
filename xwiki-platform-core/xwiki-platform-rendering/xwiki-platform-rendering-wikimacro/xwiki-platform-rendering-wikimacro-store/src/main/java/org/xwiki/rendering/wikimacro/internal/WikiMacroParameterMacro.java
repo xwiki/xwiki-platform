@@ -77,7 +77,7 @@ public class WikiMacroParameterMacro extends AbstractMacro<WikiMacroParameterMac
         super("WikiMacro Parameter", DESCRIPTION, new DefaultContentDescriptor(false),
             WikiMacroParameterMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     @Override

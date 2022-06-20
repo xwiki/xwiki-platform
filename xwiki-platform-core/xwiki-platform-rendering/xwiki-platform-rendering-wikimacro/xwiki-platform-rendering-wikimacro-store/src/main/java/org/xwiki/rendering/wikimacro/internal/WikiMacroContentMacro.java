@@ -68,7 +68,7 @@ public class WikiMacroContentMacro extends AbstractNoParameterMacro
     {
         super("WikiMacro Content", DESCRIPTION);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     @Override

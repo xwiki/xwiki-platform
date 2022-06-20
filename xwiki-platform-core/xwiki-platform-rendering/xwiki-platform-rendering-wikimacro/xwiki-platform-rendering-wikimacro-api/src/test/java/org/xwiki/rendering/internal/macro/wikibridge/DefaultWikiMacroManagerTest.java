@@ -319,6 +319,7 @@ class DefaultWikiMacroManagerTest
 
     private WikiMacro generateWikiMacro(WikiMacroVisibility visibility) throws Exception
     {
+        // TOOD: add a test with defaultCategory and move this test to legacy
         DocumentReference wikiMacroDocReference = new DocumentReference("wiki", Arrays.asList("space"), "space");
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder().id(new MacroId("testwikimacro"))
             .name("Test Wiki Macro").description("Description").defaultCategory("Test").visibility(visibility)

@@ -104,7 +104,7 @@ public class TranslationMacro extends AbstractMacro<TranslationMacroParameters>
         super("Translation", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
             TranslationMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(DEFAULT_CATEGORY_CONTENT);
     }
 
     @Override

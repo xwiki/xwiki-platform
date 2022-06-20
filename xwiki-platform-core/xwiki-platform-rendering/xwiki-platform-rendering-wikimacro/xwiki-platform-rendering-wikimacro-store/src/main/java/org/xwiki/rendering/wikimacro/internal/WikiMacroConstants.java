@@ -69,8 +69,16 @@ public interface WikiMacroConstants
 
     /**
      * Constant for representing default macro category property.
+     * @deprecated since 14.6RC1, replaced by {@link  #MACRO_DEFAULT_CATEGORIES_PROPERTY}
      */
+    @Deprecated(since = "14.6RC1")
     String MACRO_DEFAULT_CATEGORY_PROPERTY = "defaultCategory";
+
+    /**
+     * Constant for representing default macro categories property.
+     * @since 14.6RC1
+     */
+    String MACRO_DEFAULT_CATEGORIES_PROPERTY = "defaultCategories";
 
     /**
      * Name of the macro visibility property in the Wiki Macro Class.

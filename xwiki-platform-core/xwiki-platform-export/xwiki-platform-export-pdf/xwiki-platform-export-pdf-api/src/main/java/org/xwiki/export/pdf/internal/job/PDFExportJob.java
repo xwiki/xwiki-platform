@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.export.pdf.PDFPrinter;
@@ -69,9 +70,21 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     @Inject
     private RequiredSkinExtensionsRecorder requiredSkinExtensionsRecorder;
 
+    /**
+     * We use a provider instead of direct injection because:
+     * <ul>
+     * <li>the PDF printer connects to the Docker container in its initialization phase which can take some time and,
+     * more importantly, can easily fail if the environment where XWiki runs was not set up properly (e.g. Docker not
+     * installed, wrong version of Docker, missing network connection, Docker hub not accessible, etc.)</li>
+     * <li>in case the PDF printer fails to be initialized we want the exception to appear in the job log</li>
+     * <li>the PDF printer is used only when {@link PDFExportJobRequest#isServerSide()} returns {@code true} so it
+     * doesn't make sense to initialize it (e.g. pull the Docker image, create and start the container, connect to the
+     * head-less Chrome browser, etc.) unless it's used.</li>
+     * </ul>
+     */
     @Inject
     @Named("docker")
-    private PDFPrinter<URL> pdfPrinter;
+    private Provider<PDFPrinter<URL>> pdfPrinterProvider;
 
     @Inject
     private TemporaryResourceStore temporaryResourceStore;
@@ -146,7 +159,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     private void saveAsPDF() throws IOException
     {
         URL printPreviewURL = (URL) this.request.getContext().get("request.url");
-        try (InputStream pdfContent = this.pdfPrinter.print(printPreviewURL)) {
+        try (InputStream pdfContent = this.pdfPrinterProvider.get().print(printPreviewURL)) {
             this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
         }
     }

@@ -34,6 +34,7 @@ import org.xwiki.export.pdf.PDFExportConfiguration;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.AsyncDockerCmd;
+import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.SyncDockerCmd;
@@ -98,8 +99,7 @@ public class ContainerManager implements Initializable
             return null;
         }
 
-        this.logger.debug("Inspecting the state of the Docker container [{}].", containers.get(0).getId());
-        InspectContainerResponse container = exec(this.client.inspectContainerCmd(containers.get(0).getId()));
+        InspectContainerResponse container = inspectContainer(containers.get(0).getId());
         if (container.getState().getDead() == Boolean.TRUE) {
             this.logger.debug("Docker container [{}] is dead. Removing it.", container.getId());
             // The container is not reusable. Try to remove it so it can be recreated.
@@ -163,8 +163,8 @@ public class ContainerManager implements Initializable
         Ports portBindings = new Ports();
         portBindings.bind(exposedPort, Ports.Binding.bindPort(remoteDebuggingPort));
 
-        CreateContainerResponse container =
-            exec(this.client.createContainerCmd(imageName).withCmd(parameters).withExposedPorts(exposedPort)
+        try (CreateContainerCmd createContainerCmd = this.client.createContainerCmd(imageName)) {
+            CreateContainerResponse container = createContainerCmd.withCmd(parameters).withExposedPorts(exposedPort)
                 // The extra host is needed in order to be able to access the XWiki instance running on the same machine
                 // as the Docker container itself.
                 .withHostConfig(HostConfig.newHostConfig()
@@ -172,9 +172,10 @@ public class ContainerManager implements Initializable
                         // Make sure it also works when XWiki is running in Docker.
                         new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK)))
                     .withPortBindings(portBindings))
-                .withName(containerName));
-        this.logger.debug("Created the Docker container with id [{}].", container.getId());
-        return container.getId();
+                .withName(containerName).exec();
+            this.logger.debug("Created the Docker container with id [{}].", container.getId());
+            return container.getId();
+        }
     }
 
     /**
@@ -203,6 +204,18 @@ public class ContainerManager implements Initializable
             this.logger.debug("Wait for the Docker container [{}] to stop.", containerId);
             wait(this.client.waitContainerCmd(containerId));
         }
+    }
+
+    /**
+     * Inspect the specified container to get more information.
+     *
+     * @param containerId the container to inspect
+     * @return information about the specified container
+     */
+    public InspectContainerResponse inspectContainer(String containerId)
+    {
+        this.logger.debug("Inspecting the Docker container [{}].", containerId);
+        return exec(this.client.inspectContainerCmd(containerId));
     }
 
     private void wait(AsyncDockerCmd<?, ?> command)

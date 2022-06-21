@@ -19,8 +19,6 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
@@ -64,7 +62,6 @@ class DefaultSecurityEntryReaderTest
     @InjectMockComponents
     private DefaultSecurityEntryReader defaultSecurityEntryReader;
 
-    @Inject
     private SecurityReferenceFactory securityReferenceFactory;
 
     @MockComponent
@@ -76,6 +73,12 @@ class DefaultSecurityEntryReaderTest
     void setup(MockitoComponentManager componentManager) throws Exception
     {
         componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+    }
+
+    @BeforeEach
+    void beforeEach(MockitoComponentManager componentManager) throws Exception
+    {
+        this.securityReferenceFactory = componentManager.getInstance(SecurityReferenceFactory.class);
     }
 
     @BeforeEach

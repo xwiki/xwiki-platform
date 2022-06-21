@@ -100,7 +100,7 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
                 this.containerId = this.containerManager.createContainer(imageName, containerName, remoteDebuggingPort,
                     Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
                         "--remote-debugging-port=" + remoteDebuggingPort));
-                this.containerManager.startContainer(containerId);
+                this.containerManager.startContainer(this.containerId);
             }
         } catch (Exception e) {
             throw new InitializationException("Failed to initialize the Docker container for the PDF export.", e);
@@ -110,7 +110,9 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
     private void initializeChromeService(int remoteDebuggingPort) throws InitializationException
     {
         try {
-            this.chromeManager.connect(remoteDebuggingPort);
+            String chromeContainerIpAddress = this.containerManager.inspectContainer(this.containerId)
+                .getNetworkSettings().getNetworks().get("bridge").getIpAddress();
+            this.chromeManager.connect(chromeContainerIpAddress, remoteDebuggingPort);
         } catch (Exception e) {
             throw new InitializationException("Failed to initialize the Chrome remote debugging service.", e);
         }

@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Provider;
 import javax.servlet.http.Cookie;
@@ -40,6 +41,9 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.api.model.ContainerNetwork;
+import com.github.dockerjava.api.model.NetworkSettings;
 import com.github.kklisura.cdt.protocol.types.network.CookieParam;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.xpn.xwiki.XWiki;
@@ -85,6 +89,8 @@ class DockerPDFPrinterTest
 
     private String containerId = "8f55a905efec";
 
+    private String containerIpAddress = "172.17.0.2";
+
     @BeforeComponent
     void configure()
     {
@@ -104,6 +110,24 @@ class DockerPDFPrinterTest
         when(this.configuration.getChromeDockerImage()).thenReturn("test/chrome:latest");
         when(this.configuration.getChromeDockerHostName()).thenReturn("docker");
         when(this.configuration.getChromeRemoteDebuggingPort()).thenReturn(1234);
+
+        when(this.containerManager.createContainer(this.configuration.getChromeDockerImage(),
+            this.configuration.getChromeDockerContainerName(), this.configuration.getChromeRemoteDebuggingPort(),
+            Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
+                "--remote-debugging-port=" + this.configuration.getChromeRemoteDebuggingPort())))
+                    .thenReturn(this.containerId);
+
+        InspectContainerResponse inspectContainerResponse = mock(InspectContainerResponse.class);
+        when(this.containerManager.inspectContainer(this.containerId)).thenReturn(inspectContainerResponse);
+
+        NetworkSettings networkSettings = mock(NetworkSettings.class);
+        when(inspectContainerResponse.getNetworkSettings()).thenReturn(networkSettings);
+
+        ContainerNetwork network = mock(ContainerNetwork.class);
+        Map<String, ContainerNetwork> networks = Collections.singletonMap("bridge", network);
+        when(networkSettings.getNetworks()).thenReturn(networks);
+
+        when(network.getIpAddress()).thenReturn(this.containerIpAddress);
     }
 
     @Test
@@ -167,11 +191,6 @@ class DockerPDFPrinterTest
         when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName()))
             .thenReturn(null);
         when(this.containerManager.isLocalImagePresent(this.configuration.getChromeDockerImage())).thenReturn(false);
-        when(this.containerManager.createContainer(this.configuration.getChromeDockerImage(),
-            this.configuration.getChromeDockerContainerName(), this.configuration.getChromeRemoteDebuggingPort(),
-            Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
-                "--remote-debugging-port=" + this.configuration.getChromeRemoteDebuggingPort())))
-                    .thenReturn(this.containerId);
     }
 
     @Test
@@ -179,6 +198,7 @@ class DockerPDFPrinterTest
     {
         verify(this.containerManager).pullImage(this.configuration.getChromeDockerImage());
         verify(this.containerManager).startContainer(this.containerId);
+        verify(this.chromeManager).connect(this.containerIpAddress, this.configuration.getChromeRemoteDebuggingPort());
 
         this.dockerPDFPrinter.dispose();
         verify(this.containerManager).stopContainer(this.containerId);
@@ -195,5 +215,6 @@ class DockerPDFPrinterTest
     void initializeWithExistingContainer() throws Exception
     {
         verify(this.containerManager, never()).startContainer(any(String.class));
+        verify(this.chromeManager).connect(this.containerIpAddress, this.configuration.getChromeRemoteDebuggingPort());
     }
 }

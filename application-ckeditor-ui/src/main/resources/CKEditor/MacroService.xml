@@ -118,30 +118,31 @@
   #end
   #set ($discard = $extensionQuery.setInstalled(false, '', "wiki:$xcontext.database"))
   #set ($extensions = $services.extension.index.repository.search($extensionQuery))
+  #set ($macroExtensionCategory = $services.localization.render('ckeditor.plugin.macro.notinstalled'))
   #if ($extensions.size &gt; 0)
     #set ($macroExtensionsMap = {})
     #foreach ($extension in $extensions)
       ## TODO: move to a proper generic API to check if an extension can be installed by a given user
-      #if ($services.security.authorization.hasAccess('programming')
+      #set ($extensionInstallAllowed = $services.security.authorization.hasAccess('programming', $xcontext.userReference, $NULL)
         || (($extension.type == 'xar' || $extension.type == 'webjar')
-            &amp;&amp; $services.security.authorization.hasAccess('admin', "wiki:$xcontext.database") &amp;&amp; $services.extension.isAllowed($extension, "wiki:$xcontext.database")))
-        #foreach ($extensionComponent in $extension.getComponents())
-          #if ($extensionComponent.roleType == 'org.xwiki.rendering.macro.Macro')
-            #set ($discard = $macroExtensionsList.add({
-                'id' : {
-                    'id' : $extensionComponent.roleHint
-                  },
-                'name': $extensionComponent.roleHint,
-                'description': $extension.summary,
-                'defaultCategory': '_notinstalled',
-                'extensionId' : $extension.id.id,
-                'extensionVersion' : $extension.id.version.value,
-                'extensionType' : $extension.type,
-                'extensionRecommended': $extension.recommended,
-                'extensionName': $extension.name,
-                'extensionSummary': $extension.summary
-              }))
-          #end
+            &amp;&amp; $services.security.authorization.hasAccess('admin', $xcontext.userReference, "wiki:$xcontext.database") &amp;&amp; $services.extension.isAllowed($extension, "wiki:$xcontext.database")))
+      #foreach ($extensionComponent in $extension.getComponents())
+        #if ($extensionComponent.roleType == 'org.xwiki.rendering.macro.Macro')
+          #set ($discard = $macroExtensionsList.add({
+              'id' : {
+                  'id' : $extensionComponent.roleHint
+                },
+              'name': $extensionComponent.roleHint,
+              'description': $extension.summary,
+              'defaultCategory': '_notinstalled',
+              'extensionId' : $extension.id.id,
+              'extensionVersion' : $extension.id.version.value,
+              'extensionType' : $extension.type,
+              'extensionRecommended': $extension.recommended,
+              'extensionName': $extension.name,
+              'extensionSummary': $extension.summary,
+              'extensionInstallAllowed': $extensionInstallAllowed
+            }))
         #end
       #end
     #end

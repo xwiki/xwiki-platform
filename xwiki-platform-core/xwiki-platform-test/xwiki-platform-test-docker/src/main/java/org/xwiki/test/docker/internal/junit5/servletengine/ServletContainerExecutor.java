@@ -294,6 +294,16 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             mountFromHostToContainer(this.servletContainer, CLOVER_DATABASE, CLOVER_DATABASE);
         }
 
+        // Also map the permanent directory if asked by the test (to keep it after the test is finished, can be
+        // useful to debug something that only happens on the CI for example).
+        if (this.testConfiguration.isPermanentDirectoryDataSaved()
+            && !this.testConfiguration.getServletEngine().isOutsideDocker())
+        {
+            File permanentDirectoryOnHost = new File(this.testConfiguration.getOutputDirectory(), "permanentDirectory");
+            this.servletContainer.withFileSystemBind(permanentDirectoryOnHost.getAbsolutePath(),
+                this.testConfiguration.getServletEngine().getPermanentDirectory());
+        }
+
         start(this.servletContainer, this.testConfiguration);
     }
 

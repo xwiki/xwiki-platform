@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.security.internal.XWikiBridge;
@@ -41,6 +42,9 @@ public class DefaultSecurityReferenceFactory implements SecurityReferenceFactory
     @Inject
     private XWikiBridge wikiBridge;
 
+    @Inject
+    private EntityReferenceFactory referenceFactory;
+
     /** Cache the main wiki reference. */
     private SecurityReference mainWikiReference;
 
@@ -56,18 +60,20 @@ public class DefaultSecurityReferenceFactory implements SecurityReferenceFactory
     @Override
     public SecurityReference newEntityReference(EntityReference reference)
     {
-        return new SecurityReference(this.wikiBridge.toCompatibleEntityReference(reference), getMainWikiReference());
+        return new SecurityReference(
+            this.referenceFactory.getReference(this.wikiBridge.toCompatibleEntityReference(reference)),
+            getMainWikiReference());
     }
 
     @Override
     public UserSecurityReference newUserReference(DocumentReference reference)
     {
-        return new UserSecurityReference(reference, getMainWikiReference());
+        return new UserSecurityReference(this.referenceFactory.getReference(reference), getMainWikiReference());
     }
 
     @Override
     public GroupSecurityReference newGroupReference(DocumentReference reference)
     {
-        return new GroupSecurityReference(reference, getMainWikiReference());
+        return new GroupSecurityReference(this.referenceFactory.getReference(reference), getMainWikiReference());
     }
 }

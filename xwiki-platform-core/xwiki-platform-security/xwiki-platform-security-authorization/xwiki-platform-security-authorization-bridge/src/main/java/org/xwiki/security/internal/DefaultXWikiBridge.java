@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
@@ -49,6 +50,9 @@ public class DefaultXWikiBridge implements XWikiBridge
     private EntityReferenceResolver<EntityReference> currentResolver;
 
     @Inject
+    private EntityReferenceFactory referenceFactory;
+
+    @Inject
     private Provider<XWikiContext> xcontextProvider;
 
     /** Cached main wiki reference. */
@@ -58,7 +62,8 @@ public class DefaultXWikiBridge implements XWikiBridge
     public WikiReference getMainWikiReference()
     {
         if (mainWikiReference == null) {
-            mainWikiReference = new WikiReference(xcontextProvider.get().getMainXWiki());
+            mainWikiReference =
+                this.referenceFactory.getReference(new WikiReference(xcontextProvider.get().getMainXWiki()));
         }
         return mainWikiReference;
     }

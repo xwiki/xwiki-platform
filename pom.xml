@@ -50,7 +50,7 @@
     <rendering.version>${platform.version}</rendering.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.64.1</ckeditor.version>
+    <ckeditor.version>1.64.2</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.14</batik.version>
     <restlet.version>2.3.12</restlet.version>

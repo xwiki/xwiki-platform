@@ -19,18 +19,26 @@
  */
 package org.xwiki.rendering.internal.macro.toc;
 
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.toc.XWikiTocMacroParameters;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+
+import static java.util.Collections.singletonList;
 
 /**
  * Generate a Table Of Contents based on the document sections.
  * <p>
  * We override the default Table of Contents macro because we want to associate a {@code DocumentReference} picker to
  * the {@code reference} parameter (using the {@code PropertyDisplayType} annotation).
- * 
+ *
  * @version $Id$
  * @since 11.5RC1
  */
@@ -39,11 +47,28 @@ import org.xwiki.rendering.macro.toc.XWikiTocMacroParameters;
 @Singleton
 public class XWikiTocMacro extends AbstractTocMacro<XWikiTocMacroParameters>
 {
+
+    /**
+     * The HTML class attribute name.
+     */
+    protected static final String CLASS = "class";
+
     /**
      * Create and initialize the descriptor of the macro.
      */
     public XWikiTocMacro()
     {
         super(XWikiTocMacroParameters.class);
+    }
+
+    @Override
+    public List<Block> execute(XWikiTocMacroParameters parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        List<Block> blocks = super.execute(parameters, content, context);
+        GroupBlock wrapper = new GroupBlock();
+        wrapper.setParameter(CLASS, "xtoc");
+        wrapper.addChildren(blocks);
+        return singletonList(wrapper);
     }
 }

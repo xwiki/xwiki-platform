@@ -44,6 +44,25 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
       return XWiki.Model.resolve(reference, XWiki.EntityType.ATTACHMENT);
     }
 
+    function getCurrentTabId() {
+      return $(".image-selector .tab-pane.active").attr('id');
+    }
+
+    // Internal map of the tab ids and their corresponding image references.
+    var mapTabReference = {};
+
+    function setImageReferenceValue(value) {
+      if (value) {
+        modal.data('imageReference', {
+          value: value
+        });
+        $('.image-selector-modal button.btn-primary').prop('disabled', false);
+      } else {
+        modal.data('imageReference', {});
+        $('.image-selector-modal button.btn-primary').prop('disabled', true);
+      }
+    }
+
     /**
      * Can be called by the image selector tab UIXs. Indicates the list of selected images. Passing an empty array 
      * indicates that not images are currently selected. The images can either be a string that will be parsed to a 
@@ -54,6 +73,7 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
      */
     function updateSelectedImageReferences(imageReferences) {
       imageReferences = imageReferences || [];
+      var imageReferenceValue;
       if(imageReferences.length > 0) {
         // TODO:  Support the selection of several images (see CKEDITOR-445).
         var imageReference = imageReferences[0];
@@ -64,14 +84,13 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
           value = imageReference;
           value.typed = true;
         }
-        modal.data('imageReference', {
-          value: value
-        });
-        $('.image-selector-modal button.btn-primary').prop('disabled', false);
-      } else {
-        modal.data('imageReference', {});
-        $('.image-selector-modal button.btn-primary').prop('disabled', true);
+        imageReferenceValue = value;
       }
+
+      // Save the value in a map to be able to retrieve it later in case of tab change.
+      mapTabReference[getCurrentTabId()] = imageReferenceValue;
+
+      setImageReferenceValue(imageReferenceValue);
     }
 
     function initialize(modal) {
@@ -85,6 +104,11 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
             $(document).loadRequiredSkinExtensions(requiredSkinExtensions);
             imageSelector.html(html);
             imageSelector.removeClass('loading');
+
+            // Update the selection with the value of the current tab on tab change.
+            imageSelector.on('shown.bs.tab', function () {
+              setImageReferenceValue(mapTabReference[getCurrentTabId()]);
+            });
 
             modal.data('initialized', true);
           }).fail(function(error) {

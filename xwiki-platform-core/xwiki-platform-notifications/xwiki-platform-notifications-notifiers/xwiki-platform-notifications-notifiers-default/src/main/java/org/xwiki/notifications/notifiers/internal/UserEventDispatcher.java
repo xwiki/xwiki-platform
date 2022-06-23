@@ -44,6 +44,7 @@ import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.eventstream.internal.DefaultEntityEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.eventstream.query.SimpleEventQuery;
+import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -163,6 +164,7 @@ public class UserEventDispatcher implements Runnable
         SimpleEventQuery query = new SimpleEventQuery();
         query.eq(org.xwiki.eventstream.Event.FIELD_PREFILTERED, false);
         query.eq(org.xwiki.eventstream.Event.FIELD_REMOTE_OBSERVATION_ID, this.remoteObservation.getId());
+        query.addSort(org.xwiki.eventstream.Event.FIELD_DATE, Order.ASC);
         query.setLimit(BATCH_SIZE);
 
         do {

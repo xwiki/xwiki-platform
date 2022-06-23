@@ -59,6 +59,8 @@ import com.xpn.xwiki.XWikiContext;
 @Named("docker")
 public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposable
 {
+    private static final String XWIKI_INTERNAL_HOST = "host.xwiki.internal";
+
     @Inject
     private Logger logger;
 
@@ -89,7 +91,8 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
     {
         this.logger.debug("Initializing the Docker container running the headless Chrome web browser.");
         try {
-            this.containerId = this.containerManager.maybeReuseContainerByName(containerName);
+            this.containerId = this.containerManager.maybeReuseContainerByName(containerName,
+                this.configuration.isChromeDockerContainerReusable());
             if (this.containerId == null) {
                 // The container doesn't exist so we have to create it.
                 // But first we need to pull the image used to create the container, if we don't have it already.
@@ -97,9 +100,10 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
                     this.containerManager.pullImage(imageName);
                 }
 
-                this.containerId = this.containerManager.createContainer(imageName, containerName, remoteDebuggingPort,
+                this.containerId = this.containerManager.createContainer(imageName, containerName,
                     Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
-                        "--remote-debugging-port=" + remoteDebuggingPort));
+                        "--remote-debugging-port=" + remoteDebuggingPort),
+                    remoteDebuggingPort, XWIKI_INTERNAL_HOST + ":" + this.configuration.getXWikiHost());
                 this.containerManager.startContainer(this.containerId);
             }
         } catch (Exception e) {
@@ -123,6 +127,9 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
     {
         try {
             this.containerManager.stopContainer(this.containerId);
+            if (!this.configuration.isChromeDockerContainerReusable()) {
+                this.containerManager.removeContainer(this.containerId);
+            }
         } catch (Exception e) {
             throw new ComponentLifecycleException(
                 String.format("Failed to stop the Docker container [%s] used for PDF export.", this.containerId), e);
@@ -143,8 +150,7 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
             if (!printPreviewURL.toString().equals(dockerPrintPreviewURL.toString())) {
                 // Make sure the relative URLs are resolved based on the original print preview URL otherwise the user
                 // won't be able to open the links from the generated PDF because they use a host name defined only
-                // inside the Docker container where the PDF was generated. See
-                // PDFExportConfiguration#getChromeDockerHostName()
+                // inside the Docker container where the PDF was generated. See PDFExportConfiguration#getXWikiHost()
                 this.chromeManager.setBaseURL(devToolsService, printPreviewURL);
             }
 
@@ -171,7 +177,7 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
      * transformations that don't happen for the headless Chrome browser.</li>
      * <li>For safety reasons the Docker containing running the headless Chrome browser uses its own separate network
      * interface, which means for it 'localhost' doesn't point to the host running XWiki, but the Docker container
-     * itself. See {@link PDFExportConfiguration#getChromeDockerHostName()}.</li>
+     * itself. See {@link PDFExportConfiguration#getXWikiHost()}.</li>
      * </ul>
      * 
      * @param printPreviewURL the print preview URL used by the user's browser
@@ -201,8 +207,8 @@ public class DockerPDFPrinter implements PDFPrinter<URL>, Initializable, Disposa
         List<String> standardLocalHosts = Arrays.asList("localhost", "127.0.0.1");
         if (standardLocalHosts.contains(dockerPrintPreviewURL.getHost())) {
             try {
-                dockerPrintPreviewURL = new URIBuilder(dockerPrintPreviewURL.toURI())
-                    .setHost(this.configuration.getChromeDockerHostName()).build().toURL();
+                dockerPrintPreviewURL =
+                    new URIBuilder(dockerPrintPreviewURL.toURI()).setHost(XWIKI_INTERNAL_HOST).build().toURL();
             } catch (URISyntaxException e) {
                 throw new IOException(e);
             }

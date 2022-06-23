@@ -58,14 +58,20 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     }
 
     @Override
-    public String getChromeDockerHostName()
+    public boolean isChromeDockerContainerReusable()
     {
-        return this.configurationSource.getProperty(PREFIX + "chromeDockerHostName", "host.docker.internal");
+        return this.configurationSource.getProperty(PREFIX + "chromeDockerContainerReusable", false);
     }
 
     @Override
     public int getChromeRemoteDebuggingPort()
     {
         return this.configurationSource.getProperty(PREFIX + "chromeRemoteDebuggingPort", 9222);
+    }
+
+    @Override
+    public String getXWikiHost()
+    {
+        return this.configurationSource.getProperty(PREFIX + "xwikiHost", "host-gateway");
     }
 }

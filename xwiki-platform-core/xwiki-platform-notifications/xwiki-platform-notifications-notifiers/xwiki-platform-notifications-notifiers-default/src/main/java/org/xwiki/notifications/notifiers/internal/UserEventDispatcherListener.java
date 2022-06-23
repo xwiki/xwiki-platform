@@ -103,7 +103,7 @@ public class UserEventDispatcherListener extends AbstractEventListener implement
                 }
             } else if (event instanceof ApplicationReadyEvent) {
                 // Schedule a job to regularely check if any event prefiltering was missed
-                this.scheduler.scheduleWithFixedDelay(dispatcher, 0, 1, TimeUnit.HOURS);
+                this.scheduler.scheduleWithFixedDelay(this.dispatcher, 0, 1, TimeUnit.HOURS);
             }
         }
     }

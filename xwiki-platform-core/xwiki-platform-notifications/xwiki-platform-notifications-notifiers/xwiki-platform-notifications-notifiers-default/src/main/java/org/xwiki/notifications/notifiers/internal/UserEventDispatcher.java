@@ -31,6 +31,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -111,20 +112,30 @@ public class UserEventDispatcher implements Runnable
     private RemoteObservationManagerConfiguration remoteObservation;
 
     @Inject
+    private ExecutionContextManager contextManager;
+
+    @Inject
+    private Execution execution;
+
+    @Inject
     private Logger logger;
 
     @Override
     public void run()
     {
         try {
+            // Initialize a new context for the run
+            this.contextManager.initialize(new ExecutionContext());
+
             flush();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-
-            this.logger.warn("The user event dispatched thread was stopped", e);
         } catch (Throwable e) {
             // Catching Throwable to make sure we don't kill the scheduler which triggered this run
             this.logger.error("Failed to pre-filter events", e);
+        } finally {
+            // Remove any remaining context
+            this.execution.removeContext();
         }
     }
 

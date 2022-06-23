@@ -40,7 +40,7 @@ import org.xwiki.test.ui.TestUtils;
 
 /**
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  */
 class WikisArgumentsProvider implements ArgumentsProvider, AnnotationConsumer<WikisSource>
 {

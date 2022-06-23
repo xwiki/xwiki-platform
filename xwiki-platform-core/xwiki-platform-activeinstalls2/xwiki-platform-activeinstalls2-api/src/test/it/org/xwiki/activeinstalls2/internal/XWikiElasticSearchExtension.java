@@ -43,7 +43,7 @@ import org.xwiki.component.util.ReflectionUtils;
  * we need it running before XWiki starts.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  */
 public class XWikiElasticSearchExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver,
     BeforeEachCallback

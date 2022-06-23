@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  * Tests for {@link HttpSessionManager}.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  */
 @ComponentTest
 class HttpSessionManagerTest

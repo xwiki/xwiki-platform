@@ -43,7 +43,7 @@ import org.xwiki.refactoring.event.DocumentRenamingEvent;
  * It also make sure the context contains the proper information like the user or the wiki.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  * @since 13.10.7
  * @since 14.4.2
  */

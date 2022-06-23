@@ -108,14 +108,15 @@ class DockerPDFPrinterTest
 
         when(this.configuration.getChromeDockerContainerName()).thenReturn("test-pdf-printer");
         when(this.configuration.getChromeDockerImage()).thenReturn("test/chrome:latest");
-        when(this.configuration.getChromeDockerHostName()).thenReturn("docker");
         when(this.configuration.getChromeRemoteDebuggingPort()).thenReturn(1234);
+        when(this.configuration.getXWikiHost()).thenReturn("xwiki-host");
 
         when(this.containerManager.createContainer(this.configuration.getChromeDockerImage(),
-            this.configuration.getChromeDockerContainerName(), this.configuration.getChromeRemoteDebuggingPort(),
+            this.configuration.getChromeDockerContainerName(),
             Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
-                "--remote-debugging-port=" + this.configuration.getChromeRemoteDebuggingPort())))
-                    .thenReturn(this.containerId);
+                "--remote-debugging-port=" + this.configuration.getChromeRemoteDebuggingPort()),
+            this.configuration.getChromeRemoteDebuggingPort(), "host.xwiki.internal:xwiki-host"))
+                .thenReturn(this.containerId);
 
         InspectContainerResponse inspectContainerResponse = mock(InspectContainerResponse.class);
         when(this.containerManager.inspectContainer(this.containerId)).thenReturn(inspectContainerResponse);
@@ -150,7 +151,7 @@ class DockerPDFPrinterTest
         when(xcontext.getDoc().getURL("export", "x=y", "z", xcontext)).thenReturn("/xwiki/bin/export/Some/Page?x=y#z");
         when(xcontext.getWikiId()).thenReturn("test");
         when(xcontext.getWiki().getServerURL("test", xcontext)).thenReturn(new URL("http://localhost:8080"));
-        URL dockerPrintPreviewURL = new URL("http://docker:8080/xwiki/bin/export/Some/Page?x=y#z");
+        URL dockerPrintPreviewURL = new URL("http://host.xwiki.internal:8080/xwiki/bin/export/Some/Page?x=y#z");
 
         Cookie[] cookies = new Cookie[] {};
         when(this.xcontextProvider.get().getRequest().getCookies()).thenReturn(cookies);
@@ -188,7 +189,7 @@ class DockerPDFPrinterTest
     @BeforeComponent("initializeAndDispose")
     void beforeInitializeAndDispose()
     {
-        when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName()))
+        when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName(), false))
             .thenReturn(null);
         when(this.containerManager.isLocalImagePresent(this.configuration.getChromeDockerImage())).thenReturn(false);
     }
@@ -202,12 +203,14 @@ class DockerPDFPrinterTest
 
         this.dockerPDFPrinter.dispose();
         verify(this.containerManager).stopContainer(this.containerId);
+        verify(this.containerManager).removeContainer(this.containerId);
     }
 
     @BeforeComponent("initializeWithExistingContainer")
     void beforeInitializeWithExistingContainer()
     {
-        when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName()))
+        when(this.configuration.isChromeDockerContainerReusable()).thenReturn(true);
+        when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName(), true))
             .thenReturn(this.containerId);
     }
 
@@ -216,5 +219,9 @@ class DockerPDFPrinterTest
     {
         verify(this.containerManager, never()).startContainer(any(String.class));
         verify(this.chromeManager).connect(this.containerIpAddress, this.configuration.getChromeRemoteDebuggingPort());
+
+        this.dockerPDFPrinter.dispose();
+        verify(this.containerManager).stopContainer(this.containerId);
+        verify(this.containerManager, never()).removeContainer(this.containerId);
     }
 }

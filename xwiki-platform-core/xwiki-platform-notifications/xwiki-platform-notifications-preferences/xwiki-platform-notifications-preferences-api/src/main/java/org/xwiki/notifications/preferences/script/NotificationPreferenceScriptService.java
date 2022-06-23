@@ -38,6 +38,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.preferences.NotificationEmailInterval;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
@@ -293,6 +294,25 @@ public class NotificationPreferenceScriptService implements ScriptService
     public NotificationEmailDiffType getDiffType(String userId)
     {
         return emailUserPreferenceManager.getDiffType(userId);
+    }
+
+    /**
+     * @return the email notification interval configured for the current user
+     * @since 14.4.2
+     */
+    public NotificationEmailInterval getInterval()
+    {
+        return emailUserPreferenceManager.getInterval();
+    }
+
+    /**
+     * @param userId id of a user
+     * @return the notification email interval configured for the given user
+     * @since 14.4.2
+     */
+    public NotificationEmailInterval getInterval(String userId)
+    {
+        return emailUserPreferenceManager.getInterval(userId);
     }
 
     /**

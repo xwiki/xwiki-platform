@@ -121,7 +121,6 @@
     <property>
       <code>require(['jquery', 'imageSelector'], function($, imageSelector) {
   $('#urlTab input[type="text"]').on('input', function () {
-    console.log('ON')
     if ($(this).val() === '') {
       imageSelector.updateSelectedImageReferences([]);
     } else {

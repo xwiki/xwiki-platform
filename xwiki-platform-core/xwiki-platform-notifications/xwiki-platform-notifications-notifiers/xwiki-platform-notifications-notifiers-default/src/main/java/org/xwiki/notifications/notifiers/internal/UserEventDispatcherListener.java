@@ -38,8 +38,6 @@ import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
-import org.xwiki.job.DefaultRequest;
-import org.xwiki.job.JobExecutor;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
@@ -74,9 +72,6 @@ public class UserEventDispatcherListener extends AbstractEventListener implement
     private RemoteObservationManagerContext remoteState;
 
     @Inject
-    private JobExecutor jobs;
-
-    @Inject
     private Logger logger;
 
     private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -108,7 +103,7 @@ public class UserEventDispatcherListener extends AbstractEventListener implement
                 }
             } else if (event instanceof ApplicationReadyEvent) {
                 // Schedule a job to regularely check if any event prefiltering was missed
-                this.scheduler.scheduleWithFixedDelay(this::startPrefilterMissingEventsJob, 0, 1, TimeUnit.HOURS);
+                this.scheduler.scheduleWithFixedDelay(dispatcher, 0, 1, TimeUnit.HOURS);
             }
         }
     }
@@ -125,31 +120,14 @@ public class UserEventDispatcherListener extends AbstractEventListener implement
             for (RecordableEventDescriptor descriptor : descriptorList) {
                 // Find a descriptor that corresponds to the given event
                 if (StringUtils.equals(descriptor.getEventType(), eventStreamEvent.getType())) {
-                    // Add the event to the queue
-                    this.dispatcher.addEvent(eventStreamEvent);
+                    // Make sure to wakeup dispatcher
+                    this.scheduler.execute(this.dispatcher);
 
                     break;
                 }
             }
         } catch (EventStreamException e) {
             this.logger.warn("Unable to retrieve a full list of RecordableEventDescriptor.", e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-
-            this.logger.warn("Failed to add the event [{}] in the user event dispatcher", eventStreamEvent.getId(), e);
-        }
-    }
-
-    private void startPrefilterMissingEventsJob()
-    {
-        try {
-            // Wait until the job is finished so that we don't start several at the same time
-            this.jobs.execute(PrefilterMissingEventsJob.JOBTYPE, new DefaultRequest()).join();
-        } catch (InterruptedException e) {
-            this.logger.warn("Prefiltering thread was interrupted");
-            Thread.currentThread().interrupt();
-        } catch (Exception e) {
-            this.logger.error("Failed to search events for which pre filtering was missed", e);
         }
     }
 }

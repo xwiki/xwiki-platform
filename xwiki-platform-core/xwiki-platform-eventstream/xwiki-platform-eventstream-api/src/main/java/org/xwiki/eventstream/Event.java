@@ -197,6 +197,12 @@ public interface Event
      */
     String FIELD_PREFILTERED = "preFiltered";
 
+    /**
+     * @see #getRemoteObservationId()
+     * @since 14.6RC1
+     */
+    String FIELD_REMOTE_OBSERVATION_ID = "observationInstanceId";
+
     /** The importance of an event. */
     enum Importance
     {
@@ -555,5 +561,15 @@ public interface Event
     {
         LoggerFactory.getLogger(Event.class)
             .warn("org.xwiki.eventstream.Event#setPrefiltered(boolean) has been called without being reimplemented.");
+    }
+
+    /**
+     * @return the unique identifier of the instance in the cluster, or {@code null} if the event was produce in a
+     *         version of XWiki older than 14.6
+     * @since 14.6RC1
+     */
+    default String getRemoteObservationId()
+    {
+        return null;
     }
 }

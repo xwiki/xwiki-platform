@@ -90,5 +90,11 @@ public enum EventProperty
     /**
      * The version of the page concerned by the event.
      */
-    DOCUMENT_VERSION
+    DOCUMENT_VERSION,
+    /**
+     * The unique identifier of the instance in the cluster.
+     * 
+     * @since 14.6RC1
+     */
+    REMOTE_OBSERVATION_ID,
 }

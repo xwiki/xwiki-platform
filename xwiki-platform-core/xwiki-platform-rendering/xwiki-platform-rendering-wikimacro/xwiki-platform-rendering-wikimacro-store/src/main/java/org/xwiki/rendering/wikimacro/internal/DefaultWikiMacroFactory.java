@@ -145,7 +145,6 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         String macroName = getMacroName(macroDefinition, macroId);
         // The macro description as plain text
         String macroDescription = macroDefinition.getStringValue(MACRO_DESCRIPTION_PROPERTY);
-        String macroDefaultCategory = macroDefinition.getStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY);
         List<String> macroDefaultCategories = macroDefinition.getListValue(MACRO_DEFAULT_CATEGORIES_PROPERTY);
         WikiMacroVisibility macroVisibility =
             WikiMacroVisibility.fromString(macroDefinition.getStringValue(MACRO_VISIBILITY_PROPERTY));
@@ -158,7 +157,14 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
 
         // Verify default macro category.
         if (macroDefaultCategories == null || macroDefaultCategories.isEmpty()) {
-            macroDefaultCategories = List.of();
+            String macroDefaultCategory = macroDefinition.getStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY);
+            if (macroDefaultCategory != null) {
+                // In case of document where the categories have need been moved to the new defaultCategories, use the 
+                // legacy defaultCategory field.
+                macroDefaultCategories = List.of(macroDefaultCategory);
+            } else {
+                macroDefaultCategories = List.of();
+            }
             this.logger.debug("Incomplete macro definition in [{}], default macro category is empty",
                 documentReference);
         }

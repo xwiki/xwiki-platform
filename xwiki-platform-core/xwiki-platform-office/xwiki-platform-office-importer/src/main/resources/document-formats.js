@@ -59,7 +59,7 @@
     "extensions": ["odt"],
     "mediaType": "application/vnd.oasis.opendocument.text",
     "inputFamily": "TEXT",
-    "storeProperties": {"TEXT": {"FilterName": "writer8"}}
+    "storeProperties": {"TEXT": {"FilterName": "writerweb8_writer"}}
   },
   {
     "name": "OpenOffice.org 1.0 Text Document",

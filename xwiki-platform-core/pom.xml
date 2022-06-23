@@ -137,18 +137,7 @@
             -->
             <!-- Difference related to the Security refactoring. Start a new <revapi.differences> entry for other
                  differences -->
-            <revapi.differences>
-              <differences>
-                <item>
-                  <criticality>allowed</criticality>
-                  <ignore>true</ignore>
-                  <code>java.class.defaultSerializationChanged</code>
-                  <old>class com.xpn.xwiki.doc.rcs.XWikiRCSNodeId</old>
-                  <new>class com.xpn.xwiki.doc.rcs.XWikiRCSNodeId</new>
-                  <justification>This change is about adding a new field which can be null, so deserializing an old version should still work.</justification>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

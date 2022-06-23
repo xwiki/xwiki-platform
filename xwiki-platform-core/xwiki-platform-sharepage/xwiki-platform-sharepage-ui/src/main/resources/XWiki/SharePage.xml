@@ -728,10 +728,6 @@ Guten Tag ${recipientName},
   padding: 0 10px;
   max-height: 20em;
   overflow: auto;
-}
-
-body &gt; .selectize-dropdown {
-  z-index: 10051;
 }</code>
     </property>
     <property>

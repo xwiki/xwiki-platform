@@ -123,6 +123,13 @@ public class UserEventDispatcher implements Runnable
     @Override
     public void run()
     {
+        Thread currenthread = Thread.currentThread();
+
+        // Reduce the priority of this thread since it's not a critical task and it might be expensive
+        currenthread.setPriority(Thread.NORM_PRIORITY - 1);
+        // Set a more explicit thread name
+        currenthread.setName("User event dispatcher thread");
+
         try {
             // Initialize a new context for the run
             this.contextManager.initialize(new ExecutionContext());

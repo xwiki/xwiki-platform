@@ -41,7 +41,7 @@ import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)

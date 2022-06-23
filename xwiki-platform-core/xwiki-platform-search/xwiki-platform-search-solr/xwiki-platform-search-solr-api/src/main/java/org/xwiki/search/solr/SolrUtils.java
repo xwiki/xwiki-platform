@@ -268,7 +268,7 @@ public interface SolrUtils
      * @return the Solr query version of the passed value
      * @since 13.10.7
      * @since 14.4.2
-     * @since 14.5RC1
+     * @since 14.5
      */
     @Unstable
     default String toCompleteFilterQueryString(Object fieldValue)
@@ -286,7 +286,7 @@ public interface SolrUtils
      * @return the Solr query version of the passed value
      * @since 13.10.7
      * @since 14.4.2
-     * @since 14.5RC1
+     * @since 14.5
      */
     @Unstable
     default String toCompleteFilterQueryString(Object fieldValue, Type valueType)

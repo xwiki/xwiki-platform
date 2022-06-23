@@ -76,7 +76,7 @@ import com.github.kklisura.cdt.services.utils.ProxyUtils;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component(roles = ChromeManager.class)
 @Singleton

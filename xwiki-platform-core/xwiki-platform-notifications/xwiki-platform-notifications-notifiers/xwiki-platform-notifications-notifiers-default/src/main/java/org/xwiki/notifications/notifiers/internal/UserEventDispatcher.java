@@ -21,6 +21,9 @@ package org.xwiki.notifications.notifiers.internal;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -31,6 +34,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -68,7 +73,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  */
 @Component(roles = UserEventDispatcher.class)
 @Singleton
-public class UserEventDispatcher implements Runnable
+public class UserEventDispatcher implements Disposable
 {
     private static final long BATCH_SIZE = 100;
 
@@ -121,9 +126,46 @@ public class UserEventDispatcher implements Runnable
     @Inject
     private Logger logger;
 
-    @Override
-    public void run()
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    private volatile boolean running;
+
+    /**
+     * Start the scheduler.
+     */
+    public void initialize()
     {
+        // Schedule a job to regularly check if any event prefiltering was missed or a previous run failed
+        this.scheduler.scheduleWithFixedDelay(this::run, 0, 1, TimeUnit.HOURS);
+    }
+
+    /**
+     * Indicate an event just been created.
+     */
+    public void onEvent(Event event)
+    {
+        try {
+            if (getSupportedEventTypes().contains(event.getType()) && !this.running) {
+                // Make sure to wakeup the dispatcher
+                this.scheduler.execute(this::run);
+            }
+        } catch (EventStreamException e) {
+            this.logger.error("Failed to get supported event types", e);
+        }
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        // Stop the scheduling
+        this.scheduler.shutdownNow();
+    }
+
+    private void run()
+    {
+        // Indicate the pre-filtering is running
+        this.running = true;
+
         Thread currenthread = Thread.currentThread();
 
         // Reduce the priority of this thread since it's not a critical task and it might be expensive
@@ -142,9 +184,20 @@ public class UserEventDispatcher implements Runnable
             // Catching Throwable to make sure we don't kill the scheduler which triggered this run
             this.logger.error("Failed to pre-filter events", e);
         } finally {
+            // Indicate the pre-filtering is not running anymore
+            this.running = false;
+
             // Remove any remaining context
             this.execution.removeContext();
         }
+    }
+
+    private Set<String> getSupportedEventTypes() throws EventStreamException
+    {
+        List<RecordableEventDescriptor> descriptorList =
+            this.recordableEventDescriptorManager.getRecordableEventDescriptors(true);
+
+        return descriptorList.stream().map(RecordableEventDescriptor::getEventType).collect(Collectors.toSet());
     }
 
     /**
@@ -155,10 +208,7 @@ public class UserEventDispatcher implements Runnable
     private void flush() throws Exception
     {
         // Get supported events types
-        List<RecordableEventDescriptor> descriptorList =
-            this.recordableEventDescriptorManager.getRecordableEventDescriptors(true);
-        Set<String> types =
-            descriptorList.stream().map(RecordableEventDescriptor::getEventType).collect(Collectors.toSet());
+        Set<String> types = getSupportedEventTypes();
 
         // Create a search request for events produced by the current instance which haven't been prefiltered yet
         SimpleEventQuery query = new SimpleEventQuery();
@@ -171,11 +221,9 @@ public class UserEventDispatcher implements Runnable
             try (EventSearchResult result = this.events.search(query)) {
                 result.stream().forEach(event -> prefilterEvent(event, types));
 
-                if (result.getSize() < BATCH_SIZE) {
+                if (result.getSize() == 0) {
                     break;
                 }
-
-                query.setOffset(result.getOffset() + BATCH_SIZE);
             }
         } while (true);
     }
@@ -192,10 +240,8 @@ public class UserEventDispatcher implements Runnable
      * users.
      * 
      * @param event the event to associate with the user
-     * @since 12.9RC1
-     * @since 12.6.3
      */
-    public void dispatch(Event event)
+    private void dispatch(Event event)
     {
         // Keeping the same ExecutionContext forever can lead to memory leak and cache problems since
         // most

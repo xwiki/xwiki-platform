@@ -71,6 +71,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String OFFICE_IMAGE_VERSION_LABEL = "image-version";
 
+    private static final String DOCKER_SOCK = "/var/run/docker.sock";
+
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
     private RepositoryResolver repositoryResolver;
@@ -151,7 +153,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
             startContainer();
 
-            xwikiIPAddress = this.servletContainer.getContainerIpAddress();
+            xwikiIPAddress = this.servletContainer.getHost();
             xwikiPort =
                 this.servletContainer.getMappedPort(this.testConfiguration.getServletEngine().getInternalPort());
         }
@@ -271,6 +273,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
         this.servletContainer.withExposedPorts(exposedPorts.toArray(new Integer[exposedPorts.size()]));
 
+        // Some XWiki modules (e.g. PDF export) are using Docker so we need to mount the Docker socket in order for them
+        // to work when the servlet engine runs itself inside a Docker container.
+        this.servletContainer.withFileSystemBind(DOCKER_SOCK, DOCKER_SOCK);
+
         // We want by default to have the local repository mounted, but this won't work in the DOOD use case.
         // For that to work we would need to copy the data instead of mounting the volume but the time
         // it would take would be too costly.
@@ -315,7 +321,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9" : LATEST);
     }
 
-    private GenericContainer createServletContainer() throws Exception
+    private GenericContainer<?> createServletContainer() throws Exception
     {
         String baseImageName = String.format("%s:%s",
             this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag(this.testConfiguration));
@@ -339,7 +345,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 LOGGER.info("(*) Build a dedicated image embedding LibreOffice...");
                 // The second argument of the ImageFromDockerfile is here to indicate we won't delete the image
                 // at the end of the test container execution.
-                container = new XWikiLocalGenericContainer(new ImageFromDockerfile(imageName, false)
+                container = new XWikiLocalGenericContainer<>(new ImageFromDockerfile(imageName, false)
                     .withDockerfileFromBuilder(builder -> {
                         builder
                             .from(baseImageName)
@@ -379,7 +385,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                         builder.build();
                     }));
             } else {
-                container = new XWikiLocalGenericContainer(imageName);
+                container = new XWikiLocalGenericContainer<>(imageName);
             }
         } else {
             container = new GenericContainer<>(baseImageName);

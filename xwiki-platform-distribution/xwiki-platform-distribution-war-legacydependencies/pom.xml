@@ -230,6 +230,22 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-rendering-wikimacro-store</artifactId>
+      <version>${project.version}</version>
+      <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-oldcore</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-refactoring-api</artifactId>
       <version>${project.version}</version>
       <exclusions>

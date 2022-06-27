@@ -92,7 +92,7 @@ public interface ModelBridge
      *
      * @param user the document reference of a wiki user
      * @throws NotificationException in case of error when deleting the filter preferences
-     * @since 14.5RC1
+     * @since 14.5
      * @since 14.4.1
      * @since 13.10.7
      */
@@ -117,7 +117,7 @@ public interface ModelBridge
      *
      * @param wikiReference a wiki reference
      * @throws NotificationException in case of error while deleting the preferences
-     * @since 14.5RC1
+     * @since 14.5
      * @since 14.4.1
      * @since 13.10.7
      */

@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.export.pdf.PDFExportConfiguration;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.AsyncDockerCmd;
@@ -56,7 +55,7 @@ import com.github.dockerjava.transport.DockerHttpClient;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component(roles = ContainerManager.class)
 @Singleton
@@ -66,9 +65,6 @@ public class ContainerManager implements Initializable
 
     @Inject
     private Logger logger;
-
-    @Inject
-    private PDFExportConfiguration configuration;
 
     private DockerClient client;
 
@@ -86,9 +82,10 @@ public class ContainerManager implements Initializable
      * Attempts to reuse the container with the specified name.
      * 
      * @param containerName the name of the container to reuse
+     * @param reuse {@code true} to reuse the container if found, {@code false} to remove it if found
      * @return the container id, if a container with the specified name exists and can be reused, otherwise {@code null}
      */
-    public String maybeReuseContainerByName(String containerName)
+    public String maybeReuseContainerByName(String containerName, boolean reuse)
     {
         this.logger.debug("Looking for an existing Docker container with name [{}].", containerName);
         List<Container> containers =
@@ -100,10 +97,14 @@ public class ContainerManager implements Initializable
         }
 
         InspectContainerResponse container = inspectContainer(containers.get(0).getId());
-        if (container.getState().getDead() == Boolean.TRUE) {
+        if (!reuse) {
+            this.logger.debug("Docker container [{}] found but we can't reuse it.", container.getId());
+            removeContainer(container.getId());
+            return null;
+        } else if (container.getState().getDead() == Boolean.TRUE) {
             this.logger.debug("Docker container [{}] is dead. Removing it.", container.getId());
             // The container is not reusable. Try to remove it so it can be recreated.
-            exec(this.client.removeContainerCmd(container.getId()));
+            removeContainer(container.getId());
             return null;
         } else if (container.getState().getPaused() == Boolean.TRUE) {
             this.logger.debug("Docker container [{}] is paused. Unpausing it.", container.getId());
@@ -150,28 +151,28 @@ public class ContainerManager implements Initializable
      * 
      * @param imageName the image to use for the new container
      * @param containerName the name to associate with the created container
-     * @param remoteDebuggingPort the port used for remote debugging
      * @param parameters the parameters to specify when creating the container
+     * @param port the exposed port (the port the created container is going to listen to)
+     * @param extraHost the host that should be used to access the XWiki instance running outside of the created
+     *            container
      * @return the id of the created container
      */
-    public String createContainer(String imageName, String containerName, int remoteDebuggingPort,
-        List<String> parameters)
+    public String createContainer(String imageName, String containerName, List<String> parameters, int port,
+        String extraHost)
     {
-        this.logger.debug("Creating a Docker container with name [{}] using image [{}], remote debugging port [{}]"
-            + " and parameters [{}].", containerName, imageName, remoteDebuggingPort, parameters);
-        ExposedPort exposedPort = ExposedPort.tcp(remoteDebuggingPort);
+        this.logger.debug("Creating a Docker container with name [{}], using image [{}], exposing port [{}]"
+            + " and having parameters [{}].", containerName, imageName, port, parameters);
+        ExposedPort exposedPort = ExposedPort.tcp(port);
         Ports portBindings = new Ports();
-        portBindings.bind(exposedPort, Ports.Binding.bindPort(remoteDebuggingPort));
+        portBindings.bind(exposedPort, Ports.Binding.bindPort(port));
 
         try (CreateContainerCmd createContainerCmd = this.client.createContainerCmd(imageName)) {
             CreateContainerResponse container = createContainerCmd.withCmd(parameters).withExposedPorts(exposedPort)
-                // The extra host is needed in order to be able to access the XWiki instance running on the same machine
-                // as the Docker container itself.
-                .withHostConfig(HostConfig.newHostConfig()
-                    .withExtraHosts(this.configuration.getChromeDockerHostName() + ":host-gateway").withBinds(
-                        // Make sure it also works when XWiki is running in Docker.
-                        new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK)))
-                    .withPortBindings(portBindings))
+                // The extra host is needed in order for the created container to be able to access the XWiki instance
+                // running outside of it (e.g. in a separate Docker container).
+                .withHostConfig(HostConfig.newHostConfig().withExtraHosts(extraHost).withBinds(
+                    // Make sure it also works when XWiki is running in Docker.
+                    new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK))).withPortBindings(portBindings))
                 .withName(containerName).exec();
             this.logger.debug("Created the Docker container with id [{}].", container.getId());
             return container.getId();
@@ -203,6 +204,19 @@ public class ContainerManager implements Initializable
             // Wait for the container to be fully stopped before continuing.
             this.logger.debug("Wait for the Docker container [{}] to stop.", containerId);
             wait(this.client.waitContainerCmd(containerId));
+        }
+    }
+
+    /**
+     * Remove the specified container.
+     * 
+     * @param containerId the if of the container to remove
+     */
+    public void removeContainer(String containerId)
+    {
+        if (containerId != null) {
+            this.logger.debug("Removing the Docker container with id [{}].", containerId);
+            exec(this.client.removeContainerCmd(containerId));
         }
     }
 

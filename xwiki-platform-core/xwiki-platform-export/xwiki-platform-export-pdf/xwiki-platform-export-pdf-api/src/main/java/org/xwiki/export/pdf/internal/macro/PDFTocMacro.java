@@ -57,7 +57,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Component
 @Named("pdftoc")

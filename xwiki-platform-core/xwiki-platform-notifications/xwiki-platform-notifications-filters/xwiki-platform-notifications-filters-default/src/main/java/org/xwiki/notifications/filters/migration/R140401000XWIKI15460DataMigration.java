@@ -62,7 +62,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  *     when a wiki is deleted</a>
  * @see <a href="https://jira.xwiki.org/browse/XWIKI-18397">XWIKI-18397: Notification filter preferences are never
  *     cleaned for deleted users</a>
- * @since 14.5RC1
+ * @since 14.5
  * @since 14.4.1
  * @since 13.10.7
  */

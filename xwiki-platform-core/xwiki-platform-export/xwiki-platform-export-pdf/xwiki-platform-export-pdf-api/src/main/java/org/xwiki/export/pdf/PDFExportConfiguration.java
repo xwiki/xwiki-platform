@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Role
 @Unstable
@@ -44,13 +44,19 @@ public interface PDFExportConfiguration
     String getChromeDockerContainerName();
 
     /**
-     * @return the domain used to access the host running the Docker container, from within the Docker container (i.e.
-     *         by the headless Chrome web browser)
+     * @return {@code true} if the Docker container running the headless Chrome web browser can be reused across XWiki
+     *         restarts, {@code false} to remove the container each time XWiki is stopped / restarted
      */
-    String getChromeDockerHostName();
+    boolean isChromeDockerContainerReusable();
 
     /**
      * @return the port number used for communicating with the headless Chrome web browser
      */
     int getChromeRemoteDebuggingPort();
+
+    /**
+     * @return the domain or IP address that the headless Chrome browser should use to access the XWiki instance (i.e.
+     *         the print preview page)
+     */
+    String getXWikiHost();
 }

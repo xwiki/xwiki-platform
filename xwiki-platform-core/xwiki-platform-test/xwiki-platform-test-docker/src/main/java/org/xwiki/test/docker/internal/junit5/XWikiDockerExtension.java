@@ -500,7 +500,7 @@ public class XWikiDockerExtension extends AbstractExtension
             VncRecordingContainer vnc = loadVNC(extensionContext);
             File recordingFile = getResultFileLocation("flv", testConfiguration, extensionContext);
             vnc.saveRecordingToFile(recordingFile);
-            LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
+            LOGGER.info("VNC recording of test has been saved to [{}]", recordingFile);
         }
     }
 

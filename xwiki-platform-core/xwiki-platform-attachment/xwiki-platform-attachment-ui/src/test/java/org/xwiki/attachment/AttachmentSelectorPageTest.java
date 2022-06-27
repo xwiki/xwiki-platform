@@ -68,7 +68,7 @@ import static org.mockito.Mockito.when;
  * Test of {@code XWiki.AttachmentSelector}.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  * @since 14.4.2
  * @since 13.10.7
  */

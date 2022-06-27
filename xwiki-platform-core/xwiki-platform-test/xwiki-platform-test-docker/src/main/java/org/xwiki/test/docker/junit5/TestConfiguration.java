@@ -52,8 +52,6 @@ public class TestConfiguration
 
     private boolean debug;
 
-    private boolean saveDatabaseData;
-
     private boolean offline;
 
     private String servletEngineTag;
@@ -84,8 +82,13 @@ public class TestConfiguration
 
     private PropertiesMerger propertiesMerger = new PropertiesMerger();
 
+    private boolean saveDatabaseData;
+
+    private boolean savePermanentDirectoryData;
+
     /**
      * @param testConfiguration the configuration to merge with the current one
+     * @throws DockerTestException when a merge error occurs
      */
     public void merge(TestConfiguration testConfiguration) throws DockerTestException
     {
@@ -94,7 +97,6 @@ public class TestConfiguration
         mergeServletEngine(testConfiguration.getServletEngine());
         mergeVerbose(testConfiguration.isVerbose());
         mergeDebug(testConfiguration.isDebug());
-        mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
         mergeOffline(testConfiguration.isOffline());
         mergeDatabaseTag(testConfiguration.getDatabaseTag());
         mergeServletEngineTag(testConfiguration.getServletEngineTag());
@@ -109,6 +111,8 @@ public class TestConfiguration
         mergeOffice(testConfiguration.isOffice());
         mergeForbiddenServletEngines(testConfiguration.getForbiddenServletEngines());
         mergeDatabaseCommands(testConfiguration.getDatabaseCommands());
+        mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
+        mergeSavePermanentDirectoryData(testConfiguration.isPermanentDirectoryDataSaved());
     }
 
     private void mergeBrowser(Browser browser) throws DockerTestException
@@ -167,13 +171,6 @@ public class TestConfiguration
     {
         if (!isDebug() && debug) {
             this.debug = true;
-        }
-    }
-
-    private void mergeSaveDatabaseData(boolean saveDatabaseData)
-    {
-        if (!isDatabaseDataSaved() && saveDatabaseData) {
-            this.saveDatabaseData = true;
         }
     }
 
@@ -305,6 +302,20 @@ public class TestConfiguration
         this.forbiddenServletEngines = mergedForbiddenServletEngines;
     }
 
+    private void mergeSaveDatabaseData(boolean saveDatabaseData)
+    {
+        if (!isDatabaseDataSaved() && saveDatabaseData) {
+            this.saveDatabaseData = true;
+        }
+    }
+
+    private void mergeSavePermanentDirectoryData(boolean savePermanentDirectoryData)
+    {
+        if (!isPermanentDirectoryDataSaved() && savePermanentDirectoryData) {
+            this.savePermanentDirectoryData = true;
+        }
+    }
+
     /**
      * @return the browser to use
      */
@@ -383,24 +394,6 @@ public class TestConfiguration
     public void setDebug(boolean debug)
     {
         this.debug = debug;
-    }
-
-    /**
-     * @return true true if the database data should be mapped to a local directory on the host computer so that it can
-     * be saved and reused for another run
-     * @since 10.10RC1
-     */
-    public boolean isDatabaseDataSaved()
-    {
-        return this.saveDatabaseData;
-    }
-
-    /**
-     * @param saveDatabaseData see {@link #isDatabaseDataSaved()}
-     */
-    public void setSaveDatabaseData(boolean saveDatabaseData)
-    {
-        this.saveDatabaseData = saveDatabaseData;
     }
 
     /**
@@ -669,7 +662,7 @@ public class TestConfiguration
 
     /**
      * @return the list of Servlet Engines on which this test must not be executed. If the Servlet Engine is selected
-     * then the test will be skipped
+     *         then the test will be skipped
      * @since 10.11RC1
      */
     public List<ServletEngine> getForbiddenServletEngines()
@@ -683,5 +676,42 @@ public class TestConfiguration
     public void setForbiddenServletEngines(List<ServletEngine> forbiddenServletEngines)
     {
         this.forbiddenServletEngines = forbiddenServletEngines;
+    }
+
+    /**
+     * @return true true if the database data should be mapped to a local directory on the host computer so that it can
+     *         be saved and reused for another run
+     * @since 10.10RC1
+     */
+    public boolean isDatabaseDataSaved()
+    {
+        return this.saveDatabaseData;
+    }
+
+    /**
+     * @param saveDatabaseData see {@link #isDatabaseDataSaved()}
+     */
+    public void setSaveDatabaseData(boolean saveDatabaseData)
+    {
+        this.saveDatabaseData = saveDatabaseData;
+    }
+
+    /**
+     * @return true if the XWiki permanent directory should be mapped to a local directory on the host computer so that
+     *         it can be accessed once the test is finished, for debugging purposes
+     * @since 14.5
+     */
+    public boolean isPermanentDirectoryDataSaved()
+    {
+        return this.savePermanentDirectoryData;
+    }
+
+    /**
+     * @param savePermanentDirectoryData see {@link #isPermanentDirectoryDataSaved()}
+     * @since 14.5
+     */
+    public void setSavePermanentDirectoryData(boolean savePermanentDirectoryData)
+    {
+        this.savePermanentDirectoryData = savePermanentDirectoryData;
     }
 }

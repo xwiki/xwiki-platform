@@ -87,13 +87,6 @@ public @interface UITest
     boolean debug() default false;
 
     /**
-     * @return true if the database data should be mapped to a local directory on the host computer so that it can be
-     * saved and reused for another run
-     * @since 10.10RC1
-     */
-    boolean saveDatabaseData() default false;
-
-    /**
      * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in your
      * local repository). False by default to avoid developer problems but should be set to true in the CI to improve
      * performance of functional tests
@@ -197,4 +190,19 @@ public @interface UITest
      * @since 11.2RC1
      */
     String[] databaseCommands() default {};
+
+    /**
+     * @return true if the database data should be mapped to a local directory on the host computer so that it can be
+     *         saved and reused for another run
+     * @since 10.10RC1
+     */
+    boolean saveDatabaseData() default false;
+
+    /**
+     * @return true if the XWiki permanent directory should be preserved after the test is finished and the XWiki
+     *         container stopped (doesn't make sense for Servlet containers running outside of Docker). Can be useful
+     *         for debugging purposes
+     * @since 14.5
+     */
+    boolean savePermanentDirectoryData() default false;
 }

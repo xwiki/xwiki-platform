@@ -234,7 +234,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // "localhost" as the JVM host to connect to.
         if (this.testConfiguration.isDebug()) {
             catalinaOpts.add("-Xdebug");
-            catalinaOpts.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005");
+            catalinaOpts.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005");
             catalinaOpts.add("-Xnoagent");
             catalinaOpts.add("-Djava.compiler=NONE");
         }
@@ -292,6 +292,16 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             // Note 3: The copy is done the other way around when the container is stopped so that the new added
             // Clover data is available from the Maven container for computing the Clover report.
             mountFromHostToContainer(this.servletContainer, CLOVER_DATABASE, CLOVER_DATABASE);
+        }
+
+        // Also map the permanent directory if asked by the test (to keep it after the test is finished, can be
+        // useful to debug something that only happens on the CI for example).
+        if (this.testConfiguration.isPermanentDirectoryDataSaved()
+            && !this.testConfiguration.getServletEngine().isOutsideDocker())
+        {
+            File permanentDirectoryOnHost = new File(this.testConfiguration.getOutputDirectory(), "permanentDirectory");
+            this.servletContainer.withFileSystemBind(permanentDirectoryOnHost.getAbsolutePath(),
+                this.testConfiguration.getServletEngine().getPermanentDirectory());
         }
 
         start(this.servletContainer, this.testConfiguration);

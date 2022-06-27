@@ -234,7 +234,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // "localhost" as the JVM host to connect to.
         if (this.testConfiguration.isDebug()) {
             catalinaOpts.add("-Xdebug");
-            catalinaOpts.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005");
+            catalinaOpts.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005");
             catalinaOpts.add("-Xnoagent");
             catalinaOpts.add("-Djava.compiler=NONE");
         }

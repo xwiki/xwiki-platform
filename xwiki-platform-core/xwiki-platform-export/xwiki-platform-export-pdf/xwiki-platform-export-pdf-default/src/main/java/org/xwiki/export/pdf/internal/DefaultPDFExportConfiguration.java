@@ -64,6 +64,18 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     }
 
     @Override
+    public String getDockerNetwork()
+    {
+        return this.configurationSource.getProperty(PREFIX + "dockerNetwork", "bridge");
+    }
+
+    @Override
+    public String getChromeHost()
+    {
+        return this.configurationSource.getProperty(PREFIX + "chromeHost", "");
+    }
+
+    @Override
     public int getChromeRemoteDebuggingPort()
     {
         return this.configurationSource.getProperty(PREFIX + "chromeRemoteDebuggingPort", 9222);
@@ -72,6 +84,6 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     @Override
     public String getXWikiHost()
     {
-        return this.configurationSource.getProperty(PREFIX + "xwikiHost", "host-gateway");
+        return this.configurationSource.getProperty(PREFIX + "xwikiHost", "host.xwiki.internal");
     }
 }

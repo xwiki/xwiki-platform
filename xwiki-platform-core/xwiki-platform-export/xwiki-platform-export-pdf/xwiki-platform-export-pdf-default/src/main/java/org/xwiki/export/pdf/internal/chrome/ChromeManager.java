@@ -52,6 +52,7 @@ import com.github.kklisura.cdt.protocol.commands.Page;
 import com.github.kklisura.cdt.protocol.commands.Runtime;
 import com.github.kklisura.cdt.protocol.commands.Target;
 import com.github.kklisura.cdt.protocol.types.network.CookieParam;
+import com.github.kklisura.cdt.protocol.types.page.Navigate;
 import com.github.kklisura.cdt.protocol.types.page.PrintToPDF;
 import com.github.kklisura.cdt.protocol.types.page.PrintToPDFTransferMode;
 import com.github.kklisura.cdt.protocol.types.runtime.Evaluate;
@@ -171,18 +172,26 @@ public class ChromeManager implements Initializable
      * @param tabDevToolsService the developer tools service corresponding to the browser tab used to navigate to the
      *            specified web page
      * @param printPreviewURL the URL of the web page we are going to navigate to
+     * @param wait {@code true} to wait for the page to be ready, {@code false} otherwise
+     * @return {@code true} if the navigation was successful, {@code false} otherwise
      * @throws IOException if navigating to the specified web page fails
      */
-    public void navigate(ChromeDevToolsService tabDevToolsService, URL printPreviewURL) throws IOException
+    public boolean navigate(ChromeDevToolsService tabDevToolsService, URL printPreviewURL, boolean wait)
+        throws IOException
     {
         this.logger.debug("Navigating to [{}].", printPreviewURL);
         Page page = tabDevToolsService.getPage();
         page.enable();
-        page.navigate(printPreviewURL.toString());
+        Navigate navigate = page.navigate(printPreviewURL.toString());
+        boolean success = navigate.getErrorText() == null;
 
-        Runtime runtime = tabDevToolsService.getRuntime();
-        runtime.enable();
-        waitForPageReady(runtime);
+        if (success && wait) {
+            Runtime runtime = tabDevToolsService.getRuntime();
+            runtime.enable();
+            waitForPageReady(runtime);
+        }
+
+        return success;
     }
 
     /**
@@ -302,6 +311,7 @@ public class ChromeManager implements Initializable
             cookies.stream().collect(Collectors.toMap(CookieParam::getName, CookieParam::getValue)));
         Network network = tabDevToolsService.getNetwork();
         network.enable();
+        network.clearBrowserCookies();
         network.setCookies(cookies);
     }
 

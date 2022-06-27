@@ -69,85 +69,31 @@
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory><!-- TODO: change XObject structure -->
-        <disabled>0</disabled>
-        <name>defaultCategory</name>
-        <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
-      <description>
-        <disabled>0</disabled>
-        <name>description</name>
-        <number>3</number>
-        <prettyName>Macro description</prettyName>
-        <rows>5</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </description>
-      <id>
-        <disabled>0</disabled>
-        <name>id</name>
-        <number>1</number>
-        <prettyName>Macro id</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </id>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>2</number>
-        <prettyName>Macro name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <supportsInlineMode>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>supportsInlineMode</name>
-        <number>5</number>
-        <prettyName>Supports inline mode</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </supportsInlineMode>
-      <visibility>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>visibility</name>
-        <number>6</number>
-        <prettyName>Macro visibility</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator>|</separator>
-        <separators>|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>Current User|Current Wiki|Global</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </visibility>
-    </class>
-    <name>ExtensionTest.Bob</name>
-    <number>0</number>
-    <className>XWiki.WikiMacroClass</className>
-    <guid>979b141c-359c-4e7a-bc33-f2a203dd589e</guid>
-    <property>
-      <code>Bob says hi!</code>
-    </property>
-    <property>
-      <contentDescription/>
-    </property>
+    <defaultCategories>
+      <cache>0</cache>
+      <disabled>0</disabled>
+      <displayType>input</displayType>
+      <freeText>forbidden</freeText>
+      <largeStorage>0</largeStorage>
+      <multiSelect>1</multiSelect>
+      <name>defaultCategories</name>
+      <number>4</number>
+      <prettyName>Default categories</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <unmodifiable>0</unmodifiable>
+      <values/>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </defaultCategories>
     <property>
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Content</defaultCategory><!-- TODO: replace with defaultCategories -->
+      <defaultCategories>
+        <value>Content</value>
+      </defaultCategories>
     </property>
     <property>
       <description>Wiki macro for Extension Manager tests.</description>

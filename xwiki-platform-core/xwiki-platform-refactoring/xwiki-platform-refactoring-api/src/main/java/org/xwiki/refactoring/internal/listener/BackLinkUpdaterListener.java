@@ -38,8 +38,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.refactoring.internal.job.DeleteJob;
 import org.xwiki.refactoring.internal.job.MoveJob;
 import org.xwiki.refactoring.job.DeleteRequest;
@@ -69,7 +69,7 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
     private Logger logger;
 
     @Inject
-    private LinkRefactoring linkRefactoring;
+    private ReferenceUpdater updater;
 
     @Inject
     private ModelBridge modelBridge;
@@ -178,7 +178,7 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
             for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
                 this.progressManager.startStep(this);
                 if (canEdit.test(backlinkDocumentReference)) {
-                    this.linkRefactoring.renameLinks(backlinkDocumentReference, source, target);
+                    this.updater.update(backlinkDocumentReference, source, target);
                 }
                 this.progressManager.endStep(this);
             }

@@ -145,7 +145,6 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         String macroName = getMacroName(macroDefinition, macroId);
         // The macro description as plain text
         String macroDescription = macroDefinition.getStringValue(MACRO_DESCRIPTION_PROPERTY);
-        List<String> macroDefaultCategories = macroDefinition.getListValue(MACRO_DEFAULT_CATEGORIES_PROPERTY);
         WikiMacroVisibility macroVisibility =
             WikiMacroVisibility.fromString(macroDefinition.getStringValue(MACRO_VISIBILITY_PROPERTY));
         boolean macroSupportsInlineMode = macroDefinition.getIntValue(MACRO_INLINE_PROPERTY) != 0;
@@ -155,16 +154,10 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
             this.logger.debug("Incomplete macro definition in [{}], macro description is empty", documentReference);
         }
 
+        List<String> macroDefaultCategories = getDefaultCategories(macroDefinition);
         // Verify default macro category.
         if (macroDefaultCategories == null || macroDefaultCategories.isEmpty()) {
-            String macroDefaultCategory = macroDefinition.getStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY);
-            if (macroDefaultCategory != null) {
-                // In case of document where the categories have need been moved to the new defaultCategories, use the 
-                // legacy defaultCategory field.
-                macroDefaultCategories = List.of(macroDefaultCategory);
-            } else {
-                macroDefaultCategories = List.of();
-            }
+            macroDefaultCategories = List.of();
             this.logger.debug("Incomplete macro definition in [{}], default macro category is empty",
                 documentReference);
         }
@@ -378,5 +371,10 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         }
 
         return isAllowed;
+    }
+
+    private List<String> getDefaultCategories(BaseObject macroDefinition)
+    {
+        return (List<String>) macroDefinition.getListValue(MACRO_DEFAULT_CATEGORIES_PROPERTY);
     }
 }

@@ -62,8 +62,8 @@ public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumen
         // The Macro description is using plain text (same as for Java Macros).
         xclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5,
             TextAreaClass.ContentType.PURE_TEXT);
-        // TODO: explicitly remove defaultCategory __once__ somehow.
-        xclass.addStaticListField(MACRO_DEFAULT_CATEGORIES_PROPERTY, "Default categories", 1, true, "",  "input");
+        // TODO: remove macro default category!
+        xclass.addStaticListField(MACRO_DEFAULT_CATEGORIES_PROPERTY, "Default categories", 1, true, "", "input");
         xclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", "yesno");
         xclass.addStaticListField(MACRO_VISIBILITY_PROPERTY, "Macro visibility", 1, false,
             "Current User|Current Wiki|Global", ListClass.DISPLAYTYPE_SELECT, PROPERTY_PIPE);

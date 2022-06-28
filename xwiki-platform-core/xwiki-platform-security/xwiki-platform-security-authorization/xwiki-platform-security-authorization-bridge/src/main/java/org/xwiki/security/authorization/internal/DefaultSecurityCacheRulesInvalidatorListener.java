@@ -58,7 +58,7 @@ import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 
 /**
- * The instance of this class monitors updates and invalidates right cache entries whenever necessary.
+ * This class monitors updates and invalidates right cache entries whenever necessary.
  * 
  * @version $Id$
  * @since 4.0M2

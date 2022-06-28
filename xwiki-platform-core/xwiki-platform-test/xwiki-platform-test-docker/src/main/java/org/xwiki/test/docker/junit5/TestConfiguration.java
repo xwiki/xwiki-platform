@@ -256,7 +256,9 @@ public class TestConfiguration
     private void mergeExtraJARs(Collection<ArtifactCoordinate> extraJARs)
     {
         Set<ArtifactCoordinate> mergedExtraJARs = getExtraJARs();
-        mergedExtraJARs.addAll(extraJARs);
+        if (extraJARs != null) {
+            mergedExtraJARs.addAll(extraJARs);
+        }
         this.extraJARs = mergedExtraJARs;
     }
 
@@ -270,28 +272,36 @@ public class TestConfiguration
     private void mergeExtensionOverrides(List<ExtensionOverride> extensionOverrides)
     {
         List<ExtensionOverride> mergedExtensionOverrides = getExtensionOverrides();
-        mergedExtensionOverrides.addAll(extensionOverrides);
+        if (extensionOverrides != null) {
+            mergedExtensionOverrides.addAll(extensionOverrides);
+        }
         this.extensionOverrides = mergedExtensionOverrides;
     }
 
     private void mergeSSHPorts(List<Integer> sshPorts)
     {
         List<Integer> mergedSSHPorts = getSSHPorts();
-        mergedSSHPorts.addAll(sshPorts);
+        if (sshPorts != null) {
+            mergedSSHPorts.addAll(sshPorts);
+        }
         this.sshPorts = mergedSSHPorts;
     }
 
     private void mergeProfiles(List<String> profiles)
     {
         List<String> mergedProfiles = getProfiles();
-        mergedProfiles.addAll(profiles);
+        if (profiles != null) {
+            mergedProfiles.addAll(profiles);
+        }
         this.profiles = mergedProfiles;
     }
 
     private void mergeForbiddenServletEngines(List<ServletEngine> forbiddenServletEngines)
     {
         List<ServletEngine> mergedForbiddenServletEngines = getForbiddenServletEngines();
-        mergedForbiddenServletEngines.addAll(forbiddenServletEngines);
+        if (forbiddenServletEngines != null) {
+            mergedForbiddenServletEngines.addAll(forbiddenServletEngines);
+        }
         this.forbiddenServletEngines = mergedForbiddenServletEngines;
     }
 

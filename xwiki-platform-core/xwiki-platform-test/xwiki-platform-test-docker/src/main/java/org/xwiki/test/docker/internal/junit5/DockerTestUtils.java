@@ -72,6 +72,9 @@ public final class DockerTestUtils
 
     private static List<String> pulledImages = new ArrayList<>();
 
+    private static final ExtensionContext.Namespace NAMESPACE =
+        ExtensionContext.Namespace.create(XWikiDockerExtension.class);
+
     private DockerTestUtils()
     {
         // Prevents instantiation.
@@ -334,5 +337,40 @@ public final class DockerTestUtils
     public static String getAgentName()
     {
         return System.getProperty("jenkinsAgentName");
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @return the store
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public static ExtensionContext.Store getStore(ExtensionContext context)
+    {
+        return context.getRoot().getStore(NAMESPACE);
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @param configuration the test configuration
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public static void setTestConfiguration(ExtensionContext context, TestConfiguration configuration)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+        store.put(TestConfiguration.class, configuration);
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @return the test configuration
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public static TestConfiguration getTestConfiguration(ExtensionContext context)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+        return store.get(TestConfiguration.class, TestConfiguration.class);
     }
 }

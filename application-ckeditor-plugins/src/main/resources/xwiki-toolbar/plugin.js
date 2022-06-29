@@ -113,12 +113,11 @@
     if (key.substring(0, 6) === 'xwiki-') {
       return editor.localization.get(key);
     } else {
-      var parts = key.split('.');
       var value = editor.lang;
       key.split('.').forEach(function(part) {
-        value = value[part];
+        value = (value || {})[part];
       });
-      return value;
+      return value || key;
     }
   };
 })();

@@ -770,7 +770,7 @@ public class TableLayoutElement extends BaseElement
         By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
 
         // Waits for the text input to be displayed.
-        getDriver().waitUntilCondition(input -> !getDriver().findElementsWithoutWaiting(element, selector).isEmpty());
+        getDriver().waitUntilElementIsVisible(element, selector);
 
         // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements 
         // displayed in the live data (they are the same as the one of the inline edit mode).

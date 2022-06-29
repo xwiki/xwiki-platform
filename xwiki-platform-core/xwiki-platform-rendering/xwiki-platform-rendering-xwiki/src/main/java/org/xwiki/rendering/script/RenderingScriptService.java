@@ -22,6 +22,7 @@ package org.xwiki.rendering.script;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -308,13 +309,15 @@ public class RenderingScriptService implements ScriptService
     }
 
     /**
-     * TODO
-     * @param macroId a macro id 
+     * Return the list of categories of a given macro.
+     *
+     * @param macroId the macro id
      * @return the list of categories of the macro
      * @since 14.6RC1
      */
     @Unstable
-    public List<String> getMacroCategories(MacroId macroId) {
+    public Set<String> getMacroCategories(MacroId macroId)
+    {
         return this.macroCategoryManager.getMacroCategories(macroId);
     }
 

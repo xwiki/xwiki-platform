@@ -80,6 +80,7 @@ import static org.mockito.Mockito.when;
     DefaultExtendedRenderingConfiguration.class,
     RenderingConfigClassDocumentConfigurationSource.class,
     SyntaxConverter.class,
+    // TODO: fails without DefaultMacroCategoryManager
     // End RenderingScriptService
     ControlCharactersFilter.class,
     ModelScriptService.class,

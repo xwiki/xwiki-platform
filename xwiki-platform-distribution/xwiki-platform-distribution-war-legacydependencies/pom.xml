@@ -260,5 +260,10 @@
       <artifactId>xwiki-rendering-legacy-transformation-macro</artifactId>
       <version>${rendering.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-events-hibernate-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

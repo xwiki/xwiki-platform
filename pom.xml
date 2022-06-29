@@ -1255,13 +1255,12 @@
             <configuration>
               <skip>${xwiki.enforcer.banneddependencytype-xar.skip}</skip>
               <rules>
+                <!-- Forbid JAR extensions to have XAR runtime dependencies -->
                 <validateDependencyVersion implementation="org.xwiki.tool.enforcer.BannedDependencyType">
-                  <projectPackaging>jar</projectPackaging>
                   <dependencyType>xar</dependencyType>
-                </validateDependencyVersion>
-                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.BannedDependencyType">
-                  <projectPackaging>webjar</projectPackaging>
-                  <dependencyType>xar</dependencyType>
+                  <projectPackaging>jar|webjar</projectPackaging>
+                  <!-- Integration test modules are never going to be installed as extension and they need to depend on XAR modules -->
+                  <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>
                 </validateDependencyVersion>
               </rules>
             </configuration>

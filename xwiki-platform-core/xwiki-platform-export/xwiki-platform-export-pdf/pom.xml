@@ -25,13 +25,23 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-export-pdf</artifactId>
   <name>XWiki Platform - Export - PDF</name>
   <packaging>pom</packaging>
   <description>Top level POM for the PDF Export module</description>
   <modules>
+    <module>xwiki-platform-export-pdf-api</module>
+    <module>xwiki-platform-export-pdf-default</module>
     <module>xwiki-platform-export-pdf-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-export-pdf-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

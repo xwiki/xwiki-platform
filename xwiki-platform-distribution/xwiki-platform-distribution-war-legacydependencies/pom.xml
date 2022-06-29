@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-legacydependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Legacy Dependencies</name>
@@ -71,6 +71,10 @@
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-refactoring-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-transformation-macro</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -122,6 +126,10 @@
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-office-importer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-transformation-macro</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -176,6 +184,10 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-refactoring-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-transformation-macro</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -210,6 +222,10 @@
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
         </exclusion>
+         <exclusion>
+           <groupId>org.xwiki.rendering</groupId>
+           <artifactId>xwiki-rendering-transformation-macro</artifactId>
+         </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -238,6 +254,11 @@
           <artifactId>xwiki-platform-oldcore</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-legacy-transformation-macro</artifactId>
+      <version>${rendering.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

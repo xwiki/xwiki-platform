@@ -51,6 +51,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.refactoring.ReferenceRenamer;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.annotation.AfterComponent;
@@ -82,7 +83,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.atLeastOnce;
@@ -110,6 +110,9 @@ public class XWikiTest
 
     @MockComponent
     private ReferenceRenamer referenceRenamer;
+
+    @MockComponent
+    private ReferenceUpdater referenceUpdater;
 
     private static final String DOCWIKI = "Wiki";
 
@@ -1018,8 +1021,7 @@ public class XWikiTest
             this.oldcore.getXWikiContext());
 
         // Test links
-        verify(this.referenceRenamer).renameReferences(any(), eq(targetReference), eq(sourceReference),
-            eq(targetReference), eq(false));
+        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference);
         verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
             targetReference, false);
         verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,
@@ -1107,8 +1109,7 @@ public class XWikiTest
             new DocumentReference(targetReference, Locale.GERMAN), xWikiContext);
 
         // Test links
-        verify(this.referenceRenamer).renameReferences(any(), eq(targetReference), eq(sourceReference),
-            eq(targetReference), eq(false));
+        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference);
         verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
             targetReference, false);
         verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,

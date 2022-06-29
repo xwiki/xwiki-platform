@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.job;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -29,7 +30,7 @@ import org.xwiki.stability.Unstable;
  *
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 @Unstable
 public class DeleteRequest extends EntityRequest
@@ -88,7 +89,7 @@ public class DeleteRequest extends EntityRequest
      */
     public Map<DocumentReference, DocumentReference> getNewBacklinkTargets()
     {
-        return getProperty(NEW_BACKLINK_TARGETS);
+        return getProperty(NEW_BACKLINK_TARGETS, Collections.emptyMap());
     }
 
     /**

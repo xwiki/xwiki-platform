@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.6-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>14.5-SNAPSHOT</version>
+  <version>14.6-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -50,11 +50,11 @@
     <rendering.version>${platform.version}</rendering.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.64</ckeditor.version>
+    <ckeditor.version>1.64.2</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.14</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>2.4.0</tika.version>
+    <tika.version>2.4.1</tika.version>
     <pdfbox.version>2.0.26</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.29.v20200521</jetty.version>
@@ -66,8 +66,11 @@
     <!-- Versions of other software we need in our functional tests -->
     <testcontainers.version>1.17.2</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
-         sure the new version is available from https://downloadarchive.documentfoundation.org/libreoffice/old/ -->
-    <libreoffice.version>7.2.7.2</libreoffice.version>
+         sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
+         Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
+         (e.g. 7.2.7).
+    -->
+    <libreoffice.version>7.2.7</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -88,6 +91,7 @@
 
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
     <xwiki.enforcer.enforce-tika2-parsers.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-tika2-parsers.skip>
+    <xwiki.enforcer.banneddependencytype-xar.skip>${xwiki.enforcer.skip}</xwiki.enforcer.banneddependencytype-xar.skip>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
@@ -161,7 +165,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.11.0</version>
+        <version>4.12.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -532,7 +536,7 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.11.0</version>
+        <version>5.12.0</version>
       </dependency>
 
       <dependency>
@@ -1269,6 +1273,26 @@
                     <exclude>org.apache.tika:tika-parsers</exclude>
                   </excludes>
                 </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure JAR extensions don't trigger runtime dependencies on XAR extensions -->
+          <execution>
+            <id>enforcer-banneddependencytype-xar</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <skip>${xwiki.enforcer.banneddependencytype-xar.skip}</skip>
+              <rules>
+                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.BannedDependencyType">
+                  <projectPackaging>jar</projectPackaging>
+                  <dependencyType>xar</dependencyType>
+                </validateDependencyVersion>
+                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.BannedDependencyType">
+                  <projectPackaging>webjar</projectPackaging>
+                  <dependencyType>xar</dependencyType>
+                </validateDependencyVersion>
               </rules>
             </configuration>
           </execution>

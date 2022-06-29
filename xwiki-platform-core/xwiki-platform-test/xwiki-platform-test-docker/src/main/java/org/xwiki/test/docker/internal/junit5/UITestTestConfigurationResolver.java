@@ -56,8 +56,6 @@ public class UITestTestConfigurationResolver
 
     private static final String DEBUG_PROPERTY = "xwiki.test.ui.debug";
 
-    private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
-
     private static final String OFFLINE_PROPERTY = "xwiki.test.ui.offline";
 
     private static final String DATABASETAG_PROPERTY = "xwiki.test.ui.databaseTag";
@@ -74,6 +72,10 @@ public class UITestTestConfigurationResolver
 
     private static final String OFFICE_PROPERTY = "xwiki.test.ui.office";
 
+    private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
+
+    private static final String SAVEPERMANENTDIRECTORY_PROPERTY = "xwiki.test.ui.savePermanentDirectoryData";
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      * @return the constructed {@link TestConfiguration} object containing the full test configuration
@@ -86,7 +88,6 @@ public class UITestTestConfigurationResolver
         configuration.setServletEngine(resolveServletEngine(uiTestAnnotation.servletEngine()));
         configuration.setVerbose(resolveVerbose(uiTestAnnotation.verbose()));
         configuration.setDebug(resolveDebug(uiTestAnnotation.debug()));
-        configuration.setSaveDatabaseData(resolveSaveDatabaseData(uiTestAnnotation.saveDatabaseData()));
         configuration.setOffline(resolveOffline(uiTestAnnotation.offline()));
         configuration.setDatabaseTag(resolveDatabaseTag(uiTestAnnotation.databaseTag()));
         configuration.setServletEngineTag(resolveServletEngineTag(uiTestAnnotation.servletEngineTag()));
@@ -101,6 +102,9 @@ public class UITestTestConfigurationResolver
         configuration.setOffice(resolveOffice(uiTestAnnotation.office()));
         configuration.setForbiddenServletEngines(resolveForbiddenServletEngines(uiTestAnnotation.forbiddenEngines()));
         configuration.setDatabaseCommands(resolveDatabaseCommands(uiTestAnnotation.databaseCommands()));
+        configuration.setSaveDatabaseData(resolveSaveDatabaseData(uiTestAnnotation.saveDatabaseData()));
+        configuration.setSavePermanentDirectoryData(resolveSavePermanentDirectoryData(
+            uiTestAnnotation.savePermanentDirectoryData()));
         return configuration;
     }
 
@@ -190,11 +194,6 @@ public class UITestTestConfigurationResolver
     private boolean resolveDebug(boolean debug)
     {
         return resolve(debug, DEBUG_PROPERTY);
-    }
-
-    private boolean resolveSaveDatabaseData(boolean saveDatabaseData)
-    {
-        return resolve(saveDatabaseData, SAVEDBDATA_PROPERTY);
     }
 
     private boolean resolveOffline(boolean offline)
@@ -319,5 +318,15 @@ public class UITestTestConfigurationResolver
             newForbiddenServletEngines.addAll(Arrays.asList(forbiddenServletEngines));
         }
         return newForbiddenServletEngines;
+    }
+
+    private boolean resolveSaveDatabaseData(boolean saveDatabaseData)
+    {
+        return resolve(saveDatabaseData, SAVEDBDATA_PROPERTY);
+    }
+
+    private boolean resolveSavePermanentDirectoryData(boolean savePermanentDirectoryData)
+    {
+        return resolve(savePermanentDirectoryData, SAVEPERMANENTDIRECTORY_PROPERTY);
     }
 }

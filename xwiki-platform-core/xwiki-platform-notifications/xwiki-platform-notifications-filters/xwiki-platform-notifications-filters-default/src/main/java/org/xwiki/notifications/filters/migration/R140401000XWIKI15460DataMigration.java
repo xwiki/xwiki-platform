@@ -62,7 +62,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  *     when a wiki is deleted</a>
  * @see <a href="https://jira.xwiki.org/browse/XWIKI-18397">XWIKI-18397: Notification filter preferences are never
  *     cleaned for deleted users</a>
- * @since 14.5RC1
+ * @since 14.5
  * @since 14.4.1
  * @since 13.10.7
  */
@@ -111,10 +111,6 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     {
         boolean shouldExecute = super.shouldExecute(startupVersion);
 
-        if (shouldExecute && this.filterPreferenceConfiguration.useMainStore() && !isMainWiki()) {
-            shouldExecute = false;
-        }
-
         if (shouldExecute) {
             int version = startupVersion.getVersion();
             shouldExecute = !(version >= 131007000 && version < 140000000);
@@ -125,9 +121,21 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     @Override
     protected void hibernateMigrate() throws DataMigrationException
     {
-        try {
-            boolean isMainWiki = isMainWiki();
+        boolean isMainWiki = isMainWiki();
 
+        // Stop the execution early if the configuration uses the main store and we are not upgrading the main wiki.
+        // This check cannot be done in #shouldExecute because possibly missing columns are not yet added to the 
+        // database.
+        if (this.filterPreferenceConfiguration.useMainStore() && !isMainWiki) {
+            return;
+        }
+
+        internalHibernateMigrate(isMainWiki);
+    }
+
+    private void internalHibernateMigrate(boolean isMainWiki) throws DataMigrationException
+    {
+        try {
             Collection<String> knownWikiIds;
             if (isMainWiki) {
                 // The know wikis are only initialized for the main wiki, as they are not needed for the sub-wikis.

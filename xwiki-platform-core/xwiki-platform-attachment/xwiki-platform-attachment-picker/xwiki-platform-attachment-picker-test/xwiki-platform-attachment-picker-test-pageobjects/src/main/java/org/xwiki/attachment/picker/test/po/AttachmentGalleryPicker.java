@@ -98,11 +98,12 @@ public class AttachmentGalleryPicker extends BaseElement
     }
 
     /**
-     * @return {@code true} when the warning message is displayed, {@code false} otherwise
+     * Wait until the not result warning message is displayed.
      */
-    public boolean isNoResultMessageDisplayed()
+    public void waitNoResultMessageDisplayed()
     {
-        return this.attachmentGalleryPickerElement.findElement(By.className("attachmentPickerNoResults")).isDisplayed();
+        getDriver().waitUntilElementIsVisible(this.attachmentGalleryPickerElement,
+            By.className("attachmentPickerNoResults"));
     }
 
     private List<WebElement> getAllAttachments()

@@ -26,11 +26,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.internal.XWikiBridge;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -51,6 +53,7 @@ import static org.mockito.Mockito.when;
  * @since 4.0M2
  */
 @ComponentTest
+@ComponentList({EntityReferenceFactory.class})
 public class SecurityReferenceTest
 {
     private EntityReference xwiki = new EntityReference("xwiki", EntityType.WIKI);

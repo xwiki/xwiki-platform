@@ -1,0 +1,45 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.LegacyNotificationAdministrationTranslations" locale="fr">
+  <web>XWiki.Notifications.Code</web>
+  <name>LegacyNotificationAdministrationTranslations</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>legacy.event.migration.description=XWiki a bascul\u00E9 vers un nouveau syst\u00E8me de stockage des \u00E9v\u00E9nements (notifications) depuis la version 12.6. La copie des \u00E9v\u00E9nements de l'ancien vers le nouveau stockage pouvant \u00EAtre longue (particuli\u00E8rement pour les wikis anciens ayant un gros historique) et cette migration n'\u00E9tant pas toujours souhait\u00E9e, l'administrateur est libre de l'ex\u00E9cuter ou non. Sachez qu'en cas de non copie les anciens \u00E9v\u00E9nements n'appara\u00EEtront plus. La migration s'effectue en arri\u00E8re-plan.
+### Missing: legacy.event.count.store=Number of events in the standard store
+### Missing: legacy.event.count.legacy=Number of events in the legacy store
+legacy.event.migration.alltime=Tout
+legacy.event.migration.since=Depuis
+legacy.event.migration.start=D\u00E9marrer la migration</content>
+</xwikidoc>

@@ -42,7 +42,7 @@ import org.xwiki.test.docker.junit5.DockerTestException;
  * Create a sub wiki.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  */
 public class WikiCreator
 {

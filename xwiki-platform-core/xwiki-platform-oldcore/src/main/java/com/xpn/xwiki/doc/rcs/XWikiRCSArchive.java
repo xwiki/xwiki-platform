@@ -218,7 +218,7 @@ public class XWikiRCSArchive extends Archive
      * @throws PatchFailedException
      * @throws InvalidFileFormatException
      * @throws NodeNotFoundException
-     * @deprecated since 13.10.7, 14.4.1, 14.5RC1, use {@link #getNodes(WikiReference, long)} instead
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #getNodes(WikiReference, long)} instead
      */
     @Deprecated(since = "13.10.7")
     public Collection getNodes(long docId) throws NodeNotFoundException, InvalidFileFormatException,
@@ -236,7 +236,7 @@ public class XWikiRCSArchive extends Archive
      * @throws NodeNotFoundException
      * @since 13.10.7
      * @since 14.4.1
-     * @since 14.5RC1
+     * @since 14.5
      */
     public Collection getNodes(WikiReference wikiReference, long docId) throws NodeNotFoundException, InvalidFileFormatException,
         PatchFailedException

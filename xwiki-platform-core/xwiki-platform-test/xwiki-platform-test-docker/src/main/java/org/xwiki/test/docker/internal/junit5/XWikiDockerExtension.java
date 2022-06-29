@@ -222,7 +222,7 @@ public class XWikiDockerExtension extends AbstractExtension
     {
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {
-            LOGGER.info("(*) Start VNC container...");
+            LOGGER.info("(*) Starting VNC container...");
 
             BrowserWebDriverContainer<?> webDriverContainer = loadBrowserWebDriverContainer(extensionContext);
 
@@ -257,6 +257,7 @@ public class XWikiDockerExtension extends AbstractExtension
 
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc() && this.isVncStarted) {
+            LOGGER.info("(*) Stopping VNC container...");
             VncRecordingContainer vnc = loadVNC(extensionContext);
             vnc.stop();
 
@@ -499,7 +500,7 @@ public class XWikiDockerExtension extends AbstractExtension
             VncRecordingContainer vnc = loadVNC(extensionContext);
             File recordingFile = getResultFileLocation("flv", testConfiguration, extensionContext);
             vnc.saveRecordingToFile(recordingFile);
-            LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
+            LOGGER.info("VNC recording of test has been saved to [{}]", recordingFile);
         }
     }
 

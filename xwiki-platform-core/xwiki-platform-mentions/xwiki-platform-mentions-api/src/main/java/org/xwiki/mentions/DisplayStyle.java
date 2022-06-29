@@ -49,7 +49,7 @@ public enum DisplayStyle
      * @return the result of {@link DisplayStyle#valueOf(String)} or {@link #FULL_NAME} if style is {@code null}
      * @since 13.10.7
      * @since 14.4.2
-     * @since 14.5RC1
+     * @since 14.5
      */
     @Unstable
     public static DisplayStyle getOrDefault(String style)

@@ -26,7 +26,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 public class PDFImage
 {

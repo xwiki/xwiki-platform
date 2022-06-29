@@ -34,7 +34,7 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
  * property to point to the ES instance started dynamically (on a dynamic port) during the test.
  *
  * @version $Id$
- * @since 14.5RC1
+ * @since 14.5
  */
 public class DynamicTestConfigurationExtension implements BeforeAllCallback
 {

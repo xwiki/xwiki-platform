@@ -96,7 +96,7 @@ class AttachmentGalleryPickerMacroIT
 
         // Test on a filter matching no attachment, a warning message is expected.
         testPicker1.setSearch("doesnotexists").waitUntilAttachmentsCount(0);
-        assertTrue(testPicker1.isNoResultMessageDisplayed());
+        testPicker1.waitNoResultMessageDisplayed();
 
         // Test with another filter.
         testPicker1.setSearch("textcontent").waitUntilAttachmentsCount(1);
@@ -117,7 +117,7 @@ class AttachmentGalleryPickerMacroIT
         assertTrue(picker3Attachments.size() >= 2);
         assertThat(picker3Attachments.subList(0, 2), containsInAnyOrder("image1.png", "image2.png"));
         testPicker3.setSearch("textcontent").waitUntilAttachmentsCount(0);
-        assertTrue(testPicker3.isNoResultMessageDisplayed());
+        testPicker3.waitNoResultMessageDisplayed();
     }
 
     private String computedHostURL(TestConfiguration testConfiguration)

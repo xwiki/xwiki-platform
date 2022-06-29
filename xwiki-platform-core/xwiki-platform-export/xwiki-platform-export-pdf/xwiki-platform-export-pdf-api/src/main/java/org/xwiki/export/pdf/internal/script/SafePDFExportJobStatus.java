@@ -38,7 +38,7 @@ import org.xwiki.user.UserReferenceResolver;
  * 
  * @version $Id$
  * @since 14.4.2
- * @since 14.5RC1
+ * @since 14.5
  */
 public class SafePDFExportJobStatus extends SafeJobStatus<PDFExportJobStatus>
 {

@@ -30,8 +30,8 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.job.JobContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.refactoring.internal.job.DeleteJob;
 import org.xwiki.refactoring.internal.job.RenameJob;
 import org.xwiki.refactoring.job.DeleteRequest;
@@ -64,7 +64,7 @@ class BackLinkUpdaterListenerTest
     private BackLinkUpdaterListener listener;
 
     @MockComponent
-    private LinkRefactoring linkRefactoring;
+    private ReferenceUpdater updater;
 
     @MockComponent
     private ModelBridge modelBridge;
@@ -126,8 +126,8 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater).update(denisReference, aliceReference, bobReference);
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
@@ -144,8 +144,8 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
@@ -161,8 +161,8 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
     }
@@ -175,7 +175,7 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
+        verify(this.updater, never()).update(any(), any(DocumentReference.class), any());
     }
 
     @Test
@@ -186,8 +186,8 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, null, null);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater).update(denisReference, aliceReference, bobReference);
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
@@ -201,8 +201,8 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, null, null);
 
-        verify(this.linkRefactoring, never()).renameLinks(eq(carolReference), any(DocumentReference.class), any());
-        verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+        verify(this.updater, never()).update(eq(carolReference), any(DocumentReference.class), any());
+        verify(this.updater).update(denisReference, aliceReference, bobReference);
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
@@ -219,8 +219,8 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentDeletedEvent, null, null);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring).renameLinks(denisReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater).update(denisReference, aliceReference, bobReference);
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
@@ -238,7 +238,7 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(new DocumentDeletedEvent(docReference), null, null);
 
-        verify(this.linkRefactoring, never()).renameLinks(eq(aliceReference), eq(docReference),
+        verify(this.updater, never()).update(eq(aliceReference), eq(docReference),
             any(DocumentReference.class));
     }
 
@@ -253,8 +253,8 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentDeletedEvent, null, null);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [bar].", logCapture.getMessage(1));
@@ -270,8 +270,8 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentDeletedEvent, null, null);
 
-        verify(this.linkRefactoring).renameLinks(carolReference, aliceReference, bobReference);
-        verify(this.linkRefactoring, never()).renameLinks(eq(denisReference), any(DocumentReference.class), any());
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice] in wiki [foo].", logCapture.getMessage(0));
     }
@@ -284,7 +284,7 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentDeletedEvent, null, null);
 
-        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
+        verify(this.updater, never()).update(any(), any(DocumentReference.class), any());
     }
 
     @Test
@@ -296,6 +296,6 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentDeletedEvent, null, null);
 
-        verify(this.linkRefactoring, never()).renameLinks(any(), any(DocumentReference.class), any());
+        verify(this.updater, never()).update(any(), any(DocumentReference.class), any());
     }
 }

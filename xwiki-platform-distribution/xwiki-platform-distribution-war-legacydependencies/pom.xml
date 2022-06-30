@@ -259,6 +259,13 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-legacy-transformation-macro</artifactId>
       <version>${rendering.version}</version>
+      <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

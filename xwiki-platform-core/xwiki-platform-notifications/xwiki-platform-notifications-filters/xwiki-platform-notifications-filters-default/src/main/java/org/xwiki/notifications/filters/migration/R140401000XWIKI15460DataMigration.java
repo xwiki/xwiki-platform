@@ -32,7 +32,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -90,9 +89,6 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
 
     @Inject
     private UserManager userManager;
-
-    @Inject
-    private Logger logger;
 
     @Override
     public XWikiDBVersion getVersion()
@@ -174,7 +170,13 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
             for (String userReference : unknownUsers) {
-                this.store.deleteFilterPreferences(this.resolver.resolve(userReference));
+                DocumentReference userDocumentReference = this.resolver.resolve(userReference);
+                // Verify if the user still has some filters preferences to remove, in case they have already all been
+                // cleaned up when removing the filters preferences for the unknown wikis. Without this check, calling 
+                // deleteFilterPreferences could yield undesirable "no data" warning logs. 
+                if (!this.store.getPreferencesOfUser(userDocumentReference).isEmpty()) {
+                    this.store.deleteFilterPreferences(userDocumentReference);
+                }
             }
         } catch (NotificationException e) {
             throw new DataMigrationException("Failed to retrieve the notification filters preferences.", e);

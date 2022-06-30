@@ -24,17 +24,20 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Document-based implementation of {@link UserManager}.
@@ -56,24 +59,47 @@ public class DocumentUserManager implements UserManager
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
 
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Override
     public boolean exists(UserReference userReference)
     {
         boolean result;
 
-        // For the reference to point to an existing user it needs to satisfy 2 conditions:
+        // For the reference to point to an existing user it needs to satisfy 3 conditions:
+        // - the wiki of the document exists
         // - the document exists
         // - it contains an XWiki.XWikiUsers xobject
         XWikiContext xcontext = this.xwikiContextProvider.get();
         XWiki xwiki = xcontext.getWiki();
         DocumentReference userDocumentReference = ((DocumentUserReference) userReference).getReference();
+        String userWikiId = userDocumentReference.getWikiReference().getName();
+        try {
+            if (!this.wikiDescriptorManager.exists(userWikiId)) {
+                result = false;
+            } else {
+                result = exists(xcontext, xwiki, userDocumentReference);
+            }
+        } catch (WikiManagerException e) {
+            this.logger.warn("Failed to determine if wiki [{}] exists. Considering it's not the case. Cause: [{}]",
+                userWikiId,
+                getRootCauseMessage(e));
+            result = false;
+        }
+        return result;
+    }
+
+    private boolean exists(XWikiContext xcontext, XWiki xwiki, DocumentReference userDocumentReference)
+    {
+        boolean result;
         try {
             XWikiDocument document = xwiki.getDocument(userDocumentReference, xcontext);
             result = !document.isNew() && document.getXObject(USERS_XCLASS_REFERENCE) != null;
         } catch (Exception e) {
-            this.logger.warn(String.format("Failed to check if document [%s] holds an XWiki user or not. "
-                    + "Considering it's not the case. Root error: [%s]", userDocumentReference,
-                ExceptionUtils.getRootCauseMessage(e)));
+            this.logger.warn("Failed to check if document [{}] holds an XWiki user or not. "
+                    + "Considering it's not the case. Root error: [{}]", userDocumentReference,
+                getRootCauseMessage(e));
             result = false;
         }
         return result;

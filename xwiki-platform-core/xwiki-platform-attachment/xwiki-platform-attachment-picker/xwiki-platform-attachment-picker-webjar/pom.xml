@@ -48,14 +48,6 @@
       <artifactId>jquery</artifactId>
       <scope>runtime</scope>
     </dependency>
-    <!-- Provides XWiki.SuggestSolrService required to search for the attachments through solr. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
     <!-- Solr backend implementation. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

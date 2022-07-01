@@ -349,16 +349,13 @@ public class UserEventDispatcher implements Disposable
             eventQuery.withStatus(entityId);
         }
 
-        EventSearchResult result;
-        try {
-            result = this.events.search(eventQuery);
-        } catch (EventStreamException e) {
+        try (EventSearchResult result = this.events.search(eventQuery)) {
+            return result.getTotalHits() > 0;
+        } catch (Exception e) {
             this.logger.error("Failed to check status for event [{}] and entity [{}]", event.getId(), entityId, e);
 
             return false;
         }
-
-        return result.getTotalHits() > 0;
     }
 
     private void dispatch(Event event, List<DocumentReference> users)

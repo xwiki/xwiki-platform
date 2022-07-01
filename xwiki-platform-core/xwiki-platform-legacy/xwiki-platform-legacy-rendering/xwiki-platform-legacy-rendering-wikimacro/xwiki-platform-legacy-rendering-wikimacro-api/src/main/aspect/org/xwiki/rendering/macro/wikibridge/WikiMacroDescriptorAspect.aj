@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public privileged aspect WikiMacroDescriptorAspect
     /**
      * @param defaultCategory the macro default category
      * @return this builder
-     * @deprecated since 14.6RC1, use {@link WikiMacroDescriptor.Builder#defaultCategories(Set)} instead
+     * @deprecated since 14.6RC1, use {@link WikiMacroDescriptor.Builder#defaultCategories(Collection)} instead
      */
     @Deprecated(since = "14.6RC1")
     public WikiMacroDescriptor.Builder WikiMacroDescriptor.Builder.defaultCategory(String defaultCategory)

@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -162,7 +163,7 @@ class DefaultWikiMacroTest
         // TOOD: add a test with defaultCategory and move this test to legacy
         WikiMacroDescriptor descriptor =
             new WikiMacroDescriptor.Builder().id(new MacroId(macroId)).name("Wiki Macro").description("Description")
-                .defaultCategory("Test").visibility(WikiMacroVisibility.GLOBAL).supportsInlineMode(true)
+                .defaultCategories(Set.of("Test")).visibility(WikiMacroVisibility.GLOBAL).supportsInlineMode(true)
                 .contentDescriptor(contentDescriptor).parameterDescriptors(parameterDescriptors).build();
 
         this.wikiMacroDocument.setSyntax(syntax);

@@ -25,6 +25,7 @@ package org.xwiki.rendering.wikimacro.internal;
  * @version $Id$
  * @since 14.6RC1
  */
+@Deprecated(since = "14.6RC1")
 public interface LegacyWikiMacroConstants
 {
     /**
@@ -32,6 +33,5 @@ public interface LegacyWikiMacroConstants
      *
      * @deprecated since 14.6RC1, replaced by {@link WikiMacroConstants#MACRO_DEFAULT_CATEGORIES_PROPERTY}
      */
-    @Deprecated
     String MACRO_DEFAULT_CATEGORY_PROPERTY = "defaultCategory";
 }

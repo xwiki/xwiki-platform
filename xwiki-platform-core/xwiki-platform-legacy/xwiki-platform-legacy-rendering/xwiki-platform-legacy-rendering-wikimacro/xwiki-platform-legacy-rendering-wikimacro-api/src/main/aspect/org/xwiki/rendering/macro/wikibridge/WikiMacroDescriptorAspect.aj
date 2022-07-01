@@ -58,7 +58,7 @@ public privileged aspect WikiMacroDescriptorAspect
      * @since 2.3M1
      * @deprecated since 10.10RC1 use the {@link WikiMacroDescriptor.Builder} instead
      */
-    @Deprecated
+    @Deprecated(since = "10.10RC1")
     public WikiMacroDescriptor.new(MacroId id, String name, String description, String defaultCategory,
         WikiMacroVisibility visibility, ContentDescriptor contentDescriptor,
         List<WikiMacroParameterDescriptor> parameterDescriptors)
@@ -87,7 +87,7 @@ public privileged aspect WikiMacroDescriptorAspect
      *             {@link #WikiMacroDescriptor(MacroId, String, String, String, WikiMacroVisibility, ContentDescriptor, List)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "2.3M1")
     public WikiMacroDescriptor.new(String name, String description, String defaultCategory, WikiMacroVisibility visibility,
         ContentDescriptor contentDescriptor, List<WikiMacroParameterDescriptor> parameterDescriptors)
     {
@@ -99,6 +99,4 @@ public privileged aspect WikiMacroDescriptorAspect
         this.defaultCategories = Set.of(defaultCategory);
         this.visibility = visibility;
     }
-
-
 }

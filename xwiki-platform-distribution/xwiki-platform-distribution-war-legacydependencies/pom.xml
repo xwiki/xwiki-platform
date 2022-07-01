@@ -236,12 +236,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-rendering-wikimacro-api</artifactId>
       <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
-          <groupId>org.xwiki.platform</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

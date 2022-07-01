@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,9 @@ public class WikiMacroDescriptor implements MacroDescriptor
          */
         public Builder defaultCategories(Set<String> defaultCategories)
         {
-            this.descriptor.defaultCategories = defaultCategories;
+            // Copy the content of the passed set of default categories to be sure to not have a reference to a mutable 
+            // set.
+            this.descriptor.defaultCategories = Collections.unmodifiableSet(defaultCategories);
             return this;
         }
 

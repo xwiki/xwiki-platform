@@ -75,7 +75,7 @@
 
 {{velocity}}
 #if ($request.convert)
-  #if ($services.security.authorization.hasAccess('programming', $context.userReference, $doc.documentReference))
+  #if ($services.security.authorization.hasAccess('programming', $xcontext.userReference, $doc.documentReference))
   #if ($targetStandardOutput)
     $response.setContentType('application/octet-stream')
     $response.setHeader('Content-Disposition', 'attachment; filename=target');
@@ -169,7 +169,7 @@
   &lt;/fieldset&gt;
 
   &lt;p&gt;
-    #if ($services.security.authorization.hasAccess('programming', $context.userReference, $doc.documentReference))
+    #if ($services.security.authorization.hasAccess('programming', $xcontext.userReference, $doc.documentReference))
       &lt;input class="button" type="submit" name="convert" value="Convert"/&gt;
     #else
       &lt;input class="button" type="submit" name="convert" value="Convert" disabled title="You are not allowed to start a conversion."/&gt;

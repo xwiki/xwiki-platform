@@ -20,12 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.Notifications.Code.LegacyNotificationAdministrationTranslations" locale="es">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.LegacyNotificationAdministrationTranslations" locale="de">
   <web>XWiki.Notifications.Code</web>
   <name>LegacyNotificationAdministrationTranslations</name>
-  <language>es</language>
+  <language>de</language>
   <defaultLanguage>en</defaultLanguage>
-  <translation>0</translation>
+  <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
@@ -36,10 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>legacy.event.migration.description=En la versi\u00F3n 12.6, XWiki pasa a un nuevo almacenamiento de eventos (notificaciones). Puesto que copiar eventos puede ser un proceso muy largo en wikis antiguas con registro de eventos y no siempre se desea mantenerlos, la elecci\u00F3n de hacerlo se deja al administrador de la wiki. No copiarlos implica que cualquier notificaci\u00F3n anterior parecer\u00E1 haber desaparecido. La migraci\u00F3n se ejecuta en segundo plano y no tienes que esperar a que termine para avanzar al siguiente paso.
-### Missing: legacy.event.count.store=Number of events in the standard store
-### Missing: legacy.event.count.legacy=Number of events in the legacy store
-legacy.event.migration.alltime=Todos
-legacy.event.migration.since=Desde
-legacy.event.migration.start=Comenzar la migraci\u00F3n</content>
+  <content>legacy.event.migration.description=XWiki wechselte in 12.6 zu einem neuen Speicher für Ereignisse (Benachrichtigungen). Da das Kopieren von Ereignissen für alte Wikis mit vielen Ereignissen ein langwieriger Prozess sein kann und es nicht immer erwünscht ist, sie zu behalten, bleibt die Wahl dem Wiki-Administrator überlassen. Wenn Sie sie nicht kopieren, bedeutet dies, dass alle vorherigen Benachrichtigungen verschwunden zu sein scheinen. Die Migration wird im Hintergrund ausgeführt.
+legacy.event.count.store=Anzahl der Ereignisse im Standardspeicher
+legacy.event.count.legacy=Anzahl der Ereignisse im Legacy Speicher
+legacy.event.migration.alltime=Alle Zeit
+legacy.event.migration.since=Seit
+legacy.event.migration.start=Migration starten
+</content>
 </xwikidoc>

@@ -319,7 +319,9 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                 XWikiDocument userDocument = context.getWiki().getDocument(reference, context);
                 userDocument.removeXObjects(RESET_PASSWORD_REQUEST_CLASS_REFERENCE);
                 BaseObject userXObject = userDocument.getXObject(USER_CLASS_REFERENCE);
-                userXObject.setStringValue("password", newPassword);
+
+                // /!\ We cannot use BaseCollection#setStringValue as it's storing value in plain text.
+                userXObject.set("password", newPassword, context);
 
                 String saveComment = this.localizationManager.getTranslationPlain(
                     "xe.admin.passwordReset.step2.versionComment.passwordReset");

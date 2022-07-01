@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
-import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -38,13 +40,13 @@ public aspect DefaultWikiMacroFactoryAspect
             && args(macroDefinition);
 
     Object around(BaseObject macroDefinition): getDefaultCategoriesPC(macroDefinition) {
-        List<String> defaultCategories = (List<String>) proceed(macroDefinition);
-        if (defaultCategories == null || defaultCategories.isEmpty()) {
+        Set<String> defaultCategories = (Set<String>) proceed(macroDefinition);
+        if (CollectionUtils.isEmpty(defaultCategories)) {
             String stringValue = macroDefinition.getStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY);
             if (stringValue != null) {
-                defaultCategories = List.of(stringValue);
+                defaultCategories = Set.of(stringValue);
             } else {
-                defaultCategories = List.of();
+                defaultCategories = Set.of();
             }
         }
         return defaultCategories;

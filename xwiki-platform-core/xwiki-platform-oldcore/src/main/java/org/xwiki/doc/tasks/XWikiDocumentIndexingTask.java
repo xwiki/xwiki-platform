@@ -129,7 +129,11 @@ public class XWikiDocumentIndexingTask
     @Unstable
     public void setType(String type)
     {
-        this.type = type;
+        // Replace duplicate strings with a canonical version. This is useful to lower the memory footprint when 
+        // initializing tasks from sources where each type string is a new object (e.g., from the database), to avoid
+        // having a lot of String object with the same task type value (e.g., mention or links). We don't do the same
+        // for other field as they are either transient (e.g., instanceId), or more diverse (e.g., version).
+        this.type = type.intern();
     }
 
     /**

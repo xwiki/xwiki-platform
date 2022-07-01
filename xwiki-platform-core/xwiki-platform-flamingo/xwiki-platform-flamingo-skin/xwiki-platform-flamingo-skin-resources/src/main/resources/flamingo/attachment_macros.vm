@@ -134,7 +134,7 @@
   <div class="attachmentMimeType" data-type="$!escapetool.xml($attachment.mimeType)">
     #if ($attachment.isImage())
       <span title="$escapetool.xml($services.localization.render('core.viewers.attachments.mime.image'))">
-        <img src="$xwiki.getURL($attachment.getReference(), 'download', 'width=48')"
+        <img src="$escapetool.xml($xwiki.getURL($attachment.getReference(), 'download', 'width=48'))"
           alt="$escapetool.xml($attachment.filename)"/>
       </span>
     #else
@@ -145,14 +145,15 @@
 
 #macro (displayFileNameAndVersion $attachmentReference $attachment)
   <span class="name">
-    <a href="$xwiki.getURL($attachment.getReference())" data-entity-type="$escapetool.xml($attachmentReference.type)"
+    <a href="$escapetool.xml($xwiki.getURL($attachment.getReference()))"
+      data-entity-type="$escapetool.xml($attachmentReference.type)"
       data-entity-reference="$escapetool.xml($services.model.serialize($attachmentReference, 'default'))"
       title="$escapetool.xml($services.localization.render('core.viewers.attachments.download'))"
     >$escapetool.xml($attachment.filename)</a>
   </span>
   <sup>
     <span class="version">
-      <a href="$xwiki.getURL($attachmentReference, 'viewattachrev', $NULL)"
+      <a href="$escapetool.xml($xwiki.getURL($attachmentReference, 'viewattachrev', $NULL))"
         title="$escapetool.xml($services.localization.render('core.viewers.attachments.showHistory'))"
       >$escapetool.xml($attachment.version)</a>
     </span>
@@ -180,10 +181,10 @@
       ## Link to preview office document.
       <a class="viewlink action" title="$escapetool.xml($services.localization.render(
         'core.viewers.attachments.officeView.title'))" target="_blank"
-        href="$attachment.document.getURL('view', $escapetool.url({
+        href="$escapetool.xml($attachment.document.getURL('view', $escapetool.url({
           'xpage': 'office',
           'attachment': $attachment.filename
-        }))">
+        })))">
           <span class="action-icon">$services.icon.renderHTML('eye')</span><span class="action-label">$escapetool.xml(
             $services.localization.render('core.viewers.attachments.officeView'))
           </span>
@@ -196,7 +197,7 @@
       }))
       #set ($moveURL = $xwiki.getURL($attachment.document.documentReference, 'view', $queryString))
       <a class="move-attachment action" title="$escapetool.xml($services.localization.render(
-          'core.viewers.attachments.move.title'))" href="$moveURL#">
+          'core.viewers.attachments.move.title'))" href="$escapetool.xml($moveURL#)">
         <span class="action-icon">$services.icon.renderHTML('edit')</span><span class="action-label">$escapetool.xml(
           $services.localization.render('core.viewers.attachments.move'))
         </span>
@@ -212,7 +213,7 @@
       }))
       #set ($deleteURL = $xwiki.getURL($attachment.getReference(), 'delattachment', $queryString))
       <a class="actiondelete action" title="$escapetool.xml($services.localization.render(
-          'core.viewers.attachments.delete.title', [$attachment.filename]))" href="$deleteURL#">
+          'core.viewers.attachments.delete.title', [$attachment.filename]))" href="$escapetool.xml($deleteURL#)">
         <span class="action-icon">$services.icon.renderHTML('cross')</span><span class="action-label">$escapetool.xml(
           $services.localization.render('core.viewers.attachments.delete'))
         </span>

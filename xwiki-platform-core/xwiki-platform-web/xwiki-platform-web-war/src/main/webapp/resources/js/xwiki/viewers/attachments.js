@@ -217,7 +217,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       },
       success : function() {
         window[thisLivetableName].refresh();
-        if (thisLivetableName == 'docAttachments') {
+        if (thisLivetableName === 'docAttachments') {
           updateCount();
         }
         notification.replace(new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.done'], 'done'));
@@ -280,7 +280,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       label = label.replace("__number__", attachmentsNumber);
       $('#tmAttachments').contents().last()[0].nodeValue=label;
     }
-  }
+  };
   /**
    * Firing updateCount event when an attachment is successfully uploaded.
    */

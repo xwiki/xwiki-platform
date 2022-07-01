@@ -19,8 +19,11 @@
  */
 package org.xwiki.eventstream.internal;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.Event;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Default implementation for {@link EntityEvent}.
@@ -72,5 +75,60 @@ public class DefaultEntityEvent implements EntityEvent
     public void setEntityId(String entityId)
     {
         this.entityId = entityId;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     * @since 14.6RC1
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj instanceof EntityEvent) {
+            EntityEvent otherEvent = (EntityEvent) obj;
+
+            EqualsBuilder builder = new EqualsBuilder();
+
+            builder.append(getEvent(), otherEvent.getEvent());
+            builder.append(getEntityId(), otherEvent.getEntityId());
+
+            return builder.build();
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     * @since 14.6RC1
+     */
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.append(getEvent());
+        builder.append(getEntityId());
+
+        return builder.build();
+    }
+
+    @Override
+    public String toString()
+    {
+        XWikiToStringBuilder builder = new XWikiToStringBuilder(this);
+
+        builder.append("event", getEvent());
+        builder.append("entityId", getEntityId());
+
+        return builder.toString();
     }
 }

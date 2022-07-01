@@ -133,12 +133,6 @@
           <dependencies>
             <dependency>
               <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
-              <version>${project.version}</version>
-              <scope>runtime</scope>
-            </dependency>
-            <dependency>
-              <groupId>org.xwiki.platform</groupId>
               <artifactId>xwiki-platform-instance</artifactId>
               <version>${project.version}</version>
               <scope>runtime</scope>

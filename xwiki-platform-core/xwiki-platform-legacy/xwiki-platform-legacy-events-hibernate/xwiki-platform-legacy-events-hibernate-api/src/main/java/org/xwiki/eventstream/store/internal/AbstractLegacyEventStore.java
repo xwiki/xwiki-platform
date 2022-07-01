@@ -19,7 +19,10 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -125,6 +128,14 @@ public abstract class AbstractLegacyEventStore extends AbstractAsynchronousEvent
         }
 
         return null;
+    }
+
+    @Override
+    public List<EventStatus> getEventStatuses(Collection<Event> events, Collection<String> entityIds) throws Exception
+    {
+        return this.eventStatusManager.getEventStatus(
+            events instanceof List ? (List<Event>) events : new ArrayList<>(events),
+            events instanceof List ? (List<String>) entityIds : new ArrayList<>(entityIds));
     }
 
     @Override

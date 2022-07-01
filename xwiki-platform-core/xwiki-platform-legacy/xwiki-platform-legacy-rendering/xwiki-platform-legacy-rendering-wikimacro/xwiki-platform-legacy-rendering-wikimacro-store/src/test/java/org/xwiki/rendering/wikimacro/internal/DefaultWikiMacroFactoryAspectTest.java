@@ -40,6 +40,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.xwiki.rendering.wikimacro.internal.LegacyWikiMacroConstants.MACRO_DEFAULT_CATEGORY_PROPERTY;
 import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.MACRO_CODE_PROPERTY;
 import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.MACRO_CONTENT_TYPE_PROPERTY;
 import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.MACRO_DEFAULT_CATEGORIES_PROPERTY;
@@ -115,7 +116,7 @@ class DefaultWikiMacroFactoryAspectTest
         this.macroObject.setStringValue(MACRO_ID_PROPERTY, "testmacro");
         this.macroObject.setStringValue(MACRO_NAME_PROPERTY, "Test Macro");
         this.macroObject.setStringValue(MACRO_DESCRIPTION_PROPERTY, "This is a macro used for testing purposes.");
-        this.macroObject.setStringValue(WikiMacroConstantsAspect.aspectOf().MACRO_DEFAULT_CATEGORY_PROPERTY, "CatA");
+        this.macroObject.setStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY, "CatA");
         this.macroObject.setStringValue(MACRO_VISIBILITY_PROPERTY, "Current User");
         this.macroObject.setIntValue(MACRO_INLINE_PROPERTY, 1);
         this.macroObject.setStringValue(MACRO_CONTENT_TYPE_PROPERTY, "No content");

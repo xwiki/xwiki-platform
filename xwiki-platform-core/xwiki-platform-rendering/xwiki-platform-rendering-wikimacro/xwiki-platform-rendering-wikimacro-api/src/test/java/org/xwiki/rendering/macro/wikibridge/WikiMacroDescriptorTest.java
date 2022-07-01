@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -51,7 +52,7 @@ class WikiMacroDescriptorTest
             new WikiMacroParameterDescriptor("id2", "description2", true));
         // TOOD: add a test with defaultCategory and move this test to legacy
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder().name("name").description("description")
-            .defaultCategory("category").visibility(WikiMacroVisibility.GLOBAL)
+            .defaultCategories(Set.of("category")).visibility(WikiMacroVisibility.GLOBAL)
             .contentDescriptor(new DefaultContentDescriptor()).parameterDescriptors(paramDescriptors).build();
         Map<String, ParameterDescriptor> result = descriptor.getParameterDescriptorMap();
 

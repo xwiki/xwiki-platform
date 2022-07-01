@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,21 +16,22 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.rendering.wikimacro.internal;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-legacy-rendering</artifactId>
-    <version>14.6-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-legacy-rendering-wikimacro</artifactId>
-  <name>XWiki Platform - Legacy - Rendering - Wiki Macro Bridge</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Legacy - Rendering - Wiki Macro Bridge</description>
-  <modules>
-    <module>xwiki-platform-legacy-rendering-wikimacro-store</module>
-    <module>xwiki-platform-legacy-rendering-wikimacro-api</module>
-  </modules>
-</project>
+/**
+ * Class containing fields moved to legacy from {@link WikiMacroConstants}.
+ *
+ * @version $Id$
+ * @since 14.6RC1
+ */
+public interface LegacyWikiMacroConstants
+{
+    /**
+     * Constant for representing default macro category property.
+     *
+     * @deprecated since 14.6RC1, replaced by {@link WikiMacroConstants#MACRO_DEFAULT_CATEGORIES_PROPERTY}
+     */
+    @Deprecated
+    String MACRO_DEFAULT_CATEGORY_PROPERTY = "defaultCategory";
+}

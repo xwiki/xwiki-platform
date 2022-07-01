@@ -22,12 +22,9 @@ package org.xwiki.help;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
-import org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager;
-import org.xwiki.rendering.internal.syntax.SyntaxConverter;
-import org.xwiki.rendering.internal.transformation.macro.DefaultMacroTransformationConfiguration;
-import org.xwiki.rendering.script.RenderingScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -44,15 +41,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
+@RenderingScriptServiceComponentList
 @ComponentList({
-    // Start RenderingScriptService
-    RenderingScriptService.class,
+    // Start - Required in addition of RenderingScriptServiceComponentList
     DefaultExtendedRenderingConfiguration.class,
     RenderingConfigClassDocumentConfigurationSource.class,
-    SyntaxConverter.class,
-    DefaultMacroCategoryManager.class,
-    DefaultMacroTransformationConfiguration.class,
-    // End RenderingScriptService
+    // End - Required in additional of RenderingScriptServiceComponentList
     ControlCharactersFilter.class
 })
 class XWikiSyntaxMacrosListPageTest extends PageTest

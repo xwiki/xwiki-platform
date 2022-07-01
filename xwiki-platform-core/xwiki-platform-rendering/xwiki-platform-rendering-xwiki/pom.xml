@@ -112,6 +112,7 @@
             <configuration>
               <includes>
                 <include>**/scaffolding/**.class</include>
+                <include>**/RenderingScriptServiceComponentList.class</include>
               </includes>
             </configuration>
           </execution>

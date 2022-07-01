@@ -85,18 +85,6 @@ public class WikiMacroDescriptor implements MacroDescriptor
         }
 
         /**
-         * @param defaultCategory the macro default category
-         * @return this builder
-         * @deprecated since 14.6RC1, use {@link #defaultCategories(Set)} instead
-         */
-        @Deprecated(since = "14.6RC1")
-        public Builder defaultCategory(String defaultCategory)
-        {
-            this.descriptor.defaultCategories = Set.of(defaultCategory);
-            return this;
-        }
-
-        /**
          * @param defaultCategories the macro default categories
          * @return this build
          * @since 14.6RC1
@@ -220,59 +208,6 @@ public class WikiMacroDescriptor implements MacroDescriptor
         this.supportsInlineMode = descriptor.supportsInlineMode;
     }
 
-    /**
-     * Creates a new {@link WikiMacroDescriptor} instance.
-     * 
-     * @param id the macro id
-     * @param name the macro name
-     * @param description macro description
-     * @param defaultCategory default category under which this macro should be listed.
-     * @param visibility the macro visibility (only visible in the current wiki, for the current user or global)
-     * @param contentDescriptor macro content description.
-     * @param parameterDescriptors parameter descriptors.
-     * @since 2.3M1
-     * @deprecated since 10.10RC1 use the {@link Builder} instead
-     */
-    @Deprecated
-    public WikiMacroDescriptor(MacroId id, String name, String description, String defaultCategory,
-        WikiMacroVisibility visibility, ContentDescriptor contentDescriptor,
-        List<WikiMacroParameterDescriptor> parameterDescriptors)
-    {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.contentDescriptor = contentDescriptor;
-        this.parameterDescriptors = parameterDescriptors;
-        this.defaultCategories = Set.of(defaultCategory);
-        this.visibility = visibility;
-    }
-
-    /**
-     * Creates a new {@link WikiMacroDescriptor} instance.
-     * 
-     * @param name the macro name
-     * @param description macro description
-     * @param defaultCategory default category under which this macro should be listed.
-     * @param visibility the macro visibility (only visible in the current wiki, for the current user or global)
-     * @param contentDescriptor macro content description.
-     * @param parameterDescriptors parameter descriptors.
-     * @since 2.2M1
-     * @deprecated since 2.3M1 use
-     *             {@link #WikiMacroDescriptor(MacroId, String, String, String, WikiMacroVisibility, ContentDescriptor, List)}
-     *             instead
-     */
-    @Deprecated
-    public WikiMacroDescriptor(String name, String description, String defaultCategory, WikiMacroVisibility visibility,
-        ContentDescriptor contentDescriptor, List<WikiMacroParameterDescriptor> parameterDescriptors)
-    {
-        this.name = name;
-        this.description = description;
-        this.contentDescriptor = contentDescriptor;
-        this.parameterDescriptors = parameterDescriptors;
-        this.defaultCategories = Set.of(defaultCategory);
-        this.visibility = visibility;
-    }
-
     @Override
     public MacroId getId()
     {
@@ -318,8 +253,8 @@ public class WikiMacroDescriptor implements MacroDescriptor
         return descriptors;
     }
 
-    // TODO: move to legacy
     @Override
+    // TODO: move to legacy once MacroDescriptor.getDefaultCategory is moved to legacy.
     public String getDefaultCategory()
     {
         return this.getDefaultCategories().stream().findFirst().orElse(null);

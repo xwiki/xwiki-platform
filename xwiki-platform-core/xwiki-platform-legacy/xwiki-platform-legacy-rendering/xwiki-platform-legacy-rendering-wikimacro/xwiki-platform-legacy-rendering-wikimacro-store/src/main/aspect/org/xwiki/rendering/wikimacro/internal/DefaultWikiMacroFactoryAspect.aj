@@ -23,6 +23,8 @@ import java.util.List;
 
 import com.xpn.xwiki.objects.BaseObject;
 
+import static org.xwiki.rendering.wikimacro.internal.LegacyWikiMacroConstants.MACRO_DEFAULT_CATEGORY_PROPERTY;
+
 /**
  * Legacy aspect for {@link DefaultWikiMacroFactory}.
  *
@@ -38,8 +40,7 @@ public aspect DefaultWikiMacroFactoryAspect
     Object around(BaseObject macroDefinition): getDefaultCategoriesPC(macroDefinition) {
         List<String> defaultCategories = (List<String>) proceed(macroDefinition);
         if (defaultCategories == null || defaultCategories.isEmpty()) {
-            String property = WikiMacroConstantsAspect.aspectOf().MACRO_DEFAULT_CATEGORY_PROPERTY;
-            String stringValue = macroDefinition.getStringValue(property);
+            String stringValue = macroDefinition.getStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY);
             if (stringValue != null) {
                 defaultCategories = List.of(stringValue);
             } else {

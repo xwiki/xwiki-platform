@@ -19,7 +19,9 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -104,6 +106,13 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
+        public List<EventStatus> getEventStatuses(Collection<Event> events, Collection<String> entityIds)
+            throws Exception
+        {
+            return List.of();
+        }
+
+        @Override
         public void initialize() throws InitializationException
         {
             initialize(10, true, false);
@@ -154,7 +163,6 @@ public class AsynchronousEventStoreTest
         @Override
         protected Event syncPrefilterEvent(Event event) throws EventStreamException
         {
-
             this.lock.lock();
 
             try {

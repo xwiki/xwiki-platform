@@ -31,7 +31,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
-import org.xwiki.eventstream.EventStatusManager;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
@@ -47,11 +47,11 @@ import org.xwiki.notifications.CompositeEventStatusManager;
 public class DefaultCompositeEventStatusManager implements CompositeEventStatusManager
 {
     @Inject
-    private EventStatusManager eventStatusManager;
+    private EventStore eventStore;
 
     @Override
     public List<CompositeEventStatus> getCompositeEventStatuses(List<CompositeEvent> compositeEvents, String entityId)
-            throws Exception
+        throws Exception
     {
         // Creating a list of all events to avoid multiple calls to getEventStatuses() and so multiple calls to the
         // database.
@@ -79,6 +79,6 @@ public class DefaultCompositeEventStatusManager implements CompositeEventStatusM
 
     private List<EventStatus> getEventStatuses(List<Event> events, String entityId) throws Exception
     {
-        return eventStatusManager.getEventStatus(events, Arrays.asList(entityId));
+        return this.eventStore.getEventStatuses(events, Arrays.asList(entityId));
     }
 }

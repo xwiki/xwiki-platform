@@ -28,6 +28,7 @@ annotations
 deploy
 requestlog
 websocket
+apache-jsp
 
 [xml]
 etc/jetty-xwiki.xml

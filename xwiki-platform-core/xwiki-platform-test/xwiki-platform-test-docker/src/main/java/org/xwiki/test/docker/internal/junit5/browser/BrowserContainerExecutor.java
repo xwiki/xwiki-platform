@@ -85,6 +85,13 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
             // visible or missing elements (on small screens we don't display all elements).
             .withEnv("SCREEN_WIDTH", DEFAULT_WIDTH_RESOLUTION)
             .withEnv("SCREEN_HEIGHT", DEFAULT_HEIGHT_RESOLUTION)
+            // TODO: The default session timeout is 300 seconds (i.e. 5mn). We think this is what could cause the
+            // "Unable to find session with ID" error message we see sometimes on the CI. We think that it's possible
+            // that a session timeout of 300s means that the whole test suite of a docker test module must take less
+            // than 5mn or we can get the error. Thus, as a test, we increase the value to 10 times the default value.
+            // If there are still errors happening after this change then it'll mean the problem is elsewhere and we'll
+            // revert this change.
+            .withEnv("SE_NODE_SESSION_TIMEOUT", String.valueOf(10 * 300L))
             .withCapabilities(browser.getCapabilities())
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")

@@ -34,14 +34,6 @@ import org.testcontainers.containers.GenericContainer;
 public class XWikiLocalGenericContainer<T extends GenericContainer<T>> extends GenericContainer<T>
 {
     /**
-     * @see GenericContainer#GenericContainer() 
-     */
-    public XWikiLocalGenericContainer()
-    {
-        super();
-    }
-
-    /**
      * @see GenericContainer#GenericContainer(String)
      *
      * @param dockerImageName the name of the docker image to start a container from

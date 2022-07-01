@@ -35,9 +35,6 @@
 
 
 <script>
-
-import "whatwg-fetch"
-
 // This cache stores the metadata of the already resolved icons as well as the Promises for the icons currently being 
 // asynchronously resolved.
 // The goal of this cache is to only request for the resolution of an icon once per live data rendering.

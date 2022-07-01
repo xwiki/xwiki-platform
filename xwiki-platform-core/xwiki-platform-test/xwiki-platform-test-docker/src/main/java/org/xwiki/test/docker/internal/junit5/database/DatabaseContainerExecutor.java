@@ -105,7 +105,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new MySQLContainer<>(String.format("mysql:%s", testConfiguration.getDatabaseTag()));
         } else {
-            databaseContainer = new MySQLContainer<>();
+            // No tag specific, use "latest"
+            databaseContainer = new MySQLContainer<>("mysql:latest");
         }
         startMySQLContainer(databaseContainer, testConfiguration);
     }
@@ -190,7 +191,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             isMySQL8xPlus = testConfiguration.getDatabaseTag().equals("latest")
                 || extractMajor(testConfiguration.getDatabaseTag()) >= 8;
         } else {
-            isMySQL8xPlus = extractMajor(MySQLContainer.DEFAULT_TAG) >= 8;
+            // No tag specific, this means we use "latest" and thus that it's mysql 8+
+            isMySQL8xPlus = true;
         }
         return isMySQL8xPlus;
     }
@@ -206,7 +208,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new MariaDBContainer<>(String.format("mariadb:%s", testConfiguration.getDatabaseTag()));
         } else {
-            databaseContainer = new MariaDBContainer<>();
+            // No tag specific, use "latest"
+            databaseContainer = new MariaDBContainer<>("mariadb:latest");
         }
         startMySQLContainer(databaseContainer, testConfiguration);
     }
@@ -221,7 +224,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             databaseContainer =
                 new PostgreSQLContainer<>(String.format("postgres:%s", testConfiguration.getDatabaseTag()));
         } else {
-            databaseContainer = new PostgreSQLContainer<>();
+            // No tag specific, use "latest"
+            databaseContainer = new PostgreSQLContainer<>("postgres:latest");
         }
         databaseContainer
             .withDatabaseName(DBNAME)
@@ -257,7 +261,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         if (testConfiguration.getDatabaseTag() != null) {
             oracleImageFullName = String.format("xwiki/oracle-database:%s", testConfiguration.getDatabaseTag());
         } else {
-            oracleImageFullName = "xwiki/oracle-database";
+            // No tag specific, use "latest"
+            oracleImageFullName = "xwiki/oracle-database:latest";
         }
         DockerImageName oracleImage = DockerImageName.parse(oracleImageFullName)
             .asCompatibleSubstituteFor("gvenzl/oracle-xe");

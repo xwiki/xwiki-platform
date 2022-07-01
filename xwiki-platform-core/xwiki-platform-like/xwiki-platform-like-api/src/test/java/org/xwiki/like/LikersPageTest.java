@@ -43,7 +43,6 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.user.DefaultUserComponentList;
 import org.xwiki.user.internal.document.DocumentUserReference;
 import org.xwiki.user.script.UserScriptService;
-import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.velocity.tools.JSONTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -103,8 +102,6 @@ class LikersPageTest extends PageTest
 
         // Make sure UserScriptService loads properly.
         this.componentManager.getInstance(ScriptService.class, "user");
-
-        registerVelocityTool("escapetool", new EscapeTool());
     }
 
     @Test

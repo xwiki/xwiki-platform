@@ -73,8 +73,8 @@ class LikeIT
     }
 
     /**
-     * Check that guest user can only see the button if the configuration is set to force displaying it and
-     * can never interact with it.
+     * Check that guest user can only see the button if the configuration is set to force displaying it and can never
+     * interact with it.
      */
     @Test
     @Order(1)
@@ -101,6 +101,8 @@ class LikeIT
     @Order(2)
     void likeUnlikeDefaultConfiguration(TestUtils testUtils, TestReference testReference)
     {
+        DocumentReference subPageReference = new DocumentReference("SubPage", testReference.getLastSpaceReference());
+
         testUtils.login(USER1, USER1);
         testUtils.createPage(testReference, "some content");
         LikeButton likeButton = new LikeButton();
@@ -118,10 +120,28 @@ class LikeIT
         likeButton.clickToLike();
         assertEquals(2, likeButton.getLikeNumber());
 
-        // Goes to the user profile and verify that the liked pages tables displays the liked pages. 
-        UserProfileLikedPagesPage userProfileLikedPagesPage = new UserProfileLikedPagesPage(USER2);
-        userProfileLikedPagesPage.gotoPage();
-        TableLayoutElement tableLayout = userProfileLikedPagesPage.getLiveData().getTableLayout();
+        // Create another page and like it only with user 2.
+        testUtils.createPage(subPageReference, "some other content");
+        likeButton = new LikeButton();
+        likeButton.clickToLike();
+        assertEquals(1, likeButton.getLikeNumber());
+
+        // Go to its own user profile and verify that the liked pages tables displays the liked pages.
+        UserProfileLikedPagesPage user2ProfileLikedPagesPage = new UserProfileLikedPagesPage(USER2);
+        user2ProfileLikedPagesPage.gotoPage();
+        TableLayoutElement tableLayout = user2ProfileLikedPagesPage.getLiveData().getTableLayout();
+        assertEquals(2, tableLayout.countRows());
+        tableLayout.assertCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
+            testUtils.getURL(testReference.getLastSpaceReference()));
+        tableLayout.assertCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(subPageReference),
+            testUtils.getURL(subPageReference));
+        tableLayout.assertRow(LIKES_COLUMN_NAME, "2");
+        tableLayout.assertRow(LIKES_COLUMN_NAME, "1");
+
+        // Go to the profile of user 1 and verify that the like pages are displayed and valid.
+        UserProfileLikedPagesPage user1ProfileLikedPagesPage = new UserProfileLikedPagesPage(USER1);
+        user1ProfileLikedPagesPage.gotoPage();
+        tableLayout = user1ProfileLikedPagesPage.getLiveData().getTableLayout();
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
             testUtils.getURL(testReference.getLastSpaceReference()));

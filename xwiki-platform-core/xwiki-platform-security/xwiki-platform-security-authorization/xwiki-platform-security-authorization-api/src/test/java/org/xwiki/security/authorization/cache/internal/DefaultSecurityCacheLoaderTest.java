@@ -32,6 +32,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
@@ -67,7 +68,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@ComponentList({ DefaultSecurityCacheLoader.class, DefaultSecurityReferenceFactory.class })
+@ComponentList({DefaultSecurityCacheLoader.class, DefaultSecurityReferenceFactory.class, EntityReferenceFactory.class})
 public class DefaultSecurityCacheLoaderTest
 {
     @Rule

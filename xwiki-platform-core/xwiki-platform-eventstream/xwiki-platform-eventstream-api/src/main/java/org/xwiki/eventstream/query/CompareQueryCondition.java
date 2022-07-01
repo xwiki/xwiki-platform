@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -78,7 +79,15 @@ public class CompareQueryCondition extends AbstractPropertyQueryCondition
          * 
          * @since 14.0RC1
          */
-        ENDS_WITH
+        ENDS_WITH,
+
+        /**
+         * The property value contains the passed value.
+         *
+         * @since 14.4RC1
+         */
+        @Unstable
+        CONTAINS
     }
 
     private final Object value;

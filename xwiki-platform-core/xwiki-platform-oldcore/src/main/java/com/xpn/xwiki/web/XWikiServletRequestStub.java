@@ -31,7 +31,9 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
@@ -80,6 +82,8 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     private Map<String, String[]> parameters;
 
+    private Cookie[] cookies;
+
     private String requestURI;
 
     private StringBuffer requestURL;
@@ -104,6 +108,16 @@ public class XWikiServletRequestStub implements XWikiRequest
      */
     public XWikiServletRequestStub(URL requestURL, String contextPath, Map<String, String[]> requestParameters)
     {
+        this(requestURL, contextPath, requestParameters, new Cookie[0]);
+    }
+
+    /**
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public XWikiServletRequestStub(URL requestURL, String contextPath, Map<String, String[]> requestParameters,
+        Cookie[] cookies)
+    {
         if (requestURL != null) {
             this.protocol = requestURL.getProtocol();
             this.scheme = requestURL.getProtocol();
@@ -122,6 +136,7 @@ public class XWikiServletRequestStub implements XWikiRequest
         this.contextPath = contextPath;
 
         this.parameters = clone(requestParameters);
+        this.cookies = clone(cookies);
     }
 
     /**
@@ -158,6 +173,7 @@ public class XWikiServletRequestStub implements XWikiRequest
         }
 
         this.parameters = clone(request.getParameterMap());
+        this.cookies = clone(request.getCookies());
 
         if (request instanceof XWikiServletRequestStub) {
             this.daemon = ((XWikiServletRequestStub) request).daemon;
@@ -177,6 +193,15 @@ public class XWikiServletRequestStub implements XWikiRequest
         }
 
         return clone;
+    }
+
+    private Cookie[] clone(Cookie[] cookies)
+    {
+        if (cookies != null) {
+            return Stream.of(cookies).map(Cookie::clone).toArray(Cookie[]::new);
+        } else {
+            return null;
+        }
     }
 
     public void setContextPath(String contextPath)
@@ -271,7 +296,12 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public Cookie getCookie(String cookieName)
     {
-        return null;
+        if (this.cookies != null) {
+            return Stream.of(this.cookies).filter(cookie -> Objects.equals(cookieName, cookie.getName())).findFirst()
+                .orElse(null);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -283,7 +313,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public Cookie[] getCookies()
     {
-        return new Cookie[0];
+        return clone(this.cookies);
     }
 
     @Override

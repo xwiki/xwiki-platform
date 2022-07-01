@@ -99,7 +99,8 @@ public class XWikiDockerExtension extends AbstractExtension
 
     private boolean isVncStarted;
 
-    private TestConfigurationResolver testConfigurationMerger = new TestConfigurationResolver();
+    private ExtensionContextTestConfigurationResolver testConfigurationMerger =
+        new ExtensionContextTestConfigurationResolver();
 
     @Override
     public void beforeAll(ExtensionContext extensionContext)
@@ -121,8 +122,7 @@ public class XWikiDockerExtension extends AbstractExtension
             return;
         }
 
-        // Note: TestConfiguration is created in evaluateExecutionCondition()à which executes before beforeAll()
-        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+        TestConfiguration testConfiguration = computeTestConfiguration(extensionContext);
 
         // Programmatically enable logging for TestContainers code when verbose is on so that we can get the maximum
         // of debugging information.
@@ -181,7 +181,7 @@ public class XWikiDockerExtension extends AbstractExtension
 
             // Provision XWiki by installing all required extensions.
             LOGGER.info("(*) Provision extensions for test...");
-            provisionExtensions(testConfiguration, artifactResolver, mavenResolver, extensionContext);
+            provisionExtensions(artifactResolver, mavenResolver, extensionContext);
         } else {
             // Set the IP/port for the container since startServletEngine() wasn't called and it's set there normally.
             testConfiguration.getServletEngine().setIP("localhost");
@@ -209,11 +209,20 @@ public class XWikiDockerExtension extends AbstractExtension
         }
     }
 
+    private TestConfiguration computeTestConfiguration(ExtensionContext extensionContext)
+    {
+        // Note: TestConfiguration is created in evaluateExecutionCondition() which executes before beforeAll()
+        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+        mergeTestConfigurationInGlobalContext(testConfiguration, extensionContext);
+        saveTestConfiguration(extensionContext, testConfiguration);
+        return testConfiguration;
+    }
+
     private void beforeEachInternal(ExtensionContext extensionContext)
     {
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {
-            LOGGER.info("(*) Start VNC container...");
+            LOGGER.info("(*) Starting VNC container...");
 
             BrowserWebDriverContainer<?> webDriverContainer = loadBrowserWebDriverContainer(extensionContext);
 
@@ -248,6 +257,7 @@ public class XWikiDockerExtension extends AbstractExtension
 
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc() && this.isVncStarted) {
+            LOGGER.info("(*) Stopping VNC container...");
             VncRecordingContainer vnc = loadVNC(extensionContext);
             vnc.stop();
 
@@ -255,6 +265,9 @@ public class XWikiDockerExtension extends AbstractExtension
             // TestContainers. This allows the test to finish faster and thus provide faster results (because stopping
             // the container takes a bit of time).
         }
+
+        // Reset current wiki to main wiki
+        loadPersistentTestContext(extensionContext).getUtil().setCurrentWiki("xwiki");
     }
 
     @Override
@@ -326,7 +339,7 @@ public class XWikiDockerExtension extends AbstractExtension
         // annotation then it means all containers have already been started and the servlet engine is supported.
         if (!hasParentTestContainingUITestAnnotation(extensionContext)) {
             // Create & save the test configuration so that we can access it in afterAll()
-            TestConfiguration testConfiguration = testConfigurationMerger.resolve(extensionContext);
+            TestConfiguration testConfiguration = this.testConfigurationMerger.resolve(extensionContext);
             saveTestConfiguration(extensionContext, testConfiguration);
             // Skip the test if the Servlet Engine selected is in the forbidden list
             if (isServletEngineForbidden(testConfiguration)) {
@@ -450,14 +463,15 @@ public class XWikiDockerExtension extends AbstractExtension
         }
     }
 
-    private void provisionExtensions(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
-        MavenResolver mavenResolver, ExtensionContext context) throws Exception
+    private void provisionExtensions(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
+        ExtensionContext context) throws Exception
     {
+        // Initialize an extension installer
+        ExtensionInstaller extensionInstaller = new ExtensionInstaller(context, artifactResolver, mavenResolver);
+        DockerTestUtils.setExtensionInstaller(context, extensionInstaller);
+
         // Install extensions in the running XWiki
-        String xwikiRESTURL = String.format("%s/rest", loadXWikiURL(context));
-        ExtensionInstaller extensionInstaller =
-            new ExtensionInstaller(testConfiguration, artifactResolver, mavenResolver);
-        extensionInstaller.installExtensions(xwikiRESTURL, SUPERADMIN, "pass", SUPERADMIN);
+        extensionInstaller.installExtensions(SUPERADMIN, "pass", SUPERADMIN);
     }
 
     private String computeXWikiURLPrefix(String ip, int port)
@@ -473,8 +487,7 @@ public class XWikiDockerExtension extends AbstractExtension
     private void saveScreenshotAndVideo(ExtensionContext extensionContext)
     {
         // Take screenshot
-        takeScreenshot(extensionContext, loadTestConfiguration(extensionContext),
-            loadXWikiWebDriver(extensionContext));
+        takeScreenshot(extensionContext, loadTestConfiguration(extensionContext), loadXWikiWebDriver(extensionContext));
 
         // Save the video
         saveVideo(extensionContext);
@@ -487,7 +500,7 @@ public class XWikiDockerExtension extends AbstractExtension
             VncRecordingContainer vnc = loadVNC(extensionContext);
             File recordingFile = getResultFileLocation("flv", testConfiguration, extensionContext);
             vnc.saveRecordingToFile(recordingFile);
-            LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
+            LOGGER.info("VNC recording of test has been saved to [{}]", recordingFile);
         }
     }
 

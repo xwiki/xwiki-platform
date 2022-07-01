@@ -83,7 +83,7 @@ import org.xwiki.search.solr.SolrUtils;
 
 /**
  * Solr based implementation of {@link EventStore}.
- * 
+ *
  * @version $Id$
  * @since 12.4RC1
  */
@@ -522,7 +522,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 builder.append(condition.getStatusRead() ? EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS
                     : EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
                 builder.append(':');
-                builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+                builder.append(this.utils.toCompleteFilterQueryString(condition.getStatusEntityId()));
             } else {
                 builder.append('(');
                 builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
@@ -541,11 +541,11 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             builder.append('(');
             builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
             builder.append(':');
-            builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+            builder.append(this.utils.toCompleteFilterQueryString(condition.getStatusEntityId()));
             builder.append(" OR ");
             builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
             builder.append(':');
-            builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+            builder.append(this.utils.toCompleteFilterQueryString(condition.getStatusEntityId()));
             builder.append(')');
 
             return builder.toString();
@@ -561,7 +561,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             StringBuilder builder = new StringBuilder();
             builder.append(EventsSolrCoreInitializer.SOLR_FIELD_MAILLISTENERS);
             builder.append(':');
-            builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+            builder.append(this.utils.toCompleteFilterQueryString(condition.getStatusEntityId()));
 
             return builder.toString();
         }
@@ -584,7 +584,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         } else {
             builder.append('(');
             builder.append(StringUtils
-                .join(condition.getValues().stream().map(this.utils::toFilterQueryString).iterator(), " OR "));
+                .join(condition.getValues().stream().map(this.utils::toCompleteFilterQueryString).iterator(), " OR "));
             builder.append(')');
 
             return builder.toString();
@@ -629,8 +629,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
     private String getMapFieldName(String key, Type type)
     {
-        return this.utils.getMapFieldName(key, EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES,
-            type != null ? type : String.class);
+        return this.utils.getMapFieldName(key, EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES, type);
     }
 
     private String toSolrFieldName(AbstractPropertyQueryCondition condition)
@@ -677,7 +676,16 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         switch (condition.getType()) {
             case EQUALS:
-                builder.append(toFilterQueryString(condition.getProperty(), condition.getValue()));
+                String queryString = toCompleteFilterQueryString(condition.getProperty(), condition.getValue());
+                if (queryString == null) {
+                    // Negative queries in Solr can only remove results so a simple negative field existence query
+                    // doesn't match anything. Thus, use the more compatible query "all events except for those where
+                    // the field exists". See also https://stackoverflow.com/a/28859224
+                    builder.insert(0, "(*:* NOT ");
+                    builder.append("*)");
+                } else {
+                    builder.append(queryString);
+                }
                 break;
 
             case LESS:
@@ -699,19 +707,25 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 builder.append('*');
                 builder.append(this.utils.toFilterQueryString(condition.getValue()));
                 break;
+
+            case CONTAINS:
+                builder.append('*');
+                builder.append(this.utils.toFilterQueryString(condition.getValue()));
+                builder.append('*');
+                break;
         }
 
         return builder.toString();
     }
 
-    private String toFilterQueryString(String propertyName, Object propertyValue)
+    private String toCompleteFilterQueryString(String propertyName, Object propertyValue)
     {
         SearchFieldMapping mapping = SEARCH_FIELD_MAPPING.get(propertyName);
 
         if (mapping != null && mapping.type != null) {
-            return this.utils.toFilterQueryString(propertyValue, mapping.type);
+            return this.utils.toCompleteFilterQueryString(propertyValue, mapping.type);
         } else {
-            return this.utils.toFilterQueryString(propertyValue);
+            return this.utils.toCompleteFilterQueryString(propertyValue);
         }
     }
 
@@ -737,7 +751,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 builder.append('[');
             }
 
-            builder.append(this.utils.toFilterQueryString(greater.getValue()));
+            builder.append(this.utils.toCompleteFilterQueryString(greater.getValue()));
         } else {
             builder.append("[*");
         }
@@ -745,7 +759,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         builder.append(" TO ");
 
         if (less != null) {
-            builder.append(this.utils.toFilterQueryString(less.getValue()));
+            builder.append(this.utils.toCompleteFilterQueryString(less.getValue()));
 
             if (less.getType() == CompareType.LESS) {
                 builder.append('}');

@@ -38,6 +38,7 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
@@ -105,10 +106,11 @@ import static org.xwiki.security.authorization.Right.values;
  * @since 5.0M2
  */
 @ComponentTest
-@ComponentList({ DefaultSecurityCache.class, DefaultStringEntityReferenceResolver.class,
+@ComponentList({DefaultSecurityCache.class, DefaultStringEntityReferenceResolver.class,
     DefaultStringEntityReferenceSerializer.class, DefaultEntityReferenceProvider.class, DefaultModelConfiguration.class,
     AuthorizationManagerConfiguration.class, DefaultSecurityReferenceFactory.class, DefaultSecurityCacheLoader.class,
-    DefaultAuthorizationSettler.class, DefaultAuthorizationManager.class, DefaultSymbolScheme.class })
+    DefaultAuthorizationSettler.class, DefaultAuthorizationManager.class, DefaultSymbolScheme.class,
+    EntityReferenceFactory.class})
 class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTestCase
 {
     @InjectMockComponents

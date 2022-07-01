@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-jetty</artifactId>
-    <version>14.4-SNAPSHOT</version>
+    <version>14.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Configuration Resources</name>
@@ -40,7 +40,6 @@
          Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
     -->
     <jetty.version>10.0.7</jetty.version>
-    <apache-el.version>9.0.52</apache-el.version>
     <!-- Jetty requires an alpha version of slf4j -->
     <slf4j.version>2.0.0-alpha5</slf4j.version>
   </properties>
@@ -144,11 +143,12 @@
       <version>${jetty.version}</version>
       <optional>true</optional>
     </dependency>
-    <!-- We need a EL implementation for Hiberate Validator -->
+    <!-- We need a EL implementation for Hibernate Validator -->
     <dependency>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>apache-el</artifactId>
-      <version>${apache-el.version}</version>
+      <optional>true</optional>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <build>

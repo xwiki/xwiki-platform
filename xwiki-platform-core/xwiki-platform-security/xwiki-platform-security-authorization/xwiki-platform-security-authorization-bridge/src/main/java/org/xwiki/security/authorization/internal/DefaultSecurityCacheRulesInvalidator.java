@@ -27,7 +27,9 @@ import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 
 /**
- * The instance of this class monitors updates and invalidates right cache entries whenever necessary.
+ * Default implementation of {@link SecurityCacheRulesInvalidator} which entirely relies on
+ * {@link org.xwiki.security.authorization.cache.internal.SecurityCache#suspendInvalidation()} and
+ * {@link org.xwiki.security.authorization.cache.internal.SecurityCache#resumeInvalidation()}.
  * 
  * @version $Id$
  * @since 4.0M2

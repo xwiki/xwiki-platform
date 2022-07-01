@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>14.4-SNAPSHOT</version>
+    <version>14.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -626,6 +626,13 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-filter-stream-xml</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- To be remove if we stop declaring hibernate validator as oldcore runtime dependency -->
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

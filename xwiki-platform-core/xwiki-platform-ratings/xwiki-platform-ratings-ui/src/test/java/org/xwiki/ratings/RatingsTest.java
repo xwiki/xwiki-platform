@@ -32,7 +32,6 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
-import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -60,8 +59,6 @@ class RatingsTest extends PageTest
     @Test
     void displayFullRatingEscapesRequestDocRef() throws Exception
     {
-        registerVelocityTool("escapetool", new EscapeTool());
-
         // Initialize the ratings script service to allow displayFullRating to display the blocks to be tested.
         RatingsScriptService ratingsScriptService = mock(RatingsScriptService.class);
         when(ratingsScriptService.getAverageRating(any())).thenReturn(Optional.of(mock(AverageRating.class)));

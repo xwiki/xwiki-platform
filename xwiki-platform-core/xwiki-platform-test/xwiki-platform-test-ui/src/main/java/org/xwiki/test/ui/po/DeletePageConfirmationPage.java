@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -68,7 +69,87 @@ public class DeletePageConfirmationPage extends ConfirmationPage
     }
 
     /**
+     * Toggle the backlinks panel
+     *
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public void toggleBacklinksPane()
+    {
+        getDriver().findElement(By.cssSelector("#delete .pull-right a[href='#panel-backlinks']")).click();
+    }
+
+    /**
+     * @return {@code true} if a new target document was selected, {@code false} if the field is empty
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public boolean hasNewBacklinkTargetAdded()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id("newBacklinkTarget"));
+    }
+
+    /**
+     * @param target the new target document
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public void setNewBacklinkTarget(String target)
+    {
+        WebElement element = getDriver().findElement(By.id("newBacklinkTarget"));
+        SuggestInputElement suggestInputElement = new SuggestInputElement(element);
+        suggestInputElement.clearSelectedSuggestions().sendKeys(target).selectTypedText();
+    }
+
+    /**
+     * @return {@code true} if the backlinks to this document will be updated after delete, {@code false} otherwise
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public boolean isUpdateLinks()
+    {
+        return getDriver().findElement(By.name("updateLinks")).isSelected();
+    }
+
+    /**
+     * @param updateLinks {@code true} if the backlinks to this document should be updated after delete, {@code false}
+     *            otherwise
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public void setUpdateLinks(boolean updateLinks)
+    {
+        if (this.isUpdateLinks() != updateLinks) {
+            getDriver().findElement(By.name("updateLinks")).click();
+        }
+    }
+
+    /**
+     * @return {@code true} if a redirect will be added for this document after delete, {@code false} otherwise
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public boolean isAutoRedirect()
+    {
+        return getDriver().findElement(By.name("autoRedirect")).isSelected();
+    }
+
+    /**
+     * @param autoRedirect {@code true} if a redirect should be added for this document after delete, {@code false}
+     *            otherwise
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public void setAutoRedirect(boolean autoRedirect)
+    {
+        if (this.isAutoRedirect() != autoRedirect) {
+            getDriver().findElement(By.name("autoRedirect")).click();
+        }
+    }
+
+    /**
      * Confirm the deletion of the page.
+     * 
      * @return an object representing the UI displayed when a page is deleted
      */
     public DeletingPage confirmDeletePage()

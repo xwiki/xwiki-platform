@@ -29,8 +29,8 @@ import org.xwiki.attachment.refactoring.event.AttachmentMovedEvent;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
@@ -68,7 +68,7 @@ class MovedAttachmentListenerTest
     private MovedAttachmentListener listener;
 
     @MockComponent
-    private LinkRefactoring linkRefactoring;
+    private ReferenceUpdater linkRefactoring;
 
     @MockComponent
     private JobProgressManager progressManager;
@@ -112,9 +112,9 @@ class MovedAttachmentListenerTest
         verify(this.progressManager, times(3)).startStep(this.listener);
         verify(this.progressManager, times(3)).endStep(this.listener);
         verify(this.progressManager).popLevelProgress(this.listener);
-        verify(this.linkRefactoring).renameLinks(d1, SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
-        verify(this.linkRefactoring).renameLinks(d2, SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
-        verify(this.linkRefactoring).renameLinks(DOCUMENT_REFERENCE, SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
+        verify(this.linkRefactoring).update(d1, SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
+        verify(this.linkRefactoring).update(d2, SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
+        verify(this.linkRefactoring).update(DOCUMENT_REFERENCE, SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
         assertEquals(1, this.logCapture.size());
         assertEquals("Updating the back-links for attachment [Attachment wiki:space.page@oldname] in wiki [wiki].",
             this.logCapture.getMessage(0));

@@ -22,8 +22,15 @@ package org.xwiki.security.authorization.cache;
 import org.xwiki.component.annotation.Role;
 
 /**
- * The instance of this class monitors updates and invalidates right
- * cache entries whenever necessary.
+ * This component instances define how to suspend / resume the cache for invalidating rules.
+ * Note that this needs to be done to avoid problems for example: you could have an execution order where
+ * <ol>
+ * <li>a new security cache access entry is constructed by some cache loader then in another thread </li>
+ * <li>the document is updated </li>
+ * <li>the cache is invalidated and then the original thread resumes and </li>
+ * <li>the security cache access entry still based on old information is inserted back into the cache.</li>
+ * </ol>
+ *
  * @version $Id$
  * @since 4.0M2
  */

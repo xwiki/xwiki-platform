@@ -19,7 +19,6 @@
  */
 package org.xwiki.repository.test;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -40,10 +39,17 @@ public class SolrTestUtils
 
     private final TestUtils testUtils;
 
+    private final String url;
+
     public SolrTestUtils(TestUtils testUtils) throws Exception
     {
-        this.testUtils = testUtils;
+        this(testUtils, null);
+    }
 
+    public SolrTestUtils(TestUtils testUtils, String url) throws Exception
+    {
+        this.testUtils = testUtils;
+        this.url = url;
         initService();
     }
 
@@ -68,9 +74,14 @@ public class SolrTestUtils
 
     public long getSolrQueueSize() throws Exception
     {
-        Map<String, String> parameters = Collections.singletonMap("outputSyntax", "plain");
-
-        return Long
-            .valueOf(this.testUtils.getString("/bin/get/" + SOLRSERVICE_SPACE + '/' + SOLRSERVICE_PAGE, parameters));
+        String value;
+        Map<String, String> queryParams = Map.of("outputSyntax", "plain");
+        String path = String.format("/bin/get/%s/%s", SOLRSERVICE_SPACE, SOLRSERVICE_PAGE);
+        if (this.url != null) {
+            value = this.testUtils.getString(this.url, path, queryParams);
+        } else {
+            value = this.testUtils.getString(path, queryParams);
+        }
+        return Long.valueOf(value);
     }
 }

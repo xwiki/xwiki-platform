@@ -41,9 +41,7 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.XWikiDateTool;
-import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.velocity.tools.JSONTool;
-import org.xwiki.velocity.tools.RegexTool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -95,8 +93,6 @@ class GetdocumentsPageTest extends PageTest
 
         this.jsonTool = spy(new JSONTool());
         registerVelocityTool("jsontool", this.jsonTool);
-        registerVelocityTool("escapetool", new EscapeTool());
-        registerVelocityTool("regextool", new RegexTool());
     }
 
     @Test

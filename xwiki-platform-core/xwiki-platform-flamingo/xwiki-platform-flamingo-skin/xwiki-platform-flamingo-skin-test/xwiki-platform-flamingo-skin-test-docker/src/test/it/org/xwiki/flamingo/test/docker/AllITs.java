@@ -100,6 +100,12 @@ public class AllITs
     }
 
     @Nested
+    @DisplayName("Copy page tests")
+    class NestedCopyPageIT extends CopyPageIT
+    {
+    }
+
+    @Nested
     @DisplayName("Section editing tests")
     class NestedSectionEditIT extends SectionEditIT
     {

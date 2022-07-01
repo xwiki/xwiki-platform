@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
-    <version>14.4-SNAPSHOT</version>
+    <version>14.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - Store</name>
@@ -159,6 +159,11 @@
     <dependency>
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- Used to mock XWiki class -->

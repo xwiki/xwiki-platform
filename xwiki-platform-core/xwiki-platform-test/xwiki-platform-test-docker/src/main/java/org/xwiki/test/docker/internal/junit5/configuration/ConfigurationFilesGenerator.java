@@ -218,6 +218,12 @@ public class ConfigurationFilesGenerator
                 this.testConfiguration.getServletEngine().getPermanentDirectory());
         }
 
+        // Disable the Distribution Wizard by default (so that test-generated distributions that include the
+        // xwiki-platform-extension-distribution JAR dependency don't get the DW by default; as a consequence the
+        // main and subwikis will be empty by default). If you need to test the DW, set these properties to true.
+        props.setProperty("xwikiPropertiesAutomaticStartOnMainWiki", Boolean.FALSE.toString());
+        props.setProperty("xwikiPropertiesAutomaticStartOnWiki", Boolean.FALSE.toString());
+
         return props;
     }
 

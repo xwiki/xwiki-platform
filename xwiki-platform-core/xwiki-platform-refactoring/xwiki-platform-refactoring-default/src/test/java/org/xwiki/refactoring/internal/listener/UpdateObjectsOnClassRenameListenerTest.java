@@ -61,7 +61,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class UpdateObjectsOnClassRenameListenerTest
+class UpdateObjectsOnClassRenameListenerTest
 {
     @InjectMockComponents
     private UpdateObjectsOnClassRenameListener listener;
@@ -102,7 +102,7 @@ public class UpdateObjectsOnClassRenameListenerTest
     }
 
     @Test
-    public void onClassRenamed() throws Exception
+    void onClassRenamed() throws Exception
     {
         Query query = mock(Query.class);
         when(this.queryManager.createQuery(any(), any())).thenReturn(query);
@@ -144,7 +144,7 @@ public class UpdateObjectsOnClassRenameListenerTest
     }
 
     @Test
-    public void onClassMovedToDifferentWiki() throws Exception
+    void onClassMovedToDifferentWiki() throws Exception
     {
         this.listener.onEvent(
             new DocumentRenamedEvent(this.oldClassReference, new DocumentReference("bar", "Code", "NewClass")), null,
@@ -155,22 +155,13 @@ public class UpdateObjectsOnClassRenameListenerTest
     }
 
     @Test
-    public void onClassRenamedWithoutUpdateLinks() throws Exception
+    void onClassRenamedWithoutUpdateLinks() throws Exception
     {
         MoveRequest moveRequest = new MoveRequest();
         moveRequest.setUpdateLinks(false);
 
         this.listener.onEvent(new DocumentRenamedEvent(this.oldClassReference, this.newClassReference), null,
             moveRequest);
-
-        verify(this.queryManager, never()).createQuery(any(), any());
-        verify(this.wiki, never()).saveDocument(any(), any());
-    }
-
-    @Test
-    public void onOtherEvents() throws Exception
-    {
-        this.listener.onEvent(null, null, null);
 
         verify(this.queryManager, never()).createQuery(any(), any());
         verify(this.wiki, never()).saveDocument(any(), any());

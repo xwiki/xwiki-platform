@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>14.4-SNAPSHOT</version>
+    <version>14.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-minimaldependencies</artifactId>
   <name>XWiki Platform - Minimal WAR Dependencies</name>
@@ -61,6 +61,24 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-localization-source-legacy</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- JavaScript code from platform-web-war that needs translation messages should use the xwiki-l10n JavaScript
+      module provided by localization-webjar (see https://extensions.xwiki.org/xwiki/bin/view/Extension/Localization/#HFromJavaScript).
+      Translation messages are fetched using REST so we also need an implementation of the localizaion-rest-api. Note
+      that currently it's not easy to move JavaScript code outside platform-web-war (e.g. in a WebJar module that
+      properly declares its dependencies) because we're missing XWIKI-12788: "Introduce skin extension plugins for webjar
+      resources". This is the case with job.js that depends on 'xwiki-l10n' module. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-rest-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,6 +57,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
+import org.xwiki.extension.ExtensionComponent;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionIssueManagement;
@@ -63,6 +65,7 @@ import org.xwiki.extension.ExtensionNotFoundException;
 import org.xwiki.extension.ExtensionScm;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.ExtensionFactory;
+import org.xwiki.extension.internal.converter.ExtensionComponentConverter;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -902,7 +905,7 @@ public class RepositoryManager implements Initializable, Disposable
             extension.getAllowedNamespaces(), xcontext);
 
         // Properties
-        needSave |= updateProperties(extensionObject, extension.getProperties());
+        needSave |= updateProperties(extensionObject, extension);
 
         return needSave;
     }
@@ -1260,8 +1263,19 @@ public class RepositoryManager implements Initializable, Disposable
         return this.resourceReferenceSerializer.serialize(resource);
     }
 
-    protected boolean updateProperties(BaseObject object, Map<String, ?> map)
+    protected boolean updateProperties(BaseObject object, Extension extension)
     {
+        Map<String, Object> map = extension.getProperties();
+
+        // [Retro compatibility] Reinject extension components as "unknow" properties since that's what XWiki version
+        // between 13.3 and 14.5 expect to find
+        Collection<ExtensionComponent> components = extension.getComponents();
+        if (!components.isEmpty()) {
+            map = new LinkedHashMap<>(map);
+            map.put(Extension.IKEYPREFIX + Extension.FIELD_COMPONENTS,
+                StringUtils.join(ExtensionComponentConverter.toStringList(components), '\n'));
+        }
+
         List<String> list = new ArrayList<>(map.size());
         for (Map.Entry<String, ?> entry : map.entrySet()) {
             String entryString = entry.getKey() + '=' + entry.getValue();

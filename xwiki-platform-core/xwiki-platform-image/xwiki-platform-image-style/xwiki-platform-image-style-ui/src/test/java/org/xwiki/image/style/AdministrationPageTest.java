@@ -37,7 +37,6 @@ import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,7 +68,6 @@ class AdministrationPageTest extends PageTest
         this.componentManager.registerComponent(ScriptService.class, "csrf", this.csrfScriptService);
         when(this.csrfScriptService.getToken()).thenReturn("csrf_token0", "csrf_token1");
         this.velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
-        registerVelocityTool("escapetool", new EscapeTool());
     }
 
     @Test

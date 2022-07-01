@@ -86,7 +86,7 @@ public class RSACryptoScriptService implements ScriptService
     private KeyPairGenerator keyPairGenerator;
 
     @Inject
-    @Named("SHA1withRSAEncryption")
+    @Named("SHA256withRSAEncryption")
     private SignerFactory signerFactory;
 
     @Inject

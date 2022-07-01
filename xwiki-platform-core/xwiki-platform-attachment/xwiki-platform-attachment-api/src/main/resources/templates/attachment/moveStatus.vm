@@ -40,9 +40,12 @@
 #macro (displayMoveJobStatus $moveJobStatus)
   #set ($moveJobRequest = $moveJobStatus.request)
 <div class="xcontent">
-  <h2>$services.localization.render('attachment.move.status.label')</h2>
-  <p class="text-muted small">$services.localization.render('attachment.move.status.hint',
-  [$xwiki.getUserName($moveJobRequest.userReference), $xwiki.formatDate($moveJobStatus.startDate)])</p>
+  <h2>$escapetool.xml($services.localization.render('attachment.move.status.label'))</h2>
+  <p class="text-muted small">
+    $escapetool.xml($services.localization.render('attachment.move.status.hint', 
+      ['__username__', $xwiki.formatDate($moveJobStatus.startDate)])).replace('__username__', 
+        $xwiki.getUserName($moveJobRequest.userReference))
+  </p>
   #displayMoveJobRequest($moveJobRequest)
   #template('job_macros.vm')
   #displayJobStatus($moveJobStatus)
@@ -58,13 +61,13 @@
 #set ($moveJobStatus = $services.job.getJobStatus(['refactoring', 'moveAttachment', $request.moveId]))
 #if ($moveJobStatus)
   #if ($xcontext.action == 'get')
-    #outputMoveJobStatusJSON($moveJobStatus)
+    #outputmoveJobStatusJSON($moveJobStatus)
   #else
     #displayMoveJobStatus($moveJobStatus)
   #end
 #else
   $response.setStatus(404)
 <div class="box errormessage">
-  $services.localization.render('attachment.move.status.notFound')
+  $escapetool.xml($services.localization.render('attachment.move.status.notFound'))
 </div>
 #end

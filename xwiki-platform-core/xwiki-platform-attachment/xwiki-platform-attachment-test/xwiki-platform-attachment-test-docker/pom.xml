@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-attachment-test</artifactId>
-    <version>14.4-SNAPSHOT</version>
+    <version>14.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-attachment-test-docker</artifactId>
   <name>XWiki Platform - Attachment - Tests - Functional Tests in Docker</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
        see https://jira.xwiki.org/browse/XWIKI-7683 -->
-  <description>XWiki Platform - Index - Tests - Functional Tests in Docker</description>
+  <description>XWiki Platform - Attachment - Tests - Functional Tests in Docker</description>
   <packaging>jar</packaging>
   <properties>
     <!-- Functional tests are allowed to output content to the console -->

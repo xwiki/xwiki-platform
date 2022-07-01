@@ -29,7 +29,6 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>Image.Style.Code.ImageStyleClass</parent>
   <author>xwiki:XWiki.Admin</author>
-  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>#if($doc.documentReference.name == 'ImageStyleSheet')ImageStyle Sheet#{else}$services.display.title($doc, {'displayerHint': 'default', 'outputSyntaxId': 'plain/1.0'})#end</title>

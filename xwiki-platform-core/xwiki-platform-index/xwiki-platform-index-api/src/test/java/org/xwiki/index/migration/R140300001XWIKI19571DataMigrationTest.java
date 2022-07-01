@@ -19,21 +19,25 @@
  */
 package org.xwiki.index.migration;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Provider;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.query.spi.NativeQueryImplementor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -46,12 +50,15 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -102,7 +109,7 @@ class R140300001XWIKI19571DataMigrationTest
     private DatabaseMetaData databaseMetaData;
 
     @Mock
-    private PreparedStatement preparedStatement;
+    private NativeQueryImplementor nativeQueryImplementor;
 
     @Mock
     private ExecutionContext context;
@@ -141,19 +148,19 @@ class R140300001XWIKI19571DataMigrationTest
         ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.next()).thenReturn(true);
         when(this.databaseMetaData.getTables("dbname", null, "XWIKIDOCUMENTINDEXINGQUEUE", null)).thenReturn(resultSet);
-        when(this.connection.prepareStatement(
+        when(this.session.createSQLQuery(
             "select DOC_ID, VERSION, TYPE, INSTANCE_ID, TIMESTAMP from XWIKIDOCUMENTINDEXINGQUEUE"))
-            .thenReturn(this.preparedStatement);
-        ResultSet resultSetSaveTasks = mock(ResultSet.class);
-        when(this.preparedStatement.executeQuery()).thenReturn(resultSetSaveTasks);
-        when(resultSetSaveTasks.next()).thenReturn(true, false);
-        when(resultSetSaveTasks.getLong("DOC_ID")).thenReturn(1000L);
-        when(resultSetSaveTasks.getString("VERSION")).thenReturn("-4.3");
-        when(resultSetSaveTasks.getString("TYPE")).thenReturn("testtype");
-        when(resultSetSaveTasks.getString("INSTANCE_ID")).thenReturn("testinstanceid");
-        Date now = new Date();
-        Timestamp newTimestamp = new Timestamp(now.getTime());
-        when(resultSetSaveTasks.getTimestamp("TIMESTAMP")).thenReturn(newTimestamp);
+            .thenReturn(this.nativeQueryImplementor);
+
+        Timestamp now = new Timestamp(new Date().getTime());
+        when(this.nativeQueryImplementor.getResultList()).thenReturn(List.<Object[]>of(new Object[] {
+            // Oracle returns BigDecimal values.
+            BigDecimal.valueOf(1000L),
+            "-4.3",
+            "testtype",
+            "testinstanceid",
+            now
+        }));
 
         assertEquals("<changeSet author=\"xwikiorg\" id=\"R140300001XWIKI195710\">\n"
             + "  <dropTable tableName=\"XWIKIDOCUMENTINDEXINGQUEUE\"/>\n"
@@ -169,6 +176,7 @@ class R140300001XWIKI19571DataMigrationTest
         expected.setInstanceId("testinstanceid");
         expected.setTimestamp(now);
         verify(this.tasksStore).addTask("wikidi", expected);
+        verify(this.hibernateStore).setWiki(this.session);
     }
 
     @Test
@@ -178,24 +186,22 @@ class R140300001XWIKI19571DataMigrationTest
         ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.next()).thenReturn(true);
         when(this.databaseMetaData.getTables(null, "dbname", "XWIKIDOCUMENTINDEXINGQUEUE", null)).thenReturn(resultSet);
-        when(this.connection.prepareStatement(
+        when(this.session.createSQLQuery(
             "select DOC_ID, VERSION, TYPE, INSTANCE_ID, TIMESTAMP from XWIKIDOCUMENTINDEXINGQUEUE"))
-            .thenReturn(this.preparedStatement);
-        ResultSet resultSetSaveTasks = mock(ResultSet.class);
-        when(this.preparedStatement.executeQuery()).thenReturn(resultSetSaveTasks);
-        when(resultSetSaveTasks.next()).thenReturn(true, false);
-        when(resultSetSaveTasks.getLong("DOC_ID")).thenReturn(1000L);
-        when(resultSetSaveTasks.getString("VERSION")).thenReturn("-4.3");
-        when(resultSetSaveTasks.getString("TYPE")).thenReturn("testtype");
-        when(resultSetSaveTasks.getString("INSTANCE_ID")).thenReturn("testinstanceid");
-        Date now = new Date();
-        Timestamp newTimestamp = new Timestamp(now.getTime());
-        when(resultSetSaveTasks.getTimestamp("TIMESTAMP")).thenReturn(newTimestamp);
-
+            .thenReturn(this.nativeQueryImplementor);
+        Timestamp now = new Timestamp(new Date().getTime());
+        when(this.nativeQueryImplementor.getResultList()).thenReturn(List.<Object[]>of(new Object[] {
+            BigInteger.valueOf(1000L),
+            "-4.3",
+            "testtype",
+            "testinstanceid",
+            now
+        }));
         assertEquals("<changeSet author=\"xwikiorg\" id=\"R140300001XWIKI195710\">\n"
             + "  <dropTable tableName=\"XWIKIDOCUMENTINDEXINGQUEUE\"/>\n"
             + "</changeSet>\n"
             + "\n", this.dataMigration.getPreHibernateLiquibaseChangeLog());
+        verify(this.hibernateStore).setWiki(this.session);
     }
 
     @Test
@@ -203,8 +209,22 @@ class R140300001XWIKI19571DataMigrationTest
     {
         when(this.jdbcConnectionAccess.obtainConnection()).thenThrow(SQLException.class);
         DataMigrationException dataMigrationException =
-            assertThrows(DataMigrationException.class, () -> this.dataMigration.getPreHibernateLiquibaseChangeLog());
+            assertThrows(DataMigrationException.class,
+                () -> this.dataMigration.getPreHibernateLiquibaseChangeLog());
         assertEquals("Error while loading the existing tasks.", dataMigrationException.getMessage());
         assertEquals(SQLException.class, dataMigrationException.getCause().getClass());
+        verify(this.hibernateStore).setWiki(this.session);
+    }
+
+    @Test
+    void hibernateMigrateXWikiException() throws Exception
+    {
+        doThrow(XWikiException.class).when(this.hibernateStore).setWiki(any(Session.class));
+        DataMigrationException dataMigrationException =
+            assertThrows(DataMigrationException.class,
+                () -> this.dataMigration.getPreHibernateLiquibaseChangeLog());
+        assertEquals("Error while setting the current wiki in the hibernate session.",
+            dataMigrationException.getMessage());
+        assertEquals(XWikiException.class, dataMigrationException.getCause().getClass());
     }
 }

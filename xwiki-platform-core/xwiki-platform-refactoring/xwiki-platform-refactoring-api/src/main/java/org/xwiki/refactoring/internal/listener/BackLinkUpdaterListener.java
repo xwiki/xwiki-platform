@@ -29,16 +29,20 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.JobContext;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
+import org.xwiki.refactoring.internal.job.DeleteJob;
 import org.xwiki.refactoring.internal.job.MoveJob;
+import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -46,7 +50,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
- * Updates the back-links after a document has been renamed.
+ * Updates the back-links after a document has been renamed or deleted.
  * 
  * @version $Id$
  * @since 11.1RC1
@@ -54,7 +58,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 @Component
 @Named(BackLinkUpdaterListener.NAME)
 @Singleton
-public class BackLinkUpdaterListener extends AbstractEventListener
+public class BackLinkUpdaterListener extends AbstractLocalEventListener
 {
     /**
      * The name of this event listener.
@@ -65,7 +69,7 @@ public class BackLinkUpdaterListener extends AbstractEventListener
     private Logger logger;
 
     @Inject
-    private LinkRefactoring linkRefactoring;
+    private ReferenceUpdater updater;
 
     @Inject
     private ModelBridge modelBridge;
@@ -79,41 +83,66 @@ public class BackLinkUpdaterListener extends AbstractEventListener
     @Inject
     private JobProgressManager progressManager;
 
+    @Inject
+    private JobContext jobContext;
+
     /**
      * Default constructor.
      */
     public BackLinkUpdaterListener()
     {
-        super(NAME, new DocumentRenamedEvent());
+        super(NAME, new DocumentRenamedEvent(), new DocumentDeletedEvent());
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
         if (event instanceof DocumentRenamedEvent) {
-            boolean updateLinks = true;
-            boolean updateLinksOnFarm = true;
-            Predicate<EntityReference> canEdit =
-                entityReference -> this.authorization.hasAccess(Right.EDIT, entityReference);
-
-            if (source instanceof MoveJob) {
-                MoveRequest request = (MoveRequest) data;
-                updateLinks = request.isUpdateLinks();
-                updateLinksOnFarm = request.isUpdateLinksOnFarm();
-                // Check access rights taking into account the move request.
-                canEdit = entityReference -> ((MoveJob) source).hasAccess(Right.EDIT, entityReference);
-            }
-
-            if (updateLinks) {
-                updateBackLinks((DocumentRenamedEvent) event, canEdit, updateLinksOnFarm);
-            }
+            maybeUpdateLinksAfterRename(event, source, data);
+        } else if (event instanceof DocumentDeletedEvent && this.jobContext.getCurrentJob() instanceof DeleteJob) {
+            maybeUpdateLinksAfterDelete(event);
         }
     }
 
-    private void updateBackLinks(DocumentRenamedEvent event, Predicate<EntityReference> canEdit,
+    private void maybeUpdateLinksAfterDelete(Event event)
+    {
+        DeleteJob job = (DeleteJob) this.jobContext.getCurrentJob();
+        DeleteRequest request = (DeleteRequest) job.getRequest();
+        Predicate<EntityReference> canEdit = entityReference -> (job.hasAccess(Right.EDIT, entityReference));
+        DocumentDeletedEvent deletedEvent = (DocumentDeletedEvent) event;
+
+        DocumentReference newTarget = request.getNewBacklinkTargets().get(deletedEvent.getDocumentReference());
+        if (request.isUpdateLinks() && newTarget != null) {
+            updateBackLinks(deletedEvent.getDocumentReference(), newTarget, canEdit, request.isUpdateLinksOnFarm());
+        }
+    }
+
+    private void maybeUpdateLinksAfterRename(Event event, Object source, Object data)
+    {
+        boolean updateLinks = true;
+        boolean updateLinksOnFarm = true;
+        Predicate<EntityReference> canEdit =
+            entityReference -> this.authorization.hasAccess(Right.EDIT, entityReference);
+
+        if (source instanceof MoveJob) {
+            MoveRequest request = (MoveRequest) data;
+            updateLinks = request.isUpdateLinks();
+            updateLinksOnFarm = request.isUpdateLinksOnFarm();
+            // Check access rights taking into account the move request.
+            canEdit = entityReference -> ((MoveJob) source).hasAccess(Right.EDIT, entityReference);
+        }
+
+        if (updateLinks) {
+            DocumentRenamedEvent renameEvent = (DocumentRenamedEvent) event;
+            updateBackLinks(renameEvent.getSourceReference(), renameEvent.getTargetReference(), canEdit,
+                updateLinksOnFarm);
+        }
+    }
+
+    private void updateBackLinks(DocumentReference source, DocumentReference target, Predicate<EntityReference> canEdit,
         boolean updateLinksOnFarm)
     {
-        Collection<String> wikiIds = Collections.singleton(event.getSourceReference().getWikiReference().getName());
+        Collection<String> wikiIds = Collections.singleton(source.getWikiReference().getName());
         if (updateLinksOnFarm) {
             try {
                 wikiIds = this.wikiDescriptorManager.getAllIds();
@@ -128,7 +157,7 @@ public class BackLinkUpdaterListener extends AbstractEventListener
             try {
                 for (String wikiId : wikiIds) {
                     this.progressManager.startStep(this);
-                    updateBackLinks(event, canEdit, wikiId);
+                    updateBackLinks(source, target, canEdit, wikiId);
                     this.progressManager.endStep(this);
                 }
             } finally {
@@ -137,11 +166,11 @@ public class BackLinkUpdaterListener extends AbstractEventListener
         }
     }
 
-    private void updateBackLinks(DocumentRenamedEvent event, Predicate<EntityReference> canEdit, String wikiId)
+    private void updateBackLinks(DocumentReference source, DocumentReference target, Predicate<EntityReference> canEdit,
+        String wikiId)
     {
-        this.logger.info("Updating the back-links for document [{}] in wiki [{}].", event.getSourceReference(), wikiId);
-        List<DocumentReference> backlinkDocumentReferences =
-            this.modelBridge.getBackLinkedReferences(event.getSourceReference(), wikiId);
+        this.logger.info("Updating the back-links for document [{}] in wiki [{}].", source, wikiId);
+        List<DocumentReference> backlinkDocumentReferences = this.modelBridge.getBackLinkedReferences(source, wikiId);
 
         this.progressManager.pushLevelProgress(backlinkDocumentReferences.size(), this);
 
@@ -149,8 +178,7 @@ public class BackLinkUpdaterListener extends AbstractEventListener
             for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
                 this.progressManager.startStep(this);
                 if (canEdit.test(backlinkDocumentReference)) {
-                    this.linkRefactoring.renameLinks(backlinkDocumentReference, event.getSourceReference(),
-                        event.getTargetReference());
+                    this.updater.update(backlinkDocumentReference, source, target);
                 }
                 this.progressManager.endStep(this);
             }

@@ -63,7 +63,7 @@
       ## Do the move. It's the form in attachment/moveStep1.vm page that calls this page with step=2.
       #if ("$!targetAttachmentName.trim()" == '' || "$!targetLocation.trim()" == '')
         $response.setStatus(400)
-        #error($services.localization.render('attachment.move.emptyName'))
+        #error($escapetool.xml($services.localization.render('attachment.move.emptyName')))
         #template("attachment/moveStep1.vm")
       #else
         #template('attachment/refactoring_macros.vm')
@@ -75,8 +75,7 @@
           #template("attachment/moveStep1.vm")
         #elseif (!$services.security.authorization.hasAccess('edit', $targetLocation))
           $response.setStatus(403)
-          #error($services.localization.render('attachment.move.targetNotWritable',
-            [${escapetool.xml($targetLocation)}]))
+          #error($escapetool.xml($services.localization.render('attachment.move.targetNotWritable')))
           #template('attachment/moveStep1.vm')
         #else
           #try("moveJobException")
@@ -85,7 +84,7 @@
             #set ($moveJob = $services.attachment.createMoveJob($moveRequest))
           #end
           #if ("$!moveJobException" != '')
-            #displayException($services.localization.render('attachment.job.creation.error'), $moveJobException)
+            #displayException($escapetool.xml($services.localization.render('attachment.job.creation.error')), $moveJobException)
           #else
             $response.sendRedirect($doc.getURL($xcontext.action, $escapetool.url({
               'xpage': 'attachment/move',

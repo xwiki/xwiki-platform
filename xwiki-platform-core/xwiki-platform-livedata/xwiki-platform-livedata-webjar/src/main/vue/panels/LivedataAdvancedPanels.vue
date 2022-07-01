@@ -30,14 +30,7 @@
 <template>
   <div class="livedata-advanced-panels">
 
-    <!-- Properties Panel -->
-    <LivedataAdvancedPanelProperties/>
-
-    <!-- Sort Panel -->
-    <LivedataAdvancedPanelSort/>
-
-    <!-- Filter Panel -->
-    <LivedataAdvancedPanelFilter/>
+    <component v-for="panel in logic.panels" :is="panel.component" :key="panel.id" :panel="panel"/>
 
   </div>
 </template>
@@ -47,6 +40,7 @@
 import LivedataAdvancedPanelProperties from "./LivedataAdvancedPanelProperties.vue";
 import LivedataAdvancedPanelSort from "./LivedataAdvancedPanelSort.vue";
 import LivedataAdvancedPanelFilter from "./LivedataAdvancedPanelFilter.vue";
+import LiveDataAdvancedPanelExtension from "./LiveDataAdvancedPanelExtension";
 
 export default {
 
@@ -56,6 +50,7 @@ export default {
     LivedataAdvancedPanelProperties,
     LivedataAdvancedPanelSort,
     LivedataAdvancedPanelFilter,
+    LiveDataAdvancedPanelExtension,
   },
 
   inject: ["logic"],

@@ -105,8 +105,8 @@
 #set ($sourceParameters = $escapetool.url({
   'className' : 'XWiki.XWikiServerClass',
   'resultPage' : 'WikiManager.WikisLiveTableResults',
-  'translationPrefix' : 'platform.wiki.browse.'
-
+  'translationPrefix' : 'platform.wiki.browse.',
+  '$doc' : $doc.fullName
 }))
 {{liveData
   id='wikis'

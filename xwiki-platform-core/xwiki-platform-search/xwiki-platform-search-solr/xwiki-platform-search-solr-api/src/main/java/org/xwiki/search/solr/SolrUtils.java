@@ -29,6 +29,7 @@ import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Various helpers around the Solr API.
@@ -257,6 +258,42 @@ public interface SolrUtils
     {
         return toFilterQueryString(fieldValue);
     }
+
+    /**
+     * Serialize the value into a string that is a complete query string, i.e., cannot be combined with other strings.
+     * <p>
+     * For example, this serializes the empty string as "".
+     *
+     * @param fieldValue the value of a field
+     * @return the Solr query version of the passed value
+     * @since 13.10.7
+     * @since 14.4.2
+     * @since 14.5
+     */
+    @Unstable
+    default String toCompleteFilterQueryString(Object fieldValue)
+    {
+        return toFilterQueryString(fieldValue);
+    }
+
+    /**
+     * Serialize the value into a string that is a complete query string, i.e., cannot be combined with other strings.
+     * <p>
+     * For example, this serializes the empty string as "".
+     *
+     * @param fieldValue the value of a field
+     * @param valueType the type to use as reference to serialize the value
+     * @return the Solr query version of the passed value
+     * @since 13.10.7
+     * @since 14.4.2
+     * @since 14.5
+     */
+    @Unstable
+    default String toCompleteFilterQueryString(Object fieldValue, Type valueType)
+    {
+        return toFilterQueryString(fieldValue, valueType);
+    }
+
 
     /**
      * Extract from the document the value associated with the passed field name.

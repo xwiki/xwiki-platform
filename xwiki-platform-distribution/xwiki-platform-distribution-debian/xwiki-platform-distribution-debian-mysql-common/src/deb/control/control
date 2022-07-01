@@ -3,7 +3,7 @@ Version: [[version]]
 Section: java
 Priority: optional
 Architecture: all
-Depends: xwiki-common (= [[version]]), mysql-server (>= 5.7) | default-mysql-server (>= 1.0.5) | mariadb-server (>= 10.2), dbconfig-mysql | dbconfig-common
+Depends: xwiki-common (= [[version]]), mysql-server (>= 5.7), dbconfig-mysql | dbconfig-common
 Provides: xwiki-database
 Replaces: xwiki-database, xwiki-enterprise-database
 Conflicts: xwiki-database, xwiki-enterprise-database

@@ -92,7 +92,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
      */
     public ChartMacro()
     {
-        super("Chart", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false),
+        super("Chart", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false, Block.LIST_BLOCK_TYPE),
             ChartMacroParameters.class);
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }

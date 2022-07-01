@@ -127,6 +127,20 @@ class SimpleEventQueryTest
     }
 
     @Test
+    void contains()
+    {
+        SimpleEventQuery query = new SimpleEventQuery();
+
+        query.contains("property", "value");
+
+        assertEquals(1, query.getConditions().size());
+        assertEquals("property", ((CompareQueryCondition) query.getConditions().get(0)).getProperty());
+        assertFalse(((CompareQueryCondition) query.getConditions().get(0)).isCustom());
+        assertEquals("value", ((CompareQueryCondition) query.getConditions().get(0)).getValue());
+        assertEquals(CompareType.CONTAINS, ((CompareQueryCondition) query.getConditions().get(0)).getType());
+    }
+
+    @Test
     void after()
     {
         Date date = new Date();

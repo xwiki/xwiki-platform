@@ -225,6 +225,10 @@ public class SaveAction extends EditAction
             sectionDoc.readFromForm(form, context);
             String sectionContent = sectionDoc.getContent() + "\n";
             String content = tdoc.updateDocumentSection(sectionNumber, sectionContent);
+
+            // The list of attachments might have been modified by a new upload that is read in sectionDoc.readFromForm
+            // so we ensure to keep the updated list of attachments.
+            tdoc.setAttachmentList(sectionDoc.getAttachmentList());
             tdoc.setContent(content);
             tdoc.setComment(sectionDoc.getComment());
             tdoc.setMinorEdit(sectionDoc.isMinorEdit());

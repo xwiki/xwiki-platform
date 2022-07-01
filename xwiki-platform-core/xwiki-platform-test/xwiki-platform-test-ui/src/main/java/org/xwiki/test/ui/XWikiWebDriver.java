@@ -22,6 +22,7 @@ package org.xwiki.test.ui;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -544,8 +545,15 @@ public class XWikiWebDriver extends RemoteWebDriver
     public void waitUntilElementHasTextContent(final By locator, final String expectedValue)
     {
         waitUntilCondition(driver -> {
-            WebElement element = driver.findElement(locator);
-            return Boolean.valueOf(expectedValue.equals(element.getText()));
+            try {
+                WebElement element = driver.findElement(locator);
+                return Objects.equals(expectedValue, element.getText());
+            } catch (NotFoundException | StaleElementReferenceException e) {
+                // In case of NotFoundException, the element is not yet present in the DOM.
+                // In case of StaleElementReferenceException, the element was removed from the DOM between the result of
+                // findElement and the call to getText.
+                return false;
+            }
         });
     }
 

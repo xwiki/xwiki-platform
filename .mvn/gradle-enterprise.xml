@@ -47,6 +47,9 @@
       <enabled>#{env['CI'] == null}</enabled>
     </local>
     <remote>
+      <!-- Notes:
+       * To disable the remote build cache on the command line, pass: -Dgradle.cache.remote.enabled=false
+      -->
       <enabled>true</enabled>
       <!-- Only CI jobs are allowed to store build outputs in the remote cache -->
       <storeEnabled>#{env['CI'] != null}</storeEnabled>

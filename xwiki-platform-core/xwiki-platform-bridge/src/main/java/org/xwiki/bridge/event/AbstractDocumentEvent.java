@@ -24,6 +24,7 @@ import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.AbstractCancelableEvent;
 import org.xwiki.observation.event.filter.EventFilter;
+import org.xwiki.stability.Unstable;
 
 /**
  * Base class for all document related {@link org.xwiki.observation.event.Event}.
@@ -46,11 +47,22 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
         new DefaultStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     /**
-     * This event will match any other document event of the same type.
+     * The reference of the targeted document.
+     * 
+     * @since 14.4.2
+     * @since 14.5
+     */
+    private final DocumentReference documentReference;
+
+    /**
+     * This event will match any other document event of the same type. Since listeners may expect to find the document
+     * reference in the event, it is recommended to use the constructor with the explicit parameter when generating the
+     * event.
      */
     public AbstractDocumentEvent()
     {
         super();
+        this.documentReference = null;
     }
 
     /**
@@ -61,6 +73,7 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
     public AbstractDocumentEvent(DocumentReference documentReference)
     {
         super(SERIALIZER.serialize(documentReference));
+        this.documentReference = documentReference;
     }
 
     /**
@@ -71,5 +84,17 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
     public AbstractDocumentEvent(EventFilter eventFilter)
     {
         super(eventFilter);
+        this.documentReference = null;
+    }
+
+    /**
+     * @return the reference of the document targeted by this event, or {@code null} if it was not specified
+     * @since 14.4.2
+     * @since 14.5
+     */
+    @Unstable
+    public DocumentReference getDocumentReference()
+    {
+        return this.documentReference;
     }
 }

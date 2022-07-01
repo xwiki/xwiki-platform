@@ -29,7 +29,6 @@
   <creator>xwiki:XWiki.Admin</creator>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <originalMetadataAuthor>xwiki:XWiki.Admin</originalMetadataAuthor>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title/>
@@ -43,6 +42,7 @@ export.pdf.options.loadFailure=Failed to load the PDF export options.
 
 export.pdf.modal.close=Close
 export.pdf.inProgress=Exporting...
+export.pdf.failed=Failed to export as PDF
 
 export.pdf.templates.default=Default template
 export.pdf.templates.default.versionInfo=Version {0} authored by {1} on {2}

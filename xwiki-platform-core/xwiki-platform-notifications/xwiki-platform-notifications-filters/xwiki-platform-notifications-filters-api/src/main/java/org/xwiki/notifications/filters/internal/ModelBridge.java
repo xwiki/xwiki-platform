@@ -34,7 +34,6 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.stability.Unstable;
 
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
@@ -62,7 +61,6 @@ public interface ModelBridge
      * @throws NotificationException if an error happens
      * @since 13.3RC1
      */
-    @Unstable
     default Set<NotificationFilterPreference> getFilterPreferences(WikiReference wikiReference)
         throws NotificationException
     {
@@ -90,6 +88,21 @@ public interface ModelBridge
     void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
 
     /**
+     * Delete all the filter preferences related to a given user.
+     *
+     * @param user the document reference of a wiki user
+     * @throws NotificationException in case of error when deleting the filter preferences
+     * @since 14.5
+     * @since 14.4.1
+     * @since 13.10.7
+     */
+    default void deleteFilterPreferences(DocumentReference user) throws NotificationException
+    {
+        throw new UnsupportedOperationException(
+            "ModelBridge.deleteFilterPreferences(DocumentReference) Not implemented");
+    }
+
+    /**
      * Delete a filter preference.
      * @param wikiReference reference of the wiki concerned by the filter preference
      * @param filterPreferenceId name of the filter preference
@@ -98,6 +111,20 @@ public interface ModelBridge
      * @since 13.3RC1
      */
     void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId) throws NotificationException;
+
+    /**
+     * Delete all the filter preferences of a wiki.
+     *
+     * @param wikiReference a wiki reference
+     * @throws NotificationException in case of error while deleting the preferences
+     * @since 14.5
+     * @since 14.4.1
+     * @since 13.10.7
+     */
+    default void deleteFilterPreferences(WikiReference wikiReference) throws NotificationException
+    {
+        throw new UnsupportedOperationException("ModelBridge.deleteFilterPreference(WikiReference) Not implemented");
+    }
 
     /**
      * Enable or disable a filter preference.

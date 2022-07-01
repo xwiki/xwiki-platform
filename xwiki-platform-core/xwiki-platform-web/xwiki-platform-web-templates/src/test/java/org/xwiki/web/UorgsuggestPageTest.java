@@ -41,8 +41,6 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
-import org.xwiki.velocity.tools.EscapeTool;
-import org.xwiki.velocity.tools.JSONTool;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -97,9 +95,6 @@ class UorgsuggestPageTest extends PageTest
         when(qp.anyChars()).thenReturn(qp);
         when(qp.literal(anyString())).thenReturn(qp);
         when(qp.query()).thenReturn(this.query);
-
-        registerVelocityTool("escapetool", new EscapeTool());
-        registerVelocityTool("jsontool", new JSONTool());
     }
 
     @Test

@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -41,7 +40,6 @@ import org.xwiki.user.internal.group.AbstractGroupCache.GroupCacheEntry;
 import org.xwiki.user.internal.group.MembersCache;
 import org.xwiki.user.script.GroupScriptService;
 import org.xwiki.user.script.UserScriptService;
-import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.velocity.tools.JSONTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -99,10 +97,6 @@ class GetgroupmembersPageTest extends PageTest
         // Make sure User and Group script services load properly.
         this.componentManager.getInstance(ScriptService.class, "user");
         this.componentManager.getInstance(ScriptService.class, "user.group");
-
-        registerVelocityTool("stringutils", new StringUtils());
-        registerVelocityTool("stringtool", new StringUtils());
-        registerVelocityTool("escapetool", new EscapeTool());
     }
 
     @Test

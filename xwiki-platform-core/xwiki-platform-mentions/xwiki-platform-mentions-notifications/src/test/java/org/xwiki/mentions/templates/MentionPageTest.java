@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +43,6 @@ import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XHTML10ComponentList;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.tools.EscapeTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -112,10 +110,6 @@ class MentionPageTest extends PageTest
         // Create and save page 2 without a title.
         XWikiDocument xWikiDocument2 = this.xwiki.getDocument(page2, this.context);
         this.xwiki.saveDocument(xWikiDocument2, this.context);
-
-        // Registration of the required velocity tools.
-        registerVelocityTool("escapetool", new EscapeTool());
-        registerVelocityTool("stringtool", new StringUtils());
 
         // Mocking of the date script service.
         when(this.dateScriptService.displayTimeAgo(eventDate)).thenReturn("one hundred years ago");

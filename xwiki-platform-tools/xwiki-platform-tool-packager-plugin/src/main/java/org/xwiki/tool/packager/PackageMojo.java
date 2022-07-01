@@ -63,8 +63,6 @@ import org.apache.maven.repository.RepositorySystem;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.xwiki.tool.utils.AbstractOldCoreMojo;
@@ -906,7 +904,6 @@ public class PackageMojo extends AbstractOldCoreMojo
         createDirectory(targetDirectory);
         try {
             ZipUnArchiver unArchiver = new ZipUnArchiver();
-            unArchiver.enableLogging(new ConsoleLogger(Logger.LEVEL_ERROR, "Package"));
             unArchiver.setSourceFile(source);
             unArchiver.setDestDirectory(targetDirectory);
             unArchiver.setOverwrite(true);

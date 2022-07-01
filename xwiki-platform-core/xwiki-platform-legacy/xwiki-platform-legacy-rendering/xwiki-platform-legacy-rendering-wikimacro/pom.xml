@@ -33,5 +33,6 @@
   <description>XWiki Platform - Legacy - Rendering - Wiki Macro Bridge</description>
   <modules>
     <module>xwiki-platform-legacy-rendering-wikimacro-store</module>
+    <module>xwiki-platform-legacy-rendering-wikimacro-api</module>
   </modules>
 </project>

@@ -1,0 +1,45 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.LegacyNotificationAdministrationTranslations" locale="de">
+  <web>XWiki.Notifications.Code</web>
+  <name>LegacyNotificationAdministrationTranslations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>legacy.event.migration.description=XWiki hat seit der Version 12.6 einen neuen Speicherort f\u00FCr Ereignisse (Benachrichtigungen). Da das Transferieren der Ereignisdaten von dem alten in den neuen Speicher lange dauern kann, insbesondere f\u00FCr Wikis mit einer langen Nutzungszeit und vielen Ereignissen, und das Beibehalten alter Ereignisdaten nicht immer gew\u00FCnscht ist, wird diese Entscheidung Ihnen als Wiki Administrator \u00FCberlassen. Wenn Sie die Ereignisse nicht transferieren, wird es f\u00FCr Ihre Nutzer aussehen, als ob diese Ereignisse verschwunden sind. Der Transfer der Ereignisdaten findet in einem Hintergrundprozess statt und Sie brauchen die Beendigung nicht abzuwarten, sondern k\u00F6nnen gleich zum n\u00E4chsten Schritt gehen.
+### Missing: legacy.event.count.store=Number of events in the standard store
+### Missing: legacy.event.count.legacy=Number of events in the legacy store
+legacy.event.migration.alltime=Der gesamte Zeitraum
+legacy.event.migration.since=Seit
+legacy.event.migration.start=Transfer starten</content>
+</xwikidoc>

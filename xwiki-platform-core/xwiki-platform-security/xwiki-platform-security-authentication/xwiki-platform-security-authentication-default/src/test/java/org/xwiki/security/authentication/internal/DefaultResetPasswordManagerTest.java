@@ -430,7 +430,7 @@ class DefaultResetPasswordManagerTest
         String newPassword = "mypassword";
         this.resetPasswordManager.resetPassword(this.userReference, newPassword);
         verify(this.userDocument).removeXObjects(DefaultResetPasswordManager.RESET_PASSWORD_REQUEST_CLASS_REFERENCE);
-        verify(xObject).setStringValue("password", newPassword);
+        verify(xObject).set("password", newPassword, context);
     }
 
     @Test

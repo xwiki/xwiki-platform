@@ -76,6 +76,10 @@
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-transformation-macro</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -230,6 +234,17 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-rendering-wikimacro-api</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
+          <groupId>org.xwiki.platform</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-rendering-wikimacro-store</artifactId>
       <version>${project.version}</version>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
@@ -241,6 +256,10 @@
         <exclusion>
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

@@ -257,6 +257,14 @@
       <version>3.3.2</version>
       <optional>true</optional>
     </dependency>
+    <!-- Inject the legacy event migrator in the administration -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-events-hibernate-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
   <profiles>
     <profile>

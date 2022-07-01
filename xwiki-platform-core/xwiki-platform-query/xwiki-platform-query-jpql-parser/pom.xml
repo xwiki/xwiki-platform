@@ -29,10 +29,12 @@
   </parent>
   <artifactId>xwiki-platform-query-jpql-parser</artifactId>
   <name>XWiki Platform - Query - JPQL Parser</name>
-  <description>Simple Java Persistence Query Language parser based on SableCC</description>
+  <description>Java Persistence Query Language parser based on SableCC</description>
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>JPQL Query Parser</xwiki.extension.name>
     </properties>
   <dependencies>
     <!-- Test Dependencies -->

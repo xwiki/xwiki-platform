@@ -22,12 +22,13 @@ package org.xwiki.rendering.wikimacro.internal;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -154,10 +155,10 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
             this.logger.debug("Incomplete macro definition in [{}], macro description is empty", documentReference);
         }
 
-        List<String> macroDefaultCategories = getDefaultCategories(macroDefinition);
+        Set<String> macroDefaultCategories = getDefaultCategories(macroDefinition);
         // Verify default macro category.
-        if (macroDefaultCategories == null || macroDefaultCategories.isEmpty()) {
-            macroDefaultCategories = List.of();
+        if (CollectionUtils.isEmpty(macroDefaultCategories)) {
+            macroDefaultCategories = Set.of();
             this.logger.debug("Incomplete macro definition in [{}], default macro category is empty",
                 documentReference);
         }
@@ -179,7 +180,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
             .id(id)
             .name(macroName)
             .description(macroDescription)
-            .defaultCategories(new HashSet<>(macroDefaultCategories))
+            .defaultCategories(macroDefaultCategories)
             .visibility(macroVisibility)
             .supportsInlineMode(macroSupportsInlineMode)
             .contentDescriptor(contentDescriptor)
@@ -373,8 +374,8 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         return isAllowed;
     }
 
-    private List<String> getDefaultCategories(BaseObject macroDefinition)
+    private Set<String> getDefaultCategories(BaseObject macroDefinition)
     {
-        return (List<String>) macroDefinition.getListValue(MACRO_DEFAULT_CATEGORIES_PROPERTY);
+        return (Set<String>) macroDefinition.getSetValue(MACRO_DEFAULT_CATEGORIES_PROPERTY);
     }
 }

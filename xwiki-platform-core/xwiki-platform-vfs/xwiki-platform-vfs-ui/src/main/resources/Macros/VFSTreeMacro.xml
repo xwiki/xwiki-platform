@@ -352,7 +352,7 @@
       <defaultValue/>
     </property>
     <property>
-      <description>The reference to the file in an attachment archive (e.g. "[[attachment/my/file.txt")&gt;&gt;attach:space.page@attachment/my/file.txt")]]</description>
+      <description>The reference to the file in an attachment archive (e.g. "attach:space.page@attachment/my/file.txt")</description>
     </property>
     <property>
       <mandatory>1</mandatory>

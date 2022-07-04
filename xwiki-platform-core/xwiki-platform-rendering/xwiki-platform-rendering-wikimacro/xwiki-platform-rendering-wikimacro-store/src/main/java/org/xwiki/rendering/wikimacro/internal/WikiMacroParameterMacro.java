@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -77,7 +78,7 @@ public class WikiMacroParameterMacro extends AbstractMacro<WikiMacroParameterMac
         super("WikiMacro Parameter", DESCRIPTION, new DefaultContentDescriptor(false),
             WikiMacroParameterMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     @Override

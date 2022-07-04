@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 2.1RC1
  */
-public class WikiMacroDescriptorTest
+class WikiMacroDescriptorTest
 {
     /**
      * Ensure that the parameter descriptor map returned has the same order as the order in which parameter
@@ -44,13 +45,14 @@ public class WikiMacroDescriptorTest
      * WYSIWYG editor will display the wiki macro parameter in the same order as the Wiki Macro Object order.
      */
     @Test
-    public void testGetParameterDescriptorMapInCorrectOrder()
+    void testGetParameterDescriptorMapInCorrectOrder()
     {
         List<WikiMacroParameterDescriptor> paramDescriptors = Arrays.asList(
             new WikiMacroParameterDescriptor("id1", "description1", true),
             new WikiMacroParameterDescriptor("id2", "description2", true));
+        // TOOD: add a test with defaultCategory and move this test to legacy
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder().name("name").description("description")
-            .defaultCategory("category").visibility(WikiMacroVisibility.GLOBAL)
+            .defaultCategories(Set.of("category")).visibility(WikiMacroVisibility.GLOBAL)
             .contentDescriptor(new DefaultContentDescriptor()).parameterDescriptors(paramDescriptors).build();
         Map<String, ParameterDescriptor> result = descriptor.getParameterDescriptorMap();
 

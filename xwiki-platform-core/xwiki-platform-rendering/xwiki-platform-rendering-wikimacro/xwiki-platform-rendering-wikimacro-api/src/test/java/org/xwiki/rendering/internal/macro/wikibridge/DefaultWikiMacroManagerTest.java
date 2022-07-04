@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.wikibridge;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -302,7 +303,7 @@ class DefaultWikiMacroManagerTest
     }
 
     @Test
-    public void registerWikiMacroWhenUserVisibilityAndNotAllowed() throws Exception
+    void registerWikiMacroWhenUserVisibilityAndNotAllowed() throws Exception
     {
         WikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.USER);
 
@@ -321,7 +322,7 @@ class DefaultWikiMacroManagerTest
     {
         DocumentReference wikiMacroDocReference = new DocumentReference("wiki", Arrays.asList("space"), "space");
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder().id(new MacroId("testwikimacro"))
-            .name("Test Wiki Macro").description("Description").defaultCategory("Test").visibility(visibility)
+            .name("Test Wiki Macro").description("Description").defaultCategories(Set.of("Test")).visibility(visibility)
             .contentDescriptor(new DefaultContentDescriptor())
             .parameterDescriptors(Collections.emptyList()).build();
 

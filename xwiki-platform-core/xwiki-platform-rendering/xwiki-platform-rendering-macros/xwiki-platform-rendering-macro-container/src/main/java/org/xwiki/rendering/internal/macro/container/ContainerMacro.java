@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro.container;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -77,7 +78,7 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
     {
         super("Container", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false, Block.LIST_BLOCK_TYPE),
             ContainerMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_LAYOUT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_LAYOUT));
     }
 
     @Override

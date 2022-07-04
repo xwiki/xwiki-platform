@@ -33,5 +33,6 @@
   <description>XWiki Platform - Legacy - Rendering - Parent POM</description>
   <modules>
     <module>xwiki-platform-legacy-rendering-macros</module>
+    <module>xwiki-platform-legacy-rendering-wikimacro</module>
   </modules>
 </project>

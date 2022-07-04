@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -112,7 +113,7 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
     public RssMacro()
     {
         super("RSS", DESCRIPTION, new DefaultContentDescriptor(DESCRIPTION, false), RssMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override

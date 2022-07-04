@@ -41,10 +41,15 @@
 #set ($wikiMacroDocuments = $services.query.xwql("from doc.object(XWiki.WikiMacroClass) as macros").execute())
 #set ($wikiMacroMap = {})
 #foreach($macroDocumentName in $wikiMacroDocuments)
+AAA $macroDocumentName
   #set ($macroDocument = $xwiki.getDocument($macroDocumentName))
+  BBB $macroDocument
   #set ($macroObject = $macroDocument.getObject("XWiki.WikiMacroClass"))
+  CCC $macroObject $macroObject.properties
+  TODO: find out what makes the conversion to access XObject properties.
   #set ($discard = $wikiMacroMap.put($macroObject.id, [$macroDocument.documentReference.toString(), $macroObject.visibility]))
 #end
+DDDD $wikiMacroMap
 |=$services.localization.render('help.macroList.id')|=$services.localization.render('help.macroList.name')|=$services.localization.render('help.macroList.categories')|=$services.localization.render('help.macroList.description')|=$services.localization.render('help.macroList.visibility')
 #foreach ($descriptor in $services.rendering.getMacroDescriptors('xwiki/2.1'))
   #set ($wikiMacroData = $wikiMacroMap.get($descriptor.id.id))

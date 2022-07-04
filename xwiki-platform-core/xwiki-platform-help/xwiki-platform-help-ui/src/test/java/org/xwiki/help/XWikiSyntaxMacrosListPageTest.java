@@ -84,7 +84,8 @@ import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.WIKI_MAC
     DefaultContextStoreManager.class,
     // End document initializer
     // XWikiWikiModel is required to make 
-    // org.xwiki.rendering.internal.parser.reference.AbstractUntypedReferenceParser.parse work in "wiki mode".
+    // org.xwiki.rendering.internal.parser.reference.AbstractUntypedReferenceParser.parse work in "wiki mode". Otherwise
+    // untyped references are not resolved.
     // Start of XWikiWikiModel
     XWikiWikiModel.class,
     DefaultSkinAccessBridge.class,

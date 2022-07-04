@@ -102,28 +102,39 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
     @Test
     void renderTable() throws Exception
     {
+        // Initialize "WikiMacroClass"
         this.xwiki.initializeMandatoryDocuments(this.context);
-        XWikiDocument mymacro = this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "MyMacro"),
+        
+        // Create a wiki macro.
+        XWikiDocument myMacroDocument = this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "MyMacro"),
             this.context);
-        mymacro.setSyntax(Syntax.XWIKI_2_1);
-        BaseObject macroObject = mymacro.newXObject(WIKI_MACRO_CLASS_REFERENCE, this.context);
+        myMacroDocument.setSyntax(Syntax.XWIKI_2_1);
+        BaseObject macroObject = myMacroDocument.newXObject(WIKI_MACRO_CLASS_REFERENCE, this.context);
         macroObject.setStringValue(MACRO_VISIBILITY_PROPERTY, "WIKI");
         macroObject.setStringValue(MACRO_ID_PROPERTY, "mymacro");
-        this.xwiki.saveDocument(mymacro, this.context);
+        this.xwiki.saveDocument(myMacroDocument, this.context);
 
+        // Register the wiki macro component.
+        DefaultWikiMacro myMacro =
+            this.componentManager.registerMockComponent(Macro.class, "mymacro", DefaultWikiMacro.class, false);
+        DefaultMacroDescriptor macroDescriptor =
+            new DefaultMacroDescriptor(new MacroId("mymacro"), "My Macro", "My Macro Description");
+        macroDescriptor.setDefaultCategories(Set.of("Category1", "Category2"));
+        when(myMacro.getDescriptor()).thenReturn(macroDescriptor);
+        
+        // Mock the database.
+        Query query = mock(Query.class);
         QueryManagerScriptService queryManagerScriptService =
             this.componentManager.registerMockComponent(ScriptService.class, "query", QueryManagerScriptService.class,
                 false);
-        DefaultWikiMacro mymacro1 =
-            this.componentManager.registerMockComponent(Macro.class, "mymacro", DefaultWikiMacro.class, false);
-        DefaultMacroDescriptor t =
-            new DefaultMacroDescriptor(new MacroId("mymacro"), "My Macro", "My Macro Description");
-        t.setDefaultCategories(Set.of("Category1", "Category2"));
-        when(mymacro1.getDescriptor()).thenReturn(t);
-        Query query = mock(Query.class);
         when(queryManagerScriptService.xwql(any())).thenReturn(query);
         when(query.execute()).thenReturn(List.of("xwiki:XWiki.MyMacro"));
+        
+        // Render the page.
         Document document = renderHTMLPage(DOCUMENT_REFERENCE);
+        
+        
+        // Assert the values of the cells.
         Elements trs = document.select("tr");
         Element headersRow = trs.get(0);
         Elements headerThs = headersRow.select("th");

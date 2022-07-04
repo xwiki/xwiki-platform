@@ -47,9 +47,16 @@ help.tipsPanel.linkAutocompleteWYSIWYGTip=When editing in WYSIWYG, type ##[## an
 help.macroList.title=Available Macros
 help.macroList.id=Id
 help.macroList.name=Name
-help.macroList.category=Category
+help.macroList.categories=Categories
 help.macroList.description=Description
-help.macroList.visibility=Visibility</content>
+help.macroList.visibility=Visibility
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=Category
+
+#@deprecatedend</content>
   <object>
     <name>Help.Translations</name>
     <number>0</number>

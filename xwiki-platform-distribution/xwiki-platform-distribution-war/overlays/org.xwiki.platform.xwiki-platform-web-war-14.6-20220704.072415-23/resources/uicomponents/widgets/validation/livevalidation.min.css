@@ -1,0 +1,1 @@
+#template('colorThemeInit.vm') .LV_validation_message{font-size:.8em;line-height:1.8em;margin:0 0 0 .5em;position:absolute}.LV_valid{color:$theme.notificationSuccessColor}.LV_invalid{color:$theme.notificationErrorColor}

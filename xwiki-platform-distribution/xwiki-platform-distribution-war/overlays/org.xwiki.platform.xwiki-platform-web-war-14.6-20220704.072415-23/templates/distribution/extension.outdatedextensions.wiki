@@ -1,0 +1,43 @@
+##!source.syntax=xwiki/2.1
+{{template name="extension.vm" output="false"/}}
+
+{{velocity}}
+#if ("$!request.action" == '')
+  ## Display the step.
+  #set ($discard = "#getExtensionUpdaterPlan($plan)")
+  #if (!$isAjaxRequest)
+    ## The list of outdated/invalid extensions is paginated so we load the CSS here because the request is not AJAX.
+    ## Make sure the browser won't keep the same version of the resource in cache from one version of XWiki to another
+    #set ($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', {'forceSkinAction': true, 'version': $environmentVersion}))
+    $services.localization.render('platform.extension.distributionWizard.extensionsStepDescription', [
+      '[[', '>>http://platform.xwiki.org/xwiki/bin/view/Features/Applications]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Color+Theme+Application]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Component+Module]]',
+      '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Script+Module#HScriptServices]]'])
+
+    {{html}}#displayExtensionUpdaterTrigger($plan){{/html}}
+
+  #end
+  (% class="extensionUpdater" %)(((
+    #if ($plan.state == 'FINISHED')
+      (% class="xHint" %)
+      $services.localization.render('platform.extension.updater.lastCheckDate',
+          [$xwiki.formatDate($plan.endDate)])
+
+      {{html}}#displayExtensionUpdaterPlan($plan){{/html}}
+      #set ($showCompleteStepButton = $invalid.isEmpty())
+    #elseif ($plan)
+      (% class="xHint" %)
+      {{translation key="platform.extension.updater.loading"/}}
+
+      {{html}}
+      #displayJobProgressBar($plan)
+      #displayExtensionUpdaterPlanStatus($plan)
+      {{/html}}
+    #end
+  )))
+#elseif ($request.action.startsWith('checkForUpdates'))
+  #computeExtensionUpdaterPlan($plan $request.action.equals('checkForUpdatesGlobally'))
+#end
+{{/velocity}}

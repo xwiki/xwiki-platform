@@ -1,0 +1,107 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+###
+### Rename document template
+###
+#if (!$xwiki.checkAccess($doc.fullName, 'delete') && "$!request.renameId" == '')
+  #template("accessdenied.vm")
+#elseif ($xcontext.action == 'get' && "$!request.renameId" != '')
+  ## AJAX request for rename status update.
+  #template("renameStatus.vm")
+#else
+  #template("startpage.vm")
+  #if ("$!step" == '')
+    #set ($step = "$!request.step")
+    #if ("$!step" == '')
+      #set ($step = '1')
+    #end
+  #end
+  <div class="main layoutsubsection">
+  <div id="mainContentArea">
+    #if ("$!request.renameId" != '')
+      ## Display the rename status
+      #template("renameStatus.vm")
+    #elseif ($doc.isNew())
+      $response.setStatus(404)
+      #error($services.localization.render('core.rename.nonexistingDocument'))
+    #elseif ($step == 1)
+      ## Display the rename form
+      #template("renameStep1.vm")
+    #elseif (!$services.csrf.isTokenValid($request.form_token))
+      ## CSRF protection
+      $response.sendRedirect("$!services.csrf.resubmissionURL")
+    #else
+      ## Do the rename. It's the form in renameStep1.vm page that calls this page with step=2.
+      #if ("$!request.newPageName.trim()" == '')
+        $response.setStatus(400)
+        #error($services.localization.render('core.rename.emptyName'))
+        #template("renameStep1.vm")
+      #else
+        #template('refactoring_macros.vm')
+        ## Determine if the new document should be terminal.
+        #isTargetDocumentTerminal($doc.documentReference.name)
+        #getNestedDocumentReference($request.newWikiName $request.newSpaceName $request.newPageName $NULL $terminal
+          $newDocReference)
+        #set ($newDocReferenceAsString = $services.model.serialize($newDocReference))
+        ## Allow users to overwrite existing documents if they are redirect placeholders.
+        #if ($xwiki.exists($newDocReference) && !$xwiki.getDocument($newDocReference).getObject('XWiki.RedirectClass'))
+          $response.setStatus(409)
+          #error($services.localization.render('core.rename.alreadyExists', [${escapetool.xml($newDocReferenceAsString)},
+            $xwiki.getURL($newDocReference)]))
+          #template("renameStep1.vm")
+        #elseif (!$xwiki.hasAccessLevel('edit', $xcontext.user, $newDocReferenceAsString))
+          $response.setStatus(403)
+          #error($services.localization.render('core.rename.targetNotWritable',
+            [${escapetool.xml($newDocReferenceAsString)}]))
+          #template('renameStep1.vm')
+        #else
+          #set ($renameRequest = $services.refactoring.requestFactory.createRenameRequest($doc.documentReference,
+            $newDocReference))
+          ## We can't rename the children if the new page is terminal.
+          #set ($deep = $request.deep == 'true' && !$terminal)
+          #set ($discard = $renameRequest.setDeep($deep))
+          #set ($updateLinks = $request.updateLinks == 'true')
+          #set ($discard = $renameRequest.setUpdateLinks($updateLinks))
+          #set ($autoRedirect = $request.autoRedirect == 'true')
+          #set ($discard = $renameRequest.setAutoRedirect($autoRedirect))
+          ## Rename operation relies on copy.
+          #maybeUpdateTitleAfterCopy($renameRequest $doc.documentReference 'newPageTitle')
+          #if ($request.async == 'true')
+            ## We may be asked a question (we assume that async also imply we want it interactive)
+            #set ($discard = $renameRequest.setInteractive(true))
+          #end
+          #set ($renameJob = $services.refactoring.rename($renameRequest))
+          #if ($request.async != 'true')
+            #try()
+              #set ($discard = $renameJob.join())
+            #end
+          #end
+          $response.sendRedirect($doc.getURL($xcontext.action, $escapetool.url({
+            'xpage': 'rename',
+            'renameId': $renameRequest.id.get($mathtool.sub($renameRequest.id.size(), 1))
+          })))
+        #end
+      #end
+    #end
+    <div class="clearfloats"></div>
+  </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
+#end

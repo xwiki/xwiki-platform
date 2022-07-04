@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-57 -57 114 114" style="overflow: hidden;">
+ <style type="text/css">
+    * {
+      fill: none;
+      stroke-width: 7.5px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .X {
+      stroke-width: 13px;
+      stroke: #505052;
+    }
+    .west {
+      stroke: #0087CB;
+    }
+    .north {
+      stroke: #70B700;
+    }
+    .east {
+      stroke: #FF7700;
+    }
+    .south {
+      stroke: #FF0000;
+    }
+ </style>
+ <defs>
+  <filter id="WhiteBlur" filterUnits="userSpaceOnUse" x="-57" y="-57" width="114" height="114">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="blur"/>
+    <feComponentTransfer in="blur" result="whiteBlur">
+      <feFuncR type="linear" slope="-1" intercept="1"/>
+      <feFuncG type="linear" slope="-1" intercept="1"/>
+      <feFuncB type="linear" slope="-1" intercept="1"/>
+    </feComponentTransfer>
+    <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur2"/>
+    <feComponentTransfer in="blur2" result="whiteBlur2">
+      <feFuncR type="linear" slope="-1" intercept="1"/>
+      <feFuncG type="linear" slope="-1" intercept="1"/>
+      <feFuncB type="linear" slope="-1" intercept="1"/>
+    </feComponentTransfer>
+    <feMerge>
+      <feMergeNode in="whiteBlur"/>
+      <feMergeNode in="whiteBlur2"/>
+      <feMergeNode in="whiteBlur2"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+ </defs>
+<g filter="url(#WhiteBlur)">
+<g transform="rotate(-45) translate(20 -20)" class="north"><path d="M 3 -3 L 14 -14"/></g>
+<g transform="rotate(45) translate(20 -20)" class="east"><path d="M 3 -3 L 14 -14"/></g>
+<g transform="rotate(135) translate(20 -20)" class="south"><path d="M 3 -3 L 14 -14"/></g>
+<g transform="rotate(-135) translate(20 -20)" class="west"><path d="M 3 -3 L 14 -14"/></g>
+<line class="X" x1="-35" y1="-40" x2="35" y2="40"/>
+<line class="X" x1="-35" y1="40" x2="35" y2="-40"/>
+</g>
+</svg>

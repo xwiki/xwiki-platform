@@ -1,0 +1,31 @@
+/**
+ * CSS for the location picker.
+ */
+#template('colorThemeInit.vm')
+
+.location-picker .breadcrumb {
+  /* Remove the margin so that the validation message is displayed right below the breadcrumb, for simple users.
+     For advanced users the .location-edit element that follows the breadcrumb has a top margin. */
+  margin-bottom: 0;
+}
+
+.location-actions {
+  float: right;
+  /* Use the same padding as the breadcrumb. */
+  padding: 8px 15px 0 15px;
+}
+
+.location-action {
+  /* Leave some space between the actions. */
+  margin-left: 3px;
+}
+.location-action:first-of-type {
+  margin-left: 0;
+}
+
+.location-edit {
+  /* Indent the advanced location edit fields under the breadcrumb. */
+  padding: 0 2em;
+  /* Leave some space after the breadcrumb and before the submit button. */
+  margin: 20px 0 2.5em 0;
+}

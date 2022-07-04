@@ -1,0 +1,40 @@
+.debug .jstree-anchor {
+  position: relative;
+  display: block;
+  padding-left: 25px;
+}
+
+.debug .jstree-icon.jstree-ocl {
+  position: absolute;
+  z-index: 1;
+}
+
+.debug .jstree-anchor .debug-percent-container {
+  top: 0;
+  right: 0;
+  width: 300px;
+  position: absolute;
+  right: 5px;
+  text-align: right;
+}
+
+.debug .jstree-anchor .debug-percent-bar {
+  background-color: #7cd4a2;
+  display: block;
+  height: 94%;
+  position: absolute;
+  top: 3%;
+  right: 0;
+}
+
+.debug .jstree-anchor .debug-percent {
+  z-index: 1;
+  position: relative;
+  display: block;
+  margin-right: 10px;
+  font-family: monospace;
+}
+
+.debug .jstree-anchor .debug-time {
+  color: #877676e6;
+}

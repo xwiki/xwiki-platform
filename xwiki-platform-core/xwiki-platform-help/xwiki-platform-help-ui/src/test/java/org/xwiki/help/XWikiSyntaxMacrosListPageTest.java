@@ -35,6 +35,10 @@ import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
+import org.xwiki.rendering.internal.renderer.xhtml.link.DocumentXHTMLLinkTypeRenderer;
+import org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver;
+import org.xwiki.rendering.internal.resolver.DocumentResourceReferenceEntityReferenceResolver;
+import org.xwiki.rendering.internal.wiki.XWikiWikiModel;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
@@ -48,6 +52,7 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
+import com.xpn.xwiki.DefaultSkinAccessBridge;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -76,9 +81,17 @@ import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.WIKI_MAC
     ControlCharactersFilter.class,
     // Start document initializer
     WikiMacroClassDocumentInitializer.class,
-    DefaultContextStoreManager.class
+    DefaultContextStoreManager.class,
     // End document initializer
-
+    // XWikiWikiModel is required to make 
+    // org.xwiki.rendering.internal.parser.reference.AbstractUntypedReferenceParser.parse work in "wiki mode".
+    // Start of XWikiWikiModel
+    XWikiWikiModel.class,
+    DefaultSkinAccessBridge.class,
+    DefaultResourceReferenceEntityReferenceResolver.class,
+    // End of XWikiWikiModel
+    DocumentXHTMLLinkTypeRenderer.class,
+    DocumentResourceReferenceEntityReferenceResolver.class
 })
 class XWikiSyntaxMacrosListPageTest extends PageTest
 {
@@ -96,7 +109,7 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
         macroObject.setStringValue(MACRO_VISIBILITY_PROPERTY, "WIKI");
         macroObject.setStringValue(MACRO_ID_PROPERTY, "mymacro");
         this.xwiki.saveDocument(mymacro, this.context);
-        
+
         QueryManagerScriptService queryManagerScriptService =
             this.componentManager.registerMockComponent(ScriptService.class, "query", QueryManagerScriptService.class,
                 false);
@@ -110,7 +123,6 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
         when(queryManagerScriptService.xwql(any())).thenReturn(query);
         when(query.execute()).thenReturn(List.of("xwiki:XWiki.MyMacro"));
         Document document = renderHTMLPage(DOCUMENT_REFERENCE);
-        // TODO: check content ok and test translations when they exists.
         Elements trs = document.select("tr");
         Element headersRow = trs.get(0);
         Elements headerThs = headersRow.select("th");
@@ -122,7 +134,7 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
         Element myMacroRow = trs.get(1);
         Elements myMacroRowTds = myMacroRow.select("td");
         assertEquals("mymacro", myMacroRowTds.get(0).text());
-        assertEquals("xwiki:XWiki.MyMacro", myMacroRowTds.get(0).select("a").attr("href"));
+        assertEquals("/xwiki/bin/view/XWiki/MyMacro", myMacroRowTds.get(0).select("a").attr("href"));
         assertEquals("My Macro", myMacroRowTds.get(1).text());
         assertEquals(Set.of("Category1", "Category2"), Arrays.stream(myMacroRowTds.get(2).text().split("\\s*,\\s*"))
             .collect(Collectors.toSet()));

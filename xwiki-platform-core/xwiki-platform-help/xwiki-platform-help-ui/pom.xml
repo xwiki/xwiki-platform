@@ -201,6 +201,12 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.xwiki.rendering</groupId>-->
+<!--      <artifactId>xwiki-rendering-test</artifactId>-->
+<!--      <version>${rendering.version}</version>-->
+<!--      <scope>test</scope>-->
+<!--    </dependency>-->
   </dependencies>
   <build>
     <plugins>

@@ -29,8 +29,10 @@ import org.xwiki.component.annotation.Role;
  *
  * @version $Id$
  * @since 9.2RC1
+ * @deprecated use {@link EventStore} instead
  */
 @Role
+@Deprecated(since = "14.6-rc-1")
 public interface EventStatusManager
 {
     /**
@@ -40,7 +42,9 @@ public interface EventStatusManager
      * @param entityIds a list of ids of entities (users and groups)
      * @return the list of statuses corresponding to each pair or event/entity
      * @throws Exception if an error occurs
+     * @deprecated use {@link EventStore#getEventStatuses(java.util.Collection, java.util.Collection)} instead
      */
+    @Deprecated(since = "14.6-rc-1")
     List<EventStatus> getEventStatus(List<Event> events, List<String> entityIds) throws Exception;
 
     /**

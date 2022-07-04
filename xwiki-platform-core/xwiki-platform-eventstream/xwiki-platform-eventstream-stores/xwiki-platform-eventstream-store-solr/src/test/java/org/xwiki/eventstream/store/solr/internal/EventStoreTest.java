@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -293,7 +294,7 @@ public class EventStoreTest
     }
 
     @Test
-    void saveDeleteEventStatuses() throws Exception
+    void eventStatuses() throws Exception
     {
         Date date0 = new Date(0);
         Date date10 = new Date(10);
@@ -368,6 +369,13 @@ public class EventStoreTest
         this.eventStore.saveEventStatus(status131);
         this.eventStore.saveEventStatus(status141);
         this.eventStore.saveEventStatus(status151).get();
+
+        assertEquals(List.of(), this.eventStore.getEventStatuses(List.of(EVENT1, EVENT2, EVENT3), List.of("entity6")));
+        assertEquals(
+            Set.of(eventstatus(EVENT1, "entity1", true), eventstatus(EVENT1, "entity2", false),
+                eventstatus(EVENT2, "entity1", false), eventstatus(EVENT3, "entity1", true)),
+            new HashSet<>(
+                this.eventStore.getEventStatuses(List.of(EVENT1, EVENT2, EVENT3), List.of("entity1", "entity2"))));
 
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().withStatus("entity2"));
 

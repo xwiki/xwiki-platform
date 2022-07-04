@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.useravatar;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -117,7 +118,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     public UserAvatarMacro()
     {
         super("User Avatar", DESCRIPTION, UserAvatarMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override

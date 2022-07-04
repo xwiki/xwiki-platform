@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.macro.office;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -89,7 +90,7 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
         super("Office Document Viewer", "View office attachments (doc, ppt, xls, odt, odp, ods etc.) inside "
             + "wiki pages without downloading or importing them.", OfficeMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override

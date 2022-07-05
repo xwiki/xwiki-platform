@@ -41,8 +41,7 @@ public interface PDFExportConfiguration
 
     /**
      * @return the name of the Docker container running the headless Chrome web browser used to print web pages to PDF;
-     *         this is also used as a network-scoped alias for the container; defaults to
-     *         "{@code headless-chrome-pdf-printer}"
+     *         defaults to "{@code headless-chrome-pdf-printer}"
      */
     String getChromeDockerContainerName();
 
@@ -85,4 +84,17 @@ public interface PDFExportConfiguration
      *         {@link #getDockerNetwork()};
      */
     String getXWikiHost();
+
+    /**
+     * @return {@code true} if the PDF export should be performed server-side, e.g. using a headless Chrome web browser
+     *         running inside a Docker container, {@code false} if the user's web browser should be used instead;
+     *         defaults to server-side PDF generation
+     * @since 14.4.3
+     * @since 14.5.1
+     * @since 14.6RC1
+     */
+    default boolean isServerSide()
+    {
+        return true;
+    }
 }

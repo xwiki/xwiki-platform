@@ -385,7 +385,7 @@ require([
     exportButton.prependTo('#exportModalOtherCollapse .export-buttons');
 
     // Remove the accordion if the Office category is empty.
-    if (!$('#exportModelOfficeCollapse .pane-body').children().length) {
+    if (!$('#exportModelOfficeCollapse .panel-body').children().length) {
       // We need to keep the '#exportModalOtherCollapse' element because it is used by exporter.js
       $('#exportModalAccordion').replaceWith($('#exportModalOtherCollapse'));
       $('#exportModalOtherCollapse').attr({

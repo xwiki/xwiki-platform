@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -41,6 +42,7 @@ import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPrefere
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -196,16 +198,30 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     }
 
     private void identifyRemovedUsers(Map<String, Boolean> usersStatus,
-        DefaultNotificationFilterPreference filterPreference)
+        DefaultNotificationFilterPreference filterPreference) throws DataMigrationException
     {
         String owner = filterPreference.getOwner();
+
+        // Store the potential exception thrown inside computeIfAbsent, since assigning to a variable is not allowed.
+        AtomicReference<Exception> exception = new AtomicReference<>();
         usersStatus.computeIfAbsent(owner, key -> {
             DocumentReference entityReference = this.resolver.resolve(key);
             UserReference userReference =
                 this.documentReferenceUserReferenceResolver.resolve(entityReference);
 
-            return this.userManager.exists(userReference);
+            try {
+                return this.userManager.exists(userReference);
+            } catch (UserException e) {
+                exception.set(e);
+                return null;
+            }
         });
+
+        // If the exception store has been set, propagate the exception to make the migration fail.
+        if (exception.get() != null) {
+            throw new DataMigrationException(
+                String.format("Failed to identify if the owner of [%s] exists.", filterPreference), exception.get());
+        }
     }
 
     private boolean isMainWiki()

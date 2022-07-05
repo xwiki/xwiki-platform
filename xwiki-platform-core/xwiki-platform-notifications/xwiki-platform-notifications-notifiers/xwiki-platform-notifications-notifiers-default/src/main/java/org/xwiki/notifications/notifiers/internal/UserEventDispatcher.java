@@ -52,6 +52,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -280,7 +281,7 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
         }
     }
 
-    private void dispatchInContext(Event event)
+    private void dispatchInContext(Event event) throws UserException
     {
         WikiReference eventWiki = event.getWiki();
 
@@ -288,7 +289,7 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
             // The event explicitly indicate with which entities to associated it
 
             boolean mailEnabled = this.notificationConfiguration.areEmailsEnabled();
-            event.getTarget().forEach(entity -> {
+            for (String entity : event.getTarget()) {
                 DocumentReference entityReference = this.resolver.resolve(entity, event.getWiki());
                 UserReference userReference = this.documentReferenceUserReferenceResolver.resolve(entityReference);
 
@@ -306,7 +307,7 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
                 }
                 // Remember we are done pre filtering this event
                 this.events.prefilterEvent(event);
-            });
+            }
         } else {
             // Try to find users listening to this event
 

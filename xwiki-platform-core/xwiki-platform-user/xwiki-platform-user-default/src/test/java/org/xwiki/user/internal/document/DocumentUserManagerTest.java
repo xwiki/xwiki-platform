@@ -31,6 +31,7 @@ import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserException;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -40,10 +41,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import ch.qos.logback.classic.Level;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -129,10 +129,11 @@ class DocumentUserManagerTest
         when(xwiki.getDocument(reference, xcontext)).thenThrow(new XWikiException(0, 0, "error"));
         when(this.wikiDescriptorManager.exists("wiki")).thenReturn(true);
 
-        assertFalse(this.userManager.exists(new DocumentUserReference(reference, true)));
-
-        assertEquals("Failed to check if document [wiki:space.user] holds an XWiki user or not. Considering it's not "
-            + "the case. Root error: [XWikiException: Error number 0 in 0: error]", this.logCapture.getMessage(0));
+        DocumentUserReference userReference = new DocumentUserReference(reference, true);
+        UserException userException = assertThrows(UserException.class, () -> this.userManager.exists(userReference));
+        assertEquals("Failed to check if document [wiki:space.user] holds an XWiki user or not. ",
+            userException.getMessage());
+        assertEquals(XWikiException.class, userException.getCause().getClass());
     }
 
     @Test
@@ -156,9 +157,9 @@ class DocumentUserManagerTest
         when(this.contextProvider.get()).thenReturn(xcontext);
         when(this.wikiDescriptorManager.exists("wiki")).thenThrow(WikiManagerException.class);
         DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        assertFalse(this.userManager.exists(new DocumentUserReference(reference, true)));
-        assertEquals("Failed to determine if wiki [wiki] exists. Considering it's not the case. " 
-                + "Cause: [WikiManagerException: ]", this.logCapture.getMessage(0));
-        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        DocumentUserReference userReference = new DocumentUserReference(reference, true);
+        UserException userException = assertThrows(UserException.class, () -> this.userManager.exists(userReference));
+        assertEquals("Failed to determine if wiki [wiki] exists.", userException.getMessage());
+        assertEquals(WikiManagerException.class, userException.getCause().getClass());
     }
 }

@@ -31,6 +31,10 @@
   <name>XWiki Platform - Distribution - War - Dependencies</name>
   <packaging>pom</packaging>
   <description>The dependencies of the WAR as a separate pom to be reusable in other distributions.</description>
+  <properties>
+    <!-- TODO: remove when https://jira.xwiki.org/browse/XWIKI-19932 is fixed -->
+    <xwiki.enforcer.no-legacy-dependencies.exclude>.*xwiki.*:.*-legacy-(?!events-hibernate-api).*</xwiki.enforcer.no-legacy-dependencies.exclude>
+  </properties>
   <dependencies>
     <!-- ********************************************************************** -->
     <!-- Depend on the minimal WAR -->
@@ -655,6 +659,17 @@
       <artifactId>xwiki-platform-diffplugin</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+
+    <!-- TODO: remove when https://jira.xwiki.org/browse/XWIKI-19932 is fixed
+        In the non-legacy WAR because:
+           * the migration UI is in part of the default flavor
+           * it's currently too complex for installed extensions to inject tables
+     -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-events-hibernate-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- ********************************************************************** -->

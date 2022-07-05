@@ -37,6 +37,15 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+## If the translation key exists, use its value, otherwise use to the provided fallback value. 
+#macro (translateOrElse $translationKey $fallback)
+ #if($services.localization.get($translationKey))
+    $services.rendering.escape($services.localization.render($translationKey), 'xwiki/2.1')##
+  #else
+    $fallback##
+  #end
+#end
+
 ## Find all wiki macros sp that we can find if a registered macro is a wiki macro
 #set ($wikiMacroDocuments = $services.query.xwql("from doc.object(XWiki.WikiMacroClass) as macros").execute())
 #set ($wikiMacroMap = {})
@@ -53,29 +62,17 @@
     #set ($displayVisibility = $wikiMacroData.get(1))
   #else
     #set ($displayId = $descriptor.id)
-    #set ($displayVisibility = "Global")
+    #set ($displayVisibility = $services.localization.render('XWiki.WikiMacroClass_visibility_Global'))
   #end
   |$displayId|##
-  #if($services.localization.get("rendering.macro.${descriptor.id.id}.name"))
-    $services.localization.render("rendering.macro.${descriptor.id.id}.name")##
-  #else
-    $descriptor.name##
-  #end
+  #translateOrElse("rendering.macro.${descriptor.id.id}.name", $descriptor.name)
   |##
   #foreach($category in $services.rendering.getMacroCategories($descriptor.id))
     #if($foreach.index&gt;0), #end##
-    #if($services.localization.get("rendering.macroCategory.$category"))
-      $services.localization.render("rendering.macroCategory.$category")##
-    #else
-      $category##
-    #end
+    #translateOrElse("rendering.macroCategory.$category", $category)
   #end##
   |##
-  #if($services.localization.get("rendering.macro.${descriptor.id.id}.description"))
-    $services.localization.render("rendering.macro.${descriptor.id.id}.description")##
-  #else
-    $descriptor.description##
-  #end
+  #translateOrElse("rendering.macro.${descriptor.id.id}.description", $descriptor.description)
   |$displayVisibility
 #end
 {{/velocity}}</content>

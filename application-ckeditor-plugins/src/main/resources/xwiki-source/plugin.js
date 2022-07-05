@@ -60,7 +60,8 @@
         htmlConverter: sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.HTMLConverter',
           outputSyntax: 'plain',
-          language: $('html').attr('lang') || ''
+          language: $('html').attr('lang') || '',
+          formToken: document.documentElement.dataset.xwikiFormToken || ''
         }))
       }, editor.config['xwiki-source']);
 

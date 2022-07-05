@@ -41,7 +41,7 @@
 {{velocity wiki="false"}}
 #set ($toHTML = $request.toHTML == 'true')
 #set ($fromHTML = $request.fromHTML == 'true')
-#if ($toHTML || $fromHTML)
+#if (($toHTML || $fromHTML) &amp;&amp; $services.csrf.isTokenValid($request.formToken))
   #set ($text = "$!request.text")
   #set ($stripHTMLEnvelope = $request.stripHTMLEnvelope == 'true')
   #set ($output = "#ckeditor_convert($text $toHTML $fromHTML $stripHTMLEnvelope)")

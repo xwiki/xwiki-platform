@@ -34,6 +34,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.context.concurrent.ContextStoreManager;
+import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -84,6 +85,9 @@ class DefaultPDFExportJobRequestFactoryTest
 
     @MockComponent
     private ContextStoreManager contextStoreManager;
+
+    @MockComponent
+    private PDFExportConfiguration configuration;
 
     @Mock
     private XWikiContext xcontext;
@@ -153,6 +157,7 @@ class DefaultPDFExportJobRequestFactoryTest
 
         assertEquals(3, request.getId().size());
         assertEquals(Arrays.asList("export", "pdf"), request.getId().subList(0, 2));
+        assertFalse(request.isServerSide());
 
         assertTrue(request.isCheckRights());
         assertEquals(aliceReference, request.getUserReference());
@@ -177,6 +182,8 @@ class DefaultPDFExportJobRequestFactoryTest
     @Test
     void createRequestWithDefaultTemplate() throws Exception
     {
+        when(this.configuration.isServerSide()).thenReturn(true);
+
         DocumentReference templateReference =
             new DocumentReference("test", Arrays.asList("XWiki", "PDFExport"), "Template");
         when(this.currentDocumentReferenceResolver.resolve("XWiki.PDFExport.Template")).thenReturn(templateReference);
@@ -185,6 +192,7 @@ class DefaultPDFExportJobRequestFactoryTest
             eq("test"), same(this.xcontext))).thenReturn(new URL("https://www.xwiki.org"));
 
         PDFExportJobRequest request = this.requestFactory.createRequest();
+        assertTrue(request.isServerSide());
         assertEquals(templateReference, request.getTemplate());
     }
 }

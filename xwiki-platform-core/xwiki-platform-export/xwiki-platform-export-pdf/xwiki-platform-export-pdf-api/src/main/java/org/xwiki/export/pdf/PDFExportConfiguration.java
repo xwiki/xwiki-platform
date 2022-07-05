@@ -41,8 +41,7 @@ public interface PDFExportConfiguration
 
     /**
      * @return the name of the Docker container running the headless Chrome web browser used to print web pages to PDF;
-     *         this is also used as a network-scoped alias for the container; defaults to
-     *         "{@code headless-chrome-pdf-printer}"
+     *         defaults to "{@code headless-chrome-pdf-printer}"
      */
     String getChromeDockerContainerName();
 

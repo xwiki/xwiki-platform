@@ -269,7 +269,7 @@ public class UserEventDispatcher implements Disposable
         WikiReference eventWiki = event.getWiki();
 
         if (CollectionUtils.isNotEmpty(event.getTarget())) {
-            // The event explicitly indicate with which entities to associated it
+            // The event explicitly indicate with which entities the event is associated with
 
             boolean mailEnabled = this.notificationConfiguration.areEmailsEnabled();
             event.getTarget().forEach(entity -> {
@@ -288,9 +288,10 @@ public class UserEventDispatcher implements Disposable
                             ExceptionUtils.getRootCauseMessage(e));
                     }
                 }
-                // Remember we are done pre filtering this event
-                this.events.prefilterEvent(event);
             });
+
+            // Remember we are done pre filtering this event
+            this.events.prefilterEvent(event);
         } else {
             // Try to find users listening to this event
 

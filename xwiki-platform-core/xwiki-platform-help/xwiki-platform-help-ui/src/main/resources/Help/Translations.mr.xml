@@ -47,7 +47,18 @@ help.tipsPanel.linkAutocompleteWYSIWYGTip=WYSIWYG मध्ये संपा�
 help.macroList.title=उपलब्ध मॅक्रो
 help.macroList.id=आयडी
 help.macroList.name=नाव
-help.macroList.category=वर्ग
 help.macroList.description=वर्णन
-help.macroList.visibility=दृश्यमानता</content>
+help.macroList.visibility=दृश्यमानता
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=वर्ग
+
+#@deprecatedend</content>
 </xwikidoc>

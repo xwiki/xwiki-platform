@@ -51,6 +51,11 @@ help.macroList.categories=Categories
 help.macroList.description=Description
 help.macroList.visibility=Visibility
 
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+############################################################################### 
+
 #@deprecatedstart
 
 ## until 14.6RC1

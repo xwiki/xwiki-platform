@@ -24,54 +24,17 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-dashboard</artifactId>
+    <artifactId>xwiki-platform-ckeditor-test</artifactId>
     <version>14.6-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-dashboard-ui</artifactId>
-  <name>XWiki Platform - Dashboard - UI</name>
-  <packaging>xar</packaging>
-  <description>Dashboard Application</description>
-  <properties>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Dashboard Application</xwiki.extension.name>
-  </properties>
+  <artifactId>xwiki-platform-ckeditor-test-pageobjects</artifactId>
+  <name>XWiki Platform - CKEditor - Tests - Page Objects</name>
+  <packaging>jar</packaging>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-dashboard-macro</artifactId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-index-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <!-- Required for the Macro Wizard that is used by the Gadget Wizard. -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
-        <configuration>
-          <entries>
-            <entry>
-              <document>Dashboard.WebHome</document>
-              <type>customizable</type>
-            </entry>
-          </entries>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

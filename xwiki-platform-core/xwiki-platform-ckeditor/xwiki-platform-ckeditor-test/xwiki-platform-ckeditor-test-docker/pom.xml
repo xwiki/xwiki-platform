@@ -24,60 +24,34 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-edit-test</artifactId>
+    <artifactId>xwiki-platform-ckeditor-test</artifactId>
     <version>14.6-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-edit-test-docker</artifactId>
-  <name>XWiki Platform - Edit - Tests - Functional Docker Tests</name>
+  <artifactId>xwiki-platform-ckeditor-test-docker</artifactId>
+  <name>XWiki Platform - CKEditor - Tests - Docker</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see https://jira.xwiki.org/browse/XWIKI-7683 -->
+       see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
-  <description>Docker-based functional tests for the Edit module.</description>
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-rendering-macro-include</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
-    <!-- ================================
-         Dependencies for tested features
-         ================================ -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-edit-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <!-- We need a WYSIWYG editor implementation in order to activate the in-place editing. -->
+    <!-- Dependencies for tested features. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-ckeditor-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- Used to verify that annotations don't break in-place editing. -->
     <dependency>
+      <!-- We need this to test the syntax change from the Document Information panel. -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-annotation-ui</artifactId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- ================================
-         Test only dependencies
-         ================================ -->
+    <!-- Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-docker</artifactId>
@@ -86,13 +60,13 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-edit-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-ckeditor-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-annotation-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

@@ -23,46 +23,28 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.contrib</groupId>
-    <artifactId>parent-platform</artifactId>
-    <version>13.10</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-core</artifactId>
+    <version>14.6-SNAPSHOT</version>
   </parent>
-  <artifactId>application-ckeditor-pom</artifactId>
+  <artifactId>xwiki-platform-ckeditor</artifactId>
   <packaging>pom</packaging>
-  <name>CKEditor Integration Parent POM</name>
-  <version>1.64.3-SNAPSHOT</version>
+  <name>XWiki Platform - CKEditor - Parent POM</name>
   <description>Adds support for editing wiki pages using CKEditor.</description>
-  <developers>
-    <developer>
-      <id>mflorea</id>
-      <name>Marius Dumitru Florea</name>
-    </developer>
-  </developers>
-  <scm>
-    <connection>scm:git:git://github.com/xwiki-contrib/application-ckeditor.git</connection>
-    <developerConnection>scm:git:git@github.com:xwiki-contrib/application-ckeditor.git</developerConnection>
-    <url>https://github.com/xwiki-contrib/application-ckeditor/tree/master</url>
-    <tag>HEAD</tag>
-  </scm>
+  <modules>
+    <module>xwiki-platform-ckeditor-base</module>
+    <module>xwiki-platform-ckeditor-plugins</module>
+    <module>xwiki-platform-ckeditor-test</module>
+    <module>xwiki-platform-ckeditor-ui</module>
+    <module>xwiki-platform-ckeditor-webjar</module>
+  </modules>
   <properties>
-    <minimum.commons.version>8.4</minimum.commons.version>
-    <minimum.rendering.version>${minimum.commons.version}</minimum.rendering.version>
-    <minimum.platform.version>${minimum.commons.version}</minimum.platform.version>
     <ckeditor.version>4.19.0</ckeditor.version>
 
     <!-- The path to the folder where we clone the CKEditor sources. -->
     <ckeditor.path>${project.build.directory}/ckeditor4-${ckeditor.version}</ckeditor.path>
     <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>
     <ckeditor.plugins.path>${ckeditor.path}/plugins</ckeditor.plugins.path>
-
-    <!-- Disabled the enforcer because it complain about a lot of dependencies which are supposed
-         to be avoided in more recent versions of XWiki -->
-    <xwiki.enforcer.skip>true</xwiki.enforcer.skip>
-    <xwiki.enforcer.enforce-plugins.skip>false</xwiki.enforcer.enforce-plugins.skip>
-
-    <xwiki.issueManagement.jira.id>CKEDITOR</xwiki.issueManagement.jira.id>
-    <!-- Release automatically on JIRA when performing the Maven release. -->
-    <xwiki.release.jira.skip>false</xwiki.release.jira.skip>
   </properties>
   <build>
     <pluginManagement>
@@ -178,66 +160,9 @@
             </execution>
           </executions>
         </plugin>
-        <!-- We want to build the tests module but we don't want to run actual test during releases -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <arguments>-Pintegration-tests -DskipTests=true</arguments>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <!-- Verify that all org.xwiki.commons dependencies have a version specified either as:
-               - ${commons.version}
-               - ${minimum.commons.version}
-               Also verifies that all org.xwiki.rendering dependencies have a version specified either as:
-               - ${rendering.version}
-               - ${minimum.rendering.version}
-               Also verifies that all org.xwiki.platform dependencies have a version specified either as:
-               - ${platform.version}
-               - ${minimum.rendering.version}
-          -->
-          <execution>
-            <id>check-dependency-version</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.ValidateDependencyVersion">
-                  <versionCheck>
-                    <groupIdPrefix>org.xwiki.commons</groupIdPrefix>
-                    <allowedVersionRegex>\$\{commons.version\}|\$\{minimum.commons.version\}</allowedVersionRegex>
-                  </versionCheck>
-                  <versionCheck>
-                    <groupIdPrefix>org.xwiki.rendering</groupIdPrefix>
-                    <allowedVersionRegex>\$\{rendering.version\}|\$\{minimum.rendering.version\}</allowedVersionRegex>
-                  </versionCheck>
-                  <versionCheck>
-                    <groupIdPrefix>org.xwiki.platform</groupIdPrefix>
-                    <allowedVersionRegex>\$\{platform.version\}|\$\{minimum.platform.version\}</allowedVersionRegex>
-                  </versionCheck>
-                </validateDependencyVersion>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
   </build>
-  <modules>
-    <module>application-ckeditor-runtime</module>
-    <module>application-ckeditor-base</module>
-    <module>application-ckeditor-plugins</module>
-    <module>application-ckeditor-ui</module>
-    <module>application-ckeditor-webjar</module>
-  </modules>
   <profiles>
     <profile>
       <id>unix</id>
@@ -304,7 +229,7 @@
     <profile>
       <id>integration-tests</id>
       <modules>
-        <module>application-ckeditor-test</module>
+        <module>xwiki-platform-ckeditor-test</module>
       </modules>
     </profile>
   </profiles>

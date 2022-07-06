@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.notifiers.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -213,30 +214,49 @@ public class UserEventDispatcher implements Disposable
         // Create a search request for events produced by the current instance which haven't been pre-filtered yet
         SimpleEventQuery query = new SimpleEventQuery();
         // Only events which haven't been pre-filtered already
-        query.eq(org.xwiki.eventstream.Event.FIELD_PREFILTERED, false);
+        query.eq(Event.FIELD_PREFILTERED, false);
         query.open();
         // Events produced by this instance
-        query.eq(org.xwiki.eventstream.Event.FIELD_REMOTE_OBSERVATION_ID, this.remoteObservation.getId());
+        query.eq(Event.FIELD_REMOTE_OBSERVATION_ID, this.remoteObservation.getId());
         query.or();
         // Or some old events not containing the remote observation id (or some other reason causing it to be null)
-        query.eq(org.xwiki.eventstream.Event.FIELD_REMOTE_OBSERVATION_ID, null);
+        query.eq(Event.FIELD_REMOTE_OBSERVATION_ID, null);
         query.close();
         // Start by oldest events
-        query.addSort(org.xwiki.eventstream.Event.FIELD_DATE, Order.ASC);
+        query.addSort(Event.FIELD_DATE, Order.ASC);
+        // Limit the result to BATCH_SIZE events to not impact the memory too much
         query.setLimit(BATCH_SIZE);
 
+        // Events to ignore
+        List<String> failedEvents = new ArrayList<>();
+        query.not().in(Event.FIELD_ID, failedEvents);
+
+        // Keep getting the BATCH_SIZE oldest not pre-filtered events (except the failed ones) until we cannot find any
+        // left
         do {
             try (EventSearchResult result = this.events.search(query)) {
-                result.stream().forEach(event -> prefilterEvent(event, types));
-
                 if (result.getSize() == 0) {
                     break;
+                }
+
+                // Pre-filter all the found events
+                Iterable<Event> it = () -> result.stream().iterator();
+                for (Event event : it) {
+                    try {
+                        prefilterEvent(event, types);
+                    } catch (Exception e) {
+                        this.logger.warn("Failed to pre filter event with id [{}]: {}", event.getId(),
+                            ExceptionUtils.getRootCauseMessage(e));
+
+                        // Remember the failed event to not query it again
+                        failedEvents.add(event.getId());
+                    }
                 }
             }
         } while (true);
     }
 
-    private void prefilterEvent(Event event, Set<String> types)
+    private void prefilterEvent(Event event, Set<String> types) throws EventStreamException, GroupException
     {
         if (types.contains(event.getType())) {
             dispatch(event);
@@ -251,31 +271,28 @@ public class UserEventDispatcher implements Disposable
      * users.
      * 
      * @param event the event to associate with the user
+     * @throws EventStreamException when failing to pre filter the event
+     * @throws GroupException when failing to resolve a target group
      */
-    private void dispatch(Event event)
+    private void dispatch(Event event) throws EventStreamException, GroupException
     {
         // Keeping the same ExecutionContext forever can lead to memory leak and cache problems since
-        // most
-        // of the code expect it to be short lived
+        // most of the code expect it to be short lived
         try {
             this.ecm.pushContext(new ExecutionContext(), false);
         } catch (ExecutionContextException e) {
-            this.logger.error("Failed to push a new execution context for event [{}]", event.getId(), e);
-
-            return;
+            throw new EventStreamException("Failed to push a new execution context", e);
         }
 
         try {
             dispatchInContext(event);
-        } catch (Exception e) {
-            this.logger.error("Unexpected exception has been raised while dispatching event [{}]", event.getId(), e);
         } finally {
             // Get rid of current context
             this.ecm.popContext();
         }
     }
 
-    private void dispatchInContext(Event event)
+    private void dispatchInContext(Event event) throws GroupException
     {
         WikiReference eventWiki = event.getWiki();
 
@@ -283,7 +300,7 @@ public class UserEventDispatcher implements Disposable
             // The event explicitly indicate with which entities the event is associated with
 
             boolean mailEnabled = this.notificationConfiguration.areEmailsEnabled();
-            event.getTarget().forEach(entity -> {
+            for (String entity : event.getTarget()) {
                 DocumentReference entityReference = this.resolver.resolve(entity, event.getWiki());
                 UserReference userReference = this.documentReferenceUserReferenceResolver.resolve(entityReference);
 
@@ -291,15 +308,12 @@ public class UserEventDispatcher implements Disposable
                     dispatch(event, entityReference, mailEnabled);
                 } else {
                     // Also recursively associate the members of the entity if it's a group
-                    try {
-                        this.groupManager.getMembers(entityReference, true)
-                            .forEach(userDocumentReference -> dispatch(event, userDocumentReference, mailEnabled));
-                    } catch (GroupException e) {
-                        this.logger.warn("Failed to get the member of the entity [{}]: {}", entity,
-                            ExceptionUtils.getRootCauseMessage(e));
+                    for (DocumentReference userDocumentReference : this.groupManager.getMembers(entityReference,
+                        true)) {
+                        dispatch(event, userDocumentReference, mailEnabled);
                     }
                 }
-            });
+            }
 
             // Remember we are done pre filtering this event
             this.events.prefilterEvent(event);

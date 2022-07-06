@@ -48,11 +48,8 @@ import static org.xwiki.platform.notifications.test.po.NotificationsTrayPage.wai
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
-        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
         // The Solr store is not ready yet to be installed as extension
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
         // Required to ensure that the notifications rest endpoints are registered before XWikiJaxRsApplication is 

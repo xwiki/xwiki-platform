@@ -135,7 +135,7 @@
       #set ($authorReference = $services.model.resolveDocument($attachment.author))
       #set ($discard = $row.putAll({
         'mimeType': "#displayAttachmentMimeType($attachment)",
-        'filesize': "#displayAttachmentSize($attachment)",
+        'filesize': "#displayAttachmentSize($attachment.longSize)",
         'date': $xwiki.formatDate($attachment.date),
         'author': "#displayUserNameWithAvatar($attachment.author)"
       }))

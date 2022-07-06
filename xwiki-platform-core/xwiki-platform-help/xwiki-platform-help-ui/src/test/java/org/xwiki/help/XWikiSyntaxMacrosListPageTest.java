@@ -158,20 +158,20 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
         assertEquals("Velocity", velocityMacroRowTds.get(1).text());
         assertEquals("Development", velocityMacroRowTds.get(2).text());
         assertEquals("Executes a Velocity script.", velocityMacroRowTds.get(3).text());
-        assertEquals("Global", velocityMacroRowTds.get(4).text());
+        assertEquals("XWiki.WikiMacroClass_visibility_Global", velocityMacroRowTds.get(4).text());
         Element htmlMacroRow = trs.get(3);
         Elements htmlMacroRowTds = htmlMacroRow.select("td");
         assertEquals("html", htmlMacroRowTds.get(0).text());
         assertEquals("HTML", htmlMacroRowTds.get(1).text());
         assertEquals("Development", htmlMacroRowTds.get(2).text());
         assertEquals("Inserts HTML or XHTML code into the page.", htmlMacroRowTds.get(3).text());
-        assertEquals("Global", htmlMacroRowTds.get(4).text());
+        assertEquals("XWiki.WikiMacroClass_visibility_Global", htmlMacroRowTds.get(4).text());
         Element includeMacroRow = trs.get(4);
         Elements includeMacroRowTds = includeMacroRow.select("td");
         assertEquals("include", includeMacroRowTds.get(0).text());
         assertEquals("Include", includeMacroRowTds.get(1).text());
         assertEquals("Content", includeMacroRowTds.get(2).text());
         assertEquals("Include other pages into the current page.", includeMacroRowTds.get(3).text());
-        assertEquals("Global", includeMacroRowTds.get(4).text());
+        assertEquals("XWiki.WikiMacroClass_visibility_Global", includeMacroRowTds.get(4).text());
     }
 }

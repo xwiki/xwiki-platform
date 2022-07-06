@@ -213,7 +213,7 @@
       }))
       #set ($deleteURL = $xwiki.getURL($attachment.getReference(), 'delattachment', $queryString))
       <a class="actiondelete action" title="$escapetool.xml($services.localization.render(
-          'core.viewers.attachments.delete.title', [$attachment.filename]))" href="$escapetool.xml($deleteURL#)">
+          'core.viewers.attachments.delete.title', [$attachment.filename]))" href="$escapetool.xml($deleteURL)">
         <span class="action-icon">$services.icon.renderHTML('cross')</span><span class="action-label">$escapetool.xml(
           $services.localization.render('core.viewers.attachments.delete'))
         </span>
@@ -253,13 +253,23 @@
   #set ($javascriptName = $livetableId + 'Livetable')
   #set ($columns = ['mimeType', 'filename', 'filesize', 'date', 'author', 'actions'])
   #set ($columnsProperties = {
-    'mimeType': {'type': 'list', "html": true, 'class': 'XWiki.AllAttachments'},
     'filename': {'type': 'text', 'html': true},
-    'filesize': {'type': 'list', 'html': true,  'class': 'XWiki.AllAttachments'},
     'date': {'type': 'date'},
     'author': {'type': 'text', 'html': true},
     'actions': {'sortable': false,'filterable': false,'html': true}
   })
+  #if ($xwiki.exists('XWiki.AllAttachments'))
+    #set ($discard = $columnsProperties.putAll({
+      'mimeType': {'type': 'list', 'html': true, 'class': 'XWiki.AllAttachments'},
+      'filesize': {'type': 'list', 'html': true, 'class': 'XWiki.AllAttachments'}
+    }))
+  #else
+    ## When the class cannot be used, fallback to other filtering options, as appropriate by case.
+    #set ($discard = $columnsProperties.putAll({
+      'mimeType': {'type': 'text', 'html': true},
+      'filesize': {'html': true, 'filterable': false}
+    }))
+  #end
   #set ($options = {
     'translationPrefix': 'core.viewers.attachments.livetable.',
     'url': $attachmentsDoc.getURL('get', "xpage=xpart&vm=attachmentsjson.vm"),

@@ -21,11 +21,13 @@ package org.xwiki.test.ui.po;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -215,7 +217,7 @@ public class LiveTableElement extends BaseElement
     }
 
     /**
-     * Get the row index of an element.
+     * Get the row index of an element, relative to the number of currently displayed rows.
      *
      * @param by the selector of the searched element
      * @return the row index where the element was found
@@ -226,8 +228,11 @@ public class LiveTableElement extends BaseElement
     {
         WebElement livetableRowElement =
             getDriver().findElement(By.xpath("//tbody[@id='" + this.livetableId + "-display']/tr/td")).findElement(by);
-        return Integer
-            .parseInt(livetableRowElement.findElement(By.xpath("./ancestor::tr[1]")).getAttribute("data-index"));
+        if (livetableRowElement.isDisplayed()) {
+            // Count the preceding rows.
+            return livetableRowElement.findElements(By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
+        }
+        return 0;
     }
 
     /**
@@ -399,6 +404,20 @@ public class LiveTableElement extends BaseElement
     {
         WebElement rowElement = getRow(rowNumber);
         rowElement.findElement(By.xpath("td/form//input[@name = '" + actionName + "']")).click();
+    }
+
+    /**
+     * @return the Next Page arrow element, or an empty optional if the element is not enabled
+     * @since 14.6RC1
+     */
+    public Optional<WebElement> getNextPageElement()
+    {
+        try {
+            return Optional.of(getDriver().findElement(By.xpath("//table[@id='" + this.livetableId
+                + "']//td[contains(@class, 'xwiki-livetable-pagination')]//a[contains(@class, 'nextPagination')]")));
+        } catch (NoSuchElementException e) {
+            return Optional.empty();
+        }
     }
 
     private WebElement getHeaderByColumnTitle(String columnTitle)

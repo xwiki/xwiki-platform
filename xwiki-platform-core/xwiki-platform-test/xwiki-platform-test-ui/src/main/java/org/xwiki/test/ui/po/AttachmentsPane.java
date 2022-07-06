@@ -56,7 +56,7 @@ public class AttachmentsPane extends BaseElement
     private static final List<String> LIVETABLE_COLUMNS =
         Arrays.asList("mimeType", "filename", "filesize", "date", "author");
 
-    AttachmentsPane()
+    public AttachmentsPane()
     {
         this.livetableId = "docAttachments";
         this.attachmentsLivetable = new LiveTableElement(this.livetableId);
@@ -64,7 +64,7 @@ public class AttachmentsPane extends BaseElement
 
     /**
      * @param livetableId the id of the attachments livetable
-     * @since 14.3RC1
+     * @since 14.6RC1
      */
     public AttachmentsPane(String livetableId)
     {
@@ -80,7 +80,7 @@ public class AttachmentsPane extends BaseElement
     /**
      * Wait for the attachments livetable to be ready.
      *
-     * @since 14.3RC1
+     * @since 14.6RC1
      */
     public void waitForAttachmentsLivetable()
     {
@@ -139,7 +139,7 @@ public class AttachmentsPane extends BaseElement
      *
      * @param attachmentName the name of the attachment
      * @return the row index of the searched attachment
-     * @since 14.3RC1
+     * @since 14.6RC1
      */
     public int getRowIndexByAttachmentName(String attachmentName)
     {
@@ -151,7 +151,7 @@ public class AttachmentsPane extends BaseElement
      *
      * @param positionNumber the index of the attachment in the livetable
      * @return the filename of the attachment
-     * @since 14.3RC1
+     * @since 14.6RC1
      */
     public String getAttachmentNameByPosition(int positionNumber)
     {
@@ -206,7 +206,6 @@ public class AttachmentsPane extends BaseElement
     public void deleteFirstAttachment()
     {
         // We initialize before so we can remove the animation before the modal is shown
-        // this.confirmDelete = new ConfirmationModal(By.id("deleteAttachment"));
         this.confirmDelete = new ConfirmationModal(By.xpath(".//table[@id='" + this.livetableId
             + "']/parent::div/following-sibling::div[contains(@class, 'deleteAttachment')]"));
         WebElement deleteButton = this.attachmentsLivetable.getCell(1, 6).findElement(By.className("actiondelete"));
@@ -241,7 +240,7 @@ public class AttachmentsPane extends BaseElement
      * Get the number of displayed attachments, regardless of the total number.
      *
      * @return the number of attachments displayed.
-     * @since 14.3RC1
+     * @since 14.6RC1
      */
     public int getNumberOfAttachmentsDisplayed()
     {
@@ -298,7 +297,13 @@ public class AttachmentsPane extends BaseElement
         return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 4).getText();
     }
 
-    public boolean attachmentExistsByFileName(String attachmentName)
+    /**
+     * Check if the attachment exists for the currently displayed rows.
+     *
+     * @param attachmentName the name of the searched attachment
+     * @return whether the attachment exists or not in the list of currently displayed attachments
+     */
+    public boolean attachmentIsDisplayedByFileName(String attachmentName)
     {
         try {
             getDriver().findElement(By
@@ -307,6 +312,27 @@ public class AttachmentsPane extends BaseElement
             return false;
         }
         return true;
+    }
+
+    /**
+     * Check if the attachment exists, regardless of the page where it is displayed.
+     *
+     * @param attachmentName the name of the searched attachment
+     * @return whether the attachments exists or not in the list of all attachments
+     */
+    public boolean attachmentExistsByFileName(String attachmentName)
+    {
+        while (!this.attachmentIsDisplayedByFileName(attachmentName)
+            && attachmentsLivetable.getNextPageElement().get() != null) {
+            attachmentsLivetable.getNextPageElement().get().click();
+        }
+        return this.attachmentIsDisplayedByFileName(attachmentName);
+    }
+
+    public WebElement getAttachmentMoveElement(String attachmentName)
+    {
+        return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 6)
+            .findElement(By.className("move-attachment"));
     }
 
     private WebElement getAttachmentVersionElement(String attachmentName)
@@ -320,7 +346,7 @@ public class AttachmentsPane extends BaseElement
      *
      * @param columnLabel the label of the column to filter
      * @param filterValue the value to filter by
-     * @since 14.3RC1
+     * @since 14.6RC1
      */
     public void filterColumn(String columnLabel, String filterValue)
     {

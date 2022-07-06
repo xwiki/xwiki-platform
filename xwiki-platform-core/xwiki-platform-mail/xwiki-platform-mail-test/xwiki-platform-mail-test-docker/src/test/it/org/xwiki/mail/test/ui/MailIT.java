@@ -77,7 +77,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-mail-send-storage",
         // Because of https://jira.xwiki.org/browse/XWIKI-17972 we need to install the jython jar manually in
         // WEB-INF/lib.

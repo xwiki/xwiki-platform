@@ -281,7 +281,7 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
         }
     }
 
-    private void dispatchInContext(Event event) throws UserException
+    private void dispatchInContext(Event event)
     {
         WikiReference eventWiki = event.getWiki();
 
@@ -289,25 +289,28 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
             // The event explicitly indicate with which entities to associated it
 
             boolean mailEnabled = this.notificationConfiguration.areEmailsEnabled();
-            for (String entity : event.getTarget()) {
+            event.getTarget().forEach(entity -> {
                 DocumentReference entityReference = this.resolver.resolve(entity, event.getWiki());
                 UserReference userReference = this.documentReferenceUserReferenceResolver.resolve(entityReference);
 
-                if (this.userManager.exists(userReference)) {
-                    dispatch(event, entityReference, mailEnabled);
-                } else {
-                    // Also recursively associate the members of the entity if it's a group
-                    try {
+                try {
+                    if (this.userManager.exists(userReference)) {
+                        dispatch(event, entityReference, mailEnabled);
+                    } else {
+                        // Also recursively associate the members of the entity if it's a group
                         this.groupManager.getMembers(entityReference, true)
                             .forEach(userDocumentReference -> dispatch(event, userDocumentReference, mailEnabled));
-                    } catch (GroupException e) {
-                        this.logger.warn("Failed to get the member of the entity [{}]: {}", entity,
-                            ExceptionUtils.getRootCauseMessage(e));
                     }
+                } catch (UserException e) {
+                    this.logger.warn("Failed to verify if user [{}] exists. Cause: [{}]", userReference,
+                        ExceptionUtils.getRootCauseMessage(e));
+                } catch (GroupException e) {
+                    this.logger.warn("Failed to get the member of the entity [{}]: {}", entity,
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
                 // Remember we are done pre filtering this event
                 this.events.prefilterEvent(event);
-            }
+            });
         } else {
             // Try to find users listening to this event
 

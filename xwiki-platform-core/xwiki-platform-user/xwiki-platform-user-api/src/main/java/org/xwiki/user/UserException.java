@@ -32,7 +32,7 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class UserException extends Exception
 {
-    private static final long serialVersionUID = 3091220482950706563L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs a new user exception with the specified detail message and cause.

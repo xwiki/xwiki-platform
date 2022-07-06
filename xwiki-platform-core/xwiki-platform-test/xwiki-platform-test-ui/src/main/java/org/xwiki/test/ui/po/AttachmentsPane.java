@@ -56,6 +56,11 @@ public class AttachmentsPane extends BaseElement
     private static final List<String> LIVETABLE_COLUMNS =
         Arrays.asList("mimeType", "filename", "filesize", "date", "author");
 
+    /**
+     * Default constructor.
+     *
+     * @since 14.6RC1
+     */
     public AttachmentsPane()
     {
         this.livetableId = "docAttachments";
@@ -302,6 +307,7 @@ public class AttachmentsPane extends BaseElement
      *
      * @param attachmentName the name of the searched attachment
      * @return whether the attachment exists or not in the list of currently displayed attachments
+     * @since 14.6RC1
      */
     public boolean attachmentIsDisplayedByFileName(String attachmentName)
     {
@@ -329,6 +335,11 @@ public class AttachmentsPane extends BaseElement
         return this.attachmentIsDisplayedByFileName(attachmentName);
     }
 
+    /**
+     * @param attachmentName the name of the targeted attachment
+     * @return the button to trigger the attachment move action
+     * @since 14.6RC1
+     */
     public WebElement getAttachmentMoveElement(String attachmentName)
     {
         return this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 6)

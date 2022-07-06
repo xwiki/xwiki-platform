@@ -210,10 +210,18 @@ public class UserEventDispatcher implements Disposable
         // Get supported events types
         Set<String> types = getSupportedEventTypes();
 
-        // Create a search request for events produced by the current instance which haven't been prefiltered yet
+        // Create a search request for events produced by the current instance which haven't been pre-filtered yet
         SimpleEventQuery query = new SimpleEventQuery();
+        // Only events which haven't been pre-filtered already
         query.eq(org.xwiki.eventstream.Event.FIELD_PREFILTERED, false);
+        query.open();
+        // Events produced by this instance
         query.eq(org.xwiki.eventstream.Event.FIELD_REMOTE_OBSERVATION_ID, this.remoteObservation.getId());
+        query.or();
+        // Or some old events not containing the remote observation id (or some other reason causing it to be null)
+        query.eq(org.xwiki.eventstream.Event.FIELD_REMOTE_OBSERVATION_ID, null);
+        query.close();
+        // Start by oldest events
         query.addSort(org.xwiki.eventstream.Event.FIELD_DATE, Order.ASC);
         query.setLimit(BATCH_SIZE);
 
@@ -228,10 +236,13 @@ public class UserEventDispatcher implements Disposable
         } while (true);
     }
 
-    private void prefilterEvent(Event eventStreamEvent, Set<String> types)
+    private void prefilterEvent(Event event, Set<String> types)
     {
-        if (types.contains(eventStreamEvent.getType())) {
-            dispatch(eventStreamEvent);
+        if (types.contains(event.getType())) {
+            dispatch(event);
+        } else {
+            // Remember this event does not need to be pre-filtered
+            this.events.prefilterEvent(event);
         }
     }
 

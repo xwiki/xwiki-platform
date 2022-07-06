@@ -32,11 +32,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.RecordableEventConverter;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.TargetableEvent;
-import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -59,18 +59,17 @@ public class DefaultRecordableEventConverter implements RecordableEventConverter
     private ComponentManager contextComponentManager;
 
     @Inject
-    private RemoteObservationManagerConfiguration remoteObservation;
+    private EventFactory eventFactory;
 
     @Override
     public Event convert(RecordableEvent recordableEvent, String source, Object data) throws Exception
     {
         XWikiContext context = contextProvider.get();
 
-        DefaultEvent convertedEvent = new DefaultEvent();
+        Event convertedEvent = this.eventFactory.createRawEvent();
         convertedEvent.setType(recordableEvent.getClass().getCanonicalName());
         convertedEvent.setApplication(source);
         convertedEvent.setDate(new Date());
-        convertedEvent.setRemoteObservationId(this.remoteObservation.getId());
         convertedEvent.setUser(context.getUserReference());
         convertedEvent.setWiki(context.getWikiReference());
         if (recordableEvent instanceof TargetableEvent) {

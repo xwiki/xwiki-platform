@@ -72,6 +72,7 @@ import org.xwiki.model.reference.WikiReference;
  * <li>the {@link #getDocumentTitle() display title} of the target document at the time that the event occurred</li>
  * <li>the {@link #getUrl() requested URL} that caused the event</li>
  * </ul>
+ * Use {@link org.xwiki.eventstream.EventFactory} to create a new {@link Event} instance.
  * 
  * @version $Id$
  * @since 3.0M2

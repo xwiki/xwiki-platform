@@ -78,7 +78,7 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
     }
 
     @Test
-    void addEvent() throws IllegalAccessException, InterruptedException, NotificationException
+    void addEvent() throws IllegalAccessException, NotificationException
     {
         // Force a very short grace period so that the test does not take 1 minute
         FieldUtils.writeField(this.dispatcher, "grace", 100, true);

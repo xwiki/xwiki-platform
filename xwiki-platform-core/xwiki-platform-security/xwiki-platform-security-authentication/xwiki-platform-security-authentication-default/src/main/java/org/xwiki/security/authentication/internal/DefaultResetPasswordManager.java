@@ -48,6 +48,7 @@ import org.xwiki.security.authentication.ResetPasswordManager;
 import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
+import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
@@ -130,7 +131,11 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
             throw new ResetPasswordException("Only user having a page on the wiki can reset their password.");
         }
 
-        return this.userManager.exists(userReference);
+        try {
+            return this.userManager.exists(userReference);
+        } catch (UserException e) {
+            throw new ResetPasswordException(String.format("Failed to check if user [%s] exists.", userReference), e);
+        }
     }
 
     @Override

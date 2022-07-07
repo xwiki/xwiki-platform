@@ -29,6 +29,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.jupiter.api.Test;
 import org.xwiki.context.internal.concurrent.DefaultContextStoreManager;
+import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.script.QueryManagerScriptService;
@@ -92,19 +93,20 @@ import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.WIKI_MAC
     DefaultResourceReferenceEntityReferenceResolver.class,
     // End of XWikiWikiModel
     DocumentXHTMLLinkTypeRenderer.class,
-    DocumentResourceReferenceEntityReferenceResolver.class
+    DocumentResourceReferenceEntityReferenceResolver.class,
+    TranslationMacro.class
 })
 class XWikiSyntaxMacrosListPageTest extends PageTest
 {
-    public static final DocumentReference
-        DOCUMENT_REFERENCE = new DocumentReference("xwiki", "XWiki", "XWikiSyntaxMacrosList");
+    public static final DocumentReference DOCUMENT_REFERENCE =
+        new DocumentReference("xwiki", "XWiki", "XWikiSyntaxMacrosList");
 
     @Test
     void renderTable() throws Exception
     {
         // Initialize "WikiMacroClass"
         this.xwiki.initializeMandatoryDocuments(this.context);
-        
+
         // Create a wiki macro.
         XWikiDocument myMacroDocument = this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "MyMacro"),
             this.context);
@@ -121,7 +123,7 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
             new DefaultMacroDescriptor(new MacroId("mymacro"), "My Macro", "My Macro Description");
         macroDescriptor.setDefaultCategories(Set.of("Category1", "Category2"));
         when(myMacro.getDescriptor()).thenReturn(macroDescriptor);
-        
+
         // Mock the database.
         Query query = mock(Query.class);
         QueryManagerScriptService queryManagerScriptService =
@@ -129,49 +131,52 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
                 false);
         when(queryManagerScriptService.xwql(any())).thenReturn(query);
         when(query.execute()).thenReturn(List.of("xwiki:XWiki.MyMacro"));
-        
+
         // Render the page.
         Document document = renderHTMLPage(DOCUMENT_REFERENCE);
-        
-        
+
         // Assert the values of the cells.
         Elements trs = document.select("tr");
-        Element headersRow = trs.get(0);
-        Elements headerThs = headersRow.select("th");
-        assertEquals("help.macroList.id", headerThs.get(0).text());
-        assertEquals("help.macroList.name", headerThs.get(1).text());
-        assertEquals("help.macroList.categories", headerThs.get(2).text());
-        assertEquals("help.macroList.description", headerThs.get(3).text());
-        assertEquals("help.macroList.visibility", headerThs.get(4).text());
-        Element myMacroRow = trs.get(1);
-        Elements myMacroRowTds = myMacroRow.select("td");
-        assertEquals("mymacro", myMacroRowTds.get(0).text());
-        assertEquals("/xwiki/bin/view/XWiki/MyMacro", myMacroRowTds.get(0).select("a").attr("href"));
-        assertEquals("My Macro", myMacroRowTds.get(1).text());
-        assertEquals(Set.of("Category1", "Category2"), Arrays.stream(myMacroRowTds.get(2).text().split("\\s*,\\s*"))
+        Elements includeMacroRowTds = trs.get(0).select("th");
+        assertEquals("help.macroList.id", includeMacroRowTds.get(0).text());
+        assertEquals("help.macroList.name", includeMacroRowTds.get(1).text());
+        assertEquals("help.macroList.categories", includeMacroRowTds.get(2).text());
+        assertEquals("help.macroList.description", includeMacroRowTds.get(3).text());
+        assertEquals("help.macroList.visibility", includeMacroRowTds.get(4).text());
+        assertWikiMacro(trs.get(1), "mymacro", "/xwiki/bin/view/XWiki/MyMacro", "My Macro",
+            Set.of("Category1", "Category2"), "My Macro Description", "WIKI");
+        assertJavaMacro(trs.get(2), "velocity", "Velocity", "Development", "Executes a Velocity script.",
+            "XWiki.WikiMacroClass_visibility_Global");
+        assertJavaMacro(trs.get(3), "translation", "Translation", "Content",
+            "Display a translation message.", "XWiki.WikiMacroClass_visibility_Global");
+        assertJavaMacro(trs.get(4), "html", "HTML", "Development", "Inserts HTML or XHTML code into the page.",
+            "XWiki.WikiMacroClass_visibility_Global");
+        assertJavaMacro(trs.get(5), "include", "Include", "Content",
+            "Include other pages into the current page.",
+            "XWiki.WikiMacroClass_visibility_Global");
+    }
+
+    private void assertWikiMacro(Element rowElement, String id, String link, String name, Set<String> categories,
+        String description, String visibility)
+    {
+        Elements myMacroRowTds = rowElement.select("td");
+        assertEquals(id, myMacroRowTds.get(0).text());
+        assertEquals(link, myMacroRowTds.get(0).select("a").attr("href"));
+        assertEquals(name, myMacroRowTds.get(1).text());
+        assertEquals(categories, Arrays.stream(myMacroRowTds.get(2).text().split("\\s*,\\s*"))
             .collect(Collectors.toSet()));
-        assertEquals("My Macro Description", myMacroRowTds.get(3).text());
-        assertEquals("WIKI", myMacroRowTds.get(4).text());
-        Element velocityMacroRow = trs.get(2);
-        Elements velocityMacroRowTds = velocityMacroRow.select("td");
-        assertEquals("velocity", velocityMacroRowTds.get(0).text());
-        assertEquals("Velocity", velocityMacroRowTds.get(1).text());
-        assertEquals("Development", velocityMacroRowTds.get(2).text());
-        assertEquals("Executes a Velocity script.", velocityMacroRowTds.get(3).text());
-        assertEquals("XWiki.WikiMacroClass_visibility_Global", velocityMacroRowTds.get(4).text());
-        Element htmlMacroRow = trs.get(3);
-        Elements htmlMacroRowTds = htmlMacroRow.select("td");
-        assertEquals("html", htmlMacroRowTds.get(0).text());
-        assertEquals("HTML", htmlMacroRowTds.get(1).text());
-        assertEquals("Development", htmlMacroRowTds.get(2).text());
-        assertEquals("Inserts HTML or XHTML code into the page.", htmlMacroRowTds.get(3).text());
-        assertEquals("XWiki.WikiMacroClass_visibility_Global", htmlMacroRowTds.get(4).text());
-        Element includeMacroRow = trs.get(4);
-        Elements includeMacroRowTds = includeMacroRow.select("td");
-        assertEquals("include", includeMacroRowTds.get(0).text());
-        assertEquals("Include", includeMacroRowTds.get(1).text());
-        assertEquals("Content", includeMacroRowTds.get(2).text());
-        assertEquals("Include other pages into the current page.", includeMacroRowTds.get(3).text());
-        assertEquals("XWiki.WikiMacroClass_visibility_Global", includeMacroRowTds.get(4).text());
+        assertEquals(description, myMacroRowTds.get(3).text());
+        assertEquals(visibility, myMacroRowTds.get(4).text());
+    }
+
+    private void assertJavaMacro(Element rowElement, String id, String name, String categories, String description,
+        String visibility)
+    {
+        Elements includeMacroRowTds = rowElement.select("td");
+        assertEquals(id, includeMacroRowTds.get(0).text());
+        assertEquals(name, includeMacroRowTds.get(1).text());
+        assertEquals(categories, includeMacroRowTds.get(2).text());
+        assertEquals(description, includeMacroRowTds.get(3).text());
+        assertEquals(visibility, includeMacroRowTds.get(4).text());
     }
 }

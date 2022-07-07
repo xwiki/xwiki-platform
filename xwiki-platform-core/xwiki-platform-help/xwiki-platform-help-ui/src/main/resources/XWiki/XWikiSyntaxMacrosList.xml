@@ -54,14 +54,14 @@
   #set ($macroObject = $macroDocument.getObject("XWiki.WikiMacroClass"))
   #set ($discard = $wikiMacroMap.put($macroObject.id, [$macroDocument.documentReference.toString(), $macroObject.visibility]))
 #end
-|=$services.localization.render('help.macroList.id')|=$services.localization.render('help.macroList.name')|=$services.localization.render('help.macroList.categories')|=$services.localization.render('help.macroList.description')|=$services.localization.render('help.macroList.visibility')
+|={{translation key='help.macroList.id'/}}|={{translation key='help.macroList.name'/}}|={{translation key='help.macroList.categories'/}}|={{translation key='help.macroList.description'/}}|={{translation key='help.macroList.visibility'/}}
 #foreach ($descriptor in $services.rendering.getMacroDescriptors('xwiki/2.1'))
   #set ($wikiMacroData = $wikiMacroMap.get($descriptor.id.id))
   #if ("$!wikiMacroData" != '')
-    #set ($displayId = "[[$descriptor.id&gt;&gt;$wikiMacroData.get(0)]]")
+    #set ($displayId = "[[$services.rendering.escape($services.rendering.escape($descriptor.id, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$wikiMacroData.get(0)]]")
     #set ($displayVisibility = $wikiMacroData.get(1))
   #else
-    #set ($displayId = $descriptor.id)
+    #set ($displayId = $services.rendering.escape($descriptor.id, 'xwiki/2.1'))
     #set ($displayVisibility = $services.localization.render('XWiki.WikiMacroClass_visibility_Global'))
   #end
   |$displayId|##
@@ -73,7 +73,7 @@
   #end##
   |##
   #translateOrElse("rendering.macro.${descriptor.id.id}.description", $descriptor.description)
-  |$displayVisibility
+  |$services.rendering.escape($displayVisibility, 'xwiki/2.1')
 #end
 {{/velocity}}</content>
 </xwikidoc>

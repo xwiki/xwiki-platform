@@ -119,13 +119,13 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 # rendering.linkLabelFormat = %np
 
 #-# [Since 2.0M3]
-#-# Overrides default macro categories (Each macro has a default category already defined, for example
-#-# "presentation" for the Table of Contents Macro).
+#-# Overrides default macro categories (Each macro has default categories already defined, for example
+#-# "Navigation" for the Table of Contents Macro).
 #-#
-#-# Ex: To redefine the macro category for the TOC macro so that it'd be in the "My Category" category +
-#-# redefine the category for the Script Macro to be "My Other Category", you'd use:
-# rendering.macroCategories = toc:My Category
-# rendering.macroCategories = script:My Other Category
+#-# Ex: To redefine the macro categories for the TOC macro so that it'd be in the "My Category" and "Deprecated" 
+#-# categories + redefine the category for the Script Macro to be "My Other Category", you'd use:
+# rendering.transformation.macro.categories = toc = My Category\,Deprecated
+# rendering.transformation.macro.categories = script = My Other Category
 
 #-# [Since 2.5M2]
 #-# Specify whether the image dimensions should be extracted from the image parameters and included in the image URL

@@ -47,7 +47,18 @@ help.tipsPanel.breadcrumbsTip=Možete kliknuti na strelice pored elemenata mrvic
 help.macroList.title=Dostupni makroi
 help.macroList.id=Identifikator
 help.macroList.name=Ime
-help.macroList.category=Kategorija
 help.macroList.description=Opis
-help.macroList.visibility=Vidljivost</content>
+help.macroList.visibility=Vidljivost
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=Kategorija
+
+#@deprecatedend</content>
 </xwikidoc>

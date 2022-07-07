@@ -50,14 +50,14 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-notifications-sources</artifactId>
-          <version>${project.version}</version>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-notifications-sources</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-mentions-notifications</artifactId>
-          <version>${project.version}</version>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-mentions-notifications</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Test Dependencies -->

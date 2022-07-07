@@ -85,6 +85,11 @@
       <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-store-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Test Dependencies -->
     <dependency>

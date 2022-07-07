@@ -124,8 +124,8 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 #-#
 #-# Ex: To redefine the macro category for the TOC macro so that it'd be in the "My Category" category +
 #-# redefine the category for the Script Macro to be "My Other Category", you'd use:
-# rendering.macroCategories = toc:My Category
-# rendering.macroCategories = script:My Other Category
+# rendering.transformation.macro.categories = toc = My Category
+# rendering.transformation.macro.categories = script = My Other Category
 
 #-# [Since 2.5M2]
 #-# Specify whether the image dimensions should be extracted from the image parameters and included in the image URL

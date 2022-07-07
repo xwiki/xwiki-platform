@@ -19,25 +19,30 @@
  */
 package org.xwiki.user;
 
-import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * CRUD operations on users. Note that for retrieving a user's properties you should use a
- * {@link UserPropertiesResolver}.
+ * Generic exception for the user api module.
  *
  * @version $Id$
- * @since 12.2
+ * @since 14.6RC1
+ * @since 14.4.3
+ * @since 13.10.8
  */
 @Unstable
-@Role
-public interface UserManager
+public class UserException extends Exception
 {
+    private static final long serialVersionUID = 1L;
+
     /**
-     * @param userReference the reference to the user to check for existence
-     * @return true if the user pointed to by the reference exists, false otherwise
-     * @throws UserException (since 14.6RC1, 14.4.3, 13.10.8) in case of error while checking for the existence of
-     *     the user
+     * Constructs a new user exception with the specified detail message and cause.
+     *
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A
+     *     {@code null} value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
-    boolean exists(UserReference userReference) throws UserException;
+    public UserException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

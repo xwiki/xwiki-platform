@@ -19,7 +19,9 @@
  */
 package org.xwiki.notifications.filters.migration;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -162,6 +164,7 @@ class R131007000XWIKI15460DataMigrationTest
             .thenReturn(deletedUserReference);
         when(this.userManager.exists(existingUserReference)).thenReturn(true);
         when(this.userManager.exists(deletedUserReference)).thenReturn(false);
+        when(this.store.getPreferencesOfUser(deletedUserDocumentReference)).thenReturn(Collections.singletonList(nfp3));
 
         this.dataMigration.hibernateMigrate();
 

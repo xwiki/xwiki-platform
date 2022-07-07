@@ -256,7 +256,7 @@ public class UserEventDispatcher implements Disposable
         } while (true);
     }
 
-    private void prefilterEvent(Event event, Set<String> types) throws EventStreamException, GroupException
+    private void prefilterEvent(Event event, Set<String> types) throws EventStreamException
     {
         if (types.contains(event.getType())) {
             dispatch(event);
@@ -272,9 +272,8 @@ public class UserEventDispatcher implements Disposable
      * 
      * @param event the event to associate with the user
      * @throws EventStreamException when failing to pre filter the event
-     * @throws GroupException when failing to resolve a target group
      */
-    private void dispatch(Event event) throws EventStreamException, GroupException
+    private void dispatch(Event event) throws EventStreamException
     {
         // Keeping the same ExecutionContext forever can lead to memory leak and cache problems since
         // most of the code expect it to be short lived
@@ -292,7 +291,7 @@ public class UserEventDispatcher implements Disposable
         }
     }
 
-    private void dispatchInContext(Event event) throws GroupException
+    private void dispatchInContext(Event event)
     {
         WikiReference eventWiki = event.getWiki();
 
@@ -308,9 +307,14 @@ public class UserEventDispatcher implements Disposable
                     dispatch(event, entityReference, mailEnabled);
                 } else {
                     // Also recursively associate the members of the entity if it's a group
-                    for (DocumentReference userDocumentReference : this.groupManager.getMembers(entityReference,
-                        true)) {
-                        dispatch(event, userDocumentReference, mailEnabled);
+                    try {
+                        for (DocumentReference userDocumentReference : this.groupManager.getMembers(entityReference,
+                            true)) {
+                            dispatch(event, userDocumentReference, mailEnabled);
+                        }
+                    } catch (GroupException e) {
+                        this.logger.warn("Failed to get the member of the entity [{}]: {}", entity,
+                            ExceptionUtils.getRootCauseMessage(e));
                     }
                 }
             }

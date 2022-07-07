@@ -308,10 +308,8 @@ public class UserEventDispatcher implements Disposable
                 } else {
                     // Also recursively associate the members of the entity if it's a group
                     try {
-                        for (DocumentReference userDocumentReference : this.groupManager.getMembers(entityReference,
-                            true)) {
-                            dispatch(event, userDocumentReference, mailEnabled);
-                        }
+                        this.groupManager.getMembers(entityReference, true)
+                        .forEach(userDocumentReference -> dispatch(event, userDocumentReference, mailEnabled));
                     } catch (GroupException e) {
                         this.logger.warn("Failed to get the member of the entity [{}]: {}", entity,
                             ExceptionUtils.getRootCauseMessage(e));

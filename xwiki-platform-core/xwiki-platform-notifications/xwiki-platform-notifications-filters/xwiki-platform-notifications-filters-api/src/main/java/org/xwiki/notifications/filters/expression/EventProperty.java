@@ -94,7 +94,7 @@ public enum EventProperty
     /**
      * The unique identifier of the instance in the cluster.
      * 
-     * @since 14.6RC1
+     * @since 14.7RC1
      */
     REMOTE_OBSERVATION_ID,
 }

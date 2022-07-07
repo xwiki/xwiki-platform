@@ -200,7 +200,7 @@ public interface Event
 
     /**
      * @see #getRemoteObservationId()
-     * @since 14.6RC1
+     * @since 14.7RC1
      */
     String FIELD_REMOTE_OBSERVATION_ID = "observationInstanceId";
 
@@ -567,7 +567,7 @@ public interface Event
     /**
      * @return the unique identifier of the instance in the cluster, or {@code null} if the event was produced in a
      *         version of XWiki older than 14.6
-     * @since 14.6RC1
+     * @since 14.7RC1
      */
     default String getRemoteObservationId()
     {

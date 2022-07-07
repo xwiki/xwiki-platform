@@ -21,13 +21,11 @@ package org.xwiki.test.ui.po;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -404,20 +402,6 @@ public class LiveTableElement extends BaseElement
     {
         WebElement rowElement = getRow(rowNumber);
         rowElement.findElement(By.xpath("td/form//input[@name = '" + actionName + "']")).click();
-    }
-
-    /**
-     * @return the Next Page arrow element, or an empty optional if the element is not enabled
-     * @since 14.6RC1
-     */
-    public Optional<WebElement> getNextPageElement()
-    {
-        try {
-            return Optional.of(getDriver().findElement(By.xpath("//table[@id='" + this.livetableId
-                + "']//td[contains(@class, 'xwiki-livetable-pagination')]//a[contains(@class, 'nextPagination')]")));
-        } catch (NoSuchElementException e) {
-            return Optional.empty();
-        }
     }
 
     private WebElement getHeaderByColumnTitle(String columnTitle)

@@ -117,14 +117,14 @@ class AttachmentIT
         setup.getDriver().navigate().back();
 
         // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
+        this.refreshAttachmentsPane(setup);
         viewPage.waitForDocExtraPaneActive("attachments");
 
         attachmentsPane.getAttachmentLink(SECOND_ATTACHMENT).click();
         assertEquals("This is another small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
         // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
+        this.refreshAttachmentsPane(setup);
         viewPage.waitForDocExtraPaneActive("attachments");
 
         // Upload another version of the first attachment
@@ -140,7 +140,7 @@ class AttachmentIT
         assertEquals("This is a small attachment v2.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
         // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
+        this.refreshAttachmentsPane(setup);
         viewPage.waitForDocExtraPaneActive("attachments");
         attachmentsPane.waitForAttachmentsLivetable();
 
@@ -404,5 +404,14 @@ class AttachmentIT
         sb.append("{{/html}}\n{{/velocity}}");
 
         return sb.toString();
+    }
+
+    private void refreshAttachmentsPane(TestUtils setup)
+    {
+        setup.getDriver().navigate().refresh();
+        // This is needed since when the attachments livetable is filtered, the fragment identifier is changed and
+        // after a refresh the page will actually have the default tab opened. This will no longer be needed after
+        // moving the attachments livetable to Live Data.
+        (new ViewPage()).openAttachmentsDocExtraPane();
     }
 }

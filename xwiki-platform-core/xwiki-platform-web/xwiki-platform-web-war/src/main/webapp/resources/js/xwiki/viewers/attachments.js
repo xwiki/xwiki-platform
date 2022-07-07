@@ -269,17 +269,17 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    */
   var updateAttachmentsNumber = function(attachmentsNumber) {
     var itemCount = $('#Attachmentstab').find('.itemCount');
-    if(itemCount) {
+    if (itemCount) {
       itemCount.text(l10n['docextra.extranb'].replace("__number__", attachmentsNumber));
     };
     var tmAttachments = $('#tmAttachments');
-    if(tmAttachments.length) {
+    if (tmAttachments.length) {
       // Calling normalize() because a text node needs to be modified and so all consecutive text nodes are merged.
       tmAttachments[0].normalize();
       var attachmentsLabel = ' ' + l10n['docextra.attachments'] + ' ';
       var label = attachmentsLabel + l10n['docextra.extranb'];
       label = label.replace("__number__", attachmentsNumber);
-      tmAttachments.contents().last()[0].nodeValue=label;
+      tmAttachments.contents().last()[0].nodeValue = label;
     }
   };
   /**

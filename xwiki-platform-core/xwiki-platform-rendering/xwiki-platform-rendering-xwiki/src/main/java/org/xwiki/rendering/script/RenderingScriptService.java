@@ -37,6 +37,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroLookupException;
@@ -50,6 +51,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides Rendering-specific Scripting APIs.
@@ -80,7 +82,10 @@ public class RenderingScriptService implements ScriptService
 
     @Inject
     private MacroManager macroManager;
-    
+
+    @Inject
+    private MacroCategoryManager macroCategoryManager;
+
     @Inject
     private MacroIdFactory macroIdFactory;
 
@@ -300,6 +305,20 @@ public class RenderingScriptService implements ScriptService
             }
         }
         return null;
+    }
+
+    /**
+     * Return the category of the macro, possibly overridden. 
+     *
+     * @param macroId the macro id
+     * @return the category
+     * @since 13.10.8
+     * @since 14.4.3
+     */
+    @Unstable
+    public String getMacroCategory(MacroId macroId)
+    {
+        return this.macroCategoryManager.getMacroCategory(macroId);
     }
 
     private char getEscapeCharacter(Syntax syntax) throws IllegalArgumentException

@@ -328,11 +328,11 @@ public class AttachmentsPane extends BaseElement
      */
     public boolean attachmentExistsByFileName(String attachmentName)
     {
-         this.filterColumn("filename", attachmentName);
-         boolean attachmentExists = this.attachmentIsDisplayedByFileName(attachmentName);
-         this.filterColumn("filename", "");
+        this.filterColumn("filename", attachmentName);
+        boolean attachmentExists = this.attachmentIsDisplayedByFileName(attachmentName);
+        this.filterColumn("filename", "");
 
-         return attachmentExists;
+        return attachmentExists;
     }
 
     /**

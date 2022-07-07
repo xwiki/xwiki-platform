@@ -170,7 +170,7 @@ class DefaultResetPasswordManagerTest
     }
 
     @Test
-    void requestResetPasswordUnexistingUser() throws ResetPasswordException
+    void requestResetPasswordUnexistingUser() throws Exception
     {
         when(this.userReference.toString()).thenReturn("user:Foobar");
         when(this.userManager.exists(this.userReference)).thenReturn(false);
@@ -179,7 +179,7 @@ class DefaultResetPasswordManagerTest
     }
 
     @Test
-    void requestResetPasswordNotDocumentReferenceUser()
+    void requestResetPasswordNotDocumentReferenceUser() throws Exception
     {
         UserReference otherUserReference = mock(UserReference.class);
         when(this.userManager.exists(otherUserReference)).thenReturn(true);
@@ -317,7 +317,7 @@ class DefaultResetPasswordManagerTest
     }
 
     @Test
-    void checkVerificationCodeUnexistingUser() throws ResetPasswordException
+    void checkVerificationCodeUnexistingUser() throws Exception
     {
         when(this.userReference.toString()).thenReturn("user:Foobar");
         when(this.userManager.exists(this.userReference)).thenReturn(false);

@@ -30,6 +30,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
@@ -192,9 +193,10 @@ public class UserScriptService implements ScriptService
      *                      reference exists or not - for example the superadmin users or the guest users don't exist,
      *                      and a "document"-based User can be constructed and have no profile page and thus not exist)
      * @return true if the user exists in the store or false otherwise
+     * @throws UserException (since 14.6RC1, 14.4.3, 13.10.8) in case of error while checking if the user exists
      * @since 12.2
      */
-    public boolean exists(UserReference userReference)
+    public boolean exists(UserReference userReference) throws UserException
     {
         return this.userManager.exists(userReference);
     }

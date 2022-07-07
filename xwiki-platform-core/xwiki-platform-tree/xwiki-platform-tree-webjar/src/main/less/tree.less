@@ -151,7 +151,10 @@
     line-height: inherit;
   }
 }
-.jstree-xwiki-contextmenu {
-  /* 2000 is chosen to be visible in bootstrap modals. */
-  z-index: 2000;
+body.modal-open > .jstree-xwiki-contextmenu {
+  /* Bootstrap modals have z-index 1050 by default but the WYSIWYG editor has increased that to 10050 in order to be able
+    to show the Bootstrap modals on top of standard CKEditor dialogs (e.g. the standard CKEditor link dialog has been
+    customized to show a page picker that opens a Bootstrap modal with the XWiki page tree). When the tree is displayed
+    in a modal we want the context menu to be displayed on top of the modal. */
+  z-index: 10051;
 }

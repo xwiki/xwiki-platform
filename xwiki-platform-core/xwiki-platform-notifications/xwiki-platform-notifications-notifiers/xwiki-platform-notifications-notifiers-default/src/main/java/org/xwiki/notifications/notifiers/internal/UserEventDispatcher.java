@@ -58,6 +58,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
+import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -303,17 +304,20 @@ public class UserEventDispatcher implements Disposable
                 DocumentReference entityReference = this.resolver.resolve(entity, event.getWiki());
                 UserReference userReference = this.documentReferenceUserReferenceResolver.resolve(entityReference);
 
-                if (this.userManager.exists(userReference)) {
-                    dispatch(event, entityReference, mailEnabled);
-                } else {
-                    // Also recursively associate the members of the entity if it's a group
-                    try {
+                try {
+                    if (this.userManager.exists(userReference)) {
+                        dispatch(event, entityReference, mailEnabled);
+                    } else {
+                        // Also recursively associate the members of the entity if it's a group
                         this.groupManager.getMembers(entityReference, true)
-                        .forEach(userDocumentReference -> dispatch(event, userDocumentReference, mailEnabled));
-                    } catch (GroupException e) {
-                        this.logger.warn("Failed to get the member of the entity [{}]: {}", entity,
-                            ExceptionUtils.getRootCauseMessage(e));
+                            .forEach(userDocumentReference -> dispatch(event, userDocumentReference, mailEnabled));
                     }
+                } catch (UserException e) {
+                    this.logger.warn("Failed to verify if user [{}] exists. Cause: [{}]", userReference,
+                        ExceptionUtils.getRootCauseMessage(e));
+                } catch (GroupException e) {
+                    this.logger.warn("Failed to get the member of the entity [{}]: {}", entity,
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
             }
 

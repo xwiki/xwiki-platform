@@ -566,7 +566,7 @@ public interface Event
 
     /**
      * @return the unique identifier of the instance in the cluster, or {@code null} if the event was produced in a
-     *         version of XWiki older than 14.6
+     *         version of XWiki older than 14.7
      * @since 14.7RC1
      */
     default String getRemoteObservationId()

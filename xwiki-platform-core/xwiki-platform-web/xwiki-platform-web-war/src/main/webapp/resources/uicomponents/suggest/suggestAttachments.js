@@ -206,7 +206,7 @@ define('xwiki-file-picker', ['jquery'], function($) {
   return {pickLocalFiles};
 });
 
-define('xwiki-l10n', ['jquery'], function($) {
+define('xwiki-suggestAttachments-messages', ['jquery'], function($) {
   var withParams = function(translation) {
     return function() {
       var result = translation;
@@ -233,7 +233,7 @@ define('xwiki-suggestAttachments', [
   'xwiki-attachments-icon',
   'xwiki-attachments-filter',
   'xwiki-file-picker',
-  'xwiki-l10n',
+  'xwiki-suggestAttachments-messages',
   'xwiki-selectize'
 ], function($, attachmentsStore, attachmentsIcon, attachmentsFilter, filePicker, L10n) {
   var l10n = L10n(l10nBundle);
@@ -665,4 +665,4 @@ require(['jquery', 'xwiki-suggestAttachments', 'xwiki-attachmentResourcePicker',
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $request.contextPath, $mimetypeMap, $extensionMap, $l10nBundle]));
+}).apply(']]#', $jsontool.serialize([$paths, $request.contextPath, $l10nBundle]));

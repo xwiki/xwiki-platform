@@ -276,9 +276,7 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
         for (XWikiRCSNodeInfo node : new ArrayList<>(archiveNodes)) {
             XWikiDocument revision = this.documentRevisionProvider.getRevision(userDoc, node.getVersion().toString());
             if (fixPasswordHash(revision, false, false)) {
-                String author = userReferenceSerializerProvider.get()
-                    .serialize(revision.getAuthors().getOriginalMetadataAuthor());
-                documentArchive.updateArchive(revision, author, revision.getDate(), revision.getComment(),
+                documentArchive.updateArchive(revision, revision.getAuthor(), revision.getDate(), revision.getComment(),
                     revision.getRCSVersion(), context);
             }
         }

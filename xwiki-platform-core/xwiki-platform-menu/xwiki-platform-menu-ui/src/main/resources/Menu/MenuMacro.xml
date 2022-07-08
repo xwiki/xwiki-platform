@@ -51,11 +51,7 @@ $menuTemplateDoc.content.replace('{', '')
 {{/velocity}}
 
 {{menu type="horizontal fixedWidth"}}
-{{velocity}}
-## Include the content of the menu template.
-## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
-{{html}}$menuTemplateDoc.displayDocument().replace('{{', '&amp;amp;#123;&amp;amp;#123;'){{/html}}
-{{/velocity}}
+{{include reference="MenuTemplate" /}}
 {{/menu}}
 
 = Vertical Menu =
@@ -69,11 +65,7 @@ $menuTemplateDoc.content.replace('{', '')
 {{/velocity}}
 
 {{menu type="vertical"}}
-{{velocity}}
-## Include the content of the menu template.
-## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
-{{html}}$menuTemplateDoc.displayDocument().replace('{{', '&amp;amp;#123;&amp;amp;#123;'){{/html}}
-{{/velocity}}
+{{include reference="MenuTemplate" /}}
 {{/menu}}</content>
   <object>
     <name>Menu.MenuMacro</name>
@@ -1175,6 +1167,10 @@ $menuTemplateDoc.content.replace('{', '')
 #set ($discard = $xwiki.ssx.use("$xcontext.macro.doc.prefixedFullName", {'colorTheme': $colorTheme}))
 #set ($discard = $xwiki.jsx.use("$xcontext.macro.doc.prefixedFullName"))
 #if($type.contains('horizontal'))
+  ## Make sure the id is non-empty for horizontal menus as otherwise the toggle doesn't work.
+  #if ($stringtool.isBlank("$!id"))
+    #set ($id = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId("M", "GeneratedMenuId"))
+  #end
   (% role="navigation" class="menu-horizontal-toggle" %)(((
     (% class="navbar-header" %)(((
       {{html}}

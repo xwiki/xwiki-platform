@@ -21,7 +21,7 @@ package org.xwiki.attachment.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.XWikiWebDriver;
+import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -41,23 +41,13 @@ public class AttachmentPane extends ViewPage
      */
     public static AttachmentPane moveAttachment(String attachmentName)
     {
-
-        XWikiWebDriver driver = getUtil().getDriver();
-        boolean found = false;
-        for (WebElement webElement : driver.findElementsWithoutWaiting(By.cssSelector("#_attachments .attachment"))) {
-            if (driver.findElementWithoutWaiting(webElement, By.cssSelector(".name a"))
-                .getText()
-                .equals(attachmentName))
-            {
-                driver.findElementWithoutWaiting(webElement, By.cssSelector(".xwikibuttonlinks .move-attachment"))
-                    .click();
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
+        AttachmentsPane attachmentsPane = new AttachmentsPane();
+        if (!attachmentsPane.attachmentExistsByFileName(attachmentName)) {
             throw new RuntimeException("Attachment " + attachmentName + " not found in the attachments pane.");
         }
+
+        attachmentsPane.getAttachmentMoveElement(attachmentName).click();
+
         return new AttachmentPane();
     }
 

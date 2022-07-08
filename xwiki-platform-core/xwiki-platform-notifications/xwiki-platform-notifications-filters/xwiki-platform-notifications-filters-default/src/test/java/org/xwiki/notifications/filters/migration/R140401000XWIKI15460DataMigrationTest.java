@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.migration;
 
 import java.util.HashSet;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -168,6 +169,7 @@ class R140401000XWIKI15460DataMigrationTest
             .thenReturn(deletedUserReference);
         when(this.userManager.exists(existingUserReference)).thenReturn(true);
         when(this.userManager.exists(deletedUserReference)).thenReturn(false);
+        when(this.store.getPreferencesOfUser(deletedUserDocumentReference)).thenReturn(List.of(nfp3));
 
         this.dataMigration.hibernateMigrate();
 

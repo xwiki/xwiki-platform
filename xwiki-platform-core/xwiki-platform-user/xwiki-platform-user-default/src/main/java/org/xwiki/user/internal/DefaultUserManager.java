@@ -29,6 +29,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 
@@ -48,7 +49,7 @@ public class DefaultUserManager implements UserManager
     private ComponentManager componentManager;
 
     @Override
-    public boolean exists(UserReference userReference)
+    public boolean exists(UserReference userReference) throws UserException
     {
         boolean exists;
 

@@ -99,7 +99,7 @@ public class LiveTableElement extends BaseElement
         getDriver().executeJavascript("return $('" + StringEscapeUtils.escapeEcmaScript(livetableId)
             + "-ajax-loader').removeClassName('hidden')");
 
-        WebElement element = getDriver().findElement(By.id(inputId));
+        WebElement element = getDriver().findElement(By.id(livetableId)).findElement(By.id(inputId));
         if ("select".equals(element.getTagName())) {
             if (element.getAttribute("class").contains("selectized")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(element);
@@ -215,7 +215,7 @@ public class LiveTableElement extends BaseElement
     }
 
     /**
-     * Get the row index of an element.
+     * Get the row index of an element, relative to the number of currently displayed rows.
      *
      * @param by the selector of the searched element
      * @return the row index where the element was found
@@ -226,8 +226,11 @@ public class LiveTableElement extends BaseElement
     {
         WebElement livetableRowElement =
             getDriver().findElement(By.xpath("//tbody[@id='" + this.livetableId + "-display']/tr/td")).findElement(by);
-        return Integer
-            .parseInt(livetableRowElement.findElement(By.xpath("./ancestor::tr[1]")).getAttribute("data-index"));
+        if (livetableRowElement.isDisplayed()) {
+            // Count the preceding rows.
+            return livetableRowElement.findElements(By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
+        }
+        return 0;
     }
 
     /**

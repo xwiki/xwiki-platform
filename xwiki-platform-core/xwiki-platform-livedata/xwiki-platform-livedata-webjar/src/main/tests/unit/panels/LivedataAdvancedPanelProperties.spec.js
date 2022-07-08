@@ -86,7 +86,7 @@ describe('LivedataAdvancedPanelProperties.vue', () => {
   it('Toggles the visibility on click', async () => {
     let wrapper = initWrapper();
     expect(wrapper.element.querySelector('input[type = checkbox]')).toBeChecked();
-    await wrapper.find('.visibility').trigger('click');
+    await wrapper.find('.visibility input').setChecked(false);
     expect(wrapper.vm.logic.isPropertyVisible('id')).toBeFalsy();
     await Vue.nextTick();
     expect(wrapper.element.querySelector('input[type = checkbox]')).not.toBeChecked();

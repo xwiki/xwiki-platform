@@ -1,0 +1,1527 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>CKEditor</web>
+  <name>EditSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>CKEditor.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="CKEditor.VelocityMacros"/}}
+
+{{velocity}}
+#if ($doc.fullName == 'CKEditor.EditSheet')
+  This is a sheet for editing the document content using [[CKEditor&gt;&gt;http://ckeditor.com/]].
+#else
+  {{html clean="false"}}
+  ## Include the auto-save styles.
+  #set ($discard = $xwiki.ssfx.use('js/xwiki/editors/autosave.css', true))
+  #if ("$!request.section" != '')
+    &lt;div class="hidden"&gt;
+      &lt;input type="hidden" name="section" value="$!escapetool.xml($request.section)"/&gt;
+    &lt;/div&gt;
+  #end
+  &lt;div class="row"&gt;
+    &lt;div class="cke-editMeta col-xs-12 col-md-7"&gt;
+      ## Add support for editing the page title (which is not available by default in Inline Form edit mode).
+      #set ($editor = 'wiki')
+      #template('editmeta.vm')
+      #set ($editor = 'inline')
+    &lt;/div&gt;
+  &lt;/div&gt;
+  ## The xwikieditcontent id is needed for the auto-save feature.
+  &lt;div id="xwikieditcontent" data-autosave="true"&gt;
+    #set ($parameters = {
+      'content': $tdoc.content,
+      'attributes': {
+        'id': 'content',
+        'name': 'content',
+        'rows': 25,
+        'cols': 80
+      }
+    })
+    #ckeditor($parameters)
+  &lt;/div&gt;
+  {{/html}}
+#end
+{{/velocity}}</content>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>f1172aae-3aa7-4c32-9acf-b342f39832ff</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/*
+#set ($ckeditorPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-webjar', 'ckeditor'))
+#set ($ckeditorBasePath = $stringtool.removeEnd($stringtool.removeEnd($ckeditorPath, '.js'), 'ckeditor'))
+#set ($resourcePickerBundlePath = "${ckeditorBasePath}plugins/xwiki-resource/resourcePicker.bundle.min")
+#set ($macroWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-macro/macroWizard.bundle.min")
+#set ($imageWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-image/imageWizard.bundle.min")
+#set ($modalPath = "${ckeditorBasePath}plugins/xwiki-dialog/modal.min")
+#set ($l10nPath = "${ckeditorBasePath}plugins/xwiki-localization/l10n.min")
+*/
+require.config({
+  paths: {
+    ckeditor: '$!ckeditorPath',
+    resourcePickerBundle: '$!resourcePickerBundlePath',
+    modal: '$!modalPath',
+    l10n: '$!l10nPath',
+    macroWizard: '$!macroWizardBundlePath',
+    imageWizard: '$!imageWizardBundlePath',
+    // This is used by the resource suggest picker on the link modal.
+    'bootstrap3-typeahead': $jsontool.serialize($services.webjars.url('org.webjars.npm:bootstrap-3-typeahead',
+      'bootstrap3-typeahead.min')),
+    // This is used to preserve the selection when switching between WYSIWYG and Source modes.
+    'fast-diff': $jsontool.serialize($services.webjars.url('org.webjars.npm:fast-diff', 'diff'))
+  },
+  bundles: {
+    'resourcePickerBundle': ['resource', 'resourcePicker', 'entityResourcePicker', 'entityResourceSuggester',
+      'entityResourceDisplayer']
+  },
+  shim: {
+    ckeditor: {
+      exports: 'CKEDITOR',
+      // This includes dependencies of the plugins bundled with the CKEditor code.
+      deps: ['jquery', 'resource', 'resourcePicker', 'macroWizard', 'imageWizard']
+    }
+  },
+  config: {
+    l10n: {
+      // We need to specify the language because this URL can be used after the page is loaded and thus after the
+      // context language changes on the server session (e.g. if the user opens another page in another browser tab with
+      // a different language specified). We take the current language from the page HTML, rather than using Velocity,
+      // in order to avoid having the current language cached.
+      url: new XWiki.Document('Translator', 'CKEditor').getURL('get', 'outputSyntax=plain&amp;language=' +
+        encodeURIComponent(document.documentElement.getAttribute('lang') || ''))
+    }
+  }
+});
+
+window.CKEDITOR_BASEPATH = "$!ckeditorBasePath";
+
+define('xwiki-ckeditor', [
+  'jquery',
+  'ckeditor',
+  // Used to access the form token required by the upload URL.
+  'xwiki-meta',
+  // Used to catch form action events fired from Prototype.js code (actionButtons.js).
+  'xwiki-events-bridge',
+  // Configures the path to the tree widget module and its dependencies which are used by the page and attachment
+  // pickers on the link, image and macro dialogs to select pages and attachments.
+  "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"
+], function($, ckeditor, xwikiMeta) {
+  var deferred = $.Deferred();
+  var currentLocale = $('html').attr('lang') || '';
+
+  // We have to pass the plugin that makes the request (the initiator) because the expected response can be different
+  // (e.g. between the filebrowser and filetools plugins).
+  var getUploadURL = function(document, initiator) {
+    return document.getURL('get', $.param({
+      sheet: 'CKEditor.FileUploader',
+      outputSyntax: 'plain',
+      // The syntax and language are important especially when the upload request creates a new document.
+      syntax: document.syntax,
+      language: currentLocale,
+      form_token: xwikiMeta.form_token,
+      initiator: initiator
+    }));
+  };
+
+  // Extend the default CKEditor configuration with settings that depend on the source document.
+  var getConfig = function(element) {
+    var sourceDocument = XWiki.currentDocument;
+    var sourceDocumentReference = $(element).attr('data-sourceDocumentReference');
+    if (sourceDocumentReference) {
+      sourceDocument = new XWiki.Document(XWiki.Model.resolve(sourceDocumentReference, XWiki.EntityType.DOCUMENT));
+    }
+    sourceDocument.syntax = $(element).attr('data-sourceDocumentSyntax');
+
+    var config = {
+      filebrowserUploadUrl: getUploadURL(sourceDocument, 'filebrowser'),
+      height: $(element).height(),
+      mentions: [
+        {
+          // We use the source document to compute the feed URL because we want the suggested link references to be
+          // relative to the edited document (we want the editor to output relative references as much as possible).
+          feed: sourceDocument.getURL('get', $.param({
+            sheet: 'CKEditor.LinkSuggestions',
+            outputSyntax: 'plain',
+            language: currentLocale
+          // Prevent the curly brackets from being URL encoded because they mark a placeholder that will be replaced
+          // with the text typed by the user (and CKEditor takes care of URL encoding it).
+          }) + '&amp;input={encodedQuery}'),
+          itemTemplate: [
+            '&lt;li data-id="{id}" class="ckeditor-autocomplete-item"&gt;',
+              '&lt;div&gt;',
+                '&lt;span class="ckeditor-autocomplete-item-icon-wrapper"&gt;',
+                  // We have to output both icon types but normally only one is defined and the other is hidden.
+                  '&lt;img src="{iconURL}"/&gt;',
+                  '&lt;span class="{iconClass}"&gt;&lt;/span&gt;',
+                '&lt;/span&gt;',
+                '&lt;span class="ckeditor-autocomplete-item-label"&gt;{label}&lt;/span&gt;',
+              '&lt;/div&gt;',
+              '&lt;div class="ckeditor-autocomplete-item-hint"&gt;{hint}&lt;/div&gt;',
+            '&lt;/li&gt;'].join(''),
+          outputTemplate: '&lt;a href="{url}" data-reference="{typed}|-|{type}|-|{reference}"&gt;{label}&lt;/a&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;',
+          marker: '[',
+          minChars: 0,
+          itemsLimit: 6
+        }
+      ],
+      sourceDocument: sourceDocument,
+      uploadUrl: getUploadURL(sourceDocument, 'filetools'),
+      'xwiki-link': {
+        // We use the source document to compute the link label generator URL because we want the link references to be
+        // resolved relative to the edited document (as they were inserted).
+        labelGenerator: sourceDocument.getURL('get', $.param({
+          sheet: 'CKEditor.LinkLabelGenerator',
+          outputSyntax: 'plain',
+          language: currentLocale
+        }))
+      }
+    };
+    return config;
+  };
+
+  var oldReplace = ckeditor.replace;
+  ckeditor.replace = function(element, config) {
+    // Take into account the configuration options specified on the target element.
+    return oldReplace.call(this, element, ckeditor.tools.extend(getConfig(element), config, true));
+  };
+
+  var oldInline = ckeditor.inline;
+  ckeditor.inline = function(element, config) {
+    // Take into account the configuration options specified on the target element.
+    return oldInline.call(this, element, ckeditor.tools.extend(getConfig(element), config, true));
+  };
+
+  //
+  // Overwrite in order to add support for configuration namespaces.
+  //
+  ckeditor.tools.extend = function(target) {
+    var argsLength = arguments.length, overwrite, propertiesList;
+    if (typeof (overwrite = arguments[argsLength - 1]) === 'boolean') {
+      argsLength--;
+    } else if (typeof (overwrite = arguments[argsLength - 2]) === 'boolean') {
+      propertiesList = arguments[argsLength - 1];
+      argsLength -= 2;
+    }
+    for (var i = 1; i &lt; argsLength; i++) {
+      var source = arguments[i] || {};
+      ckeditor.tools.array.forEach(ckeditor.tools.object.keys(source), function(propertyName) {
+        // Only copy existing fields if in overwrite mode.
+        if (overwrite === true || target[propertyName] == null) {
+          // Only copy specified fields if list is provided.
+          if (!propertiesList || (propertyName in propertiesList)) {
+            // NOTE: This is the only part we overwrite.
+            setObjectProperty(target, propertyName, source[propertyName]);
+          }
+        }
+      });
+    }
+    return target;
+  };
+
+  var setObjectProperty = function(object, key, value) {
+    var oldValue = object[key];
+    var newValue = value;
+    // Merge the old value with the new value if both are objects and the old value is a configuration namespace.
+    if ($.isPlainObject(oldValue) &amp;&amp; oldValue.__namespace === true &amp;&amp; $.isPlainObject(newValue)) {
+      // We don't modify directly the old value because it may be inherited (e.g. global configuration).
+      newValue = ckeditor.tools.extend({}, oldValue, newValue, true);
+    }
+    object[key] = newValue;
+  };
+
+  require([
+    // We cannot add these modules to the list of dependencies because they need the tree module to be configured first.
+    'entityResourcePicker', 'entityResourceSuggester', 'entityResourceDisplayer',
+    // Load the translations for our custom CKEditor plugins. We didn't add this as a dependency to the xwiki-ckeditor
+    // module because some of our plugins load their dependencies with RequireJS and thus they are loaded with a small
+    // delay. The plugin needs to be defined before calling CKEDITOR.plugins.setLang().
+    new XWiki.Document('Translations', 'CKEditor').getURL('jsx', $.param({
+      language: currentLocale
+    }))
+  ], function() {
+    deferred.resolve(ckeditor);
+  });
+
+  return deferred.promise();
+});</code>
+    </property>
+    <property>
+      <name>CKEditor Module</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>b97f476f-dc62-43d1-a85a-a3d05acb8f22</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>// Fix CKEDITOR.tools.escapeCss() for browsers that don't support CSS.escape()
+// See https://github.com/ckeditor/ckeditor4/issues/681
+require(['jquery', 'ckeditor'], function($, ckeditor) {
+  // Test if CKEDITOR.tools.escapeCss() works as expected.
+  if (ckeditor.tools.escapeCss('.') === '.') {
+    // Special CSS characters were not escaped so we need to fix this.
+    // Use jQuery's escapeSelector() if available (only since jQuery 3.0), otherwise use some naive implementation.
+    ckeditor.tools.escapeCss = $.escapeSelector || function(selector) {
+      if (typeof selector === 'string') {
+        // Simple implementation.
+        // See https://learn.jquery.com/using-jquery-core/faq/how-do-i-select-an-element-by-an-id-that-has-characters-used-in-css-notation/
+        return selector.replace(/(:|\.|\[|\]|,|=|@)/g, '\\$1');
+      } else {
+        return selector;
+      }
+    };
+  }
+});
+
+// Fix the path to the arrow icon that indicates the presence of a sub-menu in the context menu.
+if (CKEDITOR_BASEPATH.indexOf('?') &gt;= 0) {
+  // The WebJar resource path was specified in the query string before 7.1M1 which prevented the browser from resolving
+  // relative paths. See XWIKI-10880 (A CSS file inside a webjar cannot use a resource from that webjar).
+  require(['ckeditor'], function(ckeditor) {
+    ckeditor.on('instanceReady', function(event) {
+      if (event.editor.contextMenu) {
+        event.editor.contextMenu._.panelDefinition.css.push(
+          '.cke_menuarrow {' +
+            'background-image: url("' + CKEDITOR_BASEPATH + 'skins/moono-lisa/images/arrow.png") !important;' +
+          '}'
+        );
+      }
+    });
+  });
+}
+
+// Polyfill for the xwiki:actions:beforeSave and xwiki:actions:beforePreview events (available since 7.4.1)
+// We have to use Prototype.js because it is loaded before jQuery and we need to register our save and preview listeners
+// before the actionButtons.js does it, as otherwise the CKEditor doesn't get the chance to update the text area before
+// the form is submitted.
+(function() {
+  var submitActions = ['save', 'preview'];
+  var beforeSubmitWasTriggered = false;
+  var onBeforeSubmit = function(event) {
+    beforeSubmitWasTriggered = true;
+    if (!(event.memo || {}).polyfill) {
+      removeListeners();
+    }
+  };
+  var onSubmit = function(event) {
+    if (!beforeSubmitWasTriggered &amp;&amp; jQuery) {
+      // Our CKEditor plugins use jQuery to listen to events.
+      var parts = event.eventName.split(':');
+      var data = event.memo || {};
+      data.polyfill = true;
+      jQuery(document).triggerHandler(getBeforeEventName(parts[parts.length - 1]), data);
+    }
+    beforeSubmitWasTriggered = false;
+  };
+  var getBeforeEventName = function(action) {
+    return 'xwiki:actions:before' + action.substr(0, 1).toUpperCase() + action.substr(1);
+  };
+  var removeListeners = function() {
+    submitActions.forEach(function(action) {
+      document.stopObserving(getBeforeEventName(action), onBeforeSubmit);
+      document.stopObserving('xwiki:actions:' + action, onSubmit);
+    });
+  };
+  if (typeof document.observe == 'function') {
+    submitActions.forEach(function(action) {
+      document.observe(getBeforeEventName(action), onBeforeSubmit);
+      document.observe('xwiki:actions:' + action, onSubmit);
+    });
+  }
+})();
+
+// Make sure the "Back To Edit" button from the Preview mode works as expected on XWiki versions older than 8.2 (where
+// CKEditor is not the default editor).
+require(['jquery'], function($) {
+  if (/&amp;sheet=CKEditor.EditSheet\b/.test(window.location.href)) {
+    // Make sure the CKEditor.EditSheet is preserved when coming back from Preview mode.
+    $('form#inline').find('input[name="xcontinue"]').val(function(index, oldValue) {
+      return oldValue + '&amp;sheet=CKEditor.EditSheet';
+    });
+  }
+});
+
+// Polyfill for entityReference.js
+require(['jquery'], function($) {
+  if (typeof XWiki.EntityType.byName !== 'function') {
+    // Before 6.4.1
+    var entityTypeByName = {
+      wiki: XWiki.EntityType.WIKI,
+      space: XWiki.EntityType.SPACE,
+      document: XWiki.EntityType.DOCUMENT,
+      attachment: XWiki.EntityType.ATTACHMENT
+    };
+    XWiki.EntityType.byName = function(name) {
+      return entityTypeByName[name];
+    };
+  }
+
+  if (typeof XWiki.EntityType.getName !== 'function') {
+    // Before 6.4.1
+    var entityTypes = ['wiki', 'space', 'document', 'attachment'];
+    XWiki.EntityType.getName = function(entityType) {
+      return entityTypes[entityType];
+    }
+  }
+
+  if (typeof XWiki.EntityReference.prototype.getReversedReferenceChain !== 'function') {
+    // Before 7.2M2
+    XWiki.EntityReference.prototype.getReversedReferenceChain = function() {
+      return this._extractComponents().reverse();
+    };
+  }
+
+  if (typeof XWiki.currentDocument.getDocumentReference !== 'function') {
+    // Before 7.2M3
+    // Take the current document full name.
+    var currentDocumentReference = $('meta[name="document"]').attr('content');
+    // Resolve the local reference.
+    currentDocumentReference = XWiki.Model.resolve(currentDocumentReference, XWiki.EntityType.DOCUMENT);
+    // Add the wiki component.
+    currentDocumentReference.getReversedReferenceChain()[0].parent = new XWiki.WikiReference(XWiki.currentWiki);
+    XWiki.currentDocument.getDocumentReference = function() {
+      return currentDocumentReference;
+    };
+  }
+
+  var reference = XWiki.Model.resolve('S', XWiki.EntityType.SPACE, new XWiki.WikiReference('W'));
+  if (!reference.parent) {
+    // The resolve method did not support a default value provider before 7.2M1.
+    var oldResolve = XWiki.Model.resolve;
+    XWiki.Model.resolve = function(representation, entityType, defaultValueProvider) {
+      var reference = oldResolve.apply(this, arguments);
+      if (reference &amp;&amp; defaultValueProvider &amp;&amp; typeof defaultValueProvider.extractReference === 'function') {
+        // The given default value provider is an entity reference (normally a document reference).
+        var root = reference.getReversedReferenceChain()[0];
+        // We cover the document and attachment references mainly,
+        var defaultRoot = defaultValueProvider.extractReference(root.type) || {parent: defaultValueProvider};
+        // Nested spaces were introduced in 7.2M1 so we can safely assume that the given default value provider has only
+        // one space reference component.
+        root.parent = defaultRoot.parent;
+      }
+      return reference;
+    };
+  }
+});
+
+// Fix the layout to be consistent with the Wiki edit mode (tested with the Flamingo Skin).
+require(['jquery'], function($) {
+  var ckeEditMeta = $('.cke-editMeta');
+  if (ckeEditMeta.length != 1) {
+    // Fix the layout only when the CKEditor.EditSheet is applied.
+    return;
+  }
+  // Hide the page title because the edit form has an input field to edit the title. This is consistent with the Wiki
+  // edit mode. Remove the 'editMeta' id because the edit sheet adds an element with the same id.
+  // NOTE: In order to rely on Chrome's Back-Forward cache we must not remove or move form elements. We can only hide.
+  $('#document-title').parent('#editMeta').removeAttr('id').parent('.row').hide();
+  // Move the content menu before the editMeta element so that they are displayed on the same row.
+  ckeEditMeta.attr('id', 'editMeta').addClass('col-md-pull-5')
+    .before($('#contentmenu').parent('.col-md-5').addClass('col-md-push-7'));
+});</code>
+    </property>
+    <property>
+      <name>Various fixes and polyfills</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>2</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>aec2f2f5-324f-4231-ba4e-a5a117d7871d</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-ckeditor', 'xwiki-events-bridge'], function($, ckeditorPromise) {
+  // Make sure we don't create the editors twice because this file can be loaded twice (by RequireJS, for in-place
+  // editing, and as a JSX resource, for standalone editing).
+  if (ckeditorPromise.__editSheetLoaded) {
+    return;
+  }
+  ckeditorPromise.__editSheetLoaded = true;
+
+  var createEditors = function(ckeditor, container) {
+    container.find('.ckeditor-textarea').each(function() {
+      // Wrap in try/catch so that a failure to load one editor doesn't affect the other editors.
+      try {
+        createEditor(ckeditor, this);
+      } catch(e) {
+        console.log(e);
+      }
+    });
+  };
+
+  var createEditor = function(ckeditor, textArea, instanceConfig) {
+    var deferred = $.Deferred();
+    var editor = ckeditor.replace(textArea, instanceConfig);
+    editor.once('instanceReady', deferred.resolve.bind(deferred, editor));
+    editor.once('reload', function(event) {
+      event.data.promise = event.data.promise.then(createEditor.bind(null, ckeditor, textArea));
+    });
+    return deferred.promise();
+  };
+
+  ckeditorPromise.done(function(ckeditor) {
+    createEditors(ckeditor, $(body));
+    // Make sure we don't register the event listener multiple times (in case this code is loaded multiple times).
+    $(document).off('xwiki:dom:updated.ckeditor').on('xwiki:dom:updated.ckeditor', function(event, data) {
+      createEditors(ckeditor, $(data.elements));
+    });
+  });
+});</code>
+    </property>
+    <property>
+      <name>CKEditor Loader</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>7c018302-f611-4eb4-9746-672a42b6fda2</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+/*
+#set ($ckeditorSkinPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-webjar', 'skins/moono-lisa'))
+#if ($ckeditorSkinPath.indexOf('?') &gt;= 0)
+  ## The WebJar resource path was specified in the query string before 7.1M1 which prevented the browser from resolving
+  ## relative paths. See XWIKI-10880 (A CSS file inside a webjar cannot use a resource from that webjar).
+  */
+  a.cke_button &gt; span.cke_button_icon {
+    background-image: url("$ckeditorSkinPath/icons.png") !important;
+  }
+  .cke_hidpi a.cke_button &gt; span.cke_button_icon {
+    background-image: url("$ckeditorSkinPath/icons_hidpi.png") !important;
+  }
+  .cke_notification_close, a.cke_dialog_close_button {
+    background-image: url("$ckeditorSkinPath/images/close.png") !important;
+  }
+  .cke_hidpi .cke_dialog_close_button {
+    background-image: url("$ckeditorSkinPath/images/hidpi/close.png") !important;
+  }
+  .cke_dialog a.cke_btn_reset {
+    background-image: url("$ckeditorSkinPath/images/refresh.png") !important;
+  }
+  .cke_hidpi .cke_dialog a.cke_btn_reset {
+    background-image: url("$ckeditorSkinPath/images/hidpi/refresh.png") !important;
+  }
+  .cke_dialog a.cke_btn_locked {
+    background-image: url("$ckeditorSkinPath/images/lock.png") !important;
+  }
+  .cke_hidpi .cke_dialog a.cke_btn_locked {
+    background-image: url("$ckeditorSkinPath/images/hidpi/lock.png") !important;
+  }
+  .cke_dialog a.cke_btn_unlocked {
+    background-image: url("$ckeditorSkinPath/images/lock-open.png") !important;
+  }
+  .cke_hidpi .cke_dialog a.cke_btn_unlocked {
+    background-image: url("$ckeditorSkinPath/images/hidpi/lock-open.png") !important;
+  }
+  .cke_menuarrow {
+    background-image: url("$ckeditorSkinPath/images/arrow.png") !important;
+  }
+  /*
+#end
+*/
+
+a.cke_button_disabled &gt; span.cke_button_icon.loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')") !important;
+  background-position: 0 0 !important;
+}
+
+.ckeditor-textarea.loading {
+  border: 0 none;
+  box-shadow: none;
+  color: transparent;
+  cursor: wait;
+  overflow: hidden;
+  resize: none;
+}
+
+/* Show the modal above the CKEditor dialogs */
+body &gt; .modal-backdrop {
+  z-index: 10040;
+}
+/* The modal can be nested inside the body while the backdrop is always a direct child of body. */
+body .modal {
+  z-index: 10050;
+}
+/* Make sure the selectize dropdown is displayed on top of the Bootstrap modal. */
+body &gt; .selectize-dropdown {
+  z-index: 10051;
+}
+
+/**
+ * Full-screen styles (for the standalone / classic editor).
+ */
+
+.fullScreenEditLinkContainer {
+  /* See XWIKI-5864 (Possibility to not add the maximize button for some certain textareas). */
+  display: none;
+}
+
+.cke_maximized .buttons {
+  background-color: $theme.backgroundSecondaryColor;
+  padding: .5em;
+}
+
+/* The 'skin-flamingo' class name is removed from the body element in full-screen mode so we need to fix the auto-save
+  styles. */
+.cke_maximized #autosaveControl input.autosave-frequency {
+  width: 3em;
+}
+
+/* Make sure the notifications (e.g. for Save &amp; Continue action) and the modals (e.g. for expired session) are visible
+  when editing in full-screen mode. */
+body[data-maximized] .xnotification-container,
+body[data-maximized] .xdialog-modal-container {
+  z-index: 9996;
+}
+
+/**
+ * Resource Picker Styles
+ * We duplicate a couple of Bootstrap styles because CKEditor resets the styles of all the dialog elements.
+ */
+.resourcePicker.input-group {
+  border-collapse: separate;
+  position: relative;
+}
+
+.resourcePicker input[type="text"] {
+  box-sizing: border-box;
+  padding: 6px;
+}
+
+.resourcePicker .input-group-btn {
+  font-size: 0;
+  position: relative;
+  vertical-align: middle;
+  width: 1%;
+}
+
+.resourcePicker .btn-default {
+  color: #333;
+  cursor: pointer;
+  border: 1px solid #CCC;
+  font-size: 14px;
+  line-height: 1.428571429;
+  padding: 6px 12px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.resourcePicker .btn-default:hover,
+.resourcePicker .btn-default:focus {
+  background-color: #E6E6E6;
+  background-image: none;
+}
+
+.resourcePicker .btn-default[disabled] {
+  cursor: default;
+}
+
+.resourcePicker .glyphicon {
+  font-family: 'Glyphicons Halflings';
+  line-height: 1;
+  position: relative;
+}
+
+.resourcePicker .caret {
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  border-top: 4px dashed;
+  border-top: 4px solid;
+  height: 0;
+  vertical-align: middle;
+  width: 0;
+}
+
+.resourcePicker .dropdown-toggle {
+  padding: 6px;
+}
+
+.resourcePicker .dropdown-menu {
+  background-clip: padding-box;
+  background-color: white;
+  border: 1px solid #CCC;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  float: left;
+  font-size: 14px;
+  margin: 2px 0 0;
+  padding: 5px 0;
+  position: absolute;
+}
+
+/* Overwrite the CKEditor style reset. */
+.resourcePicker .dropdown-menu li * {
+  cursor: pointer;
+}
+
+.resourcePicker .resource-hint.breadcrumb a,
+.resourcePicker .resource-hint.breadcrumb li.ellipsis {
+  font-size: smaller;
+}
+.resourcePicker .resource-hint.breadcrumb li.ellipsis {
+  color: inherit;
+}
+
+.resourcePicker .resourceDisplay {
+  box-sizing: border-box;
+}
+.resourcePicker .resourceDisplay.loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+  background-repeat: no-repeat;
+}
+
+td.cke_dialog_contents_body {
+  /* Make sure the resource type dropdown overflows outside the dialog body
+    (otherwise we get a vertical scroll bar when opening the dropdown). */
+  overflow: visible;
+}
+
+/**
+ * Make sure the footer of the entity resource picker modal is always visible because otherwise the user has to scroll a
+ * lot when the entity tree is expanded in order to click on the modal buttons to select an entity. See CKEDITOR-317:
+ * "Select page" dialog should scroll so that dialog buttons are always visible.
+ */
+.modal.entity-resource-picker-modal .ckeditor-tree {
+  /**
+   * modal margin + header + body padding + tree finder + footer = 268px
+   * modal margin = 2 x 30px
+   * header = 61px
+   * body padding = 2 x 15px
+   * tree finder = 48px
+   * footer = 69px
+   */
+  max-height: calc(100vh - 268px);
+  overflow-y: auto;
+}
+
+/**
+ * Link Options Toggle
+ */
+
+.linkOptionsToggle &gt; .cke_dialog_ui_labeled_label {
+  color: #777;
+  cursor: pointer;
+}
+.linkOptionsToggle .arrow {
+  display: inline-block;
+  height: 0;
+  width: 0;
+}
+.linkOptionsToggle .arrow-down {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #777;
+  margin-bottom: 1px;
+}
+.linkOptionsToggle .arrow-right {
+  border-bottom: 4px solid transparent;
+  border-left: 4px solid #777;
+  border-top: 4px solid transparent;
+  margin-right: 4px;
+}
+
+/**
+ * Custom tool bar icons (Glyphicon)
+ */
+a.cke_button.cke_button__xwiki-macro &gt; span.cke_button_icon.cke_button__xwiki-macro_icon,
+a.cke_button.cke_button__xwiki-macro-edit &gt; span.cke_button_icon.cke_button__xwiki-macro-edit_icon,
+a.cke_button.cke_button__xwiki-link-open &gt; span.cke_button_icon.cke_button__xwiki-link-open_icon,
+a.cke_button.cke_button__insert &gt; span.cke_button_icon.cke_button__insert_icon {
+  /* This is needed for XWiki versions older than 7.1M1 where we overwrite the icons path (see above). */
+  background-image: none !important;
+  font-family: 'Glyphicons Halflings';
+  position: relative;
+  top: 1px;
+}
+.cke_button_icon.cke_button__xwiki-macro_icon::before,
+.cke_button_icon.cke_button__xwiki-macro-edit_icon::before,
+.cke_button_icon.cke_button__xwiki-link-open_icon::before,
+.cke_button_icon.cke_button__insert_icon::before {
+  display: inline-block;
+  text-align: center;
+  width: 16px;
+}
+.cke_button_icon.cke_button__xwiki-macro_icon::before {
+  content: "\e019";
+}
+.cke_button_icon.cke_button__xwiki-macro-edit_icon::before {
+  content: "\e032";
+}
+.cke_button_icon.cke_button__xwiki-link-open_icon::before {
+  content: "\e164";
+}
+.cke_button_icon.cke_button__insert_icon::before {
+  content: "\002b";
+}
+
+/**
+ * Autocomplete styles
+ */
+ul.cke_autocomplete_panel {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  font: inherit;
+  padding: 5px 0;
+  width: auto;
+  max-width: 100%;
+  min-width: 200px;
+}
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-item {
+  padding: 3px 12px;
+}
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-item &gt; div {
+  white-space: nowrap;
+}
+.ckeditor-autocomplete-item-icon-wrapper {
+  display: inline-block;
+  height: 14px;
+  line-height: 14px;
+  margin-right: .3em;
+  text-align: center;
+  width: 14px;
+}
+.ckeditor-autocomplete-item-icon-wrapper img {
+  border-radius: 3px;
+  max-height: 14px;
+  max-width: 14px;
+  vertical-align: text-top;
+}
+/* The image still takes some space in IE11 even if there's no source specified. Let's make sure it's hidden.
+  See CKEDITOR-389: Missing space in the suggestions that appear while using the autocomplete function on IE 11 */
+.ckeditor-autocomplete-item-icon-wrapper img[src=""] {
+  display: none;
+}
+.ckeditor-autocomplete-item-hint {
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+}
+.ckeditor-autocomplete-item-hint:empty {
+  margin-top: 0;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>CKEditor Skin Fix</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>8a0aaf64-f6fd-4a0b-8262-e64062f101f5</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/**
+ * Source mode
+ */
+
+.cke_contents &gt; textarea.cke_source {
+  box-sizing: border-box;
+  color: @text-color;
+  font-family: @font-family-monospace;
+  font-size: inherit;
+  /* Same padding as on the page content. */
+  padding: @grid-gutter-width / 2;
+}
+
+.cke_contents &gt; textarea.cke_source.cke_editable_inline {
+  border: 1px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  margin-top: -1px;
+  margin-left: -1px;
+
+  .form-control-focus();
+}
+
+.cke_contents.fake {
+  /* We need this to have the box shadow visible when the source area is focused. */
+  overflow: visible;
+}
+
+#xwikicontent + .cke_contents &gt; textarea.cke_source.cke_editable_inline {
+  /* Don't take the padding and the margin into account when computing the 100% width. */
+  box-sizing: content-box;
+  /* Make sure the Source area has the same width as the WYSIWYG area. */
+  margin-left: -@grid-gutter-width / 2 - 1px;
+  margin-right: -@grid-gutter-width / 2 - 1px;
+}
+
+/**
+ * Full-screen styles for the in-line editor
+ */
+body[data-maximized="true"] {
+  overflow: hidden;
+
+  .cke_maximize_backdrop,
+  .cke_toolBar_active,
+  .cke_editable_active,
+  .cke_actionBar_active {
+    position: fixed !important;
+    right: 0 !important;
+    left: 0 !important;
+  }
+
+  /*
+   * The tool bar
+   */
+  .cke_toolBar_active {
+    /* We have to use !important in order to overwrite the in-line styles. */
+    display: block !important;
+    top: 0 !important;
+  }
+
+  /*
+   * The editing area
+   */
+  .cke_maximize_backdrop,
+  .cke_editable_active {
+    background-color: @xwiki-page-content-bg;
+  }
+  .cke_editable_active {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    overflow-y: auto !important;
+    z-index: 9995;
+
+    &amp;:focus {
+      /* Remove the focus border. */
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+  .cke_maximize_backdrop {
+    top: 0;
+    bottom: 0;
+    z-index: 99;
+  }
+
+  /*
+   * The action buttons
+   */
+  .cke_actionBar_active {
+    background-color: @xwiki-background-secondary-color;
+    border: 1px solid @xwiki-border-color;
+    bottom: 0;
+    /* Reduce a bit the padding. */
+    padding: .5em;
+    z-index: 9995;
+  }
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name>LESS</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.EditSheet</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>c6187249-bea2-403f-bc5d-b8b0c786f585</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.requirejs.module.ckeditor</name>
+    </property>
+    <property>
+      <parameters>id=xwiki-ckeditor
+path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.extension.installed.getInstalledExtension('org.xwiki.platform:xwiki-platform-ckeditor-ui', "wiki:$xcontext.database").version.value, 'xwiki-version': $services.extension.core.getCoreExtension('org.xwiki.platform:xwiki-platform-tree-webjar').version.value, 'fast-diff-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:fast-diff', "wiki:$xcontext.database").version.value, 'bs3typeahead-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:bootstrap-3-typeahead', "wiki:$xcontext.database").version.value}))</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

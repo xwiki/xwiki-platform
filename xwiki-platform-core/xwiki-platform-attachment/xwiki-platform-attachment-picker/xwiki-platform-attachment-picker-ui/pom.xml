@@ -49,23 +49,12 @@
     <!-- CKEditor is required for the integration of the attachment picker with the image picker dialog.
          It is an optional dependency and can be safely uninstalled if CKEditor is not required. -->
     <dependency>
-      <groupId>org.xwiki.contrib</groupId>
-      <artifactId>application-ckeditor-ui</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
+      <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>
       <optional>true</optional>
-      <exclusions>
-        <!-- Exclude to avoid conflicts with older versions of XWiki platform and rendering deps drawn by the 
-             contrib dependency. -->
-        <exclusion>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.xwiki.rendering</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Provides XWiki.SuggestSolrService required to search for the attachments through solr. -->
     <dependency>

@@ -50,7 +50,6 @@
     <rendering.version>${platform.version}</rendering.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.64.2</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.14</batik.version>
     <restlet.version>2.3.12</restlet.version>
@@ -380,13 +379,6 @@
         <version>1.2.0-xwiki</version>
         <scope>runtime</scope>
       </dependency>
-      <!-- Embedded in the Standard Flavor and used by the Dashboard Application (to add/edit gadgets) -->
-      <dependency>
-        <groupId>org.xwiki.contrib</groupId>
-        <artifactId>application-ckeditor-ui</artifactId>
-        <version>${ckeditor.version}</version>
-        <type>xar</type>
-      </dependency>
       <!-- Drawn by several transitive dependencies -->
       <dependency>
         <groupId>org.jfree</groupId>
@@ -428,6 +420,12 @@
         <groupId>org.webjars</groupId>
         <artifactId>bootstrap-select</artifactId>
         <version>1.13.18</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>bootstrap-3-typeahead</artifactId>
+        <version>4.0.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -930,6 +928,14 @@
         <artifactId>annotations</artifactId>
         <version>19.0.0</version>
       </dependency>
+
+      <!-- Fast Diff -->
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>fast-diff</artifactId>
+        <version>1.2.0</version>
+        <scope>runtime</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -1271,6 +1277,26 @@
                   </message>
                   <excludes>
                     <exclude>org.apache.tika:tika-parsers</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure the old ckeditor contrib extension is not used. -->
+          <execution>
+            <id>enforce-ckeditor-platform</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    Do not use the CKEditor extension from contrib. Is it now packaged in xwiki platform.
+                  </message>
+                  <excludes>
+                    <exclude>org.xwiki.contrib:application-ckeditor*</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>

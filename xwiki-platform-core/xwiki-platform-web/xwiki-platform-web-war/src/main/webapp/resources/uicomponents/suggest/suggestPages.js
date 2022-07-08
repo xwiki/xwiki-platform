@@ -18,17 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($paths = {
-  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
-})
 #set ($pageIcon = $services.icon.getMetaData('page_white'))
 #set ($webHome = $services.model.getEntityReference('DOCUMENT', 'default').name)
 #[[*/
 // Start JavaScript-only code.
-(function(paths, pageIcon, webHome) {
+(function(pageIcon, webHome) {
   "use strict";
-
-require.config({paths});
 
 define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   webHome = webHome || 'WebHome';
@@ -170,4 +165,4 @@ require(['jquery', 'xwiki-suggestPages', 'xwiki-events-bridge'], function($) {
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $pageIcon, $webHome]));
+}).apply(']]#', $jsontool.serialize([$pageIcon, $webHome]));

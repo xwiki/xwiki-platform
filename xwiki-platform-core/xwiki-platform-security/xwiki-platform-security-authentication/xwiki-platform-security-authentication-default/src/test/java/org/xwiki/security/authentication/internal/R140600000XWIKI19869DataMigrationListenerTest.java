@@ -19,14 +19,11 @@
  */
 package org.xwiki.security.authentication.internal;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.junit.jupiter.api.Test;
@@ -99,7 +96,10 @@ class R140600000XWIKI19869DataMigrationListenerTest
         verifyNoInteractions(this.resetPasswordManager);
         verifyNoInteractions(this.userReferenceResolver);
 
-        Files.writeString(migrationFile.toPath(), "XWiki.Foo\nXWiki.Bar\nXWiki.Buz", StandardOpenOption.CREATE_NEW);
+        BufferedWriter bufferedWriter = Files.newBufferedWriter(migrationFile.toPath(), StandardOpenOption.CREATE_NEW);
+        bufferedWriter.write("XWiki.Foo\nXWiki.Bar\nXWiki.Buz");
+        bufferedWriter.flush();
+        bufferedWriter.close();
 
         String mailFallbackSubject = "Subject fallback";
         String mailFallbackContent = "Mail content";
@@ -154,12 +154,18 @@ class R140600000XWIKI19869DataMigrationListenerTest
         // The file should have been deleted just after the first call
         this.listener.onEvent(null, null, null);
 
-        Files.writeString(migrationFile.toPath(), "XWiki.Foo", StandardOpenOption.CREATE);
+        bufferedWriter = Files.newBufferedWriter(migrationFile.toPath(), StandardOpenOption.CREATE);
+        bufferedWriter.write("XWiki.Foo");
+        bufferedWriter.flush();
+        bufferedWriter.close();
         File mailTemplate = new File(tmpDir, "140600000XWIKI19869-mail.txt");
         String mailSubject = "test";
         String mailContent = "Some mail content";
-        Files.writeString(mailTemplate.toPath(),
-            String.format("Subject:%s\n%s", mailSubject, mailContent), StandardOpenOption.CREATE_NEW);
+
+        bufferedWriter = Files.newBufferedWriter(mailTemplate.toPath(), StandardOpenOption.CREATE_NEW);
+        bufferedWriter.write(String.format("Subject:%s\n%s", mailSubject, mailContent));
+        bufferedWriter.flush();
+        bufferedWriter.close();
 
         this.listener.onEvent(null, null, null);
 

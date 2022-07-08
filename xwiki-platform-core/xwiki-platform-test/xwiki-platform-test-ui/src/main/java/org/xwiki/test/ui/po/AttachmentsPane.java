@@ -273,7 +273,7 @@ public class AttachmentsPane extends BaseElement
      * @param attachmentName the name of the attachment
      * @return the version number displayed for the attachment
      */
-    public String getLatestVersionOfAttachment(String attachmentName)
+    public String getLatestVersionOfAttachment(String attachmentName) throws Exception
     {
         return this.getAttachmentVersionElement(attachmentName).getText();
     }

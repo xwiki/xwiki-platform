@@ -34,7 +34,6 @@
   <modules>
     <module>xwiki-platform-ckeditor-base</module>
     <module>xwiki-platform-ckeditor-plugins</module>
-    <module>xwiki-platform-ckeditor-test</module>
     <module>xwiki-platform-ckeditor-ui</module>
     <module>xwiki-platform-ckeditor-webjar</module>
   </modules>

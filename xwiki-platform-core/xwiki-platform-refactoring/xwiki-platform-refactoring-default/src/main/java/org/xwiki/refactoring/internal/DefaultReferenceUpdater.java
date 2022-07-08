@@ -302,7 +302,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
                 for (Locale locale : locales) {
                     this.progressManager.startStep(this);
                     renameLinks(document.getTranslatedDocument(locale, xcontext), oldLinkTarget, newLinkTarget,
-                        xcontext, false, renameLambda);
+                        xcontext, relative, renameLambda);
                     this.progressManager.endStep(this);
                 }
             }

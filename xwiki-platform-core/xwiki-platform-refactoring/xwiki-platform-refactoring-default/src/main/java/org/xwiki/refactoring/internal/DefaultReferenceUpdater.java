@@ -334,8 +334,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         EntityReference newTargetReference)
     {
         // If the current document is the moved entity the links should be serialized relative to it
-        EntityReference newDocumentReference = newTargetReference.extractReference(EntityType.DOCUMENT);
-        boolean relative = newDocumentReference != null && newDocumentReference.equals(documentReference);
+        boolean relative = newTargetReference.equals(documentReference);
 
         // Old and new target must be of same type
         if (oldTargetReference.getType() != newTargetReference.getType()) {

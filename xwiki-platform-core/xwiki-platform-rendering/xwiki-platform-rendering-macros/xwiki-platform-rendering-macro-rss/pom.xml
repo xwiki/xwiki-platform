@@ -60,5 +60,13 @@
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- For the HTMLCleaner component list. -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

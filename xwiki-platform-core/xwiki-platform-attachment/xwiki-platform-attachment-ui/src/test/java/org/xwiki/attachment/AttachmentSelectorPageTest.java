@@ -41,9 +41,11 @@ import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
+import org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacroManager;
 import org.xwiki.rendering.internal.macro.wikibridge.WikiMacroEventListener;
 import org.xwiki.rendering.internal.syntax.SyntaxConverter;
+import org.xwiki.rendering.internal.transformation.macro.DefaultMacroTransformationConfiguration;
 import org.xwiki.rendering.script.RenderingScriptService;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroFactory;
@@ -83,6 +85,8 @@ import static org.mockito.Mockito.when;
     DefaultExtendedRenderingConfiguration.class,
     RenderingConfigClassDocumentConfigurationSource.class,
     SyntaxConverter.class,
+    DefaultMacroCategoryManager.class,
+    DefaultMacroTransformationConfiguration.class,
     // End RenderingScriptService
     ControlCharactersFilter.class,
     ModelScriptService.class,

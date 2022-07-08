@@ -115,7 +115,7 @@ public class Lightbox extends BaseElement
     public String getDate()
     {
         By dateSelector = By.cssSelector("#blueimp-gallery .date");
-        return getDriver().findElement(dateSelector).getText().replace("on", "");
+        return getDriver().findElement(dateSelector).getText().replace("on ", "");
     }
 
     public WebElement getDownloadButton()

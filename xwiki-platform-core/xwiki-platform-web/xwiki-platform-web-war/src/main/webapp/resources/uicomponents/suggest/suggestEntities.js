@@ -20,7 +20,7 @@
 /*!
 #set ($paths = {
   'xwiki-suggestPages': $xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true),
-  'xwiki-suggestAttachments': $xwiki.getSkinFile('uicomponents/suggest/suggestAttachments.js', true)
+  'xwiki-suggestAttachments': $xwiki.getSkinFile('uicomponents/suggest/suggestAttachments.js')
 })
 #[[*/
 // Start JavaScript-only code.

@@ -17,16 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($paths = {
-  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
-})
-#[[*/
-// Start JavaScript-only code.
-(function(paths) {
-  "use strict";
-
-require.config({paths});
 
 /**
  * Utils
@@ -188,6 +178,3 @@ require(['jquery', 'xwiki-suggestUsers', 'xwiki-suggestGroups', 'xwiki-events-br
   $(document).on('xwiki:dom:updated', init);
   $(init);
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths]));

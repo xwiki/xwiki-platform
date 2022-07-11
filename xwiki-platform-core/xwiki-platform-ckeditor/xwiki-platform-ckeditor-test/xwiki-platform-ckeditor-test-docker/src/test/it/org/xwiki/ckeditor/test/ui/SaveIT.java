@@ -21,6 +21,7 @@ package org.xwiki.ckeditor.test.ui;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.panels.test.po.DocumentInformationPanel;
@@ -71,7 +72,9 @@ public class SaveIT
 
         // Type some text to verify that it isn't lost when we change the syntax.
         CKEditor editor = new CKEditor("content").waitToLoad();
-        editor.getRichTextArea().sendKeys("test ");
+        // First move the cursor to the start before entering the text to ensure it is outside the link, being
+        // outside the link is the initial state in Chrome but not in Firefox.
+        editor.getRichTextArea().sendKeys(Keys.HOME, "test ");
 
         DocumentSyntaxPicker documentSyntaxPicker = new DocumentInformationPanel().getSyntaxPicker();
         assertEquals("xwiki/2.0", documentSyntaxPicker.getSelectedSyntax());
@@ -81,7 +84,7 @@ public class SaveIT
             .contains("from the previous XWiki 2.0 syntax to the selected XWiki 2.1 syntax?"));
         confirmationModal.confirmSyntaxConversion();
 
-        assertEquals("[[test label>>||anchor=\"target\"]]", editPage.clickSaveAndView().editWiki().getContent());
+        assertEquals("test [[label>>||anchor=\"target\"]]", editPage.clickSaveAndView().editWiki().getContent());
         assertEquals("xwiki/2.1", new DocumentInformationPanel().getSyntaxPicker().getSelectedSyntax());
     }
 }

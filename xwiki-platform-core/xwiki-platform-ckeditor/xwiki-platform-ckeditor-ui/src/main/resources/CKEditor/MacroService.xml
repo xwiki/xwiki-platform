@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="CKEditor.MacroService" locale="">
+<xwikidoc version="1.5" reference="CKEditor.MacroService" locale="">
   <web>CKEditor</web>
   <name>MacroService</name>
   <language/>
@@ -76,6 +76,23 @@
 ## }
 ## ================================================================
 #macro (getMacroList $syntaxId)
+
+  ## Loads the css resources to display the macros list
+  ## TODO: Refactor once we add support for loading css files from javascript without velocity.
+  #if ($xcontext.action == 'get')
+    #template('display_macros.vm')
+    #initRequiredSkinExtensions()
+  #end
+
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
+
+  #if ($xcontext.action == 'get')
+    #getRequiredSkinExtensions($requiredSkinExtensions)
+    #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+  #end
+
   #set ($syntax = $services.rendering.resolveSyntax($syntaxId))
   #set ($macroDescriptors = $services.rendering.getMacroDescriptors($syntax))
   #if (!$macroDescriptors)
@@ -94,16 +111,38 @@
   #set ($discard = $allMacrosExcludedCategories.add("#maybeTranslate('rendering.macroCategory.Internal' 'Internal')"))
   #set ($discard = $allMacrosExcludedCategories.add("#maybeTranslate('rendering.macroCategory.Deprecated' 'Deprecated')"))
   #set ($discard = $data.put('options', { 'allMacrosExcludedCategories' : $allMacrosExcludedCategories }))
+  ## If the current user do not want to display hidden documents, we initialize the set of hidden default
+  ## categories.
+  ## TODO: Make the list of hidden by default categories configurable from the administration (XWIKI-19993).
+  #if(!$services.user.getProperties().displayHiddenDocuments())
+    #set ($hiddenCategories = ['Internal', 'Deprecated'])
+  #else
+    #set ($hiddenCategories = [])
+  #end
   #set ($macroList = [])
   #foreach ($macroDescriptor in $macroDescriptors)
     #set ($macroTranslationKey = "rendering.macro.$macroDescriptor.id")
-    #set ($macroCategoryTranslationKey = "rendering.macroCategory.$macroDescriptor.defaultCategory")
-    #set ($discard = $macroList.add({
-      'id': $macroDescriptor.id,
-      'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",
-      'description': "#maybeTranslate(""${macroTranslationKey}.description"" $macroDescriptor.description)",
-      'defaultCategory': "#maybeTranslate($macroCategoryTranslationKey $macroDescriptor.defaultCategory)"
-    }))
+    #set ($categories = [])
+    #set ($hidden = false)
+    #foreach ($category in $services.rendering.getMacroCategories($macroDescriptor.id))
+      #set ($macroCategoryTranslationKey = "rendering.macroCategory.$category")
+      #set ($hidden = $hidden || $hiddenCategories.contains($category))
+      #set ($discard = $categories.add({
+        'id': $category,
+        'label': "#maybeTranslate($macroCategoryTranslationKey $category)"
+      }))
+    #end
+
+    #if (!$hidden)
+      #set ($defaultCategoryTranslation = "rendering.macroCategory.${macroDescriptor.defaultCategory}")
+      #set ($discard = $macroList.add({
+        'id': $macroDescriptor.id,
+        'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",
+        'description': "#maybeTranslate(""${macroTranslationKey}.description"" $macroDescriptor.description)",
+        'defaultCategory': "#maybeTranslate($defaultCategoryTranslation $macroDescriptor.defaultCategory)",
+        'categories': $categories
+      }))
+    #end
   #end
   #set ($macroList = $resolvedSortTool.sort($macroList, 'name'))
   #set ($discard = $data.put('list', $macroList))
@@ -118,7 +157,6 @@
   #end
   #set ($discard = $extensionQuery.setInstalled(false, '', "wiki:$xcontext.database"))
   #set ($extensions = $services.extension.index.repository.search($extensionQuery))
-  #set ($macroExtensionCategory = $services.localization.render('ckeditor.plugin.macro.notinstalled'))
   #if ($extensions.size &gt; 0)
     #set ($macroExtensionsMap = {})
     #foreach ($extension in $extensions)
@@ -135,6 +173,10 @@
               'name': $extensionComponent.roleHint,
               'description': $extension.summary,
               'defaultCategory': '_notinstalled',
+              'categories': [{
+                'id' :'_notinstalled',
+                'label': $services.localization.render('macroSelector.filter.category.notinstalled')
+              }],
               'extensionId' : $extension.id.id,
               'extensionVersion' : $extension.id.version.value,
               'extensionType' : $extension.type,

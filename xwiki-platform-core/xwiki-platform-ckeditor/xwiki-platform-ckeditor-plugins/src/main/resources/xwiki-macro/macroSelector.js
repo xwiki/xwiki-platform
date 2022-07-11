@@ -20,6 +20,7 @@
 define('macroSelectorTranslationKeys', [], [
   'title',
   'filter.text.placeholder',
+  'filter.category.placeholder',
   'filter.category.all',
   'filter.category.notinstalled',
   'filter.category.other',
@@ -29,10 +30,10 @@ define('macroSelectorTranslationKeys', [], [
   'install.notAllowed'
 ]);
 
-define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $modal, translations) {
+define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'xwiki-selectize'], 
+  function($, $modal, translations) {
   'use strict';
   var macrosBySyntax = {},
-  allMacrosExcludedCategories = [],
 
   getMacros = function(syntaxId, force) {
     var deferred = $.Deferred();
@@ -52,7 +53,6 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
             macroList = macroList.concat(macros.notinstalled);
           }
           macrosBySyntax[syntaxId || ''] = macroList;
-          allMacrosExcludedCategories = macros.options.allMacrosExcludedCategories;
           deferred.resolve(macroList);
         } else {
           deferred.reject.apply(deferred, arguments);
@@ -66,25 +66,36 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
 
   macroListTemplate = '<ul class="macro-list form-control" tabindex="0"></ul>',
   macroListItemTemplate =
-    '<li data-macroCategory="" data-macroId="" ' +
+    '<li data-macroCategories="" data-macroId="" ' +
         'data-extensionId="" data-extensionVersion="" data-extensionInstallAllowed="">' +
       '<div>' +
         '<span class="macro-name"></span>' +
         '<span class="macro-extension"></span>' +
-        '<span class="macro-category badge"></span>' +
+        '<span class="macro-categories-badges"></span>' +
       '</div>' +
       '<div class="macro-description"></div>' +
     '</li>',
 
   displayMacros = function(macros) {
     var list = $(macroListTemplate);
-    var categories = {};
+
+    function initMacroCategories() {
+      var categories = {};
+      macros.forEach(function (macro) {
+        macro.categories.forEach(function(category) {
+          categories[category.id] = categories[category.id] || category;
+        });
+      });
+      return categories;
+    }
+
+    var categories = initMacroCategories();
+
     macros.forEach(function(macro) {
-      var macroCategory = macro.defaultCategory || '';
-      categories[macroCategory] = (categories[macroCategory] || 0) + 1;
+      var macroCategories = macro.categories;
       var macroListItem = $(macroListItemTemplate).attr({
         'data-macroId': macro.id.id,
-        'data-macroCategory': macroCategory
+        'data-macroCategories': macroCategories.map(function(category) { return category.id; }).join(',')
       }).appendTo(list);
       macroListItem.find('.macro-name').text(macro.name);
       if (macro.extensionName) {
@@ -96,104 +107,51 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
           'data-extensionInstallAllowed': macro.extensionInstallAllowed
         });
       }
-      if (macro.defaultCategory === '_notinstalled') {
-        macroListItem.find('.macro-category').text(translations.get('filter.category.notinstalled'));
-      }
+      macro.categories.forEach(function (category) {
+        macroListItem.find('.macro-categories-badges')
+          .append($('<span>').addClass('badge').text(category.label));
+      });
+
       macroListItem.find('.macro-description').text(macro.description);
     });
-    var categoryFilter = createCategoryFilter(sortCategories(categories));
-    var textFilter = $(document.createElement('input')).attr({
+    var textFilter = $("<input/>").attr({
       'type': 'text',
       'class': 'macro-textFilter',
       'placeholder': translations.get('filter.text.placeholder')
     });
-    var filters = $(document.createElement('div')).addClass('macro-filters input-group');
-    filters.append(textFilter).append(categoryFilter);
-    this.removeClass('loading').append(filters).append(list);
-    // Filter the list of displayed macros to implement support for allMacrosExcludedCategories (i.e. when all macros
-    // is selected, don't display macros in some given categories). More generally this makes sure that the filtering
-    // is always done.
-    filterMacros.call(this);
-  },
+    var filters = $("<div/>").addClass('macro-filters xform');
+    var categoriesFilter = $('<select/>')
+      .addClass("macro-categories-field")
+      .attr("multiple", true);
+    filters.append($('<p/>').append(textFilter)).append($('<p/>').append(categoriesFilter));
+    this.removeClass('loading')
+      .append(filters)
+      .append(list);
 
-  sortCategories = function(categories) {
-    var otherCategoryCount = categories[''];
-    var allCategoryCount = otherCategoryCount || 0;
-    var notinstalledCategoryCount = categories._notinstalled;
-    if (notinstalledCategoryCount) {
-      allCategoryCount += notinstalledCategoryCount;
-    }
-    delete categories[''];
-    delete categories._notinstalled;
-    var categoryList = $.map(categories, function(categoryCount, categoryName) {
-      if (allMacrosExcludedCategories.indexOf(categoryName) < 0) {
-        allCategoryCount += categoryCount;
+    var macroSelectorThis = this;
+
+    // Initialize the selectize for the categories filter.
+    categoriesFilter.xwikiSelectize({
+      preload: true,
+      placeholder: translations.get('filter.category.placeholder'),
+      onChange: function () {
+        filterMacros.call(macroSelectorThis);
+      },
+      load: function (typedText, callback) {
+        callback(Object.keys(categories).filter(function (category) {
+          return category.toLowerCase().indexOf(typedText.toLowerCase()) !== -1;
+        }).map(function (category) {
+          return {
+            label: categories[category].label,
+            value: category
+          };
+        }));
       }
-      return {
-        'id': categoryName,
-        'name': categoryName,
-        'count': categoryCount
-      };
-    }).sort(function(alice, bob) {
-      return alice.name.localeCompare(bob.name);
     });
-    // Put "All Macros" category first.
-    categoryList.splice(0, 0, {
-      name: translations.get('filter.category.all'),
-      count: allCategoryCount
-    });
-    // Put "Other" category after other categories.
-    if (otherCategoryCount) {
-      categoryList.push({
-        id: '',
-        name: translations.get('filter.category.other'),
-        count: otherCategoryCount
-      });
-    }
-    // Put "Not installed" category last.
-    if (notinstalledCategoryCount) {
-      categoryList.push({
-        id: '_notinstalled',
-        name: translations.get('filter.category.notinstalled'),
-        count: notinstalledCategoryCount
-      });
-    }
-    return categoryList;
-  },
-
-  createCategoryFilter = function(categories) {
-    var categoryFilter = $(
-      '<div class="macro-categories input-group-btn">' +
-        '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ' +
-          'aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>' +
-        '<ul class="dropdown-menu dropdown-menu-right"></ul>' +
-      '</div>'
-    );
-    var categoryTemplate = [
-      '<li class="macro-category">',
-        '<a href="#">',
-          '<span class="macro-category-name"></span>',
-          '<span class="macro-category-count badge"></span>',
-        '</a>',
-      '</li>'].join('');
-    categoryFilter.find('ul.dropdown-menu').append(categories.map(function(category) {
-      var item = $(categoryTemplate).attr('data-category', category.id);
-      item.find('.macro-category-name').text(category.name);
-      item.find('.macro-category-count').text(category.count);
-      return item[0];
-    }));
-    var separator = '<li role="separator" class="divider"></li>';
-    // Add separator after "All Macros" category.
-    if (categories.length > 1) {
-      categoryFilter.find('.macro-category:not([data-category])').after(separator);
-    }
-    // Add separator before "Other" category.
-    categoryFilter.find('.macro-category[data-category=""]').before(separator);
-    // Add separator before "Not installed" category.
-    categoryFilter.find('.macro-category[data-category="_notinstalled"]').before(separator);
-    // Select "All Macros" by default.
-    categoryFilter.find('.caret').before(document.createTextNode(categories[0].name + ' '));
-    return categoryFilter;
+    
+    // Filter the list of displayed macros according to the default filtering values. More generally this makes sure
+    // that the filtering is always done.
+    filterMacros.call(this);
   },
 
   scrollIntoList = function(item) {
@@ -211,19 +169,19 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
 
   filterMacros = function() {
     var text = $(this).find('.macro-textFilter').val().toLowerCase();
-    var selectedCategory = $(this).find('.macro-categories .dropdown-toggle').attr('data-category');
+    var selectedCategories = $(this).find('.macro-categories-field.selectized')[0].selectize.items;
+
     var macroSelector = $(this).closest('.macro-selector');
-    macroSelector.find('.macro-list').scrollTop(0).children().each(function() {
+    macroSelector.find('.macro-list').scrollTop(0).children().each(function () {
       var name = $(this).find('.macro-name').text().toLowerCase();
       var description = $(this).find('.macro-description').text().toLowerCase();
-      var category = $(this).attr('data-macroCategory');
-      // We hide Macros located in some categories to exclude (e.g. internal and deprecated categories) so that they
-      // are less visible to users, to provide a simpler user experience by not bloating the macro list with
-      // macros that are less interesting to users.
-      // Note that when "All Macros" is selected selectedCategory is undefined.
-      var hide = (text && name.indexOf(text) < 0 && description.indexOf(text) < 0) ||
-        (typeof selectedCategory === 'string' && category !== selectedCategory) ||
-          (typeof selectedCategory !== 'string' && $.inArray(category, allMacrosExcludedCategories) !== -1);
+      var categories = $(this).attr('data-macroCategories').split(',');
+      // Hide all the macro that does not include the searched text in the name or the description.
+      // Also hide all macros that don't have all of the selected categories (if a selection exists).
+      var hide = text && text && name.indexOf(text) < 0 && description.indexOf(text) < 0 ||
+        selectedCategories.length > 0 && selectedCategories.filter(function (category) {
+          return !categories.includes(category);
+        }).length > 0;
       $(this).removeClass('selected').toggleClass('hidden', hide);
     }).not('.hidden').first().addClass('selected');
     macroSelector.trigger('change');
@@ -329,8 +287,8 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
       getSelectedMacro: function() {
         return macroSelector.find('.macro-list > li.selected').attr('data-macroId');
       },
-      getSelectedMacroCategory: function() {
-        return macroSelector.find('.macro-list > li.selected').attr('data-macroCategory');
+      getSelectedMacroCategories: function() {
+        return macroSelector.find('.macro-list > li.selected').attr('data-macroCategories').split(',');
       },
       getSelectedExtensionId: function() {
         return macroSelector.find('.macro-list > li.selected').attr('data-extensionId');
@@ -339,10 +297,10 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
         return macroSelector.find('.macro-list > li.selected').attr('data-extensionVersion');
       },
       isInstalledMacro: function() {
-        return this.getSelectedMacroCategory() != '_notinstalled';
+        return !this.getSelectedMacroCategories().includes('_notinstalled');
       },
       isExtensionInstallAllowed: function() {
-        return macroSelector.find('.macro-list > li.selected').attr('data-extensionInstallAllowed') != 'false';
+        return macroSelector.find('.macro-list > li.selected').attr('data-extensionInstallAllowed') !== 'false';
       },
       reset: function(macroId) {
         this.filter('');
@@ -411,7 +369,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
         var macroSelectorAPI = modal.find('.macro-selector').xwikiMacroSelector();
         var output = modal.data('input') || {};
         output.macroId = macroSelectorAPI.getSelectedMacro();
-        output.macroCategory = macroSelectorAPI.getSelectedMacroCategory();
+        output.macroCategories = macroSelectorAPI.getSelectedMacroCategories();
         output.extensionId = macroSelectorAPI.getSelectedExtensionId();
         output.extensionVersion = macroSelectorAPI.getSelectedExtensionVersion();
         modal.data('output', output).modal('hide');

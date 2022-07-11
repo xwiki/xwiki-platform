@@ -65,9 +65,8 @@ ul.macro-list .macro-extension {
   white-space: normal;
 }
 
-.macro-category-count.badge {
-  min-width: auto;
-  margin-left: 2em;
+.macro-categories-badges .badge {
+  margin-right: 5px;
 }
 
 .macro-editor .macro-name {

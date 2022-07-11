@@ -196,6 +196,7 @@ macroSelector.failedToRetrieveMacros=Failed to retrieve the list of available ma
 macroSelector.select=Select
 macroSelector.install=Install
 macroSelector.install.notAllowed=You are not allowed to install this extension
+macroSelector.filter.category.placeholder=Select a category...
 
 macroEditor.title=Edit Macro
 macroEditor.more=More

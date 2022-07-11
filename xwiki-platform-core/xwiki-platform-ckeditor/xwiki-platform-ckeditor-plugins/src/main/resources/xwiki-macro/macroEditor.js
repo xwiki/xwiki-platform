@@ -761,7 +761,7 @@ define(
         var input = modal.data('input');
 
         // Install the macro extension (if not already installed)
-        if (input.macroCategory == '_notinstalled') {
+        if (input.macroCategories && input.macroCategories.includes('_notinstalled')) {
           install.call(this, input, macroEditor);
         } else {
           load.call(this, input, macroEditor);

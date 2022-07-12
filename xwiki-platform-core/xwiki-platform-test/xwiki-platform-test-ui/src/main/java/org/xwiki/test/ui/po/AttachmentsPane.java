@@ -190,8 +190,8 @@ public class AttachmentsPane extends BaseElement
         WebElement deleteButton = this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 6)
             .findElement(By.className("actiondelete"));
         // This is needed since Selenium deleteButton.click() fails on smaller windows, even if the element is
-        // clickable (visible and enabled). The failure was reproduced on {@code org.xwiki.test.ui.CompareVersionsTest}
-        // and might be resolved after moving the test to docker.
+        // clickable (visible and enabled). The failure was reproduced on org.xwiki.test.ui.CompareVersionsTest and
+        // might be resolved after moving the test to docker.
         ((JavascriptExecutor) getDriver()).executeScript("arguments[0].click();", deleteButton);
         this.confirmDelete.clickOk();
 

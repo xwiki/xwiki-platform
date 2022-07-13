@@ -36,7 +36,7 @@ import org.xwiki.security.authorization.Right;
  * HTML raw block filter that considers rights of the author.
  *
  * @version $Id$
- * @since 14.6RC1
+ * @since 14.7RC1
  */
 @Component
 @Singleton
@@ -44,7 +44,7 @@ import org.xwiki.security.authorization.Right;
 public class XWikiHTMLRawBlockFilter extends HTMLRawBlockFilter
 {
     /**
-     * Used to verify if the current doc has client scripting rights.
+     * Used to verify if the current doc has scripting rights.
      */
     @Inject
     private ContextualAuthorizationManager authorizationManager;
@@ -53,7 +53,7 @@ public class XWikiHTMLRawBlockFilter extends HTMLRawBlockFilter
     public RawBlock filter(RawBlock block, RawBlockFilterParameters parameters) throws MacroExecutionException
     {
         if (SyntaxType.HTML_FAMILY_TYPES.contains(block.getSyntax().getType())
-            && !this.authorizationManager.hasAccess(Right.PROGRAM))
+            && !this.authorizationManager.hasAccess(Right.SCRIPT))
         {
             parameters.setRestricted(true);
         }

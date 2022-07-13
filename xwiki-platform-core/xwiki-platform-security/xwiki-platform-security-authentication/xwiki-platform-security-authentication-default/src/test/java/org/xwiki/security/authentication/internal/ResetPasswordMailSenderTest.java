@@ -43,6 +43,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MimeMessageFactory;
@@ -172,10 +173,14 @@ class ResetPasswordMailSenderTest
             .thenReturn(message);
         MailStatusResult mailStatusResult = mock(MailStatusResult.class);
         when(this.mailListener.getMailStatusResult()).thenReturn(mailStatusResult);
+        MailStatus mailStatus = mock(MailStatus.class);
+        when(mailStatusResult.getAll()).thenReturn(Collections.singleton(mailStatus).iterator());
+        when(mailStatusResult.isProcessed()).thenReturn(true);
+        when(mailStatus.getState()).thenReturn(MailState.SEND_SUCCESS.toString());
 
         this.resetPasswordMailSender.sendResetPasswordEmail(username, email, resetPasswordUrl);
         verify(this.mailSender).sendAsynchronously(Collections.singleton(message), session, this.mailListener);
-        verify(mailStatusResult).waitTillProcessed(30L);
+        verify(mailStatusResult).waitTillProcessed(1000L);
         verify(mailStatusResult).getAllErrors();
     }
 
@@ -250,7 +255,7 @@ class ResetPasswordMailSenderTest
         ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
             () -> this.resetPasswordMailSender.sendResetPasswordEmail(username, email, resetPasswordUrl));
         verify(this.mailSender).sendAsynchronously(Collections.singleton(message), session, this.mailListener);
-        verify(mailStatusResult).waitTillProcessed(30L);
+        verify(mailStatusResult).waitTillProcessed(1000L);
         assertEquals("Cannot send this email - Some sending error", resetPasswordException.getMessage());
     }
 
@@ -281,11 +286,15 @@ class ResetPasswordMailSenderTest
         when(this.sessionFactory.create(Collections.emptyMap())).thenReturn(session);
         MailStatusResult mailStatusResult = mock(MailStatusResult.class);
         when(this.mailListener.getMailStatusResult()).thenReturn(mailStatusResult);
+        MailStatus mailStatus = mock(MailStatus.class);
+        when(mailStatusResult.getAll()).thenReturn(Collections.singleton(mailStatus).iterator());
+        when(mailStatus.getState()).thenReturn(MailState.SEND_SUCCESS.toString());
+        when(mailStatusResult.isProcessed()).thenReturn(true);
 
         this.resetPasswordMailSender.sendAuthenticationSecurityEmail(userReference, subject, content);
 
         verify(this.mailSender).sendAsynchronously(Collections.singleton(message), session, this.mailListener);
-        verify(mailStatusResult).waitTillProcessed(30L);
+        verify(mailStatusResult).waitTillProcessed(1000L);
         verify(mailStatusResult).getAllErrors();
 
     }

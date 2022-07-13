@@ -34,14 +34,14 @@ public enum AuthenticationAction
     /**
      * Action used to reset the password of a user.
      */
-    RESET_PASSWORD("reset"),
+    RESET_PASSWORD("resetpassword"),
 
     /**
      * Action used to retrieve the username of a user.
      */
-    FORGOT_USERNAME("forgot");
+    RETRIEVE_USERNAME("retrieveusername");
 
-    private String requestParameter;
+    private final String requestParameter;
 
     AuthenticationAction(String requestParameter)
     {

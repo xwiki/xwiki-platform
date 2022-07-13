@@ -47,7 +47,7 @@ public class ResetPasswordPage extends ViewPage
     public static ResetPasswordPage gotoPage()
     {
 
-        getUtil().gotoPage(getUtil().getBaseURL() + "authenticate/reset");
+        getUtil().gotoPage(getUtil().getBaseURL() + "authenticate/resetpassword");
         return new ResetPasswordPage();
     }
 

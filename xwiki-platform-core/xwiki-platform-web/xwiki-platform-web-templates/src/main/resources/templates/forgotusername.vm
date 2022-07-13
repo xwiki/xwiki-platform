@@ -41,7 +41,7 @@
       #if($email == '' || !$services.csrf.isTokenValid($request.form_token))
         #forgotUsernameBoxStart("default")
         $services.localization.render('xe.admin.forgotUsername.instructions')
-        <form method="post" action="$services.security.authentication.getAuthenticationURL('forgot', $NULL)" id="forgotUsernameForm" class="xform">
+        <form method="post" action="$services.security.authentication.getAuthenticationURL('retrieveusername', $NULL)" id="forgotUsernameForm" class="xform">
             <dl>
                 <dt>
                     <label for="e">$services.localization.render('xe.admin.forgotUsername.email.label')</label>

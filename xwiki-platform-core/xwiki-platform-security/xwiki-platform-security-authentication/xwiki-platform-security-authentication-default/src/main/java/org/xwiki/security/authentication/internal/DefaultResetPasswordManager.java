@@ -188,8 +188,9 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
         throws ResetPasswordException
     {
         if (this.checkUserReference(requestResponse.getUserReference())) {
-            AuthenticationResourceReference resourceReference =
-                new AuthenticationResourceReference(AuthenticationAction.RESET_PASSWORD);
+            AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
+                this.contextProvider.get().getWikiReference(),
+                AuthenticationAction.RESET_PASSWORD);
 
             UserReference userReference = requestResponse.getUserReference();
             UserProperties userProperties = this.userPropertiesResolver.resolve(userReference);

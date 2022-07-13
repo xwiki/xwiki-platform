@@ -166,8 +166,9 @@ public class AuthenticationScriptService implements ScriptService
         try {
             AuthenticationAction authenticationAction = AuthenticationAction.getFromRequestParameter(action);
 
-            AuthenticationResourceReference resourceReference =
-                new AuthenticationResourceReference(authenticationAction);
+            AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
+                this.contextProvider.get().getWikiReference(),
+                authenticationAction);
             if (params != null) {
                 for (Map.Entry<String, Object> entry : params.entrySet()) {
                     resourceReference.addParameter(entry.getKey(), entry.getValue());

@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.security.authentication.AuthenticationAction;
@@ -50,8 +51,10 @@ class AuthenticationResourceReferenceSerializerTest
     @Test
     void serialize() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
     {
+        WikiReference currentWiki = new WikiReference("current");
         AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
-            AuthenticationAction.FORGOT_USERNAME);
+            currentWiki,
+            AuthenticationAction.RETRIEVE_USERNAME);
         resourceReference.addParameter("key1", "value1");
         resourceReference.addParameter("key2", Arrays.asList("value2_a", "value2_b"));
 
@@ -60,7 +63,8 @@ class AuthenticationResourceReferenceSerializerTest
         Map<String, List<String>> parameters = new HashedMap();
         parameters.put("key1", Collections.singletonList("value1"));
         parameters.put("key2", Arrays.asList("value2_a", "value2_b"));
-        ExtendedURL expectedURL = new ExtendedURL(Arrays.asList("authenticate", "forgot"), parameters);
+        ExtendedURL expectedURL = new ExtendedURL(
+            Arrays.asList("authenticate", "wiki", "current", "retrieveusername"), parameters);
 
         assertEquals(expectedURL, serialized);
     }

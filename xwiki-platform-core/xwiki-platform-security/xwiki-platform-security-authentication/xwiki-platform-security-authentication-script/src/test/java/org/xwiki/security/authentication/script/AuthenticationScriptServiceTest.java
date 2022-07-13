@@ -32,6 +32,7 @@ import javax.mail.internet.InternetAddress;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.security.authentication.AuthenticationAction;
@@ -166,13 +167,16 @@ class AuthenticationScriptServiceTest
     @Test
     void getAuthenticationURL() throws Exception
     {
-        String action = AuthenticationAction.FORGOT_USERNAME.getRequestParameter();
+        String action = AuthenticationAction.RETRIEVE_USERNAME.getRequestParameter();
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("u", "foo");
         parameters.put("v", "bar");
 
+        WikiReference wikiReference = new WikiReference("current");
+        when(this.xWikiContext.getWikiReference()).thenReturn(wikiReference);
+
         AuthenticationResourceReference resourceReference =
-            new AuthenticationResourceReference(AuthenticationAction.FORGOT_USERNAME);
+            new AuthenticationResourceReference(wikiReference, AuthenticationAction.RETRIEVE_USERNAME);
         resourceReference.addParameter("u", "foo");
         resourceReference.addParameter("v", "bar");
 

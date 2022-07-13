@@ -58,7 +58,7 @@
 <dl>
   <dt>
     <label for="j_username">$services.localization.render('username')</label>
-    #set ($forgotUsernameURL = $services.security.authentication.getAuthenticationURL('forgot', $NULL))
+    #set ($forgotUsernameURL = $services.security.authentication.getAuthenticationURL('retrieveusername', $NULL))
     #if("$!forgotUsernameURL" != "")
       <span class="xAdditional"><a href="$forgotUsernameURL" tabindex="500">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
     #end
@@ -69,7 +69,7 @@
   </dd>
   <dt>
     <label for="j_password">$services.localization.render('password')</label>
-    #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('reset', $NULL))
+    #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('resetpassword', $NULL))
     #if("$!resetPasswordUrl" != '')
       <span class="xAdditional"><a href="$resetPasswordUrl" tabindex="600">$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
     #end

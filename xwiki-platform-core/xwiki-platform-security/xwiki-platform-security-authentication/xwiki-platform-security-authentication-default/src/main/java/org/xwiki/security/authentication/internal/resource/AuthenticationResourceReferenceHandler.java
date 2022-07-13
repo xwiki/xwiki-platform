@@ -30,6 +30,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.AbstractResourceReferenceHandler;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
@@ -71,12 +72,12 @@ public class AuthenticationResourceReferenceHandler extends AbstractResourceRefe
         AuthenticationResourceReference authenticationResourceReference = (AuthenticationResourceReference) reference;
 
         switch (authenticationResourceReference.getAction()) {
-            case FORGOT_USERNAME:
-                this.handleAction("forgotusername");
+            case RETRIEVE_USERNAME:
+                this.handleAction("forgotusername", authenticationResourceReference.getWikiReference());
                 break;
 
             case RESET_PASSWORD:
-                this.handleAction("resetpassword");
+                this.handleAction("resetpassword", authenticationResourceReference.getWikiReference());
                 break;
 
             default:
@@ -88,21 +89,29 @@ public class AuthenticationResourceReferenceHandler extends AbstractResourceRefe
         chain.handleNext(reference);
     }
 
-    private void handleAction(String templateName) throws ResourceReferenceHandlerException
+    private void handleAction(String templateName, WikiReference wikiReference) throws ResourceReferenceHandlerException
     {
-        ExecutionContext context = this.execution.getContext();
-        if (context == null) {
-            context = new ExecutionContext();
+        ExecutionContext executionContext = this.execution.getContext();
+        if (executionContext == null) {
+            executionContext = new ExecutionContext();
         }
+        WikiReference currentWiki = null;
+        XWikiContext context = null;
         try {
-            XWikiContext xWikiContext = this.xWikiContextInitializer.initialize(context);
+            context = this.xWikiContextInitializer.initialize(executionContext);
+            currentWiki = context.getWikiReference();
+            context.setWikiReference(wikiReference);
             // We are directly relying on Utils#parseTemplate because we want the plugin manager to properly
             // handle the javascript placeholders and it avoids duplicating code.
-            Utils.parseTemplate(templateName, true, xWikiContext);
+            Utils.parseTemplate(templateName, true, context);
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException(
                 String.format("Error while rendering template [%s]: [%s].",
                 templateName, ExceptionUtils.getRootCauseMessage(e)), e);
+        } finally {
+            if (currentWiki != null) {
+                context.setWikiReference(currentWiki);
+            }
         }
     }
 }

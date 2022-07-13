@@ -35,6 +35,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.security.authentication.AuthenticationAction;
@@ -226,9 +227,10 @@ class DefaultResetPasswordManagerTest
         when(this.referenceSerializer.serialize(this.userReference)).thenReturn("user:Foobar");
         when(this.userProperties.getFirstName()).thenReturn("Foo");
         when(this.userProperties.getLastName()).thenReturn("Bar");
-
+        WikiReference wikiReference = new WikiReference("foo");
+        when(this.context.getWikiReference()).thenReturn(wikiReference);
         AuthenticationResourceReference resourceReference =
-            new AuthenticationResourceReference(AuthenticationAction.RESET_PASSWORD);
+            new AuthenticationResourceReference(wikiReference, AuthenticationAction.RESET_PASSWORD);
 
         String verificationCode = "foobar4242";
         resourceReference.addParameter("u", "user:Foobar");

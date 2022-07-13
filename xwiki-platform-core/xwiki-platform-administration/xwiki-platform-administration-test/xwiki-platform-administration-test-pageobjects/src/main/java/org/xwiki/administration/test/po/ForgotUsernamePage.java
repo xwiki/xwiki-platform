@@ -39,7 +39,7 @@ public class ForgotUsernamePage extends ViewPage
 
     public static ForgotUsernamePage gotoPage()
     {
-        getUtil().gotoPage(getUtil().getBaseURL() + "authenticate/forgot");
+        getUtil().gotoPage(getUtil().getBaseURL() + "authenticate/retrieveusername");
         return new ForgotUsernamePage();
     }
 

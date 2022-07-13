@@ -176,6 +176,7 @@ macroSelector.failedToRetrieveMacros=Fehler beim Abrufen der Liste verfügbarer 
 macroSelector.select=Auswählen
 macroSelector.install=Installieren
 macroSelector.install.notAllowed=Sie dürfen diese Erweiterung nicht installieren
+macroSelector.filter.category.placeholder=Eine Kategorie auswählen…
 macroEditor.title=Makro bearbeiten
 macroEditor.more=Mehr
 macroEditor.changeMacro=Makro ändern

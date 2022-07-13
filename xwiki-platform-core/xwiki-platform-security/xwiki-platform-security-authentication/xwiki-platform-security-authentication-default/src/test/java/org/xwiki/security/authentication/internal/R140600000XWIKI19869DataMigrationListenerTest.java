@@ -25,12 +25,14 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.security.authentication.ResetPasswordManager;
@@ -83,6 +85,10 @@ class R140600000XWIKI19869DataMigrationListenerTest
     private UserPropertiesResolver userPropertiesResolver;
 
     @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource propertiesConfigurationSource;
+
+    @MockComponent
     private Environment environment;
 
     @RegisterExtension
@@ -92,7 +98,11 @@ class R140600000XWIKI19869DataMigrationListenerTest
     void onEvent(@XWikiTempDir File tmpDir) throws Exception
     {
         when(this.environment.getPermanentDirectory()).thenReturn(tmpDir);
-        File migrationFile = new File(tmpDir, "140600000XWIKI19869DataMigration.txt");
+        File migrationFile = new File(tmpDir, "140600000XWIKI19869DataMigration-users.txt");
+        when(this.propertiesConfigurationSource
+            .getProperty("security.migration.R140600000XWIKI19869.sendSecurityEmail", true)).thenReturn(false);
+        when(this.propertiesConfigurationSource
+            .getProperty("security.migration.R140600000XWIKI19869.sendResetPasswordEmail", true)).thenReturn(false);
 
         this.listener.onEvent(null, null, null);
         verifyNoInteractions(this.resetPasswordMailSender);
@@ -100,6 +110,16 @@ class R140600000XWIKI19869DataMigrationListenerTest
         verifyNoInteractions(this.userReferenceResolver);
 
         Files.writeString(migrationFile.toPath(), "XWiki.Foo\nXWiki.Bar\nXWiki.Buz", StandardOpenOption.CREATE_NEW);
+
+        this.listener.onEvent(null, null, null);
+        verifyNoInteractions(this.resetPasswordMailSender);
+        verifyNoInteractions(this.resetPasswordManager);
+        verifyNoInteractions(this.userReferenceResolver);
+
+        when(this.propertiesConfigurationSource
+            .getProperty("security.migration.R140600000XWIKI19869.sendSecurityEmail", true)).thenReturn(true);
+        when(this.propertiesConfigurationSource
+            .getProperty("security.migration.R140600000XWIKI19869.sendResetPasswordEmail", true)).thenReturn(true);
 
         String mailFallbackSubject = "Subject fallback";
         String mailFallbackContent = "Mail content";

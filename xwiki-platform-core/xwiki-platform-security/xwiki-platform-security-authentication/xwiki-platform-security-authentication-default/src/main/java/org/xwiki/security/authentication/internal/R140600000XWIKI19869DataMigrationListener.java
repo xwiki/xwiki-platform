@@ -38,6 +38,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.observation.AbstractEventListener;
@@ -66,7 +67,7 @@ public class R140600000XWIKI19869DataMigrationListener extends AbstractEventList
     static final String NAME = "R140600000XWIKI19869DataMigrationListener";
     private static final List<Event> EVENT_LIST = Collections.singletonList(new ApplicationReadyEvent());
 
-    private static final String FILENAME = "140600000XWIKI19869DataMigration.txt";
+    private static final String FILENAME = "140600000XWIKI19869DataMigration-users.txt";
     private static final String MAIL_TEMPLATE = "140600000XWIKI19869-mail.txt";
     private static final String SUBJECT_MARKER = "subject:";
 
@@ -86,6 +87,10 @@ public class R140600000XWIKI19869DataMigrationListener extends AbstractEventList
     private Provider<UserPropertiesResolver> userPropertiesResolver;
 
     @Inject
+    @Named("xwikiproperties")
+    private Provider<ConfigurationSource> propertiesConfigurationProvider;
+
+    @Inject
     private Environment environment;
 
     @Inject
@@ -102,13 +107,18 @@ public class R140600000XWIKI19869DataMigrationListener extends AbstractEventList
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        ConfigurationSource configurationSource = this.propertiesConfigurationProvider.get();
+        boolean sendSecurityEmail =
+            configurationSource.getProperty("security.migration.R140600000XWIKI19869.sendSecurityEmail", true);
+        boolean sendResetPasswordEmail =
+            configurationSource.getProperty("security.migration.R140600000XWIKI19869.sendResetPasswordEmail", true);
         File migrationFile = new File(this.environment.getPermanentDirectory(), FILENAME);
-        if (Files.exists(migrationFile.toPath())) {
-            handleMigrationFile(migrationFile);
+        if ((sendSecurityEmail || sendResetPasswordEmail) && Files.exists(migrationFile.toPath())) {
+            handleMigrationFile(migrationFile, sendSecurityEmail, sendResetPasswordEmail);
         }
     }
 
-    private void handleMigrationFile(File migrationFile)
+    private void handleMigrationFile(File migrationFile, boolean sendSecurityEmail, boolean sendResetPasswordEmail)
     {
         try {
             List<String> serializedReferences = Files.readAllLines(migrationFile.toPath());
@@ -123,7 +133,7 @@ public class R140600000XWIKI19869DataMigrationListener extends AbstractEventList
                     UserReference userReference = this.userReferenceResolverProvider.get().resolve(serializedReference);
                     UserProperties userProperties = this.userPropertiesResolver.get().resolve(userReference);
                     if (userProperties.getEmail() != null) {
-                        this.handleResetPassword(userReference, mailData);
+                        this.handleResetPassword(userReference, mailData, sendSecurityEmail, sendResetPasswordEmail);
                     } else {
                         this.logger.warn("Reset email cannot be sent for user [{}] as no email address is provided.",
                             userReference);
@@ -140,20 +150,24 @@ public class R140600000XWIKI19869DataMigrationListener extends AbstractEventList
         }
     }
 
-    private void handleResetPassword(UserReference userReference, Pair<String, String> mailData)
+    private void handleResetPassword(UserReference userReference, Pair<String, String> mailData,
+        boolean sendSecurityEmail, boolean sendResetPasswordEmail)
     {
         ResetPasswordManager resetPasswordManager = this.resetPasswordManagerProvider.get();
         try {
             ResetPasswordRequestResponse resetPasswordRequestResponse =
                 resetPasswordManager.requestResetPassword(userReference);
             if (!StringUtils.isEmpty(resetPasswordRequestResponse.getVerificationCode())) {
-
-                this.resetPasswordMailSenderProvider.get().sendAuthenticationSecurityEmail(userReference,
-                    mailData.getLeft(), mailData.getRight());
-                resetPasswordManager.sendResetPasswordEmailRequest(resetPasswordRequestResponse);
+                if (sendSecurityEmail) {
+                    this.resetPasswordMailSenderProvider.get().sendAuthenticationSecurityEmail(userReference,
+                        mailData.getLeft(), mailData.getRight());
+                }
+                if (sendResetPasswordEmail) {
+                    resetPasswordManager.sendResetPasswordEmailRequest(resetPasswordRequestResponse);
+                }
             }
         } catch (ResetPasswordException e) {
-            this.logger.warn("Error when trying to force user [{}] to reset their password: [{}]",
+            this.logger.warn("Error when handling user [{}] for sending security and/or reset password email: [{}]",
                 userReference,
                 ExceptionUtils.getRootCauseMessage(e));
             this.logger.debug("Full stack trace for the reset password request: ", e);

@@ -27,7 +27,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -81,7 +80,7 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
      */
     public static final String HINT = "140600000XWIKI19869";
 
-    private static final String FILENAME = HINT + "DataMigration.txt";
+    private static final String FILENAME = HINT + "DataMigration-users.txt";
 
     private static final String XWQL_QUERY = "select distinct doc.fullName from Document doc, "
         + "doc.object(XWiki.XWikiUsers) objUser where objUser.password not like 'hash:%' and objUser.password <> '' "
@@ -151,31 +150,15 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
         // 3. If the reset password feature is enabled force a reset, else log a warning in the console
         // 4. Rewrite the history of the user page to replace plain text passwords info with new password hash from it
         //    (we don't wipe out to avoid problem with rollback)
-        boolean resetPassword = this.propertiesConfigurationProvider.get()
+        ConfigurationSource configurationSource = this.propertiesConfigurationProvider.get();
+        boolean resetPassword = configurationSource
             .getProperty("security.migration.R140600000XWIKI19869.resetPassword", true);
-        boolean requireMigrationFile = this.propertiesConfigurationProvider.get()
-            .getProperty("security.migration.R140600000XWIKI19869.requireMigrationFile", true);
         long numberOfUsersToMigrate = this.getNumberOfUsersToMigrate();
         this.logger.info("The migration will need to process [{}] user documents", numberOfUsersToMigrate);
         File migrationFile = new File(this.environment.getPermanentDirectory(), FILENAME);
-        Optional<BufferedWriter> bufferedWriterOptional = Optional.empty();
-        try {
-            bufferedWriterOptional = Optional.of(Files.newBufferedWriter(migrationFile.toPath(),
-                StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.APPEND));
-        } catch (IOException e) {
-            if (requireMigrationFile) {
-                throw new DataMigrationException("Error while trying to create the migration file for sending users "
-                    + "instructions to reset their password. If you cannot resolve the problem, you can skip this check"
-                    + " by setting the property 'security.migration.R140600000XWIKI19869.requireMigrationFile' "
-                    + "in xwiki.properties.", e);
-            } else {
-                logger.warn("Error while trying to create the migration file to force user to reset their password. "
-                        + "The migration will then output in the logs the list of users so that the admin can reach "
-                        + "them directly. The cause of the error for creating the file was [{}]",
-                    ExceptionUtils.getRootCauseMessage(e));
-            }
-        }
-        try {
+
+        try (BufferedWriter bufferedWriter = Files.newBufferedWriter(migrationFile.toPath(),
+            StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
             List<DocumentReference> users;
             do {
                 users = this.getUsers();
@@ -184,28 +167,16 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
                     this.logger.info("Start processing [{}] users over [{}]", users.size(), numberOfUsersToMigrate);
 
                     for (DocumentReference userReference : users) {
-                        this.handleUser(userReference, resetPassword, bufferedWriterOptional);
+                        this.handleUser(userReference, resetPassword, bufferedWriter);
                     }
-                    bufferedWriterOptional.ifPresent(bufferedWriter -> {
-                        try {
-                            bufferedWriter.flush();
-                        } catch (IOException e) {
-                            logger.warn("Error while flushing the buffer to write data migration file: [{}]",
-                                ExceptionUtils.getRootCauseMessage(e));
-                        }
-                    });
+                    bufferedWriter.flush();
                 }
             } while (!users.isEmpty());
-        } finally {
-            bufferedWriterOptional.ifPresent(bufferedWriter -> {
-                try {
-                    bufferedWriter.flush();
-                    bufferedWriter.close();
-                } catch (IOException e) {
-                    logger.warn("Error while flushing and closing the buffer to write data migration file: [{}]",
-                        ExceptionUtils.getRootCauseMessage(e));
-                }
-            });
+        } catch (IOException e) {
+            throw new DataMigrationException("Error while trying to create the migration file for sending users "
+                + "instructions to reset their password. If you cannot resolve the problem, you can skip this check"
+                + " by setting the property 'security.migration.R140600000XWIKI19869.requireMigrationFile' "
+                + "in xwiki.properties.", e);
         }
     }
 
@@ -242,8 +213,8 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
         }
     }
 
-    private void handleUser(DocumentReference userDocReference, boolean resetPassword,
-        Optional<BufferedWriter> bufferedWriterOptional) throws XWikiException
+    private void handleUser(DocumentReference userDocReference, boolean resetPassword, BufferedWriter bufferedWriter)
+        throws XWikiException
     {
         XWikiContext context = getXWikiContext();
         XWikiDocument userDoc = context.getWiki().getDocument(userDocReference, context);
@@ -252,17 +223,12 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
             String serializedUserRef = this.entityReferenceSerializer.serialize(userDocReference);
             this.handleHistory(userDoc);
             context.getWiki().saveDocument(userDoc, context);
-            if (bufferedWriterOptional.isPresent()) {
-                try {
-                    bufferedWriterOptional.get()
-                        .write(serializedUserRef + "\n");
-                } catch (IOException e) {
-                    logger.warn("Error when writing in migration file (root cause was [{}]. Please reach "
-                            + "individually [{}] for resetting their password.",
-                        ExceptionUtils.getRootCauseMessage(e), serializedUserRef);
-                }
-            } else {
-                logger.warn("Please reach individually [{}] for resetting their password.", serializedUserRef);
+            try {
+                bufferedWriter.write(serializedUserRef + "\n");
+            } catch (IOException e) {
+                logger.warn("Error when writing in migration file (root cause was [{}]. Please reach "
+                        + "individually [{}] for resetting their password.",
+                    ExceptionUtils.getRootCauseMessage(e), serializedUserRef);
             }
         }
     }

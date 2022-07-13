@@ -691,7 +691,8 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# [Since 14.6RC1]
 #-# [Since 14.4.3]
 #-# [Since 13.10.8]
-#-# This option is only used when performing a migration from a wiki before the versions mentioning above.
+#-# This option is only used when performing a migration from a wiki before the versions mentioned above.
+#-#
 #-# This parameter defines if as part of the migration R140600000XWIKI19869 the passwords of impacted user should be
 #-# reset or not. It's advised to keep this value as true, now for some usecases advertised administrators might want
 #-# their users to keep their passwords nevertheless, then enable the configuration and set it to false before the
@@ -701,12 +702,28 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# [Since 14.6RC1]
 #-# [Since 14.4.3]
 #-# [Since 13.10.8]
-#-# This option is only used when performing a migration from a wiki before the versions mentioning above.
-#-# This parameter defines if the migration R140600000XWIKI19869 should be stopped if the migration file used to
-#-# send notifications to users cannot be created or written. The default is to consider this file is required to avoid
-#-# for the admin to have to notify all users. Now it's possible to skip this, in which case the admin will have to
-#-# inform the users manually in case of problems.
-# security.migration.R140600000XWIKI19869.requireMigrationFile = true
+#-# This option is only used when performing a migration from a wiki before the versions mentioned above.
+#-#
+#-# This parameter defines if reset password emails should be sent as part of the migration R140600000XWIKI19869.
+#-# By default this value is set to true, so emails will be automatically produced. Now it's possible for admin to set
+#-# this option to false: note that in such case a file containing the list of users for whom a reset password email
+#-# should be sent will still be created in the permanent directory (named 140600000XWIKI19869DataMigration-users.txt).
+#-# If this file exists and this property is set back to true after the migration, the file will still be consumed to
+#-# send the emails, so it's possible to perform the migration and send the emails only later if needed.
+# security.migration.R140600000XWIKI19869.sendResetPasswordEmail = true
+
+#-# [Since 14.6RC1]
+#-# [Since 14.4.3]
+#-# [Since 13.10.8]
+#-# This option is only used when performing a migration from a wiki before the versions mentioned above.
+#-#
+#-# This parameter defines if a security email information should be sent as part of the migration R140600000XWIKI19869.
+#-# By default this value is set to true, so emails will be automatically produced. Now it's possible for admin to set
+#-# this option to false: note that in such case a file containing the list of users for whom a reset password email
+#-# should be sent will still be created in the permanent directory (named 140600000XWIKI19869DataMigration-users.txt).
+#-# If this file exists and this property is set back to true after the migration, the file will still be consumed to
+#-# send the emails, so it's possible to perform the migration and send the emails only later if needed.
+# security.migration.R140600000XWIKI19869.sendSecurityEmail = true
 
 #-------------------------------------------------------------------------------------
 # URL

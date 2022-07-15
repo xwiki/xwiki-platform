@@ -52,7 +52,7 @@
     #if($results.size() >= 10)
       #break
     #end
-    #if ($services.security.authorization.hasAccess('view', $rawResult))
+    #if ($services.security.authorization.hasAccess('view', $services.model.resolveDocument($rawResult, $wikiReference)))
       #set ($discard = $results.add($rawResult))
     #end
   #end

@@ -23,9 +23,12 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.XWikiResource;
@@ -35,8 +38,11 @@ import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.History;
 import org.xwiki.rest.model.jaxb.HistorySummary;
 import org.xwiki.rest.resources.ModificationsResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
+
+import static org.xwiki.security.authorization.Right.VIEW;
 
 /**
  * @version $Id$
@@ -45,6 +51,12 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 @Named("org.xwiki.rest.internal.resources.ModificationsResourceImpl")
 public class ModificationsResourceImpl extends XWikiResource implements ModificationsResource
 {
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
+
+    @Inject
+    private DocumentReferenceResolver<String> resolver;
+
     @Override
     public History getModifications(String wikiName, Integer start, Integer number, String order, Long ts,
             Boolean withPrettyNames) throws XWikiRestException
@@ -67,21 +79,26 @@ public class ModificationsResourceImpl extends XWikiResource implements Modifica
                 String spaceId = (String) fields[0];
                 List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
                 String pageName = (String) fields[1];
-                String language = (String) fields[2];
-                if (language.equals("")) {
-                    language = null;
+
+                DocumentReference documentReference =
+                    this.resolver.resolve(Utils.getPageId(wikiName, spaces, pageName));
+                if (this.authorizationManager.hasAccess(VIEW, documentReference)) {
+                    String language = (String) fields[2];
+                    if (language.equals("")) {
+                        language = null;
+                    }
+                    XWikiRCSNodeId nodeId = (XWikiRCSNodeId) fields[3];
+                    Timestamp timestamp = (Timestamp) fields[4];
+                    Date modified = new Date(timestamp.getTime());
+                    String modifier = (String) fields[5];
+                    String comment = (String) fields[6];
+
+                    HistorySummary historySummary =
+                        DomainObjectFactory.createHistorySummary(this.objectFactory, this.uriInfo.getBaseUri(),
+                            wikiName, spaces, pageName, language, nodeId.getVersion(), modifier, modified, comment,
+                            Utils.getXWikiApi(this.componentManager), withPrettyNames);
+                    history.getHistorySummaries().add(historySummary);
                 }
-                XWikiRCSNodeId nodeId = (XWikiRCSNodeId) fields[3];
-                Timestamp timestamp = (Timestamp) fields[4];
-                Date modified = new Date(timestamp.getTime());
-                String modifier = (String) fields[5];
-                String comment = (String) fields[6];
-
-                HistorySummary historySummary = DomainObjectFactory.createHistorySummary(objectFactory,
-                        uriInfo.getBaseUri(), wikiName, spaces, pageName, language, nodeId.getVersion(), modifier,
-                        modified, comment, Utils.getXWikiApi(componentManager), withPrettyNames);
-
-                history.getHistorySummaries().add(historySummary);
             }
 
             return history;

@@ -49,7 +49,10 @@ public class XWikiElasticSearchExtension implements BeforeAllCallback, AfterAllC
     BeforeEachCallback
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiElasticSearchExtension.class);
-    private static final String ELASTICSEARCH_VERSION = System.getProperty("elasticsearch.version");
+
+    // Provide a default version to make it easy to execute from the IDE, as otherwise you need to pass the
+    // elasticsearch.version system property.
+    private static final String ELASTICSEARCH_VERSION = System.getProperty("elasticsearch.version", "8.2.0");
     private static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(XWikiElasticSearchExtension.class);
     @Override

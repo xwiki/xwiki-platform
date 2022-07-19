@@ -86,4 +86,10 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     {
         return this.configurationSource.getProperty(PREFIX + "xwikiHost", "host.xwiki.internal");
     }
+
+    @Override
+    public boolean isServerSide()
+    {
+        return this.configurationSource.getProperty(PREFIX + "serverSide", PDFExportConfiguration.super.isServerSide());
+    }
 }

@@ -21,6 +21,7 @@ package org.xwiki.template.internal.macro;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -65,7 +66,7 @@ public class TemplateMacro extends AbstractMacro<TemplateMacroParameters>
         // The template macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the template before the other macros are executed.
         setPriority(10);
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     @Override

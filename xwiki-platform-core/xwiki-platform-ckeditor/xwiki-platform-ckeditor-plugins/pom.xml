@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-ckeditor</artifactId>
+    <version>14.7-SNAPSHOT</version>
+  </parent>
+  <packaging>jar</packaging>
+  <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
+  <name>XWiki Platform - CKEditor - Plugins</name>
+  <description>Custom plugins that help the integration of the CKEditor in XWiki.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>CKEditor Plugins for XWiki</xwiki.extension.name>
+    <!-- Explicitly indicate it's a webjar -->
+    <xwiki.extension.jar.type>webjar</xwiki.extension.jar.type>
+    <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.contrib:application-ckeditor-ckeditor</xwiki.extension.features>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
+    <!-- Bootstrap is used for the editor modals (insert / edit link, image, macro) -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>bootstrap</artifactId>
+    </dependency>
+    <!-- This is used by the resource tree picker on the link modal. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tree-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- This is used by the resource suggest picker on the link modal. -->
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>bootstrap-3-typeahead</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- This is used to preserve the selection when switching between WYSIWYG and Source modes. -->
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>fast-diff</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-base</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Verify the JavaScript code. -->
+      <plugin>
+        <groupId>org.xwiki.contrib</groupId>
+        <artifactId>jshint-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>lint</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Copy the WebJar resources to the right path before packing the jar. -->
+            <id>copy-webjar-resources</id>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Minify the WebJar resources before packing the jar. -->
+            <id>minify-webjar-resources</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>compress</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${webjar.outputDirectory}</sourceDirectory>
+              <outputDirectory>${webjar.outputDirectory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <!-- We use it also for JavaScript for now. -->
+          <!-- TODO: move to a more standard webjar packaging -->
+          <includes>
+            <include>**/*.js</include>
+            <include>**/*.css</include>
+          </includes>
+          <nosuffix>false</nosuffix>
+          <preProcessAggregates>true</preProcessAggregates>
+          <aggregations>
+            <!-- Aggregate the Resource Picker modules. -->
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <output>${webjar.outputDirectory}/xwiki-resource/resourcePicker.bundle.js</output>
+              <includes>
+                <include>*.js</include>
+              </includes>
+              <excludes>
+                <exclude>plugin.js</exclude>
+              </excludes>
+            </aggregation>
+            <!-- Aggregate the Macro Wizard modules. -->
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <output>${webjar.outputDirectory}/xwiki-macro/macroWizard.bundle.js</output>
+              <includes>
+                <include>*.js</include>
+              </includes>
+              <excludes>
+                <exclude>plugin.js</exclude>
+              </excludes>
+            </aggregation>
+            <!-- Aggregate the Image Dialog modules. -->
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <output>${webjar.outputDirectory}/xwiki-image/imageWizard.bundle.js</output>
+              <includes>
+                <include>*.js</include>
+              </includes>
+              <excludes>
+                <exclude>plugin.js</exclude>
+              </excludes>
+            </aggregation>
+          </aggregations>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <includes>
+            <!-- Include only the WebJar content -->
+            <include>META-INF/**</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <build>
+        <!-- We need to filter jasmine-require-config.txt in order to resolve the project version. -->
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <version>1.0.0</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>set-system-properties</goal>
+                </goals>
+                <configuration>
+                  <properties>
+                    <property>
+                      <!-- Force a slightly older version of the Chrome Driver in case we don't have the latest Chrome
+                        installed locally. -->
+                      <name>wdm.chromeDriverVersion</name>
+                      <value>103.0.5060.53</value>
+                    </property>
+                    <property>
+                      <!-- Try to work around error: "[SEVERE]: bind() failed: Cannot assign requested address (99)" -->
+                      <name>webdriver.chrome.whitelistedIps</name>
+                      <value />
+                    </property>
+                  </properties>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- We don't use the 'integration-tests' profile because we cannot run the tests on CI (Chrome is not installed)
+        and we're waiting for this issue https://github.com/searls/jasmine-maven-plugin/issues/349 to use docker. -->
+      <id>integration-tests-chrome</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.searls</groupId>
+            <artifactId>jasmine-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <!-- jasmine-require-config.txt is filtered so we load it from the test output directory. -->
+              <customRunnerConfiguration>
+                ${project.build.testOutputDirectory}/jasmine-require-config.txt
+              </customRunnerConfiguration>
+              <jsSrcDir>${project.basedir}/src/main/resources</jsSrcDir>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

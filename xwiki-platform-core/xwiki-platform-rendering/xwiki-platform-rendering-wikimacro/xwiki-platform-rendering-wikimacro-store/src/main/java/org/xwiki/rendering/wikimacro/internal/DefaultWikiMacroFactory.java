@@ -23,10 +23,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -144,7 +146,6 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         String macroName = getMacroName(macroDefinition, macroId);
         // The macro description as plain text
         String macroDescription = macroDefinition.getStringValue(MACRO_DESCRIPTION_PROPERTY);
-        String macroDefaultCategory = macroDefinition.getStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY);
         WikiMacroVisibility macroVisibility =
             WikiMacroVisibility.fromString(macroDefinition.getStringValue(MACRO_VISIBILITY_PROPERTY));
         boolean macroSupportsInlineMode = macroDefinition.getIntValue(MACRO_INLINE_PROPERTY) != 0;
@@ -154,9 +155,10 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
             this.logger.debug("Incomplete macro definition in [{}], macro description is empty", documentReference);
         }
 
+        Set<String> macroDefaultCategories = getDefaultCategories(macroDefinition);
         // Verify default macro category.
-        if (StringUtils.isEmpty(macroDefaultCategory)) {
-            macroDefaultCategory = null;
+        if (CollectionUtils.isEmpty(macroDefaultCategories)) {
+            macroDefaultCategories = Set.of();
             this.logger.debug("Incomplete macro definition in [{}], default macro category is empty",
                 documentReference);
         }
@@ -174,10 +176,16 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         // Note that we register wiki macros for all syntaxes FTM and there's currently no way to restrict a wiki
         // macro for a given syntax only.
         MacroId id = new MacroId(macroId);
-        MacroDescriptor macroDescriptor = new WikiMacroDescriptor.Builder().id(id).name(macroName)
-            .description(macroDescription).defaultCategory(macroDefaultCategory).visibility(macroVisibility)
-            .supportsInlineMode(macroSupportsInlineMode).contentDescriptor(contentDescriptor)
-            .parameterDescriptors(parameterDescriptors).build();
+        MacroDescriptor macroDescriptor = new WikiMacroDescriptor.Builder()
+            .id(id)
+            .name(macroName)
+            .description(macroDescription)
+            .defaultCategories(macroDefaultCategories)
+            .visibility(macroVisibility)
+            .supportsInlineMode(macroSupportsInlineMode)
+            .contentDescriptor(contentDescriptor)
+            .parameterDescriptors(parameterDescriptors)
+            .build();
 
         // Create & return the macro.
         return new DefaultWikiMacro(macroDefinition, macroDescriptor, this.componentManager);
@@ -364,5 +372,10 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         }
 
         return isAllowed;
+    }
+
+    private Set<String> getDefaultCategories(BaseObject macroDefinition)
+    {
+        return (Set<String>) macroDefinition.getSetValue(MACRO_DEFAULT_CATEGORIES_PROPERTY);
     }
 }

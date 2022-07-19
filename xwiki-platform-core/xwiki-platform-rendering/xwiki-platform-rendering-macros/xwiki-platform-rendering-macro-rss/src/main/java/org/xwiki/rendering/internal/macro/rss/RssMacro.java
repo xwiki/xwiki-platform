@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,7 +38,6 @@ import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -46,7 +46,6 @@ import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.rss.RssMacroParameters;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -102,6 +101,12 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
     private Execution execution;
 
     /**
+     * Needed to clean the content.
+     */
+    @Inject
+    private FeedItemContentCleaner contentCleaner;
+
+    /**
      * Create a Feed object from a feed specified as a URL.
      */
     private RomeFeedFactory romeFeedFactory = new DefaultRomeFeedFactory();
@@ -112,7 +117,7 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
     public RssMacro()
     {
         super("RSS", DESCRIPTION, new DefaultContentDescriptor(DESCRIPTION, false), RssMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override
@@ -277,9 +282,13 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
                 // A case where doing this might hurt is if a feed declares "text" and has any XML inside it does
                 // not want to be interpreted as such, but displayed as is instead. But this certainly is too rare
                 // compared to mis-formed feeds that say text while they want to say HTML.
-                Block html = new RawBlock(entry.getDescription().getValue(), Syntax.XHTML_1_0);
-                parentBlock.addChild(new GroupBlock(Arrays.asList(html), Collections.singletonMap(CLASS_ATTRIBUTE,
-                    "rssitemdescription")));
+                String content = entry.getDescription().getValue();
+                parentBlock.addChild(
+                    new GroupBlock(
+                        Collections.singletonList(this.contentCleaner.cleanContent(content)),
+                        Collections.singletonMap(CLASS_ATTRIBUTE, "rssitemdescription")
+                    )
+                );
             }
         }
     }
@@ -294,7 +303,7 @@ public class RssMacro extends AbstractBoxMacro<RssMacroParameters>
 
     /**
      * Convenience method to not have to handle exceptions in several places.
-     * 
+     *
      * @param content the content to parse as plain text
      * @return the parsed Blocks
      * @since 2.0M3

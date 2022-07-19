@@ -35,6 +35,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.security.authentication.AuthenticationAction;
@@ -170,7 +171,7 @@ class DefaultResetPasswordManagerTest
     }
 
     @Test
-    void requestResetPasswordUnexistingUser() throws ResetPasswordException
+    void requestResetPasswordUnexistingUser() throws Exception
     {
         when(this.userReference.toString()).thenReturn("user:Foobar");
         when(this.userManager.exists(this.userReference)).thenReturn(false);
@@ -179,7 +180,7 @@ class DefaultResetPasswordManagerTest
     }
 
     @Test
-    void requestResetPasswordNotDocumentReferenceUser()
+    void requestResetPasswordNotDocumentReferenceUser() throws Exception
     {
         UserReference otherUserReference = mock(UserReference.class);
         when(this.userManager.exists(otherUserReference)).thenReturn(true);
@@ -226,9 +227,10 @@ class DefaultResetPasswordManagerTest
         when(this.referenceSerializer.serialize(this.userReference)).thenReturn("user:Foobar");
         when(this.userProperties.getFirstName()).thenReturn("Foo");
         when(this.userProperties.getLastName()).thenReturn("Bar");
-
+        WikiReference wikiReference = new WikiReference("foo");
+        when(this.context.getWikiReference()).thenReturn(wikiReference);
         AuthenticationResourceReference resourceReference =
-            new AuthenticationResourceReference(AuthenticationAction.RESET_PASSWORD);
+            new AuthenticationResourceReference(wikiReference, AuthenticationAction.RESET_PASSWORD);
 
         String verificationCode = "foobar4242";
         resourceReference.addParameter("u", "user:Foobar");
@@ -317,7 +319,7 @@ class DefaultResetPasswordManagerTest
     }
 
     @Test
-    void checkVerificationCodeUnexistingUser() throws ResetPasswordException
+    void checkVerificationCodeUnexistingUser() throws Exception
     {
         when(this.userReference.toString()).thenReturn("user:Foobar");
         when(this.userManager.exists(this.userReference)).thenReturn(false);
@@ -430,7 +432,7 @@ class DefaultResetPasswordManagerTest
         String newPassword = "mypassword";
         this.resetPasswordManager.resetPassword(this.userReference, newPassword);
         verify(this.userDocument).removeXObjects(DefaultResetPasswordManager.RESET_PASSWORD_REQUEST_CLASS_REFERENCE);
-        verify(xObject).setStringValue("password", newPassword);
+        verify(xObject).set("password", newPassword, context);
     }
 
     @Test

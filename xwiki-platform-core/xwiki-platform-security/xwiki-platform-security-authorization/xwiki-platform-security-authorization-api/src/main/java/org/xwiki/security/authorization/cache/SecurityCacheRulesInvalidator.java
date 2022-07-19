@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Role;
  * <li>a new security cache access entry is constructed by some cache loader then in another thread </li>
  * <li>the document is updated </li>
  * <li>the cache is invalidated and then the original thread resumes and </li>
- * <li></li>the security cache access entry still based on old information is inserted back into the cache.</li>
+ * <li>the security cache access entry still based on old information is inserted back into the cache.</li>
  * </ol>
  *
  * @version $Id$

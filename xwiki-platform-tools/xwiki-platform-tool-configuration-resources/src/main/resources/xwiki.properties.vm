@@ -119,13 +119,13 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 # rendering.linkLabelFormat = %np
 
 #-# [Since 2.0M3]
-#-# Overrides default macro categories (Each macro has a default category already defined, for example
-#-# "presentation" for the Table of Contents Macro).
+#-# Overrides default macro categories (Each macro has default categories already defined, for example
+#-# "Navigation" for the Table of Contents Macro).
 #-#
-#-# Ex: To redefine the macro category for the TOC macro so that it'd be in the "My Category" category +
-#-# redefine the category for the Script Macro to be "My Other Category", you'd use:
-# rendering.macroCategories = toc:My Category
-# rendering.macroCategories = script:My Other Category
+#-# Ex: To redefine the macro categories for the TOC macro so that it'd be in the "My Category" and "Deprecated" 
+#-# categories + redefine the category for the Script Macro to be "My Other Category", you'd use:
+# rendering.transformation.macro.categories = toc = My Category\,Deprecated
+# rendering.transformation.macro.categories = script = My Other Category
 
 #-# [Since 2.5M2]
 #-# Specify whether the image dimensions should be extracted from the image parameters and included in the image URL
@@ -237,6 +237,75 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# - html: Removes all leading and trailing white spaces and new lines. If you need a space you'll need to use
 #-#         \$sp and if you need a new line you'll need to use \$nl
 #-# rendering.macro.velocity.filter = indent
+
+#-------------------------------------------------------------------------------------
+# HTML Sanitization
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.6RC1]
+#-# The HTML sanitization strategy to use for user-generated content to avoid JavaScript injection. The following
+#-# strategies are available by default:
+#-# - secure (default): Only allows known elements and attributes that are considered safe. The following options
+#-#                     allow customizing its behavior.
+#-# - insecure:         Allows everything including JavaScript. Use this only if you absolutely trust everybody who can
+#-#                     write wiki syntax (in particular, all users, but also anonymous users commenting when enabled).
+# xml.htmlElementSanitizer = secure
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of additional tags that should be allowed by the HTML sanitizer. These tags will be allowed
+#-# in addition to the already extensive built-in list of tags that are considered safe. Use with care to avoid
+#-# introducing security issues. By default, the following tags are allowed:
+#-# HTML tags: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L63-L73
+#-# SVG tags: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L91-L102
+#-# MathML tags: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L62-L64
+# xml.htmlElementSanitizer.extraAllowedTags =
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of additional attributes that should be allowed by the HTML sanitizer. These attributes will
+#-# be allowed in addition to the already extensive built-in list of attributes that are considered safe. This option
+#-# is useful if your content uses attributes that are invalid in HTML. Use with care to avoid introducing security
+#-# issues. By default, the following attributes are allowed:
+#-# HTML attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L78-L90
+#-# SVG attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L66-L89
+#-# MathML attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L73-L79
+#-# XML attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SecureHTMLElementSanitizer.java#L135
+# xml.htmlElementSanitizer.extraAllowedAttributes =
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of tags that should be forbidden. This takes precedence over any tags allowed by default or
+#-# configured above. This can be used, for example, to forbid video or audio elements.
+# xml.htmlElementSanitizer.forbidTags =
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of attributes that should be forbidden. This takes precedence over any attributes allowed by
+#-# default or configured above. This can be used, for example, to forbid inline styles by forbidding the "style"
+#-# attribute.
+# xml.htmlElementSanitizer.forbidAttributes =
+
+#-# [Since 14.6RC1]
+#-# If unknown protocols shall be allowed. This means all protocols like "xwiki:" will be allowed in links, however,
+#-# script and data-URIs will still be forbidden (for data-URIs see also below).  By default, unknown protocols are
+#-# allowed.
+# xml.htmlElementSanitizer.allowUnknownProtocols = true
+
+#-# [Since 14.6RC1]
+#-# If unknown protocols are disallowed (see above), the (Java) regular expression URIs are matched against.
+#-# The default values is ^(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp):
+# xml.htmlElementSanitizer.allowedUriRegexp = ^(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp):
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of additional tags on which data-URIs should be allowed in "src", "xlink:href" or "href".
+#-# Adding "a" here, for example, would allow linking to data-URIs which is disabled by default due to the potential of
+#-# security issues. Modern browsers should mitigate them, though, see for example
+#-# https://blog.mozilla.org/security/2017/11/27/blocking-top-level-navigations-data-urls-firefox-59/ so you could
+#-# use this to allow defining images, PDF files or files to be downloaded inline as data-URIs in links.
+# xml.htmlElementSanitizer.extraDataUriTags =
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of additional attributes that are considered safe for arbitrary content including
+#-# script-URIs, on these attributes the above-mentioned URI-checks aren't used. Use with care to avoid introducing
+#-# security issues.
+# xml.htmlElementSanitizer.extraURISafeAttributes =
 
 #-------------------------------------------------------------------------------------
 # Cache
@@ -696,6 +765,43 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-#
 #-# The default is:
 # security.authentication.resetPasswordTokenLifetime = 0
+
+#-# [Since 14.6RC1]
+#-# [Since 14.4.3]
+#-# [Since 13.10.8]
+#-# This option is only used when performing a migration from a wiki before the versions mentioned above.
+#-#
+#-# This parameter defines if as part of the migration R140600000XWIKI19869 the passwords of impacted user should be
+#-# reset or not. It's advised to keep this value as true, now for some usecases advertised administrators might want
+#-# their users to keep their passwords nevertheless, then enable the configuration and set it to false before the
+#-# migration is executed.
+# security.migration.R140600000XWIKI19869.resetPassword = true
+
+#-# [Since 14.6RC1]
+#-# [Since 14.4.3]
+#-# [Since 13.10.8]
+#-# This option is only used when performing a migration from a wiki before the versions mentioned above.
+#-#
+#-# This parameter defines if reset password emails should be sent as part of the migration R140600000XWIKI19869.
+#-# By default this value is set to true, so emails will be automatically produced. Now it's possible for admin to set
+#-# this option to false: note that in such case a file containing the list of users for whom a reset password email
+#-# should be sent will still be created in the permanent directory (named 140600000XWIKI19869DataMigration-users.txt).
+#-# If this file exists and this property is set back to true after the migration, the file will still be consumed to
+#-# send the emails, so it's possible to perform the migration and send the emails only later if needed.
+# security.migration.R140600000XWIKI19869.sendResetPasswordEmail = true
+
+#-# [Since 14.6RC1]
+#-# [Since 14.4.3]
+#-# [Since 13.10.8]
+#-# This option is only used when performing a migration from a wiki before the versions mentioned above.
+#-#
+#-# This parameter defines if a security email information should be sent as part of the migration R140600000XWIKI19869.
+#-# By default this value is set to true, so emails will be automatically produced. Now it's possible for admin to set
+#-# this option to false: note that in such case a file containing the list of users for whom a reset password email
+#-# should be sent will still be created in the permanent directory (named 140600000XWIKI19869DataMigration-users.txt).
+#-# If this file exists and this property is set back to true after the migration, the file will still be consumed to
+#-# send the emails, so it's possible to perform the migration and send the emails only later if needed.
+# security.migration.R140600000XWIKI19869.sendSecurityEmail = true
 
 #-------------------------------------------------------------------------------------
 # URL

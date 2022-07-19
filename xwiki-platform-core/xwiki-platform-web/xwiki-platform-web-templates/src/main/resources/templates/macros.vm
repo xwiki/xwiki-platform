@@ -1605,8 +1605,7 @@ $Msz MB##
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.css'),
       {'type': 'text/css', 'rel': 'stylesheet'}))
     #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
-    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
-      {'forceSkinAction' : true, 'language' : $xcontext.locale}))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
       data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)"
@@ -2418,8 +2417,7 @@ $string##
  *#
 #macro (userPicker_import)
   #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestUsersAndGroups.js',
-    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestUsersAndGroups.js'))
 #end
 
 #macro (userPicker_input $multiSelect $parameters)
@@ -2466,8 +2464,7 @@ $string##
 *#
 #macro (attachmentPicker_import)
   #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestAttachments.js',
-    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestAttachments.js'))
   ## Pull the resources required by the configured icon set in order to display attachment icons.
   #set ($discard = $services.icon.use())
 #end
@@ -2659,8 +2656,7 @@ Recursive title display detected!##
  * Used by custom property displayers that need a generic suggest input.
  *#
 #macro (xpropertySuggestInputDisplayer $field $prefix $name $value)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
-    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
   #set ($id = "${prefix}${name}")
   #set ($freeText = $!field.getValue('freeText'))
   #set ($parameters = {

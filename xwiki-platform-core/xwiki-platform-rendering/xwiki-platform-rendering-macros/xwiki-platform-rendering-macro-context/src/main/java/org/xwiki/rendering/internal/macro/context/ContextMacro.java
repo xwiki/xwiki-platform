@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -101,7 +102,7 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
         // The Context macro must execute early since it can contain include macros which can bring stuff like headings
         // for other macros (TOC macro, etc). Make it the same priority as the Include macro.
         setPriority(10);
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     @Override

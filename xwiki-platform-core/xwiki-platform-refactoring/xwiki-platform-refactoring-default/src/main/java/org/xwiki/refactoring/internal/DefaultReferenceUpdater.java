@@ -302,7 +302,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
                 for (Locale locale : locales) {
                     this.progressManager.startStep(this);
                     renameLinks(document.getTranslatedDocument(locale, xcontext), oldLinkTarget, newLinkTarget,
-                        xcontext, false, renameLambda);
+                        xcontext, relative, renameLambda);
                     this.progressManager.endStep(this);
                 }
             }
@@ -334,8 +334,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         EntityReference newTargetReference)
     {
         // If the current document is the moved entity the links should be serialized relative to it
-        EntityReference newDocumentReference = newTargetReference.extractReference(EntityType.DOCUMENT);
-        boolean relative = newDocumentReference != null && newDocumentReference.equals(documentReference);
+        boolean relative = newTargetReference.equals(documentReference);
 
         // Old and new target must be of same type
         if (oldTargetReference.getType() != newTargetReference.getType()) {

@@ -81,20 +81,23 @@
     'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
     'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
+    'selectize': "#removeJsSuffix($services.webjars.url('selectize.js', ""js/standalone/selectize${jsExtension}""))",
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
     'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
     'xwiki-job-runner': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', ""jobRunner${jsExtension}""))",
     'xwiki-l10n': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-localization-webjar', ""l10n${jsExtension}""))",
     'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
-    'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js')
+    'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
+    'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js')
   },
   'shim': {
+    'bootstrap': ['jquery'],
     'prototype': {
       'exports': '$'
     },
     'scriptaculous/dragdrop': ['scriptaculous/effects'],
-    'bootstrap' : ['jquery'],
+    'selectize': ['jquery'],
     'xwiki-entityReference': {
       'exports': 'XWiki'
     }

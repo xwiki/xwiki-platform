@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.formula;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -95,7 +96,7 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
     public FormulaMacro()
     {
         super("Formula", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), FormulaMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override

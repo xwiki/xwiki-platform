@@ -22,7 +22,9 @@ package org.xwiki.eventstream.store.solr.internal;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -58,6 +61,7 @@ import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.AbstractAsynchronousEventStore;
 import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.eventstream.internal.StreamEventSearchResult;
 import org.xwiki.eventstream.query.AbstractPropertyQueryCondition;
 import org.xwiki.eventstream.query.CompareQueryCondition;
@@ -402,6 +406,48 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         return Optional.ofNullable(toEvent(document));
     }
 
+    @Override
+    public List<EventStatus> getEventStatuses(Collection<Event> events, Collection<String> entityIds) throws Exception
+    {
+        SolrQuery solrQuery = new SolrQuery();
+
+        solrQuery.addFilterQuery(serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_ID,
+            events.stream().map(Event::getId).collect(Collectors.toList())));
+
+        solrQuery.addFilterQuery(serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS, entityIds)
+            + " OR " + serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS, entityIds));
+
+        QueryResponse response;
+        try {
+            response = this.client.query(solrQuery);
+        } catch (Exception e) {
+            throw new EventStreamException("Failed to execute Solr query", e);
+        }
+
+        SolrDocumentList documents = response.getResults();
+
+        List<EventStatus> statuses = new ArrayList<>(documents.size() * entityIds.size());
+        for (SolrDocument solrDocument : documents) {
+            Event event = toEvent(solrDocument);
+
+            Set<String> readListeners =
+                this.utils.getSet(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS, solrDocument);
+            Set<String> unreadListeners =
+                this.utils.getSet(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS, solrDocument);
+
+            for (String entityId : entityIds) {
+                boolean read = readListeners != null && readListeners.contains(entityId);
+                boolean unread = unreadListeners != null && unreadListeners.contains(entityId);
+
+                if (read || unread) {
+                    statuses.add(new DefaultEventStatus(event, entityId, read));
+                }
+            }
+        }
+
+        return statuses;
+    }
+
     private Event toEvent(SolrDocument document)
     {
         if (document == null) {
@@ -571,20 +617,25 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
     private String serializeInCondition(InQueryCondition condition)
     {
+        return serializeInCondition(toSearchFieldName(toSolrFieldName(condition)), condition.getValues());
+    }
+
+    private String serializeInCondition(String filedName, Collection<?> values)
+    {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(toSearchFieldName(toSolrFieldName(condition)));
+        builder.append(filedName);
 
         builder.append(':');
 
-        if (condition.getValues().isEmpty()) {
+        if (values.isEmpty()) {
             builder.append("[* TO *]");
 
             return "(-" + builder.toString() + ')';
         } else {
             builder.append('(');
-            builder.append(StringUtils
-                .join(condition.getValues().stream().map(this.utils::toCompleteFilterQueryString).iterator(), " OR "));
+            builder.append(
+                StringUtils.join(values.stream().map(this.utils::toCompleteFilterQueryString).iterator(), " OR "));
             builder.append(')');
 
             return builder.toString();

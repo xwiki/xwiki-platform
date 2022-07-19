@@ -23,24 +23,43 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserException;
+import org.xwiki.user.UserManager;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.group.GroupManager;
+import org.xwiki.user.internal.document.DocumentUserReference;
 
+import static ch.qos.logback.classic.Level.WARN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -90,8 +109,27 @@ class UserEventDispatcherTest
     @MockComponent
     private EventStore store;
 
+    @MockComponent
+    private DocumentReferenceResolver<String> resolver;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
+    @MockComponent
+    private GroupManager groupManager;
+
+    @MockComponent
+    private UserManager userManager;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     @InjectMockComponents
     private CustomUserEventDispatcher dispatcher;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     private DefaultEvent storeEvent(String id) throws EventStreamException
     {
@@ -100,13 +138,19 @@ class UserEventDispatcherTest
 
     private DefaultEvent storeEvent(String id, Date date) throws EventStreamException
     {
+        DefaultEvent event = initEvent(id, date);
+
+        when(this.store.getEvent(id)).thenReturn(Optional.of(event));
+
+        return event;
+    }
+
+    private DefaultEvent initEvent(String id, Date date)
+    {
         DefaultEvent event = new DefaultEvent();
 
         event.setId(id);
         event.setDate(date);
-
-        when(this.store.getEvent(id)).thenReturn(Optional.of(event));
-
         return event;
     }
 
@@ -171,5 +215,50 @@ class UserEventDispatcherTest
         assertEquals(0, this.dispatcher.priorityQueue.size());
         assertEquals(0, this.dispatcher.secondaryQueue.size());
         assertEquals(6, this.dispatcher.dispatched.size());
+    }
+
+    @Test
+    void dispatchTargetExistingUser() throws Exception
+    {
+        DefaultEvent event = initEvent("event0", new Date());
+        WikiReference wikiReference = new WikiReference("xwiki");
+        event.setWiki(wikiReference);
+        event.setTarget(Set.of("xwiki:XWiki.U1"));
+        DocumentReference userDocumentReference = new DocumentReference("xwiki", "XWiki", "U1");
+        DocumentUserReference documentUserReference = new DocumentUserReference(userDocumentReference, true);
+
+        when(this.resolver.resolve("xwiki:XWiki.U1", wikiReference)).thenReturn(userDocumentReference);
+        when(this.documentReferenceUserReferenceResolver.resolve(userDocumentReference))
+            .thenReturn(documentUserReference);
+        when(this.userManager.exists(documentUserReference)).thenReturn(true);
+        when(this.entityReferenceSerializer.serialize(userDocumentReference)).thenReturn("xwiki:XWiki.U1");
+        when(this.store.search(any())).thenReturn(mock(EventSearchResult.class));
+
+        this.dispatcher.dispatch(event);
+
+        verify(this.store).prefilterEvent(event);
+    }
+
+    @Test
+    void dispatchTargetUserExistsError() throws Exception
+    {
+        DefaultEvent event = initEvent("event0", new Date());
+        WikiReference wikiReference = new WikiReference("xwiki");
+        event.setWiki(wikiReference);
+        event.setTarget(Set.of("xwiki:XWiki.U1"));
+        DocumentReference userDocumentReference = new DocumentReference("xwiki", "XWiki", "U1");
+        DocumentUserReference documentUserReference = new DocumentUserReference(userDocumentReference, true);
+
+        when(this.resolver.resolve("xwiki:XWiki.U1", wikiReference)).thenReturn(userDocumentReference);
+        when(this.documentReferenceUserReferenceResolver.resolve(userDocumentReference))
+            .thenReturn(documentUserReference);
+        when(this.userManager.exists(documentUserReference)).thenThrow(UserException.class);
+
+        this.dispatcher.dispatch(event);
+
+        verify(this.store).prefilterEvent(event);
+        assertEquals("Failed to verify if user [reference = [xwiki:XWiki.U1]] exists. Cause: [UserException: ]",
+            this.logCapture.getMessage(0));
+        assertEquals(WARN, this.logCapture.getLogEvent(0).getLevel());
     }
 }

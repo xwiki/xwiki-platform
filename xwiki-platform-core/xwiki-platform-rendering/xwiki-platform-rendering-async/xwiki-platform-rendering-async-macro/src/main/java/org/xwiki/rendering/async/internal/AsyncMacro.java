@@ -22,6 +22,7 @@ package org.xwiki.rendering.async.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -91,7 +92,7 @@ public class AsyncMacro extends AbstractMacro<AsyncMacroParameters>
         super("Async", DESCRIPTION, new DefaultContentDescriptor("Content to execute", true, Block.LIST_BLOCK_TYPE),
             AsyncMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override

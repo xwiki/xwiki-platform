@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -57,7 +58,7 @@ public class CurrentUserManager implements UserManager
     private Provider<XWikiContext> contextProvider;
 
     @Override
-    public boolean exists(UserReference userReference)
+    public boolean exists(UserReference userReference) throws UserException
     {
         boolean exists;
 

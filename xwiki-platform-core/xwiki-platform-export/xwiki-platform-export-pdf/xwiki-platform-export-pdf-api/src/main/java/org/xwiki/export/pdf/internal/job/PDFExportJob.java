@@ -160,7 +160,9 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     {
         URL printPreviewURL = (URL) this.request.getContext().get("request.url");
         try (InputStream pdfContent = this.pdfPrinterProvider.get().print(printPreviewURL)) {
-            this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
+            if (!this.status.isCanceled()) {
+                this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
+            }
         }
     }
 }

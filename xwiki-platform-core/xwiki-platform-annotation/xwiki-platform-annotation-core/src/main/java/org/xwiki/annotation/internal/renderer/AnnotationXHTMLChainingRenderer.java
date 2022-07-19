@@ -25,20 +25,21 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import org.xwiki.annotation.renderer.AnnotationEvent;
-import org.xwiki.annotation.renderer.ChainingPrintRenderer;
 import org.xwiki.annotation.renderer.AnnotationEvent.AnnotationEventType;
+import org.xwiki.annotation.renderer.ChainingPrintRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.xml.html.HTMLElementSanitizer;
 
 /**
  * Extends the default XHTML renderer to add handling of annotations.<br>
@@ -63,12 +64,13 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
      *
      * @param linkRenderer the renderer for links
      * @param imageRenderer the renderer for images
+     * @param htmlElementSanitizer the sanitizer for HTML elements
      * @param listenerChain the listener chain in which to add this listener
      */
     public AnnotationXHTMLChainingRenderer(XHTMLLinkRenderer linkRenderer, XHTMLImageRenderer imageRenderer,
-        ListenerChain listenerChain)
+        HTMLElementSanitizer htmlElementSanitizer, ListenerChain listenerChain)
     {
-        super(linkRenderer, imageRenderer, listenerChain);
+        super(linkRenderer, imageRenderer, htmlElementSanitizer, listenerChain);
     }
 
     /**
@@ -77,7 +79,7 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
     public AnnotationMarkersXHTMLPrinter getAnnotationsMarkerPrinter()
     {
         if (annotationsMarkerPrinter == null) {
-            annotationsMarkerPrinter = new AnnotationMarkersXHTMLPrinter(getPrinter());
+            annotationsMarkerPrinter = new AnnotationMarkersXHTMLPrinter(getPrinter(), getHtmlElementSanitizer());
         }
         return annotationsMarkerPrinter;
     }

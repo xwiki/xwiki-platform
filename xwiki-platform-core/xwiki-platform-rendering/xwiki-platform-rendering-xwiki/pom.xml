@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering</artifactId>
-    <version>14.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-xwiki</artifactId>
   <name>XWiki Platform - Rendering - XWiki-specific Implementation</name>
@@ -112,6 +112,7 @@
             <configuration>
               <includes>
                 <include>**/scaffolding/**.class</include>
+                <include>**/RenderingScriptServiceComponentList.class</include>
               </includes>
             </configuration>
           </execution>

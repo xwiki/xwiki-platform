@@ -307,8 +307,8 @@ public class ChromeManager implements Initializable
      */
     public void setCookies(ChromeDevToolsService tabDevToolsService, List<CookieParam> cookies)
     {
-        this.logger.debug("Setting cookies [{}].",
-            cookies.stream().collect(Collectors.toMap(CookieParam::getName, CookieParam::getValue)));
+        this.logger.debug("Setting cookies [{}].", cookies.stream()
+            .map(cookie -> String.format("%s: %s", cookie.getName(), cookie.getValue())).collect(Collectors.toList()));
         Network network = tabDevToolsService.getNetwork();
         network.enable();
         network.clearBrowserCookies();

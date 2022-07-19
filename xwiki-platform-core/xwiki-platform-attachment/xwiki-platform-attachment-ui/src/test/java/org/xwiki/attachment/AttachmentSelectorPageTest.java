@@ -37,12 +37,11 @@ import org.xwiki.component.wiki.internal.bridge.DefaultContentParser;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.observation.EventListener;
+import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacroManager;
 import org.xwiki.rendering.internal.macro.wikibridge.WikiMacroEventListener;
-import org.xwiki.rendering.internal.syntax.SyntaxConverter;
-import org.xwiki.rendering.script.RenderingScriptService;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroFactory;
 import org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroRenderer;
@@ -74,13 +73,12 @@ import static org.mockito.Mockito.when;
  */
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
+@RenderingScriptServiceComponentList
 @ComponentList({
-    // Start RenderingScriptService
-    RenderingScriptService.class,
+    // Start -  Required in addition of RenderingScriptServiceComponentList
     DefaultExtendedRenderingConfiguration.class,
     RenderingConfigClassDocumentConfigurationSource.class,
-    SyntaxConverter.class,
-    // End RenderingScriptService
+    // Start -  Required in addition of RenderingScriptServiceComponentList
     ControlCharactersFilter.class,
     ModelScriptService.class,
     TestNoScriptMacro.class,

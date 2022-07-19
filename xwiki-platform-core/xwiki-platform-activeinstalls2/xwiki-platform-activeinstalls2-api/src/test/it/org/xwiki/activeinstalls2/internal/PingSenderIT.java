@@ -116,6 +116,9 @@ class PingSenderIT
     private PingSender pingSender;
 
     @Inject
+    private PingSetup pingSetup;
+
+    @Inject
     private DataManager dataManager;
 
     @Inject
@@ -142,6 +145,9 @@ class PingSenderIT
     @Test
     void sendPingData() throws Exception
     {
+        // Configure the Ping Sender to perform the ES setup since the ES instance is virgin at this stage.
+        this.pingSetup.setup();
+
         // Distribution Ping Data Provider setup
         String activeInstanceId = UUID.randomUUID().toString();
         when(this.instanceIdManager.getInstanceId()).thenReturn(new InstanceId(activeInstanceId));

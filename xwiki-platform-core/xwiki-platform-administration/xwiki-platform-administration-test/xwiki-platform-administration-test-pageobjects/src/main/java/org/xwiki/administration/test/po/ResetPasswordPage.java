@@ -32,6 +32,11 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class ResetPasswordPage extends ViewPage
 {
+    /**
+     * Resource action used for the reset password handling.
+     */
+    public static final String RESET_PASSWORD_URL_RESOURCE = "authenticate/resetpassword";
+
     @FindBy(id = "u")
     private WebElement userNameInput;
 
@@ -46,8 +51,7 @@ public class ResetPasswordPage extends ViewPage
 
     public static ResetPasswordPage gotoPage()
     {
-
-        getUtil().gotoPage(getUtil().getBaseURL() + "authenticate/resetpassword");
+        getUtil().gotoPage(getUtil().getBaseURL() + RESET_PASSWORD_URL_RESOURCE);
         return new ResetPasswordPage();
     }
 

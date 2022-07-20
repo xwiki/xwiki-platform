@@ -1,5 +1,6 @@
 org.xwiki.activeinstalls2.internal.ActiveInstallsInitializerListener
 org.xwiki.activeinstalls2.internal.DefaultPingSender
+org.xwiki.activeinstalls2.internal.DefaultPingSetup
 org.xwiki.activeinstalls2.internal.data.DistributionPingDataProvider
 org.xwiki.activeinstalls2.internal.data.ExtensionPingDataProvider
 org.xwiki.activeinstalls2.internal.data.DatePingDataProvider

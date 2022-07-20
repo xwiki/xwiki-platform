@@ -227,7 +227,8 @@ public class ResetPasswordIT
         String result = null;
 
         // Use a regex to extract the password reset link
-        Pattern resetLinkPattern = Pattern.compile("http[^\\s]+?authenticate/reset\\?u=" + userName + "\\&v=\\w+");
+        Pattern resetLinkPattern = Pattern.compile(
+            String.format("http[^\\s]+?%s\\?u=%s\\&v=\\w+", ResetPasswordPage.RESET_PASSWORD_URL_RESOURCE, userName));
         Matcher matcher = resetLinkPattern.matcher(emailContent);
         if (matcher.find()) {
             result = matcher.group();

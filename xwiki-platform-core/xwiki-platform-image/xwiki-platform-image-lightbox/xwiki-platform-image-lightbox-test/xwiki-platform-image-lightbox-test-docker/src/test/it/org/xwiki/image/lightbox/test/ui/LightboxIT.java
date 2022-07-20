@@ -36,10 +36,12 @@ import org.xwiki.image.lightbox.test.po.ImagePopover;
 import org.xwiki.image.lightbox.test.po.Lightbox;
 import org.xwiki.image.lightbox.test.po.LightboxPage;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.rest.model.jaxb.Object;
 
 /**
  * Functional tests for the image lightbox.
@@ -59,10 +61,12 @@ class LightboxIT
 
     private static final List<String> IMAGES = Arrays.asList("image1.png", "image2.png", "missingImage.png");
 
+    public static final String USER_NAME = "JohnDoe";
+
     @BeforeAll
     void beforeAll(TestUtils testUtils)
     {
-        testUtils.createUserAndLogin("JohnDoe", "pa$$word");
+        testUtils.createUserAndLogin(USER_NAME, "pa$$word");
     }
 
     @Test
@@ -411,6 +415,45 @@ class LightboxIT
         Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
         assertTrue(lightbox.isDisplayed());
         assertFalse(lightbox.getCopyImageIdButton().isDisplayed());
+    }
+
+    /**
+     * Check that the date displayed inside the lightbox takes into account user's timezone.
+     */
+    @Test
+    @Order(14)
+    void setNewTimezone(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        enableLightbox(testUtils, true);
+
+        setTimezone(testUtils, "Europe/Paris");
+        testUtils.createPage(testReference, this.getSimpleImage(IMAGES.get(0)));
+        LightboxPage lightboxPage = new LightboxPage();
+        lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
+        String lastUploadDate = lightboxPage.openAttachmentsDocExtraPane().getDateOfLastUpload(IMAGES.get(0));
+
+        // Make sure that the images are displayed.
+        lightboxPage.reloadPage();
+
+        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightbox.isDisplayed());
+        assertEquals(lastUploadDate, lightbox.getDate());
+
+        setTimezone(testUtils, "America/Barbados");
+        lightboxPage.reloadPage();
+
+        lastUploadDate = lightboxPage.openAttachmentsDocExtraPane().getDateOfLastUpload(IMAGES.get(0));
+        lightbox = lightboxPage.openLightboxAtImage(0);
+        assertTrue(lightbox.isDisplayed());
+        assertEquals(lastUploadDate, lightbox.getDate());
+    }
+
+    private void setTimezone(TestUtils testUtils, String timezoneValue) throws Exception
+    {
+        Object userObject = testUtils.rest().object(new LocalDocumentReference("XWiki", USER_NAME), "XWiki.XWikiUsers");
+        userObject.withProperties(TestUtils.RestTestUtils.property("timezone", timezoneValue));
+        testUtils.rest().update(userObject);
     }
 
     private void enableLightbox(TestUtils testUtils, boolean enable)

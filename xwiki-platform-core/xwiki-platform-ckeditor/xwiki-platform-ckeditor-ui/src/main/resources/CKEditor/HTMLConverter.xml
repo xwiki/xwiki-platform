@@ -57,6 +57,8 @@
   #set ($discard = $response.setContentLength($output.getBytes($characterEncoding).size()))
   ## Make sure the entire content is send back to the client.
   #set ($discard = $response.flushBuffer())
+  ## Make sure XWiki doesn't write any more content to the response.
+  #set ($discard = $xcontext.setFinished(true))
 #else
   The service used by the CKEditor source plugin to convert between HTML and wiki syntax.
 #end

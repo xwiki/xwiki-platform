@@ -27,11 +27,9 @@
 ## * outputTitle: if true then also output the title
 ## 
 ############################################################################
-#if ("$!request.outputTitle" == 'true')
-  #set ($displayTitle = true)
+#if ($request.outputTitle == 'true')
   $services.progress.pushLevel(3)
 #else
-  #set ($displayTitle = false)
   $services.progress.pushLevel(1)
 #end
 $services.progress.startStep('Compute the content to display')
@@ -39,17 +37,15 @@ $services.progress.startStep('Compute the content to display')
 #set ($noEscapeContent = true)
 #template("contentvars.vm")
 $services.progress.endStep()
-#if ($displayTitle)
+#if ($request.outputTitle == 'true')
   $services.progress.startStep('Compute title to display and modify rendered content accordingly')
   #template("titlevars.vm")
   $services.progress.endStep()
   <div class="xcontent">
     $xcontext.dropPermissions()
-    #if ($displayTitle)
-      <div class="document-info">
-        <div id="document-title"><h1>$titleToDisplay</h1></div>
-      </div>
-    #end
+    <div class="document-info">
+      <div id="document-title"><h1>$titleToDisplay</h1></div>
+    </div>
     <div id="xwikicontent">
 #end
 #if ("$!exception" != '')
@@ -57,7 +53,7 @@ $services.progress.endStep()
 #else
   $renderedContent
 #end
-#if ($displayTitle)
+#if ($request.outputTitle == 'true')
     </div>
   </div>
 #end

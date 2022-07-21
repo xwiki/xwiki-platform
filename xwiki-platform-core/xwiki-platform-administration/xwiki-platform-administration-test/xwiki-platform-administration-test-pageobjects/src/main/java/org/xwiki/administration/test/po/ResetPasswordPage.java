@@ -35,7 +35,7 @@ public class ResetPasswordPage extends ViewPage
     /**
      * Resource action used for the reset password handling.
      */
-    public static final String RESET_PASSWORD_URL_RESOURCE = "authenticate/resetpassword";
+    public static final String RESET_PASSWORD_URL_RESOURCE = "authenticate/wiki/%s/resetpassword";
 
     @FindBy(id = "u")
     private WebElement userNameInput;
@@ -49,9 +49,14 @@ public class ResetPasswordPage extends ViewPage
     @FindBy(xpath = "//*[@class='panel-body']//a[contains(text(), 'Retry')]")
     private WebElement retryUserNameButton;
 
+    public static String getResetPasswordURL()
+    {
+        return getUtil().getBaseURL() + String.format(RESET_PASSWORD_URL_RESOURCE, getUtil().getCurrentWiki());
+    }
+
     public static ResetPasswordPage gotoPage()
     {
-        getUtil().gotoPage(getUtil().getBaseURL() + RESET_PASSWORD_URL_RESOURCE);
+        getUtil().gotoPage(getResetPasswordURL());
         return new ResetPasswordPage();
     }
 

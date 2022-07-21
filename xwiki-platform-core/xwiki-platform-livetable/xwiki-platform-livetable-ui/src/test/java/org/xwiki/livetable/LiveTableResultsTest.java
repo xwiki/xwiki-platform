@@ -20,6 +20,7 @@
 package org.xwiki.livetable;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ import org.xwiki.velocity.tools.RegexTool;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.plugin.tag.TagPluginApi;
 
@@ -509,6 +511,35 @@ class LiveTableResultsTest extends PageTest
         assertEquals(0, getRowCount());
         assertEquals(1, getOffset());
         assertEquals(emptyList(), getRows());
+    }
+
+    @Test
+    void cleanupAccessToPasswordFields() throws Exception
+    {
+        // Initialize an XClass with a password field.
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "MyClass");
+        XWikiDocument xwikiDocument = this.xwiki.getDocument(documentReference, this.context);
+        BaseClass xClass = xwikiDocument.getXClass();
+        xClass.addPasswordField("password", "Password", 30);
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(0L);
+        when(this.query.execute()).thenReturn(Collections.emptyList());
+
+        this.request.put("classname", "XWiki.MyClass");
+        this.request.put("password", "abcd");
+        this.request.put("collist", "password");
+
+        renderPage();
+
+        verify(this.queryService).hql(", BaseObject as obj   "
+            + "where obj.name=doc.fullName "
+            + "and obj.className = :className "
+            + "and doc.fullName not in (:classTemplate1, :classTemplate2)  ");
     }
 
     //

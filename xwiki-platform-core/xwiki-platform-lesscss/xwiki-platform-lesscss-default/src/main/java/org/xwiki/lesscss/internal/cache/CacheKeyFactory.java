@@ -19,13 +19,22 @@
  */
 package org.xwiki.lesscss.internal.cache;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.internal.skin.SkinReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.text.StringUtils;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Factory to create a cache key.
@@ -41,6 +50,9 @@ public class CacheKeyFactory
 
     @Inject
     private XWikiContextCacheKeyFactory xcontextCacheKeyFactory;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * Get the cache key corresponding to the given LESS resource and context.
@@ -62,7 +74,22 @@ public class CacheKeyFactory
         String result = lessResource.length()  + CACHE_KEY_SEPARATOR + lessResource + CACHE_KEY_SEPARATOR
                      +  skin.length()          + CACHE_KEY_SEPARATOR + skin         + CACHE_KEY_SEPARATOR
                      +  colorTheme.length()    + CACHE_KEY_SEPARATOR + colorTheme;
-        
+
+        /** Also take into account the request parameters, if any, except parameters which are already
+         * taken into account or that are irrelevant. */
+        XWikiContext context = xcontextProvider.get();
+        List<String> excludes = Arrays.asList("skin", "colorTheme", "colorThemeVersion", "language", "docVersion",
+            XWiki.CACHE_VERSION);
+        if (context != null && context.getRequest() != null) {
+            Map<String, String[]> parameters = context.getRequest().getParameterMap();
+            for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+                if (!excludes.contains(entry.getKey())) {
+                    String[] values = entry.getValue();
+                    result += CACHE_KEY_SEPARATOR + entry.getKey() + ":" + StringUtils.join(values, "|");
+                }
+            }
+        }
+
         if (withContext) {
             String xcontext = xcontextCacheKeyFactory.getCacheKey();
             result += CACHE_KEY_SEPARATOR + xcontext.length() + CACHE_KEY_SEPARATOR + xcontext; 

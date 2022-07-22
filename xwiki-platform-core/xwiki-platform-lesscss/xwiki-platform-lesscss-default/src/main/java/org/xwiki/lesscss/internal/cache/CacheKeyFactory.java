@@ -75,24 +75,24 @@ public class CacheKeyFactory
                      +  skin.length()          + CACHE_KEY_SEPARATOR + skin         + CACHE_KEY_SEPARATOR
                      +  colorTheme.length()    + CACHE_KEY_SEPARATOR + colorTheme;
 
-        /** Also take into account the request parameters, if any, except parameters which are already
-         * taken into account or that are irrelevant. */
-        XWikiContext context = xcontextProvider.get();
-        List<String> excludes = Arrays.asList("skin", "colorTheme", "colorThemeVersion", "language", "docVersion",
-            XWiki.CACHE_VERSION);
-        if (context != null && context.getRequest() != null) {
-            Map<String, String[]> parameters = context.getRequest().getParameterMap();
-            for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
-                if (!excludes.contains(entry.getKey())) {
-                    String[] values = entry.getValue();
-                    result += CACHE_KEY_SEPARATOR + entry.getKey() + ":" + StringUtils.join(values, "|");
-                }
-            }
-        }
-
         if (withContext) {
             String xcontext = xcontextCacheKeyFactory.getCacheKey();
-            result += CACHE_KEY_SEPARATOR + xcontext.length() + CACHE_KEY_SEPARATOR + xcontext; 
+            result += CACHE_KEY_SEPARATOR + xcontext.length() + CACHE_KEY_SEPARATOR + xcontext;
+
+            /** Also take into account the request parameters, if any, except parameters which are already
+             * taken into account or that are irrelevant. */
+            XWikiContext context = xcontextProvider.get();
+            List<String> excludes = Arrays.asList("skin", "colorTheme", "colorThemeVersion", "language", "docVersion",
+                XWiki.CACHE_VERSION);
+            if (context != null && context.getRequest() != null) {
+                Map<String, String[]> parameters = context.getRequest().getParameterMap();
+                for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+                    if (!excludes.contains(entry.getKey())) {
+                        String[] values = entry.getValue();
+                        result += CACHE_KEY_SEPARATOR + entry.getKey() + ":" + StringUtils.join(values, "|");
+                    }
+                }
+            }
         }
 
         return result;

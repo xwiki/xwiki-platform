@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -72,6 +71,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final String OFFICE_IMAGE_VERSION_LABEL = "image-version";
 
     private static final String DOCKER_SOCK = "/var/run/docker.sock";
+
+    private static final String ROOT_USER = "root";
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
@@ -172,15 +173,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private void configureJetty(File sourceWARDirectory) throws Exception
     {
         this.servletContainer = createServletContainer();
-        mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
-            "/var/lib/jetty/webapps/xwiki");
+        mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(), "/var/lib/jetty/webapps/xwiki");
+
+        List<String> javaOpts = new ArrayList<>();
 
         // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
         // have been fixed.
         if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
-            List<String> javaOpts = new ArrayList<>();
             addJava17AddOpens(javaOpts);
-            this.servletContainer.withEnv("JAVA_OPTS", StringUtils.join(javaOpts, ' '));
         }
 
         // When executing on the Oracle database, we get the following timezone error unless we pass a system
@@ -189,16 +189,21 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         //   recursive SQL level 1
         //   ORA-01882: timezone region not found
         if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
-            List<String> commandPartList =
-                new ArrayList<>(Arrays.asList(this.servletContainer.getCommandParts()));
-            commandPartList.add(ORACLE_TZ_WORKAROUND);
-            this.servletContainer.setCommandParts(commandPartList.toArray(new String[0]));
+            javaOpts.add(ORACLE_TZ_WORKAROUND);
         }
+
+        maybeEnableRemoteDebugging(javaOpts);
+        this.servletContainer.withEnv("JAVA_OPTIONS", StringUtils.join(javaOpts, ' '));
 
         // Jetty 10.0.3+ has now added a protection in URLs so that encoded characters such as % are
         // prohibited by default. Since XWiki uses them, we need to configure Jetty to allow for it. See
         // https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance
         this.servletContainer.setCommand("jetty.httpConfig.uriCompliance=RFC3986");
+
+        // We need to run Jetty using the root user (instead of the jetty user) in order to have access to the Docker
+        // socket (otherwise we can't manage the Docker containers from within XWiki, which is a use case for the PDF
+        // export application).
+        this.servletContainer.withCreateContainerCmdModifier(cmd -> cmd.withUser(ROOT_USER));
     }
 
     private void configureTomcat(File sourceWARDirectory) throws Exception
@@ -230,16 +235,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // need to add them as we do for Jetty.
         // see https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
 
-        // If we're on debug mode, start XWiki in debug mode too so that we can attach a remote debugger to it
-        // in order to debug.
-        // Note: To attach the remote debugger, run "docker ps" to get the local mapped port for 5005, and use
-        // "localhost" as the JVM host to connect to.
-        if (this.testConfiguration.isDebug()) {
-            catalinaOpts.add("-Xdebug");
-            catalinaOpts.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005");
-            catalinaOpts.add("-Xnoagent");
-            catalinaOpts.add("-Djava.compiler=NONE");
-        }
+        maybeEnableRemoteDebugging(catalinaOpts);
 
         // When executing on the Oracle database, we get the following timezone error unless we pass a system
         // property to the Oracle JDBC driver:
@@ -251,6 +247,20 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
 
         this.servletContainer.withEnv("CATALINA_OPTS", StringUtils.join(catalinaOpts, ' '));
+    }
+
+    private void maybeEnableRemoteDebugging(List<String> options)
+    {
+        // If we're on debug mode, start XWiki in debug mode too so that we can attach a remote debugger to it
+        // in order to debug.
+        // Note: To attach the remote debugger, run "docker ps" to get the local mapped port for 5005, and use
+        // "localhost" as the JVM host to connect to.
+        if (this.testConfiguration.isDebug()) {
+            options.add("-Xdebug");
+            options.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005");
+            options.add("-Xnoagent");
+            options.add("-Djava.compiler=NONE");
+        }
     }
 
     private void startContainer() throws Exception
@@ -349,7 +359,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                     .withDockerfileFromBuilder(builder -> {
                         builder
                             .from(baseImageName)
-                            .user("root")
+                            .user(ROOT_USER)
                             .env("LIBREOFFICE_VERSION", officeVersion)
                             // Note: we use https://download.documentfoundation.org/libreoffice/stable/ and not
                             // https://downloadarchive.documentfoundation.org/libreoffice/old so that we can benefit

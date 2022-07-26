@@ -57,7 +57,7 @@
     <pdfbox.version>2.0.26</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.version>9.4.29.v20200521</jetty.version>
-    <netty.version>4.1.78.Final</netty.version>
+    <netty.version>4.1.79.Final</netty.version>
     <hibernate.version>5.6.10.Final</hibernate.version>
     <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
     <hsqldb.version>2.6.1</hsqldb.version>

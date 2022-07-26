@@ -47,7 +47,20 @@ help.tipsPanel.linkAutocompleteWYSIWYGTip=Lors de la rédaction dans l'éditeur 
 help.macroList.title=Macros disponibles
 help.macroList.id=Id
 help.macroList.name=Nom
-help.macroList.category=Catégorie
+help.macroList.categories=Catégories
 help.macroList.description=Description
-help.macroList.visibility=Visiblité</content>
+help.macroList.visibility=Visiblité
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+############################################################################### 
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=Catégorie
+
+#@deprecatedend
+</content>
 </xwikidoc>

@@ -69,6 +69,7 @@ class TaskExecutorTest
     private DocumentRevisionProvider documentRevisionProvider;
 
     @MockComponent
+    @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
     @MockComponent

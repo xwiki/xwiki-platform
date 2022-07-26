@@ -32,7 +32,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 

@@ -20,6 +20,7 @@
 package org.xwiki.index.internal;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -58,6 +59,7 @@ public class TaskExecutor
     private DocumentRevisionProvider documentRevisionProvider;
 
     @Inject
+    @Named("context")
     private Provider<ComponentManager> componentManager;
 
     @Inject

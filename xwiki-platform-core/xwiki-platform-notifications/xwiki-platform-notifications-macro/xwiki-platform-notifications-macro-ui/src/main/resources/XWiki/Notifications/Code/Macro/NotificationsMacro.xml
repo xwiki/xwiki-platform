@@ -579,7 +579,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
   width: 2em;
 }
 
-.notification-icon > .img-thumbnail > .fa {
+.notification-icon .img-thumbnail span {
   vertical-align: middle;
 }
 

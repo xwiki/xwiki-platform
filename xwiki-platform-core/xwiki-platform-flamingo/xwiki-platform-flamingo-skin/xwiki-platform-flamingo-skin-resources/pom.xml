@@ -137,6 +137,11 @@
       <version>1.2.1</version>
     </dependency>
     <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>moment-timezone</artifactId>
+      <version>0.5.34</version>
+    </dependency>
+    <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>Eonasdan-bootstrap-datetimepicker</artifactId>
       <version>4.17.49</version>

@@ -79,6 +79,7 @@
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url('jquery-migrate', ""jquery-migrate${jsExtension}""))",
     'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
+    'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
     'selectize': "#removeJsSuffix($services.webjars.url('selectize.js', ""js/standalone/selectize${jsExtension}""))",
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),

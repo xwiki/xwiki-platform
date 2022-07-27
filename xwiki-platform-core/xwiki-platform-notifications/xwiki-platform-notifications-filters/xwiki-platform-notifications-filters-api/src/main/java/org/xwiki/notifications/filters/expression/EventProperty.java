@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.expression;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * The several properties you can have in an {@link org.xwiki.eventstream.Event}.
  *
@@ -90,5 +92,12 @@ public enum EventProperty
     /**
      * The version of the page concerned by the event.
      */
-    DOCUMENT_VERSION
+    DOCUMENT_VERSION,
+    /**
+     * The unique identifier of the instance in the cluster.
+     * 
+     * @since 14.7RC1
+     */
+    @Unstable
+    REMOTE_OBSERVATION_ID
 }

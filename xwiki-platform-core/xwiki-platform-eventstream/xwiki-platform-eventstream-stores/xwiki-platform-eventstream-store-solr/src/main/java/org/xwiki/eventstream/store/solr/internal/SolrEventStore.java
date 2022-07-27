@@ -315,6 +315,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         this.utils.set(Event.FIELD_APPLICATION, event.getApplication(), document);
         this.utils.set(Event.FIELD_BODY, event.getBody(), document);
         this.utils.set(Event.FIELD_DATE, event.getDate(), document);
+        this.utils.set(Event.FIELD_REMOTE_OBSERVATION_ID, event.getRemoteObservationId(), document);
         this.utils.setString(Event.FIELD_DOCUMENT, event.getDocument(), document);
         this.utils.set(Event.FIELD_DOCUMENTTITLE, event.getDocumentTitle(), document);
         this.utils.set(Event.FIELD_DOCUMENTVERSION, event.getDocumentVersion(), document);
@@ -461,6 +462,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         event.setApplication(this.utils.get(Event.FIELD_APPLICATION, document));
         event.setBody(this.utils.get(Event.FIELD_BODY, document));
         event.setDate(this.utils.get(Event.FIELD_DATE, document));
+        event.setRemoteObservationId(this.utils.get(Event.FIELD_REMOTE_OBSERVATION_ID, document));
         event.setDocument(this.utils.get(Event.FIELD_DOCUMENT, document, DocumentReference.class));
         event.setDocumentTitle(this.utils.get(Event.FIELD_DOCUMENTTITLE, document));
         event.setDocumentVersion(this.utils.get(Event.FIELD_DOCUMENTVERSION, document));

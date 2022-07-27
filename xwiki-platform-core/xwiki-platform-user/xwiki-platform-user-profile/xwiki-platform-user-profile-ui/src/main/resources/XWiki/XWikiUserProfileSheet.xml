@@ -141,7 +141,46 @@
     <property>
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
-  $(function() {
+  
+   $(function() {
+    /** Add autocomplete attributes to ease form filling. */
+    var fieldsPurposes = [
+        {
+          'name': 'first_name',
+          'purpose': 'given-name'
+        },
+        {
+          'name': 'last_name',
+          'purpose': 'family-name'
+        },
+        {
+          'name': 'company',
+          'purpose': 'organization'
+        },
+        {
+          'name': 'email',
+          'purpose': 'email'
+        },
+        {
+          'name': 'phone',
+          'purpose': 'tel'
+        },
+        {
+          'name': 'address',
+          'purpose': 'street-address'
+        },
+        {
+          'name': 'blog',
+          'purpose': 'url'
+        }
+      ];
+    fieldsPurposes.forEach(function (entry) {
+      var inputField = $('[name$="' + entry.name + '"]');
+      if (inputField.length === 1) {
+        inputField.attr('autocomplete', entry.purpose);
+      }
+    });
+
     /**
      * Save the new user status.
      */

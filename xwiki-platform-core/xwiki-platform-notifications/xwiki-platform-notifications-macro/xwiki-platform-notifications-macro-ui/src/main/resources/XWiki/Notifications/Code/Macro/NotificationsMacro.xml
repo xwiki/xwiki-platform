@@ -838,6 +838,10 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
   width: 2em;
 }
 
+.notification-icon .img-thumbnail span {
+  vertical-align: middle;
+}
+
 /***********************************************
  * Notification Content
  ***********************************************/

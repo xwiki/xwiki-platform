@@ -133,7 +133,9 @@ public class PathWikiReferenceExtractorTest
     {
         // Simulate a configured Execution Context
         Execution execution = mocker.getInstance(Execution.class);
-        when(execution.getContext()).thenReturn(new ExecutionContext());
+        ExecutionContext executionContext = new ExecutionContext();
+        executionContext.setProperty("xwikicontext", true);
+        when(execution.getContext()).thenReturn(executionContext);
 
         StandardURLConfiguration urlConfiguration = mocker.getInstance(StandardURLConfiguration.class);
         when(urlConfiguration.getWikiNotFoundBehavior()).thenReturn(wikiNotFoundBehavior);

@@ -282,6 +282,7 @@
         &lt;div class="editProfileCategory"&gt;
           &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.preferences.edit'))"
               href="$doc.getURL('edit', 'category=preferences')" class="btn btn-xs"&gt;
+            &lt;span class="action-icon"&gt;$services.icon.renderHTML('pencil')&lt;/span&gt;
             &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.preferences.edit'))&lt;/span&gt;
           &lt;/a&gt;
         &lt;/div&gt;

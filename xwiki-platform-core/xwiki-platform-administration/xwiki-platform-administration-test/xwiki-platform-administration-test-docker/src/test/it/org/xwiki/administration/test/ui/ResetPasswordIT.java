@@ -34,6 +34,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 import org.xwiki.administration.test.po.ResetPasswordCompletePage;
 import org.xwiki.administration.test.po.ResetPasswordPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -47,7 +48,6 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -155,9 +155,7 @@ public class ResetPasswordIT
         MimeMessage receivedEmail = receivedEmails[0];
         assertEquals("Password reset request for " + userName, receivedEmail.getSubject());
         String receivedMailContent = getMessageContent(receivedEmail).get("textPart");
-        String passwordResetLink = getResetLink(receivedMailContent, "xwiki%3AXWiki." + userName);
-        assertNotNull(passwordResetLink);
-
+        String passwordResetLink = getResetLink(setup, receivedMailContent, "xwiki%3AXWiki." + userName);
         // Use the password reset link
         setup.gotoPage(passwordResetLink);
         // We should now be on the ResetPasswordComplete page
@@ -222,15 +220,20 @@ public class ResetPasswordIT
         return null;
     }
 
-    private String getResetLink(String emailContent, String userName)
+    private String getResetLink(TestUtils setup, String emailContent, String userName)
     {
-        String result = null;
-
+        String result;
         // Use a regex to extract the password reset link
-        Pattern resetLinkPattern = Pattern.compile("http[^\\s]+?authenticate/reset\\?u=" + userName + "\\&v=\\w+");
+        String pattern =
+            String.format("(%s)\\?u=%s\\&v=\\w+", ResetPasswordPage.getResetPasswordURL(), userName);
+        Pattern resetLinkPattern = Pattern.compile(pattern);
         Matcher matcher = resetLinkPattern.matcher(emailContent);
         if (matcher.find()) {
             result = matcher.group();
+        } else {
+            throw new AssertionFailedError(
+                String.format("Cannot find URL in email content with pattern [%s]. Actual mail content: [%s]",
+                    pattern, emailContent));
         }
 
         return result;

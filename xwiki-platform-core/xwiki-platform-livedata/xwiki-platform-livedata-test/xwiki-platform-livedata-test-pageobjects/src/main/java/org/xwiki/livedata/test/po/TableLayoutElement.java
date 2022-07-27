@@ -751,13 +751,16 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
 
-        // Hover on the property and click on the edit button on the displayed popover.
-        // We move slightly at the right of the center of the targeted element to prevent to popover of the surrounding 
-        // cells to hide the targeted location of the mouse.
-        new Actions(getDriver().getWrappedDriver()).moveToElement(element, 50, 0).perform();
+        // Hover on the property and click on the edit button on the displayed popover. We move slightly at the right of
+        // the center of the targeted element, then slightly to the left, towards the center of the element. This
+        // simulates the mouse trajectory of a real user hovering the cell above the one he/she wants to edit.
+        new Actions(getDriver().getWrappedDriver())
+            .moveToElement(element, 50, 0)
+            .moveToElement(element, 0, 0)
+            .perform();
         By editActionSelector = By.cssSelector(".displayer-action-list span[title='Edit']");
         // Waits to have at least one popover visible and click on the edit action of the last one. While it does not
-        // seems to be possible in normal conditions, using selenium and moveToElement, several popover can be visible
+        // seem to be possible in normal conditions, using selenium and moveToElement, several popover can be visible
         // at the same time (especially on Chrome). We select the latest edit action, which is the one of the targeted
         // property because the popover actions are appended at the end of the document.
         getDriver().waitUntilCondition(input -> !getDriver().findElementsWithoutWaiting(editActionSelector).isEmpty());

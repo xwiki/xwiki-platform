@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -188,7 +189,10 @@ public class AttachmentsPane extends BaseElement
             + "']/parent::div/following-sibling::div[contains(@class, 'deleteAttachment')]"));
         WebElement deleteButton = this.attachmentsLivetable.getCell(getRowIndexByAttachmentName(attachmentName), 6)
             .findElement(By.className("actiondelete"));
-        deleteButton.click();
+        // This is needed since Selenium deleteButton.click() fails on smaller windows, even if the element is
+        // clickable (visible and enabled). The failure was reproduced on org.xwiki.test.ui.CompareVersionsTest and
+        // might be resolved after moving the test to docker.
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].click();", deleteButton);
         this.confirmDelete.clickOk();
 
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
@@ -273,7 +277,7 @@ public class AttachmentsPane extends BaseElement
      * @param attachmentName the name of the attachment
      * @return the version number displayed for the attachment
      */
-    public String getLatestVersionOfAttachment(String attachmentName) throws Exception
+    public String getLatestVersionOfAttachment(String attachmentName)
     {
         return this.getAttachmentVersionElement(attachmentName).getText();
     }

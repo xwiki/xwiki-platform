@@ -25,16 +25,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>14.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-dependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Dependencies</name>
   <packaging>pom</packaging>
   <description>The dependencies of the WAR as a separate pom to be reusable in other distributions.</description>
-  <properties>
-    <!-- TODO: remove when https://jira.xwiki.org/browse/XWIKI-19932 is fixed -->
-    <xwiki.enforcer.no-legacy-dependencies.exclude>.*xwiki.*:.*-legacy-(?!events-hibernate-api).*</xwiki.enforcer.no-legacy-dependencies.exclude>
-  </properties>
   <dependencies>
     <!-- ********************************************************************** -->
     <!-- Depend on the minimal WAR -->

@@ -37,8 +37,8 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($newUrl = $services.security.authentication.getAuthenticationURL('forgot', $request.parameterMap))
-#set ($discard = $services.logging.deprecate("ForgotUsername", "The page [XWiki.ForgotUsername] should not be used anymore in favor of the new 'authenticate/forgot' URL."));
+#set ($newUrl = $services.security.authentication.getAuthenticationURL('retrieveusername', $request.parameterMap))
+#set ($discard = $services.logging.deprecate("ForgotUsername", "The page [XWiki.ForgotUsername] should not be used anymore in favor of the new 'authenticate/retrieveusername' URL."));
 #set ($discard = $response.sendRedirect($newUrl))
 {{/velocity}}</content>
   <object>

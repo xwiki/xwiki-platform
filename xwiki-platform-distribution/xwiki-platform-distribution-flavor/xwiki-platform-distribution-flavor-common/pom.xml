@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>14.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-common</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Common</name>
@@ -226,8 +226,9 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.contrib</groupId>
-      <artifactId>application-ckeditor-ui</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
+      <version>${project.version}</version>
       <type>xar</type>
     </dependency>
     <dependency>

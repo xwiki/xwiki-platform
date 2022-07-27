@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>14.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -125,42 +125,9 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <justification>Moved to a legacy module</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>interface org.xwiki.eventstream.EventStream</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method long org.xwiki.eventstream.script.EventStreamScriptService::getEventCount() throws org.xwiki.eventstream.EventStreamException</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method long org.xwiki.eventstream.script.EventStreamScriptService::getLegacyEventCount() throws org.xwiki.query.QueryException</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method org.xwiki.job.event.status.JobStatus org.xwiki.eventstream.script.EventStreamScriptService::getLegacyMigrationStatus()</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method org.xwiki.job.event.status.JobStatus org.xwiki.eventstream.script.EventStreamScriptService::startLegacyMigration(java.util.Date) throws org.xwiki.job.JobException</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>interface org.xwiki.eventstream.EventStatusManager</old>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
+
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -179,6 +146,7 @@
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
+    <module>xwiki-platform-ckeditor</module>
     <module>xwiki-platform-classloader</module>
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>

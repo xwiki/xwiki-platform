@@ -75,7 +75,8 @@
 #foreach($docExtraExtension in $docExtraExtensions)
   #set ($params = $docExtraExtension.parameters)
   #set ($template = "loaddocextrauix.vm&uix=$docExtraExtension.id")
-  #if ($params.show)
+  ## Params are evaluated as string
+  #if ($params.show && $params.show == 'true')
     #set ($newDocExtra = [$docExtraExtension.id, $params.name, $params.title, $params.itemnumber, $template, $params.shortcut])
     #set ($discard = $docextras.add($newDocExtra))
   #end

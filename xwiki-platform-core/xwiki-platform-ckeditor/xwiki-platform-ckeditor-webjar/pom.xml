@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-ckeditor</artifactId>
+    <version>14.7-SNAPSHOT</version>
+  </parent>
+  <packaging>jar</packaging>
+  <artifactId>xwiki-platform-ckeditor-webjar</artifactId>
+  <name>XWiki Platform - CKEditor - Webjar</name>
+  <description>Packages CKEditor and our custom plugins in a single WebJar.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>CKEditor WebJar</xwiki.extension.name>
+    <!-- Explicitly indicate it's a webjar -->
+    <xwiki.extension.jar.type>webjar</xwiki.extension.jar.type>
+    <!-- Where to unpack the WebJars with the custom CKEditor plugins. -->
+    <webjars.unpack.directory>${project.build.directory}/webjars</webjars.unpack.directory>
+    <webjars.unpack.contentDirectory>
+      ${webjars.unpack.directory}/META-INF/resources/webjars/xwiki-platform-ckeditor-plugins/${project.version}
+    </webjars.unpack.contentDirectory>
+    <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.contrib:application-ckeditor-webjar</xwiki.extension.features>
+  </properties>
+  <dependencies>
+    <!-- Even though we bundle the custom plugins with the CKEditor code (the plugins WebJar is merged with the CKEditor
+      WebJar) we still need to declare this dependency in order to bring the transitive dependencies that our custom
+      plugins may have (the alternative is to duplicate the dependencies here, which is too fragile). -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Download the CKEditor sources for the version (tag) we want to use. -->
+      <plugin>
+        <groupId>com.googlecode.maven-download-plugin</groupId>
+        <artifactId>download-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>download-ckeditor-sources</id>
+            <phase>generate-resources</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Unpack the WebJar with the custom CKEditor plugins that we want to include in the build. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-plugins-webjar</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <outputDirectory>${webjars.unpack.directory}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Copy the build configuration to the CKEditor sources. -->
+            <id>copy-ckeditor-build-config</id>
+            <phase>process-resources</phase>
+          </execution>
+          <execution>
+            <!-- Copy the custom plugins to the CKEditor sources so that they are included in the build. -->
+            <id>copy-custom-plugins</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${ckeditor.plugins.path}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${webjars.unpack.contentDirectory}</directory>
+                  <excludes>
+                    <!-- The plugins are bundled with the CKEditor code. -->
+                    <exclude>**/plugin.min.js</exclude>
+                  </excludes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <!-- Copy the output of the CKEditor builder to the expected WebJar location. -->
+          <execution>
+            <id>copy-ckeditor-resources</id>
+            <phase>prepare-package</phase>
+          </execution>
+          <!-- Copy the unminified code to the expected WebJar location because CKBuilder has minified everything. -->
+          <execution>
+            <id>copy-unminified-code</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${webjar.outputDirectory}/plugins</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${webjars.unpack.contentDirectory}</directory>
+                  <excludes>
+                    <!-- The plugins have been already bundled with the CKEditor code. -->
+                    <exclude>**/plugin.*</exclude>
+                    <!-- The minified version has already been copied. -->
+                    <exclude>**/*.min.*</exclude>
+                  </excludes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <!-- Copy the WebJar resources (e.g. CKEditor overwrites) to the right path before packing the jar. -->
+          <execution>
+            <!-- We can't use the inherited 'copy-webjar-resources' execution because it is executed before
+              'copy-ckeditor-resources', which means we loose our custom CKEditor configuration. -->
+            <id>copy-webjar-resources-custom</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${webjar.outputDirectory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Build the CKEditor. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <includes>
+            <!-- Include only the WebJar content -->
+            <include>META-INF/**</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

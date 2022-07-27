@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>14.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-rss</artifactId>
   <name>XWiki Platform - Rendering - Macro - RSS</name>
@@ -59,6 +59,14 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- For the HTMLCleaner component list. -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

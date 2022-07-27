@@ -106,21 +106,21 @@ public class DefaultValidationTest extends AbstractValidationTest
             Locale.ROOT));
         if (this.target.equals(resetPassword)) {
             this.logCaptureConfiguration.registerExpected("[DEPRECATED] The page [XWiki.ResetPassword] "
-                + "should not be used anymore in favor of the new 'authenticate/reset' URL.");
+                + "should not be used anymore in favor of the new 'authenticate/resetpassword' URL.");
         }
 
         Target resetPasswordComplete = new DocumentReferenceTarget(
             new DocumentReference("xwiki", "XWiki", "ResetPasswordComplete", Locale.ROOT));
         if (this.target.equals(resetPasswordComplete)) {
             this.logCaptureConfiguration.registerExpected("[DEPRECATED] The page [XWiki.ResetPasswordComplete] "
-                + "should not be used anymore in favor of the new 'authenticate/reset' URL.");
+                + "should not be used anymore in favor of the new 'authenticate/resetpassword' URL.");
         }
 
         Target forgotUsername = new DocumentReferenceTarget(
             new DocumentReference("xwiki", "XWiki", "ForgotUsername", Locale.ROOT));
         if (this.target.equals(forgotUsername)) {
             this.logCaptureConfiguration.registerExpected("[DEPRECATED] The page [XWiki.ForgotUsername] "
-                + "should not be used anymore in favor of the new 'authenticate/forgot' URL.");
+                + "should not be used anymore in favor of the new 'authenticate/retrieveusername' URL.");
         }
     }
 

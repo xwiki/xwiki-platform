@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="PanelsCode.NavigationConfiguration" locale="">
+<xwikidoc version="1.5" reference="PanelsCode.NavigationConfiguration" locale="">
   <web>PanelsCode</web>
   <name>NavigationConfiguration</name>
   <language/>
@@ -145,6 +145,7 @@
     <property>
       <exclusions>
         <value>Sandbox.WebHome</value>
+        <value>Dashboard.WebHome</value>
       </exclusions>
     </property>
     <property>

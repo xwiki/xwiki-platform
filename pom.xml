@@ -59,8 +59,6 @@
     <jetty.version>9.4.29.v20200521</jetty.version>
     <netty.version>4.1.79.Final</netty.version>
     <hibernate.version>5.6.10.Final</hibernate.version>
-    <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
-    <hsqldb.version>2.6.1</hsqldb.version>
 
     <!-- Versions of other software we need in our functional tests -->
     <testcontainers.version>1.17.3</testcontainers.version>
@@ -95,6 +93,7 @@
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
+    <hsqldb.version>2.7.0</hsqldb.version>
     <mysql.groupId>mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-java</mysql.artifactId>
     <mysql.version>8.0.30</mysql.version>

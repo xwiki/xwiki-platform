@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.expression;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * The several properties you can have in an {@link org.xwiki.eventstream.Event}.
  *
@@ -96,5 +98,6 @@ public enum EventProperty
      * 
      * @since 14.7RC1
      */
-    REMOTE_OBSERVATION_ID,
+    @Unstable
+    REMOTE_OBSERVATION_ID
 }

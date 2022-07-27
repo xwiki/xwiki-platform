@@ -31,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * A recorded event that occurred at some point in the wiki.
@@ -569,6 +570,7 @@ public interface Event
      *         version of XWiki older than 14.7
      * @since 14.7RC1
      */
+    @Unstable
     default String getRemoteObservationId()
     {
         return null;

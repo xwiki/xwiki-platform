@@ -203,6 +203,7 @@ public interface Event
      * @see #getRemoteObservationId()
      * @since 14.7RC1
      */
+    @Unstable
     String FIELD_REMOTE_OBSERVATION_ID = "observationInstanceId";
 
     /** The importance of an event. */

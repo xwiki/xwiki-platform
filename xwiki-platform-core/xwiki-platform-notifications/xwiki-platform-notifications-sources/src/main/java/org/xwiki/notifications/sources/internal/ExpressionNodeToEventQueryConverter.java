@@ -121,6 +121,30 @@ public class ExpressionNodeToEventQueryConverter
         }
     }
 
+    private String getProperty(AbstractBinaryOperatorNode operator) throws EventStreamException
+    {
+        if (operator.getLeftOperand() instanceof PropertyValueNode) {
+            return getProperty((PropertyValueNode) operator.getLeftOperand());
+        } else if (operator.getRightOperand() instanceof PropertyValueNode) {
+            return getProperty((PropertyValueNode) operator.getRightOperand());
+        } else {
+            // TODO: Unsupported
+            throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
+        }
+    }
+
+    private Object getValue(AbstractBinaryOperatorNode operator) throws EventStreamException
+    {
+        if (operator.getLeftOperand() instanceof PropertyValueNode) {
+            return getValue((AbstractValueNode) operator.getRightOperand());
+        } else if (operator.getRightOperand() instanceof PropertyValueNode) {
+            return getValue((AbstractValueNode) operator.getLeftOperand());
+        } else {
+            // TODO: Unsupported
+            throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
+        }
+    }
+
     private String getProperty(PropertyValueNode propertyNode) throws EventStreamException
     {
         String property = PROPERTY_MAPPING.get(propertyNode.getContent());
@@ -199,50 +223,24 @@ public class ExpressionNodeToEventQueryConverter
 
             parseEqualsNode(operator, result);
         } else if (operator instanceof StartsWith) {
-            // TODO: Unsupported
-            throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
+            result.startsWith(getProperty(operator), getValue(operator));
         } else if (operator instanceof EndsWith) {
-            // TODO: Unsupported
-            throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
+            result.endsWith(getProperty(operator), getValue(operator));
         } else if (operator instanceof GreaterThanNode) {
             GreaterThanNode greater = (GreaterThanNode) operator;
-            String property;
-            Object value;
-            if (operator.getLeftOperand() instanceof PropertyValueNode) {
-                property = getProperty((PropertyValueNode) operator.getLeftOperand());
-                value = getValue((AbstractValueNode) operator.getRightOperand());
-            } else if (operator.getRightOperand() instanceof PropertyValueNode) {
-                property = getProperty((PropertyValueNode) operator.getRightOperand());
-                value = getValue((AbstractValueNode) operator.getLeftOperand());
-            } else {
-                // TODO: Unsupported
-                throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
-            }
 
             if (greater.isOrEquals()) {
-                result.greaterOrEq(property, value);
+                result.greaterOrEq(getProperty(operator), getValue(operator));
             } else {
-                result.greater(property, value);
+                result.greater(getProperty(operator), getValue(operator));
             }
         } else if (operator instanceof LesserThanNode) {
             LesserThanNode lesser = (LesserThanNode) operator;
-            String property;
-            Object value;
-            if (lesser.getLeftOperand() instanceof PropertyValueNode) {
-                property = getProperty((PropertyValueNode) lesser.getLeftOperand());
-                value = getValue((AbstractValueNode) lesser.getRightOperand());
-            } else if (lesser.getRightOperand() instanceof PropertyValueNode) {
-                property = getProperty((PropertyValueNode) lesser.getRightOperand());
-                value = getValue((AbstractValueNode) lesser.getLeftOperand());
-            } else {
-                // TODO: Unsupported
-                throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
-            }
 
             if (lesser.isOrEquals()) {
-                result.lessOrEq(property, value);
+                result.lessOrEq(getProperty(operator), getValue(operator));
             } else {
-                result.less(property, value);
+                result.less(getProperty(operator), getValue(operator));
             }
         } else {
             // TODO: Unsupported

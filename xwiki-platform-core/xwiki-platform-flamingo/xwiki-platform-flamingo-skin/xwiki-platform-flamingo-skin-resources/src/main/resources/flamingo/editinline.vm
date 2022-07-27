@@ -124,6 +124,11 @@ $renderedContent
   #end
   <input type="hidden" name="async" value="$escapetool.xml($async)" />
 #end
+## Pass the section number when the form is submitted in order to affect only the specified section.
+## We need to test if the section number is present to prevent a NumberFormatException for the empty string.
+#if("$!{request.section}" != '')
+  <input type="hidden" name="section" value="$!{escapetool.xml($request.section)}" />
+#end
 ## --------------
 ## Action buttons
 ## --------------

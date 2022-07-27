@@ -32,16 +32,17 @@ import javax.mail.internet.InternetAddress;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.security.authentication.AuthenticationAction;
-import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.security.authentication.AuthenticationConfiguration;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
 import org.xwiki.security.authentication.AuthenticationFailureStrategy;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordManager;
+import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
@@ -58,7 +59,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -167,13 +167,16 @@ class AuthenticationScriptServiceTest
     @Test
     void getAuthenticationURL() throws Exception
     {
-        String action = AuthenticationAction.FORGOT_USERNAME.getRequestParameter();
+        String action = AuthenticationAction.RETRIEVE_USERNAME.getRequestParameter();
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("u", "foo");
         parameters.put("v", "bar");
 
+        WikiReference wikiReference = new WikiReference("current");
+        when(this.xWikiContext.getWikiReference()).thenReturn(wikiReference);
+
         AuthenticationResourceReference resourceReference =
-            new AuthenticationResourceReference(AuthenticationAction.FORGOT_USERNAME);
+            new AuthenticationResourceReference(wikiReference, AuthenticationAction.RETRIEVE_USERNAME);
         resourceReference.addParameter("u", "foo");
         resourceReference.addParameter("v", "bar");
 

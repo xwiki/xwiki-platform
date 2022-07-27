@@ -1,25 +1,24 @@
 <!--
-  * See the NOTICE file distributed with this work for additional
-  * information regarding copyright ownership.
-  *
-  * This is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU Lesser General Public License as
-  * published by the Free Software Foundation; either version 2.1 of
-  * the License, or (at your option) any later version.
-  *
-  * This software is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this software; if not, write to the Free
-  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 
-
- <!--
+<!--
   The LivedataFilter component is used to filter properties of the Livedata
   Each LivedataFilter is defined by two props:
   - a property to filter
@@ -63,6 +62,11 @@
 
 <script>
 import XWikiLoader from "../utilities/XWikiLoader.vue";
+import FilterBoolean from "./FilterBoolean.vue"
+import FilterDate from "./FilterDate.vue"
+import FilterList from "./FilterList.vue"
+import FilterNumber from "./FilterNumber.vue"
+import FilterText from "./FilterText.vue"
 
 export default {
 
@@ -72,6 +76,11 @@ export default {
 
   components: {
     XWikiLoader,
+    FilterBoolean,
+    FilterDate,
+    FilterList,
+    FilterNumber,
+    FilterText,
   },
 
   // The two props defining the Filter

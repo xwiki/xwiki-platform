@@ -174,7 +174,7 @@ public class ObjectEditPane extends FormContainerElement
      */
     private WebElement getXobjectContainer()
     {
-        return getDriver().findElementById(String.format("%s_%s_%s", "xobject", className, objectNumber));
+        return getDriver().findElement(By.id(String.format("%s_%s_%s", "xobject", className, objectNumber)));
     }
 
     /**

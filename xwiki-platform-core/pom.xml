@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -50,16 +50,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <systemProperties combine.children="append">
-              <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
-              <!-- TODO: Remove this property once all functional tests have been moved to use the failsafe plugin -->
-              <property>
-                <name>screenshotDirectory</name>
-                <value>${basedir}/target/screenshots</value>
-              </property>
-            </systemProperties>
-          </configuration>
           <dependencies>
             <dependency>
               <groupId>org.xwiki.commons</groupId>
@@ -67,19 +57,6 @@
               <version>${commons.version}</version>
             </dependency>
           </dependencies>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <configuration>
-            <systemProperties combine.children="append">
-              <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
-              <property>
-                <name>screenshotDirectory</name>
-                <value>${basedir}/target/screenshots</value>
-              </property>
-            </systemProperties>
-          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -125,63 +102,40 @@
 
                  Common justification example:
 
-                 <revapi.differences>
-                   <justification>This change is necessary to fix bug #1234</justification>
-                   <criticality>highlight</criticality>
-                   <differences>
-                     <item>
-                       <code>java.method.addToInterface</code>
-                       <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
-                       <new>method void com.acme.ToolInterface::setup()</new>
-                     </item>
-                     <item>
-                       <code>java.method.removed</code>
-                       <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
-                       <old>method void com.acme.ToolInterface::initialize()</old>
-                       <justification>...</justification>
-                     </item>
-                   </differences>
-                 </revapi.differences>
-
-                 Single justification example:
-
-                 <revapi.differences>
-                   <differences>
-                     <item>
-                       <code>java.method.removed</code>
-                       <old>method void org.xwiki.diff.xml.XMLDiff::xxx()</old>
-                       <justification>Unstable API added by mistake.</justification>
-                       <criticality>highlight</criticality>
-                     </item>
-                   </differences>
-                 </revapi.differences>
-            -->
             <revapi.differences>
+              <justification>This change is necessary to fix bug #1234</justification>
               <criticality>highlight</criticality>
               <differences>
                 <item>
-                  <ignore>true</ignore>
-                  <code>java.method.returnTypeChanged</code>
-                  <old>method javax.mail.internet.InternetAddress org.xwiki.security.authentication.script.AuthenticationScriptService::requestResetPassword(org.xwiki.user.UserReference) throws org.xwiki.security.authentication.ResetPasswordException</old>
-                  <new>method void org.xwiki.security.authentication.script.AuthenticationScriptService::requestResetPassword(org.xwiki.user.UserReference) throws org.xwiki.security.authentication.ResetPasswordException</new>
-                  <justification>Unstable API: this API was not properly designed and shouldn't have returned that in first place.</justification>
+                  <code>java.method.addToInterface</code>
+                  <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
+                  <new>method void com.acme.ToolInterface::setup()</new>
                 </item>
                 <item>
-                  <ignore>true</ignore>
                   <code>java.method.removed</code>
-                  <old>method javax.mail.internet.InternetAddress org.xwiki.security.authentication.ResetPasswordRequestResponse::getUserEmail()</old>
-                  <justification>Unstable API: this API was not properly designed and shouldn't have returned that in first place.</justification>
+                  <fullQualifiedClassName>com.acme.ToolInterface</fullyQualifiedClassName>
+                  <old>method void com.acme.ToolInterface::initialize()</old>
+                  <justification>...</justification>
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              ... other difference group here...
+            </revapi.differences>
+
+                 Single justification example:
+            -->
+            
+            
+
           </analysisConfiguration>
         </configuration>
       </plugin>
     </plugins>
   </build>
   <modules>
-      <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-activeinstalls</module>
+    <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-activeinstalls2</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-alerts</module>
     <module>xwiki-platform-annotation</module>
@@ -192,6 +146,7 @@
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
+    <module>xwiki-platform-ckeditor</module>
     <module>xwiki-platform-classloader</module>
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>
@@ -205,6 +160,7 @@
     <module>xwiki-platform-display</module>
     <module>xwiki-platform-edit</module>
     <module>xwiki-platform-eventstream</module>
+    <module>xwiki-platform-export</module>
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-feed</module>
     <module>xwiki-platform-filter</module>
@@ -235,6 +191,7 @@
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>
     <module>xwiki-platform-model</module>
+    <module>xwiki-platform-netflux</module>
     <module>xwiki-platform-notifications</module>
     <module>xwiki-platform-observation</module>
     <module>xwiki-platform-office</module>
@@ -242,6 +199,7 @@
     <module>xwiki-platform-panels</module>
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-ratings</module>
+    <module>xwiki-platform-realtime</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>
@@ -270,6 +228,7 @@
     <module>xwiki-platform-vfs</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webjars</module>
+    <module>xwiki-platform-websocket</module>
     <module>xwiki-platform-wiki</module>
     <module>xwiki-platform-wysiwyg</module>
     <module>xwiki-platform-xar</module>
@@ -305,6 +264,52 @@
                   <property>
                     <name>oracle.jdbc.timezoneAsRegion</name>
                     <value>false</value>
+                  </property>
+                </systemProperties>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <!-- Executed when the docker profile is not specified. This is because we want to define the
+           "screenshotDirectory" system property for Surefire/Failsafe plugins only when not executing docker-based
+           tests since it's not used for them (the screenshot directory is computed based on the "maven.build.dir"
+            system property for them). -->
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <systemProperties combine.children="append">
+                  <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is
+                       failing.
+                       TODO: Remove this property once all functional tests have been moved to use the failsafe plugin
+                  -->
+                  <property>
+                    <name>screenshotDirectory</name>
+                    <value>${project.build.directory}/screenshots</value>
+                  </property>
+                </systemProperties>
+              </configuration>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemProperties combine.children="append">
+                  <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is
+                       failing (only used by non-docker UI tests) -->
+                  <property>
+                    <name>screenshotDirectory</name>
+                    <value>${project.build.directory}/screenshots</value>
                   </property>
                 </systemProperties>
               </configuration>

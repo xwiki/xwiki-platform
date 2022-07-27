@@ -48,7 +48,7 @@ core.menu.admin.wiki=Wiki administrieren
 platform.wiki.panel.title=Wiki Information
 
 # MESSAGES
-platform.wiki.currentwiki.welcome=Willkommen im Wiki  {0}{1}{2}.
+platform.wiki.currentwiki.welcome=Willkommen im Wiki {0}{1}{2}.
 platform.wiki.currentwiki.currentUserIsOwner=Sie sind der Besitzer dieses Wikis.
 platform.wiki.currentwiki.currentUserIsAdmin=Sie sind ein Administrator in diesem Wiki.
 platform.wiki.currentwiki.joinNeedToLogin=Um diesem Wiki beizutreten, müssen Sie eingeloggt sein.
@@ -73,7 +73,7 @@ platform.wiki.currentwiki.inviteNotification=Sie sind eingeladen, dem Wiki ''{0}
 platform.wiki.currentwiki.inviteSuccess={0} erfolgreich eingeladen.
 platform.wiki.currentwiki.invitationCancelSaveComment=Einladung für {0} ({1}) zurückgezogen
 platform.wiki.currentwiki.invitationCancelNotification=Ihre Einladung wurde zurückgezogen und ist nicht mehr gültig.
-platform.wiki.currentwiki.invitationCancelSuccess=Einladung  zurückgezogen.
+platform.wiki.currentwiki.invitationCancelSuccess=Einladung zurückgezogen.
 platform.wiki.currentwiki.invitationCancelFailure=Fehler: Diese Einladung kann nicht zurückgezogen werden.
 platform.wiki.currentwiki.candidateReviewFailure=Fehler: Diese Einladung kann nicht zurückgezogen werden.
 
@@ -131,7 +131,8 @@ admin.xwiki.workspaceusers.description=Benutzerverwaltung für das Wiki: Benutze
 admin.xwiki.usersconfiguration.title=Konfiguration
 admin.xwiki.members.title=Derzeitige Mitglieder
 admin.xwiki.users.title=Alle Benutzer
-    
+
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Startseite</content>
+platform.wiki.drawer.homeWiki=Startseite
+</content>
 </xwikidoc>

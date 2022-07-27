@@ -167,7 +167,7 @@ define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], functio
     // * if there's no pagination child node then we decide based on whether the parent node is selected or not. If the
     //   parent node is selected then we use excludes (select the parent except for ...). Otherwise, we use includes
     //   (this has the effect that the child pages that don't appear in the tree, for any reason, are not included).
-    var paginationNode = findPaginationNode(childNodes);
+    var paginationNode = childNodes.find(childNode => childNode.data.type === 'pagination');
     var useExcludes = (!tree.is_loaded(parentNode) && tree.is_undetermined(parentNode)) ||
       (paginationNode && tree.is_checked(paginationNode)) ||
       (!paginationNode && tree.is_checked(parentNode));
@@ -195,16 +195,6 @@ define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], functio
         collectExportPages(tree, child, exportPages);
       }
     });
-  };
-
-  // Just because IE11 doesn't support Array.find() ...
-  var findPaginationNode = function(nodes) {
-    for (var i = nodes.length - 1; i >= 0; i--) {
-      var node = nodes[i];
-      if (node.data.type === 'pagination') {
-        return node;
-      }
-    }
   };
 
   var exportTreeAPI = {
@@ -300,10 +290,10 @@ define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], functio
       // Select all the pages by default.
       tree.select_all();
       // Handle the Select All / Node actions.
-      $(this).closest('.export-tree-container').find('.export-tree-action.selectAll').click(function(event) {
+      $(this).closest('.export-tree-container').find('.export-tree-action.selectAll').on('click', function(event) {
         event.preventDefault();
         tree.select_all();
-      }).addBack().find('.export-tree-action.selectNone').click(function(event) {
+      }).addBack().find('.export-tree-action.selectNone').on('click', function(event) {
         event.preventDefault();
         tree.deselect_all();
       });
@@ -431,7 +421,7 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   //
 
   // Enable / disable the corresponding settings when the target XWiki version changes.
-  $('#targetXWikiVersion').change(function() {
+  $('#targetXWikiVersion').on('change', function() {
     // Disable all settings.
     $('#targetXWikiVersionSettings fieldset').prop('disabled', true);
     // Enable the settings that correspond to the selected value.
@@ -445,9 +435,9 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   });
 
   // Create the container for the hidden inputs used to submit the selected pages from the export tree.
-  var hiddenContainer = $('<div class="hidden"/>').insertAfter('.export-tree');
+  var hiddenContainer = $('<div class="hidden"></div>').insertAfter('.export-tree');
 
-  $('form#export').submit(function() {
+  $('form#export').on('submit', function() {
     var exportTree = $.jstree.reference($(this).find('.export-tree'));
     // We submit only the tree filter when all nodes are selected (in order to optimize the final database query).
     if (exportTree && !exportTree.isExportingAllPages()) {
@@ -474,13 +464,13 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   };
 
   // Create the hidden form that we're going to use.
-  var form = $('<form/>').attr({
+  var form = $('<form></form>').attr({
     id: 'export-modal-form',
     method: 'post'
   }).appendTo("body");
 
   // Export modal submit.
-  $('#exportModalOtherCollapse a.btn-primary').click(function (event) {
+  $('#exportModalOtherCollapse').on('click', 'a.btn-primary', function (event) {
     var exportTree = $(this).closest('#exportModalOtherCollapse').find('.export-tree');
     if (exportTree.length > 0) {
       event.preventDefault();

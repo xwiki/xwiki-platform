@@ -23,8 +23,7 @@ package com.xpn.xwiki.plugin.skinx;
 import java.util.Collections;
 import java.util.Set;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -43,12 +42,6 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
      * extension content.
      */
     public static final String PLUGIN_NAME = "jsfx";
-
-    /**
-     * The name of the preference (in the configuration file) specifying what is the default value of the defer, in case
-     * nothing is specified in the parameters of this extension.
-     */
-    public static final String DEFER_DEFAULT_PARAM = "xwiki.plugins.skinx.deferred.default";
 
     /**
      * XWiki plugin constructor.
@@ -78,23 +71,13 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     @Override
     public String getLink(String filename, XWikiContext context)
     {
-        boolean forceSkinAction = BooleanUtils.toBoolean((Boolean) getParameter("forceSkinAction", filename, context));
         StringBuilder result = new StringBuilder("<script src='");
-        result.append(context.getWiki().getSkinFile(filename, forceSkinAction, context));
-        if (forceSkinAction) {
-            String parameters = StringUtils.removeStart(parametersAsQueryString(filename, context), "&amp;");
-            if (!StringUtils.isEmpty(parameters)) {
-                String queryParamDelimiter =
-                    StringUtils.contains(result, QUERY_PARAMETER_DELIMITER) ? "&" : QUERY_PARAMETER_DELIMITER;
-                result.append(queryParamDelimiter).append(parameters);
-            }
-        }
-        // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true
-        String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
-        Boolean defaultDefer = (!StringUtils.isEmpty(defaultDeferString)) ? Boolean.valueOf(defaultDeferString) : true;
-        if (BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", filename, context), defaultDefer)) {
+        result.append(XMLUtils.escapeAttributeValue(getSkinFileURL(filename, context)));
+
+        if (isDefer(filename, context)) {
             result.append("' defer='defer");
         }
+
         result.append("'></script>\n");
         return result.toString();
     }

@@ -71,6 +71,12 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     public static final String UPLOAD_MAXSIZE_PARAMETER = "upload_maxsize";
 
     /**
+     * The default maximum size for uploaded documents. This limit can be changed using the {@code upload_maxsize}
+     * XWiki preference.
+     */
+    public static final long UPLOAD_DEFAULT_MAXSIZE = 33554432L;
+
+    /**
      * The name of the parameter that can be set in the global XWiki preferences to override the default size threshold
      * for on-disk storage.
      */
@@ -82,15 +88,9 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadPlugin.class);
 
     /**
-     * The default maximum size for uploaded documents. This limit can be changed using the <tt>upload_maxsize</tt>
-     * XWiki preference.
-     */
-    private static final long UPLOAD_DEFAULT_MAXSIZE = 33554432L;
-
-    /**
      * The default maximum size for in-memory stored uploaded documents. If a file is larger than this limit, it will be
      * stored on disk until the current request finishes. This limit can be changed using the
-     * <tt>upload_sizethreshold</tt> XWiki preference.
+     * {@code upload_sizethreshold} XWiki preference.
      */
     private static final long UPLOAD_DEFAULT_SIZETHRESHOLD = 100000L;
 
@@ -377,7 +377,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      *
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
-     * @return The file name, or <tt>null</tt> if no file was uploaded for that form field.
+     * @return The file name, or {@code null} if no file was uploaded for that form field.
      */
     public String getFileName(String formfieldName, XWikiContext context)
     {
@@ -392,7 +392,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      *
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
-     * @return The corresponding FileItem, or <tt>null</tt> if no file was uploaded for that form field.
+     * @return The corresponding FileItem, or {@code null} if no file was uploaded for that form field.
      */
     public FileItem getFile(String formfieldName, XWikiContext context)
     {

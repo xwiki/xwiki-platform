@@ -20,7 +20,6 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
@@ -132,38 +131,13 @@ public class BaseElement
     }
 
     /**
-     * Waits for the javascript libraries and their plugins that need to load before the UI's elements can be used
-     * safely.
-     * <p>
-     * Subclassed should override this method and add additional checks needed by their logic.
-     *
-     * @since 12.5RC1
+     * Wait until the page is ready for user interaction. The page is ready when there are no pending HTTP requests
+     * (e.g. to load resources or data) and no pending promises (e.g. no asynchronous code that waits to be executed).
+     * 
+     * @since 14.2RC1
      */
-    public void waitUntilPageJSIsLoaded()
+    public void waitUntilPageIsReady()
     {
-        // Prototype
-        getDriver().waitUntilJavascriptCondition("return window.Prototype != null && window.Prototype.Version != null");
-
-        // JQuery and dependencies
-        // JQuery dropdown plugin needed for the edit button's dropdown menu.
-        // TODO: We seem to have a flicker possibly caused by this check taking more than the default 10s timeout from
-        // time to time, see https://jira.xwiki.org/browse/XCOMMONS-1865. Testing this hypothesis by waiting a first
-        // time and if it fails waiting again and logging some message. Remove if the increased timeout doesn't help.
-        // If it helps, then we might need to dive deeper and understand why it can take more than 10s (underpowered
-        // machine, etc).
-        try {
-            getDriver()
-                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
-        } catch (TimeoutException e) {
-            LOGGER.error("Wait for JQuery took more than [{}] seconds", getDriver().getTimeout(), e);
-            getDriver()
-                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
-        }
-
-        // Make sure all asynchronous elements have been executed
-        getDriver().waitUntilJavascriptCondition("return !document.getElementsByClassName('xwiki-async').length");
-
-        // Make sure the shortcuts are loaded
-        getDriver().waitUntilJavascriptCondition("return shortcut != null && shortcut != undefined");
+        getDriver().waitUntilElementHasAttributeValue(By.tagName("html"), "data-xwiki-page-ready", "true");
     }
 }

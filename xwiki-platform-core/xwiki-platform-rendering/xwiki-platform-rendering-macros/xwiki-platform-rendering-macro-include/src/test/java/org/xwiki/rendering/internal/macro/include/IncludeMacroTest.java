@@ -45,6 +45,7 @@ import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
@@ -97,7 +98,7 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
     CurrentMacroEntityReferenceResolver.class,
     DefaultAuthorizationManager.class
 })
-public class IncludeMacroTest
+class IncludeMacroTest
 {
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -265,7 +266,7 @@ public class IncludeMacroTest
             + "beginLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
             + "endLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
             + "onSpace\n"
-            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
+            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true] [Itest.png]\n"
             + "endParagraph\n"
             + "endMetaData [[base]=[includedWiki:includedSpace.includedPage]"
             + "[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
@@ -274,7 +275,9 @@ public class IncludeMacroTest
 
         DocumentReference includedDocumentReference =
             new DocumentReference("includedWiki", "includedSpace", "includedPage");
+        PageReference includedPageReference = new PageReference("includedWiki", "includedSpace", "includedPage");
         setupDocumentMocks("includedWiki:includedSpace.includedPage", includedDocumentReference,
+            "includedWiki:includedSpace/includedPage", includedPageReference,
             "[[page]] [[attach:test.png]] image:test.png");
         when(this.dab.getCurrentDocumentReference()).thenReturn(includedDocumentReference);
 
@@ -284,6 +287,58 @@ public class IncludeMacroTest
 
         List<Block> blocks =
             this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+        verify(this.dab).pushDocumentInContext(any(Map.class), any(DocumentModelBridge.class));
+        verify(this.dab).popDocumentFromContext(any(Map.class));
+
+        parameters.setPage("includedWiki:includedSpace/includedPage");
+
+        blocks =
+            this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    /**
+     * Verify that ids are adapted if they would duplicate an id of the parent document.
+     */
+    @Test
+    void adaptIdsOfIncludedHeadingsAndImages() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginSection\n"
+            + "beginHeader [1, HHeading-1]\n"
+            + "onWord [Heading]\n"
+            + "endHeader [1, HHeading-1]\n"
+            + "beginParagraph\n"
+            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true] [Itest.png-1]\n"
+            + "endParagraph\n"
+            + "endSection\n"
+            + "endMetaData [[base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        String documentContent = "= Heading =\n"
+            + "image:test.png";
+
+        DocumentReference includedDocumentReference =
+            new DocumentReference("includedWiki", "includedSpace", "includedPage");
+        setupDocumentMocks("includedWiki:includedSpace.includedPage", includedDocumentReference,
+            documentContent);
+        when(this.dab.getCurrentDocumentReference()).thenReturn(includedDocumentReference);
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("includedWiki:includedSpace.includedPage");
+        parameters.setContext(Context.NEW);
+
+        MacroTransformationContext context = createMacroTransformationContext("whatever", false);
+        // Initialize XDOM with ids from the including page.
+        context.setXDOM(getXDOM(documentContent));
+
+        List<Block> blocks = this.includeMacro.execute(parameters, null, context);
 
         assertBlocks(expected, blocks, this.rendererFactory);
         verify(this.dab).pushDocumentInContext(any(Map.class), any(DocumentModelBridge.class));
@@ -555,12 +610,27 @@ public class IncludeMacroTest
     private void setupDocumentMocks(String includedReferenceString, DocumentReference includedReference,
         String includedContent) throws Exception
     {
-        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, includedReference)).thenReturn(true);
-        when(this.macroEntityReferenceResolver.resolve(eq(includedReferenceString), eq(EntityType.DOCUMENT),
-            any(MacroBlock.class))).thenReturn(includedReference);
-        when(this.dab.getDocumentInstance((EntityReference) includedReference)).thenReturn(this.includedDocument);
+        setupDocumentMocks(includedReferenceString, includedReference, null, null, includedContent);
+    }
+
+    private void setupDocumentMocks(String includedDocumentReferenceString, DocumentReference includedDocumentReference,
+        String includedPageReferenceString, PageReference includedPageReference, String includedContent)
+        throws Exception
+    {
+        when(this.macroEntityReferenceResolver.resolve(eq(includedDocumentReferenceString), eq(EntityType.DOCUMENT),
+            any(MacroBlock.class))).thenReturn(includedDocumentReference);
+        when(this.dab.getDocumentInstance((EntityReference) includedDocumentReference))
+            .thenReturn(this.includedDocument);
+        if (includedPageReference != null) {
+            when(this.macroEntityReferenceResolver.resolve(eq(includedPageReferenceString), eq(EntityType.PAGE),
+                any(MacroBlock.class))).thenReturn(includedPageReference);
+            when(this.dab.getDocumentInstance((EntityReference) includedPageReference))
+                .thenReturn(this.includedDocument);
+        }
+
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, includedDocumentReference)).thenReturn(true);
         when(this.dab.getTranslatedDocumentInstance(this.includedDocument)).thenReturn(this.includedDocument);
-        when(this.includedDocument.getDocumentReference()).thenReturn(includedReference);
+        when(this.includedDocument.getDocumentReference()).thenReturn(includedDocumentReference);
         when(this.includedDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
         when(this.includedDocument.getXDOM()).thenReturn(getXDOM(includedContent));
         when(this.includedDocument.getRealLanguage()).thenReturn("");

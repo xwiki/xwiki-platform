@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -39,6 +40,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.CompositeBlockMatcher;
@@ -48,6 +50,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.velocity.VelocityManager;
 
 /**
@@ -144,7 +147,51 @@ public class DocumentContentAsyncExecutor
             }
         }
 
+        IdGenerator idGenerator = parameters.getIdGenerator();
+        if (idGenerator != null) {
+            content.setIdGenerator(idGenerator);
+            makeIdsUnique(content, idGenerator);
+        }
+
         return content;
+    }
+
+    /**
+     * Replace ids of heading and images by unique ids.
+     *
+     * @param content the XDOM to modify in-place
+     * @param idGenerator the id generator for unique ids
+     * @since 14.2RC1
+     */
+    private void makeIdsUnique(XDOM content, IdGenerator idGenerator)
+    {
+        // Traverse the XDOM and adapt all image and heading blocks.
+        content.getBlocks(block -> {
+            if (block instanceof ImageBlock) {
+                ImageBlock imageBlock = (ImageBlock) block;
+                imageBlock.setId(adaptId(idGenerator, imageBlock.getId()));
+            } else if (block instanceof HeaderBlock) {
+                HeaderBlock headerBlock = (HeaderBlock) block;
+                headerBlock.setId(adaptId(idGenerator, headerBlock.getId()));
+            }
+            return false;
+        }, Block.Axes.DESCENDANT);
+    }
+
+    /**
+     * @param idGenerator the id generator to use
+     * @param id the id to adapt to make it unique
+     * @return the unique id, can be the input if was already unique
+     * @since 14.2RC1
+     */
+    private String adaptId(IdGenerator idGenerator, String id)
+    {
+        if (StringUtils.isNotBlank(id)) {
+            String prefix = id.substring(0, 1);
+            String suffix = id.substring(1);
+            return idGenerator.generateUniqueId(prefix, suffix);
+        }
+        return id;
     }
 
     /**

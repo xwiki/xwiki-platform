@@ -20,12 +20,10 @@
 package org.xwiki.vfs.internal.script;
 
 import java.net.URI;
-import java.net.URLEncoder;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.url.ExtendedURL;
 import org.xwiki.vfs.VfsResourceReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,19 +36,19 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @since 12.4RC1
  */
 @ComponentTest
-public class VfsResourceReferenceConverterTest
+class VfsResourceReferenceConverterTest
 {
     @InjectMockComponents
     private VfsResourceReferenceConverter vfsResourceReferenceConverter;
 
     @Test
-    public void convertWithNull()
+    void convertWithNull()
     {
         assertNull(this.vfsResourceReferenceConverter.convertToType(null, null));
     }
 
     @Test
-    public void convertWithString() throws Exception
+    void convertWithString() throws Exception
     {
         String value = "attach:Toto.WebHome@testvfs.zip///test.doc";
         VfsResourceReference expectedReference = new VfsResourceReference(URI.create(value));
@@ -58,7 +56,7 @@ public class VfsResourceReferenceConverterTest
     }
 
     @Test
-    public void convertWithSpecialString() throws Exception
+    void convertWithSpecialString() throws Exception
     {
         String value = "attach:Toto.WebHome@testvfs.zip///logo xwiki.png";
         VfsResourceReference expectedReference =

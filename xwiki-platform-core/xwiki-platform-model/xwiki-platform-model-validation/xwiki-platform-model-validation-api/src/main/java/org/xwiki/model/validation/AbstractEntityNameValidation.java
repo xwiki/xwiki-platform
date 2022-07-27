@@ -20,7 +20,6 @@
 package org.xwiki.model.validation;
 
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define generic methods for transforming or validating entities based on the implementation of the
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.0RC1
  */
-@Unstable
 public abstract class AbstractEntityNameValidation implements EntityNameValidation
 {
     @Override

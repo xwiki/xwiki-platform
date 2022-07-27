@@ -21,3 +21,6 @@ com.xpn.xwiki.internal.query.DeprecatedConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.script.DeprecatedScriptContextInitializer
 com.xpn.xwiki.internal.template.SUExecutor
 com.xpn.xwiki.web.ViewrevAction
+com.xpn.xwiki.web.TempResourceAction
+com.xpn.xwiki.web.PDFAction
+com.xpn.xwiki.web.InlineAction

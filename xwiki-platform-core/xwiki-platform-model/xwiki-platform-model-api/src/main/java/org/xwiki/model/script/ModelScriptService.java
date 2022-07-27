@@ -310,6 +310,22 @@ public class ModelScriptService implements ScriptService
     }
 
     /**
+     * Creates an {@link ObjectPropertyReference} from a property name and the reference of the object having that
+     * property.
+     * 
+     * @param propertyName the property name
+     * @param objectReference the object reference
+     * @return the reference of the specified object property
+     * @since 12.10.11
+     * @since 13.4.6
+     * @since 13.10RC1
+     */
+    public ObjectPropertyReference createObjectPropertyReference(String propertyName, ObjectReference objectReference)
+    {
+        return new ObjectPropertyReference(propertyName, objectReference);
+    }
+
+    /**
      * Creates a {@link WikiReference} from a string representing the wiki name.
      *
      * @param wikiName the wiki name (eg "xwiki")

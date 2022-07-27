@@ -172,7 +172,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 &lt;/table&gt;
 }}}
 
-{{info}}For improved features see the [[Livetable Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
+{{info}}For improved features see the [[Livetable Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
 )))|(((
 {{velocity}}
 $xwiki.ssfx.use("js/xwiki/table/table.css")
@@ -221,7 +221,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 |Cell 21|Cell 22
 }}}
 
-{{info}}For improved features see the [[Livetable Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
+{{info}}For improved features see the [[Livetable Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
 )))|(((
 {{velocity}}
 $xwiki.ssfx.use("js/xwiki/table/table.css")

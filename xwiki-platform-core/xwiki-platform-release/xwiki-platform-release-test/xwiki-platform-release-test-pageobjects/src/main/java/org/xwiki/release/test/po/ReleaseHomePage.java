@@ -78,11 +78,4 @@ public class ReleaseHomePage extends ViewPage
     {
         return new LiveDataElement("releases");
     }
-
-    @Override
-    public ReleaseHomePage waitUntilPageIsLoaded()
-    {
-        getReleaseLiveData().getTableLayout().waitUntilReady();
-        return this;
-    }
 }

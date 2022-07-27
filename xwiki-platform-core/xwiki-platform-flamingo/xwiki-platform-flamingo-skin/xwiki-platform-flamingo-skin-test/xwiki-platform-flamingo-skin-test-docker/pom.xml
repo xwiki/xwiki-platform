@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-test-docker</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Test - Functional Docker Tests</name>
@@ -110,6 +110,36 @@
       <artifactId>xwiki-platform-wiki-user-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed for InvitationIT. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-invitation-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <!-- We currently need to depend on mail-ui for InvitationIT because it contains the Mail.SendMailConfigClass. 
+         We can not have administration-ui depend on mail-ui, because mail-ui already depends on administration-ui which 
+         would create a loop. mail-ui ust needs the configurable class stuff from administration-ui, so when that gets
+         refactored out, we can fix the dependency directly in administration-ui and not have anything here specific to
+         mail. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <!-- Required to create wikis -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-template-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- ================================
          Test only dependencies
          ================================ -->
@@ -137,6 +167,18 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-include</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Needed for the InvitationIT. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-invitation-test-pageobject</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.icegreen</groupId>
+      <artifactId>greenmail-junit5</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

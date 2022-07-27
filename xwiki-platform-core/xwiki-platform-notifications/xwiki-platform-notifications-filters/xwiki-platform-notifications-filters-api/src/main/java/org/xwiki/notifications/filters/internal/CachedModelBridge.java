@@ -19,29 +19,22 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.CacheManager;
-import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -50,10 +43,11 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheManager;
 
 /**
- * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid
- * fetching them several time during the same HTTP request.
+ * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid fetching
+ * them several time during the same HTTP request.
  *
  * @version $Id$
  * @since 9.5RC1
@@ -63,57 +57,56 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 @Singleton
 public class CachedModelBridge implements ModelBridge, Initializable
 {
-    private static final String USER_TOGGLEABLE_FILTER_PREFERENCES = "userToggleableFilterPreference";
+    private static final String PREFERENCEFILTERCACHE_NAME = "NotificationsFilterPreferences";
 
-    private static final String CONTEXT_KEY_FORMAT = "%s_[%s]";
-
-    private static final String CACHE_NAME = "NotificationsFiltersPreferencesCache";
+    private static final String TOGGLECACHE_NAME = "ToggeableFilterActivations";
 
     @Inject
     private ModelBridge modelBridge;
 
     @Inject
-    private Execution execution;
+    private UnboundedEntityCacheManager cacheManager;
 
     @Inject
-    private EntityReferenceSerializer<String> serializer;
+    private EntityReferenceFactory referenceFactory;
 
     @Inject
-    private CacheManager cacheManager;
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-    private Cache<Set<NotificationFilterPreference>> cache;
+    private Map<EntityReference, Set<NotificationFilterPreference>> preferenceFilterCache;
+
+    private Map<EntityReference, Map<String, Boolean>> toggleCache;
+
+    void invalidatePreferencefilter(EntityReference reference)
+    {
+        this.preferenceFilterCache.remove(reference);
+    }
 
     @Override
     public void initialize() throws InitializationException
     {
-        try {
-            CacheConfiguration configuration = new CacheConfiguration(CACHE_NAME);
-            CacheFactory cacheFactory = cacheManager.getCacheFactory();
-            this.cache = cacheFactory.newCache(configuration);
-        } catch (ComponentLookupException | CacheException e) {
-            throw new InitializationException(
-                    String.format("Failed to initialize the notification filters preferences cache [%s].", CACHE_NAME),
-                    e);
-        }
+        this.preferenceFilterCache = this.cacheManager.createCache(PREFERENCEFILTERCACHE_NAME, false);
+
+        // TODO: optimize the invalidation to not be done on every user document modification
+        this.toggleCache = this.cacheManager.createCache(TOGGLECACHE_NAME, true);
     }
 
     @Override
-    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
+    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference userReference)
+        throws NotificationException
     {
-        if (user == null) {
-            return Collections.EMPTY_SET;
+        if (userReference == null) {
+            return Collections.emptySet();
         }
 
-        String userId = serializer.serialize(user);
-
-        Set<NotificationFilterPreference> preferences = cache.get(userId);
+        Set<NotificationFilterPreference> preferences = this.preferenceFilterCache.get(userReference);
         if (preferences != null) {
             return preferences;
         }
 
-        preferences = modelBridge.getFilterPreferences(user);
+        preferences = this.modelBridge.getFilterPreferences(userReference);
 
-        cache.set(userId, preferences);
+        this.preferenceFilterCache.put(this.referenceFactory.getReference(userReference), preferences);
 
         return preferences;
     }
@@ -123,38 +116,33 @@ public class CachedModelBridge implements ModelBridge, Initializable
         throws NotificationException
     {
         if (wikiReference == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
-        String wiki = serializer.serialize(wikiReference);
-
-        Set<NotificationFilterPreference> preferences = cache.get(wiki);
+        Set<NotificationFilterPreference> preferences = this.preferenceFilterCache.get(wikiReference);
         if (preferences != null) {
             return preferences;
         }
 
-        preferences = modelBridge.getFilterPreferences(wikiReference);
+        preferences = this.modelBridge.getFilterPreferences(wikiReference);
 
-        cache.set(wiki, preferences);
+        this.preferenceFilterCache.put(this.referenceFactory.getReference(wikiReference), preferences);
 
         return preferences;
     }
 
     @Override
-    public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user) throws NotificationException
+    public Map<String, Boolean> getToggeableFilterActivations(DocumentReference userReference)
+        throws NotificationException
     {
-        // We need to store the user reference in the cache's key, otherwise all users of the same context will share
-        // the same cache, which can happen when a notification email is triggered.
-        final String contextEntry = String.format(CONTEXT_KEY_FORMAT, USER_TOGGLEABLE_FILTER_PREFERENCES,
-            serializer.serialize(user));
-
-        ExecutionContext context = execution.getContext();
-        if (context.hasProperty(contextEntry)) {
-            return (Map<String, Boolean>) context.getProperty(contextEntry);
+        Map<String, Boolean> values = this.toggleCache.get(userReference);
+        if (values != null) {
+            return values;
         }
 
-        Map<String, Boolean> values = modelBridge.getToggeableFilterActivations(user);
-        context.setProperty(contextEntry, values);
+        values = this.modelBridge.getToggeableFilterActivations(userReference);
+
+        this.toggleCache.put(this.referenceFactory.getReference(userReference), values);
 
         return values;
     }
@@ -162,64 +150,72 @@ public class CachedModelBridge implements ModelBridge, Initializable
     @Override
     public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
-        modelBridge.deleteFilterPreference(user, filterPreferenceId);
-        clearCache(user);
+        this.modelBridge.deleteFilterPreference(user, filterPreferenceId);
+    }
+
+    @Override
+    public void deleteFilterPreferences(DocumentReference user) throws NotificationException
+    {
+        this.modelBridge.deleteFilterPreferences(user);
+        invalidateUserPreferencesFilters(user);
     }
 
     @Override
     public void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
         throws NotificationException
     {
-        modelBridge.deleteFilterPreference(wikiReference, filterPreferenceId);
-        clearCache(wikiReference);
+        this.modelBridge.deleteFilterPreference(wikiReference, filterPreferenceId);
+    }
+
+    @Override
+    public void deleteFilterPreferences(WikiReference wikiReference)
+        throws NotificationException
+    {
+        // Remove the preferences from the database, then remove the preferences from the cache.
+        this.modelBridge.deleteFilterPreferences(wikiReference);
+        invalidateWikiPreferenceFilters(wikiReference);
     }
 
     @Override
     public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
-            throws NotificationException
+        throws NotificationException
     {
-        modelBridge.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
-        clearCache(user);
+        this.modelBridge.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
     }
 
     @Override
     public void setFilterPreferenceEnabled(WikiReference wikiReference, String filterPreferenceId, boolean enabled)
         throws NotificationException
     {
-        modelBridge.setFilterPreferenceEnabled(wikiReference, filterPreferenceId, enabled);
-        clearCache(wikiReference);
+        this.modelBridge.setFilterPreferenceEnabled(wikiReference, filterPreferenceId, enabled);
     }
 
     @Override
     public void saveFilterPreferences(WikiReference wikiReference,
         Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
-        modelBridge.saveFilterPreferences(wikiReference, filterPreferences);
-        clearCache(wikiReference);
+        this.modelBridge.saveFilterPreferences(wikiReference, filterPreferences);
     }
 
     @Override
     public void saveFilterPreferences(DocumentReference user,
-            Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
+        Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
-        modelBridge.saveFilterPreferences(user, filterPreferences);
-        clearCache(user);
+        this.modelBridge.saveFilterPreferences(user, filterPreferences);
     }
 
     @Override
     public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
     {
-        modelBridge.setStartDateForUser(user, startDate);
-        clearCache(user);
+        this.modelBridge.setStartDateForUser(user, startDate);
     }
 
     @Override
     public void createScopeFilterPreference(DocumentReference user, NotificationFilterType type,
-            Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
-            throws NotificationException
+        Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
+        throws NotificationException
     {
-        modelBridge.createScopeFilterPreference(user, type, formats, eventTypes, reference);
-        clearCache(user);
+        this.modelBridge.createScopeFilterPreference(user, type, formats, eventTypes, reference);
     }
 
     @Override
@@ -227,33 +223,44 @@ public class CachedModelBridge implements ModelBridge, Initializable
         Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
         throws NotificationException
     {
-        modelBridge.createScopeFilterPreference(wikiReference, type, formats, eventTypes, reference);
-        clearCache(wikiReference);
-    }
-
-    private void clearCache(EntityReference entityReference)
-    {
-        if (entityReference == null) {
-            return;
-        }
-
-        String userId = serializer.serialize(entityReference);
-        cache.remove(userId);
-
-        ExecutionContext context = execution.getContext();
-        for (String key: new ArrayList<>(context.getProperties().keySet())) {
-            if (key.startsWith(USER_TOGGLEABLE_FILTER_PREFERENCES)) {
-                context.removeProperty(key);
-            }
-        }
+        this.modelBridge.createScopeFilterPreference(wikiReference, type, formats, eventTypes, reference);
     }
 
     /**
      * Clear the whole cache.
+     * 
      * @since 11.3RC1
      */
     public void clearCache()
     {
-        cache.removeAll();
+        this.preferenceFilterCache.clear();
+        this.toggleCache.clear();
+    }
+
+    /**
+     * Remove all the {@link NotificationFilterPreference}s related to entities from {@code wikiReference} from the
+     * cache.
+     *
+     * @param wikiReference the wiki reference to invalidate
+     */
+    private void invalidateWikiPreferenceFilters(WikiReference wikiReference)
+    {
+        this.preferenceFilterCache.values()
+            .forEach(set -> set.removeIf(filter -> filter.isFromWiki(wikiReference.getName())));
+    }
+
+    /**
+     * Remove all the {@link  NotificationFilterPreference}s related to the given user form the cache.
+     *
+     * @param user the document reference of the user to remove from the cache
+     */
+    private void invalidateUserPreferencesFilters(DocumentReference user)
+    {
+        String serializedUserReference = this.entityReferenceSerializer.serialize(user);
+        // Remove the filter preferences of the user from the cache.
+        this.preferenceFilterCache.remove(user);
+        // Remove the user from the filter preferences of the other entities of the cache. 
+        this.preferenceFilterCache.values()
+            .forEach(set -> set.removeIf(filter -> Objects.equals(filter.getUser(), serializedUserReference)));
     }
 }

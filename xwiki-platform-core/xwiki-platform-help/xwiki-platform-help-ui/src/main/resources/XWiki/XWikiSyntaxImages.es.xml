@@ -44,7 +44,7 @@
 
 |=Funcionalidad|=Sintaxis XWiki 1.0|=Resultado
 |Imagen de un adjunto en la página actual|(((
-{{info}}Ver [[Macro Image&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Image+Macro+%28Radeox%29]] para más detalle{{/info}}
+{{info}}Ver [[Macro Image&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Image%20Macro%20%28Radeox%29]] para más detalle{{/info}}
 {{{{image:img.png}}}}
 )))|image:XWiki.XWikiSyntaxImages@img.png
 |Imagen de un adjunto en otra página|{{{{image:img.png|document=Espacio.Página}}}}|image:XWiki.XWikiSyntaxImages@img.png

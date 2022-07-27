@@ -27,7 +27,6 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.model.jaxb.PropertyDescriptor;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a live data property type.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Path("/liveData/sources/{sourceId}/types/{typeId}")
-@Unstable
 public interface LiveDataPropertyTypeResource
 {
     /**

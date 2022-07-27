@@ -79,7 +79,7 @@ public class AnnotationsLabel extends BaseElement
         this.showAnnotationById(idText);
         // The id format is "ID<index>".
         String index = idText.substring(2);
-        getDriver().findElementByCssSelector("#annotation_view_" + index + " a.delete").click();
+        getDriver().findElement(By.cssSelector("#annotation_view_" + index + " a.delete")).click();
         getDriver().waitUntilElementIsVisible(By.xpath("//input[@value='Yes']"));
         getDriver().findElement(By.xpath("//input[@value='Yes']")).click();
     }

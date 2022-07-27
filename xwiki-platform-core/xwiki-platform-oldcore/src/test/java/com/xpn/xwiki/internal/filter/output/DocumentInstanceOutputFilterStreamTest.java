@@ -31,11 +31,17 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
+import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -51,6 +57,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link DocumentInstanceOutputFilterStream}.
@@ -219,9 +227,9 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
 
         assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
         assertEquals(toDate("2000-01-01 00:00:00.0 UTC"), document.getCreationDate());
-        assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
         assertEquals(toDate("2000-01-02 00:00:00.0 UTC"), document.getDate());
         assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), document.getContentUpdateDate());
+        assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
         assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"), document.getContentAuthorReference());
         assertEquals(true, document.isMinorEdit());
         assertEquals("comment", document.getComment());
@@ -363,9 +371,17 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
     }
 
     @Test
-    void documentwithoutauthorandcreator() throws FilterException, XWikiException
+    void documentwithoutauthorandcreator(MockitoComponentManager componentManager) throws Exception
     {
+        UserReferenceSerializer<DocumentReference> userReferenceSerializer = componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
+        UserReferenceResolver<DocumentReference> userReferenceResolver = componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
+
         DocumentReference contextUser = new DocumentReference("wiki", "XWiki", "contextuser");
+        UserReference contextUserReference = mock(UserReference.class, "contextuser");
+        when(userReferenceResolver.resolve(contextUser)).thenReturn(contextUserReference);
+        when(userReferenceSerializer.serialize(contextUserReference)).thenReturn(contextUser);
         this.oldcore.getXWikiContext().setUserReference(contextUser);
 
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
@@ -380,9 +396,12 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
 
         assertFalse(document.isNew());
 
-        assertEquals(contextUser, document.getCreatorReference());
-        assertEquals(contextUser, document.getAuthorReference());
-        assertEquals(contextUser, document.getContentAuthorReference());
+        DocumentAuthors authors = document.getAuthors();
+        assertEquals(contextUserReference, authors.getCreator());
+        assertEquals(contextUserReference, authors.getEffectiveMetadataAuthor());
+        assertEquals(contextUserReference, authors.getOriginalMetadataAuthor());
+        assertEquals(contextUserReference, authors.getCreator());
+        assertEquals(contextUserReference, authors.getContentAuthor());
     }
 
     @Test

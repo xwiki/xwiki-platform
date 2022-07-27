@@ -38,7 +38,7 @@ $services.localization.render('accountnotactive_email')
 <div>
 ## CSRF prevention
 <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
-<input type="hidden" name="xwikiname" value="${escapetool.xml($xcontext.user)}" />
+<input type="hidden" name="xwikiname" value="${escapetool.xml($xcontext.inactiveUserReference)}" />
 <label for="validKey">$services.localization.render('core.users.activation.validationKey.label') <input type="text" name="validkey" size="16" id="validKey"/></label>
 <span class="buttonwrapper"><input type="submit" value="$services.localization.render('confirmaccount')" class="button"/></span>
 </div>

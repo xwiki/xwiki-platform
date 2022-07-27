@@ -22,6 +22,7 @@ package org.xwiki.extension.xar.internal.handler.packager;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -38,10 +39,13 @@ import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.logging.LogLevel;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.xar.XarEntryType.UpgradeType;
 
 import com.xpn.xwiki.XWikiContext;
@@ -81,6 +85,10 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 
     @Inject
     private Logger logger;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     @Override
     public XWikiDocument merge(XWikiDocument currentDocument, XWikiDocument previousDocument,
@@ -276,19 +284,26 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         if (mergedDocument != null) {
             mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
         }
-        DocumentReference userReference = configuration != null ? configuration.getAuthorReference() : null;
-        if (userReference != null) {
-            nextDocument.setAuthorReference(userReference);
-            nextDocument.setContentAuthorReference(userReference);
+        DocumentReference userDocumentReference = configuration != null ? configuration.getAuthorReference() : null;
+        if (userDocumentReference != null) {
+            UserReference userReference = this.documentReferenceUserReferenceResolver.resolve(userDocumentReference);
+            if (nextDocument != null) {
+                DocumentAuthors authors = nextDocument.getAuthors();
+                authors.setContentAuthor(userReference);
+                authors.setEffectiveMetadataAuthor(userReference);
+            }
+
             for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
-                attachment.setAuthorReference(nextDocument.getAuthorReference());
+                attachment.setAuthorReference(userDocumentReference);
             }
             if (mergedDocument != null) {
-                mergedDocument.setAuthorReference(userReference);
-                mergedDocument.setContentAuthorReference(userReference);
+                DocumentAuthors mergedDocumentAuthors = mergedDocument.getAuthors();
+                mergedDocumentAuthors.setEffectiveMetadataAuthor(userReference);
+                mergedDocumentAuthors.setContentAuthor(userReference);
+
                 for (XWikiAttachment attachment : mergedDocument.getAttachmentList()) {
                     if (attachment.isContentDirty()) {
-                        attachment.setAuthorReference(mergedDocument.getAuthorReference());
+                        attachment.setAuthorReference(userDocumentReference);
                     }
                 }
             }

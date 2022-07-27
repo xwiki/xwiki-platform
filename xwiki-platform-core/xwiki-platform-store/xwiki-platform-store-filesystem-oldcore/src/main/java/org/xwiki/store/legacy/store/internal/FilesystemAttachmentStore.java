@@ -222,6 +222,16 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     }
 
     @Override
+    public boolean attachmentContentExists(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
+        throws XWikiException
+    {
+        File attachFile =
+            this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
+
+        return attachFile.exists();
+    }
+
+    @Override
     public void deleteXWikiAttachment(final XWikiAttachment attachment, final XWikiContext context,
         final boolean bTransaction) throws XWikiException
     {
@@ -276,14 +286,17 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     private class AttachmentSaveTransactionRunnable extends TransactionRunnable<XWikiHibernateTransaction>
     {
         /**
-         * Construct a TransactionRunnable for saving the attachment content. @param attachment the XWikiAttachment
-         * whose content should be saved. @param updateDocument whether or not to update the document at the same
-         * time. @param context the XWikiContext for the request. @param attachFile the File to store the attachment
-         * in. @param tempFile the File to put the attachment content in until the transaction is complete. @param
-         * backupFile the File to backup the content of the existing attachment in. @param lock this Lock will be locked
-         * while the attachment file is being written to. @throws XWikiException if thrown by {@link
-         * XWikiAttachment#updateContentArchive(XWikiContext)} or {@link FilesystemAttachmentVersioningStore#
-         * getArchiveSaveRunnable(XWikiAttachmentArchive, XWikiContext)
+         * Construct a TransactionRunnable for saving the attachment content.
+         * 
+         * @param attachment the XWikiAttachment whose content should be saved.
+         * @param updateDocument whether or not to update the document at the same time.
+         * @param context the XWikiContext for the request.
+         * @param attachFile the File to store the attachment in.
+         * @param tempFile the File to put the attachment content in until the transaction is complete.
+         * @param backupFile the File to backup the content of the existing attachment in.
+         * @param lock this Lock will be locked while the attachment file is being written to.
+         * @throws XWikiException if thrown by {@link XWikiAttachment#updateContentArchive(XWikiContext)} or
+         *             {@link FilesystemAttachmentVersioningStore# getArchiveSaveRunnable(XWikiAttachmentArchive, XWikiContext)}
          */
         AttachmentSaveTransactionRunnable(final XWikiAttachment attachment, final boolean updateDocument,
             final XWikiContext context, final File attachFile, final File tempFile, final File backupFile,

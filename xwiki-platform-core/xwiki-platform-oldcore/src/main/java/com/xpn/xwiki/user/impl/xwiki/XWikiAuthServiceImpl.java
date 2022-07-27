@@ -565,7 +565,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     /**
      * The authentication library we are using (SecurityFilter) requires that its URLs do not contain the context path,
-     * in order to be usable with <tt>RequestDispatcher.forward</tt>. Since our URL factory include the context path in
+     * in order to be usable with {@code RequestDispatcher.forward}. Since our URL factory include the context path in
      * the generated URLs, we use this method to remove (if needed) the context path.
      *
      * @param url The URL to process.

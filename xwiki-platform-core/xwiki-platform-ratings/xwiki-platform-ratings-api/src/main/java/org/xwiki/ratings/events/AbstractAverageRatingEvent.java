@@ -23,7 +23,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.observation.event.Event;
 import org.xwiki.ratings.AverageRating;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -32,7 +31,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public abstract class AbstractAverageRatingEvent implements Event
 {
     private AverageRating newAverageRating;

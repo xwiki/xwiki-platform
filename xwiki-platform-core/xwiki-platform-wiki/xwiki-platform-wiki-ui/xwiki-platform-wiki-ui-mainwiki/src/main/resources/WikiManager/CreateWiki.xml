@@ -1266,8 +1266,8 @@ return XWiki;
  * Code to make the dynamic "flavor/template" tab bar
  **************************************************************/
 require(['jquery'], function($) {
-  $(window).ready(function(){
-    $('.flavor_template  &gt; .xwikitabbar &gt; li &gt; a').click(function(event) {
+  $(function(){
+    $('.flavor_template  &gt; .xwikitabbar &gt; li &gt; a').on('click', function(event) {
       var thisTabWidget = $(this).parents('.flavor_template');
       // Change the tab bar
       var activeTab = thisTabWidget.find('.xwikitabbar .active');
@@ -1290,25 +1290,25 @@ require(['jquery'], function($) {
  * Code to only have a flavor or a template used, never both
  **************************************************************/
 require(['jquery'], function($) {
-  $(window).ready(function(){
+  $(function(){
     /**
      * When a template is selected, unselect the flavor
      */
-    $('#'+'template').change(function(event) {
+    $('#'+'template').on('change', function(event) {
       if (this.value != 'xwikinotemplate') {
         $('.xwiki-flavor-picker-option-selected').removeClass('xwiki-flavor-picker-option-selected');
         $('input[name="flavor"]:radio:checked').prop('checked', false);
       }
     });
-    
+
     /**
      * When a flavor is selected, unselect the template
      */
     var onFlavorChanged = function(event) {
       $('#'+'template').val('xwikinotemplate');
     }
-    $('input[name="flavor"]:radio').change(onFlavorChanged);
-    $('.xwiki-flavor-picker-option').click(onFlavorChanged);
+    $('input[name="flavor"]:radio').on('change', onFlavorChanged);
+    $('.xwiki-flavor-picker-option').on('click', onFlavorChanged);
   });
 });
 #end

@@ -36,9 +36,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -69,6 +71,10 @@ public class DocumentEventRecorder
 
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     /**
      * Record the given event.
@@ -143,7 +149,9 @@ public class DocumentEventRecorder
         event.setBody(msgPrefix + title);
         event.setDocumentVersion(doc.getVersion());
         // This might be wrong once non-altering events will be logged.
-        event.setUser(doc.getAuthorReference());
+        DocumentReference originalAuthor =
+            this.userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());
+        event.setUser(originalAuthor);
         event.setHidden(doc.isHidden());
         event.setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, contextProvider.get()));
 

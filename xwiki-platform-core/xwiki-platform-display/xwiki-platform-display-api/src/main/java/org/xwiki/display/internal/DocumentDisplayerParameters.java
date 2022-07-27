@@ -20,6 +20,7 @@
 package org.xwiki.display.internal;
 
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * {@link DocumentDisplayer} parameters.
@@ -77,6 +78,13 @@ public class DocumentDisplayerParameters implements Cloneable
     private Syntax targetSyntax;
 
     private boolean asyncAllowed = true;
+
+    /**
+     * The id generator to generate ids that are unique also in the parent document.
+     *
+     * @since 14.2RC1
+     */
+    private IdGenerator idGenerator;
 
     /**
      * @return the id of the document section to display
@@ -246,6 +254,24 @@ public class DocumentDisplayerParameters implements Cloneable
         this.asyncAllowed = asyncAllowed;
     }
 
+    /**
+     * @return the id generator to use for unique ids
+     * @since 14.2RC1
+     */
+    public IdGenerator getIdGenerator()
+    {
+        return this.idGenerator;
+    }
+
+    /**
+     * @param idGenerator the id generator to make sure ids are unique
+     * @since 14.2RC1
+     */
+    public void setIdGenerator(IdGenerator idGenerator)
+    {
+        this.idGenerator = idGenerator;
+    }
+
     @Override
     public DocumentDisplayerParameters clone()
     {
@@ -262,6 +288,8 @@ public class DocumentDisplayerParameters implements Cloneable
         clone.setSectionId(sectionId);
         clone.setTitleDisplayed(titleDisplayed);
         clone.setTransformationContextIsolated(transformationContextIsolated);
+        // No copy of the id generator as we explicitly want that it is shared.
+        clone.setIdGenerator(this.idGenerator);
         return clone;
     }
 }

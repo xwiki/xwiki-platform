@@ -31,9 +31,9 @@ import org.xwiki.configuration.ConfigurationSource;
  * Base class for {@link ApplicationContext} implementations.
  * 
  * @version $Id$
- * @deprecated starting with 3.5M1, use the notion of Environment instead
+ * @deprecated use the notion of Environment instead
  */
-@Deprecated
+@Deprecated(since = "3.5M1")
 public abstract class AbstractApplicationContext implements ApplicationContext
 {
     /**

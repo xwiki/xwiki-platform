@@ -19,25 +19,29 @@
  */
 package org.xwiki.notifications.preferences.internal;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheManager;
 
 /**
- * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid
- * fetching them several time during the same HTTP request.
+ * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid fetching
+ * them several time during the same HTTP request.
  *
  * @version $Id$
  * @since 9.5RC1
@@ -45,75 +49,89 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 @Component
 @Named("cached")
 @Singleton
-public class CachedModelBridge implements ModelBridge
+public class CachedModelBridge implements ModelBridge, Initializable
 {
-    private static final String USER_NOTIFICATIONS_PREFERENCES = "userNotificationsPreferences";
-
-    private static final String WIKI_NOTIFICATIONS_PREFERENCES = "wikiNotificationsPreferences";
-
-    private static final String CACHE_KEY_PATTERN = "%s_[%s]";
+    private static final String CACHE_NAME = "NotificationsPreferences";
 
     @Inject
     private ModelBridge modelBridge;
 
     @Inject
-    private Execution execution;
+    private UnboundedEntityCacheManager cacheManager;
 
     @Inject
-    private EntityReferenceSerializer<String> serializer;
+    private EntityReferenceFactory referenceFactory;
+
+    private Map<EntityReference, List<NotificationPreference>> preferenceCache;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        // TODO: optimize the invalidation not not be on every user document modification
+        this.preferenceCache = this.cacheManager.createCache(CACHE_NAME, true);
+    }
 
     @Override
     public List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
-            throws NotificationException
+        throws NotificationException
     {
-        // We need to store the user reference in the cache's key, otherwise all users of the same context will share
-        // the same cache, which can happen when a notification email is triggered.
-        final String specificUserNotificationsPreferences = String.format(CACHE_KEY_PATTERN,
-                USER_NOTIFICATIONS_PREFERENCES, serializer.serialize(userReference));
-
-        ExecutionContext context = execution.getContext();
-        if (context.hasProperty(specificUserNotificationsPreferences)) {
-            return (List<NotificationPreference>) context.getProperty(specificUserNotificationsPreferences);
+        if (userReference == null) {
+            return Collections.emptyList();
         }
 
-        List<NotificationPreference> preferences = modelBridge.getNotificationsPreferences(userReference);
-        context.setProperty(specificUserNotificationsPreferences, preferences);
+        List<NotificationPreference> preferences = this.preferenceCache.get(userReference);
+        if (preferences != null) {
+            return preferences;
+        }
+
+        preferences = this.modelBridge.getNotificationsPreferences(userReference);
+
+        this.preferenceCache.put(this.referenceFactory.getReference(userReference), preferences);
 
         return preferences;
     }
 
     @Override
     public List<NotificationPreference> getNotificationsPreferences(WikiReference wikiReference)
-            throws NotificationException
+        throws NotificationException
     {
-        // We need to store the wiki reference in the cache's key
-        final String specificWikiNotificationsPreferences = String.format(CACHE_KEY_PATTERN,
-                WIKI_NOTIFICATIONS_PREFERENCES, serializer.serialize(wikiReference));
-
-        ExecutionContext context = execution.getContext();
-        if (context.hasProperty(specificWikiNotificationsPreferences)) {
-            return (List<NotificationPreference>) context.getProperty(specificWikiNotificationsPreferences);
+        if (wikiReference == null) {
+            return Collections.emptyList();
         }
 
-        List<NotificationPreference> preferences = modelBridge.getNotificationsPreferences(wikiReference);
-        context.setProperty(specificWikiNotificationsPreferences, preferences);
+        List<NotificationPreference> preferences = this.preferenceCache.get(wikiReference);
+        if (preferences != null) {
+            return preferences;
+        }
+
+        preferences = this.modelBridge.getNotificationsPreferences(wikiReference);
+
+        this.preferenceCache.put(this.referenceFactory.getReference(wikiReference), preferences);
 
         return preferences;
     }
 
     @Override
-    public void setStartDateForUser(DocumentReference userReference, Date startDate)
-            throws NotificationException
+    public void setStartDateForUser(DocumentReference userReference, Date startDate) throws NotificationException
     {
-        // Obviously, there is no possible cache here
-        modelBridge.setStartDateForUser(userReference, startDate);
+        this.modelBridge.setStartDateForUser(userReference, startDate);
     }
 
     @Override
     public void saveNotificationsPreferences(DocumentReference userReference,
-            List<NotificationPreference> notificationPreferences) throws NotificationException
+        List<NotificationPreference> notificationPreferences) throws NotificationException
     {
-        // Obviously there is nothing to cache
-        modelBridge.saveNotificationsPreferences(userReference, notificationPreferences);
+        this.modelBridge.saveNotificationsPreferences(userReference, notificationPreferences);
+    }
+
+    /**
+     * @param reference the reference of the entity to invalidate
+     * @since 13.4.4
+     * @since 12.10.10
+     * @since 13.8RC1
+     */
+    public void invalidatePreference(EntityReference reference)
+    {
+        this.preferenceCache.remove(reference);
     }
 }

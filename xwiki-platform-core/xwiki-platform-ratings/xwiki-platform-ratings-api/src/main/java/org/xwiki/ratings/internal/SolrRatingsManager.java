@@ -216,11 +216,11 @@ public class SolrRatingsManager implements RatingsManager
 
             Object value = queryParameter.getValue();
             if (value instanceof String || value instanceof Date) {
-                result.append(solrUtils.toFilterQueryString(value));
+                result.append(this.solrUtils.toCompleteFilterQueryString(value));
             } else if (value instanceof UserReference) {
-                result.append(solrUtils.toFilterQueryString(value, UserReference.class));
+                result.append(this.solrUtils.toCompleteFilterQueryString(value, UserReference.class));
             } else if (value instanceof EntityReference) {
-                result.append(solrUtils.toFilterQueryString(value, EntityReference.class));
+                result.append(this.solrUtils.toCompleteFilterQueryString(value, EntityReference.class));
             } else if (value != null) {
                 result.append(value);
             }
@@ -424,9 +424,11 @@ public class SolrRatingsManager implements RatingsManager
     @Override
     public long removeRatings(EntityReference entityReference) throws RatingsException
     {
-        String escapedEntityReference = this.solrUtils.toFilterQueryString(entityReference, EntityReference.class);
+        String escapedEntityReference =
+            this.solrUtils.toCompleteFilterQueryString(entityReference, EntityReference.class);
         String filterQuery = String.format(FILTER_REFERENCE_OR_PARENTS,
-            RatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
+            RatingQueryField.MANAGER_ID.getFieldName(),
+            this.solrUtils.toCompleteFilterQueryString(this.getIdentifier()),
             RatingQueryField.ENTITY_REFERENCE.getFieldName(), escapedEntityReference,
             RatingQueryField.PARENTS_REFERENCE.getFieldName(), escapedEntityReference);
         SolrQuery solrQuery = new SolrQuery()
@@ -453,9 +455,10 @@ public class SolrRatingsManager implements RatingsManager
     public long moveRatings(EntityReference oldReference, EntityReference newReference)
         throws RatingsException
     {
-        String escapedEntityReference = this.solrUtils.toFilterQueryString(oldReference, EntityReference.class);
+        String escapedEntityReference = this.solrUtils.toCompleteFilterQueryString(oldReference, EntityReference.class);
         String filterQuery = String.format(FILTER_REFERENCE_OR_PARENTS,
-            RatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
+            RatingQueryField.MANAGER_ID.getFieldName(),
+            this.solrUtils.toCompleteFilterQueryString(this.getIdentifier()),
             RatingQueryField.ENTITY_REFERENCE.getFieldName(), escapedEntityReference,
             RatingQueryField.PARENTS_REFERENCE.getFieldName(), escapedEntityReference);
         int offset = 0;
@@ -554,7 +557,7 @@ public class SolrRatingsManager implements RatingsManager
                 offsetIndex += BULK_OPERATIONS_BATCH_SIZE;
             } while (!ratings.isEmpty());
 
-            float newAverage = Float.valueOf(sumOfVotes) / numberOfVotes;
+            float newAverage = (numberOfVotes > 0) ? Float.valueOf(sumOfVotes) / numberOfVotes : 0;
             return this.getAverageRatingManager().resetAverageRating(entityReference, newAverage, numberOfVotes);
         } else {
             throw new RatingsException(AVERAGE_RATING_NOT_ENABLED_ERROR_MESSAGE);

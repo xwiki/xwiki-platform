@@ -399,10 +399,12 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        super.setOwnerDocument(ownerDocument);
+        if (this.ownerDocument != ownerDocument) {
+            super.setOwnerDocument(ownerDocument);
 
-        if (this.ownerDocument != null) {
-            setDocumentReference(this.ownerDocument.getDocumentReference());
+            if (this.ownerDocument != null) {
+                setDocumentReference(this.ownerDocument.getDocumentReference());
+            }
         }
     }
 

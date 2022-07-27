@@ -19,17 +19,20 @@
  */
 package org.xwiki.rendering.macro.formula;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.formula.ImageData;
+import org.xwiki.formula.FormulaRenderer;
 import org.xwiki.formula.ImageStorage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
-import org.xwiki.test.jmock.MockingComponentManager;
+import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -38,46 +41,58 @@ import org.xwiki.test.jmock.MockingComponentManager;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
-public class IntegrationTests
+@AllComponents
+public class IntegrationTests implements RenderingTests
 {
-    @RenderingTestSuite.Initialized
-    public void initialize(MockingComponentManager componentManager) throws Exception
-    {
-        Mockery mockery = new JUnit4Mockery();
+    private DocumentAccessBridge mockDocumentAccessBridge;
 
+    private ImageStorage mockImageStorage;
+
+    private FormulaMacroConfiguration mockConfiguration;
+
+    private AttachmentReference attachmentReference1;
+
+    private AttachmentReference attachmentReference2;
+
+    @RenderingTests.Initialized
+    public void initialize(MockitoComponentManager componentManager) throws Exception
+    {
         // Document Access Bridge Mock
-        final DocumentAccessBridge mockDocumentAccessBridge =
-            componentManager.registerMockComponent(mockery, DocumentAccessBridge.class);
+        mockDocumentAccessBridge = componentManager.registerMockComponent(DocumentAccessBridge.class);
 
         // Image Storage Mock
-        final ImageStorage mockImageStorage = componentManager.registerMockComponent(mockery, ImageStorage.class);
+        mockImageStorage = componentManager.registerMockComponent(ImageStorage.class);
 
         // Configuration Mock
-        final FormulaMacroConfiguration mockConfiguration =
-            componentManager.registerMockComponent(mockery, FormulaMacroConfiguration.class);
+        mockConfiguration = componentManager.registerMockComponent(FormulaMacroConfiguration.class);
 
-        mockery.checking(new Expectations()
-        {
-            {
-                atLeast(1).of(mockDocumentAccessBridge).getCurrentDocumentReference();
-                DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-                will(returnValue(documentReference));
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        when(mockDocumentAccessBridge.getCurrentDocumentReference()).thenReturn(documentReference);
 
-                AttachmentReference attachmentReference = new AttachmentReference(
-                    "06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966", documentReference);
-                atLeast(2).of(mockDocumentAccessBridge).getAttachmentURL(attachmentReference, false);
-                will(returnValue(
-                    "/xwiki/bin/view/space/page/06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966"));
+        attachmentReference1 = new AttachmentReference(
+            "06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966", documentReference);
+        when(mockDocumentAccessBridge.getAttachmentURL(attachmentReference1, false)).thenReturn(
+            "/xwiki/bin/view/space/page/06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966");
 
-                atLeast(2).of(mockConfiguration).getRenderer();
-                will(returnValue("snuggletex"));
+        attachmentReference2 = new AttachmentReference(
+            "190ef2f68e7fbd75c869d74dea959b1a48faadefc7a0c9219e3e94d005821935", documentReference);
+        when(mockDocumentAccessBridge.getAttachmentURL(attachmentReference2, false)).thenReturn(
+            "/xwiki/bin/view/space/page/190ef2f68e7fbd75c869d74dea959b1a48faadefc7a0c9219e3e94d005821935");
 
-                atLeast(2).of(mockImageStorage).get(with(any(String.class)));
-                will(returnValue(null));
+        when(mockConfiguration.getRenderer()).thenReturn("snuggletex");
+        when(mockConfiguration.getDefaultType()).thenReturn(FormulaRenderer.Type.DEFAULT);
+        when(mockConfiguration.getDefaultFontSize()).thenReturn(FormulaRenderer.FontSize.DEFAULT);
+        when(mockImageStorage.get(any(String.class))).thenReturn(null);
+    }
 
-                atLeast(2).of(mockImageStorage).put(with(any(String.class)), with(any(ImageData.class)));
-            }
-        });
+    @AfterEach
+    public void after()
+    {
+        verify(mockDocumentAccessBridge, times(1)).getCurrentDocumentReference();
+
+        verify(mockConfiguration, times(1)).getRenderer();
+        verify(mockConfiguration, times(1)).getDefaultType();
+
+        verify(mockImageStorage, times(1)).get(any(String.class));
     }
 }

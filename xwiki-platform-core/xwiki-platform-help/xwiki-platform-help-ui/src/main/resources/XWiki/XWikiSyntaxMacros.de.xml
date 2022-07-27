@@ -56,7 +56,7 @@ Java Inhalt
 {code}
 }}})))
 
-{{info}}Eine vollständige Liste der verfügbaren Makros ist im [[Erweiterungswiki&gt;&gt;http://extensions.xwiki.org/]] zu finden.{{/info}}
+{{info}}Eine vollständige Liste der verfügbaren Makros ist im [[Erweiterungswiki&gt;&gt;https://extensions.xwiki.org/]] zu finden.{{/info}}
 
 === 2.0 Macros ===
 
@@ -70,5 +70,5 @@ System.out.println("Hello World!");
 }}}
 )))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
 
-{{info}}Eine vollständige Liste der verfügbaren Makros ist im [[Erweiterungswiki&gt;&gt;http://extensions.xwiki.org/]] zu finden.{{/info}}</content>
+{{info}}Eine vollständige Liste der verfügbaren Makros ist im [[Erweiterungswiki&gt;&gt;https://extensions.xwiki.org/]] zu finden.{{/info}}</content>
 </xwikidoc>

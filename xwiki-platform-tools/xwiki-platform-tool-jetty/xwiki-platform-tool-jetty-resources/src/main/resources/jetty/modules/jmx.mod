@@ -21,8 +21,7 @@
 DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
-Enables JMX instrumentation for server beans and
-enables JMX agent.
+Enables local JMX support for Jetty components.
 
 [depend]
 server

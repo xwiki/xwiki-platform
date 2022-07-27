@@ -306,8 +306,8 @@ public class AnnotatableViewPage extends BaseElement
      */
     public int getCommentId(String annotationId)
     {
-        return Integer.valueOf(getDriver().findElementByXPath("//*[@id='_comments']" +
-            "//div[contains(@class, 'annotation')][a[contains(@href,'#" + annotationId + "')]]")
+        return Integer.valueOf(getDriver().findElement(By.xpath("//*[@id='_comments']" +
+            "//div[contains(@class, 'annotation')][a[contains(@href,'#" + annotationId + "')]]"))
             .getAttribute("id").replace("xwikicomment_", ""));
     }
 }

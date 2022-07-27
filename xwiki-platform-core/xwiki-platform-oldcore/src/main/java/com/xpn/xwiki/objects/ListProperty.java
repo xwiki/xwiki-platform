@@ -312,11 +312,13 @@ public class ListProperty extends BaseProperty implements Cloneable
          */
         public void setOwner(ListProperty owner)
         {
-            if (this.dirty) {
-                owner.setValueDirty(true);
+            if (this.owner != owner) {
+                if (this.dirty) {
+                    owner.setValueDirty(true);
+                }
+                this.owner = owner;
+                owner.actualList = this.actualList;
             }
-            this.owner = owner;
-            owner.actualList = this.actualList;
         }
 
         /**

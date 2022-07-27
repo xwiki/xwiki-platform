@@ -21,28 +21,32 @@ package com.xpn.xwiki.internal.sheet.scripting;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.script.service.ScriptService;
 import org.xwiki.sheet.SheetBinder;
 import org.xwiki.sheet.SheetManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.script.sheet.SheetScriptService;
 import com.xpn.xwiki.web.Utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
@@ -54,19 +58,15 @@ import static org.mockito.Mockito.when;
  */
 // We need to register all components because we use XWikiDocument.
 @AllComponents
-public class SheetScriptServiceTest
+@ComponentTest
+class SheetScriptServiceTest
 {
-    /**
-     * Mocks the dependencies of the component under test.
-     */
-    @Rule
-    public final MockitoComponentMockingRule<ScriptService> mocker =
-        new MockitoComponentMockingRule<ScriptService>(SheetScriptService.class);
-
-    /**
-     * The script service being tested.
-     */
+    @InjectMockComponents
     private SheetScriptService sheetScriptService;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     private SheetBinder mockClassSheetBinder;
 
@@ -74,32 +74,20 @@ public class SheetScriptServiceTest
 
     private DocumentAccessBridge mockDocumentAccessBridge;
 
-    /**
-     * Test setup.
-     * 
-     * @throws Exception if test setup fails
-     */
-    @Before
-    public void setUp() throws Exception
-    {
-        // Required in order to create a new instance of XWikiDocument.
-        Utils.setComponentManager(mocker);
-        this.sheetScriptService = (SheetScriptService) mocker.getComponentUnderTest();
-    }
-
     @AfterComponent
-    public void afterComponent() throws Exception
+    void afterComponent(MockitoComponentManager componentManager) throws Exception
     {
+        Utils.setComponentManager(componentManager);
         // Because of @AllComponents all component are injected (for XWikiDocument) while in this case we would like
         // SheetScriptService to be isolated
 
-        this.mockClassSheetBinder = this.mocker.registerMockComponent(SheetBinder.class, "class");
-        this.mockDocumentSheetBinder = this.mocker.registerMockComponent(SheetBinder.class, "document");
-        this.mockDocumentAccessBridge = this.mocker.registerMockComponent(DocumentAccessBridge.class);
+        this.mockClassSheetBinder = componentManager.registerMockComponent(SheetBinder.class, "class");
+        this.mockDocumentSheetBinder = componentManager.registerMockComponent(SheetBinder.class, "document");
+        this.mockDocumentAccessBridge = componentManager.registerMockComponent(DocumentAccessBridge.class);
 
-        this.mocker.registerMockComponent(SheetManager.class);
-        this.mocker.registerMockComponent(ConfigurationSource.class, "all");
-        this.mocker.registerMockComponent(ConfigurationSource.class, "xwikiproperties");
+        componentManager.registerMockComponent(SheetManager.class);
+        componentManager.registerMockComponent(ConfigurationSource.class, "all");
+        componentManager.registerMockComponent(ConfigurationSource.class, "xwikiproperties");
     }
 
     /**
@@ -109,7 +97,7 @@ public class SheetScriptServiceTest
      * @throws Exception if the test fails to lookup the class sheet binder
      */
     @Test
-    public void bindClassSheetClonesDocument() throws Exception
+    void bindClassSheetClonesDocument() throws Exception
     {
         DocumentReference classReference = new DocumentReference("wiki", "Space", "MyClass");
         final XWikiDocument classDocument = new XWikiDocument(classReference);
@@ -128,14 +116,14 @@ public class SheetScriptServiceTest
             }
         }), same(sheetReference))).thenReturn(true);
 
-        Assert.assertTrue(this.sheetScriptService.bindClassSheet(classDocumentApi, sheetReference));
+        assertTrue(this.sheetScriptService.bindClassSheet(classDocumentApi, sheetReference));
     }
 
     /**
      * Unit test for {@link SheetScriptService#getDocuments(DocumentReference)}.
      */
     @Test
-    public void getDocuments() throws Exception
+    void getDocuments() throws Exception
     {
         DocumentReference sheetReference = new DocumentReference("wiki", "Space", "Sheet");
         DocumentReference publicDocumentReference = new DocumentReference("wiki", "Space", "PublicPage");
@@ -152,7 +140,7 @@ public class SheetScriptServiceTest
         when(this.mockDocumentAccessBridge.isDocumentViewable(publicClassReference)).thenReturn(true);
         when(this.mockDocumentAccessBridge.isDocumentViewable(publicDocumentReference)).thenReturn(true);
 
-        Assert.assertEquals(Arrays.asList(publicDocumentReference, publicClassReference),
+        assertEquals(Arrays.asList(publicDocumentReference, publicClassReference),
             this.sheetScriptService.getDocuments(sheetReference));
     }
 }

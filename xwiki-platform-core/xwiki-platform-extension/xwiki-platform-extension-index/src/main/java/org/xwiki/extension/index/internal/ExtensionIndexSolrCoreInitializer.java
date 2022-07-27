@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.DefaultExtensionComponent;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
@@ -101,10 +102,12 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final long SCHEMA_VERSION_13_3 = 130300000;
 
+    private static final long SCHEMA_VERSION_14_0 = 140000000;
+
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_13_3;
+        return SCHEMA_VERSION_14_0;
     }
 
     @Override
@@ -163,6 +166,10 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
             // Store hints for each component type
             setStringField(toComponentFieldName("*"), true, true);
+        }
+
+        if (cversion < SCHEMA_VERSION_14_0) {
+            setStringField(InstalledExtension.FIELD_INSTALLED_NAMESPACES, true, false);
         }
     }
 

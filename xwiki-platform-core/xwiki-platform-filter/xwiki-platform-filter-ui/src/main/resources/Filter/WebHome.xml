@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Filter.WebHome" locale="">
+<xwikidoc version="1.5" reference="Filter.WebHome" locale="">
   <web>Filter</web>
   <name>WebHome</name>
   <language/>
@@ -36,9 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{warning}}Filter module is still young and experimental and while exporting should be safe enough, importing can be more risky for the current instance.{{/warning}}
-
-{{include reference="FilterStreamDescriptorForm"/}}
+  <content>{{include reference="FilterStreamDescriptorForm"/}}
 
 {{velocity output="true"}}
 #set($input = $request.input)
@@ -77,6 +75,7 @@
 
 {{velocity}}
 #if ($request.convert)
+  #if ($services.security.authorization.hasAccess('programming', $xcontext.userReference, $doc.documentReference))
   #if ($targetStandardOutput)
     $response.setContentType('application/octet-stream')
     $response.setHeader('Content-Disposition', 'attachment; filename=target');
@@ -106,6 +105,9 @@
         {{/error}}
       #end
     #end
+  #end
+  #else
+    {{error}}You are not allowed to start a conversion.{{/error}}
   #end
 #end
 {{/velocity}}
@@ -167,7 +169,11 @@
   &lt;/fieldset&gt;
 
   &lt;p&gt;
-  &lt;input class="button" type="submit" name="convert" value="Convert"/&gt;
+    #if ($services.security.authorization.hasAccess('programming', $xcontext.userReference, $doc.documentReference))
+      &lt;input class="button" type="submit" name="convert" value="Convert"/&gt;
+    #else
+      &lt;input class="button" type="submit" name="convert" value="Convert" disabled title="You are not allowed to start a conversion."/&gt;
+    #end
   &lt;/p&gt;
 &lt;/div&gt;
 &lt;/form&gt;
@@ -189,8 +195,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -238,6 +247,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

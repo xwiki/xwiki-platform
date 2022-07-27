@@ -73,5 +73,10 @@ Ein eingebetteter Absatz.
 ))) | Zelle Drei
 
 Nächster Absatz im Dokument der obersten Ebene
-)))</content>
+)))
+|((({{{(% class="myClass" style="color:blue" %)(((Blaue Absätze
+
+innerhalb myClass)))}}})))| (% class="myClass" style="color:blue" %)(((Blaue Absätze
+
+innerhalb meiner Gruppe)))</content>
 </xwikidoc>

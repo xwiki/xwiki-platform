@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-panels</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-panels-ui</artifactId>
   <name>XWiki Platform - Panels - UI</name>
@@ -91,13 +91,23 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>jquery-ui</artifactId>
-      <version>1.11.4</version>
+      <version>1.13.0</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>jquery-ui-touch-punch</artifactId>
       <version>0.2.3-2</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>scriptaculous</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- Needed to display icons -->
@@ -120,7 +130,7 @@
     <!-- Used to check access rights (e.g. in the Applications panel). -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-script</artifactId>
+      <artifactId>xwiki-platform-security-authorization-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

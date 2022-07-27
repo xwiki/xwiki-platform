@@ -41,8 +41,9 @@ administration.templateProvider.description.hint=Die Informationen, die für den
 administration.templateProvider.icon=Symbol
 administration.templateProvider.icon.hint=Das Symbol, das für den Vorlagenanbieter angezeigt werden soll, wenn eine neue Seite erstellt wird. Wählen Sie eines aus der {0}vollständigen Liste von Symbolen{1}.
 administration.templateProvider.creationRestrictions=Erstellungsbeschränkungen
-administration.templateProvider.creationRestrictions.hint=Die Liste der Standorte (einschließlich ihrer untergeordneten Standorte), an denen diese Vorlage Seiten erstellen darf
+administration.templateProvider.creationRestrictions.hint=Die Liste der Speicherorte (einschliesslich ihrer untergeordneten Orte), an denen diese Vorlage Seiten erstellen darf
 administration.templateProvider.creationRestrictions.none=Mit dieser Vorlage können überall Seiten erstellt werden
 administration.templateProvider.creationRestrictionsAreSuggestions=Erstellungsbeschränkungen als Vorschläge
-administration.templateProvider.creationRestrictionsAreSuggestions.hint=Ermöglicht es dem Benutzer, einen beliebigen Ort zum Erstellen der Seite mit dieser Vorlage auszuwählen, wobei die erste Erstellungsbeschränkung als vorausgefüllter Standardort verwendet wird, wenn die Vorlage aus der Liste ausgewählt wird.</content>
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Ermöglicht es dem Benutzer, einen beliebigen Ort zum Erstellen der Seite mit dieser Vorlage auszuwählen, wobei die erste Erstellungsbeschränkung als vorausgefüllter Standardort verwendet wird, wenn die Vorlage aus der Liste ausgewählt wird.
+</content>
 </xwikidoc>

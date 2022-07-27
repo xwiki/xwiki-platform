@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -44,6 +44,11 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
       <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -199,13 +204,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-bridge</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-script</artifactId>
+      <artifactId>xwiki-platform-security-authorization-bridge</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -359,7 +358,12 @@
       <version>${commons.version}</version>
       <scope>runtime</scope>
     </dependency>
-
+    <!-- Needed to wait for document backlink indexation queue to be consumed. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Dependencies not needed by the plugin itself but included in the WAR it generates,
          listed to be sure it's built before the plugin -->
     <dependency>
@@ -367,6 +371,13 @@
       <artifactId>xwiki-platform-velocity-webapp</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

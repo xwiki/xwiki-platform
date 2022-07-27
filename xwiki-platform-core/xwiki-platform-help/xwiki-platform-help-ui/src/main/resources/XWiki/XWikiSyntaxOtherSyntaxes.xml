@@ -123,13 +123,5 @@
 
 === 1.0 Other Syntaxes ===
 
-Other syntaxes are also available (bundled or through [[extensions&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Main/WebHome]]):
-* [[JSPWiki&gt;&gt;http://www.jspwiki.org/wiki/TextFormattingRules]] (Bundled)
-* [[MediaWiki&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/MediaWiki/MediaWiki%20Syntax/]] (Extension)
-* [[Confluence&gt;&gt;http://confluence.atlassian.com/display/CONF20/Confluence+Notation+Guide+Overview]] (Bundled)
-* [[TWiki&gt;&gt;http://twiki.org/cgi-bin/view/TWiki/WikiSyntax]] (Bundled)
-* [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]] (Bundled)
-* [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]] (Bundled)
-* [[Markdown&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Markdown%20Syntax%201.2]] (Extension)
-* [[DokuWiki&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/DokuWiki/DokuWiki%20Syntax%20Parser/]] (Extension)</content>
+Other syntaxes are also [[available&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/ExtensionCode/AllExtensions/WebHome#%7Ct=extensions&amp;category=syntax]].</content>
 </xwikidoc>

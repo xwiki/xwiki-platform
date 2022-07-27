@@ -19,17 +19,25 @@
  */
 package com.xpn.xwiki.objects;
 
+import java.lang.reflect.ParameterizedType;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.component.util.ReflectionUtils;
 
-public abstract class NumberProperty extends BaseProperty
+public abstract class NumberProperty<N extends Number> extends BaseProperty
 {
     private static final long serialVersionUID = 1L;
 
-    private Number value;
+    private N value;
+
+    private Class<N> numberClass;
 
     public NumberProperty()
     {
+        ParameterizedType genericType =
+            (ParameterizedType) ReflectionUtils.resolveType(NumberProperty.class, getClass());
+        this.numberClass = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]);
     }
 
     @Override
@@ -41,8 +49,49 @@ public abstract class NumberProperty extends BaseProperty
     @Override
     public void setValue(Object value)
     {
+        N number = convert(value);
+
         setValueDirty(value);
-        this.value = (Number) value;
+        this.value = number;
+    }
+
+    private N convert(Object value)
+    {
+        N number = null;
+
+        if (value != null) {
+            if (this.numberClass == value.getClass()) {
+                number = (N) value;
+            } else {
+                if (this.numberClass == Double.class) {
+                    if (value instanceof Number) {
+                        number = (N) (Double) ((Number) value).doubleValue();
+                    } else {
+                        number = (N) Double.valueOf(value.toString());
+                    }
+                } else if (this.numberClass == Float.class) {
+                    if (value instanceof Number) {
+                        number = (N) (Float) ((Number) value).floatValue();
+                    } else {
+                        number = (N) Float.valueOf(value.toString());
+                    }
+                } else if (this.numberClass == Integer.class) {
+                    if (value instanceof Number) {
+                        number = (N) (Integer) ((Number) value).intValue();
+                    } else {
+                        number = (N) Integer.valueOf(value.toString());
+                    }
+                } else if (this.numberClass == Long.class) {
+                    if (value instanceof Number) {
+                        number = (N) (Long) ((Number) value).longValue();
+                    } else {
+                        number = (N) Long.valueOf(value.toString());
+                    }
+                }
+            }
+        }
+
+        return number;
     }
 
     @Override
@@ -59,8 +108,7 @@ public abstract class NumberProperty extends BaseProperty
             return false;
         }
 
-        return new EqualsBuilder().appendSuper(super.equals(obj))
-            .append(getValue(), ((NumberProperty) obj).getValue())
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(getValue(), ((NumberProperty) obj).getValue())
             .isEquals();
     }
 

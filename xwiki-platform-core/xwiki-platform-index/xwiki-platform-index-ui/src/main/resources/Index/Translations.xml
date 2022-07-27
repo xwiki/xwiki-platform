@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.4" reference="Index.Translations" locale="">
   <web>Index</web>
   <name>Translations</name>
   <language/>
@@ -44,7 +44,10 @@ index.spacesMacro.spaceAdministration.alt=Administer Space
 index.spacesMacro.createSpace.link=Create a new space
 index.spacesMacro.createSpace.defaultSpaceName=Space name
 index.spacesMacro.createSpace.submit=Create
-index.deletedDocuments.deleteAll=Delete all</content>
+index.deletedDocuments.deleteAll=Delete all
+index.administration.remainingTasks.heading=Remaining Document Analysis tasks
+index.administration.remainingTasks.emptyQueue=No remaining tasks.
+admin.documentanalysis=Document Analysis</content>
   <object>
     <name>Index.Translations</name>
     <number>0</number>
@@ -63,6 +66,8 @@ index.deletedDocuments.deleteAll=Delete all</content>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

@@ -25,7 +25,6 @@ import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.livedata.LiveDataQuery.Source;
-import org.xwiki.stability.Unstable;
 
 /**
  * The interface used to access the available live data sources.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Role
-@Unstable
 public interface LiveDataSourceManager
 {
     /**

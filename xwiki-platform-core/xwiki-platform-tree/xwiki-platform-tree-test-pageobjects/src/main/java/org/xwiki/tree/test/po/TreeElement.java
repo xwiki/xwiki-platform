@@ -143,7 +143,8 @@ public class TreeElement extends BaseElement
      */
     public TreeElement waitForNodeSelected(String nodeId)
     {
-        String selectedNodeXPath = String.format(".//*[@id = '%s' and @aria-selected = 'true']", nodeId);
+        String selectedNodeXPath =
+            String.format(".//*[@id = '%s_anchor' and contains(@class, 'jstree-clicked')]", nodeId);
         getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));
         return this;
     }
@@ -156,6 +157,7 @@ public class TreeElement extends BaseElement
     /**
      * @return the list of selected node IDs.
      */
+    @SuppressWarnings("unchecked")
     public List<String> getSelectedNodeIDs()
     {
         if (getDriver() instanceof JavascriptExecutor) {
@@ -189,6 +191,7 @@ public class TreeElement extends BaseElement
 
     /**
      * Allow to select multiple nodes at once by maintaining ctrl key pressed while clicking on nodes.
+     * 
      * @param nodes the nodes to select.
      * @since 13.3RC1
      */
@@ -216,7 +219,7 @@ public class TreeElement extends BaseElement
     {
         return getDriver()
             .findElementsWithoutWaiting(this.element,
-                By.cssSelector(".jstree-node[aria-level=\"1\"]:not(.jstree-hidden)"))
+                By.cssSelector(".jstree-container-ul > .jstree-node:not(.jstree-hidden)"))
             .stream().map(nodeElement -> By.id(nodeElement.getAttribute("id")))
             .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).collect(Collectors.toList());
     }

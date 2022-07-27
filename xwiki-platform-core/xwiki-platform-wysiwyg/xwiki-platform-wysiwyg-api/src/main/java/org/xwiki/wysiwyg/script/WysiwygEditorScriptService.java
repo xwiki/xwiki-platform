@@ -19,6 +19,7 @@
  */
 package org.xwiki.wysiwyg.script;
 
+import java.util.Collection;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -41,11 +42,14 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -95,6 +99,9 @@ public class WysiwygEditorScriptService implements ScriptService
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
      * <p>
@@ -119,6 +126,16 @@ public class WysiwygEditorScriptService implements ScriptService
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * @return The syntax identifier of the rendered HTML.
+     * @since 14.1RC1
+     */
+    @Unstable
+    public Syntax getHTMLSyntax()
+    {
+        return Syntax.ANNOTATED_HTML_5_0;
     }
 
     /**
@@ -339,7 +356,19 @@ public class WysiwygEditorScriptService implements ScriptService
         // We clone the document in order to not impact the environment (the document cache for example).
         XWikiDocument clonedDocument = xwikiContext.getDoc().clone();
         clonedDocument.setContentAuthorReference(xwikiContext.getUserReference());
+        this.injectTemoraryAttachments(clonedDocument);
         return clonedDocument;
+    }
+
+    private void injectTemoraryAttachments(XWikiDocument clonedDocument)
+    {
+        Collection<XWikiAttachment> uploadedAttachments =
+            this.temporaryAttachmentSessionsManager.getUploadedAttachments(clonedDocument.getDocumentReference());
+        if (!uploadedAttachments.isEmpty()) {
+            for (XWikiAttachment uploadedAttachment : uploadedAttachments) {
+                clonedDocument.setAttachment(uploadedAttachment);
+            }
+        }
     }
 
     /**

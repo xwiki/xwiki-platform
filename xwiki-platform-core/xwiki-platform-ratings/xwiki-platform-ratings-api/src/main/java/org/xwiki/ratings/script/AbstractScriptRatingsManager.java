@@ -38,7 +38,8 @@ import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
-import org.xwiki.stability.Unstable;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -52,7 +53,6 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public abstract class AbstractScriptRatingsManager implements RatingsScriptServiceAPI
 {
     private RatingsManager ratingsManager;
@@ -63,6 +63,9 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
     @Inject
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
 
     @Inject
     private Logger logger;
@@ -128,6 +131,24 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
         } catch (RatingsException e) {
             logger.error("Error when getting average rating for reference [{}]", reference,
                 ExceptionUtils.getRootCause(e));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<AverageRating> recomputeAverageRating(EntityReference reference)
+    {
+        if (this.authorizationManager.hasAccess(Right.PROGRAM)) {
+            try {
+                return Optional.of(this.ratingsManager.recomputeAverageRating(reference));
+            } catch (RatingsException e) {
+                logger.error("Error when computing average rating for reference [{}]", reference,
+                    ExceptionUtils.getRootCause(e));
+            }
+        } else {
+            logger.warn("Recomputation of average rating is not authorized for users without programming rights. "
+                + "The script in [{}] cannot be executed properly.",
+                this.contextProvider.get().getDoc().getDocumentReference());
         }
         return Optional.empty();
     }

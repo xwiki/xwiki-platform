@@ -33,13 +33,16 @@ import org.openqa.selenium.support.FindBy;
  */
 public class CopyOrRenameOrDeleteStatusPage extends BasePage
 {
+    private static final String MESSAGE_CSS_SELECTOR =
+        ".xcontent.job-status .box.successmessage, .xcontent.job-status .box.errormessage";
+
     @FindBy(css = ".job-status .col-lg-6:first-child .breadcrumb > li:last-child a")
     private WebElement oldPage;
 
     @FindBy(css = ".job-status .col-lg-6:last-child .breadcrumb > li:last-child a")
     private WebElement newPage;
 
-    @FindBy(css = ".box.successmessage, .box.errormessage")
+    @FindBy(css = MESSAGE_CSS_SELECTOR)
     private WebElement message;
 
     /**
@@ -49,7 +52,10 @@ public class CopyOrRenameOrDeleteStatusPage extends BasePage
      */
     public CopyOrRenameOrDeleteStatusPage waitUntilFinished()
     {
-        getDriver().waitUntilElementDisappears(By.cssSelector(".job-status .ui-progress"));
+        // Waits for a success or error message to be displayed before continuing. Previously, this method was waiting 
+        // for the job progress bar to be "missing" before continuing, which could happen too early, before the bar was
+        // even displayed once.
+        getDriver().waitUntilElementIsVisible(By.cssSelector(MESSAGE_CSS_SELECTOR));
         return this;
     }
 

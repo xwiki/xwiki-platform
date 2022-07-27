@@ -41,6 +41,6 @@ describe('DisplayerActions.vue', () => {
         }
       }
     })
-    expect(wrapper.text()).toMatch('livedata.displayer.emptyValue')
+    expect(wrapper.text()).toMatch('')
   })
 })

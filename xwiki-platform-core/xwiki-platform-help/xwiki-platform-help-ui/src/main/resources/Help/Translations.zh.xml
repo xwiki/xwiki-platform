@@ -47,7 +47,18 @@ help.tipsPanel.linkAutocompleteWYSIWYGTip=在WYSIWYG模式中进行编辑时，�
 help.macroList.title=可用的宏
 help.macroList.id=Id
 help.macroList.name=名称
-help.macroList.category=类别
 help.macroList.description=描述
-help.macroList.visibility=可见性</content>
+help.macroList.visibility=可见性
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=分类
+
+#@deprecatedend</content>
 </xwikidoc>

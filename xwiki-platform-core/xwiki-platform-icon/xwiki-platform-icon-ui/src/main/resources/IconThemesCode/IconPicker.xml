@@ -246,7 +246,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       iconNameDiv.addClass('xwikiIconPickerIconName').text(iconTheme[i].name);
       displayer.append(iconNameDiv);
       // Change the input value when the icon is clicked
-      displayer.click(function(event) {
+      displayer.on('click', function(event) {
         currentInput.val(currentInput.data('xwikiIconPickerSettings').prefix + $(event.currentTarget).children('.xwikiIconPickerIconName').text() );
         closePicker();
       });
@@ -308,7 +308,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   var createIconThemeSelector = function() {
     iconThemeSelector = $(document.createElement('select'));
     // Change the current icon theme where the selector is used
-    iconThemeSelector.change(function() {
+    iconThemeSelector.on('change', function() {
       currentIconTheme = iconThemeSelector.val();
       // Remove all the displayed icons
       $('.xwikiIconPickerIcon').remove();
@@ -421,14 +421,14 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       }
     }
     // Close the picker when the user press 'escape'.
-    currentInput.keyup(function (event) {
+    currentInput.on('keyup', function(event) {
       // See: http://stackoverflow.com/questions/1160008/which-keycode-for-escape-key-with-jquery
       if (event.which == 27) {
         closePicker();
       }
     });
   }
-  
+
   /**
    * Create the jQuery plugin
    */
@@ -437,7 +437,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
     var settings = $.extend({
       prefix: 'icon:image:'
     }, options);
-  
+
     // Enable the picker on focus
     this.each(function() {
       var elem = $(this);
@@ -448,25 +448,25 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       // Attach the settings to the input
       $(this).data('xwikiIconPickerSettings', settings);
       // Create the picker on focus
-      $(this).focusin(function(event) {
+      $(this).on('focusin', function(event) {
         createPicker($(event.currentTarget));
       });
     });
-    
+
     // Because the picker uses the 'fixed' position, we must recompute its position everytime the user scrolls the page
     // Otherwise, the picker would stay in the same position *on the screen* without staying close to the input.
-    $(window).scroll(function() {
+    $(window).on('scroll', function() {
       setPickerPosition();
     });
-    
+
     // Close the picker if the input and the picker itself have lost the focus
-    $(window).click(function(event) {
+    $(window).on('click', function(event) {
       if (xwikiCurrentIconsPicker &amp;&amp; document.activeElement != currentInput[0] &amp;&amp;
           !$.contains(xwikiCurrentIconsPicker[0], document.activeElement)) {
         closePicker();
       }
     });
-    
+
     // Return this object to enable the jQuery chaining
     return this;
   }

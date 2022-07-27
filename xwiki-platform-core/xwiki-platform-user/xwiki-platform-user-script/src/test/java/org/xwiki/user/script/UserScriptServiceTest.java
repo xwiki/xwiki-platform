@@ -28,11 +28,16 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserPropertiesResolver;
+import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link UserScriptService}
@@ -54,6 +59,9 @@ public class UserScriptServiceTest
     @MockComponent
     private UserReferenceResolver<String> userReferenceResolver;
 
+    @MockComponent
+    private UserReferenceSerializer<String> userReferenceSerializer;
+
     /**
      * Verify that the correct signature is called when a string parameter is passed to specify the user reference.
      */
@@ -64,5 +72,13 @@ public class UserScriptServiceTest
         verify(this.userPropertiesResolver, never()).resolve(eq(CurrentUserReference.INSTANCE),
             ArgumentMatchers.<String>any());
         verify(this.userReferenceResolver).resolve("xwiki:XWiki.Admin");
+    }
+
+    @Test
+    void serialize()
+    {
+        UserReference userReference = mock(UserReference.class);
+        when(this.userReferenceSerializer.serialize(userReference)).thenReturn("XWiki.Admin");
+        assertEquals("XWiki.Admin", this.scriptService.serialize(userReference));
     }
 }

@@ -23,18 +23,4 @@
  * See https://github.com/google/closure-compiler/blob/master/src/com/google/javascript/jscomp/js/polyfills.txt
  */
 define('xwiki-livedata-polyfills', function () {
-  /**
-   * Polyfill for the custom event function for IE 11
-   * Taken from https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
-   */
-  (function () {
-    if (typeof window.CustomEvent === "function") return false;
-    function CustomEvent (event, params) {
-      params = params || {bubbles: false, cancelable: false, detail: null};
-      var evt = document.createEvent('CustomEvent');
-      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-      return evt;
-    }
-    window.CustomEvent = CustomEvent;
-  })();
 });

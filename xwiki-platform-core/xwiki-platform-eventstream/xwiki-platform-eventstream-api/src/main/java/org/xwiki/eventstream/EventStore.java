@@ -19,13 +19,14 @@
  */
 package org.xwiki.eventstream;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Save and access store events.
@@ -34,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.4RC1
  */
 @Role
-@Unstable
 public interface EventStore
 {
     /**
@@ -159,4 +159,18 @@ public interface EventStore
      * @since 12.6
      */
     EventSearchResult search(EventQuery query, Set<String> fields) throws EventStreamException;
+
+    /**
+     * Get the list of statuses concerning the given events and the given entities.
+     *
+     * @param events a list of events
+     * @param entityIds a list of ids of entities (users and groups)
+     * @return the list of statuses corresponding to each pair or event/entity
+     * @throws Exception if an error occurs
+     * @since 14.6RC1
+     */
+    default List<EventStatus> getEventStatuses(Collection<Event> events, Collection<String> entityIds) throws Exception
+    {
+        return List.of();
+    }
 }

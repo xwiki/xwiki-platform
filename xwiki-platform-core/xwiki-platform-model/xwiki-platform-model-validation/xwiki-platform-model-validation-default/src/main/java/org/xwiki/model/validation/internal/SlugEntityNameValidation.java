@@ -41,7 +41,7 @@ import org.xwiki.model.validation.AbstractEntityNameValidation;
 public class SlugEntityNameValidation extends AbstractEntityNameValidation
 {
     protected static final String COMPONENT_NAME = "SlugEntityNameValidation";
-    private static final Pattern VALIDATION_PATTERN = Pattern.compile("^([\\w]+[-]?[\\w]+)+$");
+    private static final Pattern VALIDATION_PATTERN = Pattern.compile("^\\w+(-\\w+)*$");
     private static final String REPLACEMENT_CHARACTER = "-";
 
     @Override

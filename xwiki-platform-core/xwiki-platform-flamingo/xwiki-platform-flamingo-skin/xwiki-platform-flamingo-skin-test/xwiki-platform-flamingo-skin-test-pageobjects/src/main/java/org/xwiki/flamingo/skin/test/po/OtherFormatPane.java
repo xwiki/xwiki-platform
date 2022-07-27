@@ -77,7 +77,7 @@ public class OtherFormatPane extends BaseElement
      */
     public boolean isExportButtonAvailable(String buttonText)
     {
-        return getDriver().findElementByLinkText(buttonText) != null;
+        return getDriver().findElement(By.linkText(buttonText)) != null;
     }
 
     /**
@@ -88,7 +88,7 @@ public class OtherFormatPane extends BaseElement
      */
     public void clickExportButton(String buttonText)
     {
-        getDriver().findElementByLinkText(buttonText).click();
+        getDriver().findElement(By.linkText(buttonText)).click();
     }
 
     /**

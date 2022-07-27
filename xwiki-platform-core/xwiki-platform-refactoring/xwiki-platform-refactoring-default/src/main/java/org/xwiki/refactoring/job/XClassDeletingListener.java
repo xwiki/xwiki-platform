@@ -22,6 +22,7 @@ package org.xwiki.refactoring.job;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -60,6 +61,9 @@ import org.xwiki.refactoring.job.question.EntitySelection;
 @Named("XClassDeletingListener")
 public class XClassDeletingListener extends AbstractEventListener
 {
+    private static final String QUERY = "select distinct obj.name from BaseObject obj where obj.className=:className "
+        + "order by obj.name asc";
+
     @Inject
     private Logger logger;
 
@@ -171,32 +175,30 @@ public class XClassDeletingListener extends AbstractEventListener
         int queryLimit = 25;
         DocumentReference classReference = (DocumentReference) entitySelection.getEntityReference();
 
-        String query = "select distinct obj.name from BaseObject obj where obj.className=:className "
-            + "order by obj.name asc";
+        if (classReference.getLocale() == null || Locale.ROOT.equals(classReference.getLocale())) {
+            String className = localSerializer.serialize(classReference);
+            try {
+                List<String> results = this.queryManager.createQuery(QUERY, Query.HQL)
+                    .setLimit(queryLimit)
+                    .bindValue("className", className)
+                    .setWiki(classReference.getWikiReference().getName())
+                    .<String>execute();
 
-        String className = localSerializer.serialize(classReference);
-        try {
-
-            List<String> results = this.queryManager.createQuery(query, Query.HQL)
-                .setLimit(queryLimit)
-                .bindValue("className", className)
-                .setWiki(classReference.getWikiReference().getName())
-                .<String>execute();
-
-            if (results.isEmpty()) {
-                question.markAsFreePage(entitySelection);
-            } else {
-                if (results.size() == queryLimit) {
-                    question.setObjectsPotentiallyHidden(true);
+                if (results.isEmpty()) {
+                    question.markAsFreePage(entitySelection);
+                } else {
+                    if (results.size() == queryLimit) {
+                        question.setObjectsPotentiallyHidden(true);
+                    }
+                    for (String documentObjectName : results) {
+                        EntityReference documentObjectReference = this.resolver.resolve(documentObjectName,
+                            EntityType.DOCUMENT, classReference);
+                        question.markImpactedObject(entitySelection, documentObjectReference);
+                    }
                 }
-                for (String documentObjectName : results) {
-                    EntityReference documentObjectReference = this.resolver.resolve(documentObjectName,
-                        EntityType.DOCUMENT, classReference);
-                    question.markImpactedObject(entitySelection, documentObjectReference);
-                }
+            } catch (QueryException e) {
+                logger.error("Error while executing query to retrieve objects linked to an XClass.", e);
             }
-        } catch (QueryException e) {
-            logger.error("Error while executing query to retrieve objects linked to an XClass.", e);
         }
     }
 }

@@ -16,7 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
+-->
 
 <!--
   LayoutCardsCard is a card component for the Cards Layout.
@@ -65,7 +65,7 @@
       >
         <!-- Specify the handle to drag properties -->
         <template #handle>
-          <span class="fa fa-ellipsis-v"></span>
+          <XWikiIcon :icon-descriptor="{name: 'more-vertical'}"/>
         </template>
 
         <!-- Property Name -->
@@ -90,12 +90,14 @@ import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
 import XWikiDraggable from "../../utilities/XWikiDraggable.vue";
 import XWikiDraggableItem from "../../utilities/XWikiDraggableItem.vue";
+import XWikiIcon from "../../utilities/XWikiIcon";
 
 export default {
 
   name: "LayoutCardsCard",
 
   components: {
+    XWikiIcon,
     LivedataEntrySelector,
     LivedataDisplayer,
     XWikiDraggable,

@@ -22,8 +22,17 @@ package com.xpn.xwiki.api;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,7 +52,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @OldcoreTest
@@ -52,6 +60,12 @@ class DocumentTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @MockComponent
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
+
+    @MockComponent
+    private ObservationManager observationManager;
 
     @Test
     void toStringReturnsFullName()
@@ -85,6 +99,23 @@ class DocumentTest
 
         lst = adoc.getObjects(adoc.getFullName());
         assertEquals(1, lst.size());
+    }
+
+    @Test
+    void getObject()
+    {
+        XWikiContext context = new XWikiContext();
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
+
+        doc.getXClass().addNumberField("prop", "prop", 5, "long");
+
+        Document apiDocument = new Document(doc, context);
+        ObjectReference objectReference = new ObjectReference("Wiki.Space.Page[2]", doc.getDocumentReference());
+        Object apiObject = apiDocument.getObject(objectReference, true);
+        apiObject.set("prop", 20);
+
+        assertEquals(apiObject, apiDocument.getObject("Wiki.Space.Page", 2));
+        assertEquals(2, apiObject.getNumber());
     }
 
     @Test
@@ -265,7 +296,7 @@ class DocumentTest
     }
 
     @Test
-    void saveAsAuthorWhenNoPR() throws XWikiException
+    void saveAsAuthorWhenNoPR(MockitoComponentManager componentManager) throws XWikiException, ComponentLookupException
     {
         XWikiDocument xdoc = new XWikiDocument(new DocumentReference("wiki0", "Space", "Page"));
         xdoc.setAuthorReference(new DocumentReference("wiki1", "XWiki", "initialauthor"));
@@ -275,12 +306,19 @@ class DocumentTest
         xdoc.setContentDirty(false);
         this.oldcore.getSpyXWiki().saveDocument(xdoc, this.oldcore.getXWikiContext());
 
+        UserReferenceResolver<DocumentReference> userReferenceResolver = componentManager.getInstance(
+            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
+
         // Set context user
-        this.oldcore.getXWikiContext().setUserReference(new DocumentReference("wiki2", "XWiki", "contextuser"));
+        DocumentReference contextUser = new DocumentReference("wiki2", "XWiki", "contextuser");
+        this.oldcore.getXWikiContext().setUserReference(contextUser);
+        UserReference userContextReference = userReferenceResolver.resolve(contextUser);
         // Set context author
         XWikiDocument contextDocument = new XWikiDocument("wiki1", "XWiki", "authordocument");
         DocumentReference authorReference = new DocumentReference("wiki3", "XWiki", "contextauthor");
+        UserReference userAuthorReference = userReferenceResolver.resolve(authorReference);
         contextDocument.setContentAuthorReference(authorReference);
+        this.oldcore.getSpyXWiki().saveDocument(xdoc, this.oldcore.getXWikiContext());
         this.oldcore.getXWikiContext().setDoc(contextDocument);
 
         when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.EDIT, authorReference,
@@ -299,14 +337,20 @@ class DocumentTest
         when(this.oldcore.getMockRightService().hasAccessLevel("edit", this.oldcore.getXWikiContext().getUser(),
             document.getPrefixedFullName(), this.oldcore.getXWikiContext())).thenReturn(true);
 
+        when(this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE))
+            .thenReturn(userContextReference)
+            .thenReturn(userContextReference)
+            .thenReturn(userAuthorReference)
+            .thenReturn(userContextReference);
         document.save();
 
-        assertEquals(authorReference, document.getAuthorReference());
+        assertEquals(userContextReference, document.getAuthors().getOriginalMetadataAuthor());
+        assertEquals(userAuthorReference, document.getAuthors().getEffectiveMetadataAuthor());
 
         when(this.oldcore.getMockRightService().hasProgrammingRights(this.oldcore.getXWikiContext())).thenReturn(true);
 
         document.save();
 
-        assertEquals(this.oldcore.getXWikiContext().getUserReference(), document.getAuthorReference());
+        assertEquals(userContextReference, document.getAuthors().getEffectiveMetadataAuthor());
     }
 }

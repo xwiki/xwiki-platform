@@ -20,7 +20,6 @@
 package org.xwiki.notifications;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Get the configuration options concerning the Notification module.
@@ -55,7 +54,6 @@ public interface NotificationConfiguration
      * @return true if pre filtering should be used for ALERT user notifications
      * @since 12.6
      */
-    @Unstable
     default boolean isEventPrefilteringEnabled()
     {
         return false;
@@ -65,7 +63,6 @@ public interface NotificationConfiguration
      * @return true if the REST/async cache is enabled.
      * @since 12.2
      */
-    @Unstable
     default boolean isRestCacheEnabled()
     {
         return true;
@@ -75,7 +72,6 @@ public interface NotificationConfiguration
      * @return the number of threads to use for computing notifications in REST.
      * @since 12.5RC1
      */
-    @Unstable
     default int getRESTPoolSize()
     {
         return 2;
@@ -85,7 +81,6 @@ public interface NotificationConfiguration
      * @return the number of threads to use for computing notifications in Async renderer.
      * @since 12.5RC1
      */
-    @Unstable
     default int getAsyncPoolSize()
     {
         return 2;

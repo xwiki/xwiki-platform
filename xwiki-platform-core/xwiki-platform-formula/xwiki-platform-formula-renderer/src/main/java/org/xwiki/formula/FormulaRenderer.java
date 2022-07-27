@@ -49,7 +49,10 @@ public interface FormulaRenderer
         GIF(".gif", "image/gif"),
 
         /** Lossy image format created by Joint Photographic Experts Group. */
-        JPEG(".jpg", "image/jpeg");
+        JPEG(".jpg", "image/jpeg"),
+
+        /** XML-based vector image format created by the W3C as an open format. */
+        SVG(".svg", "image/svg+xml");
 
         /** The default rendered image format. */
         public static final Type DEFAULT = PNG;

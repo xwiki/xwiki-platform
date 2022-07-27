@@ -303,7 +303,6 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
 
         adminPage.getSearchBar().selectRepository("");
         adminPage = new ExtensionAdministrationPage();
-        adminPage.waitUntilPageIsLoaded();
         // Test direct search
         adminPage = adminPage.setIndexed(false);
         // The value of the search input must be preserved when we switch the repository.
@@ -321,7 +320,6 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
 
         adminPage.getSearchBar().selectRepository("");
         adminPage = new ExtensionAdministrationPage();
-        adminPage.waitUntilPageIsLoaded();
         // Test direct search
         adminPage = adminPage.setIndexed(false);
         assertNotNull(adminPage.getSearchBar().selectRepository("").getExtension(extensionId));
@@ -336,7 +334,6 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
 
         adminPage.getSearchBar().selectRepository("");
         adminPage = new ExtensionAdministrationPage();
-        adminPage.waitUntilPageIsLoaded();
         // Test direct search
         adminPage = adminPage.setIndexed(false);
         assertNotNull(adminPage.getSearchBar().selectRepository("").getExtension(extensionId));

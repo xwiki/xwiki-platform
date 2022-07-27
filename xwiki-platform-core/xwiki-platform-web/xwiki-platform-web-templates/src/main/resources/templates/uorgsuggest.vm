@@ -40,13 +40,19 @@
     #set ($wikiReference = $doc.documentReference.wikiReference)
   #end
   #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name).addFilter('unique'))
-  ## TODO: Use the advanced query parameter API:
-  ## query.bindValue('input').anyChars().literal($input).anyChars().query()
-  ## as soon as we fix XWIKI-15362 (An XWQL query that selects from an object property fails when using the advanced
-  ## query parameter API)
-  #set ($query = $query.setLimit(10).bindValue('input', "%$input%"))
+  #set ($query = $query.bindValue('input').anyChars().literal($input).anyChars().query())
   #set ($rawResults = $query.execute())
-  #displayResults($rawResults $wikiReference)
+  #set ($results = [])
+  ## Iterate over the results and select the first 10 results that are accessible to the current user.
+  #foreach($rawResult in $rawResults)
+    #if($results.size() >= 10)
+      #break
+    #end
+    #if ($services.security.authorization.hasAccess('view', $services.model.resolveDocument($rawResult, $wikiReference)))
+      #set ($discard = $results.add($rawResult))
+    #end
+  #end
+  #displayResults($results $wikiReference)
 #end
 ##
 #macro (displayResults $rawResults $wikiReference)

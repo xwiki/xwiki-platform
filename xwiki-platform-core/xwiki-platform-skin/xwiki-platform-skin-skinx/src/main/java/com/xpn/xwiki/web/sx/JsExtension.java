@@ -81,26 +81,28 @@ public class JsExtension implements Extension
             Compiler compiler = new Compiler();
 
             // Configure the Closure Compiler. We should use as much as possible the same configuration we use for
-            // minifying JavaScript code at build time (with the corresponding Maven plugin).
+            // minifying JavaScript code at build time (with the corresponding Maven plugin). See the top level POM file
+            // from xwiki-commons.
             CompilerOptions options = new CompilerOptions();
 
             // Support the latest stable ECMAScript features (excludes drafts) as input.
             options.setLanguageIn(LanguageMode.STABLE);
 
-            // The output language must match the highest ECMAScript version supported by all the browsers we support.
+            // Don't transpile the code (i.e. use the same version of ECMAScript for output as we do for input) because
+            // the web browsers we support are implementing the latest ECMAScript stable specifications. Note that we
+            // don't use STABLE because it means different things for input language and output language (see
+            // https://github.com/google/closure-compiler/issues/3679#issuecomment-689925089) which means the code would
+            // still be transpiled (even if both input and output are set to STABLE).
             // See https://dev.xwiki.org/xwiki/bin/view/Community/SupportStrategy/BrowserSupportStrategy
-            // As long as we support IE11 we need to output a lower version of ECMAScript.
-            options.setLanguageOut(LanguageMode.ECMASCRIPT5_STRICT);
+            options.setLanguageOut(LanguageMode.NO_TRANSPILE);
+
+            // We don't need to inject polyfills as long as we don't do any transpiling (the same version of ECMAScript
+            // is used for input and output). See above.
+            options.setRewritePolyfills(false);
 
             // Enable the JavaScript strict mode based on the configuration.
             options.setStrictModeInput(getConfig().shouldRunJavaScriptInStrictMode());
             options.setEmitUseStrict(options.expectStrictModeInput());
-
-            // Add support for using the latest JavaScript APIs by including the necessary polyfills in the output. Note
-            // that the polyfills won't be included if the JavaScript minification is disabled (e.g. from the debug
-            // configuration) so running the unminified code on browsers that don't support the latest APIs (e.g. IE11)
-            // won't work, if you use such APIs.
-            options.setRewritePolyfills(true);
 
             // Generate the source map so that we have meaningful error messages. The specified path is not used. We
             // just need to set a path in order to enable source map generation.

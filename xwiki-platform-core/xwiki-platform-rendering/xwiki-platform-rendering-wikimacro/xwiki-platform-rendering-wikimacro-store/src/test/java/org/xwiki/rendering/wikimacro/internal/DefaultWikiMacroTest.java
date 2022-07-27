@@ -26,11 +26,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
@@ -100,7 +100,7 @@ class DefaultWikiMacroTest
     private XWikiDocument user;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.wikiMacroDocumentReference =
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "space", "macroPage");
@@ -160,9 +160,10 @@ class DefaultWikiMacroTest
         DefaultContentDescriptor contentDescriptor, List<WikiMacroParameterDescriptor> parameterDescriptors)
         throws Exception
     {
+        // TOOD: add a test with defaultCategory and move this test to legacy
         WikiMacroDescriptor descriptor =
             new WikiMacroDescriptor.Builder().id(new MacroId(macroId)).name("Wiki Macro").description("Description")
-                .defaultCategory("Test").visibility(WikiMacroVisibility.GLOBAL).supportsInlineMode(true)
+                .defaultCategories(Set.of("Test")).visibility(WikiMacroVisibility.GLOBAL).supportsInlineMode(true)
                 .contentDescriptor(contentDescriptor).parameterDescriptors(parameterDescriptors).build();
 
         this.wikiMacroDocument.setSyntax(syntax);
@@ -208,7 +209,7 @@ class DefaultWikiMacroTest
      * Test normal wiki macro execution.
      */
     @Test
-    void testExecute() throws Exception
+    void execute() throws Exception
     {
         registerWikiMacro("wikimacro1", "This is **bold**", Syntax.XWIKI_2_0);
 
@@ -227,7 +228,7 @@ class DefaultWikiMacroTest
      * other words, the nested macro should not generate extra paragraph elements.
      */
     @Test
-    void testExecuteWhenInlineAndWithMacro() throws Exception
+    void executeWhenInlineAndWithMacro() throws Exception
     {
         registerWikiMacro("wikimacro1", "This is **bold**", Syntax.XWIKI_2_0);
         registerWikiMacro("wikimacro2", "{{wikimacro1 param1=\"v1\" param2=\"v2\"/}}", Syntax.XWIKI_2_0);
@@ -241,7 +242,7 @@ class DefaultWikiMacroTest
      * Check that macro used inside wiki macro are executed as part of the document.
      */
     @Test
-    void testExecuteWhenInnerMacro() throws Exception
+    void executeWhenInnerMacro() throws Exception
     {
         WikiModel wikiModel = this.componentManager.registerMockComponent(WikiModel.class);
         registerWikiMacro("wikimacro1", "{{toc/}}", Syntax.XWIKI_2_0);
@@ -260,7 +261,7 @@ class DefaultWikiMacroTest
      * Check that macro used inside wiki macro are executed with the right syntax.
      */
     @Test
-    void testExecuteWhenWithDifferentMacroSyntax() throws Exception
+    void executeWhenWithDifferentMacroSyntax() throws Exception
     {
         registerWikiMacro("wikimacro", "{{groovy}}println \"[[path:/some/path]]\"{{/groovy}}", Syntax.XWIKI_2_1);
 
@@ -275,7 +276,7 @@ class DefaultWikiMacroTest
      * {@link DefaultWikiMacro} re-parse it.
      */
     @Test
-    void testExecuteWhenWikiMacroDirectlyProvideTheResult() throws Exception
+    void executeWhenWikiMacroDirectlyProvideTheResult() throws Exception
     {
         registerWikiMacro("wikimacrowithresult",
             "{{groovy}}" + "xcontext.macro.result = java.util.Collections.singletonList("
@@ -289,7 +290,7 @@ class DefaultWikiMacroTest
      * Test default parameter value injection.
      */
     @Test
-    void testDefaultParameterValues() throws Exception
+    void defaultParameterValues() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -297,7 +298,7 @@ class DefaultWikiMacroTest
         // Initialize velocity engine.
         final VelocityEngine vEngine = this.componentManager.getInstance(VelocityEngine.class);
         Properties properties = new Properties();
-        properties.setProperty("resource.loader", "file");
+        properties.setProperty("resource.loaders", "file");
         vEngine.initialize(properties);
 
         // Hack into velocity context.
@@ -306,15 +307,8 @@ class DefaultWikiMacroTest
 
         when(mockVelocityManager.getCurrentVelocityContext()).thenReturn(vContext);
         when(mockVelocityManager.evaluate(any(Writer.class), any(String.class), any(Reader.class)))
-            .thenAnswer(new Answer<Boolean>()
-            {
-                @Override
-                public Boolean answer(InvocationOnMock invocation) throws Throwable
-                {
-                    return vEngine.evaluate(vContext, (Writer) invocation.getArgument(0),
-                        (String) invocation.getArgument(1), (Reader) invocation.getArgument(2));
-                }
-            });
+            .thenAnswer((Answer<Boolean>) invocation -> vEngine.evaluate(vContext, invocation.getArgument(0),
+                invocation.getArgument(1), (Reader) invocation.getArgument(2)));
 
         List<WikiMacroParameterDescriptor> parameterDescriptors =
             Arrays.asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, "default_value"));
@@ -335,7 +329,7 @@ class DefaultWikiMacroTest
      * Test result value injection.
      */
     @Test
-    void testResultValueFromContext() throws Exception
+    void resultValueFromContext() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -343,7 +337,7 @@ class DefaultWikiMacroTest
         // Initialize velocity engine.
         final VelocityEngine vEngine = this.componentManager.getInstance(VelocityEngine.class);
         Properties properties = new Properties();
-        properties.setProperty("resource.loader", "file");
+        properties.setProperty("resource.loaders", "file");
         vEngine.initialize(properties);
 
         // Hack into velocity context.
@@ -353,15 +347,8 @@ class DefaultWikiMacroTest
 
         when(mockVelocityManager.getCurrentVelocityContext()).thenReturn(vContext);
         when(mockVelocityManager.evaluate(any(Writer.class), any(String.class), any(Reader.class)))
-            .thenAnswer(new Answer<Boolean>()
-            {
-                @Override
-                public Boolean answer(InvocationOnMock invocation) throws Throwable
-                {
-                    return vEngine.evaluate(vContext, (Writer) invocation.getArgument(0),
-                        (String) invocation.getArgument(1), (Reader) invocation.getArgument(2));
-                }
-            });
+            .thenAnswer((Answer<Boolean>) invocation -> vEngine.evaluate(vContext, invocation.getArgument(0),
+                invocation.getArgument(1), (Reader) invocation.getArgument(2)));
 
         registerWikiMacro("wikimacro1", "{{velocity}}#set ($xcontext.macro.result = $wordBlock)" + "{{/velocity}}",
             Syntax.XWIKI_2_0, Collections.emptyList());
@@ -378,7 +365,7 @@ class DefaultWikiMacroTest
      * Test result value injection from new binding.
      */
     @Test
-    void testResultValueFromNewBinding() throws Exception
+    void resultValueFromNewBinding() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -386,7 +373,7 @@ class DefaultWikiMacroTest
         // Initialize velocity engine.
         final VelocityEngine vEngine = this.componentManager.getInstance(VelocityEngine.class);
         Properties properties = new Properties();
-        properties.setProperty("resource.loader", "file");
+        properties.setProperty("resource.loaders", "file");
         vEngine.initialize(properties);
 
         // Hack into velocity context.
@@ -399,15 +386,8 @@ class DefaultWikiMacroTest
             return vContext;
         });
         when(mockVelocityManager.evaluate(any(Writer.class), any(String.class), any(Reader.class)))
-            .thenAnswer(new Answer<Boolean>()
-            {
-                @Override
-                public Boolean answer(InvocationOnMock invocation) throws Throwable
-                {
-                    return vEngine.evaluate(vContext, (Writer) invocation.getArgument(0),
-                        (String) invocation.getArgument(1), (Reader) invocation.getArgument(2));
-                }
-            });
+            .thenAnswer((Answer<Boolean>) invocation -> vEngine.evaluate(vContext, invocation.getArgument(0),
+                invocation.getArgument(1), (Reader) invocation.getArgument(2)));
 
         registerWikiMacro("wikimacro1", "{{velocity}}#set ($wikimacro.result = $wordBlock){{/velocity}}",
             Syntax.XWIKI_2_0, Collections.emptyList());
@@ -424,7 +404,7 @@ class DefaultWikiMacroTest
      * Test parameter types are converted to appropriate value
      */
     @Test
-    void testParameterType() throws Exception
+    void parameterType() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -432,7 +412,7 @@ class DefaultWikiMacroTest
         // Initialize velocity engine.
         final VelocityEngine vEngine = this.componentManager.getInstance(VelocityEngine.class);
         Properties properties = new Properties();
-        properties.setProperty("resource.loader", "file");
+        properties.setProperty("resource.loaders", "file");
         vEngine.initialize(properties);
 
         // Hack into velocity context.
@@ -445,15 +425,8 @@ class DefaultWikiMacroTest
             return vContext;
         });
         when(mockVelocityManager.evaluate(any(Writer.class), any(String.class), any(Reader.class)))
-            .thenAnswer(new Answer<Boolean>()
-            {
-                @Override
-                public Boolean answer(InvocationOnMock invocation) throws Throwable
-                {
-                    return vEngine.evaluate(vContext, (Writer) invocation.getArgument(0),
-                        (String) invocation.getArgument(1), (Reader) invocation.getArgument(2));
-                }
-            });
+            .thenAnswer((Answer<Boolean>) invocation -> vEngine.evaluate(vContext, invocation.getArgument(0),
+                invocation.getArgument(1), (Reader) invocation.getArgument(2)));
 
         List<WikiMacroParameterDescriptor> parameterDescriptors =
             Arrays.asList(new WikiMacroParameterDescriptor("param1", "This is param1", true, null, Integer.class));
@@ -480,7 +453,7 @@ class DefaultWikiMacroTest
     }
 
     @Test
-    void testContext() throws Exception
+    void context() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -488,7 +461,7 @@ class DefaultWikiMacroTest
         // Initialize velocity engine.
         final VelocityEngine vEngine = this.componentManager.getInstance(VelocityEngine.class);
         Properties properties = new Properties();
-        properties.setProperty("resource.loader", "file");
+        properties.setProperty("resource.loaders", "file");
         vEngine.initialize(properties);
 
         // Hack into velocity context.
@@ -497,15 +470,8 @@ class DefaultWikiMacroTest
 
         when(mockVelocityManager.getCurrentVelocityContext()).thenReturn(vContext);
         when(mockVelocityManager.evaluate(any(Writer.class), any(String.class), any(Reader.class)))
-            .thenAnswer(new Answer<Boolean>()
-            {
-                @Override
-                public Boolean answer(InvocationOnMock invocation) throws Throwable
-                {
-                    return vEngine.evaluate(vContext, (Writer) invocation.getArgument(0),
-                        (String) invocation.getArgument(1), (Reader) invocation.getArgument(2));
-                }
-            });
+            .thenAnswer((Answer<Boolean>) invocation -> vEngine.evaluate(vContext, invocation.getArgument(0),
+                invocation.getArgument(1), (Reader) invocation.getArgument(2)));
 
         List<WikiMacroParameterDescriptor> parameterDescriptors =
             Arrays.asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, "default_value"));
@@ -525,7 +491,7 @@ class DefaultWikiMacroTest
      * Makes sure getParameterNames return parameters with source case.
      */
     @Test
-    void testDefaultParameterNames() throws Exception
+    void defaultParameterNames() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -533,7 +499,7 @@ class DefaultWikiMacroTest
         // Initialize velocity engine.
         final VelocityEngine vEngine = this.componentManager.getInstance(VelocityEngine.class);
         Properties properties = new Properties();
-        properties.setProperty("resource.loader", "file");
+        properties.setProperty("resource.loaders", "file");
         vEngine.initialize(properties);
 
         // Hack into velocity context.
@@ -542,15 +508,8 @@ class DefaultWikiMacroTest
 
         when(mockVelocityManager.getCurrentVelocityContext()).thenReturn(vContext);
         when(mockVelocityManager.evaluate(any(Writer.class), any(String.class), any(Reader.class)))
-            .thenAnswer(new Answer<Boolean>()
-            {
-                @Override
-                public Boolean answer(InvocationOnMock invocation) throws Throwable
-                {
-                    return vEngine.evaluate(vContext, (Writer) invocation.getArgument(0),
-                        (String) invocation.getArgument(1), (Reader) invocation.getArgument(2));
-                }
-            });
+            .thenAnswer((Answer<Boolean>) invocation -> vEngine.evaluate(vContext, invocation.getArgument(0),
+                invocation.getArgument(1), (Reader) invocation.getArgument(2)));
 
         registerWikiMacro("wikimacro1", "{{velocity}}$xcontext.macro.params.parameterNames{{/velocity}}",
             Syntax.XWIKI_2_0);
@@ -565,7 +524,7 @@ class DefaultWikiMacroTest
     }
 
     @Test
-    void testGetCurrentMacroBlock() throws Exception
+    void getCurrentMacroBlock() throws Exception
     {
         //@formatter:off
         registerWikiMacro("wikimacro",
@@ -575,7 +534,7 @@ class DefaultWikiMacroTest
             + "println xcontext.macro.context.getCurrentMacroBlock().nextSibling.children[0].word\n"
             + "println xcontext.macro.context.getCurrentMacroBlock().previousSibling.children[0].word\n"
             + "{{/groovy}}",
-            Syntax.XWIKI_2_0, Collections.<WikiMacroParameterDescriptor>emptyList());
+            Syntax.XWIKI_2_0, Collections.emptyList());
         //@formatter:on
 
         Converter converter = this.componentManager.getInstance(Converter.class);
@@ -589,7 +548,7 @@ class DefaultWikiMacroTest
     }
 
     @Test
-    void testExecuteWhenWikiMacroBinding() throws Exception
+    void executeWhenWikiMacroBinding() throws Exception
     {
         //@formatter:off
         registerWikiMacro("wikimacrobindings",
@@ -621,7 +580,7 @@ class DefaultWikiMacroTest
     }
 
     @Test
-    void testExecuteWhenWikiRequiringPRAfterDropPermission() throws Exception
+    void executeWhenWikiRequiringPRAfterDropPermission() throws Exception
     {
         registerWikiMacro("wikimacrobindings", "{{groovy}}print xcontext.macro.doc{{/groovy}}");
 
@@ -642,12 +601,12 @@ class DefaultWikiMacroTest
     }
 
     @Test
-    void testWikimacrocontentWhenTypeWiki() throws Exception
+    void wikimacrocontentWhenTypeWiki() throws Exception
     {
         registerWikiMacro("wikimacro",
             "{{velocity}}$xcontext.context.authorReference{{/velocity}}\n{{wikimacrocontent/}}", Syntax.XWIKI_2_0,
             new DefaultContentDescriptor("", false, Block.LIST_BLOCK_TYPE),
-            Collections.<WikiMacroParameterDescriptor>emptyList());
+            Collections.emptyList());
 
         Converter converter = this.componentManager.getInstance(Converter.class);
 
@@ -694,7 +653,7 @@ class DefaultWikiMacroTest
     }
 
     @Test
-    void testWikimacroparameterWhenTypeWiki() throws Exception
+    void wkimacroparameterWhenTypeWiki() throws Exception
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors = Arrays
             .asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, null, Block.LIST_BLOCK_TYPE));
@@ -750,12 +709,12 @@ class DefaultWikiMacroTest
     }
 
     @Test
-    void testWikimacrocontentWhenInRawBlock() throws Exception
+    void wikimacrocontentWhenInRawBlock() throws Exception
     {
         registerWikiMacro("wikimacro",
             "{{html wiki='true' clean='false'}}<span class='class'>{{wikimacrocontent/}}</span>{{/html}}",
             Syntax.XWIKI_2_0, new DefaultContentDescriptor("", false, Block.LIST_BLOCK_TYPE),
-            Collections.<WikiMacroParameterDescriptor>emptyList());
+            Collections.emptyList());
 
         Converter converter = this.componentManager.getInstance(Converter.class);
 
@@ -767,7 +726,7 @@ class DefaultWikiMacroTest
         String expect =
             "beginDocument [[syntax]=[XWiki 2.1]]\n"
             + "beginMacroMarkerStandalone [wikimacro] [] [[[label>>path:reference]]]\n"
-            + "onRawText [<span class='class'>] [xhtml/1.0]\n"
+            + "onRawText [<span class='class'>] [html/5.0]\n"
             + "beginMetaData [[non-generated-content]="
                 + "[java.util.List<org.xwiki.rendering.block.Block>][wikimacrocontent]=[true]]\n"
             + "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
@@ -775,7 +734,7 @@ class DefaultWikiMacroTest
             + "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
             + "endMetaData [[non-generated-content]="
                 + "[java.util.List<org.xwiki.rendering.block.Block>][wikimacrocontent]=[true]]\n"
-            + "onRawText [</span>] [xhtml/1.0]\n"
+            + "onRawText [</span>] [html/5.0]\n"
             + "endMacroMarkerStandalone [wikimacro] [] [[[label>>path:reference]]]\n"
             + "endDocument [[syntax]=[XWiki 2.1]]";
         //@formatter:on
@@ -784,7 +743,7 @@ class DefaultWikiMacroTest
     }
 
     @Test
-    void testWikimacroparameterWhenInRawBlock() throws Exception
+    void wikimacroparameterWhenInRawBlock() throws Exception
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors = Arrays
             .asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, null, Block.LIST_BLOCK_TYPE));
@@ -807,7 +766,7 @@ class DefaultWikiMacroTest
         String expect =
             "beginDocument [[syntax]=[XWiki 2.1]]\n"
             + "beginMacroMarkerStandalone [wikimacro] [param1=[[label>>path:reference]]]\n"
-            + "onRawText [<span class='class'>] [xhtml/1.0]\n"
+            + "onRawText [<span class='class'>] [html/5.0]\n"
             + "beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
                 + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n"
             + "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
@@ -815,7 +774,7 @@ class DefaultWikiMacroTest
             + "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
             + "endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
                 + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n"
-            + "onRawText [</span>] [xhtml/1.0]\n"
+            + "onRawText [</span>] [html/5.0]\n"
             + "endMacroMarkerStandalone [wikimacro] [param1=[[label>>path:reference]]]\n" +
             "endDocument [[syntax]=[XWiki 2.1]]";
         //@formatter:on

@@ -18,17 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($paths = {
-  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
-})
 #set ($pageIcon = $services.icon.getMetaData('page_white'))
 #set ($webHome = $services.model.getEntityReference('DOCUMENT', 'default').name)
 #[[*/
 // Start JavaScript-only code.
-(function(paths, pageIcon, webHome) {
+(function(pageIcon, webHome) {
   "use strict";
-
-require.config({paths});
 
 define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   webHome = webHome || 'WebHome';
@@ -46,10 +41,10 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
       // that appears in the value.
       searchField: ['searchValue', 'label', 'hint'],
       load: function(text, callback) {
-        loadPages(text, this.settings).done(callback).fail(callback);
+        loadPages(text, this.settings).then(callback, callback);
       },
       loadSelected: function(text, callback) {
-        loadPage(text, this.settings).done(callback).fail(callback);
+        loadPage(text, this.settings).then(callback, callback);
       }
     }
   };
@@ -86,7 +81,7 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
       number: 10,
       localeAware: true,
       prettyNames: true
-    }, true)).then($.proxy(processPages, null, options));
+    }, true)).then(processPages.bind(null, options));
   };
 
   var loadPage = function(value, options) {
@@ -94,7 +89,7 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
     var documentRestURL = new XWiki.Document(documentReference).getRestURL();
     return $.getJSON(documentRestURL, $.param({
       prettyNames: true
-    })).then($.proxy(processPage, null, options)).then(function(page) {
+    })).then(processPage.bind(null, options)).then(function(page) {
       // An array is expected in xwiki.selectize.js
       return [page];
     });
@@ -114,8 +109,8 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
    * Adapt the JSON returned by the REST call to the format expected by the Selectize widget.
    */
   var processPages = function(options, response) {
-    if ($.isArray(response.searchResults)) {
-      return response.searchResults.map($.proxy(processPage, null, options));
+    if (Array.isArray(response.searchResults)) {
+      return response.searchResults.map(processPage.bind(null, options));
     } else {
       return [];
     }
@@ -170,4 +165,4 @@ require(['jquery', 'xwiki-suggestPages', 'xwiki-events-bridge'], function($) {
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $pageIcon, $webHome]));
+}).apply(']]#', $jsontool.serialize([$pageIcon, $webHome]));

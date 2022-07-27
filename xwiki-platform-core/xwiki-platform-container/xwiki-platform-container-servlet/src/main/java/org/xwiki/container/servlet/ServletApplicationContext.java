@@ -32,9 +32,9 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.AbstractApplicationContext;
 
 /**
- * @deprecated starting with 3.5M1, use the notion of Environment instead
+ * @deprecated use the notion of Environment instead
  */
-@Deprecated
+@Deprecated(since = "3.5M1")
 public class ServletApplicationContext extends AbstractApplicationContext
 {
     /**

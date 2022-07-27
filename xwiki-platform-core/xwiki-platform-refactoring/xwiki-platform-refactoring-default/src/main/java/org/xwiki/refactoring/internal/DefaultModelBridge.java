@@ -36,6 +36,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -288,6 +289,24 @@ public class DefaultModelBridge implements ModelBridge
             return xcontext.getWiki().getStore().loadBacklinks(documentReference, true, xcontext);
         } catch (XWikiException e) {
             this.logger.error("Failed to retrieve the back-links for document [{}] on wiki [{}].", documentReference,
+                wikiId, e);
+            return Collections.emptyList();
+        } finally {
+            xcontext.setWikiId(previousWikiId);
+        }
+    }
+
+    @Override
+    public List<DocumentReference> getBackLinkedReferences(AttachmentReference reference, String wikiId)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        String previousWikiId = xcontext.getWikiId();
+        try {
+            xcontext.setWikiId(wikiId);
+
+            return xcontext.getWiki().getStore().loadBacklinks(reference, true, xcontext);
+        } catch (XWikiException e) {
+            this.logger.error("Failed to retrieve the back-links for attachment [{}] on wiki [{}].", reference,
                 wikiId, e);
             return Collections.emptyList();
         } finally {

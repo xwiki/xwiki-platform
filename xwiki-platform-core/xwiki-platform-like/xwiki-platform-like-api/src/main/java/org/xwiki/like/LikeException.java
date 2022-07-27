@@ -19,15 +19,12 @@
  */
 package org.xwiki.like;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Generic exception for Like module.
  *
  * @version $Id$
  * @since 12.7RC1
  */
-@Unstable
 public class LikeException extends Exception
 {
     private static final long serialVersionUID = -125179817034821968L;

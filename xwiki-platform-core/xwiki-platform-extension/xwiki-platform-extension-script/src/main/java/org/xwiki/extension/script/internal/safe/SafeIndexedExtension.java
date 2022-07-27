@@ -32,29 +32,12 @@ import org.xwiki.script.internal.safe.ScriptSafeProvider;
 public class SafeIndexedExtension<T extends IndexedExtension> extends SafeRatingExtension<T> implements IndexedExtension
 {
     /**
-     * The provider of instances safe for public scripts.
-     */
-    private ScriptSafeProvider<Object> safeProvider;
-
-    /**
      * @param extension the wrapped extension
      * @param safeProvider the provider of instances safe for public scripts
      */
     public SafeIndexedExtension(T extension, ScriptSafeProvider<Object> safeProvider)
     {
         super(extension, safeProvider);
-
-        this.safeProvider = safeProvider;
-    }
-
-    /**
-     * @param <S> the type of the object
-     * @param unsafe the unsafe object
-     * @return the safe version of the object
-     */
-    protected <S> S safe(Object unsafe)
-    {
-        return this.safeProvider.get(unsafe);
     }
 
     // IndexedExtension

@@ -137,10 +137,6 @@ New lines are not honored in XWiki Syntax 1.0. Use line breaks instead.
 
 A new line is a carriage return. A line break is a forced new line that can appear anywhere in the text.
 
-{{info}}
-In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} new lines are honored which is not the case in XWiki Syntax 1.0 and in Creole Syntax.
-{{/info}}
-
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
 |Line break|{{{Line\\New line}}}|Line\\New line
 |New line|Line\\New line|Line\\New line</content>

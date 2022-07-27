@@ -24,18 +24,26 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Provider;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.security.authentication.AuthenticationAction;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.ExtendedURL;
+
+import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link AuthenticationResourceReferenceResolver}.
@@ -48,19 +56,46 @@ class AuthenticationResourceReferenceResolverTest
     @InjectMockComponents
     private AuthenticationResourceReferenceResolver resolver;
 
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
+    private XWikiContext context;
+
+    @BeforeEach
+    void setup()
+    {
+        this.context = mock(XWikiContext.class);
+        when(contextProvider.get()).thenReturn(this.context);
+    }
+
     @Test
     void resolve() throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
+        WikiReference currentWiki = new WikiReference("current");
+        when(this.context.getMainXWiki()).thenReturn("current");
         Map parameters = new HashMap<>();
         parameters.put("key1", Collections.singletonList("value1"));
         parameters.put("key2", Arrays.asList("value2_a", "value2_b"));
 
-        ExtendedURL extendedURL = new ExtendedURL(Collections.singletonList("reset"), parameters);
+        ExtendedURL extendedURL = new ExtendedURL(Collections.singletonList("resetpassword"), parameters);
         AuthenticationResourceReference resourceReference =
             this.resolver.resolve(extendedURL, AuthenticationResourceReference.TYPE, parameters);
 
         AuthenticationResourceReference expectedReference = new AuthenticationResourceReference(
+            currentWiki,
             AuthenticationAction.RESET_PASSWORD);
+        expectedReference.addParameter("key1", Collections.singletonList("value1"));
+        expectedReference.addParameter("key2", Arrays.asList("value2_a", "value2_b"));
+
+        assertEquals(expectedReference, resourceReference);
+
+        extendedURL = new ExtendedURL(Arrays.asList("wiki", "foo", "retrieveusername"), parameters);
+        resourceReference =
+            this.resolver.resolve(extendedURL, AuthenticationResourceReference.TYPE, parameters);
+
+        expectedReference = new AuthenticationResourceReference(
+            new WikiReference("foo"),
+            AuthenticationAction.RETRIEVE_USERNAME);
         expectedReference.addParameter("key1", Collections.singletonList("value1"));
         expectedReference.addParameter("key2", Arrays.asList("value2_a", "value2_b"));
 
@@ -70,10 +105,20 @@ class AuthenticationResourceReferenceResolverTest
     @Test
     void resolveBadAction()
     {
+        when(this.context.getMainXWiki()).thenReturn("current");
         ExtendedURL extendedURL = new ExtendedURL(Collections.singletonList("foobar"), Collections.emptyMap());
         CreateResourceReferenceException createResourceReferenceException =
             assertThrows(CreateResourceReferenceException.class,
                 () -> this.resolver.resolve(extendedURL, AuthenticationResourceReference.TYPE, Collections.emptyMap()));
+
+        assertEquals("Cannot find an authentication action for name [foobar]",
+            createResourceReferenceException.getMessage());
+
+        ExtendedURL extendedURL2 = new ExtendedURL(Arrays.asList("wiki", "foo", "foobar"), Collections.emptyMap());
+        createResourceReferenceException =
+            assertThrows(CreateResourceReferenceException.class,
+                () -> this.resolver.resolve(extendedURL2,
+                    AuthenticationResourceReference.TYPE, Collections.emptyMap()));
 
         assertEquals("Cannot find an authentication action for name [foobar]",
             createResourceReferenceException.getMessage());
@@ -82,6 +127,7 @@ class AuthenticationResourceReferenceResolverTest
     @Test
     void resolveBadURL()
     {
+        when(this.context.getMainXWiki()).thenReturn("current");
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("authenticate", "foobar"));
         CreateResourceReferenceException createResourceReferenceException =
             assertThrows(CreateResourceReferenceException.class,

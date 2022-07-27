@@ -709,14 +709,14 @@ var Validate = {
   Length: function(value, paramsObj){
     var value = String(value);
     var paramsObj = paramsObj || {};
-    var params = { 
+    var params = {
       wrongLengthMessage: paramsObj.wrongLengthMessage || "Must be " + paramsObj.is + " characters long!",
       tooShortMessage:      paramsObj.tooShortMessage || "Must not be less than " + paramsObj.minimum + " characters long!",
       tooLongMessage:       paramsObj.tooLongMessage || "Must not be more than " + paramsObj.maximum + " characters long!",
       is:                           ((paramsObj.is) || (paramsObj.is == 0)) ? paramsObj.is : null,
       minimum:                  ((paramsObj.minimum) || (paramsObj.minimum == 0)) ? paramsObj.minimum : null,
       maximum:                 ((paramsObj.maximum) || (paramsObj.maximum == 0)) ? paramsObj.maximum : null
-    }
+    };
     switch(true){
       case (params.is !== null):
         if( value.length != Number(params.is) ) Validate.fail(params.wrongLengthMessage);

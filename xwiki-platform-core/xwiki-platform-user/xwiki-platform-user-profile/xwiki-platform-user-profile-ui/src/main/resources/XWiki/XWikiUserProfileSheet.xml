@@ -37,9 +37,10 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ("$!request.userId" != "" &amp;&amp; ($request.action == "disable" || $request.action == "enable") &amp;&amp; $services.csrf.isTokenValid($request.csrf))
+#if ($hasAdmin &amp;&amp; "$!request.userId" != "" &amp;&amp; ($request.action == "disable" || $request.action == "enable") &amp;&amp; $services.csrf.isTokenValid($request.csrf))
 #set ($user = $xwiki.getUser($request.userId))
-#if ($user.getUser().exists($xcontext.context))
+#set ($isCurrentUser = $user.getUser().userReference.equals($xcontext.userReference))
+#if (!$isCurrentUser &amp;&amp; $user.getUser().exists($xcontext.context))
   #set ($disabled = ($request.action == "disable"))
   #set ($discard = $user.setDisabledStatus($disabled))
   #set ($success = ($disabled &amp;&amp; $user.isDisabled()) || (!$disabled &amp;&amp; !$user.isDisabled()))
@@ -140,8 +141,8 @@
     <property>
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
-  $(document).ready(function() {
-
+  
+   $(function() {
     /** Add autocomplete attributes to ease form filling. */
     var fieldsPurposes = [
         {
@@ -191,7 +192,7 @@
         'csrf': xm.form_token,
         'user': XWiki.Model.serialize(xm.documentReference),
         'target': 'user'
-      }).done(function() {
+      }).then(() =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.done'))", 'done');
         if (action == 'watchUser') {
@@ -201,7 +202,7 @@
           $('.notificationWatchUserFollowing').addClass('hidden');
           $('.notificationWatchUserNotFollowing').removeClass('hidden');
         }
-      }).fail(function() {
+      }).catch(() =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.error'))", 'error');
       });
@@ -214,7 +215,7 @@
         'action': action,
         'csrf': xm.form_token,
         'userId': XWiki.Model.serialize(xm.documentReference)
-      }).done(function(data) {
+      }).then(data =&gt; {
         notification.hide();
         if (data.success) {
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.done'))", 'done');
@@ -228,27 +229,27 @@
         } else {
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.error'))", 'error');
         }
-      }).fail(function() {
+      }).catch(() =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.error'))", 'error');
       });
     };
 
-    $('#disable').click(function (event) {
+    $('#disable').on('click', function(event) {
       setUserDisableStatus('disable');
     });
 
-    $('#enable').click(function (event) {
+    $('#enable').on('click', function(event) {
       setUserDisableStatus('enable');
     });
 
     /**
      * DOM events
      */
-    $('.notificationWatchUserAdd').click(function (event) {
+    $('.notificationWatchUserAdd').on('click', function(event) {
       changeUserStatus('watchUser');
     });
-    $('.notificationWatchUserRemove').click(function (event) {
+    $('.notificationWatchUserRemove').on('click', function(event) {
       changeUserStatus('unwatchUser');
     });
   });
@@ -606,8 +607,9 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
     &lt;div class='userInfo'&gt;
     #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
       &lt;div class='editProfileCategory'&gt;
-        &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))" 
-              href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;
+        &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))"
+           href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')" class="btn btn-xs"&gt;
+          &lt;span class="action-icon"&gt;$services.icon.renderHTML('pencil')&lt;/span&gt;
           &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))&lt;/span&gt;
         &lt;/a&gt;
       &lt;/div&gt;

@@ -33,7 +33,7 @@ import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
  * @since 9.11.6
  */
 @Component
-@Named("personalMessage")
+@Named(PersonalMessageDescriptor.EVENT_TYPE)
 @Singleton
 public class PersonalMessageDescriptor extends AbstractMessageDescriptor
 {

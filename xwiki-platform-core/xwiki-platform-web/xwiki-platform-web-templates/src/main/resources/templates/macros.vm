@@ -244,6 +244,9 @@ $xwiki.getUserName("xwiki:${username}")
  * }
  *#
 #macro (displayUser $arg $options)
+  #if ($stringtool.isEmpty($arg))
+    #set ($arg = "XWiki.XWikiGuest")
+  #end
   #set ($isList = $arg.iterator())
   #if ($isList)
     #set ($usersList = $arg)
@@ -1518,8 +1521,8 @@ $Msz MB##
   <tr class="xwiki-livetable-display-filters">
     #foreach ($column in $columns)
       #set ($columnProperties = $columnsProperties.get($column))
-      ## Note: Even though the column is hidden, we still need a TD to generate valid HTML
-      <td class="xwiki-livetable-display-header-filter">
+      ## Note: Even though the column is hidden, we still need a (pottentially hidden) TD to generate valid HTML
+      <td class="xwiki-livetable-display-header-filter #if ("$!columnProperties.type" == 'hidden')hidden#end">
         #if ($columnProperties.type != 'hidden')
           #if ($columnProperties.filterable != false && "$!column" != '_actions')
             #set ($columnXClassName = $columnProperties.get('class'))
@@ -1602,8 +1605,7 @@ $Msz MB##
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.css'),
       {'type': 'text/css', 'rel': 'stylesheet'}))
     #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
-    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
-      {'forceSkinAction' : true, 'language' : $xcontext.locale}))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
       data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)"
@@ -1699,6 +1701,45 @@ $displayName##
       #set ($action.icon = "$!services.icon.renderHTML($action.icon)")
     #end
   #end
+#end
+
+#**
+ * Internal macro - Remove the obfuscated results (i.e., non-viewable rows) from the map when the total number of 
+ * returned rows is larger or equal to the total number of counted rows.
+ *
+ * @param map the response map returned to the user. This map is expected to have a totalrows and returnedrows fields
+ *            with numeric values and a rows field containing a arrow of objects containing a doc_viewable boolean
+ *            field   
+ *
+ * @internal
+ * @since 13.9RC1
+ * @since 13.4.4
+ * @since 12.10.11
+ *#
+##
+#macro (livetable_filterObfuscated $map)
+  ## When the total number of rows is not bigger than the limit, we remove the obfuscated results from the response since
+  ## this has no impact on the pagination.
+  #set ($rows = $map.get('rows'))
+  #set ($offset = 0)
+  #if($map.get('offset'))
+    #set ($offset = $mathtool.sub($map.get('offset'), 1))
+  #end
+  #if ($map.get('totalrows') <= $map.get('returnedrows'))
+    #set ($filteredRows = [])
+    #foreach ($row in $rows)
+      #if($row['doc_viewable'])
+        #set ($discard = $filteredRows.add($row))
+      #end
+    #end
+    ## The offset needs to be taken into account when returning the total number of pages otherwise, client-side can
+    ## consider that previsouly returned results have been removed (e.g., in case of page size change).
+    #set($discard = $map.put('totalrows', $mathtool.add($filteredRows.size(), $offset)))
+    #set($discard = $map.put('returnedrows', $filteredRows.size()))
+  #else
+    #set ($filteredRows = $rows)
+  #end
+  #set ($discard = $map.put('rows', $filteredRows))
 #end
 
 #**
@@ -2318,18 +2359,6 @@ $displayName##
 #end
 
 #**
- * Macro that displays a gradient specific to IE browsers (IE6-IE9)
- *
- * @param $startColor initial color for a gradient, format #AARRGGBB, range from #FF000000 to #FFFFFFFF
- * @param $endColor final color for the gradient
- *#
-#macro (css_filterGradient $startColor $endColor)
-  #if (("$!{startColor}" != '') && ("$!{endColor}" != ''))
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=${startColor}, endColorstr=${endColor},GradientType=0 );
-  #end
-#end
-
-#**
  * Macro that adds the prefixes for box-sizing CSS property that alters the default CSS box model used to calculate widths and heights of elements
  *
  *
@@ -2388,8 +2417,7 @@ $string##
  *#
 #macro (userPicker_import)
   #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestUsersAndGroups.js',
-    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestUsersAndGroups.js'))
 #end
 
 #macro (userPicker_input $multiSelect $parameters)
@@ -2436,8 +2464,7 @@ $string##
 *#
 #macro (attachmentPicker_import)
   #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestAttachments.js',
-    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestAttachments.js'))
   ## Pull the resources required by the configured icon set in order to display attachment icons.
   #set ($discard = $services.icon.use())
 #end
@@ -2629,8 +2656,7 @@ Recursive title display detected!##
  * Used by custom property displayers that need a generic suggest input.
  *#
 #macro (xpropertySuggestInputDisplayer $field $prefix $name $value)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
-    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
   #set ($id = "${prefix}${name}")
   #set ($freeText = $!field.getValue('freeText'))
   #set ($parameters = {
@@ -2903,4 +2929,43 @@ Recursive title display detected!##
     </span>
     <a href="$xwiki.getURL($docReference)">$escapetool.xml($docReference.name)</a>
   </div>
+#end
+
+##
+## Parse the provided filterValue according to its match type and assign the resulting start/end dates to the dateRange
+## map.
+## First, if a after or before matchType is provided, a '/' is added respectivelly at the end or at the beguinning of  
+## filterValue.
+## Then, we first start by trying to split filterValue using a '/', and parse the two substring as ISO 8601 dates.
+## If none of the substring conforms to the ISO 8601 date format, a second try is done by splitting using '-', and 
+## the two substrings are parsed as timestamps.
+##
+## @since 14.0RC1
+## @since 13.10.2
+## @since 13.4.6
+##
+#macro (parseDateRange $matchType $filterValue $dateRange)
+  ## Transform the filter value into a date range if needed.
+  #if ($matchType == 'after')
+    #set ($dateRangeString = "$filterValue/")
+  #elseif ($matchType == 'before')
+    #set ($dateRangeString = "/$filterValue")
+  #else
+    ## Between start and end date.
+    #set ($dateRangeString = $filterValue)
+  #end
+  ## Try to parse as ISO 8601 time interval (see https://en.wikipedia.org/wiki/ISO_8601#Time_intervals)
+  #set ($parts = $dateRangeString.split('/', -1))
+  #if ($parts.size() == 2)
+    #set ($dateRange.start = $datetool.toDate('iso_tz', $parts[0]))
+    #set ($dateRange.end = $datetool.toDate('iso_tz', $parts[1]))
+  #end
+  #if (!$dateRange.start && !$dateRange.end)
+    ## Try to parse as timestamp range. Note that this doesn't handle well negative timestamps.
+    #set ($parts = $dateRangeString.split('-', -1))
+    #if ($parts.size() == 2)
+      #set ($dateRange.start = $datetool.toDate($numbertool.toNumber($parts[0])))
+      #set ($dateRange.end = $datetool.toDate($numbertool.toNumber($parts[1])))
+    #end
+  #end
 #end

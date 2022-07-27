@@ -74,7 +74,7 @@ public class WikiDeletedListener extends AbstractEventListener
             SolrClient client = this.solr.getClient(EventsSolrCoreInitializer.NAME);
 
             client.deleteByQuery(org.xwiki.eventstream.Event.FIELD_WIKI + ':'
-                + this.utils.toFilterQueryString(wikiDeletedEvent.getWikiId()));
+                + this.utils.toCompleteFilterQueryString(wikiDeletedEvent.getWikiId()));
             client.commit();
         } catch (Exception e) {
             this.logger.error("Failed to delete events associated with wiki [{}]", wikiDeletedEvent.getWikiId(), e);

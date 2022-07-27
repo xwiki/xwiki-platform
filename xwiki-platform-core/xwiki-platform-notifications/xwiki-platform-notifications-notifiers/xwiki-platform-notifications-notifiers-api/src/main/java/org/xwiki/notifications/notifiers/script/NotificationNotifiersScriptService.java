@@ -46,7 +46,6 @@ import org.xwiki.rendering.async.internal.AsyncRendererExecutorResponse;
 import org.xwiki.rendering.async.internal.AsyncRendererResult;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.rometools.rome.io.SyndFeedOutput;
 
@@ -164,7 +163,6 @@ public class NotificationNotifiersScriptService implements ScriptService
      * @throws NotificationException in case of error during the request.
      * @since 12.2
      */
-    @Unstable
     public String getNotificationCount(NotificationParameters parameters, boolean forcePlaceHolder)
         throws NotificationException
     {
@@ -188,7 +186,6 @@ public class NotificationNotifiersScriptService implements ScriptService
      * @throws NotificationException in case of error during the request.
      * @since 12.2
      */
-    @Unstable
     public String getNotifications(NotificationParameters parameters, boolean forcePlaceHolder)
         throws NotificationException
     {

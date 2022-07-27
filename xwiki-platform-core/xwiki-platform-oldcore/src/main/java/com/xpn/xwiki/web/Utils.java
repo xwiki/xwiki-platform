@@ -612,14 +612,6 @@ public class Utils
                 fileupload = new FileUploadPlugin("fileupload", "fileupload", context);
                 context.put("fileuploadplugin", fileupload);
                 fileupload.loadFileList(context);
-                List<FileItem> fileItems = fileupload.getFileItems(context);
-                for (FileItem item : fileItems) {
-                    if (item.isFormField()) {
-                        String sName = item.getFieldName();
-                        String sValue = item.getString(context.getWiki().getEncoding());
-                        request.setAttribute(sName, sValue);
-                    }
-                }
             }
         } catch (Exception e) {
             if ((e instanceof XWikiException)

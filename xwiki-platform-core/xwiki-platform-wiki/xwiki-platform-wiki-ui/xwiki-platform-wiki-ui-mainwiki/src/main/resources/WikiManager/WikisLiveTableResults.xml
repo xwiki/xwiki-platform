@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.5" reference="WikiManager.WikisLiveTableResults" locale="">
   <web>WikiManager</web>
   <name>WikisLiveTableResults</name>
   <language/>
@@ -46,11 +46,19 @@
 #set ($extra = "${extra} and doc.name IN (")
 #set ($separator = "")
 #foreach ($wiki in $services.wiki.getAll())
-  ## XWiki.XWikiComments is a mandatory document that it must exists and we should have acces to it
-  #set ($testPageReference = $services.model.createDocumentReference($wiki.id, 'XWiki', 'XWikiComments'))
-  #if ($xwiki.hasAccessLevel('view', $xcontext.user, $testPageReference) || ($services.wiki.user.getUserScope($wiki.id)!='LOCAL_ONLY' &amp;&amp; $services.wiki.user.getMembershipType($wiki.id) != 'INVITE') || $services.wiki.user.hasPendingInvitation($xcontext.userReference, $wiki.id))
-    #set ($extra = "${extra}${separator}'XWikiServer${stringtool.capitalize($wiki.id)}'")
-    #set ($separator = ",")
+  #try("wikisListException")
+    ## XWiki.XWikiComments is a mandatory document that it must exists and we should have acces to it
+    #set ($testPageReference = $services.model.createDocumentReference($wiki.id, 'XWiki', 'XWikiComments'))
+    #if ($xwiki.hasAccessLevel('view', $xcontext.user, $testPageReference) ||
+      ($services.wiki.user.getUserScope($wiki.id) != 'LOCAL_ONLY' &amp;&amp; $services.wiki.user.getMembershipType($wiki.id) != 'INVITE') ||
+      $services.wiki.user.hasPendingInvitation($xcontext.userReference, $wiki.id))
+      #set ($extra = "${extra}${separator}'XWikiServer${stringtool.capitalize($wiki.id)}'")
+      #set ($separator = ",")
+    #end
+  #end
+  #if ("$!wikisListException" != '')
+    $services.logging.getLogger("WikiManager.WikisLiveTableResultsMacros")
+      .warn("An error occurred while listing wiki [${wiki.id}].", $wikisListException)
   #end
 #end
 #set ($extra = "${extra})")

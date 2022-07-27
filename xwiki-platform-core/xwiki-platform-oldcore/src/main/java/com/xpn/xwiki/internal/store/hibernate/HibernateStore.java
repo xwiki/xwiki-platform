@@ -33,7 +33,9 @@ import java.sql.Statement;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -64,7 +66,6 @@ import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.integrator.spi.Integrator;
-import org.hibernate.internal.util.StringHelper;
 import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.KeyValue;
@@ -89,6 +90,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
 import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
@@ -154,12 +156,11 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
     private DataMigrationManager dataMigrationManager;
 
-    private final BootstrapServiceRegistry bootstrapServiceRegistry =
-        new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
+    private BootstrapServiceRegistry bootstrapServiceRegistry;
 
-    private final MetadataSources metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
+    private MetadataSources metadataSources;
 
-    private final Configuration configuration = new Configuration(this.metadataSources);
+    private HibernateStoreConfiguration configuration;
 
     private StandardServiceRegistry standardServiceRegistry;
 
@@ -172,6 +173,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     private Metadata configurationMetadata;
 
     private String configurationCatalog;
+
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private DataMigrationManager getDataMigrationManager()
     {
@@ -218,9 +221,18 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         return url;
     }
 
+    private void createConfiguration()
+    {
+        this.bootstrapServiceRegistry = new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
+        this.metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
+        this.configuration = new HibernateStoreConfiguration(this.metadataSources, this.configuration);
+    }
+
     @Override
     public void initialize() throws InitializationException
     {
+        createConfiguration();
+
         URL url = getHibernateConfigurationURL();
         if (url != null) {
             this.configuration.configure(url);
@@ -292,18 +304,34 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     }
 
     /**
+     * Reload the Hibernate setup.
+     * <p>
+     * This method is synchronized to make sure that it's only executed once at a time.
+     * 
      * @since 11.5RC1
      */
     public void build()
     {
-        // Get rid of existing session factory
-        disposeInternal();
+        this.lock.writeLock().lock();
 
-        this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
-        this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
+        try {
+            // Check if it's a rebuild
+            if (this.sessionFactory != null) {
+                // Get rid of existing session factory
+                disposeInternal();
 
-        // Create a new session factory
-        this.sessionFactory = this.configuration.buildSessionFactory(this.standardServiceRegistry);
+                // Recreate the configuration
+                createConfiguration();
+            }
+
+            this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
+            this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
+
+            // Create a new session factory
+            this.sessionFactory = this.configuration.buildSessionFactory(this.standardServiceRegistry);
+        } finally {
+            this.lock.writeLock().unlock();
+        }
     }
 
     private void disposeInternal()
@@ -431,7 +459,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public DatabaseProduct getDatabaseProductName()
     {
         if (this.databaseProductCache == DatabaseProduct.UNKNOWN) {
-            if (this.sessionFactory != null) {
+            if (getSessionFactory() != null) {
                 DatabaseMetaData metaData = getDatabaseMetaData();
                 if (metaData != null) {
                     try {
@@ -669,6 +697,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
                         }
                     });
                 }
+
+                session.setProperty("xwiki.database", databaseName);
             }
 
             getDataMigrationManager().checkDatabase();
@@ -678,8 +708,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
             Object[] args = {wikiId};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while switching to database {0}",
-                e, args);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while switching to wiki {0}", e,
+                args);
         }
     }
 
@@ -778,11 +808,34 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             return false;
         }
 
+        String contextWikiId = this.wikis.getCurrentWikiId();
+
         if (session != null) {
+            String sessionDatabase = (String) session.getProperties().get("xwiki.database");
+            String contextDatabase = getDatabaseFromWikiName(contextWikiId);
+
+            // The current context is trying to manipulate a database different from the one in the current session
+            if (!Objects.equals(sessionDatabase, contextDatabase)) {
+                Object[] args = {contextWikiId};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
+                    "Cannot switch to database {0} in an existing session", null, args);
+            }
+
             this.logger.debug("Taking session from context [{}]", session);
             this.logger.debug("Taking transaction from context [{}]", transaction);
 
             return false;
+        }
+
+        // We should not try to access the schema/database which is not a registered wiki
+        try {
+            if (!this.wikis.isMainWiki(contextWikiId) && this.wikis.getById(contextWikiId) == null) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                    "No wiki with id [" + contextWikiId + "] could be found");
+            }
+        } catch (WikiManagerException e) {
+            throw new XWikiException("Failed to load the wiki descriptor", e);
         }
 
         // session is obviously null here
@@ -819,7 +872,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public SessionFactory getSessionFactory()
     {
-        return this.sessionFactory;
+        this.lock.readLock().lock();
+
+        try {
+            return this.sessionFactory;
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     /**

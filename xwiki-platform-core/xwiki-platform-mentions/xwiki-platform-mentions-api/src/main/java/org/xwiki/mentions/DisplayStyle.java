@@ -27,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.5RC1
  */
-@Unstable
 public enum DisplayStyle
 {
     /**
@@ -43,5 +42,21 @@ public enum DisplayStyle
     /**
      * Displays the login of the mentioned user.
      */
-    LOGIN
+    LOGIN;
+
+    /**
+     * @param style the display style (e.g., login)
+     * @return the result of {@link DisplayStyle#valueOf(String)} or {@link #FULL_NAME} if style is {@code null}
+     * @since 13.10.7
+     * @since 14.4.2
+     * @since 14.5
+     */
+    @Unstable
+    public static DisplayStyle getOrDefault(String style)
+    {
+        if (style == null) {
+            return FULL_NAME;
+        }
+        return DisplayStyle.valueOf(style);
+    }
 }

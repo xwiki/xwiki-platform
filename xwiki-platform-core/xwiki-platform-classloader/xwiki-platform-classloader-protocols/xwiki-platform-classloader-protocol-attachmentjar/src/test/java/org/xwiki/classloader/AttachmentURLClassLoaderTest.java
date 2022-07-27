@@ -21,9 +21,9 @@ package org.xwiki.classloader;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.net.URL;
 import java.net.URLStreamHandler;
-import java.net.URLStreamHandlerFactory;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
@@ -31,11 +31,15 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.classloader.internal.DefaultClassLoaderManager;
 import org.xwiki.classloader.internal.ExtendedURLStreamHandlerFactory;
+import org.xwiki.classloader.internal.JarExtendedURLStreamHandler;
 import org.xwiki.classloader.internal.protocol.attachmentjar.AttachmentURLStreamHandler;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -43,7 +47,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,8 +55,9 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({ AttachmentURLStreamHandler.class, ExtendedURLStreamHandlerFactory.class })
-public class AttachmentURLClassLoaderTest
+@ComponentList({AttachmentURLStreamHandler.class, ExtendedURLStreamHandlerFactory.class,
+    DefaultClassLoaderManager.class, JarExtendedURLStreamHandler.class, TestEnvironment.class})
+class AttachmentURLClassLoaderTest
 {
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -71,25 +75,24 @@ public class AttachmentURLClassLoaderTest
     @Test
     void findResource() throws Exception
     {
-        URLStreamHandlerFactory streamHandlerFactory = this.componentManager.getInstance(URLStreamHandlerFactory.class);
-        URL.setURLStreamHandlerFactory(streamHandlerFactory);
+        NamespaceURLClassLoader cl = this.componentManager.<ClassLoaderManager>getInstance(ClassLoaderManager.class)
+            .getURLClassLoader(null, false);
 
-        ExtendedURLClassLoader cl =
-            new ExtendedURLClassLoader(new URL[] {
-                new URL("attachmentjar://page%40filename1"),
-                new URL("http://some/url"),
-                new URL("attachmentjar://filename2")
-            }, null, streamHandlerFactory);
+        URLStreamHandler attachmentURLStreamHandler =
+            this.componentManager.getInstance(ExtendedURLStreamHandler.class, "attachmentjar");
+        cl.addURL(new URL(null, "attachmentjar://page%40filename1", attachmentURLStreamHandler));
+        cl.addURL(new URL("http://some/url"));
+        cl.addURL(new URL(null, "attachmentjar://filename2", attachmentURLStreamHandler));
 
         assertEquals(3, cl.getURLs().length);
         assertEquals("attachmentjar://page%40filename1", cl.getURLs()[0].toString());
         assertEquals("http://some/url", cl.getURLs()[1].toString());
         assertEquals("attachmentjar://filename2", cl.getURLs()[2].toString());
 
-        final AttachmentReference attachmentName1 = new AttachmentReference("filename1",
-            new DocumentReference("wiki", "space", "page"));
-        final AttachmentReference attachmentName2 = new AttachmentReference("filename2",
-            new DocumentReference("wiki", "space", "page"));
+        final AttachmentReference attachmentName1 =
+            new AttachmentReference("filename1", new DocumentReference("wiki", "space", "page"));
+        final AttachmentReference attachmentName2 =
+            new AttachmentReference("filename2", new DocumentReference("wiki", "space", "page"));
 
         when(this.arf.resolve("page@filename1")).thenReturn(attachmentName1);
         when(this.dab.getAttachmentContent(attachmentName1))
@@ -100,6 +103,12 @@ public class AttachmentURLClassLoaderTest
             .thenReturn(new ByteArrayInputStream(createJarFile("/something")));
 
         assertEquals("jar:attachmentjar://filename2!/something", cl.findResource("/something").toString());
+
+        // Make sure closing the classloader get rid of temporary files
+        cl.close();
+        Environment environment = this.componentManager.getInstance(Environment.class);
+        File jars = new File(environment.getTemporaryDirectory(), JarExtendedURLStreamHandler.JARS_FOLDER);
+        assertEquals(0, jars.list().length);
     }
 
     private byte[] createJarFile(String resourceName) throws Exception

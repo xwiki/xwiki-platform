@@ -45,7 +45,7 @@ public class DocumentPicker extends BaseElement
      */
     public DocumentPicker()
     {
-        this.container = getDriver().findElementByClassName("location-picker");
+        this.container = getDriver().findElement(By.className("location-picker"));
         waitUntilReady();
     }
 

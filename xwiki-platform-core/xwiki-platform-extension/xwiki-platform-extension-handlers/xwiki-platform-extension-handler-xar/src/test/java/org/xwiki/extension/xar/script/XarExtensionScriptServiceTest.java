@@ -34,7 +34,6 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.xar.internal.job.DiffXarJob;
 import org.xwiki.extension.xar.internal.job.RepairXarJob;
-import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.DocumentReference;
@@ -56,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @since 11.0
  */
 @ComponentTest
-public class XarExtensionScriptServiceTest
+class XarExtensionScriptServiceTest
 {
     @InjectMockComponents
     private XarExtensionScriptService xarExtensionScriptService;
@@ -82,7 +81,7 @@ public class XarExtensionScriptServiceTest
     }
 
     @Test
-    public void repairInstalledExtension() throws JobException
+    void repairInstalledExtension() throws JobException
     {
         when(this.authorization.hasAccess(Right.PROGRAM)).thenReturn(true);
         String wiki = "subwiki";
@@ -110,7 +109,7 @@ public class XarExtensionScriptServiceTest
     }
 
     @Test
-    public void diff() throws JobException
+    void diff() throws JobException
     {
         when(this.authorization.hasAccess(Right.PROGRAM)).thenReturn(true);
         String wiki = "subwiki";

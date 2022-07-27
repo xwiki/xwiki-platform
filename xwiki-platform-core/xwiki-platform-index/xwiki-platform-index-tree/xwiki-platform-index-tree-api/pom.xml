@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-index-tree</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-index-tree-api</artifactId>
   <name>XWiki Platform - Index - Tree - API</name>
   <description>Defines multiple document hierarchies (nested pages, nested spaces, parent-child, etc.) that can be displayed using the document tree macro.</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.39</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Document Tree API</xwiki.extension.name>
   </properties>

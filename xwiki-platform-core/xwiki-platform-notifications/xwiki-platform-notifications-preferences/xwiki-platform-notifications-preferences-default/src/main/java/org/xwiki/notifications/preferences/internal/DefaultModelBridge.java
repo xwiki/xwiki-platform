@@ -82,10 +82,20 @@ public class DefaultModelBridge implements ModelBridge
     public static final String NOTIFICATION_PREFERENCE_CLASS_STRING =
         WIKI_SPACE + '.' + NOTIFICATIONS + '.' + CODE + '.' + NOTIFICATION_PREFERENCE_CLASS_NAME;
 
-    private static final LocalDocumentReference NOTIFICATION_PREFERENCE_CLASS =
+    /**
+     * @since 13.4.4
+     * @since 12.10.10
+     * @since 13.8RC1
+     */
+    public static final LocalDocumentReference NOTIFICATION_PREFERENCE_CLASS =
         new LocalDocumentReference(Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), NOTIFICATION_PREFERENCE_CLASS_NAME);
 
-    private static final LocalDocumentReference GLOBAL_PREFERENCES =
+    /**
+     * @since 13.4.4
+     * @since 12.10.10
+     * @since 13.8RC1
+     */
+    public static final LocalDocumentReference GLOBAL_PREFERENCES =
         new LocalDocumentReference(Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationAdministration");
 
     private static final String NOTIFICATION_START_DATE_UPDATE_COMMENT = "Update start date for the notifications.";

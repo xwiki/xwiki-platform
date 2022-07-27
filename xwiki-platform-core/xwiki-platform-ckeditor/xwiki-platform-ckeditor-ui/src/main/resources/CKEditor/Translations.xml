@@ -1,0 +1,384 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="CKEditor.Translations" locale="">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=Disabled Plugins
+CKEditor.ConfigClass_removePlugins.hint=The list of plugins that have been disabled.
+CKEditor.ConfigClass_removeButtons=Disabled Toolbar Features
+CKEditor.ConfigClass_removeButtons.hint=The list of toolbar features that have been disabled.
+CKEditor.ConfigClass_linkShowAdvancedTab=Link: Show Advanced Tab
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=Allows you to set link attributes such as id, name, class or style.
+CKEditor.ConfigClass_linkShowTargetTab=Link: Show Target Tab
+CKEditor.ConfigClass_linkShowTargetTab.hint=Allows you to set the link target attribute (e.g. to open the link in a new tab).
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Load JavaScript Skin Extensions
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Some rendering macros are displayed using JavaScript code. Loading the JavaScript code improves the WYSIWYG aspect of the editor but it may cause problems if the JavaScript code interferes with the CKEditor code or if it changes content outside of the macro output boundaries.
+CKEditor.ConfigClass_advanced=Advanced Configuration
+CKEditor.ConfigClass_advanced.hint=You can write a JavaScript snippet to modify directly the configuration object. Check the {0}CKEditor documentation{1} for the list of available configuration properties.
+
+ckeditor.content.placeholder=Start typing here...
+
+ckeditor.admin.saveComment=Updated the CKEditor configuration from the Administration
+ckeditor.admin.reset=Reset
+ckeditor.admin.reset.hint=Restore the default configuration
+ckeditor.admin.reset.confirmation=Are you sure you want to restore the default configuration? All your changes will be lost.
+
+ckeditor.plugin.link.options=Options
+ckeditor.plugin.link.anchor=Anchor
+ckeditor.plugin.link.queryString=Query String
+ckeditor.plugin.link.defaultLabel=type the link label
+ckeditor.plugin.link.openInNewTab=Open Link in New Tab
+
+ckeditor.plugin.list.listType.none=None
+
+ckeditor.plugin.macro.placeholder=macro:{0}
+ckeditor.plugin.macro.buttonHint=XWiki Macro
+ckeditor.plugin.macro.editButtonHint=Edit Macro
+ckeditor.plugin.macro.refreshFailed=Failed to refresh the edited content.
+ckeditor.plugin.macro.dedicatedInsertButtonHint=Insert {0} macro
+
+ckeditor.plugin.office.importer.title=Import Office File
+ckeditor.plugin.office.importer.filePath=File Path
+ckeditor.plugin.office.importer.filePath.hint=Choose the office file to import. The file will be uploaded and attached to this page and its content inserted in the content of the page.
+ckeditor.plugin.office.importer.filterStyles=Filter Styles
+ckeditor.plugin.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
+ckeditor.plugin.office.importer.useOfficeViewer=Use the Office Viewer
+ckeditor.plugin.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
+ckeditor.plugin.office.importer.required=Required
+ckeditor.plugin.office.importer.import=Import
+ckeditor.plugin.office.importer.inProgress=Importing office file...
+ckeditor.plugin.office.importer.done=Office file successfully imported.
+ckeditor.plugin.office.importer.fail=Office import failed.
+ckeditor.plugin.office.importer.noUploadURL=File upload URL is not configured.
+ckeditor.plugin.office.importer.failedToLoadForm=Failed to load the form.
+
+ckeditor.plugin.resource.notSpecified=The {0} is not specified.
+ckeditor.plugin.save.leaveConfirmationMessage=There are unsaved changes. Do you want to discard them?
+ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.
+ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
+
+ckeditor.plugin.toolbar.basicStyles=Basic Styles
+ckeditor.plugin.toolbar.lists=Lists
+ckeditor.plugin.toolbar.bulletedlist=Bulleted List
+ckeditor.plugin.toolbar.numberedlist=Numbered List
+ckeditor.plugin.toolbar.insert=Insert
+ckeditor.plugin.toolbar.horizontalrule=Horizontal Line
+ckeditor.plugin.toolbar.specialchar=Special Character
+ckeditor.plugin.toolbar.infoBox=Info Box
+ckeditor.plugin.toolbar.successBox=Success Box
+ckeditor.plugin.toolbar.warningBox=Warning Box
+ckeditor.plugin.toolbar.errorBox=Error Box
+ckeditor.plugin.toolbar.toc=Table of Contents
+ckeditor.plugin.toolbar.include=Include
+ckeditor.plugin.toolbar.code=Code Snippet
+ckeditor.plugin.toolbar.otherMacros=Other Macros
+
+ckeditor.plugin.syntax.update.inProgress=Updating the WYSIWYG editor
+ckeditor.plugin.syntax.update.done=WYSIWYG editor updated
+ckeditor.plugin.syntax.update.failed=Failed to update the WYSIWYG editor
+ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not supported by the {0} syntax.
+
+ckeditor.plugin.image.imageEditor.standardTab.title=Standard
+ckeditor.plugin.image.imageEditor.advancedTab.title=Advanced
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=Image Styles
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=Select the style to apply on the image.
+ckeditor.plugin.image.imageEditor.standardTab.alt.label=Alternative Text
+ckeditor.plugin.image.imageEditor.standardTab.alt.hint=Define an alternate text for an image, if the image cannot be displayed.
+ckeditor.plugin.image.imageEditor.standardTab.caption.label=Caption
+ckeditor.plugin.image.imageEditor.standardTab.caption.hint=Activate and define an image caption.
+ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=Activate and define an image caption.
+
+ckeditor.plugin.image.imageEditor.advancedTab.size.label=Size
+ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=Width
+ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=Height
+ckeditor.plugin.image.imageEditor.advancedTab.size.hint=Define the image size.
+ckeditor.plugin.image.imageEditor.advancedTab.border.label=Border
+ckeditor.plugin.image.imageEditor.advancedTab.border.hint=When checked, the image is displayed with a border
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=Alignment
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=Define the image alignment.
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=None
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=Start
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Center
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=End
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Text Wrap
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=When checked, the image is wrapped around the surrounding text.
+
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=Document Tree
+ckeditor.plugin.image.imageSelector.uploadTab.title=Upload
+ckeditor.plugin.image.imageSelector.uploadTab.file.title=File
+ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Select a local file to add to the page.
+ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=Upload
+ckeditor.plugin.image.imageSelector.iconTab.title=Icon
+ckeditor.plugin.image.imageSelector.iconTab.icon.title=Icon
+ckeditor.plugin.image.imageSelector.iconTab.icon.hint=The identifier of the icon to display as an image.
+ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=accept
+ckeditor.plugin.image.imageSelector.urlTab.title=Url
+ckeditor.plugin.image.imageSelector.urlTab.url.title=Url
+ckeditor.plugin.image.imageSelector.urlTab.url.hint=The url of the image to display.
+ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
+
+ckeditor.inline.failedToInit=Failed to initialize CKEditor.
+
+ckeditor.upload.error.csrf=The CSRF token is missing.
+ckeditor.upload.error.emptyReturn=Error when uploading the file: it might exceed the configured maximum upload size.
+
+modal.ok=OK
+modal.cancel=Cancel
+modal.close=Close
+
+resource.attach.label=Attachment
+resource.attach.placeholder=Path.To.Page@attachment.png
+resource.data.label=Data URI
+resource.doc.label=Page
+resource.doc.placeholder=Path.To.Page
+resource.icon.label=Icon
+resource.mailto.label=Mail Address
+resource.mailto.placeholder=user@example.org
+resource.path.label=Path
+resource.path.placeholder=/path/to/file
+resource.unc.label=UNC Path
+resource.unc.placeholder=//server/share/path/to/file
+resource.unknown.label=Unknown
+resource.url.label=URL
+resource.url.placeholder=http://www.example.org/image.png
+resource.user.label=User
+resource.user.placeholder=alias
+
+resourcePicker.attach.hint=Select an attachment
+resourcePicker.doc.hint=Select a page
+
+entityResourceSuggester.doc.placeholder=Find a page...
+entityResourceSuggester.attach.placeholder=Find an attachment...
+
+entityResourcePicker.select=Select
+entityResourcePicker.doc.title=Select Page
+entityResourcePicker.attach.title=Select Attachment
+
+macroSelector.title=Select Macro
+macroSelector.filter.text.placeholder=Type to filter
+macroSelector.filter.category.all=All Macros
+macroSelector.filter.category.other=Other
+macroSelector.filter.category.notinstalled=Not installed
+macroSelector.failedToRetrieveMacros=Failed to retrieve the list of available macros.
+macroSelector.select=Select
+macroSelector.install=Install
+macroSelector.install.notAllowed=You are not allowed to install this extension
+macroSelector.filter.category.placeholder=Select a category...
+
+macroEditor.title=Edit Macro
+macroEditor.more=More
+macroEditor.changeMacro=Change Macro
+macroEditor.submit=Submit
+macroEditor.content=Content
+macroEditor.noParameters=This macro has no parameters.
+macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
+macroEditor.installRequestFailed=Failed to install the {0} macro.
+
+
+imageEditor.modal.backToEditor.button=Back
+imageEditor.modal.loadFail.message=Failed to retrieve the image editor form.
+imageEditor.modal.title=Edit Image
+imageEditor.modal.insertButton=Insert
+imageEditor.modal.initialization.fail=Failed to retrieve the image selection form.
+
+imageSelector.modal.title=Select Image
+imageSelector.modal.selectButton=Select
+imageSelector.modal.loadFail.message=Failed to retrieve the image selection form.
+imageSelector.modal.fileUpload.success=File upload succeeded.
+imageSelector.modal.fileUpload.fail=File upload failed.
+imageSelector.modal.fileUpload.abort=File upload aborted.
+imageSelector.modal.initialization.fail=Failed to retrieve the image selection form.
+</content>
+  <object>
+    <name>CKEditor.Translations</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>db49c038-03d9-4c33-9cfe-5f758ae54354</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/*
+#set ($lines = $stringtool.split($doc.content, $util.newline))
+#set ($translations = {})
+#foreach ($line in $lines)
+  #set ($key = $stringtool.substringBefore($line.trim(), '='))
+  #if ($key.startsWith('ckeditor.plugin.'))
+    #set ($relativeKeyStart = $key.indexOf('.', 16))
+    #set ($pluginName = "xwiki-$key.substring(16, $relativeKeyStart)")
+    #set ($relativeKey = $key.substring($mathtool.add($relativeKeyStart, 1)))
+    #set ($pluginTranslations = $translations.get($pluginName))
+    #if (!$pluginTranslations)
+      #set ($pluginTranslations = {})
+      #set ($discard = $translations.put($pluginName, $pluginTranslations))
+    #end
+    #set ($translation = $services.localization.get($key))
+    #if ($translation)
+      #set ($discard = $pluginTranslations.put($relativeKey, $translation.rawSource))
+    #else
+      #set ($discard = $pluginTranslations.put($relativeKey, $relativeKey))
+    #end
+  #end
+#end
+*/
+require(['ckeditor'], function(ckeditor) {
+  var translations = $jsontool.serialize($translations);
+  for (var pluginName in translations) {
+    if (translations.hasOwnProperty(pluginName)) {
+      ckeditor.plugins.setLang(pluginName, '$xcontext.locale', translations[pluginName]);
+    }
+  }
+});</code>
+    </property>
+    <property>
+      <name>Make the translations available to the JavaScript code</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>de8e7437-7d08-414a-81ba-9dd339004ee3</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

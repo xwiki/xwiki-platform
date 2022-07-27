@@ -27,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.10
  */
-@Unstable
 public class LiveDataException extends Exception
 {
     /**

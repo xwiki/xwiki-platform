@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.stability.Unstable;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -38,7 +37,6 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
  * @version $Id$
  * @since 12.10
  */
-@Unstable
 public class WithParameters
 {
     private final Map<String, Object> parameters = new HashMap<>();

@@ -45,6 +45,7 @@ import org.xwiki.test.junit5.XWikiTempDirExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,7 +59,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ExtendWith(XWikiTempDirExtension.class)
-public class DefaultOfficeConverterTest
+class DefaultOfficeConverterTest
 {
     private LocalConverter localConverter;
 
@@ -68,14 +69,14 @@ public class DefaultOfficeConverterTest
     private DefaultOfficeConverter defaultOfficeConverter;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         this.localConverter = mock(LocalConverter.class);
         this.defaultOfficeConverter = new DefaultOfficeConverter(localConverter, tmpDir);
     }
 
     @Test
-    public void convertDocument() throws IOException, OfficeException, OfficeConverterException
+    void convertDocument() throws IOException, OfficeException, OfficeConverterException
     {
         OfficeConverterException officeConverterException = assertThrows(OfficeConverterException.class,
             () -> this.defaultOfficeConverter.convertDocument(Collections.emptyMap(), "myFile", "myOutputFile"));
@@ -128,7 +129,7 @@ public class DefaultOfficeConverterTest
     }
 
     @Test
-    public void isConversionSupported() throws Exception
+    void isConversionSupported() throws Exception
     {
         when(this.localConverter.getFormatRegistry()).thenReturn(DefaultDocumentFormatRegistry.getInstance());
         for (String mediaType : Arrays.asList("application/vnd.oasis.opendocument.text", "application/msword",
@@ -139,5 +140,13 @@ public class DefaultOfficeConverterTest
         for (String mediaType : Arrays.asList("foo/bar", "application/pdf")) {
             assertFalse(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"));
         }
+    }
+
+    @Test
+    void getDocumentFormat()
+    {
+        when(this.localConverter.getFormatRegistry()).thenReturn(DefaultDocumentFormatRegistry.getInstance());
+        assertNull(this.defaultOfficeConverter.getDocumentFormat("test.foo"));
+        assertEquals("odt", this.defaultOfficeConverter.getDocumentFormat("test.odt").getExtension());
     }
 }

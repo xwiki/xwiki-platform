@@ -16,8 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+-->
 
 <!--
   LayoutTableHeaderNames is a component for the Table layout that displays
@@ -72,7 +71,7 @@
           :title="$t('livedata.action.reorder.hint')"
           @click.stop
         >
-          <span class="fa fa-ellipsis-v"></span>
+          <XWikiIcon :icon-descriptor="{name: 'text_align_justify'}"/>
         </div>
         <!-- Property Name -->
         <span class="property-name">{{ property.name }}</span>
@@ -80,15 +79,10 @@
           Sort icon
           Only show the icon for the first-level sort property
         -->
-        <span
+        <XWikiIcon
           v-if="logic.isPropertySortable(property.id)"
-          :class="[
-            'sort-icon',
-            'fa',
-            { 'sorted': isFirstSortLevel(property) },
-            (isFirstSortLevel(property) && firstSortLevel.descending) ? 'fa-caret-up' : 'fa-caret-down',
-          ]"
-        ></span>
+          :icon-descriptor="{name: isFirstSortLevel(property) && firstSortLevel.descending? 'caret-down': 'caret-up'}"
+          :class="['sort-icon',  isFirstSortLevel(property)? 'sorted': '']"/>
       </div>
       <!--
         Resize handle
@@ -111,12 +105,14 @@
 import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
 import XWikiDraggable from "../../utilities/XWikiDraggable.vue";
 import { mousedownmove } from "../../directives.js";
+import XWikiIcon from "../../utilities/XWikiIcon";
 
 export default {
 
   name: "LayoutTableHeaderNames",
 
   components: {
+    XWikiIcon,
     LivedataEntrySelectorAll,
     XWikiDraggable,
   },

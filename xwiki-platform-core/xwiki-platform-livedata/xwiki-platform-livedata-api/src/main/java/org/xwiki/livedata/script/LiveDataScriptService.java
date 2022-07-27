@@ -37,7 +37,6 @@ import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Scripting APIs for the Live Data component.
@@ -48,7 +47,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(LiveDataScriptService.ROLEHINT)
 @Singleton
-@Unstable
 public class LiveDataScriptService implements ScriptService
 {
     /**

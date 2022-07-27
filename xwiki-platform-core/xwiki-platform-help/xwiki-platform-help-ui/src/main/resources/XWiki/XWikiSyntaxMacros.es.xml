@@ -51,7 +51,7 @@ Hay dos clases de macros en la Sintaxis XWiki 1.0:
 * Macros Radeox (llamadas usando la sintaxis ##{nombredemacro:parám1=valor1|...|parámN=valorN}##)
 
 {{info}}
-La lista completa de macros disponibles está en la [[wiki de Extensiones&gt;&gt;http://extensions.xwiki.org/]].
+La lista completa de macros disponibles está en la [[wiki de Extensiones&gt;&gt;https://extensions.xwiki.org/]].
 {{/info}}
 
 |=Funcionalidad|=Sintaxis XWiki 1.0
@@ -85,7 +85,7 @@ La macros Radeox no se pueden utilizar en la Sintaxis XWiki {{velocity}}$crtSynt
 {{/info}}
 
 {{info}}
-La lista completa de macros disponibles está en la [[wiki de Extensiones&gt;&gt;http://extensions.xwiki.org/]].
+La lista completa de macros disponibles está en la [[wiki de Extensiones&gt;&gt;https://extensions.xwiki.org/]].
 {{/info}}
 
 ==== Macros en esta wiki ====

@@ -24,6 +24,7 @@ import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -218,9 +219,13 @@ public class XWikiMessageTool
      */
     protected List<String> getDocumentBundleNames()
     {
-        List<String> docNamesList;
-
         XWikiContext context = getXWikiContext();
+
+        if (context == null) {
+            return Collections.emptyList();
+        }
+
+        List<String> docNamesList;
 
         String docNames = context.getWiki().getXWikiPreference(KEY, context);
         if (docNames == null || "".equals(docNames)) {
@@ -243,6 +248,10 @@ public class XWikiMessageTool
     public List<XWikiDocument> getDocumentBundles()
     {
         XWikiContext context = getXWikiContext();
+
+        if (context == null) {
+            return Collections.emptyList();
+        }
 
         String defaultLanguage = context.getWiki().getDefaultLanguage(context);
         List<XWikiDocument> result = new ArrayList<XWikiDocument>();
@@ -281,17 +290,17 @@ public class XWikiMessageTool
      */
     public XWikiDocument getDocumentBundle(String documentName)
     {
-        XWikiDocument docBundle;
+        XWikiDocument docBundle = null;
 
-        if (documentName.length() == 0) {
-            docBundle = null;
-        } else {
+        if (!documentName.isEmpty()) {
             try {
                 XWikiContext context = getXWikiContext();
 
-                // First, looks for a document suffixed by the language
-                docBundle = context.getWiki().getDocument(documentName, context);
-                docBundle = docBundle.getTranslatedDocument(context);
+                if (context != null) {
+                    // First, looks for a document suffixed by the language
+                    docBundle = context.getWiki().getDocument(documentName, context);
+                    docBundle = docBundle.getTranslatedDocument(context);
+                }
             } catch (XWikiException e) {
                 // Error while loading the document.
                 // TODO: A runtime exception should be thrown that will bubble up till the
@@ -321,17 +330,18 @@ public class XWikiMessageTool
             try {
                 XWikiContext context = getXWikiContext();
 
-                // First, looks for a document suffixed by the language
-                XWikiDocument docBundle = context.getWiki().getDocument(documentName, context);
-                XWikiDocument tdocBundle = docBundle.getTranslatedDocument(context);
-                list.add(tdocBundle);
-                if (!tdocBundle.getRealLanguage().equals(defaultLanguage)) {
-                    XWikiDocument defdocBundle = docBundle.getTranslatedDocument(defaultLanguage, context);
-                    if (tdocBundle != defdocBundle) {
-                        list.add(defdocBundle);
+                if (context != null) {
+                    // First, looks for a document suffixed by the language
+                    XWikiDocument docBundle = context.getWiki().getDocument(documentName, context);
+                    XWikiDocument tdocBundle = docBundle.getTranslatedDocument(context);
+                    list.add(tdocBundle);
+                    if (!tdocBundle.getRealLanguage().equals(defaultLanguage)) {
+                        XWikiDocument defdocBundle = docBundle.getTranslatedDocument(defaultLanguage, context);
+                        if (tdocBundle != defdocBundle) {
+                            list.add(defdocBundle);
+                        }
                     }
                 }
-
             } catch (XWikiException e) {
                 // Error while loading the document.
                 // TODO: A runtime exception should be thrown that will bubble up till the

@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.internal.event;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -33,7 +34,10 @@ import org.xwiki.model.reference.EntityReference;
  * @param <T> the entity type
  */
 public abstract class AbstractEntityCopyOrRenameEvent<T extends EntityReference> extends AbstractEvent
+    implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * The source reference.
      */

@@ -308,35 +308,38 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         'type'     : 'POST',
         'dataType' : 'json',
         'data' : {
-          'action'      : 'deleteObj'            ,
+          'action'      : 'deleteObj',
           'objNumber'   : objNumber ,
-          'form_token'  : xm.form_token       ,
+          'form_token'  : xm.form_token,
           'outputSyntax': 'plain'
         }
-      }).done(function(data){
-        if (data.status == 'success') {
+      }).then(data =&gt; {
+        if (data.status === 'success') {
           obj.fadeOut();
           xm.refreshVersion();
-          notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.deletingDone'))', 'done'));
-        } else if (data.status == 'fail') {
-          if (data.cause == 'form_token') {
-            notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.csrf'))', 'error'));
-          } else if (data.cause == 'rights') {
-            notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.rights'))', 'error'));
+          notif.replace(new XWiki.widgets.Notification(
+            '$escapetool.javascript($services.localization.render('skin.sheet.js.deletingDone'))', 'done'));
+        } else if (data.status === 'fail') {
+          if (data.cause === 'form_token') {
+            notif.replace(new XWiki.widgets.Notification(
+              '$escapetool.javascript($services.localization.render('skin.sheet.js.error.csrf'))', 'error'));
+          } else if (data.cause === 'rights') {
+            notif.replace(new XWiki.widgets.Notification(
+              '$escapetool.javascript($services.localization.render('skin.sheet.js.error.rights'))', 'error'));
           }
         }
       });
     }
-    
+
     var confirmationBoxParams = {
       confirmationText: '$escapetool.javascript($services.localization.render('skin.sheet.js.deleteConfirmationText'))',
       yesButtonText: '$escapetool.javascript($services.localization.render('skin.sheet.js.deleteConfirmationYes'))',
       noButtonText: '$escapetool.javascript($services.localization.render('skin.sheet.js.deleteConfirmationNo'))'
     };
-    
+
     // Display a confirmation box
     new XWiki.widgets.ConfirmationBox({onYes: deleteObjOnConfirm}, confirmationBoxParams);
-    
+
     // Do not perform the default action bound to the &lt;button&gt; element
     return false;
   }
@@ -360,7 +363,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       properties.slideToggle();
     }
   }
-  
+
   /**
    * Function that performs an ajax request to get the code that displays an object and inject it in the page.
    */
@@ -372,15 +375,16 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         'action'    : 'displayObj',
         'objNumber' : objNumber
       }
-    }).done(function(data) {
-      notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.addingDone'))', 'done'));
+    }).then(data =&gt; {
+      notif.replace(new XWiki.widgets.Notification(
+        '$escapetool.javascript($services.localization.render('skin.sheet.js.addingDone'))', 'done'));
       // Add the html code into the document
       $('#overrideSection').append(data);
       // Get the new object
       var newObj = $('.overrideObject').last();
       // Bind the events of the new objects
-      newObj.find('.overrideTitle').click(objTitleClicked);
-      newObj.find('button').click(onDeleteObj);
+      newObj.find('.overrideTitle').on('click', objTitleClicked);
+      newObj.find('button').on('click', onDeleteObj);
       // Show the new object
       // First we remove our own 'hidden' class
       newObj.find('.overrideProperties').removeClass('hidden');
@@ -396,49 +400,52 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
   /**
    * Function called when the user add a new override object
    */
-  $('#newPathAdd').click(function() {
+  $('#newPathAdd').on('click', function() {
     $.ajax({
       'url'      : XWiki.currentDocument.getURL('get'),
       'type'     : 'POST',
       'dataType' : 'json',
       'data' : {
-        'action'      : 'newObj'            ,
-        'path'        : $('#newPath').val() ,
-        'form_token'  : xm.form_token       ,
+        'action'      : 'newObj',
+        'path'        : $('#newPath').val(),
+        'form_token'  : xm.form_token,
         'outputSyntax': 'plain'
       }
-    }).done(function(data) {
-      notif = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.adding'))', 'inprogress');
-      if (data.status == 'success') {
+    }).then(data =&gt; {
+      notif = new XWiki.widgets.Notification(
+        '$escapetool.javascript($services.localization.render('skin.sheet.js.adding'))', 'inprogress');
+      if (data.status === 'success') {
         xm.refreshVersion();
         displayObj(data.objNumber);
-      } else if (data.status == 'fail') {
-        if (data.cause == 'form_token') {
-          notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.csrf'))', 'error'));
-        } else if (data.cause == 'rights') {
-          notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.rights'))', 'error'));
+      } else if (data.status === 'fail') {
+        if (data.cause === 'form_token') {
+          notif.replace(new XWiki.widgets.Notification(
+            '$escapetool.javascript($services.localization.render('skin.sheet.js.error.csrf'))', 'error'));
+        } else if (data.cause === 'rights') {
+          notif.replace(new XWiki.widgets.Notification(
+            '$escapetool.javascript($services.localization.render('skin.sheet.js.error.rights'))', 'error'));
         }
       }
     });
-    
+
     // Do not perform the default action bound to the &lt;button&gt; element
     return false;
   });
-  
+
   var onDeprecatedPropertyClicked = function() {
     $('.deprecatedProperties &gt; dl').slideToggle();
   }
-  
+
   /**
    * Function that initialize the javascript events
    */
   var init = function() {
     // Bind objTitleClicked to the existing objects
-    $('.overrideTitle').click(objTitleClicked);
+    $('.overrideTitle').on('click', objTitleClicked);
     // Bind onDeleteObj to the existing objects
-    $('.overrideObject button').click(onDeleteObj);
+    $('.overrideObject button').on('click', onDeleteObj);
     $('.deprecatedProperties &gt; dl').hide();
-    $('.deprecatedProperties &gt; h2').click(onDeprecatedPropertyClicked);
+    $('.deprecatedProperties &gt; h2').on('click', onDeprecatedPropertyClicked);
   }
   
   init();

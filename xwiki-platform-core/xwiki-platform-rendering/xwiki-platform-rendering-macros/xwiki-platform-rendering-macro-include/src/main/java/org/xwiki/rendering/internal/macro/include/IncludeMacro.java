@@ -19,10 +19,10 @@
  */
 package org.xwiki.rendering.internal.macro.include;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.inject.Inject;
@@ -74,7 +74,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         // The include macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the included page before the other macros are executed.
         setPriority(10);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override
@@ -106,7 +106,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         if (!this.authorization.hasAccess(Right.VIEW, documentBridge.getDocumentReference())) {
             throw new MacroExecutionException(
                 String.format("Current user [%s] doesn't have view rights on document [%s]",
-                    this.documentAccessBridge.getCurrentUserReference(), includedReference));
+                    this.documentAccessBridge.getCurrentUserReference(), documentBridge.getDocumentReference()));
         }
 
         // Step 4: Display the content of the included document.
@@ -126,6 +126,9 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         displayParameters.setTransformationContextRestricted(context.getTransformationContext().isRestricted());
         displayParameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
         displayParameters.setContentTranslated(true);
+        if (context.getXDOM() != null) {
+            displayParameters.setIdGenerator(context.getXDOM().getIdGenerator());
+        }
 
         Stack<Object> references = this.macrosBeingExecuted.get();
         if (parametersContext == Context.NEW) {
@@ -133,7 +136,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
                 references = new Stack<>();
                 this.macrosBeingExecuted.set(references);
             }
-            references.push(includedReference);
+            references.push(documentBridge.getDocumentReference());
         }
 
         XDOM result;
@@ -156,7 +159,9 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         // Step 6: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());
-        String source = this.defaultEntityReferenceSerializer.serialize(includedReference);
+        // Serialize the document reference since that's what is expected in those properties
+        // TODO: add support for more generic source and base reference (object property reference, etc.)
+        String source = this.defaultEntityReferenceSerializer.serialize(documentBridge.getDocumentReference());
         metadata.getMetaData().addMetaData(MetaData.SOURCE, source);
         if (parametersContext == Context.NEW) {
             metadata.getMetaData().addMetaData(MetaData.BASE, source);

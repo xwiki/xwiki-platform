@@ -23,9 +23,17 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.refactoring.internal.event.AbstractEntityCopyOrRenameEvent;
+import org.xwiki.refactoring.job.CopyRequest;
 
 /**
  * Event fired when a document is about to be copied.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the job which produced this event or null for a remote event</li>
+ * <li>data: the {@link CopyRequest} request of the job which  produced this event</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 11.1RC1
@@ -33,6 +41,8 @@ import org.xwiki.refactoring.internal.event.AbstractEntityCopyOrRenameEvent;
 public class DocumentCopyingEvent extends AbstractEntityCopyOrRenameEvent<DocumentReference>
     implements BeginFoldEvent, CancelableEvent
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor, used by listeners.
      */

@@ -72,7 +72,6 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
         this.editPreferences.click();
         getDriver().waitUntilPageIsReloaded();
         PreferencesEditPage preferencesEditPage = new PreferencesEditPage();
-        preferencesEditPage.waitUntilPageJSIsLoaded();
         return preferencesEditPage;
     }
 

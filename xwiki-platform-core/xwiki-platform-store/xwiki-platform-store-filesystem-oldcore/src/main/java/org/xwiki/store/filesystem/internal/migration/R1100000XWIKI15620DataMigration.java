@@ -106,32 +106,32 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         // Previous wiki store location
         File oldDirectory = this.getPre11WikiDir(wikiId);
 
-        if (!oldDirectory.exists()) {
-            this.logger.info("The wiki [{}] does not have any filesystem store", wikiId);
-
-            return;
-        }
-
         // New wiki store location
         File newDirectory = this.fstools.getWikiDir(wikiId);
 
-        // Move the wiki store
-        try {
-            this.logger.info("Moving wiki folder [{}] to new location [{}]", oldDirectory, newDirectory);
+        if (oldDirectory.exists()) {
+            // Move the wiki store
+            try {
+                this.logger.info("Moving wiki folder [{}] to new location [{}]", oldDirectory, newDirectory);
 
-            FileUtils.moveDirectory(oldDirectory, newDirectory);
-        } catch (IOException e) {
-            throw new DataMigrationException("Failed to move wiki store to the new location", e);
+                moveDirectory(oldDirectory, newDirectory);
+            } catch (IOException e) {
+                throw new DataMigrationException("Failed to move wiki store to the new location", e);
+            }
         }
 
         // Set right root directory
         setStoreRootDirectory(this.fstools.getStoreRootDirectory());
 
-        // Rewrite store paths based on reference hash instead of URL encoding for the current wiki
-        try {
-            migrate(newDirectory, true);
-        } catch (IOException e) {
-            throw new DataMigrationException("Failed to refactor filesystem store paths", e);
+        if (newDirectory.exists()) {
+            // Rewrite store paths based on reference hash instead of URL encoding for the current wiki
+            try {
+                migrate(newDirectory, true);
+            } catch (IOException e) {
+                throw new DataMigrationException("Failed to refactor filesystem store paths", e);
+            }
+        } else {
+            this.logger.info("The wiki [{}] does not have any filesystem store", wikiId);
         }
     }
 
@@ -167,7 +167,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         this.logger.info("Moving document folder [{}] to new location [{}]", oldDocumentContentDirectory,
             newDocumentContentDirectory);
 
-        FileUtils.moveDirectory(oldDocumentContentDirectory, newDocumentContentDirectory);
+        moveDirectory(oldDocumentContentDirectory, newDocumentContentDirectory);
 
         migrateAttachments(newDocumentContentDirectory, documentReference);
         migrateDeletedAttachments(newDocumentContentDirectory, documentReference);
@@ -190,7 +190,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
                     this.logger.info("Moving attachment folder [{}] to new location [{}]", oldAttachmentDirectory,
                         newAttachmentDirectory);
 
-                    FileUtils.moveDirectory(oldAttachmentDirectory, newAttachmentDirectory);
+                    moveDirectory(oldAttachmentDirectory, newAttachmentDirectory);
 
                     migrateAttachmentFiles(newAttachmentDirectory, attachmentReference.getName(), this.logger);
                 }
@@ -265,7 +265,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
                     this.logger.info("Moving deleted attachment folder [{}] to new location [{}]",
                         oldDeletedAttachmentDirectory, newDeletedAttachmentDirectory);
 
-                    FileUtils.moveDirectory(oldDeletedAttachmentDirectory, newDeletedAttachmentDirectory);
+                    moveDirectory(oldDeletedAttachmentDirectory, newDeletedAttachmentDirectory);
 
                     migrateAttachmentFiles(newDeletedAttachmentDirectory, attachmentReference.getName(), this.logger);
                 }
@@ -318,5 +318,13 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
                 cleanEmptyfolder(localeDirectory);
             }
         }
+    }
+
+    private void moveDirectory(final File srcDir, final File destDir) throws IOException
+    {
+        // Make sure the destination parent exist
+        destDir.getParentFile().mkdirs();
+
+        FileUtils.moveDirectory(srcDir, destDir);
     }
 }

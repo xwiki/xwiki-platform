@@ -19,15 +19,12 @@
  */
 package org.xwiki.ratings;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Generic exception for Rating API.
  *
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public class RatingsException extends Exception
 {
     private static final long serialVersionUID = -2229233170941158972L;

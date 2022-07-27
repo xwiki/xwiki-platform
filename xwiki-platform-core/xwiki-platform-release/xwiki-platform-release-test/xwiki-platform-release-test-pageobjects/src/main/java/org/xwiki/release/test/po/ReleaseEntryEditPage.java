@@ -35,15 +35,6 @@ public class ReleaseEntryEditPage extends InlinePage
     @FindBy(id = "ReleaseCode.ReleaseClass_0_releaseManagers")
     private WebElement releaseManagersInput;
 
-    @Override
-    public ReleaseEntryEditPage waitUntilPageIsLoaded()
-    {
-        // Wait for the user picker to be ready.
-        getReleaseManagersPicker();
-
-        return this;
-    }
-
     /**
      * @return the user picker used to select the release managers
      */

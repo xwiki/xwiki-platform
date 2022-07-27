@@ -71,10 +71,9 @@ public class PropAddAction extends XWikiAction
         String propName = ((PropAddForm) form).getPropName();
 
         if (!Util.isValidXMLElementName(propName)) {
-            context.put("message", "action.addClassProperty.error.invalidName");
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST,
-                localizePlainOrKey("action.addClassProperty.error.invalidName"));
-            return true;
+            writeAjaxErrorResponse(HttpServletResponse.SC_BAD_REQUEST,
+                localizePlainOrKey("action.addClassProperty.error.invalidName"), context);
+            return false;
         }
 
         String propType = ((PropAddForm) form).getPropType();

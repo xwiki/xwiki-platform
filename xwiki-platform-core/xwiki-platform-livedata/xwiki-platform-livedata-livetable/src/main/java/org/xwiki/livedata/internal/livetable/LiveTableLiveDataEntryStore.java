@@ -43,11 +43,7 @@ import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
-import org.xwiki.template.TemplateManager;
 
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -55,7 +51,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 /**
@@ -82,20 +77,11 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
         "Can't update object properties if the object type (class name) is undefined.";
 
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
-    private TemplateManager templateManager;
-
-    @Inject
-    private ContextualAuthorizationManager authorization;
+    private LiveTableLiveDataResultsRenderer resultsRenderer;
 
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
-    @Inject
-    private LiveTableRequestHandler liveTableRequestHandler;
 
     @Inject
     private ModelBridge modelBridge;
@@ -146,46 +132,18 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
             Object resultPage = query.getSource().getParameters().get(LiveTableRequestHandler.RESULT_PAGE);
             String liveTableResultsJSON;
             if (template instanceof String) {
-                liveTableResultsJSON = getLiveTableResultsFromTemplate((String) template, query);
+                liveTableResultsJSON = this.resultsRenderer.getLiveTableResultsFromTemplate((String) template, query);
             } else if (resultPage instanceof String) {
-                liveTableResultsJSON = getLiveTableResultsFromPage((String) resultPage, query);
+                liveTableResultsJSON = this.resultsRenderer.getLiveTableResultsFromPage((String) resultPage, query);
             } else {
-                liveTableResultsJSON = getLiveTableResultsFromPage("XWiki.LiveTableResults", query);
+                liveTableResultsJSON =
+                    this.resultsRenderer.getLiveTableResultsFromPage("XWiki.LiveTableResults", query);
             }
             return (ObjectNode) objectMapper.readTree(liveTableResultsJSON);
         } finally {
             // Restore the original query source.
             query.setSource(originalSource);
         }
-    }
-
-    private String getLiveTableResultsFromTemplate(String template, LiveDataQuery query)
-    {
-        return this.liveTableRequestHandler.getLiveTableResults(query, () -> {
-            try {
-                return this.templateManager.render(template);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    private String getLiveTableResultsFromPage(String page, LiveDataQuery query) throws Exception
-    {
-        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(page);
-        this.authorization.checkAccess(Right.VIEW, documentReference);
-
-        return this.liveTableRequestHandler.getLiveTableResults(query, () -> {
-            try {
-                // The live table results page may use "global" variables.
-                this.templateManager.render("xwikivars.vm");
-                XWikiContext xcontext = this.xcontextProvider.get();
-                return xcontext.getWiki().getDocument(documentReference, xcontext).getRenderedContent(Syntax.PLAIN_1_0,
-                    xcontext);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     private List<Map<String, Object>> convertLiveTableRowsToLiveDataEntries(ArrayNode rows, ObjectMapper objectMapper)

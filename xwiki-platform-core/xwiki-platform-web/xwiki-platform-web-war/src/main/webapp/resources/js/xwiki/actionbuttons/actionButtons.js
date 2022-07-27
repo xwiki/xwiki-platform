@@ -78,7 +78,7 @@ var XWiki = (function(XWiki) {
       }
       for (var key in shortcuts) {
         var targetButtons = $$("input[name=" + key + "]");
-        if (targetButtons.size() > 0) {
+        if (targetButtons.length) {
           shortcut.add(shortcuts[key], function() {
             this.click();
           }.bind(targetButtons.first()));
@@ -185,11 +185,7 @@ var XWiki = (function(XWiki) {
       // We check both the current event and the original event in order to preserve backwards compatibility with older
       // code that may prevent default behavior only for the original event. We recommend calling preventDefault() only
       // on the current event because most of the listeners shouldn't be aware of the original event.
-      // Note that the check on isPrevented is a hack to support IE11: even if the event called preventDefault in the
-      // event listener, the returned event will have defaultPrevented set to false on IE11.
-      // We are artificially setting isPrevented to true in onSave.
-      // See for more information: https://stackoverflow.com/questions/23349191/event-preventdefault-is-not-working-in-ie-11-for-custom-events
-      var defaultPrevented = event.defaultPrevented || originalEvent.defaultPrevented || event.isPrevented;
+      var defaultPrevented = event.defaultPrevented || originalEvent.defaultPrevented;
       // Stop the original event if the current event has been stopped. Also, in Internet Explorer the original event
       // can't be stopped from the current event's handlers, so in case some old code has tried to stop the original
       // event we must stop it again here.
@@ -210,7 +206,9 @@ var XWiki = (function(XWiki) {
     createMessages : function() {
       this.savingBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.inprogress'))", "inprogress", {inactive: true});
       this.savedBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.done'))", "done", {inactive: true});
-      this.failedBox = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error", ["<span id=""ajaxRequestFailureReason""/>"]))', "error", {inactive: true});
+      this.failedBox = new XWiki.widgets.Notification(
+        '$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error", ["<span id=""ajaxRequestFailureReason""></span>"]))',
+        "error", {inactive: true});
       this.progressMessageTemplate = "$escapetool.javascript($services.localization.render('core.editors.savewithprogress.notification'))";
       this.progressBox = new XWiki.widgets.Notification(this.progressMessageTemplate.replace('__PROGRESS__', '0'), "inprogress", {inactive: true});
       this.savedWithMergeBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.doneWithMerge'))", "done", {inactive: true});
@@ -268,11 +266,6 @@ var XWiki = (function(XWiki) {
 
       // Prevent the default form submit behavior.
       event.preventDefault();
-      // This is a hack to support IE11: event.defaultPrevented is set to true, but the event returned by
-      // element#fire won't have the value set to true, apparently because IE11 badly supports it.
-      // See also: https://stackoverflow.com/questions/23349191/event-preventdefault-is-not-working-in-ie-11-for-custom-events
-      // So we provide a custom property to be sure to get it on IE11. You can see it handled in notify() method above.
-      event.isPrevented = true;
 
       // Show the right notification message.
       if (isCreateFromTemplate) {
@@ -306,7 +299,6 @@ var XWiki = (function(XWiki) {
         method : 'post',
         parameters : formData.toQueryString(),
         onSuccess : this.onSuccess.bind(this, state),
-        on1223 : this.on1223.bind(this),
         on0 : this.on0.bind(this),
         on409 : this.on409.bind(this, state),
         on401 : this.on401.bind(this, state),
@@ -314,11 +306,7 @@ var XWiki = (function(XWiki) {
         onFailure : this.onFailure.bind(this, state)
       });
     },
-    // IE converts 204 status code into 1223...
-    on1223 : function(response) {
-      response.request.options.onSuccess(response);
-    },
-    // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+    // 0 is returned for network failures.
     on0 : function(response) {
       response.request.options.onFailure(response);
     },
@@ -342,13 +330,17 @@ var XWiki = (function(XWiki) {
       $$('input[name=mergeChoices]').forEach(function (item) {item.remove();});
       $$('input[name=customChoices]').forEach(function (item) {item.remove();});
 
+      var hasBeenSaved = false;
       if (state.isCreateFromTemplate) {
-        if (response.responseJSON) {
+        // We might have a responseJSON containing other information than links, if the template cannot be accessed.
+        if (response.responseJSON && response.responseJSON.links) {
           // Start the progress display.
           this.getStatus(response.responseJSON.links[0].href, state);
         } else {
           this.progressBox.hide();
           this.savingBox.replace(this.savedBox);
+          // in such case the page is saved, so we'll need to maybe redirect
+          hasBeenSaved = true;
         }
       } else {
         this.progressBox.hide();
@@ -357,11 +349,13 @@ var XWiki = (function(XWiki) {
         } else {
           this.savingBox.replace(this.savedBox);
         }
-        if (!state.isContinue || $('body').hasClassName('previewbody')) {
-          state.saveButton.fire("xwiki:document:saved");
-          if (this.maybeRedirect(state.isContinue)) {
-            return;
-          }
+        hasBeenSaved = true;
+      }
+
+      if (hasBeenSaved && !state.isContinue || $('body').hasClassName('previewbody')) {
+        state.saveButton.fire("xwiki:document:saved", response.responseJSON);
+        if (this.maybeRedirect(state.isContinue)) {
+          return;
         }
       }
 
@@ -373,13 +367,12 @@ var XWiki = (function(XWiki) {
 
         // We only update this field since the other ones are updated by the callback of setVersion.
         if (editingVersionDateField) {
-          editingVersionDateField.setValue(new Date().getTime())
+          editingVersionDateField.setValue(new Date().getTime());
         }
       }
 
       // Announce that the document has been saved
-      // TODO: We should send the new version as a memo field
-      state.saveButton.fire("xwiki:document:saved");
+      state.saveButton.fire("xwiki:document:saved", response.responseJSON);
 
       // If documents have been merged we need to reload to get latest saved version.
       if (response.responseJSON && response.responseJSON.mergedDocument) {
@@ -418,12 +411,9 @@ var XWiki = (function(XWiki) {
       // We don't rely on window.location.reload() since it might keep cached data from the form.
       // We don't rely on window.location.reload(true) either since it's unclear if it's properly supported by
       // all browsers. Instead we rely on a query parameter with the current date.
-      // URLSearchParams is not supported by IE11 but we rely on a polyfill.
-      require(["$services.webjars.url('org.webjars.npm:url-search-params-polyfill', 'index.js')"], function() {
-        var params = new URLSearchParams(window.location.search);
-        params.set("timestamp", new Date().getTime());
-        window.location.search = "?" + params.toString();
-      });
+      var params = new URLSearchParams(window.location.search);
+      params.set("timestamp", new Date().getTime());
+      window.location.search = "?" + params.toString();
     },
     // 401 happens when the user is not authorized to do that: can be a logout or a change in perm
     on401 : function (state, response) {
@@ -464,7 +454,7 @@ var XWiki = (function(XWiki) {
     },
     // 403 happens in case of CSRF issue
     on403 : function (state, response) {
-      if (!response.responseJSON || !response.responseJSON.errorType === "CSRF") {
+      if (!response.responseJSON || response.responseJSON.errorType !== "CSRF") {
         return this.on401(state, response);
       }
 
@@ -484,7 +474,6 @@ var XWiki = (function(XWiki) {
             method : 'post',
             parameters : "form_token=" + answerJson.newToken,
             onSuccess : self.onSuccess.bind(self, state),
-            on1223 : self.on1223.bind(self),
             on0 : self.on0.bind(self),
             on409 : self.on409.bind(self, state),
             on401 : self.on401.bind(self, state),
@@ -689,7 +678,7 @@ var XWiki = (function(XWiki) {
       this.enableEditors();
       this.savingBox.replace(this.failedBox);
       this.progressBox.replace(this.failedBox);
-      if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+      if (!response.statusText) {
         $('ajaxRequestFailureReason').update('Server not responding');
       } else if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
         // Regard the body of plain text responses as custom status messages.
@@ -719,7 +708,6 @@ var XWiki = (function(XWiki) {
             this.maybeRedirect(state.isContinue);
           }
         }.bind(this),
-        on1223 : this.on1223.bind(this),
         on0 : this.on0.bind(this),
         onFailure : this.onFailure.bind(this, state)
       });

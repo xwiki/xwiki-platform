@@ -187,6 +187,15 @@ public class DefaultAverageRatingTest
         assertNotNull(defaultAverageRank.getUpdatedAt());
         assertTrue(beforeFirstUpdate.toInstant()
             .isAfter(defaultAverageRank.getUpdatedAt().toInstant().minus(1, ChronoUnit.MINUTES)));
+
+        // check that if we remove all votes the average is set to 0.
+        defaultAverageRank.removeRating(0);
+        defaultAverageRank.removeRating(0);
+        defaultAverageRank.removeRating(0);
+        defaultAverageRank.removeRating(0);
+        defaultAverageRank.removeRating(0);
+        assertEquals(0f, defaultAverageRank.getAverageVote(), 0);
+        assertEquals(0, defaultAverageRank.getNbVotes());
     }
 
     @Test

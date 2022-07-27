@@ -28,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.7RC1
  */
-@Unstable
 @Role
 public interface LikeConfiguration
 {

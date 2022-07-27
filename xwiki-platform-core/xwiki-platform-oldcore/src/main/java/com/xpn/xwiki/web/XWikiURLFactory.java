@@ -54,7 +54,7 @@ public interface XWikiURLFactory
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
      *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        we would need an API signature that accepts a {@code Map<String, String>} for the Query String, for
      *        example
      */
     URL createURL(String spaces, String name, String action, String querystring, String anchor, XWikiContext context);
@@ -66,7 +66,7 @@ public interface XWikiURLFactory
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
      *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        we would need an API signature that accepts a {@code Map<String, String>} for the Query String, for
      *        example
      */
     URL createExternalURL(String spaces, String name, String action, String querystring, String anchor,
@@ -79,7 +79,7 @@ public interface XWikiURLFactory
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
      *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        we would need an API signature that accepts a {@code Map<String, String>} for the Query String, for
      *        example
      */
     URL createURL(String spaces, String name, String action, String querystring, String anchor, String xwikidb,
@@ -92,7 +92,7 @@ public interface XWikiURLFactory
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
      *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        we would need an API signature that accepts a {@code Map<String, String>} for the Query String, for
      *        example
      */
     URL createExternalURL(String spaces, String name, String action, String querystring, String anchor,
@@ -194,7 +194,7 @@ public interface XWikiURLFactory
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
      *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        we would need an API signature that accepts a {@code Map<String, String>} for the Query String, for
      *        example
      */
     URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
@@ -207,7 +207,7 @@ public interface XWikiURLFactory
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
      *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        we would need an API signature that accepts a {@code Map<String, String>} for the Query String, for
      *        example
      */
     URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring, String xwikidb,
@@ -220,7 +220,7 @@ public interface XWikiURLFactory
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
      *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        we would need an API signature that accepts a {@code Map<String, String>} for the Query String, for
      *        example
      */
     URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, String querystring,
@@ -233,7 +233,7 @@ public interface XWikiURLFactory
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
      *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        we would need an API signature that accepts a {@code Map<String, String>} for the Query String, for
      *        example
      */
     URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, String querystring,

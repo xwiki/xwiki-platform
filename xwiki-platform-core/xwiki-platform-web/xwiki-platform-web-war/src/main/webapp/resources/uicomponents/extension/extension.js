@@ -129,10 +129,7 @@ XWiki.ExtensionBehaviour = Class.create({
       });
       return false;
     } else {
-      var failureReason = response.statusText;
-      if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-        failureReason = 'Server not responding';
-      }
+      var failureReason = response.statusText || 'Server not responding';
       new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('extensions.info.fetch.failed'))" + failureReason, "error");
       return true;
     }
@@ -734,12 +731,13 @@ require(['jquery'], function($) {
     };
 
     var parents = $(this).find('ul').prev('.node').addClass('parent');
-    $(this).hasClass('collapsible') && parents.click(toggleCollapsed);
+    $(this).hasClass('collapsible') && parents.on('click', toggleCollapsed);
     if ($(this).hasClass('selectable')) {
       parents.append('<span class="actions"><input type="checkbox"/></span>');
-      parents.find('.actions input[type="checkbox"]').click(toggleSelection).before('<span class="selectedCount"/>')
+      parents.find('.actions input[type="checkbox"]').on('click', toggleSelection)
+        .before('<span class="selectedCount"></span>')
         .prev('.selectedCount').each(updateSelectedCount);
-      $(this).find('input[type="checkbox"]').click(function() {
+      $(this).find('input[type="checkbox"]').on('click', function() {
         $(tree).find('.selectedCount').each(updateSelectedCount);
       });
     }
@@ -759,8 +757,8 @@ require(['jquery'], function($) {
   var maybeScheduleRefresh = function(timeout) {
     // this = .extensionUpdater
     // Refresh if the upgrade plan job is running (if the progress bar is displayed).
-    if ($(this).children('.ui-progress').size() > 0) {
-      setTimeout($.proxy(refresh, this), timeout || 1000);
+    if ($(this).children('.ui-progress').length) {
+      setTimeout(refresh.bind(this), timeout || 1000);
     } else {
       // Re-enable the buttons.
       $(this).prev('form').find('button').prop('disabled', false);
@@ -770,9 +768,9 @@ require(['jquery'], function($) {
   var refresh = function(parameters) {
     // this = .extensionUpdater
     var url = $(this).prev('form').find('input[name=asyncURL]').prop('value');
-    $.post(url, parameters || {}, $.proxy(onRefresh, this))
+    $.post(url, parameters || {}).then(onRefresh.bind(this))
       // Wait 10s before trying again if the request has failed.
-      .fail($.proxy(maybeScheduleRefresh, this, 10000));
+      .catch(maybeScheduleRefresh.bind(this, 10000));
   };
 
   var onRefresh = function(data) {
@@ -795,7 +793,7 @@ require(['jquery'], function($) {
     // AJAX form submit.
     event.preventDefault();
     // Select this button if it is part of a drop down.
-    if ($(this).parent('.dropdown-menu').size() > 0) {
+    if ($(this).parent('.dropdown-menu').length) {
       var dropDownToggle = $(this).closest('.button-group').children('.dropdown-toggle');
       dropDownToggle.prev().insertAfter(this);
       dropDownToggle.before(this);
@@ -806,8 +804,8 @@ require(['jquery'], function($) {
     // The actual form submit.
     var params = {};
     params[this.name] = this.value;
-    form.next('.extensionUpdater').each($.proxy(refresh, null, params));
+    form.next('.extensionUpdater').each((index, extensionUpdater) => refresh.call(extensionUpdater, params));
   };
 
-  $('.extensionUpdater').each(maybeScheduleRefresh).prev('form').find('button').click(onCheckForUpdates);
+  $('.extensionUpdater').each(maybeScheduleRefresh).prev('form').find('button').on('click', onCheckForUpdates);
 });

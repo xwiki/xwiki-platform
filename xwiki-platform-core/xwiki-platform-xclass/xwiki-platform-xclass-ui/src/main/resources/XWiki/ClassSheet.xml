@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.ClassSheet" locale="">
+<xwikidoc version="1.4" reference="XWiki.ClassSheet" locale="">
   <web>XWiki</web>
   <name>ClassSheet</name>
   <language/>
@@ -208,24 +208,35 @@
 
   {{translation key="platform.xclass.defaultClassSheet.pages.description"/}}
 
-  {{html}}
-  #set ($columns = ['doc.title', 'doc.location', 'doc.date', 'doc.author', 'doc.objectCount', '_actions'])
-  #set ($columnsProperties = {
-    'doc.title': {'link': 'view'},
-    'doc.location': {'html': true},
-    'doc.author': {'link': 'author'},
-    'doc.objectCount': {'type': 'numeric', 'filterable': false, 'sortable': false},
-    '_actions': {'sortable': false, 'filterable': false, 'html': true, 'actions': ['edit', 'delete']}
-  })
   #set ($options = {
     'className': $doc.fullName,
     'translationPrefix' : 'platform.index.',
-    'rowCount': 10,
-    'outputOnlyHtml': true,
     'queryFilters': ['unique']
   })
-  #livetable("classEntries" $columns $columnsProperties $options)
-  {{/html}}
+  {{liveData
+    id="classEntries"
+    properties="doc.title,doc.location,doc.date,doc.author,doc.objectCount,_actions"
+    source="liveTable"
+    className="${doc.fullName}"
+    sourceParameters="${escapetool.url($options)}"
+  }}
+  {
+    "meta": {
+      "propertyDescriptors": [
+        {
+          "id": "doc.title",
+          "editable": false
+        },
+        {
+          "id": "doc.objectCount",
+          "editable": false,
+          "filterable": false,
+          "sortable": false
+        }
+      ]
+    }
+  }
+  {{/liveData}}
 
   (% id="HClassSheets" %)
   = {{translation key="platform.xclass.defaultClassSheet.sheets.heading"/}} =

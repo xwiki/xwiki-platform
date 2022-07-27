@@ -267,7 +267,7 @@
     <property>
       <code>'use strict';
 require(['jquery', 'xwiki-meta'], function ($, xm) {
-  $('ul.followed-users a.userstatus-follow').click(function(event) {
+  $('ul.followed-users a.userstatus-follow').on('click', function(event) {
     var button = $(this);
     var behavior = {
       onYes: function() {
@@ -278,11 +278,11 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
           'csrf': xm.form_token,
           'user': button.attr('data-userid'),
           'target': 'user'
-        }).done(function() {
+        }).then(() =&gt; {
           button.parent('li').remove();
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.done'))", 'done');
-        }).fail(function() {
+        }).catch(() =&gt; {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.error'))", 'error');
         });

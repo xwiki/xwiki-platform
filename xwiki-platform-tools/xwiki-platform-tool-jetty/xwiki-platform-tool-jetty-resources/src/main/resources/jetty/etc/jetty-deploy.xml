@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://www.eclipse.org/jetty/configure_10_0.dtd">
 
 <!-- =============================================================== -->
 <!-- Create the deployment manager                                   -->
@@ -48,9 +48,9 @@
           <Arg>somethingnotmatching.jar</Arg>
         </Call>
 
-        <Call id="webappprovider" name="addAppProvider">
+        <Call name="addAppProvider">
           <Arg>
-            <New class="org.eclipse.jetty.deploy.providers.WebAppProvider">
+            <New id="webappprovider" class="org.eclipse.jetty.deploy.providers.WebAppProvider">
               <Set name="monitoredDirName">
                 <Property>
                   <Name>jetty.deploy.monitoredPath</Name>
@@ -70,7 +70,7 @@
                 </Property>
               </Set>
               <Set name="scanInterval"><Property name="jetty.deploy.scanInterval" default="1"/></Set>
-              <Set name="extractWars"><Property name="jetty.deploy.extractWars" default="true"/></Set>
+              <Set name="extractWars"><Property name="jetty.deploy.extractWars" default="false"/></Set>
               <Set name="configurationManager">
                 <New class="org.eclipse.jetty.deploy.PropertiesConfigurationManager">
                 </New>

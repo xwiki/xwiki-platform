@@ -134,6 +134,8 @@
           <element name="modified" type="dateTime"></element>
           <element name="modifier" type="string"></element>
           <element name="modifierName" type="string"></element>
+          <element name="originalMetadataAuthor" type="string"></element>
+          <element name="originalMetadataAuthorName" type="string"></element>
           <element name="comment" type="string"></element>
           <element name="content" type="string"></element>
           <element name="class" type="xwiki:Class" minOccurs="0" maxOccurs="1"></element>

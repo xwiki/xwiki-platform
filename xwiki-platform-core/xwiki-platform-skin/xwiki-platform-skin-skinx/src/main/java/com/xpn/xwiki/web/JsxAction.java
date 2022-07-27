@@ -207,7 +207,9 @@ public class JsxAction extends AbstractSxAction
             ArrayNode sources = (ArrayNode) sourceMap.get("sources");
             // Closure compiler can add synthetic sources when polyfills are embedded in the compilation so we need to
             // modify the last source in the array.
-            sources.set(sources.size() - 1, sources.textNode(getSourceURL(context)));
+            if (!sources.isEmpty()) {
+                sources.set(sources.size() - 1, sources.textNode(getSourceURL(context)));
+            }
             return objectMapper.writeValueAsString(sourceMap);
         } catch (Exception e) {
             LOGGER.warn("Failed to fix the source path in the generated JavaScript source mapping. Root cause is [{}].",

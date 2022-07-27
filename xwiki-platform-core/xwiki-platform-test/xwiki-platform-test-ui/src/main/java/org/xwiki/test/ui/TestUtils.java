@@ -76,6 +76,7 @@ import org.opentest4j.AssertionFailedError;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AbstractLocalizedEntityReference;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -296,17 +297,19 @@ public class TestUtils
         options.deleteAllCookies();
         if (session != null) {
             for (Cookie cookie : session.getCookies()) {
-                // Using a cookie with localhost domain apparently triggers the following error in firefox:
+                // Using a cookie for single component domain (i.e., without '.', like 'localhost' or 'xwikiweb') 
+                // apparently triggers the following error in firefox:
                 // org.openqa.selenium.UnableToSetCookieException:
                 //[Exception... "Component returned failure code: 0x80070057 (NS_ERROR_ILLEGAL_VALUE)
                 // [nsICookieManager.add]" nsresult: "0x80070057 (NS_ERROR_ILLEGAL_VALUE)"
                 // location: "JS frame :: chrome://marionette/content/cookie.js :: cookie.add :: line 177" data: no]
                 //
-                // According to the following stackoverflow thread
-                // https://stackoverflow.com/questions/1134290/cookies-on-localhost-with-explicit-domain
+                // According to the following discussions:
+                // - https://stackoverflow.com/questions/1134290/cookies-on-localhost-with-explicit-domain
+                // - https://github.com/mozilla/geckodriver/issues/1579
                 // a working solution is to put null in the cookie domain.
                 // Now we might need to fix this in our real code, but the situation is not quite clear for me.
-                if ("localhost".equals(cookie.getDomain())) {
+                if (cookie.getDomain() !=null && !cookie.getDomain().contains(".")) {
                     cookie = new Cookie(cookie.getName(), cookie.getValue(), null, cookie.getPath(),
                         cookie.getExpiry(), cookie.isSecure(), cookie.isHttpOnly());
                 }
@@ -745,6 +748,16 @@ public class TestUtils
         return getURL(space, "WebHome", "deletespace", "confirm=1&async=false&affectChidlren=on");
     }
 
+    /**
+     * @param space the reference of the space to delete
+     * @return the URL that can be used to delete the specified pace
+     * @since 14.1RC1
+     */
+    public String getURLToDeleteSpace(EntityReference space)
+    {
+        return getURL(space, "WebHome", "deletespace", "confirm=1&async=false&affectChidlren=on");
+    }
+
     public ViewPage createPage(String space, String page, String content, String title)
     {
         return createPage(Collections.singletonList(space), page, content, title);
@@ -977,6 +990,17 @@ public class TestUtils
         getDriver().get(getURLToDeleteSpace(space));
     }
 
+    /**
+     * Accesses the URL to delete the specified space.
+     *
+     * @param space the reference of the space to delete
+     * @since 14.1RC1
+     */
+    public void deleteSpace(EntityReference space)
+    {
+        getDriver().get(getURLToDeleteSpace(space));
+    }
+
     public boolean pageExists(String space, String page) throws Exception
     {
         return rest().exists(new LocalDocumentReference(space, page));
@@ -1120,6 +1144,14 @@ public class TestUtils
     }
 
     /**
+     * @since 14.5
+     */
+    public void setCurrentWiki(String currentWiki)
+    {
+        this.currentWiki = currentWiki;
+    }
+
+    /**
      * @since 7.3M1
      */
     public String getBaseURL()
@@ -1156,7 +1188,7 @@ public class TestUtils
      */
     public String getBaseBinURL()
     {
-        return getBaseURL() + "bin/";
+        return getBaseBinURL(this.currentWiki);
     }
 
     /**
@@ -1649,6 +1681,19 @@ public class TestUtils
         return new ClassEditPage();
     }
 
+    /**
+     * Goes to a page in edit class mode.
+     *
+     * @param reference a document reference
+     * @return the {@link ClassEditPage} Page Object for the page
+     * @since 14.0RC1
+     */
+    public ClassEditPage editClass(DocumentReference reference)
+    {
+        gotoPage(reference, "edit", "editor=class");
+        return new ClassEditPage();
+    }
+
     public String getVersion() throws Exception
     {
         Xwiki xwiki = rest().getResource("", null);
@@ -2052,7 +2097,21 @@ public class TestUtils
 
     public String getString(String path, Map<String, ?> queryParams) throws Exception
     {
-        try (InputStream inputStream = getInputStream(getBaseURL(), path, queryParams)) {
+        return getString(getBaseURL(), path, queryParams);
+    }
+
+    /**
+     * Extended version to work in a docker context.
+     *
+     * @param baseURL the base url
+     * @param path an additional path added after the base url
+     * @param queryParams additional query parameter added to the computed url
+     * @return the context of the computed url
+     * @throws Exception in case of error when executing the request
+     */
+    public String getString(String baseURL, String path, Map<String, ?> queryParams) throws Exception
+    {
+        try (InputStream inputStream = getInputStream(baseURL, path, queryParams)) {
             return IOUtils.toString(inputStream);
         }
     }
@@ -2360,6 +2419,11 @@ public class TestUtils
             // Add name
             elements.add(page.getName());
 
+            // Add translation
+            if (StringUtils.isNotEmpty(page.getLanguage())) {
+                elements.add(page.getLanguage());
+            }
+
             return elements.toArray();
         }
 
@@ -2478,7 +2542,10 @@ public class TestUtils
                 expectedCodes = STATUS_CREATED_ACCEPTED;
             }
 
-            return TestUtils.assertStatusCodes(executePut(PageResource.class, page, toElements(page)), release,
+            Class resourceClass =
+                StringUtils.isEmpty(page.getLanguage()) ? PageResource.class : PageTranslationResource.class;
+
+            return TestUtils.assertStatusCodes(executePut(resourceClass, page, toElements(page)), release,
                 expectedCodes);
         }
 
@@ -2504,6 +2571,14 @@ public class TestUtils
             // Add page
             EntityReference documentReference = reference.extractReference(EntityType.DOCUMENT);
             page.setName(documentReference.getName());
+
+            // Add locale
+            if (reference instanceof AbstractLocalizedEntityReference) {
+                Locale locale = getLocale(reference);
+                if (locale != null) {
+                    page.setLanguage(locale.toString());
+                }
+            }
 
             return page;
         }
@@ -2633,10 +2708,8 @@ public class TestUtils
         // TODO: make EntityReference#getParameter() public
         private Locale getLocale(EntityReference reference)
         {
-            if (reference instanceof DocumentReference) {
-                return ((DocumentReference) reference).getLocale();
-            } else if (reference instanceof LocalDocumentReference) {
-                return ((LocalDocumentReference) reference).getLocale();
+            if (reference instanceof AbstractLocalizedEntityReference) {
+                return ((AbstractLocalizedEntityReference) reference).getLocale();
             }
 
             return null;

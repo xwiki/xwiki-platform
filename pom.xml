@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,33 +41,35 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>13.6-SNAPSHOT</version>
+  <version>14.7-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
     <platform.version>${commons.version}</platform.version>
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>
-    <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
-    <hsqldb.version>2.5.2</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.53.2</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.14</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>1.27</tika.version>
-    <pdfbox.version>2.0.24</pdfbox.version>
+    <tika.version>2.4.1</tika.version>
+    <pdfbox.version>2.0.26</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-
-    <!-- CSS4J/Carte -->
-    <css4j.version>3.5.1</css4j.version>
-
-    <!-- Jetty version -->
     <jetty.version>9.4.29.v20200521</jetty.version>
+    <netty.version>4.1.79.Final</netty.version>
+    <hibernate.version>5.6.10.Final</hibernate.version>
+    <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
+    <hsqldb.version>2.6.1</hsqldb.version>
 
-    <!-- Netty version -->
-    <netty.version>4.1.65.Final</netty.version>
+    <!-- Versions of other software we need in our functional tests -->
+    <testcontainers.version>1.17.3</testcontainers.version>
+    <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
+         sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
+         Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
+         (e.g. 7.2.7).
+    -->
+    <libreoffice.version>7.2.7</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -87,33 +89,27 @@
     <xwiki.nexus.skipLocalStaging>true</xwiki.nexus.skipLocalStaging>
 
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
-
-    <!-- Hibernate -->
-    <hibernate.version>5.5.3.Final</hibernate.version>
+    <xwiki.enforcer.enforce-tika2-parsers.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-tika2-parsers.skip>
+    <xwiki.enforcer.banneddependencytype-xar.skip>${xwiki.enforcer.skip}</xwiki.enforcer.banneddependencytype-xar.skip>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
     <mysql.groupId>mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-    <mysql.version>8.0.25</mysql.version>
+    <mysql.version>8.0.30</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>2.7.3</mariadb.version>
+    <mariadb.version>3.0.6</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.2.23</pgsql.version>
+    <pgsql.version>42.4.0</pgsql.version>
     <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>
-
-    <!-- Versions of other software we need in our functional tests -->
-    <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
-         sure the new version is available from https://downloadarchive.documentfoundation.org/libreoffice/old/ -->
-    <libreoffice.version>7.0.6.2</libreoffice.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -168,7 +164,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.4.0</version>
+        <version>4.12.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -192,70 +188,141 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
         <version>${tika.version}</version>
+      </dependency>
+      <!-- Tika Parsers modules -->
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-advancedmedia-module</artifactId>
+        <version>${tika.version}</version>
         <exclusions>
-          <!-- Wrong id -->
+          <!-- XWiki does not support JAX-RC 2 for now -->
           <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
           </exclusion>
           <!-- Wrong id -->
           <exclusion>
-            <groupId>com.sun.activation</groupId>
-            <artifactId>javax.activation</artifactId>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
           </exclusion>
-          <!-- Wrong id -->
+          <!-- Remove when is https://issues.apache.org/jira/browse/TIKA-3537 fixed -->
           <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
-        <artifactId>tika-parsers</artifactId>
+        <artifactId>tika-parser-scientific-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-sqlite3-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-crypto-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-news-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-miscoffice-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-mail-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-cad-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-apple-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-pdf-module</artifactId>
         <version>${tika.version}</version>
         <exclusions>
-          <!-- We don't need it the way we use Tika and it causes various conflicts -->
           <exclusion>
-            <artifactId>cxf-rt-rs-client</artifactId>
-            <groupId>org.apache.cxf</groupId>
-          </exclusion>
-          <!-- Artifact id changed -->
-          <exclusion>
-            <groupId>com.sun.activation</groupId>
-            <artifactId>javax.activation</artifactId>
-          </exclusion>
-          <!-- Artifact id changed -->
-          <exclusion>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-          </exclusion>
-          <!-- Requires a too recent version -->
-          <exclusion>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-          </exclusion>
-          <!-- Wrong id -->
-          <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-          </exclusion>
-          <!-- Wrong id -->
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
+            <!-- We are using Slf4J in XWiki -->
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-pkg-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-microsoft-module</artifactId>
+        <version>${tika.version}</version>
+        <exclusions>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-xml-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-font-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-html-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-code-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-text-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-audiovideo-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-image-module</artifactId>
+        <version>${tika.version}</version>
+      </dependency>
+
       <!-- Rome is used in rss macro and feed api modules and in Tika -->
       <dependency>
         <groupId>rome</groupId>
@@ -298,12 +365,12 @@
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
-        <version>1.16.0</version>
+        <version>1.18.0</version>
       </dependency>
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome-utils</artifactId>
-        <version>1.16.0</version>
+        <version>1.18.0</version>
       </dependency>
       <dependency>
         <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
@@ -311,13 +378,6 @@
         <artifactId>boilerpipe</artifactId>
         <version>1.2.0-xwiki</version>
         <scope>runtime</scope>
-      </dependency>
-      <!-- Embedded in the Standard Flavor and used by the Dashboard Application (to add/edit gadgets) -->
-      <dependency>
-        <groupId>org.xwiki.contrib</groupId>
-        <artifactId>application-ckeditor-ui</artifactId>
-        <version>${ckeditor.version}</version>
-        <type>xar</type>
       </dependency>
       <!-- Drawn by several transitive dependencies -->
       <dependency>
@@ -329,7 +389,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.10.10</version>
+        <version>2.10.14</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -341,13 +401,31 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery</artifactId>
-        <version>2.2.4</version>
+        <version>3.6.0</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>prototype</artifactId>
+        <version>1.7.3.0</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>scriptaculous</artifactId>
+        <version>1.9.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>bootstrap-select</artifactId>
-        <version>1.12.0</version>
+        <version>1.13.18</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>bootstrap-3-typeahead</artifactId>
+        <version>4.0.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -365,26 +443,19 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>momentjs</artifactId>
-        <version>2.24.0</version>
+        <version>2.29.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>bootstrap-daterangepicker</artifactId>
-        <version>3.0.3</version>
+        <version>3.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>selectize.js</artifactId>
-        <version>0.12.5</version>
-        <scope>runtime</scope>
-      </dependency>
-      <!-- Needed for IE11 backward compatibility: this API is currently used in platform-web -->
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>url-search-params-polyfill</artifactId>
-        <version>8.1.0</version>
+        <version>0.13.3</version>
         <scope>runtime</scope>
       </dependency>
 
@@ -453,13 +524,17 @@
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
 
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.8.0</version>
+        <version>5.12.1</version>
       </dependency>
 
       <dependency>
@@ -476,7 +551,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.13.1</version>
+        <version>1.15.2</version>
       </dependency>
 
       <!-- PDF -->
@@ -484,11 +559,25 @@
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
         <version>${pdfbox.version}</version>
+        <exclusions>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>fontbox</artifactId>
         <version>${pdfbox.version}</version>
+        <exclusions>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
@@ -505,6 +594,7 @@
         <artifactId>xmpbox</artifactId>
         <version>${pdfbox.version}</version>
         <exclusions>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
@@ -526,7 +616,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>xmlgraphics-commons</artifactId>
-        <version>2.6</version>
+        <version>2.7</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -539,31 +629,31 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>bootstrap-switch</artifactId>
-        <version>3.3.2</version>
+        <version>3.3.4</version>
         <scope>runtime</scope>
       </dependency>
       <!--Used by oldcore + querymanager -->
       <dependency>
         <groupId>com.github.jsqlparser</groupId>
         <artifactId>jsqlparser</artifactId>
-        <version>4.1</version>
+        <version>4.2</version>
       </dependency>
 
       <!-- JNR -->
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.3.4</version>
+        <version>1.3.9</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-constants</artifactId>
-        <version>0.10.2</version>
+        <version>0.10.3</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.2.4</version>
+        <version>2.2.12</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -573,7 +663,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.7</version>
+        <version>3.1.15</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -581,11 +671,25 @@
         <version>1.0.2</version>
       </dependency>
 
+      <!-- Carte Utils -->
+      <dependency>
+        <groupId>io.sf.carte</groupId>
+        <artifactId>css4j</artifactId>
+        <version>3.7.2</version>
+      </dependency>
+
       <!-- Carte CSS4J -->
       <dependency>
         <groupId>io.sf.carte</groupId>
+        <artifactId>carte-util</artifactId>
+        <!-- Note: has a different release cycle than CSS4J -->
+        <version>3.5.1</version>
+      </dependency>
+      <dependency>
+        <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
-        <version>${css4j.version}</version>
+        <!-- Note: has a different release cycle than CSS4J "core" -->
+        <version>3.7.1</version>
       </dependency>
 
       <!-- Carte XML DTD -->
@@ -593,14 +697,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>xml-dtd</artifactId>
         <!-- Note: has a different release cycle than CSS4J -->
-        <version>3.5.1</version>
-        <exclusions>
-          <!-- We're using a more recent version pulled from css4j -->
-          <exclusion>
-            <groupId>io.sf.carte</groupId>
-            <artifactId>carte-util</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>4.0.0</version>
       </dependency>
 
       <!-- Restlet -->
@@ -706,15 +803,8 @@
       <!-- Mails -->
       <dependency>
         <groupId>com.icegreen</groupId>
-        <artifactId>greenmail</artifactId>
-        <version>1.5.13</version>
-        <exclusions>
-          <!-- Not the right id -->
-          <exclusion>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-          </exclusion>
-        </exclusions>
+        <artifactId>greenmail-junit5</artifactId>
+        <version>1.6.9</version>
       </dependency>
 
       <!-- Make sure to use a version of the Jetty client libraries matching the Jetty version we package -->
@@ -806,12 +896,45 @@
         <artifactId>netty-buffer</artifactId>
         <version>${netty.version}</version>
       </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-transport-native-epoll</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-transport-classes-epoll</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-transport-native-unix-common</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-transport-native-kqueue</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-transport-classes-kqueue</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
 
       <!-- Jetbrain's annotations are used by several dependencies -->
       <dependency>
         <groupId>org.jetbrains</groupId>
         <artifactId>annotations</artifactId>
         <version>19.0.0</version>
+      </dependency>
+
+      <!-- Fast Diff -->
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>fast-diff</artifactId>
+        <version>1.2.0</version>
+        <scope>runtime</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1033,10 +1156,6 @@
                 </features>
               </extensionOverride>
               <extensionOverride>
-                <id>xml-apis:xml-apis</id>
-                <features>xerces:xmlParserAPIs/2.6.2</features>
-              </extensionOverride>
-              <extensionOverride>
                 <id>xerces:xercesImpl</id>
                 <features>xerces:xerces-impl</features>
               </extensionOverride>
@@ -1140,6 +1259,66 @@
                 </validateDependencyVersion>
               </rules>
               <skip>${xwiki.enforcer.check-dependency-version.skip}</skip>
+            </configuration>
+          </execution>
+          <!-- Make sure new Tika 2 parsers modules are used -->
+          <execution>
+            <id>enforce-tika2-parsers</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <skip>${xwiki.enforcer.enforce-tika2-parsers.skip}</skip>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    Use new Tika 2 parsers modules (or xwiki-platform-tika-parsers)
+                  </message>
+                  <excludes>
+                    <exclude>org.apache.tika:tika-parsers</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure the old ckeditor contrib extension is not used. -->
+          <execution>
+            <id>enforce-ckeditor-platform</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    Do not use the CKEditor extension from contrib. Is it now packaged in xwiki platform.
+                  </message>
+                  <excludes>
+                    <exclude>org.xwiki.contrib:application-ckeditor*</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure JAR extensions don't trigger runtime dependencies on XAR extensions -->
+          <execution>
+            <id>enforcer-banneddependencytype-xar</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <skip>${xwiki.enforcer.banneddependencytype-xar.skip}</skip>
+              <rules>
+                <!-- Forbid JAR extensions to have XAR runtime dependencies -->
+                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.BannedDependencyType">
+                  <dependencyType>xar</dependencyType>
+                  <projectPackaging>jar|webjar</projectPackaging>
+                  <!-- Integration test modules are never going to be installed as extension and they need to depend on XAR modules -->
+                  <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>
+                </validateDependencyVersion>
+              </rules>
             </configuration>
           </execution>
         </executions>
@@ -1252,7 +1431,7 @@
     <repository>
       <id>nexus.xwiki.org</id>
       <name>XWiki Maven Remote Repository for Releases</name>
-      <url>http://nexus.xwiki.org/nexus/content/repositories/releases/</url>
+      <url>https://nexus.xwiki.org/nexus/content/repositories/releases/</url>
     </repository>
   </distributionManagement>
 </project>

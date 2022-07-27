@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -30,6 +31,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.validation.EntityNameValidation;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
@@ -45,10 +47,13 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -104,6 +109,10 @@ class SaveActionTest
     @MockComponent
     private DocumentRevisionProvider documentRevisionProvider;
 
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
     private XWikiContext context;
 
     @InjectMockComponents
@@ -120,6 +129,10 @@ class SaveActionTest
     private EditForm mockForm;
 
     private XWiki xWiki;
+
+    private UserReference fooUserReference;
+
+    private DocumentAuthors mockAuthors;
 
     @BeforeEach
     void setup()
@@ -146,6 +159,11 @@ class SaveActionTest
         when(this.entityNameValidationConfiguration.useValidation()).thenReturn(false);
 
         this.context.setUserReference(USER_REFERENCE);
+        this.fooUserReference = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(USER_REFERENCE)).thenReturn(this.fooUserReference);
+
+        this.mockAuthors = mock(DocumentAuthors.class);
+        when(this.mockClonedDocument.getAuthors()).thenReturn(mockAuthors);
     }
 
     @Test
@@ -174,7 +192,8 @@ class SaveActionTest
         assertFalse(saveAction.save(this.context));
         assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
 
-        verify(mockClonedDocument).setAuthor("XWiki.FooBar");
+        verify(this.mockAuthors).setOriginalMetadataAuthor(this.fooUserReference);
+        verify(this.mockAuthors).setEffectiveMetadataAuthor(this.fooUserReference);
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
@@ -251,7 +270,8 @@ class SaveActionTest
         assertFalse(saveAction.save(this.context));
         assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
 
-        verify(mockClonedDocument).setAuthor("XWiki.FooBar");
+        verify(this.mockAuthors).setOriginalMetadataAuthor(this.fooUserReference);
+        verify(this.mockAuthors).setEffectiveMetadataAuthor(this.fooUserReference);
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
@@ -284,5 +304,32 @@ class SaveActionTest
         assertFalse(this.saveAction.save(this.context));
 
         verify(this.mockClonedDocument).readFromTemplate(templateReference, this.context);
+    }
+
+    @Test
+    void saveSectionWithAttachmentUpload() throws Exception
+    {
+        when(mockRequest.getParameter("section")).thenReturn("2");
+        when(xWiki.hasSectionEdit(context)).thenReturn(true);
+        XWikiDocument sectionDoc = mock(XWikiDocument.class);
+        when(mockClonedDocument.clone()).thenReturn(sectionDoc);
+        String sectionContent = "Some content from the section";
+        when(sectionDoc.getContent()).thenReturn(sectionContent);
+        String fullContent = "Some previous content " + sectionContent + " some after content";
+        when(mockClonedDocument.updateDocumentSection(2, sectionContent + "\n")).thenReturn(fullContent);
+        List<XWikiAttachment> attachmentList = mock(List.class);
+        when(sectionDoc.getAttachmentList()).thenReturn(attachmentList);
+        String comment = "Some comment";
+        when(sectionDoc.getComment()).thenReturn(comment);
+        when(sectionDoc.isMinorEdit()).thenReturn(true);
+
+        assertFalse(this.saveAction.save(this.context));
+
+        verify(sectionDoc).readFromForm(any(), eq(context));
+        verify(mockClonedDocument).setAttachmentList(attachmentList);
+        verify(mockClonedDocument).setContent(fullContent);
+        verify(mockClonedDocument).setComment(comment);
+        verify(mockClonedDocument).setMinorEdit(true);
+        verify(mockClonedDocument, never()).readFromForm(any(), any());
     }
 }

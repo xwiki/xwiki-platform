@@ -101,6 +101,16 @@ public class XWikiContext extends Hashtable<Object, Object>
     @Deprecated
     public static final String KEY_LEGACY_VELOCITYCONTEXT = "vcontext";
 
+    /**
+     * The reference of a logged-in inactive user: in such case the context user reference is guest, so we store
+     * the actual logged-in user with that key.
+     *
+     * @since 14.3RC1
+     * @since 13.10.5
+     */
+    @Unstable
+    public static final String INACTIVE_USER_REFERENCE = "inactiveUserReference";
+
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiContext.class);
 
@@ -512,6 +522,9 @@ public class XWikiContext extends Hashtable<Object, Object>
         return StringUtils.equalsIgnoreCase(wikiName, getMainXWiki());
     }
 
+    /**
+     * @return the current document handled in the context or {@code null}.
+     */
     public XWikiDocument getDoc()
     {
         return (XWikiDocument) get("doc");

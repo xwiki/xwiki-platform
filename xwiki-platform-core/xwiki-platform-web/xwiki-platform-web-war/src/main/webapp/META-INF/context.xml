@@ -23,15 +23,16 @@
 <!--
   Used only when deploying XWiki in Tomcat.
 
-  Prevent JAR scanning and disable WebSocket and JSP support. This is done to increase Tomcat startup to the maximum.
+  Prevent JAR scanning and disable JSP support. This is done to increase Tomcat startup to the maximum. Note that we keep
+  WebSocket support enabled because it is needed by the real-time editing.
   See https://wiki.apache.org/tomcat/HowTo/FasterStartUp &
   https://tcollignon.github.io/2016/02/09/Accelerate-tomcat-78-start-up.html
 -->
-<Context containerSciFilter="org.apache.tomcat.websocket.server.WsSci|org.apache.jasper.servlet.JasperInitializer">
+<Context containerSciFilter="org.apache.jasper.servlet.JasperInitializer">
   <JarScanner>
     <JarScanFilter defaultTldScan="false"/>
   </JarScanner>
   <!-- We need to set the resource cache size since the default (10K) is too small for loading all XWiki resources at
        once -->
-  <Resources cacheMaxSize="32768" />
+  <Resources cacheMaxSize="50176" />
 </Context>

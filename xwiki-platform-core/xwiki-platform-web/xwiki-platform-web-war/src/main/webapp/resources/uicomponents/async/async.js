@@ -26,21 +26,10 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
       complete: function(xhr, textStatus) {
         switch (xhr.status) {
           case 200:
-            // Add asynchronous meta tags
-            var asyncHead = xhr.getResponseHeader('X-XWIKI-HTML-HEAD');
-            if (asyncHead) {
-              $('head').append(asyncHead);
-            }
-
-            // Replace the element by the asynchronous result
+            // Replace the element by the asynchronous result. Note that the X-XWIKI-HTML-HEAD and X-XWIKI-HTML-SCRIPTS
+            // custom HTTP response headers that contain the required stylesheets and JavaScript files are handled
+            // automatically by xwiki.js
             element.replaceWith(xhr.responseText);
-
-            // Insert the scripts after the HTML
-            var asyncScripts = xhr.getResponseHeader('X-XWIKI-HTML-SCRIPTS');
-            if (asyncScripts) {
-              // FIXME: injecting <script> elements this way seems to generate a warning in some conditions
-              $('head').append(asyncScripts);
-            }
 
             break;
 
@@ -64,9 +53,9 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
   var showSpinner = function(element)
   {
     if (element.tagName == 'div') {
-      element.html('<div class="fa fa-spinner fa-spin"/>');
+      element.html('<div class="fa fa-spinner fa-spin"></div>');
     } else {
-      element.html('<span class="fa fa-spinner fa-spin"/>');
+      element.html('<span class="fa fa-spinner fa-spin"></span>');
     }
   };
   

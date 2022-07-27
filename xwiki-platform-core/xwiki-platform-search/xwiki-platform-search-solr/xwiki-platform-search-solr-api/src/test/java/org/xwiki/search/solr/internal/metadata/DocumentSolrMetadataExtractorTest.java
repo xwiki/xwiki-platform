@@ -29,21 +29,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -55,7 +56,11 @@ import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -72,11 +77,11 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
@@ -88,11 +93,46 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class DocumentSolrMetadataExtractorTest
+@ComponentTest
+class DocumentSolrMetadataExtractorTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<SolrMetadataExtractor> mocker =
-        new MockitoComponentMockingRule<SolrMetadataExtractor>(DocumentSolrMetadataExtractor.class);
+    @InjectMockComponents
+    private DocumentSolrMetadataExtractor metadataExtractor;
+
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
+    private Execution execution;
+
+    @MockComponent
+    @Named("plain/1.0")
+    private BlockRenderer renderer;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @MockComponent
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    @MockComponent
+    private UserReferenceSerializer<String> userReferenceSerializer;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
+
+    @MockComponent
+    @Named("solr")
+    private EntityReferenceSerializer<String> fieldNameSerializer;
+
+    @MockComponent
+    private SolrFieldNameEncoder fieldNameEncoder;
+
+    @MockComponent
+    @Named("document")
+    private SolrReferenceResolver documentSolrReferenceResolver;
 
     private XWikiContext xcontext = mock(XWikiContext.class);
 
@@ -108,20 +148,18 @@ public class DocumentSolrMetadataExtractorTest
 
     private DocumentReference frenchDocumentReference = new DocumentReference(this.documentReference, Locale.FRENCH);
 
-    @Before
-    public void setUp() throws Exception
-    {
-        this.mocker.registerMockComponent(SolrReferenceResolver.class, "document");
+    private DocumentAuthors documentAuthors = mock(DocumentAuthors.class);
 
+    @BeforeEach
+    void setUp() throws Exception
+    {
         // XWikiContext Provider
-        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(this.xcontext);
+        when(this.contextProvider.get()).thenReturn(this.xcontext);
 
         // XWikiContext trough Execution
         ExecutionContext executionContext = new ExecutionContext();
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xcontext);
-        Execution execution = this.mocker.registerMockComponent(Execution.class);
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(executionContext);
 
         // XWiki
         XWiki wiki = mock(XWiki.class);
@@ -133,16 +171,15 @@ public class DocumentSolrMetadataExtractorTest
         when(this.document.isHidden()).thenReturn(false);
         when(this.document.getLocale()).thenReturn(Locale.ROOT);
         when(this.document.getRealLocale()).thenReturn(Locale.US);
+        when(this.document.getAuthors()).thenReturn(this.documentAuthors);
 
         when(this.document.getTranslatedDocument(Locale.FRENCH, this.xcontext)).thenReturn(this.translatedDocument);
         when(this.translatedDocument.getRealLocale()).thenReturn(Locale.FRENCH);
         when(this.translatedDocument.getLocale()).thenReturn(Locale.FRENCH);
         when(this.translatedDocument.getDocumentReference()).thenReturn(this.frenchDocumentReference);
+        when(this.translatedDocument.getAuthors()).thenReturn(this.documentAuthors);
 
-        // Field Name Serializer
-        EntityReferenceSerializer<String> fieldNameSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "solr");
-        when(fieldNameSerializer.serialize(any())).then(new Answer<String>()
+        when(this.fieldNameSerializer.serialize(any())).then(new Answer<String>()
         {
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable
@@ -156,28 +193,18 @@ public class DocumentSolrMetadataExtractorTest
             }
         });
 
-        // Field Name Encoder
-        SolrFieldNameEncoder fieldNameEncoder = this.mocker.getInstance(SolrFieldNameEncoder.class);
-        when(fieldNameEncoder.encode(any())).then(AdditionalAnswers.returnsFirstArg());
+        when(this.fieldNameEncoder.encode(any())).then(AdditionalAnswers.returnsFirstArg());
     }
 
     @Test
-    public void getSimpleDocument() throws Exception
+    void getSimpleDocument() throws Exception
     {
-        //
-        // Mock
-        //
-
         // ID
         String id = "wiki:Space.Name_" + Locale.ROOT.toString();
-        SolrReferenceResolver documentSolrReferenceResolver =
-            this.mocker.getInstance(SolrReferenceResolver.class, "document");
         when(documentSolrReferenceResolver.getId(documentReference)).thenReturn(id);
 
         // Full Name
         String fullName = "Space.Name";
-        EntityReferenceSerializer<String> localEntityReferenceSerializer =
-            this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localEntityReferenceSerializer.serialize(this.documentReference)).thenReturn(fullName);
 
         // Hierarchy
@@ -188,23 +215,26 @@ public class DocumentSolrMetadataExtractorTest
             .thenReturn("Path");
 
         // Creator.
+        UserReference creatorUserReference = mock(UserReference.class);
+        when(this.documentAuthors.getCreator()).thenReturn(creatorUserReference);
         DocumentReference creatorReference = new DocumentReference("wiki", "Space", "Creator");
-        when(this.document.getCreatorReference()).thenReturn(creatorReference);
+        when(this.documentReferenceUserReferenceSerializer.serialize(creatorUserReference))
+            .thenReturn(creatorReference);
 
         String creatorStringReference = "wiki:Space.Creator";
-        EntityReferenceSerializer<String> entityReferenceSerializer =
-            this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "default");
-        when(entityReferenceSerializer.serialize(creatorReference)).thenReturn(creatorStringReference);
+        when(this.userReferenceSerializer.serialize(creatorUserReference)).thenReturn(creatorStringReference);
 
         String creatorDisplayName = "Crea Tor";
         when(this.xcontext.getWiki().getPlainUserName(creatorReference, this.xcontext)).thenReturn(creatorDisplayName);
 
         // Author.
+        UserReference authorUserReference = mock(UserReference.class);
+        when(this.documentAuthors.getOriginalMetadataAuthor()).thenReturn(authorUserReference);
         DocumentReference authorReference = new DocumentReference("wiki", "Space", "Author");
-        when(this.document.getAuthorReference()).thenReturn(authorReference);
+        when(this.documentReferenceUserReferenceSerializer.serialize(authorUserReference)).thenReturn(authorReference);
 
         String authorStringReference = "wiki:Space.Author";
-        when(entityReferenceSerializer.serialize(authorReference)).thenReturn(authorStringReference);
+        when(this.userReferenceSerializer.serialize(authorUserReference)).thenReturn(authorStringReference);
 
         String authorDisplayName = "Au Thor";
         when(this.xcontext.getWiki().getPlainUserName(authorReference, this.xcontext)).thenReturn(authorDisplayName);
@@ -234,7 +264,6 @@ public class DocumentSolrMetadataExtractorTest
 
         // Rendered Content
         final String renderedContent = "rendered content";
-        BlockRenderer plainRenderer = this.mocker.registerMockComponent(BlockRenderer.class, "plain/1.0");
         doAnswer(new Answer<Void>()
         {
             @Override
@@ -247,7 +276,7 @@ public class DocumentSolrMetadataExtractorTest
 
                 return null;
             }
-        }).when(plainRenderer).render((Block) any(), any());
+        }).when(this.renderer).render((Block) any(), any());
 
         // Raw Content
         String rawContent = "raw content";
@@ -256,7 +285,7 @@ public class DocumentSolrMetadataExtractorTest
         //
         // Call
         //
-        SolrInputDocument solrDocument = this.mocker.getComponentUnderTest().getSolrDocument(this.documentReference);
+        SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
 
         //
         // Assert and verify
@@ -302,24 +331,21 @@ public class DocumentSolrMetadataExtractorTest
     }
 
     @Test
-    public void getDocumentThrowingException() throws Exception
+    void getDocumentThrowingException() throws Exception
     {
         XWikiException thrown = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
             XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Unreadable document");
         when(this.xcontext.getWiki().getDocument(this.documentReference, this.xcontext)).thenThrow(thrown);
 
-        try {
-            this.mocker.getComponentUnderTest().getSolrDocument(this.frenchDocumentReference);
-            fail("An exception was expected.");
-        } catch (SolrIndexerException ex) {
-            assertEquals("Failed to get input Solr document for entity '" + this.frenchDocumentReference + "'",
-                ex.getMessage());
-            assertSame(thrown, ex.getCause());
-        }
+        SolrIndexerException solrIndexerException = assertThrows(SolrIndexerException.class,
+            () -> this.metadataExtractor.getSolrDocument(this.frenchDocumentReference));
+        assertEquals("Failed to get input Solr document for entity '" + this.frenchDocumentReference + "'",
+            solrIndexerException.getMessage());
+        assertSame(thrown, solrIndexerException.getCause());
     }
 
     @Test
-    public void getDocumentWithObjects() throws Exception
+    void getDocumentWithObjects() throws Exception
     {
         //
         // Mock
@@ -386,8 +412,6 @@ public class DocumentSolrMetadataExtractorTest
         when(this.document.getXObjects())
             .thenReturn(Collections.singletonMap(commentsClassReference, Arrays.asList(comment)));
 
-        EntityReferenceSerializer<String> localEntityReferenceSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localEntityReferenceSerializer.serialize(commentsClassReference)).thenReturn("space.commentsClass");
 
         BaseClass xclass = mock(BaseClass.class);
@@ -407,8 +431,7 @@ public class DocumentSolrMetadataExtractorTest
         //
         // Call
         //
-        SolrInputDocument solrDocument =
-            this.mocker.getComponentUnderTest().getSolrDocument(this.frenchDocumentReference);
+        SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.frenchDocumentReference);
 
         //
         // Assert and verify
@@ -466,7 +489,7 @@ public class DocumentSolrMetadataExtractorTest
      * @see "XWIKI-9417: Search does not return any results for Static List values"
      */
     @Test
-    public void setStaticListPropertyValue() throws Exception
+    void setStaticListPropertyValue() throws Exception
     {
         BaseObject xobject = mock(BaseObject.class);
 
@@ -490,7 +513,7 @@ public class DocumentSolrMetadataExtractorTest
         when(staticListClass.getMap(xcontext))
             .thenReturn(Collections.singletonMap("red", new ListItem("red", "Dark Red")));
 
-        SolrInputDocument solrDocument = this.mocker.getComponentUnderTest().getSolrDocument(this.documentReference);
+        SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
 
         // Make sure both the raw value (which is saved in the database) and the display value (specified in the XClass)
         // are indexed. The raw values are indexed as strings in order to be able to perform exact matches.
@@ -532,9 +555,8 @@ public class DocumentSolrMetadataExtractorTest
         DocumentReference authorReference = new DocumentReference("wiki", "XWiki", authorAlias);
         when(attachment.getAuthorReference()).thenReturn(authorReference);
 
-        EntityReferenceSerializer<String> serializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         String authorStringReference = "wiki:" + authorFullName;
-        when(serializer.serialize(authorReference)).thenReturn(authorStringReference);
+        when(this.entityReferenceSerializer.serialize(authorReference)).thenReturn(authorStringReference);
 
         when(this.xcontext.getWiki().getPlainUserName(authorReference, this.xcontext)).thenReturn(authorDisplayName);
 
@@ -551,14 +573,14 @@ public class DocumentSolrMetadataExtractorTest
             when(this.document.getAttachmentList()).thenReturn(Arrays.<XWikiAttachment>asList(logo));
         }
 
-        SolrInputDocument solrDocument = this.mocker.getComponentUnderTest().getSolrDocument(this.documentReference);
+        SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
 
-        assertEquals("Wrong attachment content indexed", expect, solrDocument.getFieldValue("attcontent_en_US"));
+        assertEquals(expect, solrDocument.getFieldValue("attcontent_en_US"), "Wrong attachment content indexed");
 
     }
 
     @Test
-    public void getDocumentWithAttachments() throws Exception
+    void getDocumentWithAttachments() throws Exception
     {
         Date logoDate = new Date(123);
         XWikiAttachment logo = createMockAttachment("logo.png", "image/png", logoDate, "foo", "Alice", "Shy Alice");
@@ -567,7 +589,7 @@ public class DocumentSolrMetadataExtractorTest
         when(this.document.getAttachmentList()).thenReturn(Arrays.<XWikiAttachment>asList(logo, todo));
 
         SolrInputDocument solrDocument =
-            this.mocker.getComponentUnderTest().getSolrDocument(this.frenchDocumentReference);
+            this.metadataExtractor.getSolrDocument(this.frenchDocumentReference);
 
         assertEquals(Arrays.asList("logo.png", "todo.txt"), solrDocument.getFieldValues(FieldUtils.FILENAME));
         assertEquals(Arrays.asList("image/png", "text/plain"), solrDocument.getFieldValues(FieldUtils.MIME_TYPE));
@@ -581,50 +603,50 @@ public class DocumentSolrMetadataExtractorTest
     }
 
     @Test
-    public void testAttachmentExtractFromTxt() throws Exception
+    void testAttachmentExtractFromTxt() throws Exception
     {
         assertAttachmentExtract("text content\n", "txt.txt");
     }
 
     @Test
-    public void testAttachmentExtractFromMSOffice97() throws Exception
+    void testAttachmentExtractFromMSOffice97() throws Exception
     {
         assertAttachmentExtract("MS Office 97 content\n\n", "msoffice97.doc");
 
     }
 
     @Test
-    public void testAttachmentExtractFromOpenXML() throws Exception
+    void testAttachmentExtractFromOpenXML() throws Exception
     {
         assertAttachmentExtract("OpenXML content\n", "openxml.docx");
     }
 
     @Test
-    public void testAttachmentExtractFromOpenDocument() throws Exception
+    void testAttachmentExtractFromOpenDocument() throws Exception
     {
         assertAttachmentExtract("OpenDocument content\n", "opendocument.odt");
     }
 
     @Test
-    public void testAttachmentExtractFromPDF() throws Exception
+    void testAttachmentExtractFromPDF() throws Exception
     {
         assertAttachmentExtract("\nPDF content\n\n\n", "pdf.pdf");
     }
 
     @Test
-    public void testAttachmentExtractFromZIP() throws Exception
+    void testAttachmentExtractFromZIP() throws Exception
     {
         assertAttachmentExtract("\nzip.txt\nzip content\n\n\n\n", "zip.zip");
     }
 
     @Test
-    public void testAttachmentExtractFromHTML() throws Exception
+    void testAttachmentExtractFromHTML() throws Exception
     {
         assertAttachmentExtract("something\n", "html.html");
     }
 
     @Test
-    public void testAttachmentExtractFromClass() throws Exception
+    void testAttachmentExtractFromClass() throws Exception
     {
         String expectedContent =
             "public synchronized class HelloWorld {\n" +

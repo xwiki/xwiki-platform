@@ -25,7 +25,6 @@
 #end
 #set ($paths = {
   'jsTree': $services.webjars.url('jstree', "jstree$jsExtension"),
-  'JobRunner': $services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', "jobRunner$jsExtension"),
   'tree-finder': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "finder$jsExtension"),
   'tree': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "tree$jsExtension")
 })
@@ -122,14 +121,14 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         });
 
         // Called when the user click on "select all"
-        questionForm.find('.btSelectAllTree').click(function(event){
+        questionForm.find('.btSelectAllTree').on('click', function(event) {
           event.preventDefault();
           deleteTree.jstree().check_all();
           answerProperties.selectAllExtensions = true;
         });
 
         // Called when the user click on "select none"
-        questionForm.find('.btUnselectAllTree').click(function(event){
+        questionForm.find('.btUnselectAllTree').on('click', function(event) {
           event.preventDefault();
           deleteTree.jstree().uncheck_all();
         });

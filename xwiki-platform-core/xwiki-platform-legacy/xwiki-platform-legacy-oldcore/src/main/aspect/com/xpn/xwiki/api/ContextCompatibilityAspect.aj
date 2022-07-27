@@ -51,4 +51,19 @@ public privileged aspect ContextCompatibilityAspect
     {
         return this.context.getUtil();
     }
+
+    /**
+     * Return the current uix object. This method is defined to allow to access this object without programming rights.
+     *
+     * @return the current uix object
+     *
+     * @since 14.1RC1
+     * @since 13.10.3
+     * @deprecated since 14.1RC1, use the "uix" key from the velocity context instead in the UIX templates
+     */
+    @Deprecated
+    public java.lang.Object Context.getUix()
+    {
+        return getXWikiContext().get("uix");
+    }
 }

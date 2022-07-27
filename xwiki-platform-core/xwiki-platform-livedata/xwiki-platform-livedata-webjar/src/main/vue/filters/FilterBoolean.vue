@@ -47,10 +47,10 @@ export default {
 
   computed: {
     trueValue() {
-      return this.config.hasOwnProperty('trueValue') ? this.config.trueValue : 'true';
+      return Object.prototype.hasOwnProperty.call(this.config, 'trueValue') ? this.config.trueValue : 'true';
     },
     falseValue() {
-      return this.config.hasOwnProperty('falseValue') ? this.config.falseValue : 'false';
+      return Object.prototype.hasOwnProperty.call(this.config, 'falseValue') ? this.config.falseValue : 'false';
     }
   },
 

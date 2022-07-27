@@ -22,7 +22,6 @@ package org.xwiki.ratings;
 import java.util.Date;
 
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * General interface to provide information about average rating notation.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public interface AverageRating
 {
     /**

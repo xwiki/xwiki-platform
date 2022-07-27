@@ -33,6 +33,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.DefaultJobStatus;
+import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
@@ -66,6 +67,19 @@ public class WikiCreationJob extends AbstractJob<WikiCreationRequest, DefaultJob
 
     @Inject
     private DocumentReferenceResolver<String> defaultDocumentReferenceResolver;
+
+    @Override
+    protected WikiCreationRequest castRequest(Request request)
+    {
+        WikiCreationRequest castedRequest;
+        if (request instanceof WikiCreationRequest) {
+            castedRequest = (WikiCreationRequest) request;
+        } else {
+            castedRequest = new WikiCreationRequest(request);
+        }
+
+        return castedRequest;
+    }
 
     @Override
     protected void runInternal() throws Exception

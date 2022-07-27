@@ -32,7 +32,10 @@
 #######################################################
 ##                     DISPLAY
 #######################################################
+#set ($discard = $xwiki.jsfx.use('js/xwiki/delete.js'))
 #template('refactoringStatus_macros.vm')
+#template('refactoring_macros.vm')
+#template('xwikivars.vm')
 
 #controller()
 #macro(displayContent $deletecontent)
@@ -85,7 +88,7 @@
 ##            DISPLAY RUNNING JOB
 #######################################################
 #macro (displayDeleteJobStatus $deleteJobStatus)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
   ## TODO: allows question templates to inject the web resources they need
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
     {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -117,7 +120,7 @@
 ##            DISPLAY CONFIRMATION PAGE
 #######################################################
 #macro(displayConfirmationPage)
-  <form action="$doc.getURL('delete', "$!{languageparams}")" method="post">
+  <form id="delete" class="xform" action="$doc.getURL('delete', "$!{languageparams}")" method="post">
     #getChildren()
     #getBacklinks()
     #getChildren_legacy()
@@ -228,7 +231,39 @@
       #end
       </ul>
     #end
-    #set($body = $services.localization.render('core.delete.backlinksWarning', [$message]))
+    #define($body)
+      <p class="noitems">
+        $escapetool.xml($services.localization.render('core.delete.backlinksInfo', [$doc.backlinks.size()]))
+      </p>
+      <dl>
+        <dt>
+          <label for="newBacklinkTarget">
+            $escapetool.xml($services.localization.render('core.delete.backlinkTarget.label'))
+          </label>
+          <span class="xHint">$escapetool.xml($services.localization.render('core.delete.backlinkTarget.hint'))</span>
+        </dt>
+        <dd>
+          #set ($pagePickerParams = {
+            'id': 'newBacklinkTarget',
+            'name': 'newBacklinkTarget'
+          })
+          #pagePicker($pagePickerParams)
+        </dd>
+        ##------------
+        ## Links field
+        ##------------
+        #displayLinksCheckbox({
+          'label': 'core.delete.updateLinks.label',
+          'hint': 'core.delete.updateLinks.hint',
+          'hidden': true
+        })
+        #displayAutoRedirectCheckbox({
+          'label': 'core.delete.autoRedirect.label',
+          'hint': 'core.delete.autoRedirect.hint',
+          'hidden': true
+        })
+      </dl>
+    #end
     #displayPanel('panel-backlinks', 'panel-default', $heading, $body)
     #set($hasInlinks = true)
   #end

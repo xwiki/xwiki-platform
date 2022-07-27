@@ -68,7 +68,8 @@ public abstract class AbstractMinorEventNotificationFilter implements Notificati
             Collection<NotificationFilterPreference> filterPreferences,
             NotificationFormat format)
     {
-        return event.getType().equals(UPDATE_TYPE) && !event.getDocumentVersion().endsWith(VERSION_SCHEME)
+        return getFormats().contains(format) && event.getType().equals(UPDATE_TYPE)
+            && !event.getDocumentVersion().endsWith(VERSION_SCHEME)
                 ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
     }
 

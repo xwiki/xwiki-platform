@@ -48,7 +48,7 @@ public class PersistentTestContext
     /** Utility methods which should be available to tests and to pages. */
     private TestUtils util;
 
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private Map<String, Object> properties = new HashMap<>();
 
     /**
      * Starts an XWiki instance if not already started.
@@ -74,7 +74,7 @@ public class PersistentTestContext
     public PersistentTestContext(List<XWikiExecutor> executors, XWikiWebDriver driver)
     {
         initialize(executors);
-        this.driver = driver;
+        setDriver(driver);
     }
 
     private void initialize(List<XWikiExecutor> executors)
@@ -89,7 +89,7 @@ public class PersistentTestContext
     {
         this.executors = toClone.executors;
         this.util = toClone.util;
-        this.driver = toClone.driver;
+        setDriver(toClone.driver);
         this.properties.putAll(toClone.properties);
     }
 
@@ -125,8 +125,8 @@ public class PersistentTestContext
 
     public void shutdown() throws Exception
     {
-        if (this.driver != null) {
-            this.driver.quit();
+        if (getDriver() != null) {
+            getDriver().quit();
         }
         for (XWikiExecutor executor : this.executors) {
             executor.stop();

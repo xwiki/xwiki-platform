@@ -31,6 +31,7 @@ import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
+import org.xwiki.xml.html.HTMLElementSanitizer;
 
 /**
  * Renders annotations in the XHTML format.
@@ -67,10 +68,13 @@ public class AnnotationXHTMLRenderer extends AbstractAnnotationRenderer
     @Inject
     private LinkLabelGenerator linkLabelGenerator;
 
+    @Inject
+    private HTMLElementSanitizer htmlElementSanitizer;
+
     @Override
     public ChainingPrintRenderer getAnnotationPrintRenderer(ListenerChain chain)
     {
-        return new AnnotationXHTMLChainingRenderer(linkRenderer, imageRenderer, chain);
+        return new AnnotationXHTMLChainingRenderer(linkRenderer, imageRenderer, this.htmlElementSanitizer, chain);
     }
 
     @Override

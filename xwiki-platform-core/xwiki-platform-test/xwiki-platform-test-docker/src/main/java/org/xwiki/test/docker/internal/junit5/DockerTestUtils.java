@@ -41,6 +41,8 @@ import org.testcontainers.containers.output.FrameConsumerResultCallback;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.DockerLoggerFactory;
+import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 
 import com.github.dockerjava.api.command.LogContainerCmd;
@@ -72,6 +74,9 @@ public final class DockerTestUtils
 
     private static List<String> pulledImages = new ArrayList<>();
 
+    private static final ExtensionContext.Namespace NAMESPACE =
+        ExtensionContext.Namespace.create(XWikiDockerExtension.class);
+
     private DockerTestUtils()
     {
         // Prevents instantiation.
@@ -85,9 +90,8 @@ public final class DockerTestUtils
      */
     public static void followOutput(GenericContainer<?> container, Class<?> loggingClass)
     {
-        LogContainerCmd cmd = container.getDockerClient().logContainerCmd(container.getContainerId())
-            .withFollowStream(true)
-            .withTail(0);
+        LogContainerCmd cmd =
+            container.getDockerClient().logContainerCmd(container.getContainerId()).withFollowStream(true).withTail(0);
 
         FrameConsumerResultCallback callback = new FrameConsumerResultCallback();
         Consumer<OutputFrame> consumer = new Slf4jLogConsumer(LoggerFactory.getLogger(loggingClass));
@@ -130,7 +134,7 @@ public final class DockerTestUtils
     /**
      * @param container the container to start
      * @param testConfiguration the configuration to build (database, debug mode, etc). Used to verify if we're online
-     *        to pull the image
+     *            to pull the image
      * @throws Exception if the container fails to start
      */
     public static void startContainer(GenericContainer<?> container, TestConfiguration testConfiguration)
@@ -139,14 +143,17 @@ public final class DockerTestUtils
         // Get the latest image in case the tag has been updated on dockerhub.
         String dockerImageName = container.getDockerImageName();
 
+        // TODO: Force pulling the selenium FF and Chrome docker images.
+        // Remove once https://github.com/testcontainers/testcontainers-java/issues/4608 is fixed
+        BrowserTestUtils.pullBrowserImages(container, testConfiguration);
+
         // Don't pull if:
         // - we're offline
         // - we've already pulled this image in this test run
         // - the container corresponds to an image that's been dynamically built by the test and thus that doesn't
-        //   exists on dockerhub.
+        // exists on dockerhub.
         if (!testConfiguration.isOffline() && !pulledImages.contains(dockerImageName)
-            && !(container instanceof XWikiLocalGenericContainer))
-        {
+            && !(container instanceof XWikiLocalGenericContainer)) {
             // Pull images once every day (to avoid the 200 pull rate limit of dockerhub when authenticated).
             container.withImagePullPolicy(new DurationImagePullPolicy(DAY));
             pulledImages.add(dockerImageName);
@@ -155,7 +162,7 @@ public final class DockerTestUtils
         // Get container debug logs to try to diagnose container failing errors
         //
         // TODO: We should only log this in debug mode normally but because of
-        //  https://github.com/testcontainers/testcontainers-java/issues/2483 we want to see the retry debug message
+        // https://github.com/testcontainers/testcontainers-java/issues/2483 we want to see the retry debug message
         // from TC so that when the container fails to start on the first try but succeed on the following tries, we
         // can know that the displayed stack trace is not a sign of a problem and should be ignored.
         if (testConfiguration.isVerbose()) {
@@ -181,20 +188,20 @@ public final class DockerTestUtils
     private static void startContainerInternal(GenericContainer<?> container, TestConfiguration testConfiguration)
     {
         // Try to debug a timeout error starting BrowserWebDriverContainer:
-        //   ...
-        //   Caused by: org.testcontainers.containers.ContainerLaunchException: Container startup failed
-        //   ...
-        //   Caused by: org.rnorth.ducttape.RetryCountExceededException: Retry limit hit with exception
-        //   ...
-        //   Caused by: org.testcontainers.containers.ContainerLaunchException: Could not create/start container
-        //   ...
-        //   Caused by: org.rnorth.ducttape.TimeoutException: org.rnorth.ducttape.TimeoutException: java.util
-        //     .concurrent.TimeoutException
-        //   ...
-        //   Caused by: org.rnorth.ducttape.TimeoutException: java.util.concurrent.TimeoutException
-        //   ...
-        //   Caused by: java.util.concurrent.TimeoutException
-        //   ...
+        // ...
+        // Caused by: org.testcontainers.containers.ContainerLaunchException: Container startup failed
+        // ...
+        // Caused by: org.rnorth.ducttape.RetryCountExceededException: Retry limit hit with exception
+        // ...
+        // Caused by: org.testcontainers.containers.ContainerLaunchException: Could not create/start container
+        // ...
+        // Caused by: org.rnorth.ducttape.TimeoutException: org.rnorth.ducttape.TimeoutException: java.util
+        // .concurrent.TimeoutException
+        // ...
+        // Caused by: org.rnorth.ducttape.TimeoutException: java.util.concurrent.TimeoutException
+        // ...
+        // Caused by: java.util.concurrent.TimeoutException
+        // ...
         // We noticed that several BrowserWebDriverContainer are started when it fails and we need to find out which
         // code starts them.
         if (testConfiguration.isVerbose()) {
@@ -237,13 +244,13 @@ public final class DockerTestUtils
         builder.append(DASH);
         builder.append(testConfiguration.getDatabaseTag() != null ? testConfiguration.getDatabaseTag() : DEFAULT);
         builder.append(DASH);
-        builder.append(testConfiguration.getJDBCDriverVersion() != null
-            ? testConfiguration.getJDBCDriverVersion() : DEFAULT);
+        builder.append(
+            testConfiguration.getJDBCDriverVersion() != null ? testConfiguration.getJDBCDriverVersion() : DEFAULT);
         builder.append(DASH);
         builder.append(testConfiguration.getServletEngine().name());
         builder.append(DASH);
-        builder.append(testConfiguration.getServletEngineTag() != null
-            ? testConfiguration.getServletEngineTag() : DEFAULT);
+        builder.append(
+            testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag() : DEFAULT);
         builder.append(DASH);
         builder.append(testConfiguration.getBrowser().name());
         return builder.toString().toLowerCase();
@@ -253,11 +260,11 @@ public final class DockerTestUtils
      * @param fileSuffix the suffix of the file to create
      * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param extensionContext the test execution context from which to extract the test class and test name used to
-     *        compute the name of the new file
+     *            compute the name of the new file
      * @return the file object in which to save a result
      */
-    public static File getResultFileLocation(String fileSuffix,
-        TestConfiguration testConfiguration, ExtensionContext extensionContext)
+    public static File getResultFileLocation(String fileSuffix, TestConfiguration testConfiguration,
+        ExtensionContext extensionContext)
     {
         // Note: There's currently a limitation in Jenkins when archiving artifacts: they are copied without caring
         // about their locations. And since we run the same test several times but with different configurations,
@@ -268,12 +275,12 @@ public final class DockerTestUtils
         // Tests could be repeated and if they are we need to compute a file name that takes into account the repetition
         // There seems to be no easy way to get them right now, see https://github.com/junit-team/junit5/issues/1884
         // Thus we currently extract the repetition index from the display name which is like:
-        //     ...[test-template-invocation:#2]
+        // ...[test-template-invocation:#2]
         String repetitionIndex = getRepetitionIndex(extensionContext);
-        return new File(newDir, String.format("%s-%s-%s%s.%s",
-            DockerTestUtils.getTestConfigurationName(testConfiguration),
-            extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName(),
-            repetitionIndex, fileSuffix));
+        return new File(newDir,
+            String.format("%s-%s-%s%s.%s", DockerTestUtils.getTestConfigurationName(testConfiguration),
+                extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName(),
+                repetitionIndex, fileSuffix));
     }
 
     /**
@@ -330,5 +337,121 @@ public final class DockerTestUtils
     public static String getAgentName()
     {
         return System.getProperty("jenkinsAgentName");
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @return the store
+     * @since 14.5
+     */
+    public static ExtensionContext.Store getStore(ExtensionContext context)
+    {
+        return context.getRoot().getStore(NAMESPACE);
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @return the XWiki URL
+     * @since 14.5
+     */
+    public static String getXWikiURL(ExtensionContext context)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+        return store.get(String.class, String.class);
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @param xwikiURL the XWiki URL
+     * @since 14.5
+     */
+    public static void setXWikiURL(ExtensionContext context, String xwikiURL)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+        store.put(String.class, xwikiURL);
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @return the helper to create wikis
+     * @since 14.5
+     */
+    public static WikiCreator getWikiCreator(ExtensionContext context)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+
+        WikiCreator creator = store.get(WikiCreator.class, WikiCreator.class);
+
+        if (creator == null) {
+            creator = new WikiCreator(context);
+            store.put(WikiCreator.class, creator);
+        }
+
+        return creator;
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @return the component manager
+     * @since 14.5
+     */
+    public static ComponentManager getComponentManager(ExtensionContext context)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+
+        EmbeddableComponentManager componentManager =
+            store.get(EmbeddableComponentManager.class, EmbeddableComponentManager.class);
+
+        if (componentManager == null) {
+            // Initialize XWiki Component system
+            componentManager = new EmbeddableComponentManager();
+            componentManager.initialize(Thread.currentThread().getContextClassLoader());
+            store.put(EmbeddableComponentManager.class, componentManager);
+        }
+
+        return componentManager;
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @return the helper to install extensions
+     * @since 14.5
+     */
+    public static ExtensionInstaller getExtensionInstaller(ExtensionContext context)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+
+        return store.get(ExtensionInstaller.class, ExtensionInstaller.class);
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @param installer the helper to install extensions
+     * @since 14.5
+     */
+    public static void setExtensionInstaller(ExtensionContext context, ExtensionInstaller installer)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+        store.put(ExtensionInstaller.class, installer);
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @param configuration the test configuration
+     */
+    public static void setTestConfiguration(ExtensionContext context, TestConfiguration configuration)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+        store.put(TestConfiguration.class, configuration);
+    }
+
+    /**
+     * @param context the context where to find the store
+     * @return the test configuration
+     */
+    public static TestConfiguration getTestConfiguration(ExtensionContext context)
+    {
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
+        return store.get(TestConfiguration.class, TestConfiguration.class);
     }
 }

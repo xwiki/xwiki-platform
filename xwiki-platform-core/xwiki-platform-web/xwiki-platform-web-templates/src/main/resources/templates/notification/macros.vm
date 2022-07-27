@@ -114,6 +114,7 @@
       #if ($stringtool.isNotBlank($details))
       <button class="btn btn-xs toggle-notification-event-details" type="submit">
         <span class="fa fa-ellipsis-h"></span>
+        <span class="sr-only">$services.localization.render('notifications.macro.showEventDetails')</span>
       </button>
       #end
     </div>
@@ -171,7 +172,8 @@
   #set ($userDoc = $xwiki.getDocument($user))
   #getUserAvatarURL($userDoc.documentReference, $avatarURL, 40)
   #set ($userName = $xwiki.getUserName($user))
-  <span class="notification-event-user"><img src="$avatarURL.url" alt="$escapetool.xml($userDoc.pageReference.name)"/>#if(!$onlyAvatar) <a href="$userDoc.getURL()">$userName</a>#end</span>##
+  #set ($plainUserName = $xwiki.getPlainUserName($user))
+  <span class="notification-event-user"><img src="$avatarURL.url" alt="$escapetool.xml($plainUserName)"/>#if(!$onlyAvatar)${userName}#end</span>##
 #end
 #**
  * Display a line with the name of all users

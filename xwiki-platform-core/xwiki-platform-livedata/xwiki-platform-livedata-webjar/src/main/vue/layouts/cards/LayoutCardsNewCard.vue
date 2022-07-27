@@ -16,8 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+-->
 
 <!--
   LayoutCardsNewCard is a component for the Card layout that can be used
@@ -35,7 +34,7 @@
       href="#"
       @click.prevent="logic.addEntry()"
     >
-      <span class="fa fa-plus-circle fa-3x"></span>
+      <XWikiIcon :icon-descriptor="{name: 'add'}"/>
       <span class="add-entry-text">
         {{ $t('livedata.action.addEntry') }}
       </span>
@@ -47,9 +46,12 @@
 
 
 <script>
+import XWikiIcon from "../../utilities/XWikiIcon";
 export default {
 
   name: "LayoutCardsNewCard",
+
+  components: {XWikiIcon},
 
   inject: ["logic"],
 

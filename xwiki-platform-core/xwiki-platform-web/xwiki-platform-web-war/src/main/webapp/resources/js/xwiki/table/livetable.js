@@ -19,7 +19,7 @@
  */
 var XWiki = (function(XWiki) {
 // Start XWiki augmentation.
-var widgets = XWiki.widgets = XWiki.widgets || {};
+XWiki.widgets = XWiki.widgets || {};
 
 /**
   * The class representing an AJAX-populated live table.
@@ -196,8 +196,7 @@ XWiki.widgets.LiveTable = Class.create({
         "tableId" : self.domNodeName
       });
 
-      var ajx = new Ajax.Request(url,
-      {
+      new Ajax.Request(url, {
         method: 'get',
         onComplete: function( transport ) {
           // Let code know loading is finished
@@ -323,7 +322,7 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Let code know displaying is finished
     // 1. Named event (for code interested by that table only)
-    document.fire("xwiki:livetable:" + this.domNodeName + ":displayComplete")
+    document.fire("xwiki:livetable:" + this.domNodeName + ":displayComplete");
     // 2. Generic event (for code potentially interested in any livetable)
     document.fire("xwiki:livetable:displayComplete", {
       "tableId" : this.domNodeName
@@ -353,10 +352,26 @@ XWiki.widgets.LiveTable = Class.create({
       if (descriptor.type === 'hidden') {
         return;
       }
-      // The column's display name to be used when displaying the reponsive version.
+      // The column's display name to be used when displaying the responsive version.
       var displayName = descriptor.displayName || column;
       var fieldName = column.replace(/^doc\./, 'doc_');
-      if (column === '_actions') {
+      // When a cell is part of a non-viewable row (except for the actions that simply stays empty), we display a 
+      // message indicating that the content is not present because the current user does not have the right to view it.
+      if (!row['doc_viewable'] && !row[fieldName]) {
+        const notViewableCellMessage = $jsontool.serialize($services.localization.render('platform.livetable.docNotViewable'));
+        var td = new Element('td', {
+          'class': [
+            fieldName,
+            'link' + (descriptor.link || ''),
+            'type' + (descriptor.type || '')
+          ].join(' '),
+          'data-title': displayName
+        });
+        if (column !== '_actions') {
+          td.update(notViewableCellMessage + "<sup>*</sup>");
+        }
+        tr.appendChild(td);
+      } else if (column === '_actions') {
         var adminActions = ['admin', 'rename', 'rights'];
         var td = new Element('td', {
           'class': 'actions',
@@ -444,9 +459,6 @@ XWiki.widgets.LiveTable = Class.create({
           container.innerHTML = row[fieldName] || '';
         } else if (row[fieldName] !== undefined && row[fieldName] !== null) {
           var text = row[fieldName] + '';
-          if (fieldName === 'doc_name' && !row['doc_viewable']) {
-            text += '*';
-          }
           if (showFilterNote && fieldName === 'doc_title' && row['doc_title_raw'] !== undefined) {
             container.addClassName('docTitleComputed');
           }
@@ -562,7 +574,7 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Let code know displaying is finished
     // 1. Named event (for code interested by that table only)
-    document.fire("xwiki:livetable:" + this.domNodeName + ":displayComplete")
+    document.fire("xwiki:livetable:" + this.domNodeName + ":displayComplete");
     // 2. Generic event (for code potentially interested in any livetable)
     document.fire("xwiki:livetable:displayComplete", {
       "tableId" : this.domNodeName
@@ -1064,7 +1076,7 @@ var LiveTableFilter = Class.create({
       if ((this.inputs[i].type == "radio") || (this.inputs[i].type == "checkbox")) {
         var filter = this.filters[key];
         if (filter) {
-          if (Object.isArray(filter)) {
+          if (Array.isArray(filter)) {
             this.inputs[i].checked = (filter.indexOf(this.inputs[i].value.strip()) != -1);
           } else {
             this.inputs[i].checked = (filter == this.inputs[i].value.strip());
@@ -1080,7 +1092,7 @@ var LiveTableFilter = Class.create({
 
     this.selects.each(function(select) {
       var values = this.filters[select.name];
-      if (!Object.isArray(values)) {
+      if (!Array.isArray(values)) {
         values = [values];
       }
       var selectedValues = [];
@@ -1126,7 +1138,7 @@ var LiveTableFilter = Class.create({
   },
 
   _isBlank: function(value) {
-    var values = Object.isArray(value) ? value : [value];
+    var values = Array.isArray(value) ? value : [value];
     return values.every(function(value) {
       return typeof value !== 'string' || value.blank();
     });
@@ -1208,10 +1220,10 @@ var LiveTableTagCloud = Class.create({
       this.domNode = $(domNodeName);
       this.cloudFilter = false;
       this.selectedTags = {};
-      for (var i = 0; i < table.tags.size(); i++) {
+      for (var i = 0; i < table.tags.length; i++) {
         this.selectedTags[table.tags[i]] = {};
       }
-      if (Object.isArray(tags)) {
+      if (Array.isArray(tags)) {
          this.tags = tags;
          if (tags.length > 0) {
            this.updateTagCloud(tags);
@@ -1397,9 +1409,7 @@ var init = function(event) {
   elements.forEach(function(element) {
     var liveTableElements = element.classList.contains('xwiki-livetable') ? [element] :
       element.querySelectorAll('.xwiki-livetable');
-    // Iterate the NodeList of live table elements in a way that is compatible with IE11.
-    // See XWIKI-17170: LiveTables not working on IE11
-    Array.prototype.forEach.call(liveTableElements, maybeCreateLiveTable);
+    liveTableElements.forEach(maybeCreateLiveTable);
   });
 };
 

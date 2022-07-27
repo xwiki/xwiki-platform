@@ -157,7 +157,7 @@ public class LoggingScriptService implements ScriptService
      */
     public LogEvent translate(LogEvent logEvent)
     {
-        if (logEvent.getTranslationKey() != null) {
+        if (logEvent != null && logEvent.getTranslationKey() != null) {
             Translation translation = this.localization.getTranslation(logEvent.getTranslationKey());
 
             if (translation != null) {

@@ -49,7 +49,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -274,8 +274,8 @@ public class LessCompilerScriptServiceTest
         assertFalse(mocker.getComponentUnderTest().clearCache());
 
         // Verify
-        verifyZeroInteractions(lessCache);
-        verifyZeroInteractions(colorThemeCache);
+        verifyNoInteractions(lessCache);
+        verifyNoInteractions(colorThemeCache);
     }
 
     @Test
@@ -319,8 +319,8 @@ public class LessCompilerScriptServiceTest
         assertFalse(mocker.getComponentUnderTest().clearCacheFromColorTheme("colorTheme"));
 
         // Verify
-        verifyZeroInteractions(lessCache);
-        verifyZeroInteractions(colorThemeCache);
+        verifyNoInteractions(lessCache);
+        verifyNoInteractions(colorThemeCache);
     }
 
     @Test
@@ -364,8 +364,8 @@ public class LessCompilerScriptServiceTest
         assertFalse(mocker.getComponentUnderTest().clearCacheFromSkin("skin"));
 
         // Verify
-        verifyZeroInteractions(lessCache);
-        verifyZeroInteractions(colorThemeCache);
+        verifyNoInteractions(lessCache);
+        verifyNoInteractions(colorThemeCache);
     }
 
 }

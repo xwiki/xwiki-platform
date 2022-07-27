@@ -3,8 +3,7 @@
 #if (!$maxColumnsNumber || $maxColumnsNumber <= 0)
   #set ($maxColumnsNumber = 50)
 #end
-/* Don't fill 100% because IE doesn't fit things properly in. */
-#set($columnsTotalWidth = 99)
+#set($columnsTotalWidth = 100)
 /* 1.5% padding right to all the columns except last one. */
 #set($columnPadding = 0.75)
 
@@ -37,7 +36,7 @@
 
 /* Generate column-specific css classes */
 #foreach($columns in [1..$maxColumnsNumber])
-  /* Compute the percent of the screen width of a column. Round so that the java upper rounding doesn't screw IE, and because 2 decimals should be enough for everyone. */
+  /* Compute the percent of the screen width of a column. Round because 2 decimals should be enough for everyone. */
   #set($rawComputedColumnWidth = (($columnsTotalWidth - $columnPadding * 2 * ($columns - 1)) / $columns))
   #set($computedColumnWidth = $mathtool.roundTo(2, $rawComputedColumnWidth))
   .container-columns-$columns .column{

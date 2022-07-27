@@ -20,7 +20,6 @@
 package org.xwiki.test.docker.internal.junit5;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.test.docker.internal.junit5.MavenTimestampVersionConverter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -30,24 +29,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 10.11RC1
  */
-public class MavenTimestampVersionConverterTest
+class MavenTimestampVersionConverterTest
 {
     @Test
-    public void convertWhenTimestamp()
+    void convertWhenTimestamp()
     {
         MavenTimestampVersionConverter converter = new MavenTimestampVersionConverter();
         assertEquals("10.11-SNAPSHOT", converter.convert("10.11-20181128.193513-21"));
     }
 
     @Test
-    public void convertWhenNotTimestamp()
+    void convertWhenNotTimestamp()
     {
         MavenTimestampVersionConverter converter = new MavenTimestampVersionConverter();
         assertEquals("10.11-20181128", converter.convert("10.11-20181128"));
     }
 
     @Test
-    public void convertWhenAlreadySNAPSHOT()
+    void convertWhenAlreadySNAPSHOT()
     {
         MavenTimestampVersionConverter converter = new MavenTimestampVersionConverter();
         assertEquals("10.11-SNAPSHOT", converter.convert("10.11-SNAPSHOT"));

@@ -99,7 +99,7 @@
     $response.sendRedirect($doc.getURL())
   #else
 
-    {{error}}{{translation key="platform.wiki.sheet.erroraliasalreadynotexists" parameters="$request.domain"/}}{{/error}}
+    {{error}}{{translation key="platform.wiki.sheet.erroraliasalreadynotexists" parameters="~"${services.rendering.escape($escapetool.java($request.domain), 'xwiki/2.1')}~""/}}{{/error}}
 
   #end
 #end
@@ -118,7 +118,7 @@
     $response.sendRedirect($doc.getURL())
   #else
   
-    {{error}}{{translation key="platform.wiki.sheet.erroraliasdoesnotexists" parameters="$request.domain"/}}{{/error}}
+    {{error}}{{translation key="platform.wiki.sheet.erroraliasdoesnotexists" parameters="~"${services.rendering.escape($escapetool.java($request.domain), 'xwiki/2.1')}~""/}}{{/error}}
     
   #end
 #end

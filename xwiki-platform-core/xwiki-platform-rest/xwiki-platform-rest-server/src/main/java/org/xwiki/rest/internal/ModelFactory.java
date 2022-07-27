@@ -112,6 +112,7 @@ import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -162,6 +163,9 @@ public class ModelFactory
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private UserReferenceSerializer<String> userReferenceSerializer;
 
     public ModelFactory()
     {
@@ -746,6 +750,14 @@ public class ModelFactory
         if (withPrettyNames) {
             page.setModifierName(xwikiContext.getWiki().getUserName(doc.getContentAuthor(), null, false, xwikiContext));
         }
+
+        String originalAuthor = this.userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());
+        page.setOriginalMetadataAuthor(originalAuthor);
+        if (withPrettyNames) {
+            page.setOriginalMetadataAuthorName(
+                xwikiContext.getWiki().getUserName(originalAuthor, null, false, xwikiContext));
+        }
+
 
         calendar = Calendar.getInstance();
         calendar.setTime(doc.getContentUpdateDate());

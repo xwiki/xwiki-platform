@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 require(['jquery', 'bootstrap'], function($) {
-  $(document).ready(function() {
+  $(function() {
 
     // Fix the bad location of the dropdown menu when the trigger is close to the end of the screen.
     // See: http://jira.xwiki.org/browse/XWIKI-12609

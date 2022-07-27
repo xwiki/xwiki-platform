@@ -1,3 +1,4 @@
 500:org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration
 org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration
 org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource
+org.xwiki.rendering.internal.configuration.migrations.R140100000XRENDERING375DataMigration

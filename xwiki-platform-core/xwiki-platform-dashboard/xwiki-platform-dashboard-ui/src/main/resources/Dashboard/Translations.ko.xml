@@ -37,11 +37,11 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>dashboard.templateProvider.description=커스터마이징 가젯
-
 dashboard.gadgetSelector.title=가젯 선택
 dashboard.gadgetEditor.title=가젯 편집
 dashboard.gadgetEditor.changeGadget.label=가젯 변경
 dashboard.gadgetEditor.gadgetTitle.label=가젯 제목
-### Missing: dashboard.gadgetEditor.gadgetTitle.hint=The title of this gadget appears at the top of the gadget panel on the dashboard (may contain velocity code).
-### Missing: dashboard.initialization.saveMessage=Initialize default dashboard user setup</content>
+dashboard.gadgetEditor.gadgetTitle.hint=이 Gadget의 제목은 대시보드의 Gadget 패널 맨 위에 나타납니다(velocity code를 포함할 수 있음).
+dashboard.initialization.saveMessage=기본 대시보드 사용자 설정을 초기화합니다
+</content>
 </xwikidoc>

@@ -158,7 +158,7 @@ public class XWikiExecutor
                 } else {
                     this.executionDirectory = "";
                 }
-                this.executionDirectory += "target/xwiki";
+                this.executionDirectory = findXWikiDirectoryInTarget(this.executionDirectory);
             }
             if (index > 0) {
                 this.executionDirectory += "-" + index;
@@ -552,5 +552,27 @@ public class XWikiExecutor
         }
 
         return stopCommand;
+    }
+
+    private String findXWikiDirectoryInTarget(String baseDirectory)
+    {
+        // Try the standard location first
+        File defaultDirectory = new File(String.format("%starget/xwiki", baseDirectory));
+        if (defaultDirectory.exists()) {
+            return defaultDirectory.getPath();
+        }
+
+        // Find all directories starting with "xwiki" and look for a file inside named "start_xwiki.sh". Return the
+        // first such directory found.
+        File targetFile = new File(String.format("%starget", baseDirectory));
+        File[] directories = targetFile.listFiles(
+            file -> file.isDirectory() && file.getName().startsWith("xwiki"));
+        for (File directory : directories) {
+            File[] startFiles = directory.listFiles(file -> file.getName().equals("start_xwiki.sh"));
+            if (startFiles != null && startFiles.length > 0) {
+                return directory.getPath();
+            }
+        }
+        return "target/xwiki";
     }
 }

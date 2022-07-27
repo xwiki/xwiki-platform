@@ -28,7 +28,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.livedata.LiveDataSource;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a property of a live data entry.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Path("/liveData/sources/{sourceId}/entries/{entryId}/properties/{propertyId}")
-@Unstable
 public interface LiveDataEntryPropertyResource
 {
     /**

@@ -38,7 +38,7 @@ define(['jquery'], function($) {
     var immediatePropagationStopped = jQueryEvent && typeof(jQueryEvent.isImmediatePropagationStopped) === 'function'
       && jQueryEvent.isImmediatePropagationStopped();
     if (!immediatePropagationStopped && element && shouldBridgeEvent(eventName)) {
-      var memo = $.isArray(data) ? data[0] : data;
+      var memo = Array.isArray(data) ? data[0] : data;
       var propagationStopped = jQueryEvent && typeof(jQueryEvent.isPropagationStopped) === 'function'
         && jQueryEvent.isPropagationStopped();
       // Execute only the event listeners registered directly on the event target if the jQuery event was stopped.

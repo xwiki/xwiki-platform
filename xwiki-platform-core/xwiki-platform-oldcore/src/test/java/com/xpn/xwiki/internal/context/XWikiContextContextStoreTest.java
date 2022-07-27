@@ -21,11 +21,14 @@ package com.xpn.xwiki.internal.context;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.Cookie;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -134,16 +137,17 @@ class XWikiContextContextStoreTest
     {
         Map<String, String[]> parameters = new HashMap<>();
         parameters.put("param1", new String[] {"value1", "value2"});
-        XWikiServletRequestStub request = new XWikiServletRequestStub(this.wikiURL, parameters);
+        Cookie[] cookies = new Cookie[] {new Cookie("color", "red")};
+        XWikiServletRequestStub request = new XWikiServletRequestStub(this.wikiURL, "/test", parameters, cookies);
         this.oldcore.getXWikiContext().setRequest(request);
 
         Map<String, Serializable> contextStore = new HashMap<>();
 
         this.store.save(contextStore, Arrays.asList(XWikiContextContextStore.PREFIX_PROP_REQUEST));
 
-        assertEquals(3, contextStore.size());
+        assertEquals(4, contextStore.size());
         assertEquals(this.wikiURL.toString(), contextStore.get(XWikiContextContextStore.PROP_REQUEST_URL).toString());
-        assertEquals(null, contextStore.get(XWikiContextContextStore.PROP_REQUEST_CONTEXTPATH));
+        assertEquals("/test", contextStore.get(XWikiContextContextStore.PROP_REQUEST_CONTEXTPATH));
 
         Map<String, String[]> storedParameters =
             (Map<String, String[]>) contextStore.get(XWikiContextContextStore.PROP_REQUEST_PARAMETERS);
@@ -151,6 +155,11 @@ class XWikiContextContextStoreTest
         Map.Entry<String, String[]> entry = storedParameters.entrySet().iterator().next();
         assertEquals("param1", entry.getKey());
         assertEquals(Arrays.asList(parameters.get("param1")), Arrays.asList(entry.getValue()));
+
+        Cookie[] storedCookies = (Cookie[]) contextStore.get(XWikiContextContextStore.PROP_REQUEST_COOKIES);
+        assertEquals(1, storedCookies.length);
+        assertEquals(cookies[0].getName(), storedCookies[0].getName());
+        assertEquals(cookies[0].getValue(), storedCookies[0].getValue());
     }
 
     @Test
@@ -212,6 +221,21 @@ class XWikiContextContextStoreTest
         assertEquals(this.wikiURL.toString(), this.oldcore.getXWikiContext().getRequest().getRequestURL().toString());
         assertFalse(((XWikiServletRequestStub) this.oldcore.getXWikiContext().getRequest()).isDaemon());
         assertNull(this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC));
+    }
+
+    @Test
+    void restoreRequestURL() throws MalformedURLException, URISyntaxException
+    {
+        assertNull(this.oldcore.getXWikiContext().getURL());
+
+        URL url = new URL("http://host:80/path?param=value#hash");
+
+        Map<String, Serializable> contextStore = new HashMap<>();
+        contextStore.put(XWikiContextContextStore.PROP_REQUEST_URL, url);
+
+        this.store.restore(contextStore);
+
+        assertEquals(url.toURI(), this.oldcore.getXWikiContext().getURL().toURI());
     }
 
     @Test

@@ -19,15 +19,15 @@
  */
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.jfree.data.general.Dataset;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.data.category.CategoryDataset;
-
+import org.junit.jupiter.api.Test;
 import org.xwiki.chart.model.ChartModel;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests building a category dataset from a table data source.
@@ -35,10 +35,11 @@ import org.xwiki.chart.model.ChartModel;
  * @version $Id$
  * @since 4.2M1
  */
-public class TableCategoryDatasetBuilderTest extends AbstractMacroContentTableBlockDataSourceTest
+@ComponentTest
+class TableCategoryDatasetBuilderTest extends AbstractMacroContentTableBlockDataSourceTest
 {
     @Test
-    public void testBuildCategoryDataset() throws Exception
+    void buildCategoryDataset() throws Exception
     {
         String content =
             "| column 1 | column 2 | column 3 | column 4\n" +
@@ -46,35 +47,35 @@ public class TableCategoryDatasetBuilderTest extends AbstractMacroContentTableBl
             "| row 2 | 22 | 23 | 24 \n";
         setUpContentExpectation(content);
 
-        getDataSource().buildDataset(content, map("type", "line", "range", "B2-D3"), null);
+        this.source.buildDataset(content, map("type", "line", "range", "B2-D3"), null);
 
-        ChartModel chartModel = getDataSource().getChartModel();
+        ChartModel chartModel = this.source.getChartModel();
 
         Dataset dataset = chartModel.getDataset();
 
-        Assert.assertTrue(dataset instanceof CategoryDataset);
-        Assert.assertTrue(chartModel.getAxis(0) instanceof CategoryAxis);
-        Assert.assertTrue(chartModel.getAxis(1) instanceof ValueAxis);
+        assertTrue(dataset instanceof CategoryDataset);
+        assertTrue(chartModel.getAxis(0) instanceof CategoryAxis);
+        assertTrue(chartModel.getAxis(1) instanceof ValueAxis);
 
         CategoryDataset categoryDataset = (CategoryDataset) dataset;
 
-        Assert.assertTrue(categoryDataset.getRowKey(0).equals(" row 1 "));
-        Assert.assertTrue(categoryDataset.getRowKey(1).equals(" row 2 "));
+        assertTrue(categoryDataset.getRowKey(0).equals(" row 1 "));
+        assertTrue(categoryDataset.getRowKey(1).equals(" row 2 "));
 
-        Assert.assertTrue(categoryDataset.getColumnKey(0).equals(" column 2 "));
-        Assert.assertTrue(categoryDataset.getColumnKey(1).equals(" column 3 "));
-        Assert.assertTrue(categoryDataset.getColumnKey(2).equals(" column 4"));
+        assertTrue(categoryDataset.getColumnKey(0).equals(" column 2 "));
+        assertTrue(categoryDataset.getColumnKey(1).equals(" column 3 "));
+        assertTrue(categoryDataset.getColumnKey(2).equals(" column 4"));
 
-        Assert.assertTrue(categoryDataset.getValue(0, 0).intValue() == 12);
-        Assert.assertTrue(categoryDataset.getValue(0, 1).intValue() == 13);
-        Assert.assertTrue(categoryDataset.getValue(0, 2).intValue() == 14);
-        Assert.assertTrue(categoryDataset.getValue(1, 0).intValue() == 22);
-        Assert.assertTrue(categoryDataset.getValue(1, 1).intValue() == 23);
-        Assert.assertTrue(categoryDataset.getValue(1, 2).intValue() == 24);
+        assertTrue(categoryDataset.getValue(0, 0).intValue() == 12);
+        assertTrue(categoryDataset.getValue(0, 1).intValue() == 13);
+        assertTrue(categoryDataset.getValue(0, 2).intValue() == 14);
+        assertTrue(categoryDataset.getValue(1, 0).intValue() == 22);
+        assertTrue(categoryDataset.getValue(1, 1).intValue() == 23);
+        assertTrue(categoryDataset.getValue(1, 2).intValue() == 24);
     }
 
     @Test
-    public void testBuildCategoryDatasetColumnsSeries() throws Exception
+    void buildCategoryDatasetColumnsSeries() throws Exception
     {
         String content =
             "| column 1 | column 2 | column 3 | column 4\n" +
@@ -82,30 +83,30 @@ public class TableCategoryDatasetBuilderTest extends AbstractMacroContentTableBl
             "| row 2 | 22 | 23 | 24 \n";
         setUpContentExpectation(content);
 
-        getDataSource().buildDataset(content, map("type", "line", "range", "B2-D3", "series", "columns"), null);
+        this.source.buildDataset(content, map("type", "line", "range", "B2-D3", "series", "columns"), null);
 
-        ChartModel chartModel = getDataSource().getChartModel();
+        ChartModel chartModel = this.source.getChartModel();
 
         Dataset dataset = chartModel.getDataset();
 
-        Assert.assertTrue(dataset instanceof CategoryDataset);
-        Assert.assertTrue(chartModel.getAxis(0) instanceof CategoryAxis);
-        Assert.assertTrue(chartModel.getAxis(1) instanceof ValueAxis);
+        assertTrue(dataset instanceof CategoryDataset);
+        assertTrue(chartModel.getAxis(0) instanceof CategoryAxis);
+        assertTrue(chartModel.getAxis(1) instanceof ValueAxis);
 
         CategoryDataset categoryDataset = (CategoryDataset) dataset;
 
-        Assert.assertTrue(categoryDataset.getColumnKey(0).equals(" row 1 "));
-        Assert.assertTrue(categoryDataset.getColumnKey(1).equals(" row 2 "));
+        assertTrue(categoryDataset.getColumnKey(0).equals(" row 1 "));
+        assertTrue(categoryDataset.getColumnKey(1).equals(" row 2 "));
 
-        Assert.assertTrue(categoryDataset.getRowKey(0).equals(" column 2 "));
-        Assert.assertTrue(categoryDataset.getRowKey(1).equals(" column 3 "));
-        Assert.assertTrue(categoryDataset.getRowKey(2).equals(" column 4"));
+        assertTrue(categoryDataset.getRowKey(0).equals(" column 2 "));
+        assertTrue(categoryDataset.getRowKey(1).equals(" column 3 "));
+        assertTrue(categoryDataset.getRowKey(2).equals(" column 4"));
 
-        Assert.assertTrue(categoryDataset.getValue(0, 0).intValue() == 12);
-        Assert.assertTrue(categoryDataset.getValue(1, 0).intValue() == 13);
-        Assert.assertTrue(categoryDataset.getValue(2, 0).intValue() == 14);
-        Assert.assertTrue(categoryDataset.getValue(0, 1).intValue() == 22);
-        Assert.assertTrue(categoryDataset.getValue(1, 1).intValue() == 23);
-        Assert.assertTrue(categoryDataset.getValue(2, 1).intValue() == 24);
+        assertTrue(categoryDataset.getValue(0, 0).intValue() == 12);
+        assertTrue(categoryDataset.getValue(1, 0).intValue() == 13);
+        assertTrue(categoryDataset.getValue(2, 0).intValue() == 14);
+        assertTrue(categoryDataset.getValue(0, 1).intValue() == 22);
+        assertTrue(categoryDataset.getValue(1, 1).intValue() == 23);
+        assertTrue(categoryDataset.getValue(2, 1).intValue() == 24);
     }
 }

@@ -105,6 +105,10 @@ define('xwiki-livedata', [
   const Logic = function (element) {
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-config") || "{}");
+    this.data.entries = Object.freeze(this.data.entries);
+
+    // Reactive properties must be initialized before Vue is instantiated.
+    this.firstEntriesLoading = true;
     this.currentLayoutId = "";
     this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = {
@@ -114,6 +118,7 @@ define('xwiki-livedata', [
     };
     this.openedPanels = [];
     this.footnotes = new FootnotesService();
+    this.panels = [];
 
     element.removeAttribute("data-config");
 
@@ -125,9 +130,13 @@ define('xwiki-livedata', [
       silentFallbackWarn: true,
     });
 
+    // Vue.js replaces the container - prevent this by creating a placeholder for Vue.js to replace.
+    const placeholderElement = document.createElement('div');
+    this.element.appendChild(placeholderElement);
+
     // create Vuejs instance
-    new Vue({
-      el: this.element,
+    const vue = new Vue({
+      el: placeholderElement,
       components: {
         "XWikiLivedata": XWikiLivedata,
       },
@@ -136,7 +145,31 @@ define('xwiki-livedata', [
       data: {
         logic: this
       },
+      mounted()
+      {
+        element.classList.remove('loading');
+        // Trigger the "instanceCreated" event on the next tick to ensure that the constructor has returned and thus
+        // all references to the logic instance have been initialized.
+        this.$nextTick(function () {
+          this.logic.triggerEvent('instanceCreated', {});
+        });
+      }
     });
+
+    // Fetch the data if we don't have any. This call must be made just after the main Vue component is initialized as 
+    // LivedataPersistentConfiguration must be mounted for the persisted filters to be loaded and applied when fetching 
+    // the entries.
+    // We use a dedicated field (firstEntriesLoading) for the first load as the fetch start/end events can be triggered 
+    // before the loader components is loaded (and in this case the loader is never hidden even once the entries are
+    // displayed).
+    if (!this.data.data.entries.length) {
+      this.updateEntries()
+        // Mark the loader as finished, even if it fails as the loader should stop and a message be displayed to the 
+        // user in this case.
+        .finally(() => this.firstEntriesLoading = false);
+    } else {
+      this.firstEntriesLoading = false;
+    }
 
     editBus.init(this);
 
@@ -163,7 +196,7 @@ define('xwiki-livedata', [
     }
 
     // Load needed translations for the Livedata
-    this.loadTranslations({
+    const translationsPromise = this.loadTranslations({
       prefix: "livedata.",
       keys: [
         "dropdownMenu.title",
@@ -207,17 +240,55 @@ define('xwiki-livedata', [
         "displayer.boolean.false",
         "displayer.xObjectProperty.missingDocumentName.errorMessage",
         "displayer.xObjectProperty.failedToRetrieveField.errorMessage",
+        "displayer.actions.edit",
+        "displayer.actions.followLink",
         "filter.list.emptyLabel",
         "footnotes.computedTitle",
         "footnotes.propertyNotViewable",
-        "bottombar.noEntries"
+        "bottombar.noEntries",
+        "error.updateEntriesFailed"
       ],
     });
 
-    // Fetch the data if we don't have any.
-    if (!this.data.data.entries.length) {
-      this.updateEntries();
+    // Return a translation only once the translations have been loaded from the server.
+    this.translate = async (key, ...args) => {
+      // Make sure that the translations are loaded from the server before translating.
+      await translationsPromise;
+      return vue.$t(key, args);
     }
+    
+    // Waits for the translations to be loaded before continuing.
+    this.translationsLoaded = async() => {
+      await translationsPromise;
+    }
+
+    // Registers panels once the translations have been loadded as they are otherwise hard to update.
+    this.translationsLoaded().finally(() => {
+      this.registerPanel({
+        id: 'propertiesPanel',
+        title: vue.$t('livedata.panel.properties.title'),
+        name: vue.$t('livedata.dropdownMenu.panels.properties'),
+        icon: 'list-bullets',
+        component: 'LivedataAdvancedPanelProperties',
+        order: 1000
+      });
+      this.registerPanel({
+        id: 'sortPanel',
+        title: vue.$t('livedata.panel.sort.title'),
+        name: vue.$t('livedata.dropdownMenu.panels.sort'),
+        icon: 'table_sort',
+        component: 'LivedataAdvancedPanelSort',
+        order: 2000
+      });
+      this.registerPanel({
+        id: 'filterPanel',
+        title: vue.$t('livedata.panel.filter.title'),
+        name: vue.$t('livedata.dropdownMenu.panels.filter'),
+        icon: 'filter',
+        component: 'LivedataAdvancedPanelFilter',
+        order: 3000
+      });
+    });
   };
 
 
@@ -502,20 +573,29 @@ define('xwiki-livedata', [
       return liveDataSource.getEntries(this.data.query)
         .then(data => {
           // After fetch event
-          this.triggerEvent("afterEntryFetch");
           return data
-        });
+        })
+        .finally(() => this.triggerEvent("afterEntryFetch"));
     },
 
 
     updateEntries () {
       return this.fetchEntries()
         .then(data => {
-          this.data.data = data
+          this.data.data = Object.freeze(data);
           // Remove the outdated footnotes, they will be recomputed by the new entries.
           this.footnotes.reset()
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+          // Prevent undesired notifications of the end user for non business related errors (for instance, the user
+          // left the page before the request was completed).
+          // See https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
+          if (err.readyState === 4) {
+            this.translate('livedata.error.updateEntriesFailed')
+              .then(value => new XWiki.widgets.Notification(value, 'error'));
+          }
+          console.error('Failed to fetch the entries', err)
+        });
     },
 
 
@@ -1413,6 +1493,31 @@ define('xwiki-livedata', [
 
     getEditBus() {
       return editBus;
+    },
+
+    /**
+     * Registers a panel.
+     *
+     * The panel must have the following attributes:
+     * * id: the id of the panel, must be unique among all panels, also used as suffix of the class on the panel
+     * * name: the name that shall be shown in the menu
+     * * title: the title that shall be displayed in the title bar of the panel
+     * * icon: the name of the icon for the menu and the title of the panel
+     * * container: the Element that shall be attached to the extension panel's body, this should contain the main UI
+     * * component: the component of the panel, should be "LiveDataAdvancedPanelExtension" for extension panels
+     * * order: the ordering number, panels are sorted by this number in ascending order
+     *
+     * @param {Object} panel the panel to add
+     */
+    registerPanel(panel)
+    {
+      // Basic insertion sorting to avoid shuffling the (reactive) array.
+      const index = this.panels.findIndex(p => p.order > panel.order);
+      if (index === -1) {
+        this.panels.push(panel);
+      } else {
+        this.panels.splice(index, 0, panel);
+      }
     }
   };
 

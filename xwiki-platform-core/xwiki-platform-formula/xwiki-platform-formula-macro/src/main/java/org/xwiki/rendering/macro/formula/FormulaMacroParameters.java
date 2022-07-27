@@ -32,10 +32,10 @@ import org.xwiki.properties.annotation.PropertyDescription;
 public class FormulaMacroParameters
 {
     /** The font size to use for the image. */
-    private FontSize size = FontSize.DEFAULT;
+    private FontSize size;
 
     /** The type of image to generate. */
-    private Type type = Type.DEFAULT;
+    private Type type;
 
     /**
      * @param size indicate which font size to use

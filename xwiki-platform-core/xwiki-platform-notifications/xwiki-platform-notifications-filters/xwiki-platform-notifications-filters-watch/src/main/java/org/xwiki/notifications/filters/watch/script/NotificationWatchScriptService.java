@@ -121,7 +121,6 @@ public class NotificationWatchScriptService implements ScriptService
      * @throws NotificationException if an error happens
      * @since 12.8RC1
      */
-    @Unstable
     public boolean isLocationWatchedWithAllEventTypes(EntityReference location) throws NotificationException
     {
         return watchedEntityFactory.createWatchedLocationReference(location).isWatchedWithAllEventTypes(

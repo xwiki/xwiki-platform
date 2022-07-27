@@ -74,9 +74,6 @@ class CreatePanelTest extends PageTest
     @Test
     void createPanel() throws Exception
     {
-        EscapeTool tool = new EscapeTool();
-        registerVelocityTool("escapetool", tool);
-
         // Replace the response with a spy to be able to assert sendRedirect parameters.
         this.response = spy(this.response);
         this.context.setResponse(this.response);
@@ -91,7 +88,8 @@ class CreatePanelTest extends PageTest
         renderPage(new DocumentReference("xwiki", "Panels", "CreatePanel"));
 
         // Verify in particular that the document we are redirected to has a name that conforms to the naming strategy.
-        verify(this.response).sendRedirect("/xwiki/bin/inline/Panels/" + tool.url(TRANSFORMED_PAGE_TITLE)
+        EscapeTool tool = new EscapeTool();
+        verify(this.response).sendRedirect("/xwiki/bin/edit/Panels/" + tool.url(TRANSFORMED_PAGE_TITLE)
             + "?template=Panels.PanelTemplate"
             + "&Panels.PanelClass_0_name=" + tool.url(PAGE_TITLE)
             + "&Panels.PanelClass_0_content=" + tool
@@ -102,9 +100,6 @@ class CreatePanelTest extends PageTest
     @Test
     void createPanelPageAlreadyExist() throws Exception
     {
-        EscapeTool tool = new EscapeTool();
-        registerVelocityTool("escapetool", tool);
-
         // Replace the response with a spy to be able to assert sendRedirect parameters.
         this.response = spy(this.response);
         this.context.setResponse(this.response);

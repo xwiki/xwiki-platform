@@ -24,7 +24,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.observation.event.Event;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsManager;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -36,7 +35,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public class UpdatedRatingEvent extends AbstractRatingEvent implements Event
 {
     private int oldVote;

@@ -123,7 +123,6 @@ public class VfsResourceReference extends EntityResourceReference
      * entry inside it, e.g. {@code attach:space.page@attachment/path/to/file}.
      * @since 12.4RC1
      */
-    @Unstable
     public VfsResourceReference(String fullReference)
     {
         super(XWIKI_REFERENCE, EntityResourceAction.fromString(""));
@@ -163,7 +162,6 @@ public class VfsResourceReference extends EntityResourceReference
      * @return the actual reference to the VFS (e.g. {@code attach:space.page@file.zip}).
      * @since 12.4RC1
      */
-    @Unstable
     public String getReference()
     {
         return this.reference;
@@ -173,7 +171,6 @@ public class VfsResourceReference extends EntityResourceReference
      * @return the scheme of this reference (e.g. {@code attach}).
      * @since 12.4RC1
      */
-    @Unstable
     public String getScheme()
     {
         return this.scheme;
@@ -253,7 +250,6 @@ public class VfsResourceReference extends EntityResourceReference
      * @return the Content-Type to return with the response
      * @since 12.3RC1
      */
-    @Unstable
     public String getContentType()
     {
         return getParameterValue(PARAMETER_CONTENTTYPE);
@@ -263,7 +259,6 @@ public class VfsResourceReference extends EntityResourceReference
      * @param contentType the Content-Type to return with the response
      * @since 12.3RC1
      */
-    @Unstable
     public void setContentType(String contentType)
     {
         setParameter(PARAMETER_CONTENTTYPE, contentType);

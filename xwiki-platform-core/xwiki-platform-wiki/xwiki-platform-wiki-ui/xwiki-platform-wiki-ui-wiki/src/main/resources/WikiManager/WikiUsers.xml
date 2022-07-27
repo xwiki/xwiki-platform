@@ -525,7 +525,7 @@
     // Disable the membership type radio buttons when the user scope is local only.
     $('input[type=radio][name=WikiManager\\.WikiUserClass_0_membershipType]').prop('disabled', value === 'local_only');
   };
-  userScope.click(userScopeChanged);
+  userScope.on('click', userScopeChanged);
   userScopeChanged();
 });
 
@@ -545,17 +545,17 @@ require(['jquery'], function($) {
     addMembersButton.prop('disabled', true);
     parameters.push({name: 'xpage', value: 'adduorg'});
     var addMembersURL = new XWiki.Document('XWikiAllGroup', 'XWiki').getURL('get');
-    $.post(addMembersURL, parameters).done(function() {
+    Promise.resolve($.post(addMembersURL, parameters)).then(function() {
       // Clear the list of selected users.
       $('#userInput')[0].selectize.clear(true);
       // Reload the live table.
       editgrouptable.refresh();
       // Show notification message.
       new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
-    }).fail(function(response) {
+    }).catch(function(response) {
       new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addFailure')" +
         response.statusText, 'error', {timeout: 5});
-    }).always(function() {
+    }).finally(function() {
       addMembersButton.prop('disabled', false);
     });
   });

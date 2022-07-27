@@ -410,7 +410,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
   var createUserModal = $('#createUserModal');
 
   var validateCreateUserForm = function(form) {
-    return form.size() &gt; 0 &amp;&amp; (!window.LiveValidation ||
+    return form.length &amp;&amp; (!window.LiveValidation ||
       LiveValidation.massValidate(LiveValidationForm.getInstance(form[0]).fields));
   };
 
@@ -425,7 +425,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       createUserModalBody.removeClass('loading').append(createUserForm);
       $(document).trigger('xwiki:dom:updated', {'elements': createUserModalBody.toArray()});
       createUserForm.find(':input').filter(':visible').first().focus();
-      createUserButton.prop('disabled', createUserForm.size() === 0);
+      createUserButton.prop('disabled', !createUserForm.length);
     });
   }).on('click', '.btn-primary', function(event) {
     var createUserForm = createUserModal.find('form#register');
@@ -437,9 +437,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       $jsontool.serialize($services.localization.render('xe.admin.users.create.inProgress')),
       'inprogress'
     );
-    $.post(createUserForm.attr('action'), createUserForm.serialize()).done(function(html) {
+    $.post(createUserForm.attr('action'), createUserForm.serialize()).then(html =&gt; {
       var errorMessage = $('&lt;div/&gt;').html(html).find('.errormessage, .LV_validation_message.LV_invalid');
-      if (errorMessage.size() &gt; 0) {
+      if (errorMessage.length) {
         createUserButton.prop('disabled', false);
         notification.replace(new XWiki.widgets.Notification(errorMessage.text(), 'error'));
       } else {
@@ -451,7 +451,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
           'done'
         ));
       }
-    }).fail(function (response) {
+    }).catch(() =&gt; {
       createUserButton.prop('disabled', false);
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.users.create.failed')),
@@ -482,7 +482,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       $(document).trigger('xwiki:dom:updated', {'elements': self.toArray()});
       var editUserForm = editUserModal.find('form#edituser');
       editUserForm.find(':input').filter(':visible').first().focus();
-      saveButton.prop('disabled', editUserForm.size() === 0);
+      saveButton.prop('disabled', !editUserForm.length);
     });
   };
 
@@ -500,14 +500,14 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       'inprogress'
     );
     $(document).trigger('xwiki:actions:beforeSave');
-    $.post(editForm.attr('action'), editForm.serialize()).done(function() {
+    $.post(editForm.attr('action'), editForm.serialize()).then(() =&gt; {
       $(document).trigger('xwiki:document:saved');
       editUserModal.modal('hide').data('liveTable').refresh();
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.done')),
         'done'
       ));
-    }).fail(function (response) {
+    }).catch(response =&gt; {
       saveButton.prop('disabled', false);
       var message = $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.error',
         ['__reason__']));
@@ -536,7 +536,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
         failed: $jsontool.serialize($services.localization.render('administration.section.users.disableUser.failed'))
       }
     }
-    var onToggleUser = function(action, event) {
+    var onToggleUser = function(event) {
       event.preventDefault();
       var actionTrigger = $(this);
       if (actionTrigger.hasClass('pending')) {
@@ -544,21 +544,22 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
         return;
       }
       actionTrigger.addClass('pending');
+      var action = event.data.action;
       var notification = new XWiki.widgets.Notification(notificationMessage[action].inProgress, 'inprogress');
       // The enable and disable actions redirect to the user profile by default which may take a lot of time to render so
       // we redirect to a URL that doesn't render anything.
       var emptyResponseURL = new XWiki.Document('AdminUsersSheet', 'XWiki').getURL('get', 'outputSyntax=plain');
-      $.post(actionTrigger.attr('href'), {'xredirect': emptyResponseURL}).done(function() {
+      Promise.resolve($.post(actionTrigger.attr('href'), {'xredirect': emptyResponseURL})).then(function() {
         window['livetable_userstable'].refresh();
         notification.replace(new XWiki.widgets.Notification(notificationMessage[action].done, 'done'));
-      }).fail(function() {
+      }).catch(function() {
         notification.replace(new XWiki.widgets.Notification(notificationMessage[action].failed, 'error'));
-      }).always(function() {
+      }).finally(function() {
         actionTrigger.removeClass('pending');
       });
     };
-    $('#userstable').on('click', 'a.actionenable', $.proxy(onToggleUser, null, 'enable'));
-    $('#userstable').on('click', 'a.actiondisable', $.proxy(onToggleUser, null, 'disable'));
+    $('#userstable').on('click', 'a.actionenable', {action: 'enable'}, onToggleUser);
+    $('#userstable').on('click', 'a.actiondisable', {action: 'disable'}, onToggleUser);
   })();
 
   //
@@ -615,9 +616,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
         newAuthor: newAuthor,
         requiredRight: requiredRight
       });
-      return newAuthorValidationRequest;
+      return Promise.resolve(newAuthorValidationRequest);
     } else {
-      return $.Deferred().resolve({valid: true}).promise();
+      return Promise.resolve({valid: true});
     }
   };
   deleteUserModal.on('change', '#newAuthor', function(event) {
@@ -626,17 +627,17 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     var newAuthorField = $(event.target);
     // Hide the previous error message.
     newAuthorField.nextAll('.xErrorMsg').addClass('hidden');
-    validateNewAuthor(newAuthorField.val(), newAuthorField.data('requiredRight')).done(function(result) {
+    validateNewAuthor(newAuthorField.val(), newAuthorField.data('requiredRight')).then(function(result) {
       if (result.valid === false) {
         newAuthorField.nextAll('.xErrorMsg').removeClass('hidden');
       }
-    }).always(function() {
+    }).finally(function() {
       // Re-enable the modal submit button.
       deleteUserButton.prop('disabled', false);
     });
   });
 
-  deleteUserButton.click(function() {
+  deleteUserButton.on('click', function() {
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('xe.admin.users.delete.inProgress')),
       'inprogress'
@@ -647,14 +648,14 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       docname: userReference,
       newAuthor: deleteUserModal.find('#newAuthor').val(),
       form_token: xm.form_token
-    }).done(function() {
+    }).then(() =&gt; {
       deleteUserModal.data('liveTable').deleteRow(deleteUserModal.data('rowIndex'));
       deleteUserModal.data('liveTableElement').trigger('xwiki:user:deleted', {reference: userReference});
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.users.delete.done')),
         'done'
       ));
-    }).fail(function() {
+    }).catch(() =&gt; {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.users.delete.failed')),
         'error'

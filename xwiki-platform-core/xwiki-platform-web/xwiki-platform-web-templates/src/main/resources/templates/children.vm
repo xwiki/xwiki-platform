@@ -74,7 +74,7 @@
       'propertyDescriptors': [
         { 'id': '_actions', 'displayer': { 'id': 'actions', 'actions': ['copy', 'rename', 'rights', 'delete'] } }
         ],
-        'actions': [ { 'id': 'copy', 'allowProperty': '' } ]
+        'actions': [ { 'id': 'copy', 'allowProperty': 'doc.viewable', 'urlProperty': 'doc.copy_url' } ]
       }
     })
     #set ($sourceParameters = $escapetool.url({

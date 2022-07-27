@@ -217,6 +217,6 @@ public class AllDocsIT
 
         RightsEditPage rightsEditPage = new RightsEditPage();
         rightsEditPage.switchToUsers();
-        assertEquals(EditRightsPane.State.NONE, rightsEditPage.getGuestRight(EditRightsPane.Right.ADMIN));
+        assertEquals(EditRightsPane.State.NONE, rightsEditPage.getGuestRight(EditRightsPane.Right.DELETE));
     }
 }

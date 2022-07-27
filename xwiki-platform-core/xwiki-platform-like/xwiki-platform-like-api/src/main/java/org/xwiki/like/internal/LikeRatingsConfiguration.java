@@ -22,10 +22,12 @@ package org.xwiki.like.internal;
 import java.util.Collections;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.ratings.RatingsConfiguration;
 
@@ -44,6 +46,12 @@ public class LikeRatingsConfiguration implements RatingsConfiguration
      * Default hint for Rating Manager.
      */
     public static final String RATING_MANAGER_HINT = "like";
+
+    // Note that we only use the xwiki.properties configuration for now, since we're not yet sure we want to expose
+    // those configurations to end users. It might change in the future to a composite configuration source.
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource configurationSource;
 
     /**
      * {@inheritDoc}
@@ -97,7 +105,7 @@ public class LikeRatingsConfiguration implements RatingsConfiguration
     @Override
     public boolean isAverageStored()
     {
-        return false;
+        return this.configurationSource.getProperty("like.averagerating.isStored", false);
     }
 
     /**
@@ -123,7 +131,7 @@ public class LikeRatingsConfiguration implements RatingsConfiguration
     @Override
     public String getAverageRatingStorageHint()
     {
-        return null;
+        return this.configurationSource.getProperty("like.averagerating.hint", "xobject");
     }
 
     /**

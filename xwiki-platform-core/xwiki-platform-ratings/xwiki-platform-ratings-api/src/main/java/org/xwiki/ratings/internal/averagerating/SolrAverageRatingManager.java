@@ -105,9 +105,10 @@ public class SolrAverageRatingManager extends AbstractAverageRatingManager
     {
         SolrQuery solrQuery = new SolrQuery()
             .addFilterQuery(String.format("filter(%s:%s) AND filter(%s:%s)",
-                AverageRatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
+                AverageRatingQueryField.MANAGER_ID.getFieldName(),
+                this.solrUtils.toCompleteFilterQueryString(this.getIdentifier()),
                 AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(),
-                solrUtils.toFilterQueryString(entityReference, EntityReference.class)))
+                this.solrUtils.toCompleteFilterQueryString(entityReference, EntityReference.class)))
             .setStart(0)
             .setRows(1)
             .setSort(AverageRatingQueryField.UPDATED_AT.getFieldName(), this.getOrder(true));
@@ -138,9 +139,11 @@ public class SolrAverageRatingManager extends AbstractAverageRatingManager
     @Override
     public long removeAverageRatings(EntityReference entityReference) throws RatingsException
     {
-        String escapedEntityReference = this.solrUtils.toFilterQueryString(entityReference, EntityReference.class);
+        String escapedEntityReference =
+            this.solrUtils.toCompleteFilterQueryString(entityReference, EntityReference.class);
         String filterQuery = String.format(FILTER_REFERENCE_OR_PARENTS,
-            AverageRatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
+            AverageRatingQueryField.MANAGER_ID.getFieldName(),
+            this.solrUtils.toCompleteFilterQueryString(this.getIdentifier()),
             AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), escapedEntityReference,
             AverageRatingQueryField.PARENTS.getFieldName(), escapedEntityReference);
         SolrQuery solrQuery = new SolrQuery()
@@ -164,9 +167,10 @@ public class SolrAverageRatingManager extends AbstractAverageRatingManager
     public long moveAverageRatings(EntityReference oldReference, EntityReference newReference)
         throws RatingsException
     {
-        String escapedEntityReference = this.solrUtils.toFilterQueryString(oldReference, EntityReference.class);
+        String escapedEntityReference = this.solrUtils.toCompleteFilterQueryString(oldReference, EntityReference.class);
         String filterQuery = String.format(FILTER_REFERENCE_OR_PARENTS,
-            AverageRatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
+            AverageRatingQueryField.MANAGER_ID.getFieldName(),
+            this.solrUtils.toCompleteFilterQueryString(this.getIdentifier()),
             AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), escapedEntityReference,
             AverageRatingQueryField.PARENTS.getFieldName(), escapedEntityReference);
         int offset = 0;

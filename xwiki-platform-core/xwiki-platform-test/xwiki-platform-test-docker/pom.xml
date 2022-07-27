@@ -25,19 +25,33 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-docker</artifactId>
   <name>XWiki Platform - Test - Docker UI Test Framework</name>
   <packaging>jar</packaging>
   <description>Uses Docker to start/stop browsers and XWiki</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
-    <testcontainers.version>1.15.3</testcontainers.version>
+    <xwiki.jacoco.instructionRatio>0.21</xwiki.jacoco.instructionRatio>
     <!-- TODO: Put back when the XWikiBrowserWebDriverContainer class is removed or when we find a construct that makes
          Spoon pass on it. -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
+  <dependencyManagement>
+    <!-- Force our version of Selenium (so that the one coming from TC isn't used for example) -->
+    <dependencies>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-chrome-driver</artifactId>
+        <version>${selenium.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-remote-driver</artifactId>
+        <version>${selenium.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -153,6 +167,12 @@
       <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Used to create wikis during tests -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Since the minimal dependency list doesn't include the Flamingo resources JAR (see the comment in it for
      more explanations), we need to add a dependency to it since we need to unpack it -->
     <dependency>
@@ -232,7 +252,9 @@
             <configuration>
               <excludes>
                 <!-- Cyclomatic complexity > 10 -->
-                **/WARBuilder.java
+                **/WARBuilder.java,
+                <!-- Class Fan-Out Complexity > 20 -->
+                **/DockerTestUtils.java
               </excludes>
             </configuration>
           </execution>

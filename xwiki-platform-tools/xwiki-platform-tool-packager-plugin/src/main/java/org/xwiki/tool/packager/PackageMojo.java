@@ -53,7 +53,6 @@ import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -64,8 +63,6 @@ import org.apache.maven.repository.RepositorySystem;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.xwiki.tool.utils.AbstractOldCoreMojo;
@@ -99,12 +96,6 @@ public class PackageMojo extends AbstractOldCoreMojo
      */
     @Component
     protected RepositorySystem repositorySystem;
-
-    /**
-     * Local repository to be used by the plugin to resolve dependencies.
-     */
-    @Parameter(property = "localRepository")
-    protected ArtifactRepository localRepository;
 
     /**
      * List of remote repositories to be used by the plugin to resolve dependencies.
@@ -358,6 +349,21 @@ public class PackageMojo extends AbstractOldCoreMojo
         return artifact;
     }
 
+    /**
+     * Resolve {@code xwiki-platform-tool-configuration-resources}, then look for velocity scripts inside the artifact
+     * and interpret them before copying the result to {@code configurationFileTargetDirectory}.
+     * <p>
+     * <a 
+     *   href="https://sonarcloud.io/organizations/xwiki/rules?open=javasecurity%3AS6096&rule_key=javasecurity%3AS6096">
+     *   javasecurity:S6096
+     * </a> is ignored because we trust the content of {@code xwiki-platform-tool-configuration-resources} since it is 
+     * produced by maven using source code we own.
+     *
+     * @param configurationFileTargetDirectory the root directory where the configuration files found in {@code
+     *     xwiki-platform-tool-configuration-resources} are copied ({@code webapps/xwiki/WEB-INF} by default)
+     * @throws MojoExecutionException when failing to resolve {@code xwiki-platform-tool-configuration-resources}
+     */
+    @SuppressWarnings("javasecurity:S6096")
     private void generateConfigurationFiles(File configurationFileTargetDirectory) throws MojoExecutionException
     {
         VelocityContext context = createVelocityContext();
@@ -367,6 +373,8 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         configurationFileTargetDirectory.mkdirs();
 
+        // Since the jar comes from a trusted source, there is no risk of "zip slip" attack. Consequently, the
+        // entries of the jar do not need to be validated.
         try (JarInputStream jarInputStream =
             new JarInputStream(new FileInputStream(configurationResourcesArtifact.getFile()))) {
             JarEntry entry;
@@ -629,7 +637,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-localization-source-legacy", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-security-bridge", getXWikiPlatformVersion(), null, "jar"));
+            "xwiki-platform-security-authorization-bridge", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-url-scheme-standard", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
@@ -657,9 +665,9 @@ public class PackageMojo extends AbstractOldCoreMojo
         // Velocity templates. Most of these templates are located in platform-web and currently we don't declare the
         // dependencies of platform-web (they are declared in enterprise-web) thus we need to bundle this script service
         // here. In the future we may want to create a separate module to hold the Velocity templates from platform-web
-        // and this module should have a dependency on platform-security-script.
+        // and this module should have a dependency on platform-security-authorization-script.
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-security-script", getXWikiPlatformVersion(), null, "jar"));
+            "xwiki-platform-security-authorization-script", getXWikiPlatformVersion(), null, "jar"));
 
         // Copy/Delete/Rename/Move actions are currently in the Refactoring module and for now we consider them as
         // core actions.
@@ -896,7 +904,6 @@ public class PackageMojo extends AbstractOldCoreMojo
         createDirectory(targetDirectory);
         try {
             ZipUnArchiver unArchiver = new ZipUnArchiver();
-            unArchiver.enableLogging(new ConsoleLogger(Logger.LEVEL_ERROR, "Package"));
             unArchiver.setSourceFile(source);
             unArchiver.setDestDirectory(targetDirectory);
             unArchiver.setOverwrite(true);
@@ -965,7 +972,6 @@ public class PackageMojo extends AbstractOldCoreMojo
         props.put("xwikiDbConnectionUsername", "sa");
         props.put("xwikiDbConnectionPassword", "");
         props.put("xwikiDbConnectionDriverClass", "org.hsqldb.jdbcDriver");
-        props.put("xwikiDbDialect", "org.hibernate.dialect.HSQLDialect");
         props.put("xwikiDbHbmXwiki", "xwiki.hbm.xml");
         props.put("xwikiDbHbmFeeds", "feeds.hbm.xml");
 

@@ -43,6 +43,14 @@ public class XWikiDocumentMatcher implements ArgumentMatcher<XWikiDocument>
     @Override
     public boolean matches(XWikiDocument argument)
     {
-        return argument != null && Equality.areEqual(this.reference, argument.getDocumentReference());
+        if (argument != null) {
+            if (this.reference.getLocale() != null) {
+                return Equality.areEqual(this.reference, argument.getDocumentReferenceWithLocale());
+            } else {
+                return Equality.areEqual(this.reference, argument.getDocumentReference());
+            }
+        }
+
+        return false;
     }
 }

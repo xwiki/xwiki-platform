@@ -47,6 +47,8 @@
     $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
     $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
     $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
+    $xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
+    $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     ### Support attachment sorting
     #set ($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
     #if ($sortAttachmentsBy != '')
@@ -73,7 +75,8 @@
 #foreach($docExtraExtension in $docExtraExtensions)
   #set ($params = $docExtraExtension.parameters)
   #set ($template = "loaddocextrauix.vm&uix=$docExtraExtension.id")
-  #if ($params.show)
+  ## Params are evaluated as string
+  #if ($params.show && $params.show == 'true')
     #set ($newDocExtra = [$docExtraExtension.id, $params.name, $params.title, $params.itemnumber, $template, $params.shortcut])
     #set ($discard = $docextras.add($newDocExtra))
   #end

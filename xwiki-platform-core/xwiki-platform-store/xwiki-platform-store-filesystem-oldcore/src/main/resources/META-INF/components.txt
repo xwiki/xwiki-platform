@@ -18,3 +18,5 @@ org.xwiki.store.legacy.store.internal.FilesystemRecycleBinContentStore
 org.xwiki.store.serialization.xml.internal.AttachmentListMetadataSerializer
 org.xwiki.store.serialization.xml.internal.AttachmentMetadataSerializer
 org.xwiki.store.serialization.xml.internal.DeletedAttachmentMetadataSerializer
+org.xwiki.store.filesystem.internal.DefaultTemporaryAttachmentSessionsManager
+org.xwiki.store.script.TemporaryAttachmentsScriptService

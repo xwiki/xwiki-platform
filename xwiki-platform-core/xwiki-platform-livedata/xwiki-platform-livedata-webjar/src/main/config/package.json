@@ -8,26 +8,34 @@
     "lint": "vue-cli-service lint",
     "test": "vue-cli-service test:unit"
   },
+  "engines": {
+    "npm": "8.11.0",
+    "node": "16.15.1"
+  },
   "dependencies": {
-    "vue": "2.6.12",
-    "vue-i18n": "8.15.5",
-    "lz-string": "^1.4.4",
-    "u-node": "^0.0.2",
-    "vuedraggable": "^2.24.3"
+    "vue": "2.6.14",
+    "vue-i18n": "8.27.2",
+    "lz-string": "1.4.4",
+    "u-node": "0.0.2",
+    "vuedraggable": "2.24.3",
+    "vue-tippy": "4.14.0",
+    "vue2-touch-events": "3.2.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.11",
-    "@vue/cli-plugin-eslint": "~4.5.11",
-    "@vue/cli-service": "~4.5.11",
-    "@babel/eslint-parser": "7.14.7",
-    "eslint": "7.30.0",
-    "eslint-plugin-vue": "7.13.0",
-    "less": "^4.1.1",
-    "less-loader": "^8.0.0",
-    "vue-template-compiler": "2.6.12",
-    "@vue/cli-plugin-unit-jest": "~4.5.0",
-    "@vue/test-utils": "1.2.1",
-    "jquery": "2.2.4",
-    "@testing-library/jest-dom": "5.14.1"
+    "@vue/cli-plugin-babel": "5.0.8",
+    "@vue/cli-plugin-eslint": "5.0.8",
+    "@vue/cli-service": "5.0.8",
+    "@vue/cli-plugin-unit-jest": "5.0.8",
+    "@babel/eslint-parser": "7.18.2",
+    "eslint": "7.32.0",
+    "eslint-plugin-vue": "8.7.1",
+    "less": "4.1.3",
+    "less-loader": "11.0.0",
+    "vue-template-compiler": "2.6.14",
+    "@vue/test-utils": "1.3.0",
+    "jquery": "3.6.0",
+    "@testing-library/jest-dom": "5.16.4",
+    "flush-promises": "1.0.2",
+    "@vue/vue2-jest": "^27.0.0"
   }
 }

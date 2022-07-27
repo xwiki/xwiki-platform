@@ -41,7 +41,7 @@ public class ListPropertyTest
         ListProperty p = new ListProperty();
 
         p.setValueDirty(false);
-        
+
         List<String> list = p.getList();
 
         list.add("foo");
@@ -53,6 +53,11 @@ public class ListPropertyTest
         p.setList(null);
 
         assertTrue(p.isValueDirty());
+
+        p.setValueDirty(false);
+
+        assertEquals(Arrays.asList(), p.getList());
+        assertFalse(p.isValueDirty());
     }
 
     @Test

@@ -1,5 +1,5 @@
 <?xml version='1.1' encoding='UTF-8'?>
-<xwikidoc version="1.4" reference="space.page" locale="">
+<xwikidoc version="1.5" reference="space.page" locale="">
   <web>space</web>
   <name>page</name>
   <language/>
@@ -8,6 +8,7 @@
   <creator>XWiki.creator</creator>
   <creationDate>1297952360000</creationDate>
   <author>XWiki.author</author>
+  <originalMetadataAuthor>XWiki.originalMetadataAuthor</originalMetadataAuthor>
   <customClass/>
   <contentAuthor>XWiki.contentAuthor</contentAuthor>
   <date>1297952371000</date>

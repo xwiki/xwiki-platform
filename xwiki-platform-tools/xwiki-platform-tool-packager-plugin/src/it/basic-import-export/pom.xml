@@ -53,7 +53,6 @@
                 <xwikiDbConnectionUsername>sa</xwikiDbConnectionUsername>
                 <xwikiDbConnectionPassword />
                 <xwikiDbConnectionDriverClass>org.hsqldb.jdbcDriver</xwikiDbConnectionDriverClass>
-                <xwikiDbDialect>org.hibernate.dialect.HSQLDialect</xwikiDbDialect>
                 <xwikiDbHbmXwiki>xwiki.hbm.xml</xwikiDbHbmXwiki>
                 <xwikiDbHbmFeeds>feeds.hbm.xml</xwikiDbHbmFeeds>
               </properties>

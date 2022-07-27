@@ -24,7 +24,7 @@
  * Usage example:
  *
  * require(['deferred!module'], function(modulePromise) {
- *   modulePromise.done(function(module) {
+ *   modulePromise.then(module => {
  *     // Use the module.
  *   });
  * });

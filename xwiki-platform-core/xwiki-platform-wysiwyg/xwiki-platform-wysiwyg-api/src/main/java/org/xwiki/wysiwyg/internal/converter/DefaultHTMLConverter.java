@@ -76,14 +76,14 @@ public class DefaultHTMLConverter implements HTMLConverter
      * The component used to parse the XHTML obtained after cleaning.
      */
     @Inject
-    @Named("xhtml/1.0")
+    @Named("xhtml/5")
     private Parser xhtmlParser;
 
     /**
      * The component used to parse the XHTML obtained after cleaning, when transformations are not executed.
      */
     @Inject
-    @Named("xhtml/1.0")
+    @Named("xhtml/5")
     private StreamParser xhtmlStreamParser;
 
     /**
@@ -113,7 +113,7 @@ public class DefaultHTMLConverter implements HTMLConverter
      * The component used to render a XDOM to XHTML.
      */
     @Inject
-    @Named("annotatedxhtml/1.0")
+    @Named("annotatedhtml/5.0")
     private BlockRenderer xhtmlRenderer;
 
     /**
@@ -256,7 +256,7 @@ public class DefaultHTMLConverter implements HTMLConverter
         TransformationContext txContext = new TransformationContext();
         txContext.setXDOM(xdom);
         txContext.setSyntax(syntax);
-        txContext.setTargetSyntax(Syntax.ANNOTATED_XHTML_1_0);
+        txContext.setTargetSyntax(Syntax.ANNOTATED_HTML_5_0);
 
         // It's very important to set a Transformation id as otherwise if any Velocity Macro is executed it'll be
         // executed in isolation (and if you have, say, 2 velocity macros, the second one will not 'see' what's defined

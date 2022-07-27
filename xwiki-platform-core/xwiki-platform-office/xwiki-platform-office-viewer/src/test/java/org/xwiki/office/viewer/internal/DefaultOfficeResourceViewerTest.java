@@ -23,15 +23,15 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,6 +66,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -73,6 +74,9 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.ExtendedURL;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -148,6 +152,9 @@ class DefaultOfficeResourceViewerTest
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
     /**
      * The mock {@link XDOMOfficeDocumentBuilder} instance used in tests.
      */
@@ -181,6 +188,9 @@ class DefaultOfficeResourceViewerTest
     @MockComponent
     private TemporaryResourceStore temporaryResourceStore;
 
+    @MockComponent
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
     @XWikiTempDir
     private File tempDir;
 
@@ -194,6 +204,7 @@ class DefaultOfficeResourceViewerTest
      */
     private Cache<OfficeDocumentView> externalCache;
 
+    private XWikiContext context;
 
     @BeforeComponent
     void beforeComponent(MockitoComponentManager componentManager) throws Exception
@@ -227,6 +238,8 @@ class DefaultOfficeResourceViewerTest
 
         OfficeConverter officeConverter = mock(OfficeConverter.class);
         when(this.officeServer.getConverter()).thenReturn(officeConverter);
+        this.context = mock(XWikiContext.class);
+        when(this.contextProvider.get()).thenReturn(this.context);
     }
 
     /**
@@ -274,6 +287,36 @@ class DefaultOfficeResourceViewerTest
     }
 
     /**
+     * Tests creating a view for an existing office attachment.
+     *
+     * @throws Exception if an error occurs
+     */
+    @Test
+    void viewTemporaryUploadedOfficeAttachmentWithCacheMiss(MockitoComponentManager componentManager) throws Exception
+    {
+        when(attachmentCache.get(CACHE_KEY)).thenReturn(null);
+        when(documentAccessBridge.getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference())).thenReturn(
+            Collections.emptyList());
+        when(documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn(null);
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(temporaryAttachmentSessionsManager.getUploadedAttachment(ATTACHMENT_REFERENCE))
+            .thenReturn(Optional.of(attachment));
+
+        ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
+        when(attachment.getContentInputStream(this.context)).thenReturn(attachmentContent);
+
+        XDOMOfficeDocument xdomOfficeDocument =
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
+        when(
+            officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
+                ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
+
+        this.officeResourceViewer.createView(ATTACHMENT_RESOURCE_REFERENCE, DEFAULT_VIEW_PARAMETERS);
+
+        verify(attachmentCache).set(eq(CACHE_KEY), any(AttachmentOfficeDocumentView.class));
+    }
+
+    /**
      * Tests creating a view for an office attachment which has already been viewed and cached.
      * 
      * @throws Exception if an error occurs.
@@ -291,6 +334,40 @@ class DefaultOfficeResourceViewerTest
         when(documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn(ATTACHMENT_VERSION);
 
         assertNotNull(this.officeResourceViewer.createView(ATTACHMENT_RESOURCE_REFERENCE, DEFAULT_VIEW_PARAMETERS));
+    }
+
+    /**
+     * Tests creating a view for an office attachment which has already been viewed and cached.
+     *
+     * @throws Exception if an error occurs.
+     */
+    @Test
+    void viewTemporaryUploadedOfficeAttachmentWithCacheHit(MockitoComponentManager componentManager) throws Exception
+    {
+        AttachmentOfficeDocumentView officeDocumentView =
+            new AttachmentOfficeDocumentView(ATTACHMENT_RESOURCE_REFERENCE, ATTACHMENT_REFERENCE, ATTACHMENT_VERSION,
+                new XDOM(new ArrayList<Block>()), new HashSet<File>());
+        when(attachmentCache.get(CACHE_KEY)).thenReturn(officeDocumentView);
+
+        when(documentAccessBridge.getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference())).thenReturn(
+            Collections.emptyList());
+        when(documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn(null);
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(temporaryAttachmentSessionsManager.getUploadedAttachment(ATTACHMENT_REFERENCE))
+            .thenReturn(Optional.of(attachment));
+
+        ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
+        when(attachment.getContentInputStream(this.context)).thenReturn(attachmentContent);
+
+        XDOMOfficeDocument xdomOfficeDocument =
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
+        when(
+            officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
+                ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
+
+        this.officeResourceViewer.createView(ATTACHMENT_RESOURCE_REFERENCE, DEFAULT_VIEW_PARAMETERS);
+
+        verify(attachmentCache).set(eq(CACHE_KEY), any(AttachmentOfficeDocumentView.class));
     }
 
     /**
@@ -313,6 +390,27 @@ class DefaultOfficeResourceViewerTest
             .thenReturn(officeDocumentView);
 
         assertNotNull(this.officeResourceViewer.createView(resourceReference, DEFAULT_VIEW_PARAMETERS));
+    }
+
+    @Test
+    void viewExistingOfficeFileWithCacheHitNoOwnerDocument() throws Exception
+    {
+        ResourceReference resourceReference = new ResourceReference("http://resource", ResourceType.URL);
+
+        when(this.resourceReferenceSerializer.serialize(resourceReference)).thenReturn(
+            "url:" + resourceReference.getReference());
+
+        Map<String, Object> parameters = Collections.emptyMap();
+        when(this.documentAccessBridge.getCurrentDocumentReference())
+            .thenReturn(ATTACHMENT_REFERENCE.getDocumentReference());
+        OfficeDocumentView officeDocumentView =
+            new OfficeDocumentView(resourceReference, new XDOM(new ArrayList<Block>()), new HashSet<File>());
+        when(
+            externalCache.get(STRING_DOCUMENT_REFERENCE + "/url:http://resource/" + parameters.hashCode()))
+            .thenReturn(officeDocumentView);
+
+        assertNotNull(this.officeResourceViewer.createView(resourceReference, parameters));
+        verify(this.documentAccessBridge).getCurrentDocumentReference();
     }
 
     /**
@@ -345,7 +443,7 @@ class DefaultOfficeResourceViewerTest
         assertNotNull(this.officeResourceViewer.createView(ATTACHMENT_RESOURCE_REFERENCE, DEFAULT_VIEW_PARAMETERS));
 
         verify(attachmentCache).remove(CACHE_KEY);
-        verify(attachmentCache).set(eq(CACHE_KEY), notNull(AttachmentOfficeDocumentView.class));
+        verify(attachmentCache).set(eq(CACHE_KEY), notNull());
     }
 
     @Test

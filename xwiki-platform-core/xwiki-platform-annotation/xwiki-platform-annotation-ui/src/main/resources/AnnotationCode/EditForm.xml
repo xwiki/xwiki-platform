@@ -36,7 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="AnnotationCode.Macros" /}}
+  <content>{{template name="display_macros.vm" /}}
+
+{{include reference="AnnotationCode.Macros" /}}
 
 {{velocity output="false"}}
 #if ("$!{request.reference}" != '')
@@ -48,7 +50,12 @@
 
 {{velocity filter="none"}}
 {{html clean="false"}}
+## The annotation edit form is loaded asynchronously so we need to send back also the required JavaScript and CSS
+## resources (besides the form HTML).
+#initRequiredSkinExtensions()
 #displayEditBoxFromReference("$!{request.id}", $annotationReference)
+#getRequiredSkinExtensions($requiredSkinExtensions)
+#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

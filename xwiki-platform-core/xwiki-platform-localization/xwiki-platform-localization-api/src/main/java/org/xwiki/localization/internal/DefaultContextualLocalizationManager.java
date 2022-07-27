@@ -20,7 +20,6 @@
 package org.xwiki.localization.internal;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -28,9 +27,6 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
 /**
  * Default implementation of {@link ContextualLocalizationManager}.
@@ -54,13 +50,6 @@ public class DefaultContextualLocalizationManager implements ContextualLocalizat
     @Inject
     private LocalizationContext localizationContext;
 
-    /**
-     * The plain text renderer.
-     */
-    @Inject
-    @Named("plain/1.0")
-    private BlockRenderer plainRenderer;
-
     @Override
     public Translation getTranslation(String key)
     {
@@ -70,17 +59,7 @@ public class DefaultContextualLocalizationManager implements ContextualLocalizat
     @Override
     public String getTranslationPlain(String key, Object... parameters)
     {
-        Translation translation = getTranslation(key);
-
-        if (translation == null) {
-            return null;
-        }
-
-        Block block = translation.render(parameters);
-
-        DefaultWikiPrinter wikiPrinter = new DefaultWikiPrinter();
-        this.plainRenderer.render(block, wikiPrinter);
-
-        return wikiPrinter.toString();
+        return this.localizationManager.getTranslationPlain(key, this.localizationContext.getCurrentLocale(),
+            parameters);
     }
 }

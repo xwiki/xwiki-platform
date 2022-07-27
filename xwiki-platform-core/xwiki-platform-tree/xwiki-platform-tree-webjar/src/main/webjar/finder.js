@@ -64,13 +64,13 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
   var findNode = function(event, data) {
     this.deselect_all();
     this.close_all();
-    this.openTo(data.id, $.proxy(function(node) {
+    this.openTo(data.id, node => {
       if (this.select_node(node) !== false) {
         // Scroll only the node label into view because the entire node may take a lot of vertical space due to its
         // descendants (when the node is expanded).
         this.get_node(node, true).children('.jstree-anchor')[0].scrollIntoView(false);
       }
-    }, this));
+    });
   };
 
   // Move the icon inside the value container because it's easier to style it like that.
@@ -86,7 +86,7 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
     this.init = function (element, options) {
       parent.init.call(this, element, options);
 
-      $(createSuggestInput(options)).insertBefore(element).on('xwiki:suggest:selected', $.proxy(findNode, this));
+      $(createSuggestInput(options)).insertBefore(element).on('xwiki:suggest:selected', findNode.bind(this));
     };
   };
 });

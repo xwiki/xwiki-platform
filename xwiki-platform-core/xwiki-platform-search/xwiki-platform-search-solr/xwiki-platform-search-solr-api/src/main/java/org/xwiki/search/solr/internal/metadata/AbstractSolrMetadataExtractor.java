@@ -34,7 +34,7 @@ import javax.inject.Provider;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.tika.metadata.Metadata;
-import org.apache.tika.metadata.TikaMetadataKeys;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -515,13 +515,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * 
      * @param attachment the attachment to extract the content from
      * @return the text representation of the attachment's content
-     * @throws SolrIndexerException if problems occur
      */
     protected String getContentAsText(XWikiAttachment attachment)
     {
         try {
             Metadata metadata = new Metadata();
-            metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, attachment.getFilename());
+            metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, attachment.getFilename());
 
             InputStream in = attachment.getContentInputStream(this.xcontextProvider.get());
 

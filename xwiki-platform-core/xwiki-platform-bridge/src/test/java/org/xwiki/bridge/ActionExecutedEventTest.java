@@ -19,209 +19,210 @@
  */
 package org.xwiki.bridge;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for the {@link ActionExecutedEvent} event type.
  * 
  * @version $Id$
  */
-public class ActionExecutedEventTest
+class ActionExecutedEventTest
 {
     // Tests for constructors
 
     @Test
-    public void testDefaultConstructor()
+    void defaultConstructor()
     {
         ActionExecutedEvent event = new ActionExecutedEvent();
-        Assert.assertNull("A default action was used!", event.getActionName());
+        assertNull(event.getActionName(), "A default action was used!");
     }
 
     @Test
-    public void testConstructorWithActionName()
+    void constructorWithActionName()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertEquals("Action name was lost!", "something", event.getActionName());
+        assertEquals("something", event.getActionName(), "Action name was lost!");
     }
 
     // Tests for matches(Object)
 
     @Test
-    public void testMatchesSameObject()
+    void matchesSameObject()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertTrue("Same object wasn't matched!", event.matches(event));
+        assertTrue(event.matches(event), "Same object wasn't matched!");
     }
 
     @Test
-    public void testMatchesSameAction()
+    void matchesSameAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertTrue("Same action wasn't matched!", event.matches(new ActionExecutedEvent("something")));
+        assertTrue(event.matches(new ActionExecutedEvent("something")), "Same action wasn't matched!");
     }
 
     @Test
-    public void testDoesntMatchNull()
+    void doesntMatchNull()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("null was matched!", event.matches(null));
+        assertFalse(event.matches(null), "null was matched!");
     }
 
     @Test
-    public void testDoesntMatchWildcardAction()
+    void doesntMatchWildcardAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("Wildcard action was matched!", event.matches(new ActionExecutedEvent()));
+        assertFalse(event.matches(new ActionExecutedEvent()), "Wildcard action was matched!");
     }
 
     @Test
-    public void testDoesntMatchDifferentAction()
+    void doesntMatchDifferentAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("A different action was matched!", event.matches(new ActionExecutedEvent("else")));
+        assertFalse(event.matches(new ActionExecutedEvent("else")), "A different action was matched!");
     }
 
     @Test
-    public void testDoesntMatchDifferentCaseAction()
+    void doesntMatchDifferentCaseAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("Action matching was case insensitive!",
-            event.matches(new ActionExecutedEvent("SomeThing")));
+        assertFalse(event.matches(new ActionExecutedEvent("SomeThing")), "Action matching was case insensitive!");
     }
 
     @Test
-    public void testDoesntMatchDifferentTypeOfAction()
+    void doesntMatchDifferentTypeOfAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("A different type of action was matched!",
-            event.matches(new ActionExecutingEvent("something")));
+        assertFalse(event.matches(new ActionExecutingEvent("something")), "A different type of action was matched!");
     }
 
     @Test
-    public void testWildcardActionMatchesAll()
+    void wildcardActionMatchesAll()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertTrue("Wildcard action didn't match!", new ActionExecutedEvent().matches(event));
-        Assert.assertTrue("Wildcard action didn't match another wildcard action!",
-            new ActionExecutedEvent().matches(new ActionExecutedEvent()));
+        assertTrue(new ActionExecutedEvent().matches(event), "Wildcard action didn't match!");
+        assertTrue(new ActionExecutedEvent().matches(new ActionExecutedEvent()),
+            "Wildcard action didn't match another wildcard action!");
     }
 
     @Test
-    public void testWildcardActionDoesnMatchNull()
+    void wildcardActionDoesnMatchNull()
     {
-        Assert.assertFalse("Wildcard action matched null!", new ActionExecutedEvent().matches(null));
+        assertFalse(new ActionExecutedEvent().matches(null), "Wildcard action matched null!");
     }
 
     @Test
-    public void testEmptyActionDoesntMatch()
+    void emptyActionDoesntMatch()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("Empty action behaves as wildcard!", new ActionExecutedEvent("").matches(event));
+        assertFalse(new ActionExecutedEvent("").matches(event), "Empty action behaves as wildcard!");
     }
 
     // Tests for equals(Object)
 
     @Test
-    public void testEqualsSameObject()
+    void equalsSameObject()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertTrue("Same object wasn't equal!", event.equals(event));
+        assertEquals(event, event, "Same object wasn't equal!");
     }
 
     @Test
-    public void testEqualsSameAction()
+    void equalsSameAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertTrue("Same action wasn't equal!", event.equals(new ActionExecutedEvent("something")));
+        assertEquals(new ActionExecutedEvent("something"), event, "Same action wasn't equal!");
     }
 
     @Test
-    public void testEqualsWithNull()
+    void equalsWithNull()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("null was equal!", event.equals(null));
+        assertNotEquals(null, event, "null was equal!");
     }
 
     @Test
-    public void testDoesntEqualWildcardAction()
+    void doesntEqualWildcardAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("Wildcard action was equal!", event.equals(new ActionExecutedEvent()));
+        assertNotEquals(new ActionExecutedEvent(), event, "Wildcard action was equal!");
     }
 
     @Test
-    public void testDoesntEqualDifferentAction()
+    void doesntEqualDifferentAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("A different action was equal!", event.equals(new ActionExecutedEvent("else")));
+        assertNotEquals(new ActionExecutedEvent("else"), event, "A different action was equal!");
     }
 
     @Test
-    public void testDoesntEqualDifferentCaseAction()
+    void doesntEqualDifferentCaseAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("Action equals comparison was case insensitive!",
-            event.equals(new ActionExecutedEvent("SomeThing")));
+        assertNotEquals(new ActionExecutedEvent("SomeThing"), event, "Action equals comparison was case insensitive!");
     }
 
     @Test
-    public void testDoesntEqualDifferentTypeOfAction()
+    void doesntEqualDifferentTypeOfAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("Same object isn't matched!", event.equals(new ActionExecutingEvent("something")));
+        assertNotEquals(new ActionExecutingEvent("something"), event, "Same object isn't matched!");
     }
 
     @Test
-    public void testWildcardActionDoesntEqualOtherActions()
+    void wildcardActionDoesntEqualOtherActions()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertFalse("Wildcard action equals another action!", new ActionExecutedEvent().equals(event));
+        assertNotEquals(new ActionExecutedEvent(), event, "Wildcard action equals another action!");
     }
 
     @Test
-    public void testWildcardActionDoesntEqualEmptyAction()
+    void wildcardActionDoesntEqualEmptyAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("");
-        Assert.assertFalse("Wildcard action equals another action!", new ActionExecutedEvent().equals(event));
+        assertNotEquals(new ActionExecutedEvent(), event, "Wildcard action equals another action!");
     }
 
     @Test
-    public void testWildcardActionEqualsWildcardAction()
+    void wildcardActionEqualsWildcardAction()
     {
-        Assert.assertTrue("Wildcard action isn't equal to another wildcard action",
-            new ActionExecutedEvent().equals(new ActionExecutedEvent()));
+        assertEquals(new ActionExecutedEvent(), new ActionExecutedEvent(),
+            "Wildcard action isn't equal to another wildcard action");
     }
 
     @Test
-    public void testWildcardActionDoesntEqualNull()
+    void wildcardActionDoesntEqualNull()
     {
-        Assert.assertFalse("Wildcard action equals null!", new ActionExecutedEvent().equals(null));
+        assertNotEquals(null, new ActionExecutedEvent(), "Wildcard action equals null!");
     }
 
     // Tests for hashCode()
 
     @Test
-    public void testHashCode()
+    void hashCodeNotZero()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("something");
-        Assert.assertTrue("Hashcode was zero!", event.hashCode() != 0);
+        assertNotEquals(0, event.hashCode(), "Hashcode was zero!");
     }
 
     @Test
-    public void testHashCodeWithEmptyAction()
+    void hashCodeWithEmptyAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent("");
-        Assert.assertTrue("Hashcode for empty string action wasn't zero!", event.hashCode() == 0);
+        assertEquals(0, event.hashCode(), "Hashcode for empty string action wasn't zero!");
     }
 
     @Test
-    public void testHashCodeForWildcardAction()
+    void hashCodeForWildcardAction()
     {
         ActionExecutedEvent event = new ActionExecutedEvent();
-        Assert.assertTrue("Hashcode for wildcard action wasn't zero!", event.hashCode() == 0);
+        assertEquals(0, event.hashCode(), "Hashcode for wildcard action wasn't zero!");
     }
 }

@@ -328,9 +328,6 @@
   max-width: 50px;
   max-height: 50px;
 }
-* html .annotationAvatar img {
-  width: 50px;
-}
 
 #allAnnotations .annotationAvatar  {
   padding-top: 5px;

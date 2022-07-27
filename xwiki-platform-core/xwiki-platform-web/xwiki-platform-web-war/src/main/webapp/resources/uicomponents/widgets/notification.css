@@ -6,7 +6,7 @@
   right: 0;
   margin: auto;
   text-align: center;
-  z-index: 1200;
+  z-index: 10051; /* One more than the z-index of bootstrap's modal. */
   display: block !important;
   max-width: 80%;
 }

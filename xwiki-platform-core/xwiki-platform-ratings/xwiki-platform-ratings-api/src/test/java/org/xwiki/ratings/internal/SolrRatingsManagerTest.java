@@ -123,9 +123,9 @@ public class SolrRatingsManagerTest
     void setup(MockitoComponentManager componentManager) throws Exception
     {
         this.manager.setRatingConfiguration(configuration);
-        when(this.solrUtils.toFilterQueryString(any()))
+        when(this.solrUtils.toCompleteFilterQueryString(any()))
             .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
-        when(this.solrUtils.toFilterQueryString(any(), any()))
+        when(this.solrUtils.toCompleteFilterQueryString(any(), any()))
             .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
         when(this.solrUtils.getId(any()))
             .then(invocationOnMock -> ((SolrDocument) invocationOnMock.getArgument(0)).get("id"));
@@ -819,6 +819,47 @@ public class SolrRatingsManagerTest
 
         AverageRating averageRating = mock(AverageRating.class);
         when(this.averageRatingManager.resetAverageRating(inputReference, 1.75f, 4)).thenReturn(averageRating);
+        assertEquals(averageRating, this.manager.recomputeAverageRating(inputReference));
+    }
+
+    @Test
+    void recomputeAverageRatings_noVote() throws Exception
+    {
+        when(this.configuration.isAverageStored()).thenReturn(true);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
+        EntityReference inputReference = mock(EntityReference.class);
+        when(inputReference.toString()).thenReturn("document:Input.Reference");
+        String managerId = "myManager";
+
+        this.manager.setIdentifier(managerId);
+
+        String filterQuery = String.format("filter(%s:%s) AND filter(%s:%s)",
+            RatingQueryField.ENTITY_REFERENCE.getFieldName(), "document\\:Input.Reference",
+            RatingQueryField.MANAGER_ID.getFieldName(), managerId);
+
+        SolrQuery expectedQuery = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setRows(100)
+            .setStart(0)
+            .setSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
+
+        QueryResponse response1 = mock(QueryResponse.class);
+        when(solrClient.query(any())).then(invocationOnMock -> {
+            SolrQuery givenQuery = invocationOnMock.getArgument(0);
+            QueryResponse result = null;
+            assertEquals(expectedQuery.getQuery(), givenQuery.getQuery());
+            assertArrayEquals(expectedQuery.getFilterQueries(), givenQuery.getFilterQueries());
+            assertEquals(expectedQuery.getRows(), givenQuery.getRows());
+            assertEquals(expectedQuery.getStart(), givenQuery.getStart());
+            assertEquals(expectedQuery.getSorts(), givenQuery.getSorts());
+            result = response1;
+            return result;
+        });
+        // empty response
+        when(response1.getResults()).thenReturn(new SolrDocumentList());
+
+        AverageRating averageRating = mock(AverageRating.class);
+        when(this.averageRatingManager.resetAverageRating(inputReference, 0, 0)).thenReturn(averageRating);
         assertEquals(averageRating, this.manager.recomputeAverageRating(inputReference));
     }
 

@@ -33,6 +33,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.job.RefactoringJobs;
@@ -57,7 +58,7 @@ import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
 @Component
 @Named(UpdateRightsOnDocumentRenameListener.NAME)
 @Singleton
-public class UpdateRightsOnDocumentRenameListener extends AbstractDocumentEventListener
+public class UpdateRightsOnDocumentRenameListener extends AbstractLocalEventListener
 {
     /**
      * The name of the listener.

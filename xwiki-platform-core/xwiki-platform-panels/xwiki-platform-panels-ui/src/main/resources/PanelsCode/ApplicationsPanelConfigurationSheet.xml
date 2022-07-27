@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.5" reference="PanelsCode.ApplicationsPanelConfigurationSheet" locale="">
   <web>PanelsCode</web>
   <name>ApplicationsPanelConfigurationSheet</name>
   <language/>
@@ -138,8 +138,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -153,7 +156,9 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -185,6 +190,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -202,25 +209,21 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>/************************************
- * Configure RequireJS to use jQuery-UI
- ************************************/
-require.config({
-  paths: {
-    'jquery-ui' : "$services.webjars.url('jquery-ui', 'jquery-ui.min')",
-    ## The WebJar version doesn't match the version of the packaged jquery-ui-touch-punch library so we are forced to
-    ## specify the library version when computing the WebJar resource URL.
-    'jquery-ui-touch-punch' : "$services.webjars.url('jquery-ui-touch-punch/0.2.3/jquery.ui.touch-punch.min')"
-  },
-  shim: {
-    'jquery-ui' : ['jquery'],
-    'jquery-ui-touch-punch': ['jquery', 'jquery-ui']
-  }
+      <code>define('xwiki-panels-applications-config-messages', {
+  prefix: 'platform.panels.applications.ajax.',
+  keys: ['success', 'csrf', 'noright', 'error']
 });
+
 /************************************
  * Script that enable the drag &amp; drop of applications
  ************************************/
-require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function($, xm) {
+require([
+  'jquery',
+  'xwiki-meta',
+  'xwiki-l10n!xwiki-panels-applications-config-messages',
+  'jquery-ui',
+  'jquery-ui-touch-punch'
+], function($, xm, l10n) {
 
   /**
    * Save the black list and the order configuration
@@ -238,52 +241,48 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
     for (var i = 0; i &lt;displaylistElems.length; ++i) {
       displaylistOrder.push(displaylistElems[i].id);
     }
-    $.ajax({
-      url: '$xwiki.getURL('PanelsCode.ApplicationsPanelConfigurationAjax', 'get', 'outputSyntax=plain')',
-      data: {
-        'form_token': xm['form_token'],
-        'blacklist': JSON.stringify(blacklist),
-        'orderlist': JSON.stringify(displaylistOrder)
-      },
-      success: function(data, status) {
-        if (data == 'SUCCESS') {
-          new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('platform.panels.applications.ajax.success'))', 'done');
-        } else if (data == 'BAD CSRF') {
-          new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('platform.panels.applications.ajax.csrf'))', 'error');
-        } else if (data == 'NO RIGHT') {
-          new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('platform.panels.applications.ajax.noright'))', 'error');
-        } else {
-          new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('platform.panels.applications.ajax.error'))', 'error');
-        }
-      },
-      error: function() {
-        new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('platform.panels.applications.ajax.error'))', 'error');
+    $.post(new XWiki.Document('ApplicationsPanelConfigurationAjax', 'PanelsCode').getURL('get'), {
+      outputSyntax: 'plain',
+      form_token: xm.form_token,
+      blacklist: JSON.stringify(blacklist),
+      orderlist: JSON.stringify(displaylistOrder)
+    }).then(data =&gt; {
+      if (data === 'SUCCESS') {
+        new XWiki.widgets.Notification(l10n['success'], 'done');
+      } else if (data === 'BAD CSRF') {
+        new XWiki.widgets.Notification(l10n['csrf'], 'error');
+      } else if (data === 'NO RIGHT') {
+        new XWiki.widgets.Notification(l10n['noright'], 'error');
+      } else {
+        new XWiki.widgets.Notification(l10n['error'], 'error');
       }
+    }).catch(() =&gt; {
+      new XWiki.widgets.Notification(l10n['error'], 'error');
     });
   };
 
   /**
    * Initialization
    */
-  $(document).ready(function() {
-    // Define the selector for the elements on which we will use the jquery-ui sortable plugin, which allows to sort 
+  $(function() {
+    // Define the selector for the elements on which we will use the jquery-ui sortable plugin, which allows to sort
     // inner elements with drag &amp;amp; drop.
     var sortableSelector = '.appsPanel &gt; div &gt; ul';
-    
+
     // Enable the sortable plugin.
     // The 'connectWith' option allows the drag &amp; drop from a sortable list (e.g. the displayed panels) to an other
     // sortable list (e.g. the blacklisted panels).
     // Here we create 2 sortable lists, because the selector match those 2.
     $(sortableSelector).sortable({connectWith: sortableSelector});
-    
+
     // Allow reverting the changes
-    $('#bt-revert').click(function(){
+    $('#bt-revert').on('click', function() {
       // Refresh the page
       window.location.reload();
     });
-    
+
     // Redefine the save action
-    $('#bt-save').click(save);
+    $('#bt-save').on('click', save);
   });
 });
 </code>
@@ -292,7 +291,7 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
       <name>Drag &amp; Drop</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>
@@ -314,8 +313,11 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -329,7 +331,9 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -342,6 +346,8 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -377,6 +383,8 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -404,13 +412,16 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
 }</code>
     </property>
     <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
       <name>CSS</name>
     </property>
     <property>
-      <parse/>
+      <parse>0</parse>
     </property>
     <property>
-      <use>currentPage</use>
+      <use>onDemand</use>
     </property>
   </object>
 </xwikidoc>

@@ -1198,4 +1198,18 @@ public privileged aspect XWikiCompatibilityAspect
     {
         return this.xwiki.getConfiguredSyntaxes();
     }
+
+    /**
+     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
+     * RequestDispatcher, buffering the output, then returning it as a string.
+     *
+     * @param url URL of the servlet
+     * @return text result of the servlet
+     * @deprecated since 12.10.9, 13.4.3, 13.7RC1
+     */
+    @Deprecated
+    public String XWiki.invokeServletAndReturnAsString(String url)
+    {
+        return hasProgrammingRights() ? this.xwiki.invokeServletAndReturnAsString(url, getXWikiContext()) : null;
+    }
 }

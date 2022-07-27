@@ -47,7 +47,7 @@
 
 Permite añadir contenido que no será formateado (en otras palabras, en el que no se tendrá en cuenta la Sintaxis XWiki).
 
-{{info}}En la Sintaxis XWiki 1.0 la [[macro Pre&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Pre+Macro+%28Radeox%29]] solo mantiene la Sintaxis XWiki y las macros Radeox. Sin embargo, las plantillas HTML y los scripts Groovy/Velocity scripts son ejecutados.{{/info}}
+{{info}}En la Sintaxis XWiki 1.0 la [[macro Pre&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Pre%20Macro%20%28Radeox%29]] solo mantiene la Sintaxis XWiki y las macros Radeox. Sin embargo, las plantillas HTML y los scripts Groovy/Velocity scripts son ejecutados.{{/info}}
 
 |=Funcionalidad|=Sintaxis XWiki 1.0|=Resultado
 |Literal en línea|{{{Algún contenido literal {pre}*[no renderizado]*{/pre}}}}|Algún contenido literal {{{*[no renderizado]*}}}
@@ -58,7 +58,7 @@ multilínea
 contenido
 {/pre}
 }}}
-{{info}}También se puede utilizar la [[macro Code&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Code+Macro+%28Radeox%29]] pero, por defecto, visualiza su contenido en un cuadro.{{/info}}
+{{info}}También se puede utilizar la [[macro Code&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Code%20Macro%20%28Radeox%29]] pero, por defecto, visualiza su contenido en un cuadro.{{/info}}
 )))|((({{{
 multilínea
 *literal*

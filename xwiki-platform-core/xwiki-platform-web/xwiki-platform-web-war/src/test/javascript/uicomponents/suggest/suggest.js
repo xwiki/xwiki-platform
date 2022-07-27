@@ -19,7 +19,6 @@
  */
 require.config({
   paths: {
-    'prototype': 'js/prototype/prototype.min',
     'xlist': 'uicomponents/widgets/list/xlist.min',
     'suggest': 'uicomponents/suggest/suggest.min'
   },

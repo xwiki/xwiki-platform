@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -45,7 +45,7 @@
   </modules>
   <properties>
     <!-- The version of Maven used during XWiki runtime (more recent than the one used during the build to benefit from bugfixes and improvements)-->
-    <maven.version>3.8.1</maven.version>
+    <maven.version>3.8.6</maven.version>
     <maven.resolver.version>1.6.3</maven.resolver.version>
 
     <!-- Flavors known to be valid with the current distribution -->
@@ -157,6 +157,9 @@
     <!-- The child modules don't provide APIs (those should be in xwiki-platform-core) so we don't need to check for
       backward compatibility breakages. -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
+
+    <!-- TODO: remove when https://jira.xwiki.org/browse/XWIKI-19932 is fixed -->
+    <xwiki.enforcer.no-legacy-dependencies.exclude>.*xwiki.*:.*-legacy-(?!events-hibernate-api).*</xwiki.enforcer.no-legacy-dependencies.exclude>
   </properties>
 
   <!-- Avoid enforce-upper-bounds rule complains (they're actually false positives since Extension Manager is not
@@ -167,13 +170,18 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>13.6-SNAPSHOT</version>
+        <version>14.7-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-security-script</artifactId>
-        <version>13.6-SNAPSHOT</version>
+        <artifactId>xwiki-platform-security-authorization-script</artifactId>
+        <version>14.7-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-webjars-api</artifactId>
+        <version>14.7-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>
@@ -184,7 +192,7 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tree-webjar</artifactId>
-        <version>13.6-SNAPSHOT</version>
+        <version>14.7-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -268,7 +276,7 @@
         <plugin>
           <groupId>org.basepom.maven</groupId>
           <artifactId>duplicate-finder-maven-plugin</artifactId>
-          <version>1.5.0</version>
+          <version>1.5.1</version>
           <executions>
             <execution>
               <id>war-check-duplicates</id>
@@ -282,32 +290,6 @@
                 <checkCompileClasspath>false</checkCompileClasspath>
                 <checkTestClasspath>false</checkTestClasspath>
                 <exceptions>
-                  <!-- None of these should bundle org.w3c classes but at least they seem compatible.
-                       See https://issues.apache.org/bugzilla/show_bug.cgi?id=49897,
-                       https://issues.apache.org/bugzilla/show_bug.cgi?id=49206 and http://bugs.jython.org/issue2121 -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>org.apache.xmlgraphics</groupId>
-                        <artifactId>batik-ext</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <classes>
-                      <class>org.w3c.dom.ElementTraversal</class>
-                      <class>org.w3c.dom.events.DocumentEvent</class>
-                      <class>org.w3c.dom.events.Event</class>
-                      <class>org.w3c.dom.events.EventException</class>
-                      <class>org.w3c.dom.events.EventListener</class>
-                      <class>org.w3c.dom.events.EventTarget</class>
-                      <class>org.w3c.dom.events.MouseEvent</class>
-                      <class>org.w3c.dom.events.MutationEvent</class>
-                      <class>org.w3c.dom.events.UIEvent</class>
-                    </classes>
-                  </exception>
                   <!-- This is a PITA. The classes are actually incompatible! We should do something about it but I
                        don't see a solution ATM... -->
                   <exception>
@@ -346,44 +328,6 @@
                       <resource>META-INF/BCKEY.DSA</resource>
                       <resource>META-INF/BCKEY.SF</resource>
                     </resources>
-                  </exception>
-                  <!-- XStream includes both xapp and xmlpull and XAPP bundle somes classes of xmlpull.
-                       See http://x-stream.github.io/jira/689/ for more.
-                   -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>xmlpull</groupId>
-                        <artifactId>xmlpull</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3_min</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <packages>
-                      <package>org.xmlpull</package>
-                    </packages>
-                  </exception>
-                  <!-- Seems to be the same thing -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <packages>
-                      <package>javax.xml.namespace</package>
-                    </packages>
                   </exception>
                   <!-- Does not seems to be an issue -->
                   <exception>
@@ -501,7 +445,6 @@
                       <!-- Ensure that emory-util-classloader and dependencies using it are not bundled anymore -->
                       <exclude>org.xwiki.commons:xwiki-commons-legacy-classloader-api:*</exclude>
                       <exclude>edu.emory.mathcs.util:emory-util-classloader:*</exclude>
-                      <exclude>org.xwiki.commons:xwiki-commons-legacy-protocol-jar:*</exclude>
                     </excludes>
                   </bannedDependencies>
                 </rules>

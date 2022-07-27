@@ -48,7 +48,7 @@ Ci sono due tipi di macro nella Sintassi XWiki 1.0:
 * Macro Velocity (chiamate usando la sintassi ###macroname(param1 ... paramN)## )
 * Macro Radeox (chiamate usando la sintassi ##{macroname:param1=value1|...|paramN=valueN}## )
 
-{{info}}Per l'elenco completo delle macro disponibili controllare la pagina delle [[Estensioni di XWiki&gt;&gt;http://extensions.xwiki.org/]].{{/info}}
+{{info}}Per l'elenco completo delle macro disponibili controllare la pagina delle [[Estensioni di XWiki&gt;&gt;https://extensions.xwiki.org/]].{{/info}}
 
 |=Caratteristica|=Sintassi XWiki 1.0
 |Macro Velocity|(((
@@ -77,5 +77,5 @@ System.out.println("Hello World!");
 
 {{info}}Non si possono usare le macro Radeox con la Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}. Perciò devono essere riscritte come macro XWiki.{{/info}}
 
-{{info}}Per l'elenco completo delle macro disponibili controllare la pagina delle [[Estensioni di XWiki&gt;&gt;http://extensions.xwiki.org/]].{{/info}}</content>
+{{info}}Per l'elenco completo delle macro disponibili controllare la pagina delle [[Estensioni di XWiki&gt;&gt;https://extensions.xwiki.org/]].{{/info}}</content>
 </xwikidoc>

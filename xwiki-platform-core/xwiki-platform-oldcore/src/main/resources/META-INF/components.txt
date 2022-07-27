@@ -43,6 +43,7 @@ com.xpn.xwiki.internal.filter.input.PropertyClassEventGenerator
 com.xpn.xwiki.internal.filter.input.XWikiAttachmentContentInputSourceReferenceParser
 com.xpn.xwiki.internal.filter.input.XWikiAttachmentEventGenerator
 com.xpn.xwiki.internal.filter.input.XWikiDocumentLocaleEventGenerator
+com.xpn.xwiki.internal.filter.input.XWikiPageAttachmentContentInputSourceReferenceParser
 com.xpn.xwiki.internal.filter.output.BaseClassOutputFilterStream
 com.xpn.xwiki.internal.filter.output.BaseObjectOutputFilterStream
 com.xpn.xwiki.internal.filter.output.BasePropertyOutputFilterStream
@@ -56,6 +57,7 @@ com.xpn.xwiki.internal.filter.output.XWikiDocumentOutputFilterStream
 com.xpn.xwiki.script.display.DisplayScriptService
 com.xpn.xwiki.internal.job.JobRequestContextInitializer
 com.xpn.xwiki.internal.localization.XWikiLocalizationContext
+500:com.xpn.xwiki.internal.localization.XWikiLocalizationManager
 com.xpn.xwiki.internal.mandatory.DocumentAsyncClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
@@ -107,6 +109,7 @@ com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter
 com.xpn.xwiki.internal.model.reference.UserAndGroupDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.UserAndGroupEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver
+org.xwiki.internal.model.reference.CurrentPageReferenceDocumentReferenceResolver
 com.xpn.xwiki.internal.model.DefaultLegacySpaceResolver
 com.xpn.xwiki.internal.namespace.DefaultNamespaceContextExecutor
 com.xpn.xwiki.internal.objects.classes.DefaultDBListQueryBuilder
@@ -146,6 +149,7 @@ com.xpn.xwiki.internal.template.TemplateListener
 com.xpn.xwiki.internal.template.VelocityTemplateEvaluator
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.query.CurrentLanguageQueryFilter
+com.xpn.xwiki.internal.redirection.RedirectClassRedirectionFilter
 com.xpn.xwiki.script.sheet.SheetScriptService
 com.xpn.xwiki.internal.sheet.ClassSheetBinder
 com.xpn.xwiki.internal.sheet.DocumentSheetBinder
@@ -156,6 +160,8 @@ com.xpn.xwiki.internal.render.OldRenderingProvider
 com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString
 com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier
 com.xpn.xwiki.internal.velocity.DefaultVelocityEvaluator
+org.xwiki.internal.web.GetDocExistValidator
+org.xwiki.internal.web.ViewDocExistValidator
 com.xpn.xwiki.objects.meta.BooleanMetaClass
 com.xpn.xwiki.objects.meta.ComputedFieldMetaClass
 com.xpn.xwiki.objects.meta.DateMetaClass
@@ -206,7 +212,10 @@ com.xpn.xwiki.store.migration.hibernate.R911001XWIKI14895DataMigration
 com.xpn.xwiki.store.migration.hibernate.R1008010XWIKI10092DataMigration
 com.xpn.xwiki.store.migration.hibernate.R1138000XWIKI16709DataMigration
 com.xpn.xwiki.store.migration.hibernate.R130200000XWIKI17200DataMigration
-com.xpn.xwiki.store.migration.hibernate.R130200001XWIKI18429DataMigration
+com.xpn.xwiki.store.migration.hibernate.R140000000XWIKI19125DataMigration
+com.xpn.xwiki.store.migration.hibernate.R140200010XWIKI19207DataMigration
+com.xpn.xwiki.store.migration.hibernate.R140200000XWIKI19352DataMigration
+com.xpn.xwiki.store.migration.hibernate.R140600000XWIKI19869DataMigration
 com.xpn.xwiki.store.VoidAttachmentVersioningStore
 com.xpn.xwiki.store.XWikiHibernateStore
 com.xpn.xwiki.store.XWikiHibernateVersioningStore
@@ -228,7 +237,6 @@ com.xpn.xwiki.web.EditAction
 com.xpn.xwiki.web.ExportAction
 com.xpn.xwiki.web.GetAction
 com.xpn.xwiki.web.ImportAction
-com.xpn.xwiki.web.InlineAction
 com.xpn.xwiki.web.LockAction
 com.xpn.xwiki.web.LoginAction
 com.xpn.xwiki.web.LoginErrorAction
@@ -237,7 +245,6 @@ com.xpn.xwiki.web.LogoutAction
 com.xpn.xwiki.web.ObjectAddAction
 com.xpn.xwiki.web.ObjectRemoveAction
 com.xpn.xwiki.web.ObjectsSynchronizeAction
-com.xpn.xwiki.web.PDFAction
 com.xpn.xwiki.web.PreviewAction
 com.xpn.xwiki.web.PropAddAction
 com.xpn.xwiki.web.PropDeleteAction
@@ -252,7 +259,6 @@ com.xpn.xwiki.web.SaveAction
 com.xpn.xwiki.web.SaveAndContinueAction
 com.xpn.xwiki.web.SkinAction
 com.xpn.xwiki.web.SVGAction
-com.xpn.xwiki.web.TempResourceAction
 com.xpn.xwiki.web.TexAction
 com.xpn.xwiki.web.UndeleteAction
 com.xpn.xwiki.web.UnknownAction

@@ -461,7 +461,7 @@ var XWiki = (function(XWiki) {
         input : this.input,
         action : this.options.targetURL,
         additionalFields : {}
-      }
+      };
       var redirect = this.form.down('input[name=xredirect]');
       this.formData.additionalFields.xredirect = this.options.responseURL || redirect && redirect.value;
       var form_token = this.form.down('input[name=form_token]');

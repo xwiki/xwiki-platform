@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsApplicationsPreferencesMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsApplicationsPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsApplicationsPreferencesMacro</name>
   <language/>
@@ -126,20 +126,9 @@
     <property>
       <code>'use strict';
 /**
- * Start the requirejs config.
- */
-require.config({
-  paths: {
-    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', 'js/bootstrap-switch.min')'
-  },
-  shim: {
-    'bootstrap-switch' : ['jquery']
-  }
-});
-/**
  * Start the real script.
  */
-require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget) {
+require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget) {
 
   /**
    * Page initialization
@@ -190,19 +179,19 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         var targetUser = $('.notifPreferences').attr('data-user');
       }
       var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
-      $.post(url, {
+      Promise.resolve($.post(url, {
         action: 'savePreferences',
         target: $('.notifPreferences').attr('data-target'),
         user: targetUser,
         json: JSON.stringify(data),
         csrf: xm.form_token
-      }).done(function() {
+      })).then(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).error(function() {
+      }).catch(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
-      }).always(function() {
+      }).finally(function() {
         // Enable again the triggers
         toggles.bootstrapSwitch('disabled', false);
       });
@@ -237,8 +226,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     });
 
   };
-  
-  $(document).ready(preferenceInit);
+
+  $(preferenceInit);
   $(document).on('xwiki:dom:updated', preferenceInit)
 });
 </code>
@@ -340,7 +329,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <cache>long</cache>
     </property>
     <property>
-      <code>define('EventTypeWidget', ['jquery', 'xwiki-meta', 'bootstrap-switch'], function($, xm) {
+      <code>define('EventTypeWidget', ['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function($, xm) {
   /**
   * Construct an EventTypeWidget.
   */
@@ -515,7 +504,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <cache>long</cache>
     </property>
     <property>
-      <code>define('ApplicationWidget', ['jquery', 'EventTypeWidget', 'bootstrap-switch'], function($, EventTypeWidget) {
+      <code>define('ApplicationWidget', ['jquery', 'EventTypeWidget', 'xwiki-bootstrap-switch'], function($, EventTypeWidget) {
   /**
    * Construct an application widget.
    */
@@ -798,7 +787,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -873,15 +862,24 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
         <disabled>0</disabled>
@@ -1100,7 +1098,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Notifications</defaultCategory>
+      <defaultCategories>
+        <value>Notifications</value>
+      </defaultCategories>
     </property>
     <property>
       <description>Display the preferences of the current user about notification applications.</description>

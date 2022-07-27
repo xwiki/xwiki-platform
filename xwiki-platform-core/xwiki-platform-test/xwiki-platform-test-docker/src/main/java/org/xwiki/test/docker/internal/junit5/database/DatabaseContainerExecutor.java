@@ -31,6 +31,7 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.junit5.RuntimeUtils;
@@ -50,6 +51,10 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     private static final String DBUSERNAME = DBNAME;
 
     private static final String DBPASSWORD = DBUSERNAME;
+
+    private static final String ORACLE_USERNAME = "oracle";
+
+    private static final String ORACLE_PASSWORD = ORACLE_USERNAME;
 
     /**
      * @param testConfiguration the configuration to build (database, debug mode, etc)
@@ -100,7 +105,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new MySQLContainer<>(String.format("mysql:%s", testConfiguration.getDatabaseTag()));
         } else {
-            databaseContainer = new MySQLContainer<>();
+            // No tag specific, use "latest"
+            databaseContainer = new MySQLContainer<>("mysql:latest");
         }
         startMySQLContainer(databaseContainer, testConfiguration);
     }
@@ -185,7 +191,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             isMySQL8xPlus = testConfiguration.getDatabaseTag().equals("latest")
                 || extractMajor(testConfiguration.getDatabaseTag()) >= 8;
         } else {
-            isMySQL8xPlus = extractMajor(MySQLContainer.DEFAULT_TAG) >= 8;
+            // No tag specific, this means we use "latest" and thus that it's mysql 8+
+            isMySQL8xPlus = true;
         }
         return isMySQL8xPlus;
     }
@@ -201,7 +208,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new MariaDBContainer<>(String.format("mariadb:%s", testConfiguration.getDatabaseTag()));
         } else {
-            databaseContainer = new MariaDBContainer<>();
+            // No tag specific, use "latest"
+            databaseContainer = new MariaDBContainer<>("mariadb:latest");
         }
         startMySQLContainer(databaseContainer, testConfiguration);
     }
@@ -216,7 +224,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             databaseContainer =
                 new PostgreSQLContainer<>(String.format("postgres:%s", testConfiguration.getDatabaseTag()));
         } else {
-            databaseContainer = new PostgreSQLContainer<>();
+            // No tag specific, use "latest"
+            databaseContainer = new PostgreSQLContainer<>("postgres:latest");
         }
         databaseContainer
             .withDatabaseName(DBNAME)
@@ -248,15 +257,19 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     private void startOracleContainer(TestConfiguration testConfiguration) throws Exception
     {
         JdbcDatabaseContainer<?> databaseContainer;
+        String oracleImageFullName;
         if (testConfiguration.getDatabaseTag() != null) {
-            databaseContainer = new OracleContainer(String.format("xwiki/oracle-database:%s",
-                testConfiguration.getDatabaseTag()));
+            oracleImageFullName = String.format("xwiki/oracle-database:%s", testConfiguration.getDatabaseTag());
         } else {
-            databaseContainer = new OracleContainer("xwiki/oracle-database");
+            // No tag specific, use "latest"
+            oracleImageFullName = "xwiki/oracle-database:latest";
         }
+        DockerImageName oracleImage = DockerImageName.parse(oracleImageFullName)
+            .asCompatibleSubstituteFor("gvenzl/oracle-xe");
+        databaseContainer = new OracleContainer(oracleImage);
         databaseContainer
-            .withUsername("system")
-            .withPassword("oracle");
+            .withUsername(ORACLE_USERNAME)
+            .withPassword(ORACLE_PASSWORD);
 
         startDatabaseContainer(databaseContainer, 1521, testConfiguration);
     }

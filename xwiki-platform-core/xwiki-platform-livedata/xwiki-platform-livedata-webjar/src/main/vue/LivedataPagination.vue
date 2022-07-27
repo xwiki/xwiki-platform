@@ -1,23 +1,22 @@
 <!--
-  * See the NOTICE file distributed with this work for additional
-  * information regarding copyright ownership.
-  *
-  * This is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU Lesser General Public License as
-  * published by the Free Software Foundation; either version 2.1 of
-  * the License, or (at your option) any later version.
-  *
-  * This software is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this software; if not, write to the Free
-  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 
 <!--
   The LivedataPagination component is used to change the current page
@@ -93,7 +92,7 @@
         href="#"
         @click.prevent="changePageIndex(!isFirstPage, 0)"
       >
-        <span class="fa fa-angle-double-left"></span>
+        <XWikiIcon :icon-descriptor="{name: 'fast-backward'}"/>
       </a>
 
       <!--
@@ -110,7 +109,7 @@
         href="#"
         @click.prevent="changePageIndex(!isFirstPage, logic.getPageIndex() - 1)"
       >
-        <span class="fa fa-angle-left"></span>
+        <XWikiIcon :icon-descriptor="{name: 'step-backward'}"/>
       </a>
 
 
@@ -149,7 +148,7 @@
 
       <!--
         Go to Next Page button
-        Can be shown / hiden by the `pagination.showNextPrevious` property
+        Can be shown / hidden by the `pagination.showNextPrevious` property
         in the Livedata meta config
       -->
       <a
@@ -161,7 +160,7 @@
         href="#"
         @click.prevent="changePageIndex(!isLastPage , logic.getPageIndex() + 1)"
       >
-        <span class="fa fa-angle-right"></span>
+        <XWikiIcon :icon-descriptor="{name: 'step-forward'}"/>
       </a>
 
       <!--
@@ -178,7 +177,7 @@
         href="#"
         @click.prevent="changePageIndex(!isLastPage, logic.getPageCount() - 1)"
       >
-        <span class="fa fa-angle-double-right"></span>
+        <XWikiIcon :icon-descriptor="{name: 'fast-forward'}"/>
       </a>
 
     </nav>
@@ -188,9 +187,12 @@
 
 
 <script>
+import XWikiIcon from "./utilities/XWikiIcon";
 export default {
 
   name: "LivedataPagination",
+
+  components: {XWikiIcon},
 
   inject: ["logic"],
 
@@ -311,7 +313,6 @@ export default {
 
 .livedata-pagination {
   color: #777777;
-  margin-left: 1rem;
   font-size: 0.9em;
 }
 

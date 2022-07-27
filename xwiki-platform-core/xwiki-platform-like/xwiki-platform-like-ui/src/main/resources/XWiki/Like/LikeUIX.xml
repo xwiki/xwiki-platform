@@ -161,13 +161,13 @@
         'xaction': 'like',
         'form_token': xm.form_token,
         'document': XWiki.Model.serialize(xm.documentReference)
-     }).done(function(data) {
+     }).then(data =&gt; {
        likeButton.removeClass('btn-primary');
        likeButton.addClass('btn-default');
        likeButton.find('.like-number').text(data.counter);
        $('#is-liked').val('true');
        new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.newlike.success'))", 'done');
-     }).fail(function(data) {
+     }).catch(() =&gt; {
        new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.newlike.error'))", 'error');
      });
   };
@@ -178,13 +178,13 @@
       'xaction': 'unlike',
       'form_token': xm.form_token,
       'document': XWiki.Model.serialize(xm.documentReference)
-    }).done(function(data) {
+    }).then(data =&gt; {
       unlikeButton.removeClass('btn-default');
       unlikeButton.addClass('btn-primary');
       unlikeButton.find('.like-number').text(data.counter);
       $('#is-liked').val('false');
       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.success'))", 'done');
-    }).fail(function(data) {
+    }).catch(() =&gt; {
       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.error'))", 'error');
     });
   };

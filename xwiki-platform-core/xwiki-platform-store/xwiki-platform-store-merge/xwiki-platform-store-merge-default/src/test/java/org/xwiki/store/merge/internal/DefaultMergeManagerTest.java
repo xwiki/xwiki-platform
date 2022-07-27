@@ -284,7 +284,6 @@ public class DefaultMergeManagerTest
         @BeforeEach
         public void before() throws Exception
         {
-            this.oldcore.registerMockEnvironment();
             this.currentDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
             this.previousDocument = this.currentDocument.clone();
             this.nextDocument = this.currentDocument.clone();

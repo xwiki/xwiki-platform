@@ -100,6 +100,12 @@ public class AllITs
     }
 
     @Nested
+    @DisplayName("Copy page tests")
+    class NestedCopyPageIT extends CopyPageIT
+    {
+    }
+
+    @Nested
     @DisplayName("Section editing tests")
     class NestedSectionEditIT extends SectionEditIT
     {
@@ -114,6 +120,48 @@ public class AllITs
     @Nested
     @DisplayName("Page viewers tests")
     class NestedViewersIT extends ViewersIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Page history manipulation tests")
+    class NestedVersionIT extends VersionIT
+    {
+    }
+    
+    @Nested
+    @DisplayName("Edit Class tests")
+    class NestedEditClassIT extends EditClassIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Bean Validation tests")
+    class NestedBeanValidationIT extends BeanValidationIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Comments tests")
+    class NestedCommentsIT extends CommentsIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Create Page And Space tests")
+    class NestedCreatePageAndSpaceIT extends CreatePageAndSpaceIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Restore deleted Page tests")
+    class NestedRestoreDeletedPageIT extends RestoreDeletedPageIT
+    {
+    }
+    
+    @Nested
+    @DisplayName("Invitation tests")
+    class NestedInvitationIT extends InvitationIT
     {
     }
 }

@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.extension.xar.internal.delete.question.ExtensionBreakingQuestion;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.question.EntitySelection;

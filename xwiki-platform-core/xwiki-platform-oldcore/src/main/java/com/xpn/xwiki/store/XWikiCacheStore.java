@@ -42,6 +42,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
@@ -657,6 +658,13 @@ public class XWikiCacheStore extends AbstractXWikiStore
         XWikiContext context) throws XWikiException
     {
         return this.store.loadBacklinks(documentReference, bTransaction, context);
+    }
+
+    @Override
+    public List<DocumentReference> loadBacklinks(AttachmentReference attachmentReference, boolean bTransaction,
+        XWikiContext context) throws XWikiException
+    {
+        return this.store.loadBacklinks(attachmentReference, bTransaction, context);
     }
 
     @Override

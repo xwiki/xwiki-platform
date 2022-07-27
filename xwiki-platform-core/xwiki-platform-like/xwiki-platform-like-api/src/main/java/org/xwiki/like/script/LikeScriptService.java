@@ -54,7 +54,6 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Singleton
 @Named("like")
-@Unstable
 public class LikeScriptService implements ScriptService
 {
     @Inject
@@ -223,7 +222,6 @@ public class LikeScriptService implements ScriptService
      * @return the number of likes performed.
      * @since 12.9RC1
      */
-    @Unstable
     public Optional<Long> countUserLikes(UserReference userReference)
     {
         Optional<Long> result = Optional.empty();
@@ -263,7 +261,6 @@ public class LikeScriptService implements ScriptService
      * @return a list of user references who liked the reference.
      * @since 12.8RC1
      */
-    @Unstable
     public List<UserReference> getLikers(EntityReference target, int offset, int limit)
     {
         try {

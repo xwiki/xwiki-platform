@@ -22,7 +22,6 @@ package org.xwiki.ratings.script;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.stability.Unstable;
 
 /**
  * This class only defines a component using methods defined in {@link AbstractScriptRatingsManager}.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 @Component(roles = DefaultScriptRatingsManager.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultScriptRatingsManager extends AbstractScriptRatingsManager

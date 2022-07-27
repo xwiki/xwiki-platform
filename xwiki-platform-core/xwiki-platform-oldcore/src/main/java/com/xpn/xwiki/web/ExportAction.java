@@ -153,6 +153,10 @@ public class ExportAction extends XWikiAction
 
     private String export(String format, XWikiContext context) throws XWikiException, IOException
     {
+        // Put the specified document revision in the context early so that it can be used even when the export format
+        // is unknown (e.g. when performing client-side PDF export).
+        handleRevision(context);
+
         // We currently use the PDF export infrastructure but we have to redesign the export code.
         XWikiURLFactory urlFactory = new OfficeExporterURLFactory();
         PdfExport exporter = new OfficeExporter();
@@ -173,7 +177,6 @@ public class ExportAction extends XWikiAction
 
         urlFactory.init(context);
         context.setURLFactory(urlFactory);
-        handleRevision(context);
 
         XWikiDocument doc = context.getDoc();
         context.getResponse().setContentType(exportType.getMimeType());

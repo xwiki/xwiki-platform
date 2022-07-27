@@ -1,3 +1,0 @@
-org.xwiki.administration.internal.migration.ConfigurableClassMigrationXarExtensionListener
-org.xwiki.administration.internal.migration.ConfigurableClassScopeMigrator
-org.xwiki.administration.internal.migration.R130600000XWIKI18723DataMigration

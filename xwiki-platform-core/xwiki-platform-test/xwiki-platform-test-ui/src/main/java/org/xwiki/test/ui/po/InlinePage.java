@@ -190,21 +190,4 @@ public class InlinePage extends ViewPage
             new FormContainerElement(getFormLocator()).setCheckBox(By.xpath(xpath), true);
         }
     }
-
-    /**
-     * @since 7.4M2
-     */
-    @Override
-    public void waitUntilPageJSIsLoaded()
-    {
-        super.waitUntilPageJSIsLoaded();
-
-        // Actionbuttons javascript for saving the page.
-        getDriver().waitUntilJavascriptCondition(
-            "return XWiki != undefined "
-                + "&& XWiki.actionButtons != undefined "
-                + "&& XWiki.actionButtons.EditActions != undefined "
-                + "&& XWiki.actionButtons.AjaxSaveAndContinue != undefined");
-    }
-
 }

@@ -119,7 +119,7 @@ define('edit-bus', ['vue'], (Vue) => {
           })
           .catch(() => {
             new XWiki.widgets.Notification(`The row save action failed.`, 'error');
-          })
+          });
       }
     }
 
@@ -135,6 +135,10 @@ define('edit-bus', ['vue'], (Vue) => {
       }
       return true;
     }
+
+    onAnyEvent(callback) {
+      this.editBus.$on(['save-editing-entry', 'start-editing-entry', 'cancel-editing-entry'], () => callback())
+    }
   }
 
   /**
@@ -148,7 +152,8 @@ define('edit-bus', ['vue'], (Vue) => {
   }
 
   /**
-   * Notifies the start of a cell modification. After this event, the cell is considered as edited unless it is canceled.
+   * Notifies the start of a cell modification. After this event, the cell is considered as edited unless it is
+   * canceled.
    * @param entry the entry of the edited row
    * @param propertyId the property id of the edited cell.
    */
@@ -198,6 +203,10 @@ define('edit-bus', ['vue'], (Vue) => {
   function isEditable() {
     return _editBusService.isEditable();
   }
+  
+  function onAnyEvent(callback) {
+    _editBusService.onAnyEvent(callback);
+  }
 
-  return {init, start, cancel, save, isEditable};
+  return {init, start, cancel, save, isEditable, onAnyEvent};
 })

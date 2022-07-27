@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.objects;
 
-public class DoubleProperty extends NumberProperty
+public class DoubleProperty extends NumberProperty<Double>
 {
     private static final long serialVersionUID = 1L;
 }

@@ -48,9 +48,9 @@ define('xwiki-diff', ['jquery', 'xwiki-events-bridge'], function($) {
 
   var enhanceDiffSummaryItem = function() {
     var details = $(this).next('ul');
-    if (details.size() > 0) {
+    if (details.length) {
       details.hide();
-      $(this).find('a').click(function(event) {
+      $(this).find('a').on('click', function(event) {
         event.preventDefault();
         details.toggle();
       });
@@ -109,7 +109,7 @@ define('xwiki-diff', ['jquery', 'xwiki-events-bridge'], function($) {
   };
 
   var enhanceHTMLDiff = function(container) {
-    container.find('.html-diff-context-toggle').click(function(event) {
+    container.find('.html-diff-context-toggle').on('click', function(event) {
       event.preventDefault();
       var toggle = $(this);
       var htmlDiff = toggle.closest('.changes-body').find('.html-diff');

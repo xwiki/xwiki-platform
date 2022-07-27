@@ -256,7 +256,7 @@
 #end
 
 #macro (displayCopyJobStatus $copyJobStatus)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
   #set ($copyJobState = $copyJobStatus.state)
   #set ($finished = $copyJobState == 'FINISHED')
   #set ($copyJobRequest = $copyJobStatus.request)

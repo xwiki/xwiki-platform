@@ -19,25 +19,28 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 
 /**
  * Skin Extension plugin that allows pulling javascript code stored inside wiki documents as
  * <code>XWiki.JavaScriptExtension</code> objects.
- * 
+ *
  * @version $Id$
  */
 public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
 {
-    /** The name of the XClass storing the code for this type of extensions. */
+    /**
+     * The name of the XClass storing the code for this type of extensions.
+     */
     public static final String JSX_CLASS_NAME = "XWiki.JavaScriptExtension";
 
-    /** The local reference of the XClass storing the code for this type of extensions. */
+    /**
+     * The local reference of the XClass storing the code for this type of extensions.
+     */
     public static final LocalDocumentReference JSX_CLASS_REFERENCE = new LocalDocumentReference("XWiki",
         "JavaScriptExtension");
 
@@ -48,18 +51,12 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     public static final String PLUGIN_NAME = "jsx";
 
     /**
-     * The name of the preference (in the configuration file) specifying what is the default value of the defer, in case
-     * nothing is specified in the parameters of this extension.
-     */
-    public static final String DEFER_DEFAULT_PARAM = "xwiki.plugins.skinx.deferred.default";
-
-    /**
      * XWiki plugin constructor.
-     * 
+     *
      * @param name The name of the plugin, which can be used for retrieving the plugin API from velocity. Unused.
      * @param className The canonical classname of the plugin. Unused.
      * @param context The current request context.
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#XWikiDefaultPlugin(String, String, com.xpn.xwiki.XWikiContext)
      */
     public JsSkinExtensionPlugin(String name, String className, XWikiContext context)
     {
@@ -72,7 +69,7 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
      * We must override this method since the plugin manager only calls it for classes that provide their own
      * implementation, and not an inherited one.
      * </p>
-     * 
+     *
      * @see com.xpn.xwiki.plugin.XWikiPluginInterface#virtualInit(com.xpn.xwiki.XWikiContext)
      */
     @Override
@@ -92,14 +89,13 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
         }
 
         StringBuilder result = new StringBuilder("<script src='");
-        result.append(getDocumentSkinExtensionURL(documentReference, documentName, PLUGIN_NAME, context));
-        // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true
-        String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
-        Boolean defaultDefer = (!StringUtils.isEmpty(defaultDeferString)) ? Boolean.valueOf(defaultDeferString) : true;
-        if (BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", documentName, context), defaultDefer)) {
+        result.append(XMLUtils.escapeAttributeValue(
+            getDocumentSkinExtensionURL(documentReference, documentName, PLUGIN_NAME, context)));
+        if (isDefer(documentName, context)) {
             result.append("' defer='defer");
         }
         result.append("'></script>\n");
+
         return result.toString();
     }
 
@@ -121,7 +117,7 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
      * We must override this method since the plugin manager only calls it for classes that provide their own
      * implementation, and not an inherited one.
      * </p>
-     * 
+     *
      * @see AbstractSkinExtensionPlugin#endParsing(String, XWikiContext)
      */
     @Override

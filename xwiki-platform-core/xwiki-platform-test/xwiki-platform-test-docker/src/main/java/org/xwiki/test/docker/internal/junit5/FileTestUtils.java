@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 
 /**
  * Utility methods related to File for setting up the test framework (unzip to directory, create directory, copy file,
@@ -50,7 +49,6 @@ public final class FileTestUtils
         createDirectory(targetDirectory);
         try {
             ZipUnArchiver unArchiver = new ZipUnArchiver();
-            unArchiver.enableLogging(new ConsoleLogger(org.codehaus.plexus.logging.Logger.LEVEL_ERROR, "Package"));
             unArchiver.setSourceFile(source);
             unArchiver.setDestDirectory(targetDirectory);
             unArchiver.setOverwrite(true);

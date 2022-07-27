@@ -51,6 +51,7 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.annotations.Authenticate;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.context.RequestInitializer;
@@ -64,6 +65,7 @@ import com.xpn.xwiki.internal.context.RequestInitializer;
 @Component
 @Named(AsyncRendererResourceReferenceHandler.HINT)
 @Singleton
+@Authenticate
 public class AsyncRendererResourceReferenceHandler extends AbstractResourceReferenceHandler<ResourceType>
 {
     /**

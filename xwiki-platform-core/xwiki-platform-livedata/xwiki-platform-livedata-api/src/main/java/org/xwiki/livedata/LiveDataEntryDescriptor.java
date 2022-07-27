@@ -19,8 +19,6 @@
  */
 package org.xwiki.livedata;
 
-import org.xwiki.stability.Unstable;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -30,7 +28,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @since 12.10
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Unstable
 public class LiveDataEntryDescriptor
 {
     private String idProperty;

@@ -40,10 +40,10 @@
 admin.wikis.descriptor=서술자
 admin.wikis.descriptor.description=위키 서술자 설정
 admin.wiki.description=당신의 위키를 서술하고(예쁜 이름과 서술) 소유자와 홈페이지를 설정하세요.
-platform.wiki.admin.wiki.ownerProblemConfirmation=새로운 소유자의 유저는 존재하지 않거나 다른 위키로 부터 왔습니다. \\n 저장하고 계속 진행하시겠습니까?
+platform.wiki.admin.wiki.ownerProblemConfirmation=새로운 소유자의 유저는 존재하지 않거나 다른 위키로 부터 왔습니다.\n저장하고 계속 진행하시겠습니까?
 platform.wiki.admin.wiki.csrfInvalidError=유효하지 않은 보안(CSRF)토큰, 페이지를 새로고침 하거나 다시 시도하세요.
 platform.wiki.admin.wiki.requiredFieldsError='홈페이지' 필드를 비울 수 없습니다.
-platform.wiki.admin.wiki.ownerWarning=주의:  이것은 한번 바뀌게 되면, 이전 소유자는 권한을 잃어버리게 됩니다. 만약 이전 소유자와 동일한 소유자 라면,  위키에서 스스로 잠기게 되지 않도록 하십시요. 만양 실수라면, 메인 위키 관리자 또는 수퍼관리자 계정으로 접속해야 할 것입니다.
+platform.wiki.admin.wiki.ownerWarning=주의: 이것은 한번 바뀌게 되면, 이전 소유자는 권한을 잃어버리게 됩니다. 만약 이전 소유자와 동일한 소유자 라면, 위키에서 스스로 잠기게 되지 않도록 하십시요. 만약 실수라면, 메인 위키 관리자 또는 슈퍼관리자 계정으로 접속해야 할 것입니다.
 
 ###############################################################################
 ## Deprecated
@@ -59,5 +59,6 @@ platform.wiki.admin.wiki.ownerWarning=주의:  이것은 한번 바뀌게 되면
 ### Missing: admin.wiki=Wiki
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

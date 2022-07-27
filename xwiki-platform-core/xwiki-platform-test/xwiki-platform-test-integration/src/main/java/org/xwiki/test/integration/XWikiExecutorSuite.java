@@ -57,7 +57,7 @@ public class XWikiExecutorSuite extends ClasspathSuite
 
     private static final Filter METHOD_FILTER = new XWikiExecutorTestMethodFilter(PATTERN);
 
-    private List<XWikiExecutor> executors = new ArrayList<XWikiExecutor>();
+    private List<XWikiExecutor> executors = new ArrayList<>();
 
     public XWikiExecutorSuite(Class< ? > klass, RunnerBuilder builder) throws InitializationError
     {
@@ -71,18 +71,18 @@ public class XWikiExecutorSuite extends ClasspathSuite
         /**
          * @return the number of executors to run
          */
-        public int value() default 1;
+        int value() default 1;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public static @interface PreStart
+    public @interface PreStart
     {
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public static @interface PostStart
+    public @interface PostStart
     {
     }
 
@@ -94,7 +94,7 @@ public class XWikiExecutorSuite extends ClasspathSuite
     @Override
     protected List<Runner> getChildren()
     {
-        List<Runner> runners = new ArrayList<Runner>();
+        List<Runner> runners = new ArrayList<>();
 
         // Filter the test classes to run.
         for (Runner runner : super.getChildren()) {

@@ -127,7 +127,7 @@ function launchLocalEditor(webdavUrl) {
 	var associations = prefManager.getCharPref("extensions.foxwiki.associations").split(",");
 	var launchAppPath = "";
 	for( var i = 0; i < associations.length; i++ ) {
-		parts = associations[i].split("=");
+		var parts = associations[i].split("=");
 		if( parts[0] == ext ) {
 			launchAppPath = parts[1];
 			break;

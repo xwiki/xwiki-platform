@@ -24,16 +24,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
+import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.validator.ValidationError;
 import org.xwiki.validator.Validator;
 
@@ -64,49 +64,28 @@ public class DefaultValidationTest extends AbstractValidationTest
     protected PrintStream stderr;
 
     /**
-     * This map contains the warning logs that are expected during the test.
-     */
-    protected Map<Target, List<String>> expectedWarningLogs;
-
-    /**
      * The new stderr stream we're using to replace the default console output.
      */
     protected ByteArrayOutputStream err;
+
+    private LogCaptureValidator logCaptureValidator;
+    private LogCaptureConfiguration logCaptureConfiguration;
 
     public DefaultValidationTest(Target target, HttpClient client, Validator validator, String credentials)
         throws Exception
     {
         super("testDocumentValidity", target, client, credentials);
 
+        this.logCaptureValidator = new LogCaptureValidator();
         this.validator = validator;
-        this.expectedWarningLogs = new HashMap<>();
-        this.initializeExpectedWarningLogs();
-    }
-
-    private void initializeExpectedWarningLogs()
-    {
-        Target resetPassword = new DocumentReferenceTarget(new DocumentReference("xwiki", "XWiki", "ResetPassword"));
-        this.expectedWarningLogs.put(resetPassword,
-            Collections.singletonList("[DEPRECATED] The page [XWiki.ResetPassword] should not be used anymore in favor "
-                + "of the new 'authenticate/reset' URL."));
-
-        Target resetPasswordComplete =
-            new DocumentReferenceTarget(new DocumentReference("xwiki", "XWiki", "ResetPasswordComplete"));
-        this.expectedWarningLogs.put(resetPasswordComplete,
-            Collections.singletonList("The page [XWiki.ResetPasswordComplete] should not be used anymore in favor of "
-                + "the new 'authenticate/reset' URL."));
-
-        Target forgotUsername =
-            new DocumentReferenceTarget(new DocumentReference("xwiki", "XWiki", "ForgotUsername"));
-        this.expectedWarningLogs.put(forgotUsername,
-            Collections.singletonList("The page [XWiki.ForgotUsername] should not be used anymore in favor of the "
-                + "new 'authenticate/forgot' URL."));
     }
 
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
+        this.logCaptureConfiguration = new LogCaptureConfiguration();
+        this.registerExpectedLogs();
 
         // TODO Until we find a way to incrementally display the result of tests this stays
         System.out.println(getName());
@@ -119,6 +98,30 @@ public class DefaultValidationTest extends AbstractValidationTest
         this.stderr = System.err;
         this.err = new ByteArrayOutputStream();
         System.setErr(new PrintStream(this.err));
+    }
+
+    private void registerExpectedLogs()
+    {
+        Target resetPassword = new DocumentReferenceTarget(new DocumentReference("xwiki", "XWiki", "ResetPassword",
+            Locale.ROOT));
+        if (this.target.equals(resetPassword)) {
+            this.logCaptureConfiguration.registerExpected("[DEPRECATED] The page [XWiki.ResetPassword] "
+                + "should not be used anymore in favor of the new 'authenticate/resetpassword' URL.");
+        }
+
+        Target resetPasswordComplete = new DocumentReferenceTarget(
+            new DocumentReference("xwiki", "XWiki", "ResetPasswordComplete", Locale.ROOT));
+        if (this.target.equals(resetPasswordComplete)) {
+            this.logCaptureConfiguration.registerExpected("[DEPRECATED] The page [XWiki.ResetPasswordComplete] "
+                + "should not be used anymore in favor of the new 'authenticate/resetpassword' URL.");
+        }
+
+        Target forgotUsername = new DocumentReferenceTarget(
+            new DocumentReference("xwiki", "XWiki", "ForgotUsername", Locale.ROOT));
+        if (this.target.equals(forgotUsername)) {
+            this.logCaptureConfiguration.registerExpected("[DEPRECATED] The page [XWiki.ForgotUsername] "
+                + "should not be used anymore in favor of the new 'authenticate/retrieveusername' URL.");
+        }
     }
 
     @Override
@@ -135,11 +138,11 @@ public class DefaultValidationTest extends AbstractValidationTest
 
         // Detect server-side error/warning messages from the stdout
         assertFalse(String.format("Errors found in the stdout output: [%s]", output), hasLogErrors(output));
-        assertFalse(String.format("Warnings found in the stdout output: [%s]", output), hasLogWarnings(output));
+        this.logCaptureValidator.validate(output, this.logCaptureConfiguration, false);
 
         // Detect server-side error/warning messages from the stderr
         assertFalse(String.format("Errors found in the stderr output: [%s]", errput), hasLogErrors(errput));
-        assertFalse(String.format("Warnings found in the stderr output: [%s]", errput), hasLogWarnings(errput));
+        this.logCaptureValidator.validate(errput, this.logCaptureConfiguration);
 
         super.tearDown();
     }
@@ -166,15 +169,12 @@ public class DefaultValidationTest extends AbstractValidationTest
         boolean hasError = false;
         for (ValidationError error : errors) {
             if (error.getType() == ValidationError.Type.WARNING) {
-                List<String> expectedLogs = this.expectedWarningLogs.getOrDefault(this.target, Collections.emptyList());
-                if (!expectedLogs.contains(error.getMessage())) {
-                    if (error.getLine() >= 0) {
-                        System.out
-                            .println(
-                                "Warning at " + error.getLine() + ":" + error.getColumn() + " " + error.getMessage());
-                    } else {
-                        System.out.println("Warning " + error.getMessage());
-                    }
+                if (error.getLine() >= 0) {
+                    System.out
+                        .println(
+                            "Warning at " + error.getLine() + ":" + error.getColumn() + " " + error.getMessage());
+                } else {
+                    System.out.println("Warning " + error.getMessage());
                 }
             } else {
                 if (error.getLine() >= 0) {

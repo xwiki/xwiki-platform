@@ -20,22 +20,22 @@
 package org.xwiki.user;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
- * CRUD operations on users. Note that for retrieving a user's prooperties you should use a
+ * CRUD operations on users. Note that for retrieving a user's properties you should use a
  * {@link UserPropertiesResolver}.
  *
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 @Role
 public interface UserManager
 {
     /**
      * @param userReference the reference to the user to check for existence
      * @return true if the user pointed to by the reference exists, false otherwise
+     * @throws UserException (since 14.6RC1, 14.4.3, 13.10.8) in case of error while checking for the existence of
+     *     the user
      */
-    boolean exists(UserReference userReference);
+    boolean exists(UserReference userReference) throws UserException;
 }

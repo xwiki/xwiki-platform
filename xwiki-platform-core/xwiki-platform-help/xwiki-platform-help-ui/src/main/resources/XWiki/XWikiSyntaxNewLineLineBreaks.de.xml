@@ -54,11 +54,8 @@ In XWiki Syntax 2.0 werden neue Zeilen beachtet, was in XWiki Syntax 1.0 und Cre
 |Neue Zeile|Zeile\\Neue Zeile|Zeile Neue Zeile
 
 === 2.0 New Line Line Breaks ===
-Eine neue Zeile ist ein Absatzende. Ein Zeilenumbruch ist eine erzwungene neue Zeile, welche an jeder Stelle im Text auftreten kann.
 
-{{info}}
-In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} werden neue Zeilen beachtet, was in XWiki Syntax 1.0 und Creole Syntax nicht der Fall ist.
-{{/info}}
+Eine neue Zeile ist ein Absatzende. Ein Zeilenumbruch ist eine erzwungene neue Zeile, welche an jeder Stelle im Text auftreten kann.
 
 |=Funktion|=XWiki Syntax 2.0|=Ergebnis
 |Zeilenumbruch|{{{Zeile\\Neue Zeile}}}|Zeile\\Neue Zeile

@@ -1,0 +1,186 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.AdminTranslations" locale="nl">
+  <web>XWiki</web>
+  <name>AdminTranslations</name>
+  <language>nl</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>AdminTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>administration.title=Beheer
+### Missing: administration.title.page=Page Administration
+### Missing: administration.title.wiki=Wiki Administration
+### Missing: administration.title.global=Global Administration
+### Missing: administration.sectionTitle=Administration: {0}
+### Missing: administration.sectionTitle.page=Page Administration: {0}
+### Missing: administration.sectionTitle.wiki=Wiki Administration: {0}
+### Missing: administration.sectionTitle.global=Global Administration: {0}
+### Missing: administration.menu.search.hint=Search for...
+### Missing: administration.menu.search.noResults=No results.
+
+# Registration Section
+### Missing: XWiki.XWikiPreferences_use_email_verification.hint=If set to "Yes" then an email will be sent to the email address provided when filling the registration form.
+### Missing: XWiki.XWikiPreferences_validation_email_content.hint=The email template that will be send to users in order to validate their email address.
+### Missing: XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
+### Missing: XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
+### Missing: XWiki.Registration_heading.hint=This is the line at the top of the page which is shown to people who are registering and when they have just registered. Velocity and wiki syntax may be used.
+### Missing: XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
+### Missing: XWiki.Registration_liveValidation_enabled.hint=Set this to false to disable the live validation JavaScript code (fields will still be validated at the server side).
+### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
+### Missing: XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
+### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.
+### Missing: XWiki.Registration_defaultRedirect.hint=This is the URL the user will be redirected to after pushing the login button if the xredirect parameter is not specified. Velocity code may be used.
+### Missing: XWiki.Registration_requireCaptcha.hint=Set this true to require the user to solve a CAPTCHA in order to register.
+### Missing: XWiki.Registration_registrationSuccessMessage.hint=This is shown to the user when they have registered successfully. Velocity and wiki syntax code may be used.
+### Missing: XWiki.Registration_passwordLength.hint=The minimum length of the password. A longer password is more secure, it is recommended to keep it above 6 characters.
+### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=If checked, force the user to chose a password with at least one lowercase character.
+### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=If checked, force the user to chose a password with at least one uppercase character.
+### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=If checked, force the user to chose a password with at least one number.
+### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=If checked, force the user to chose a password with at least one symbol character.
+
+# Look &amp; Feel Sections
+### Missing: admin.themes=Themes
+### Missing: admin.themes.description=Customize the color and icon themes, skin and logo.
+### Missing: admin.colorthemes.local=Local
+### Missing: admin.colorthemes.global=Global
+### Missing: XWiki.XWikiPreferences_showannotations.hint=Display the annotations section in the page layout.
+### Missing: XWiki.XWikiPreferences_showcomments.hint=Display the comments section in the page layout.
+### Missing: XWiki.XWikiPreferences_showattachments.hint=Display the attachments section in the page layout.
+### Missing: XWiki.XWikiPreferences_showhistory.hint=Display the history section in the page layout.
+### Missing: XWiki.XWikiPreferences_showinformation.hint=Display the information section in the page layout.
+### Missing: XWiki.XWikiPreferences_title.hint=Define the page title format as seen by browsers.
+### Missing: XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specifying page description, author, keywords etc.
+### Missing: XWiki.XWikiPreferences_webcopyright.hint=Define the informations displayed in the copyright section of the footer.
+### Missing: XWiki.XWikiPreferences_version.hint=Define the informations displayed in the version section of the footer.
+### Missing: XWiki.XWikiPreferences_skin.hint=Specify the default skin used. It can be a filesystem skin, example "flamingo", or a custom page skin, example "XWiki.DefaultSkin"
+### Missing: XWiki.XWikiPreferences_iconTheme.hint=Specify the icon theme to use by default.
+### Missing: XWiki.XWikiPreferences_colorTheme.hint=Specify the color theme to use by default.
+
+# Editing Sections
+### Missing: admin.edit=Editing
+### Missing: admin.edit.description=Configure the edit mode, the WYSIWYG editor and the available syntaxes.
+### Missing: admin.title=Title
+### Missing: XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Prevent the users from creating wiki pages with empty title.
+### Missing: XWiki.XWikiPreferences_editor.hint=Select the type of editor to use by default for editing the page content.
+### Missing: XWiki.XWikiPreferences_editcomment.hint=Allow entering a message when creating a new page version.
+### Missing: XWiki.XWikiPreferences_editcomment_mandatory.hint=For each change made, the page will not be saved until a version summary message is given.
+### Missing: XWiki.XWikiPreferences_minoredit.hint=Allow pages to have major (x.1) and minor (1.x) versions. The minor versions can be seen using the "Show Minor Edits" button from the page History.
+### Missing: admin.wysiwyg.description=Choose the default WYSIWYG editor and configure it.
+### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
+
+# Localization Section
+### Missing: XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki has content in multiple languages. This will allow your users to translate the wiki pages and to view the interface in their preferred language.
+### Missing: XWiki.XWikiPreferences_languages.hint=Select the languages that will be available in the interface. The users will be able to translate the pages of your wiki in any of these languages (if multilingual mode is enabled).
+### Missing: XWiki.XWikiPreferences_default_language.hint=Select the default language of the wiki
+### Missing: XWiki.XWikiPreferences_dateformat.hint=Specify the format used to display the dates (e.g. the page creation date)
+### Missing: XWiki.XWikiPreferences_timezone.hint=Globally set the timezone for the dates
+
+# Import Section
+### Missing: administration.section.import.hint=Begin by uploading a new package or by selecting one from the list of available packages. The content of the selected package will be displayed on the right along with the import options.
+
+# Export Section
+### Missing: administration.section.export.pages=Pages
+### Missing: administration.section.export.pages.all=All pages
+### Missing: administration.section.export.withHistory.hint=Include the page history in the export. Only the latest version of a page is exported otherwise.
+### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
+### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
+### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
+### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
+### Missing: administration.section.export.packageName.hint=The file name used when generating the archive with the exported wiki pages.
+### Missing: administration.section.export.moreOptions=More options
+### Missing: administration.section.export.lessOptions=Less options
+### Missing: administration.section.export.description.hint=The package description, displayed when importing the package.
+### Missing: administration.section.export.author.hint=The package author, displayed when importing the package.
+### Missing: administration.section.export.licence.hint=The content license. E.g.: LGPL, GPLV2, etc.
+### Missing: administration.section.export.version.hint=The package version, stored in the package descriptor.
+### Missing: administration.section.export.backupPack.hint=Preserve the page author when importing the pages. This option has no effect on the exported content and can be changed before the import.
+
+# Users Section
+### Missing: administration.section.users.enableUser.inProgress=Enabling user account...
+### Missing: administration.section.users.enableUser.done=User account enabled
+### Missing: administration.section.users.enableUser.failed=Failed to enable the user account
+### Missing: administration.section.users.disableUser.inProgress=Disabling user account...
+### Missing: administration.section.users.disableUser.done=User account disabled
+### Missing: administration.section.users.disableUser.failed=Failed to disable the user account
+### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
+### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user without replacing the author.
+### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user without replacing the author.
+### Missing: administration.section.users.deleteUser.newAuthor=New Author
+### Missing: administration.section.users.deleteUser.newAuthor.hint=Select an user that has {0} rights or leave this field empty if you don''t want to replace the author.
+### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
+### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
+### Missing: administration.section.users.deleteUser.newAuthor.script=script
+### Missing: admin.usersgroups.extensionrights=Extension Rights
+
+# Other Category
+### Missing: admin.other=Other
+### Missing: admin.other.description=Various configurations for extensions.
+### Missing: administration.section.analytics.status=Status
+### Missing: administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not
+
+# Social category
+### Missing: admin.social=Social
+### Missing: admin.social.description=Configuration for social features.
+
+# Configurable Class
+### Missing: XWiki.ConfigurableClass_displayInSection=Display in section
+### Missing: XWiki.ConfigurableClass_heading=Heading
+### Missing: XWiki.ConfigurableClass_configurationClass=Configuration class
+### Missing: XWiki.ConfigurableClass_linkPrefix=Link prefix
+### Missing: XWiki.ConfigurableClass_propertiesToShow=Properties to show
+### Missing: XWiki.ConfigurableClass_codeToExecute=Code to execute
+### Missing: XWiki.ConfigurableClass_iconAttachment=Icon attachment
+### Missing: XWiki.ConfigurableClass_displayInCategory=Display in category
+### Missing: XWiki.ConfigurableClass_displayBeforeCategory=Display before category
+### Missing: XWiki.ConfigurableClass_categoryIcon=Category icon
+### Missing: XWiki.ConfigurableClass_scope=Scope
+### Missing: XWiki.ConfigurableClass_scope_WIKI=Wiki
+### Missing: XWiki.ConfigurableClass_scope_SPACE=Current space
+### Missing: XWiki.ConfigurableClass_scope_ALL_SPACES=All spaces
+### Missing: XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki and all spaces
+### Missing: XWiki.ConfigurableClass_sectionOrder=Section order
+
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+### Missing: XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
+### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+
+## Deprecated since 11.8RC1
+### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

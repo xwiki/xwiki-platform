@@ -330,29 +330,26 @@
     // Let the others know that the DOM has been updated (e.g. to enhance the source fields with pickers).
     $(document).trigger('xwiki:dom:updated', {'elements': source.toArray()});
   }
-  $('.addSearchSuggestSource').click(function(event) {
+  $('.addSearchSuggestSource').on('click', function(event) {
     event.stopPropagation();
     event.preventDefault();
     if ($(this).hasClass('loading')) return;
     $(this).addClass('loading');
     var notification = new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.inProgress')", 'inprogress');
     var addLink = this;
-    $.get(targetDocument.getURL('objectadd'), {
+    Promise.resolve($.get(targetDocument.getURL('objectadd'), {
       form_token: $(this).closest('form').find('input[name="form_token"]').prop('value'),
       classname: 'XWiki.SearchSuggestSourceClass',
       xredirect: targetDocument.getURL('get', $.param({
         sheet: 'XWiki.SearchSuggestSourceSheet',
         xobjectNumber: '',
       }))
-    })
-    .done(function(data) {
+    })).then(function(data) {
       insertSource.call(addLink, data);
       notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.done')", 'done'));
-    })
-    .fail(function() {
+    }).catch(function() {
       notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.failed')", 'error'));
-    })
-    .always(function() {
+    }).finally(function() {
       $(addLink).removeClass('loading');
     });
   });

@@ -29,10 +29,10 @@ import org.xwiki.extension.index.IndexedExtensionQuery;
 import org.xwiki.extension.repository.search.ExtensionQuery;
 
 /**
- * Various script APIs related to installed extensions.
+ * Various script APIs related to indexed extensions.
  * 
  * @version $Id$
- * @since 5.3M1
+ * @since 12.10
  */
 @Component
 @Named(ExtensionManagerScriptService.ROLEHINT + '.' + ExtensionIndexScriptService.ID)

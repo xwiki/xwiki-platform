@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -92,9 +93,9 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
      */
     public ChartMacro()
     {
-        super("Chart", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false),
+        super("Chart", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false, Block.LIST_BLOCK_TYPE),
             ChartMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override

@@ -138,7 +138,10 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
         this.uriInfo.getQueryParameters().forEach((key, values) -> {
             if (key.startsWith(FILTERS_PREFIX)) {
                 String property = key.substring(FILTERS_PREFIX.length());
-                filters.add(getFilter(property, matchAll.contains(property), values));
+                Filter filter = getFilter(property, matchAll.contains(property), values);
+                if (!filter.getConstraints().isEmpty()) {
+                    filters.add(filter);
+                }
             }
         });
         return filters;
@@ -149,11 +152,15 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
         Filter filter = new Filter();
         filter.setProperty(property);
         filter.setMatchAll(matchAll);
+        String operatorSeparator = ":";
         for (String constraint : constraints) {
-            String[] parts = constraint.split(":", 2);
-            String value = parts.length == 1 ? parts[0] : parts[1];
-            String operator = parts.length > 1 ? parts[0] : null;
-            filter.getConstraints().add(new Constraint(value, operator));
+            // All constraint should have an operator.
+            if (constraint.contains(operatorSeparator)) {
+                String[] parts = constraint.split(operatorSeparator, 2);
+                String value = parts[1];
+                String operator = StringUtils.isBlank(parts[0]) ? null : parts[0];
+                filter.getConstraints().add(new Constraint(value, operator));
+            }
         }
         return filter;
     }

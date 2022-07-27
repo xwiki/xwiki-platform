@@ -258,14 +258,14 @@
               multiple: true
             }
           }).on('changed.jstree', function(event, data) {
-            selectButton.prop('disabled', data.selected.size() === 0);
+            selectButton.prop('disabled', !data.selected.length);
           }).on('dblclick', '.jstree-anchor', function() {
             selectButton.click();
           });
         }
       });
 
-      selectButton.click(function() {
+      selectButton.on('click', function() {
         modal.modal('hide');
         modal.triggerHandler('xwiki:locationTreePicker:select', {
           'tree': $.jstree.reference(treeElement)

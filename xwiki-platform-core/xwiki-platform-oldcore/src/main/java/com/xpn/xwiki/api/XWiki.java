@@ -1011,18 +1011,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
-     * RequestDispatcher, buffering the output, then returning it as a string.
-     *
-     * @param url URL of the servlet
-     * @return text result of the servlet
-     */
-    public String invokeServletAndReturnAsString(String url)
-    {
-        return this.xwiki.invokeServletAndReturnAsString(url, getXWikiContext());
-    }
-
-    /**
      * Return the URL of the static file provided by the current skin The file is first looked in the skin active for
      * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the "parent
      * skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.
@@ -1407,7 +1395,6 @@ public class XWiki extends Api
      * @return the list of available locales
      * @since 12.4RC1
      */
-    @Unstable
     public List<Locale> getAvailableLocales()
     {
         return this.xwiki.getAvailableLocales(getXWikiContext());
@@ -1632,7 +1619,6 @@ public class XWiki extends Api
      * @throws XWikiException if the document cannot be renamed properly.
      * @since 12.5RC1
      */
-    @Unstable
     public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
         List<DocumentReference> childDocumentReferences) throws XWikiException
@@ -2924,7 +2910,7 @@ public class XWiki extends Api
      */
     public XWikiUser checkAuth() throws XWikiException
     {
-        return this.context.getWiki().getAuthService().checkAuth(this.context);
+        return this.context.getWiki().checkAuth(this.context);
     }
 
     /**
@@ -2939,7 +2925,13 @@ public class XWiki extends Api
      */
     public XWikiUser checkAuth(String username, String password, String rememberme) throws XWikiException
     {
-        return this.context.getWiki().getAuthService().checkAuth(username, password, rememberme, this.context);
+        XWikiUser user =
+            this.context.getWiki().getAuthService().checkAuth(username, password, rememberme, this.context);
+        if (user.isDisabled(this.context)) {
+            this.context.put(XWikiContext.INACTIVE_USER_REFERENCE, user.getUserReference());
+            user = null;
+        }
+        return user;
     }
 
     /**
@@ -2965,7 +2957,7 @@ public class XWiki extends Api
 
     /**
      * API to get the Servlet path for a given wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
-     * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
+     * {@code xwiki.virtual.usepath} is enabled in xwiki.cfg, it is "wiki/wikiname/".
      *
      * @param wikiName wiki for which to get the path
      * @return The servlet path
@@ -2977,7 +2969,7 @@ public class XWiki extends Api
 
     /**
      * API to get the Servlet path for the current wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
-     * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
+     * {@code xwiki.virtual.usepath} is enabled in xwiki.cfg, it is "wiki/wikiname/".
      *
      * @return The servlet path
      */
@@ -2988,7 +2980,7 @@ public class XWiki extends Api
 
     /**
      * API to get the webapp path for the current wiki. This usually is "xwiki/". It can be configured in xwiki.cfg with
-     * the config <tt>xwiki.webapppath</tt>.
+     * the config {@code xwiki.webapppath}.
      *
      * @return The servlet path
      */

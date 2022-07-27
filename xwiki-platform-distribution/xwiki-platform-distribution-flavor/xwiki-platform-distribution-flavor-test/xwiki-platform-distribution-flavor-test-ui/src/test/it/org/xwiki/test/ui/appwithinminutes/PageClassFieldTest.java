@@ -253,8 +253,7 @@ public class PageClassFieldTest extends AbstractClassEditorTest
         pagePicker.sendKeys(className).waitForSuggestions().sendKeys(Keys.ENTER);
         // Change the selected page.
         pagePicker.clearSelectedSuggestions().sendKeys(className, " testh").waitForSuggestions().sendKeys(Keys.ENTER);
-        // We wait for the page to load because Selenium doesn't do it all the time when Save & View is clicked.
-        entryEditPage.clickSaveAndView().waitUntilPageIsLoaded();
+        entryEditPage.clickSaveAndView();
 
         // Assert the view mode.
         List<WebElement> pages = getDriver().findElements(By.cssSelector("#xwikicontent dd a"));

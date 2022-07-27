@@ -333,13 +333,13 @@ if (typeof XWiki.index.trash.attachments == "undefined") {
  */
 XWiki.index.trash.attachments.displayEntry = function (row, i, table) {
   var tr = new Element('tr'); // The resulting table row
-  var file = new Element('a', {'href' : row.url}).update(row.filename);
+  var file = new Element('a', {'href' : row.url}).update((row.filename || '').escapeHTML());
   tr.appendChild(new Element('td').update(file));
-  var doc = new Element('a', {'href' : row.documentUrl}).update(row.title);
+  var doc = new Element('a', {'href' : row.documentUrl}).update((row.title || '').escapeHTML());
   doc.appendChild(document.createTextNode(' (' + row.docName + ')'));
   tr.appendChild(new Element('td').update(doc));
-  tr.appendChild(new Element('td').update(row.date));
-  var deleter = new Element('a', {'href' : row.deleterurl}).update(row.deletername);
+  tr.appendChild(new Element('td').update((row.date || '').escapeHTML()));
+  var deleter = new Element('a', {'href' : row.deleterurl}).update((row.deletername || '').escapeHTML());
   tr.appendChild(new Element('td').update(deleter));
   var actions = new Element('td', {'class' : 'itemActions'});
   if(row.canDelete) {

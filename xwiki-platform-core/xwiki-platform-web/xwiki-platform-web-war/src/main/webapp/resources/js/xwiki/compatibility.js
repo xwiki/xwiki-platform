@@ -373,16 +373,16 @@ Object.extend(XWiki.constants, {
   if ($$("meta[name='document']").length > 0) {
     return;
   }
-  
+
   // Get the DOM elements we need
   var html = $$('html')[0];
   var head = $$('head')[0];
-  
+
   // Function that creates a meta tag with the value taken from the new HTML data-* attrribute
   var addMetaTag = function(name, value) {
     head.insert(new Element('meta', {'name': name, 'content': html.readAttribute('data-xwiki-'+value)}));
-  }
-  
+  };
+
   // Add the new meta tags
   addMetaTag('document',   'document');
   addMetaTag('wiki',       'wiki');

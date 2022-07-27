@@ -19,21 +19,29 @@
  */
 package org.xwiki.refactoring.internal;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.parser.LinkParser;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -71,25 +79,33 @@ public class DefaultMacroRefactoring implements MacroRefactoring
     private Provider<ReferenceRenamer> referenceRenamerProvider;
 
     @Inject
+    private Provider<LinkParser> linkParserProvider;
+
+    @Inject
     @Named("context")
     private ComponentManager componentManager;
 
     @Inject
     private RenderingContext renderingContext;
 
+    @Inject
+    private Logger logger;
+
     private boolean shouldMacroContentBeParsed(Macro<?> macro)
     {
         ContentDescriptor contentDescriptor = macro.getDescriptor().getContentDescriptor();
-        return Block.LIST_BLOCK_TYPE.equals(contentDescriptor.getType());
+        return contentDescriptor != null && Block.LIST_BLOCK_TYPE.equals(contentDescriptor.getType());
     }
 
-    private Macro<?> getMacro(MacroBlock macroBlock, Syntax syntax) throws MacroRefactoringException
+    private Macro<?> getMacro(MacroBlock macroBlock, Syntax syntax)
     {
         MacroId macroId = new MacroId(macroBlock.getId(), syntax);
         try {
             return this.macroManager.getMacro(macroId);
         } catch (MacroLookupException e) {
-            throw new MacroRefactoringException(String.format("Error while getting macro [%s]", macroId), e);
+            // if the macro cannot be found or instantiated we shouldn't raise an exception, just ignore that macro.
+            this.logger.debug("Cannot get macro with id [{}]: [{}]", macroId, ExceptionUtils.getRootCauseMessage(e));
+            return null;
         }
     }
 
@@ -114,30 +130,71 @@ public class DefaultMacroRefactoring implements MacroRefactoring
         return new MacroBlock(originalBlock.getId(), originalBlock.getParameters(), content, originalBlock.isInline());
     }
 
+    private XDOM parseMacro(MacroBlock macroBlock) throws MacroRefactoringException
+    {
+        MacroTransformationContext transformationContext = this.getTransformationContext(macroBlock);
+        Syntax renderingSyntax = this.macroContentParser.getCurrentSyntax(transformationContext);
+        Macro<?> macro = this.getMacro(macroBlock, renderingSyntax);
+        // if the macro cannot be found or if it cannot be parsed, we don't consider it.
+        if (macro != null && this.shouldMacroContentBeParsed(macro)) {
+            try {
+                return this.macroContentParser
+                    .parse(macroBlock.getContent(), transformationContext, true, macroBlock.isInline());
+            } catch (MacroExecutionException e) {
+                throw new MacroRefactoringException("Error while parsing macro content for reference replacement", e);
+            }
+        }
+        return null;
+    }
+
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
         throws MacroRefactoringException
     {
+        return innerReplaceReference(macroBlock,
+            xdom -> this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
+            sourceReference, targetReference, relative));
+    }
+
+    @Override
+    public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
+        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative)
+        throws MacroRefactoringException
+    {
+        return innerReplaceReference(macroBlock,
+            xdom -> this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
+            sourceReference, targetReference, relative));
+    }
+
+    private Optional<MacroBlock> innerReplaceReference(MacroBlock macroBlock, Predicate<Block> lambda)
+        throws MacroRefactoringException
+    {
+        XDOM xdom = this.parseMacro(macroBlock);
         MacroTransformationContext transformationContext = this.getTransformationContext(macroBlock);
         Syntax renderingSyntax = this.macroContentParser.getCurrentSyntax(transformationContext);
-        Macro<?> macro = this.getMacro(macroBlock, renderingSyntax);
-        if (this.shouldMacroContentBeParsed(macro)) {
+        if (xdom != null) {
             try {
-                XDOM xdom = this.macroContentParser
-                    .parse(macroBlock.getContent(), transformationContext, true, macroBlock.isInline());
-                boolean updated = this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
-                    sourceReference, targetReference, relative);
+                boolean updated = lambda.test(xdom);
                 if (updated) {
                     return Optional.of(this.renderMacroBlock(macroBlock, xdom, renderingSyntax));
                 }
-            } catch (MacroExecutionException e) {
-                throw new MacroRefactoringException("Error while parsing macro content for reference replacement", e);
             } catch (ComponentLookupException e) {
                 throw new MacroRefactoringException("Error while rendering macro content after reference replacement ",
                     e);
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Set<ResourceReference> extractReferences(MacroBlock macroBlock) throws MacroRefactoringException
+    {
+        XDOM xdom = this.parseMacro(macroBlock);
+        if (xdom != null) {
+            return this.linkParserProvider.get().extractReferences(xdom);
+        } else {
+            return Collections.emptySet();
+        }
     }
 }

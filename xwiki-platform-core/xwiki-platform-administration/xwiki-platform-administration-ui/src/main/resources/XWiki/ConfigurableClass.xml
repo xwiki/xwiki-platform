@@ -317,7 +317,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   &lt;/script&gt;
   {{/html}}##
   ##
-#else
+#elseif ($currentDoc != 'XWiki.ConfigurableClass')
   ##
   ##------------------------------------------------------------------------------------------------------------
   ## If section is not set then we are viewing the main administration page.

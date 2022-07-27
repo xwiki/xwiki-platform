@@ -49,18 +49,18 @@
 |Enlace a una página en la que se especifica el espacio|{{{[Main.WebHome]}}}|[[Página de Inicio&gt;&gt;Main.WebHome]]
 |Enlace a una subwiki|{{{[subwiki:Main.WebHome]}}}|[[Página de inicio&gt;&gt;xwiki:Main.WebHome]]
 |Enlace que se abre en un ventana nueva|{{{[etiqueta&gt;WebHome&gt;_blank]}}}|[[etiqueta&gt;&gt;WebHome||target="_blank"]]
-|Enlace directo a un URL en el texto|{{{Esto es una URL: http://xwiki.org}}}|Esto es una URL: http://xwiki.org
-|Enlace a una URL|{{{[http://xwiki.org]}}}|[[http://xwiki.org]]
-|Enlace a una URL con una etiqueta|{{{[XWiki&gt;http://xwiki.org]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Enlace directo a un URL en el texto|{{{Esto es una URL: https://xwiki.org}}}|Esto es una URL: https://xwiki.org
+|Enlace a una URL|{{{[https://xwiki.org]}}}|[[https://xwiki.org]]
+|Enlace a una URL con una etiqueta|{{{[XWiki&gt;https://xwiki.org]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
 |Enlace a una dirección de correo electrónico|{{{[juan@herrero.net&gt;mailto:juan@herrero.net]}}}|[[juan@herrero.net&gt;&gt;mailto:juan@herrero.net]]
 |Enlace a una imagen|{{{&lt;a href="$xwiki.getURL("Espacio1.Página1")"&gt;{image:img.png|document=Espacio2.Página2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
 |Enlace a una imagen con parámetros de imagen|{{{&lt;a href="$xwiki.getURL("Espacio1.Página1")"&gt;{image:img.png|document=Espacio2.Página2|width=26|height=26}&lt;/a&gt;}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
 |Enlace a un adjunto en la página actual|(((
-{{info}}Ver [[Macro Attach&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] para más detalle{{/info}}
+{{info}}Ver [[Macro Attach&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] para más detalle{{/info}}
 {{{{attach:texto|file=img.png}}}}
 )))|[[texto&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Enlace a un adjunto en una página distinta|(((
-{{info}}Ver [[Macro Attach&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] para más detalles{{/info}}
+{{info}}Ver [[Macro Attach&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] para más detalles{{/info}}
 {{{{attach:texto|document=Espacio.Página|file=img.png}}}}
 )))|[[texto&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Enlace a un ancla en una página|{{{[etiqueta&gt;Espacio.Página#ancla]}}}|[[etiqueta&gt;&gt;XWiki.XWikiSyntax||anchor=ancla]]
@@ -88,7 +88,7 @@ El formato completo de un enlace es **##[etiqueta {&gt; o |}] (recurso) [@aliasI
 **** **##nombreDePágina##**: Una cadena de texto obligatorio que contiene el nombre de la página wiki enlazada. Ejemplo: ##WebHome##
 ** **##cadenaDeConsulta##**: Una cadena de consulta opcional para especificar los parámetros a utilizar en el renderizado de la URL. Ejemplo: ##midato1=5&amp;midato2=Hola##
 ** **##ancla##**: Una nombre de ancla opcional que apunta a un ancla definida en el enlace referenciado. Ten en cuenta que en XWiki se crea de forma automática anclas para los encabezados. Ejemplo: ##HTablaDeContenidos##
-* **##aliasInterWiki##**: Un alias de [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] opcional definido en la Tabla InterWiki (ver la [[Guía del Administrador&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Solo es válido para nombres de páginas wiki. Ejemplo: ##wikipedia##
+* **##aliasInterWiki##**: Un alias de [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] opcional definido en la Tabla InterWiki (ver la [[Guía del Administrador&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Solo es válido para nombres de páginas wiki. Ejemplo: ##wikipedia##
 * **##destino##**: Una cadena de texto opcional que se corresponde con el atributo HTML ##target## para un elemento de enlace #A##. Este elemento se emplea al renderizar el enlace. De forma predeterminada abre el enlace en la ventana actual. Ejemplos: ##_self##, ##_blank##
 
 === Enlaces 2.0 ===
@@ -103,9 +103,9 @@ El formato completo de un enlace es **##[etiqueta {&gt; o |}] (recurso) [@aliasI
 |Enlace a una página especificando el espacio|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
 |Enlace a una subwiki|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
 |Enlace que abre una ventana nueva|{{{[[etiqueta&gt;&gt;WebHome||target="_blank"]]}}}|[[etiqueta&gt;&gt;WebHome||target="_blank"]]
-|Enlace directo en el texto a una URL|{{{Esto es una URL: http://xwiki.org}}}|Esto es una URL: http://xwiki.org
-|Enlace a una URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
-|Enlace a una URL con una etiqueta|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Enlace directo en el texto a una URL|{{{Esto es una URL: https://xwiki.org}}}|Esto es una URL: https://xwiki.org
+|Enlace a una URL|{{{[[https://xwiki.org]]}}}|[[https://xwiki.org]]
+|Enlace a una URL con una etiqueta|{{{[[XWiki&gt;&gt;https://xwiki.org]]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
 |Enlace a una dirección de correo electrónico|{{{[[juan@herrero.net&gt;&gt;mailto:juan@herrero.net]]}}}|[[juan@herrero.net&gt;&gt;mailto:juan@herrero.net]]
 |Enlace a una imagen|{{{[[image:Espacio2.Página2@img.png&gt;&gt;Espacio1.Página1]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
 |Enlace a una imagen con parámetros de imagen|{{{[[[[image:Espacio2.Página2@img.png||width="26" height="26"]]&gt;&gt;Espacio1.Página1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
@@ -125,7 +125,7 @@ Las partes entre ##( )## son obligatorias, mientras que las partes entre ##[ ]##
 
 El formato completo de un enlace es **##[etiqueta&gt;&gt;] (recurso) [@aliasInterWiki] [||parámetros]##**
 
-* **##etiqueta##**: Una cadena de texto opcional que se mostrará al usuario como nombre del enlace al renderizar. La etiqueta puede contener sintaxis XWiki. Si no se especifica ninguna etiqueta se generará un etiqueta predeterminada. EL formato de generación se puede cambiar, ver la [[Guía de Administración&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Ejemplo: ##Mi Página##
+* **##etiqueta##**: Una cadena de texto opcional que se mostrará al usuario como nombre del enlace al renderizar. La etiqueta puede contener sintaxis XWiki. Si no se especifica ninguna etiqueta se generará un etiqueta predeterminada. EL formato de generación se puede cambiar, ver la [[Guía de Administración&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Ejemplo: ##Mi Página##
 * **##recurso##**: La referencia del enlace completa utilizando la sintaxis siguiente: **##(referencia) [?cadenaDeConsulta] [#ancla]##**
 ** **##referencia##**: La referencia del enlace en uno de las formas siguientes:
 *** **URL**: Cualquier URL en la forma **##protocolo:~/~/ruta##**. Ejemplos: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##

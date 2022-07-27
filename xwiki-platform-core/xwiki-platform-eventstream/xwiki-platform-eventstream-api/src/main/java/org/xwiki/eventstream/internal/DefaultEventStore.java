@@ -19,7 +19,9 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -28,7 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -83,6 +85,9 @@ public class DefaultEventStore implements EventStore, Initializable
     @Inject
     private Execution execution;
 
+    @Inject
+    private Logger logger;
+
     private EventStore legacyStore;
 
     private EventStore store;
@@ -93,13 +98,16 @@ public class DefaultEventStore implements EventStore, Initializable
         if (this.configuration.isEventStoreEnabled()) {
             String hint = this.configuration.getEventStore();
 
-            if (StringUtils.isNotEmpty(hint)) {
-                try {
-                    this.store =
-                        this.componentManager.getInstance(EventStore.class, this.configuration.getEventStore());
-                } catch (ComponentLookupException e) {
+            try {
+                this.store = this.componentManager.getInstance(EventStore.class, hint);
+            } catch (ComponentLookupException e) {
+                if (this.configuration.isEventStoreSet()) {
+                    // Fail the init if the store was explicitly configured
                     throw new InitializationException(
-                        String.format("Failed to get the configured event store [%s]", hint, e));
+                        String.format("Failed to get the configured event store [%s]", hint), e);
+                } else {
+                    // Ignore the failure if the store was not explicitly configured
+                    this.logger.warn("No default implementation of EventStore could be lookup", e);
                 }
             }
         }
@@ -112,7 +120,7 @@ public class DefaultEventStore implements EventStore, Initializable
                 this.legacyStore = this.componentManager.getInstance(EventStore.class, legacyHint);
             } catch (ComponentLookupException e) {
                 throw new InitializationException(
-                    String.format("Failed to get the legacy event stream [%s]", legacyHint, e));
+                    String.format("Failed to get the legacy event stream [%s]", legacyHint), e);
             }
         }
     }
@@ -422,5 +430,19 @@ public class DefaultEventStore implements EventStore, Initializable
         if (event.getGroupId() == null && context != null) {
             event.setGroupId((String) context.getProperty(GROUP_ID_CONTEXT_KEY));
         }
+    }
+
+    @Override
+    public List<EventStatus> getEventStatuses(Collection<Event> events, Collection<String> entityIds) throws Exception
+    {
+        if (this.store != null) {
+            return this.store.getEventStatuses(events, entityIds);
+        }
+
+        if (this.legacyStore != null) {
+            return this.legacyStore.getEventStatuses(events, entityIds);
+        }
+
+        return List.of();
     }
 }

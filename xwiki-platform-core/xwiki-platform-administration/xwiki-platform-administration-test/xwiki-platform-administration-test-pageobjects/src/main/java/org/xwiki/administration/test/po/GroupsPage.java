@@ -69,22 +69,7 @@ public class GroupsPage extends BasePage
     {
         AdministrationPage.gotoPage().clickSection("Users & Rights", "Groups");
         GroupsPage groupsPage = new GroupsPage();
-        return groupsPage.waitUntilPageIsLoaded();
-    }
-
-    /**
-     * Method that overrides waitUntilPageIsLoaded() and waits also for the groups live table to load.
-     *
-     * @see org.xwiki.test.ui.po.BasePage#waitUntilPageIsLoaded()
-     */
-    @Override
-    public GroupsPage waitUntilPageIsLoaded()
-    {
-        super.waitUntilPageIsLoaded();
-
-        groupsLiveTable.waitUntilReady();
-
-        return this;
+        return groupsPage;
     }
 
     public LiveTableElement getGroupsTable()

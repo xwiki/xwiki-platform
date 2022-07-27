@@ -27,11 +27,13 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.http.Cookie;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -126,6 +128,11 @@ public class XWikiContextContextStore extends AbstractContextStore
     public static final String SUFFIX_PROP_REQUEST_PARAMETERS = "parameters";
 
     /**
+     * The suffix of the entry containing the request cookies.
+     */
+    public static final String SUFFIX_PROP_REQUEST_COOKIES = "cookies";
+
+    /**
      * The suffix of the entry containing the request wiki.
      * 
      * @since 10.11RC1
@@ -154,6 +161,11 @@ public class XWikiContextContextStore extends AbstractContextStore
      * Name of the entry containing the request parameters.
      */
     public static final String PROP_REQUEST_PARAMETERS = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_PARAMETERS;
+
+    /**
+     * Name of the entry containing the request cookies.
+     */
+    public static final String PROP_REQUEST_COOKIES = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_COOKIES;
 
     /**
      * Name of the entry containing the request wiki.
@@ -205,7 +217,7 @@ public class XWikiContextContextStore extends AbstractContextStore
     public XWikiContextContextStore()
     {
         super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_ACTION, PROP_REQUEST_BASE, PROP_REQUEST_URL,
-            PROP_REQUEST_PARAMETERS, PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
+            PROP_REQUEST_PARAMETERS, PROP_REQUEST_COOKIES, PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
     }
 
     @Override
@@ -264,6 +276,10 @@ public class XWikiContextContextStore extends AbstractContextStore
                         saveRequestParameters(contextStore, request);
                         break;
 
+                    case SUFFIX_PROP_REQUEST_COOKIES:
+                        saveRequestCookies(contextStore, request);
+                        break;
+
                     case SUFFIX_PROP_REQUEST_WIKI:
                         contextStore.put(key, xcontext.getOriginalWikiId());
                         break;
@@ -307,10 +323,21 @@ public class XWikiContextContextStore extends AbstractContextStore
         contextStore.put(PROP_REQUEST_PARAMETERS, new LinkedHashMap<>(request.getParameterMap()));
     }
 
+    private void saveRequestCookies(Map<String, Serializable> contextStore, XWikiRequest request)
+    {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            // Clone the cookies.
+            cookies = Stream.of(cookies).map(Cookie::clone).toArray(Cookie[]::new);
+        }
+        contextStore.put(PROP_REQUEST_COOKIES, cookies);
+    }
+
     private void saveRequestAll(Map<String, Serializable> contextStore, String key, XWikiRequest request)
     {
         saveRequestURL(contextStore, request);
         saveRequestParameters(contextStore, request);
+        saveRequestCookies(contextStore, request);
     }
 
     @Override

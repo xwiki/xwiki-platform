@@ -20,7 +20,6 @@
 package org.xwiki.livedata;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * The component that provides the live data entries and their meta data.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Role
-@Unstable
 public interface LiveDataSource
 {
     /**

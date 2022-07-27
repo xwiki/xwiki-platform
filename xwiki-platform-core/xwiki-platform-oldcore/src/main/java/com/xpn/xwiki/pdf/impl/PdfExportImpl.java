@@ -223,10 +223,10 @@ public class PdfExportImpl implements PdfExport
      * Convert a valid XHTML document into an XSL-FO document through XSLT transformations. Two transformations are
      * involved:
      * <ol>
-     * <li>A base transformation which converts the XHTML into a temporary XSL-FO; it uses the <tt>xhtml2fo.xsl</tt>
-     * file, or the <tt>xhtmlxsl</tt> property of the applied PDFTemplate.</li>
+     * <li>A base transformation which converts the XHTML into a temporary XSL-FO; it uses the {@code xhtml2fo.xsl}
+     * file, or the {@code xhtmlxsl} property of the applied PDFTemplate.</li>
      * <li>An eventual post-processing transformation which cleans up the temporary XSL-FO in order to avoid FOP bugs;
-     * it uses the <tt>fop.xsl</tt> file, or the <tt>fopxsl</tt> property of the applied PDFTemplate.</li>
+     * it uses the {@code fop.xsl} file, or the {@code fopxsl} property of the applied PDFTemplate.</li>
      * </ol>
      *
      * @param xhtml the XHTML document to convert
@@ -294,11 +294,11 @@ public class PdfExportImpl implements PdfExport
     /**
      * Apply CSS styling to an XHTML document. The style to apply is taken from:
      * <ol>
-     * <li>the <tt>pdf.css</tt> skin file</li>
-     * <li>and the <tt>style</tt> property of the applied PDFTemplate</li>
+     * <li>the {@code pdf.css} skin file</li>
+     * <li>and the {@code style} property of the applied PDFTemplate</li>
      * </ol>
      * The content found in these locations is concatenated. The CSS rules are applied on the document, and the
-     * resulting style properties are embedded in the document, inside <tt>style</tt> attributes. The resulting XHTML
+     * resulting style properties are embedded in the document, inside {@code style} attributes. The resulting XHTML
      * document with the inlined style is then serialized and returned.
      *
      * @param html the valid XHTML document to style
@@ -319,7 +319,7 @@ public class PdfExportImpl implements PdfExport
 
     /**
      * Apply a CSS style sheet to an XHTML document and return the document with the resulting style properties inlined
-     * in <tt>style</tt> attributes.
+     * in {@code style} attributes.
      *
      * @param html the valid XHTML document to style
      * @param css the style sheet to apply
@@ -395,8 +395,8 @@ public class PdfExportImpl implements PdfExport
     /**
      * Get the XSLT for converting (valid) XHTML to XSL-FO. The content is searched in:
      * <ol>
-     * <li>the <tt>xhtmlxsl</tt> property of the current PDFTemplate</li>
-     * <li>the <tt>xhtml2fo.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
+     * <li>the {@code xhtmlxsl} property of the current PDFTemplate</li>
+     * <li>the {@code xhtml2fo.xsl} resource (usually a file inside xwiki-core-*.jar)</li>
      * </ol>
      *
      * @param context the current request context
@@ -410,8 +410,8 @@ public class PdfExportImpl implements PdfExport
     /**
      * Get the XSLT for post-processing the XSL-FO file. The content is searched in:
      * <ol>
-     * <li>the <tt>fopxsl</tt> property of the current PDFTemplate</li>
-     * <li>the <tt>fop.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
+     * <li>the {@code fopxsl} property of the current PDFTemplate</li>
+     * <li>the {@code fop.xsl} resource (usually a file inside xwiki-core-*.jar)</li>
      * </ol>
      *
      * @param context the current request context
@@ -438,14 +438,7 @@ public class PdfExportImpl implements PdfExport
     {
         String xsl = getPDFTemplateProperty(propertyName, context);
         if (!StringUtils.isBlank(xsl)) {
-            try {
-                return IOUtils.toInputStream(xsl, context.getWiki().getEncoding());
-            } catch (IOException e) {
-                // This really shouldn't happen since it would mean that the encoding is either invalid or doesn't
-                // exist in the JVM.
-                LOGGER.error("Couldn't get XSLT for PDF exporting. Invalid or not existing encoding [{}]",
-                    context.getWiki().getEncoding(), e);
-            }
+            return IOUtils.toInputStream(xsl, context.getWiki().getEncoding());
         }
         return getClass().getClassLoader().getResourceAsStream(fallbackFile);
     }

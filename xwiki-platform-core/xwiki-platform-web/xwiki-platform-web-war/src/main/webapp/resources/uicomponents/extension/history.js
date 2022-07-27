@@ -25,7 +25,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   // Hide the submit button
   $('.extension-history-source-upload input[type=submit]').addClass('hidden');
 
-  $('.extension-history-sources-header').click(function() {
+  $('.extension-history-sources-header').on('click', function() {
     $(this).closest('.extension-history-sources-selector').toggleClass('opened');
   });
 
@@ -40,7 +40,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     deleteLink.addClass('loading').children().hide();
     // Reduce the cost of the request by disabling the redirect.
     var deleteURL = deleteLink.attr('href').replace(/xredirect=/, 'xfoo=');
-    $.get(deleteURL).done(function() {
+    $.get(deleteURL).then(() => {
       var source = deleteLink.closest('.extension-history-source');
       if (source.hasClass('selected')) {
         // Select the 'local history' source.
@@ -48,7 +48,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         onSelectHistorySource.call(localHistorySource.children('.extension-history-source-name'));
       }
       source.remove();
-    }).fail(function() {
+    }).catch(() => {
       deleteLink.removeClass('loading').children().show();
     });
   };
@@ -77,18 +77,18 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     recordsForm.children('.extension-history-records')
       .append('<li class="extension-history-record loading"><span style="visibility:hidden">Loading</span></li>');
     // Request the history records.
-    $.get(source.attr('data-recordsURL')).done(function(html) {
+    $.get(source.attr('data-recordsURL')).then(html => {
       recordsForm.replaceWith(html);
       recordsForm = sourceSelector.next('.extension-history-records-form');
-      recordsForm.size() > 0 && $(document).trigger('xwiki:dom:updated', {'elements': recordsForm.toArray()});
-    }).fail(function() {
+      recordsForm.length && $(document).trigger('xwiki:dom:updated', {'elements': recordsForm.toArray()});
+    }).catch(() => {
       // TODO
     });
   };
 
   var enhanceHistorySources = function(container) {
-    container.find('.extension-history-source a.deleteLink').click(onDeleteHistorySource);
-    container.find('a.extension-history-source-name').click(onSelectHistorySource);
+    container.find('.extension-history-source a.deleteLink').on('click', onDeleteHistorySource);
+    container.find('a.extension-history-source-name').on('click', onSelectHistorySource);
   };
   enhanceHistorySources($('.extension-history-sources'));
 
@@ -125,12 +125,12 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     event.preventDefault();
     var moreLink = $(event.target).css('visibility', 'hidden');
     var loadingRecord = moreLink.closest('.extension-history-record').addClass('loading');
-    $.get(moreLink.attr('href')).done(function(html) {
+    $.get(moreLink.attr('href')).then(html => {
       var container = $(document.createElement('div'));
       var newRecords = container.append(html).find('.extension-history-record');
       $(document).trigger('xwiki:dom:updated', {'elements': container.toArray()});
       loadingRecord.replaceWith(newRecords);
-    }).fail(function() {
+    }).catch(() => {
       loadingRecord.removeClass('loading');
       moreLink.css('visibility', null);
       // TODO: Notify the user about the failed request.
@@ -145,10 +145,10 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 
   var enhanceHistoryRecordsForm = function(recordsForm) {
     // Enhance the 'more' link.
-    recordsForm.find('.extension-history-record a.more').click(loadMoreHistoryRecords);
+    recordsForm.find('.extension-history-record a.more').on('click', loadMoreHistoryRecords);
     // Enable/Disable the history actions based on the number of records selected.
     enableDisableActions.call(recordsForm);
-    recordsForm.find('.extension-history-record input[type="checkbox"]').click(enableDisableActions);
+    recordsForm.find('.extension-history-record input[type="checkbox"]').on('click', enableDisableActions);
   };
 
   enhanceHistoryRecordsForm($('.extension-history-records-form'));
@@ -172,25 +172,25 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     }
   };
 
-  $('.extension-history-actions button[value="replayPlan"]').click(onPreviewReplayPlan);
+  $('.extension-history-actions button[value="replayPlan"]').on('click', onPreviewReplayPlan);
   $(document).on('xwiki:dom:updated', function(event, data) {
-    $(data.elements).find('.extension-history-actions button[value="replayPlan"]').click(onPreviewReplayPlan);
+    $(data.elements).find('.extension-history-actions button[value="replayPlan"]').on('click', onPreviewReplayPlan);
   });
 
-  $('.extension-history-replay-options button[value="replayPlan"]').click(function(event) {
+  $('.extension-history-replay-options button[value="replayPlan"]').on('click', function(event) {
     event.preventDefault();
     getReplayPlan($(event.target).closest('.extension-history'));
   });
 
-  $('.extension-history-replay-options a.btn-default').click(function(event) {
+  $('.extension-history-replay-options a.btn-default').on('click', function(event) {
     event.preventDefault();
     replayPlanRequest && replayPlanRequest.abort();
     $(event.target).closest('.extension-history-replay-options').addClass('hidden').prevAll().show();
   });
 
   var enhanceReplayPlan = function(replayPlan) {
-    replayPlan.find('a.btn-default').click(cancelReplayPlan);
-    replayPlan.find('button[value="replay"]').click(submitReplayPlan);
+    replayPlan.find('a.btn-default').on('click', cancelReplayPlan);
+    replayPlan.find('button[value="replay"]').on('click', submitReplayPlan);
   };
 
   var replayPlanRequest;
@@ -198,17 +198,16 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var forms = extensionHistory.children('form');
     var data = forms.serialize() + '&data=replayPlan';
     forms.find(':input').prop('disabled', true);
-    replayPlanRequest = $.post(forms.attr('action'), data).always(function() {
-      forms.find(':input').prop('disabled', false);
-    }).done(function(html) {
+    replayPlanRequest = $.post(forms.attr('action'), data);
+    Promise.resolve(replayPlanRequest).then(html => {
       extensionHistory.children().hide();
       extensionHistory.find('.extension-history-replay-options').show().addClass('hidden');
       extensionHistory.append(html);
       var replayPlan = extensionHistory.find('.extension-history-replay-plan');
-      replayPlan.size() > 0 && $(document).trigger('xwiki:dom:updated', {'elements': replayPlan.toArray()});
+      replayPlan.length && $(document).trigger('xwiki:dom:updated', {'elements': replayPlan.toArray()});
       enhanceReplayPlan(replayPlan);
-    }).fail(function() {
-      // TODO
+    }).finally(() => {
+      forms.find(':input').prop('disabled', false);
     });
   };
 
@@ -224,7 +223,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var replayButton = $(this).prop('disabled', true);
     var form = replayButton.closest('form');
     var data = form.serialize() + '&action=replay';
-    $.post(form.attr('action'), data).done(function(data) {
+    $.post(form.attr('action'), data).then(data => {
       // Make sure we remove the document fragment identifier from the end of the URL.
       var replayStatusURL = window.location.href.replace(/#.*$/, '');
       replayStatusURL += replayStatusURL.indexOf('?') < 0 ? '?' : '&';
@@ -232,7 +231,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         'data': 'replayStatus',
         'jobId': data.jobId
       });
-    }).fail(function() {
+    }).catch(() => {
       replayButton.prop('disabled', false);
       // TODO: Display the error message.
     });
@@ -251,33 +250,33 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 
     var jobState = container.attr('data-jobState');
     if (jobState == 'WAITING') {
-      container.find('form.extension-question button[value="continue"]').click($.proxy(updateReplayStatus, null,
-        container, 'action=continue'));
+      container.find('form.extension-question button[value="continue"]')
+        .on('click', updateReplayStatus.bind(null, container, 'action=continue'));
       // Some questions have their own buttons (e.g. the "Show changes" button on the merge conflict question).
-      container.find('form.extension-question button[name="extensionAction"]').click($.proxy(updateReplayStatus, null,
-        container, 'data=replayStatus'));
+      container.find('form.extension-question button[name="extensionAction"]')
+        .on('click', updateReplayStatus.bind(null, container, 'data=replayStatus'));
     } else if (typeof jobState == 'string' && jobState != 'FINISHED') {
-      setTimeout($.proxy(updateReplayStatus, this, container), 1000);
+      setTimeout(updateReplayStatus.bind(null, container), 1000);
     }
   };
 
   var getReplayStatusUIState = function(container) {
     return {
-      'logOpened': container.find('.log.hidden').size() === 0
+      'logOpened': !container.find('.log.hidden').length
     };
   };
 
   var updateReplayStatus = function(container, data, event) {
     if (event) {
       event.preventDefault();
-      data += '&' + $(this).closest('form').serialize();
+      data += '&' + $(event.target).closest('form').serialize();
     } else {
       data = data || {
         'data': 'replayStatus',
         'jobId': container.attr('data-jobId')
       };
     }
-    $.post(container.attr('data-extensionHistoryURL'), data).done(function(html) {
+    $.post(container.attr('data-extensionHistoryURL'), data).then(html => {
       var uiState = getReplayStatusUIState(container);
       var wrapper = $(document.createElement('div'));
       wrapper.append(html);
@@ -285,9 +284,9 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       var newElements = wrapper.children();
       container.replaceWith(newElements);
       $(document).trigger('xwiki:dom:updated', {'elements': newElements.toArray()});
-    }).fail(function() {
+    }).catch(() => {
       // TODO
-    })
+    });
   };
 
   enhanceReplayStatus($('.extension-history-replay-status'));

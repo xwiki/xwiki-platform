@@ -539,7 +539,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return pc == null ? null : pc.newProperty().getClass().getName();
+        if (pc != null) {
+            BaseProperty property = pc.newProperty();
+            if (property != null) {
+                return property.getClass().getName();
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -595,8 +602,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         XWikiDocument attachmentDocument =
             xcontext.getWiki().getDocument(attachmentReference.getDocumentReference(), xcontext);
-        return new ByteArrayInputStream(
-            attachmentDocument.getAttachment(attachmentReference.getName()).getContent(xcontext));
+        return attachmentDocument.getAttachment(attachmentReference.getName()).getContentInputStream(xcontext);
     }
 
     @Override

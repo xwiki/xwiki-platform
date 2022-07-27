@@ -39,6 +39,34 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>= Editing =
+
+== Horizontal Line ==
+
+=== 1.0 Horizontal Line ===
+
+{{info}}There must be 4 or more dashes.{{/info}}
+
+|=Feature|=XWiki Syntax 1.0|=Result
+|Simple horizontal line|{{{----}}}|(((----)))
+|Parametrized horizontal line|&lt;hr style="border-color:blue"/&gt;|(((
+(% style="border-color:blue" %)
+----
+)))
+
+=== 2.0 Horizontal Line ===
+
+{{info}}There must be 4 or more dashes.{{/info}}
+
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Simple horizontal line|{{{----}}}|(((----)))
+|Parametrized horizontal line|((({{{
+(% style="border-color:blue" %)
+----
+}}})))|(((
+(% style="border-color:blue" %)
+----
+)))</content>
   <object>
     <class>
       <name>XWiki.XWikiSyntaxClass</name>
@@ -117,36 +145,4 @@
       <section>3</section>
     </property>
   </object>
-  <content>= Editing =
-
-== Horizontal Line ==
-
-=== 1.0 Horizontal Line ===
-
-{{info}}There must be 4 or more dashes.{{/info}}
-
-{{info}}Note that this is different from Creole where exactly 4 dashes are required.{{/info}}
-
-|=Feature|=XWiki Syntax 1.0|=Result
-|Simple horizontal line|{{{----}}}|(((----)))
-|Parametrized horizontal line|&lt;hr style="color:blue"/&gt;|(((
-(% style="color:blue" %)
-----
-)))
-
-=== 2.0 Horizontal Line ===
-
-{{info}}There must be 4 or more dashes.{{/info}}
-
-{{info}}Note that this is different from Creole where exactly 4 dashes are required.{{/info}}
-
-|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
-|Simple horizontal line|{{{----}}}|(((----)))
-|Parametrized horizontal line|((({{{
-(% style="color:blue" %)
-----
-}}})))|(((
-(% style="color:blue" %)
-----
-)))</content>
 </xwikidoc>

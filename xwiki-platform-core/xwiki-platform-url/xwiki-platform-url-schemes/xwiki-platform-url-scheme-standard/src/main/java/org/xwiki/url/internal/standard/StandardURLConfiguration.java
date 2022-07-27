@@ -38,13 +38,13 @@ public interface StandardURLConfiguration
 
     /**
      * @return the path prefix used when using path-based URLs for multiwiki (e.g. for a wiki named {@code mywiki}:
-     *         {@code http://server/xwiki/&lt;prefix&gt;/mywiki/...})
+     *         {@code http://server/xwiki/<prefix>/mywiki/...})
      */
     String getWikiPathPrefix();
 
     /**
      * @return the path prefix used for signifying that a URL is pointing at a Model Entity (Document, Space, Object,
-     *         etc): {@code http://server/xwiki/&lt;prefix&gt;/...}.
+     *         etc): {@code http://server/xwiki/<prefix>/...}.
      *         For example: {@code http://server/xwiki/bin/...}.
      */
     String getEntityPathPrefix();

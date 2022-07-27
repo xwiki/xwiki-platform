@@ -944,12 +944,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        super.setOwnerDocument(ownerDocument);
+        if (this.ownerDocument != ownerDocument) {
+            super.setOwnerDocument(ownerDocument);
 
-        for (String propertyName : getPropertyList()) {
-            PropertyInterface property = getField(propertyName);
-            if (property instanceof BaseElement) {
-                ((BaseElement) property).setOwnerDocument(ownerDocument);
+            for (String propertyName : getPropertyList()) {
+                PropertyInterface property = getField(propertyName);
+                if (property instanceof BaseElement) {
+                    ((BaseElement) property).setOwnerDocument(ownerDocument);
+                }
             }
         }
     }

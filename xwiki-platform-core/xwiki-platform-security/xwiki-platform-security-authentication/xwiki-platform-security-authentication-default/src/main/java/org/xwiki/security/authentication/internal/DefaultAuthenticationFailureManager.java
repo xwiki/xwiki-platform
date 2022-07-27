@@ -341,7 +341,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
 
     private long getMaxTime()
     {
-        return configuration.getTimeWindow() * 1000;
+        return Long.valueOf(configuration.getTimeWindow()) * 1000L;
     }
 
     private int getMaxNbAttempts()

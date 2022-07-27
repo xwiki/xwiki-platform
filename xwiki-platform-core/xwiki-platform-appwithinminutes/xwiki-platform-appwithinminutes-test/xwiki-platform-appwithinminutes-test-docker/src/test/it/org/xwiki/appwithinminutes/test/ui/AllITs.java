@@ -61,4 +61,16 @@ public class AllITs
     class NestedAddEntryIT extends AddEntryIT
     {
     }
+
+    @Nested
+    @DisplayName("Document fields test")
+    class NestedDocumentFieldsIT extends DocumentFieldsIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Application name test")
+    class NestedApplicationNameIt extends ApplicationNameIt
+    {
+    }
 }

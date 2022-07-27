@@ -249,10 +249,4 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
         List<WebElement> warnings = getDriver().findElementsWithoutWaiting(getForm(), By.className("warningmessage"));
         return warnings.size() == 1 && warnings.get(0).isDisplayed();
     }
-
-    @Override
-    public ApplicationHomeEditPage waitUntilPageIsLoaded()
-    {
-        return this;
-    }
 }

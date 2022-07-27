@@ -47,7 +47,7 @@ require([paths.treeRequireConfig], function() {
       var treeElement = modal.find('.location-tree');
       var selectButton = modal.find('.modal-footer .btn-primary');
 
-      trigger.click(function(event) {
+      trigger.on('click', function(event) {
         event.preventDefault();
         modal.modal();
       });
@@ -63,14 +63,14 @@ require([paths.treeRequireConfig], function() {
         var tree = $.jstree.reference(treeElement);
         if (!tree) {
           // Initialize the tree and hook the event listeners.
-          tree = treeElement.xtree({
+          treeElement.xtree({
             core: {
               multiple: treeElement.data('multiple') === 'true'
             }
           }).one('ready.jstree', function(event, data) {
             openToNodeId && data.instance.openTo(openToNodeId);
           }).on('changed.jstree', function(event, data) {
-            selectButton.prop('disabled', data.selected.size() === 0);
+            selectButton.prop('disabled', !data.selected.length);
           }).on('dblclick', '.jstree-anchor', function() {
             selectButton.click();
           });
@@ -81,7 +81,7 @@ require([paths.treeRequireConfig], function() {
         }
       });
 
-      selectButton.click(function() {
+      selectButton.on('click', function() {
         modal.modal('hide');
         modal.triggerHandler('xwiki:locationTreePicker:select', {
           'tree': $.jstree.reference(treeElement)
@@ -99,15 +99,18 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     var wikiField = picker.find('.location-wiki-field');
     var parentField = picker.find('input.location-parent-field');
 
-    picker.find('.location-action-pick').click(function(event) {
-      var selectedValue = parentField.val();
-      if (selectedValue) {
-        var wiki = wikiField.val() || xm.wiki;
-        var spaceReference = XWiki.Model.resolve(selectedValue, XWiki.EntityType.SPACE, [wiki]);
+    picker.find('.location-action-pick').on('click', function(event) {
+      // Open to the parent wiki, by default. The wiki node should be visible in the tree, otherwise we wouldn't be able
+      // to move pages to top level, under the wiki node.
+      var wiki = wikiField.val() || xm.wiki;
+      var openToNodeId = 'wiki:' + wiki;
+      if (parentField.val()) {
+        // Open to the parent document, if specified.
+        var spaceReference = XWiki.Model.resolve(parentField.val(), XWiki.EntityType.SPACE, [wiki]);
         var documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, spaceReference);
-        var openToNodeId = 'document:' + XWiki.Model.serialize(documentReference);
-        $(this).attr('data-openTo', openToNodeId);
+        openToNodeId = 'document:' + XWiki.Model.serialize(documentReference);
       }
+      $(this).attr('data-openTo', openToNodeId);
     });
 
     picker.find('.modal').on('xwiki:locationTreePicker:select', function(event, data) {
@@ -155,12 +158,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
      **/
     var getPageName = function(title) {
       var url = XWiki.currentDocument.getURL("get");
-      return $.get(url, {
+      return Promise.resolve($.get(url, {
         'xpage': 'entitynamevalidation_json',
         'outputSyntax': 'plain',
         'name': title,
         'form_token': xm.form_token
-      });
+      }));
     };
 
     /**
@@ -195,18 +198,28 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       if (event.type === 'input') {
         // Delay the update.
         titleInputTimeout = setTimeout(updateLocationAndNameFromTitleInput, inputDelay);
-      } else {
+      } else if (event.type === 'change') {
         // Update right away.
         updateLocationAndNameFromTitleInput();
+      } else if (event.type === 'keyup' && event.keyCode === 13) {
+        // Update right away and submit the form since the user hit enter, so he's expecting the form to be submitted.
+        // Note that the reason we need this is because we disable the submit button in
+        // updateLocationAndNameFromTitleInput: by default the event when clicking Enter on an text input field is
+        // to simulate a click button on the input submit button. But since the button is disabled, this submit
+        // cannot occur here.
+        // So we're actually actively listening on the enter input, to manually trigger the submit.
+        // Also note that we cannot perform a submit on each change event, since those are also triggered whenever
+        // the input text looses focus. And in such case, we don't want to trigger a submit.
+        updateLocationAndNameFromTitleInput(true);
       }
     };
 
-    var updateLocationAndNameFromTitleInput = function() {
+    var updateLocationAndNameFromTitleInput = function(submit) {
       // ensure the buttons are disabled before we got the name answer
       disableButtons();
       var titleInputVal = titleInput.val();
       // Update the name field.
-      getPageName(titleInputVal).done(function(data) {
+      getPageName(titleInputVal).then(data => {
         // Ensure that the input didn't change while we were waiting the answer.
         // It also protects the value if a previous request was slow to arrive.
         if (titleInputVal === titleInput.val()) {
@@ -216,9 +229,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
           // Update the location preview.
           updateLocationFromTitleInput();
         }
-        // enable back the buttons
-        enableButtons();
-      }).fail(function (response) {
+      }).catch(() => {
         if (titleInputVal === titleInput.val()) {
           new XWiki.widgets.Notification(l10n['entitynamevalidation.nametransformation.error'], 'error');
           // we trigger a change so we can validate the name
@@ -226,8 +237,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
           // Update the location preview.
           updateLocationFromTitleInput();
         }
-        // enable back the buttons
+      }).finally(() => {
+        // Enable back the buttons
         enableButtons();
+        if (submit) {
+          titleInput.closest('form').submit();
+        }
       });
     };
 
@@ -328,8 +343,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     // Synchronize the location fields while the user types.
     // We catch the change event because we want to make sure everything's updated when the user change fields
     // (particulary useful in our automated tests).
-    titleInput.on('input change', scheduleUpdateOfLocationAndNameFromTitleInput);
-    wikiField.change(updateLocationFromWikiField);
+    titleInput.on('input change keyup', scheduleUpdateOfLocationAndNameFromTitleInput);
+    wikiField.on('change', updateLocationFromWikiField);
     nameInput.on('input change', updateLocationFromNameInput);
     spaceReferenceInput.on('input change xwiki:suggest:selected', updateLocationFromSpaceReference);
 
@@ -347,7 +362,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
 
     // Show the location edit options when pressing the pencil button.
     var locationEdit = picker.find('.location-edit');
-    picker.find('.location-action-edit').click(function(event) {
+    picker.find('.location-action-edit').on('click', function(event) {
       event.preventDefault();
       // Note: Using toggleClass() instead of toggle() because using the 'hidden' class
       // allows us to have the element hidden by default more easily from Velocity.
@@ -471,16 +486,16 @@ require(['jquery'], function($) {
     });
 
     // Trigger validation when the terminal status changes.
-    terminalCheckbox.change(function() {
+    terminalCheckbox.on('change', function() {
       spaceValidator.validate();
     });
   };
 
   var synchChildrenWithTerminalPage = function(deepCheckbox, terminalCheckbox) {
-    deepCheckbox.change(function() {
+    deepCheckbox.on('change', function() {
       deepCheckbox.prop('checked') && terminalCheckbox.prop('checked', false);
     });
-    terminalCheckbox.change(function() {
+    terminalCheckbox.on('change', function() {
       terminalCheckbox.prop('checked') && deepCheckbox.prop('checked', false);
     });
   };
@@ -507,7 +522,7 @@ require(['jquery'], function($) {
 
     // If the form is not valid on submission and the location edit is hidden, make sure to display it so that
     // validation errors are also displayed.
-    picker.closest('form').submit(function(event) {
+    picker.closest('form').on('submit', function(event) {
       var isValid = LiveValidation.massValidate(pickerValidators);
       if (!isValid && locationEdit.hasClass('hidden')) {
         locationEditToggle.click();
@@ -542,7 +557,7 @@ require(['jquery'], function($) {
       // Read the alowed spaces specified by the template provider, unless they are just suggestions in which case they
       // should be ignored by validation.
       if (!restrictionsAreSuggestions && allowedSpacesData) {
-        allowedSpaces = $.parseJSON(input.attr('data-allowed-spaces'));
+        allowedSpaces = JSON.parse(input.attr('data-allowed-spaces'));
       }
 
       var message = input.attr('data-allowed-spaces-message');
@@ -588,7 +603,7 @@ require(['jquery'], function($) {
     addTerminalPageValidation(spaceValidator, terminalCheckbox);
     synchChildrenWithTerminalPage(deepCheckbox, terminalCheckbox);
 
-    languageSelect.change(function() {
+    languageSelect.on('change', function() {
       if (languageSelect.val() === 'ALL') {
         deepCheckbox.prop('disabled', false);
       } else {

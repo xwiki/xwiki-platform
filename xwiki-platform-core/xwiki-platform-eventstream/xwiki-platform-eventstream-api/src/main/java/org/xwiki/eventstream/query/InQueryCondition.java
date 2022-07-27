@@ -19,6 +19,7 @@
  */
 package org.xwiki.eventstream.query;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -44,6 +45,35 @@ public class InQueryCondition extends AbstractPropertyQueryCondition
     public InQueryCondition(boolean reversed, String property, List<Object> values)
     {
         super(reversed, property);
+
+        this.values = values;
+    }
+
+    /**
+     * @param reversed true if the condition should be reversed
+     * @param property the name of the property
+     * @param custom true if the property is a custom parameter
+     * @param values the values to compare to the property value
+     * @since 13.9RC1
+     */
+    public InQueryCondition(boolean reversed, String property, boolean custom, List<Object> values)
+    {
+        super(reversed, property, custom);
+
+        this.values = values;
+    }
+
+    /**
+     * @param reversed true if the condition should be reversed
+     * @param property the name of the property
+     * @param custom true if it's a custom event reversed
+     * @param customType the type in which that property was stored
+     * @param values the values to compare to the property value
+     * @since 14.2RC1
+     */
+    public InQueryCondition(boolean reversed, String property, boolean custom, Type customType, List<Object> values)
+    {
+        super(reversed, property, custom, customType);
 
         this.values = values;
     }

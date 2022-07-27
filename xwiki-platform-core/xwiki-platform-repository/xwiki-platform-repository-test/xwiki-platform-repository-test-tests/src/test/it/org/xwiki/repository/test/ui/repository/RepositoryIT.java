@@ -34,9 +34,11 @@ import org.xwiki.extension.DefaultExtensionAuthor;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
+import org.xwiki.extension.repository.xwiki.model.jaxb.AbstractExtension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
+import org.xwiki.extension.repository.xwiki.model.jaxb.Property;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.repository.Resources;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
@@ -416,6 +418,8 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         Assert.assertEquals("maven:oldversionnedextension", extension.getExtensionFeatures().get(1).getId());
         Assert.assertEquals("10.0", extension.getExtensionFeatures().get(1).getVersion());
         Assert.assertEquals("GNU Lesser General Public License 2.1", extension.getLicenses().get(0).getName());
+        Assert.assertEquals("org.xwiki.rendering.macro.Macro/mymacro1\norg.xwiki.rendering.macro.Macro/mymacro2",
+            getProperty("xwiki.extension.components", extension));
 
         Assert.assertEquals(fileSize,
             getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "2.0").length);
@@ -552,5 +556,16 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         extensionsPage = new ExtensionsPage();
         livetable = extensionsPage.getLiveTable();
         Assert.assertEquals(1, livetable.getRowCount());
+    }
+
+    private String getProperty(String key, AbstractExtension extension)
+    {
+        for (Property property : extension.getProperties()) {
+            if (property.getKey().equals(key)) {
+                return property.getStringValue();
+            }
+        }
+
+        return null;
     }
 }

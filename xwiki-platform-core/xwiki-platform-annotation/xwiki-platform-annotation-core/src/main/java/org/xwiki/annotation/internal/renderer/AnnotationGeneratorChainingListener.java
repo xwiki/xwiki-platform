@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.content.AlteredContent;
 import org.xwiki.annotation.content.ContentAlterer;
+import org.xwiki.annotation.content.TextExtractor;
 import org.xwiki.annotation.renderer.AnnotationEvent;
 import org.xwiki.annotation.renderer.AnnotationEvent.AnnotationEventType;
 import org.xwiki.rendering.listener.Listener;
@@ -84,7 +85,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     /**
      * The collection of annotations to generate annotation events for, by default the empty list.
      */
-    private Collection<Annotation> annotations = Collections.<Annotation> emptyList();
+    private Collection<Annotation> annotations = Collections.<Annotation>emptyList();
 
     /**
      * Cleaner for the annotation selection text, so that it can be mapped on the content.
@@ -98,16 +99,21 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     private Map<Event, SortedMap<Integer, List<AnnotationEvent>>> bookmarks =
         new HashMap<Event, SortedMap<Integer, List<AnnotationEvent>>>();
 
+    private TextExtractor textExtractor;
+
     /**
      * Builds an annotation generator listener from the passed link generator in the passed chain.
      *
      * @param selectionAlterer cleaner for the annotation selection text, so that it can be mapped on the content
      * @param listenerChain the chain in which this listener is part of
+     * @param textExtractor plain text extractor, depending on a given syntax
      */
-    public AnnotationGeneratorChainingListener(ContentAlterer selectionAlterer, ListenerChain listenerChain)
+    public AnnotationGeneratorChainingListener(ContentAlterer selectionAlterer, ListenerChain listenerChain,
+        TextExtractor textExtractor)
     {
         this.chain = listenerChain;
         this.selectionAlterer = selectionAlterer;
+        this.textExtractor = textExtractor;
     }
 
     @Override
@@ -158,9 +164,9 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     {
         // Store the raw text as it is ftm. Should handle syntax in the future
         super.onRawText(text, syntax);
-        // Similar approach to verbatim FTM. In the future, syntax specific cleaner could be used for various syntaxes
-        // (which would do the great job for HTML, for example)
-        handleRawText(text);
+        // Handle text depending on the syntax and, if possible, extract the plain text content, as the users see it
+        // when they add the annotation.
+        handleRawText(textExtractor.extractText(text, syntax));
     }
 
     /**
@@ -221,6 +227,9 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
                 // alteredSelection.length() - 1
                 Object[] startEvt = getEventAndOffset(contextIndex + alteredSelectionStartIndex, false);
                 Object[] endEvt = getEventAndOffset(contextIndex + alteredSelectionEndIndex, true);
+                ann.set(Annotation.PLAIN_TEXT_START_OFFSET_FIELD, contextIndex + alteredSelectionStartIndex);
+                // The end offset should be just after the last annotated character.
+                ann.set(Annotation.PLAIN_TEXT_END_OFFSET_FIELD, contextIndex + alteredSelectionEndIndex + 1);
                 if (startEvt != null & endEvt != null) {
                     // store the bookmarks
                     addBookmark((Event) startEvt[0], new AnnotationEvent(AnnotationEventType.START, ann),

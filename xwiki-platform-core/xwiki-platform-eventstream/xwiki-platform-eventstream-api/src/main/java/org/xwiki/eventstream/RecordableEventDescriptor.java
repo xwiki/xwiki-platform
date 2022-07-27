@@ -20,7 +20,6 @@
 package org.xwiki.eventstream;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide a description for a specific implementation of RecordableEvent so that users can know what the event is
@@ -115,7 +114,6 @@ public interface RecordableEventDescriptor
      *          key.
      * @since 12.9RC1
      */
-    @Unstable
     default String getEventTitle()
     {
         return "";

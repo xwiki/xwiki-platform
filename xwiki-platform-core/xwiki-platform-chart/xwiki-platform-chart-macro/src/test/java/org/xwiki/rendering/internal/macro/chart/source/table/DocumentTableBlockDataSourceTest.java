@@ -21,9 +21,7 @@ package org.xwiki.rendering.internal.macro.chart.source.table;
 
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -32,9 +30,14 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DocumentTableBlockDataSource}.
@@ -42,32 +45,34 @@ import static org.mockito.Mockito.*;
  * @version $$Id$
  * @since 5.0RC1
  */
-public class DocumentTableBlockDataSourceTest
+@ComponentTest
+class DocumentTableBlockDataSourceTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DocumentTableBlockDataSource> componentManager =
-        new MockitoComponentMockingRule<DocumentTableBlockDataSource>(DocumentTableBlockDataSource.class);
+    @InjectMockComponents
+    private DocumentTableBlockDataSource source;
+
+    @MockComponent
+    private DocumentAccessBridge dab;
+
+    @MockComponent
+    private DocumentReferenceResolver<String> resolver;
 
     @Test
-    public void isDefinedChartSourceTheCurrentDocumentWhenReferenceNotNullAndMatching() throws Exception
+    void isDefinedChartSourceTheCurrentDocumentWhenReferenceNotNullAndMatching() throws Exception
     {
-        DocumentAccessBridge dab = this.componentManager.getInstance(DocumentAccessBridge.class);
         DocumentReference currentReference = new DocumentReference("currentwiki", "currentspace", "currentpage");
-        when(dab.getCurrentDocumentReference()).thenReturn(currentReference);
+        when(this.dab.getCurrentDocumentReference()).thenReturn(currentReference);
 
-        DocumentReferenceResolver<String> resolver =
-            this.componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        when(resolver.resolve("wiki:space.page", currentReference)).thenReturn(documentReference);
+        when(this.resolver.resolve("wiki:space.page", currentReference)).thenReturn(documentReference);
 
         MacroBlock currentMacroBlock = mock(MacroBlock.class);
         MetaDataBlock metaDataBlock = new MetaDataBlock(Collections.EMPTY_LIST,
             new MetaData(Collections.singletonMap(MetaData.SOURCE, (Object) "wiki:space.page")));
         when(currentMacroBlock.getFirstBlock(any(BlockMatcher.class), any(Block.Axes.class))).thenReturn(metaDataBlock);
 
-        DocumentTableBlockDataSource source = this.componentManager.getComponentUnderTest();
-        source.setParameter("document", "wiki:space.page");
+        this.source.setParameter("document", "wiki:space.page");
 
-        Assert.assertTrue(source.isDefinedChartSourceTheCurrentDocument(currentMacroBlock));
+        assertTrue(source.isDefinedChartSourceTheCurrentDocument(currentMacroBlock));
     }
 }

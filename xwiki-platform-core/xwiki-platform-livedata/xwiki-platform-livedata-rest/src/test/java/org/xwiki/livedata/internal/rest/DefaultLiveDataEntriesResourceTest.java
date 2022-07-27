@@ -148,7 +148,7 @@ class DefaultLiveDataEntriesResourceTest
     void getEntriesWithNamespaceNull() throws Exception
     {
         List<String> properties = Arrays.asList("prop1", null, "prop2");
-        List<String> matchAll = Arrays.asList(null, "equals:1");
+        List<String> matchAll = Arrays.asList(null, "prop", "other");
         List<String> sort = Arrays.asList("pro2", null);
         List<Boolean> descending = Arrays.asList(true, false, null);
 
@@ -157,6 +157,8 @@ class DefaultLiveDataEntriesResourceTest
 
         MultivaluedMapImpl<String, String> multivaluedMap = new MultivaluedMapImpl<>();
         multivaluedMap.putSingle("filters.age", "18");
+        multivaluedMap.putSingle("filters.other", "contains:xwiki:XWiki.Admin");
+        multivaluedMap.putSingle("filters.author", ":xwiki:XWiki.Author");
         multivaluedMap.putSingle("notfilter.unused", "abcd");
         when(this.uriInfo.getQueryParameters()).thenReturn(multivaluedMap);
         when(this.defaultLiveDataConfigResolver.resolve(any())).thenReturn(config);
@@ -179,7 +181,11 @@ class DefaultLiveDataEntriesResourceTest
         assertEquals("{\"query\":{"
             + "\"properties\":[\"prop1\",\"prop2\"],"
             + "\"source\":{\"id\":\"sourceId\"},"
-            + "\"filters\":[{\"property\":\"age\",\"constraints\":[{\"value\":\"18\"}]}],"
+            + "\"filters\":["
+            + "{\"property\":\"other\",\"matchAll\":true,\"constraints\":"
+            + "[{\"operator\":\"contains\",\"value\":\"xwiki:XWiki.Admin\"}]"
+            + "},"
+            + "{\"property\":\"author\",\"constraints\":[{\"value\":\"xwiki:XWiki.Author\"}]}],"
             + "\"sort\":[{\"property\":\"pro2\",\"descending\":true}],"
             + "\"offset\":0,"
             + "\"limit\":10}}", this.objectMapper.writeValueAsString(configCaptor.getValue()));

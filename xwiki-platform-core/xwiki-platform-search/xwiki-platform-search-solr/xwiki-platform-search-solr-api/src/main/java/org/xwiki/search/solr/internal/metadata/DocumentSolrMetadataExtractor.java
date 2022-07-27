@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -40,6 +41,8 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -68,6 +71,15 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    private UserReferenceSerializer<String> userReferenceSerializer;
+
+    // TODO: relying on this serializer should be prevented by properly rewriting XWiki#getPlainUserName
+    //  to use UserReference
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
 
     /**
      * Used to serialize entity reference to be used in dynamic field names.
@@ -122,7 +134,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         addLocales(translatedDocument, translatedDocument.getLocale(), solrDocument);
 
         // Get both serialized user reference string and pretty user name
-        setAuthors(solrDocument, translatedDocument, entityReference);
+        setAuthors(solrDocument, translatedDocument);
 
         // Document dates.
         solrDocument.setField(FieldUtils.CREATIONDATE, translatedDocument.getCreationDate());
@@ -140,23 +152,24 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     /**
      * @param solrDocument the Solr document
      * @param translatedDocument the XWiki document
-     * @param entityReference the document reference
      */
-    private void setAuthors(SolrInputDocument solrDocument, XWikiDocument translatedDocument,
-        EntityReference entityReference)
+    private void setAuthors(SolrInputDocument solrDocument, XWikiDocument translatedDocument)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentAuthors authors = translatedDocument.getAuthors();
 
-        String authorString = entityReferenceSerializer.serialize(translatedDocument.getAuthorReference());
+        UserReference originalAuthor = authors.getOriginalMetadataAuthor();
+        String authorString = this.userReferenceSerializer.serialize(originalAuthor);
         solrDocument.setField(FieldUtils.AUTHOR, authorString);
-        String authorDisplayString =
-            xcontext.getWiki().getPlainUserName(translatedDocument.getAuthorReference(), xcontext);
+        String authorDisplayString = xcontext.getWiki().getPlainUserName(
+            this.documentReferenceUserReferenceSerializer.serialize(originalAuthor), xcontext);
         solrDocument.setField(FieldUtils.AUTHOR_DISPLAY, authorDisplayString);
 
-        String creatorString = entityReferenceSerializer.serialize(translatedDocument.getCreatorReference());
+        UserReference creator = authors.getCreator();
+        String creatorString = this.userReferenceSerializer.serialize(creator);
         solrDocument.setField(FieldUtils.CREATOR, creatorString);
-        String creatorDisplayString =
-            xcontext.getWiki().getPlainUserName(translatedDocument.getCreatorReference(), xcontext);
+        String creatorDisplayString = xcontext.getWiki().getPlainUserName(
+            this.documentReferenceUserReferenceSerializer.serialize(creator), xcontext);
         solrDocument.setField(FieldUtils.CREATOR_DISPLAY, creatorDisplayString);
     }
 

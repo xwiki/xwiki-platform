@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
@@ -29,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -58,6 +61,9 @@ public class CommentAddAction extends XWikiAction
     private static final String USER_SPACE_PREFIX = "XWiki.";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentAddAction.class);
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
 
     @Override
     protected Class<? extends XWikiForm> getFormClass()
@@ -109,7 +115,9 @@ public class CommentAddAction extends XWikiAction
                 // A registered user must always post with his name.
                 object.set(AUTHOR_PROPERTY_NAME, context.getUser(), context);
             }
-            doc.setAuthorReference(context.getUserReference());
+            // We only update the original author of the document to avoid changing the effective one.
+            doc.getAuthors().setOriginalMetadataAuthor(
+                this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE));
 
             String comment = localizePlainOrKey("core.comment.addComment");
 

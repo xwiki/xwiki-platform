@@ -22,4 +22,9 @@
 #if ($request.useLayoutVars == 'true')
 #template('layoutvars.vm')
 #end
+#if ($vm.endsWith('.vm'))
 #template($vm)
+#else
+#set ($discard = $response.setStatus(400))
+Invalid template.
+#end

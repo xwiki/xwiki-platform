@@ -303,14 +303,14 @@ Object.extend(XWiki, {
 
     updateField : function (fieldName, value) {
       var element = $$('input[name=' + fieldName + ']');
-      if (element &amp;&amp; element.size() &gt; 0) {
+      if (element &amp;&amp; element.length) {
         element[0].value = value;
       }
     },
 
     handleCancelAction : function() {
       var elements = $$('form .buttons input[type=submit][name=action_cancel]');
-      if (elements &amp;&amp; elements.size() &gt; 0) {
+      if (elements &amp;&amp; elements.length) {
         var button = elements[0];
         Event.stopObserving(button, 'click');
         button.observe('click', function(event){
@@ -557,10 +557,6 @@ div.userInfo, div.userPreferences, div.watchlistManagement, div.userDashboard {
   background-color: $theme.backgroundSecondaryColor;
 }
 
-.userInfo {
-  -ms-word-break: break-all; /* IE8, IE9 */
-}
-
 .userInfo a {
   word-wrap: break-word;
 }
@@ -572,6 +568,7 @@ div.userInfo, div.userPreferences, div.watchlistManagement, div.userDashboard {
 .userInfo h2 {
   font-size: larger;
   font-weight: bolder;
+  margin-top: 10px;
 }
         
 div.userInfo input[type="text"], div.userInfo input[type="password"], div.userInfo textarea, div.userInfo select, div.userPreferences select {
@@ -582,12 +579,21 @@ div.editProfileCategory {
   float:right;
 }
 
-div.editProfileCategory a {
-  display:block;
-  width: 16px;
-  height: 16px;
-  background: url("$xwiki.getSkinFile('icons/silk/pencil.png')") no-repeat;
+div.editProfileCategory {
+  float:right;
+  a.btn-xs {
+    background-color: @xwiki-page-content-bg;
+    border: 1px solid @xwiki-border-color;
+    .action-icon {
+      font-size: larger;
+      color: @btn-default-color;
+    }
+    &amp;:hover, &amp;:active, &amp;:focus {
+      border-color: darken(@dropdown-divider-bg, 10%);
+    }
+  }
 }
+
 
 /* Watchlist */
 
@@ -677,6 +683,9 @@ span#avatarUpload {
 .dashboard .clearfloats:after, .dashboard .clearfloats:before {
   clear: right;
 }</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name>userprofile</name>

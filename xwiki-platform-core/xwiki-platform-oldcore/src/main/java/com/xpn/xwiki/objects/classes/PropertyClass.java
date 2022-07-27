@@ -650,8 +650,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public BaseProperty fromValue(Object value)
     {
         BaseProperty property = newProperty();
-        property.setValue(value);
-        return property;
+        if (property != null) {
+            property.setValue(value);
+            return property;
+        }
+
+        return null;
     }
 
     @Override

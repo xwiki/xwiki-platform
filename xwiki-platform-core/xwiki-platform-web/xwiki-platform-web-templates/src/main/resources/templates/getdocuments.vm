@@ -56,13 +56,20 @@ $response.setContentType("application/json")
 ##
 #set ($dateFilter = $request.get("doc.date"))
 #if("$!{dateFilter}" != '')
-  #set ($dates = $dateFilter.split('-'))
-  #if ($dates.size() == 2)
+  #set ($dateRange = {})
+  #parseDateRange($matchType $dateFilter $dateRange)
+  #if ($dateRange.start && $dateRange.end)
     ## Date range matching
-    #set ($discard = $queryParams.add($datetool.toDate($numbertool.toNumber($dates[0]))))
+    #set ($discard = $queryParams.add($dateRange.start))
     #set ($whereQueryPart = "${whereQueryPart} and doc.date between ?$queryParams.size()")
-    #set ($discard = $queryParams.add($datetool.toDate($numbertool.toNumber($dates[1]))))
+    #set ($discard = $queryParams.add($dateRange.end))
     #set ($whereQueryPart = "${whereQueryPart} and ?$queryParams.size()")
+  #elseif ($dateRange.start)
+    #set ($discard = $queryParams.add($dateRange.start))
+    #set ($whereQueryPart = "${whereQueryPart} and doc.date >= ?$queryParams.size()")
+  #elseif ($dateRange.end)
+    #set ($discard = $queryParams.add($dateRange.end))
+    #set ($whereQueryPart = "${whereQueryPart} and doc.date <= ?$queryParams.size()")
   #else
     ## Single value matching
     #set ($discard = $queryParams.add($dateFilter))
@@ -75,6 +82,10 @@ $response.setContentType("application/json")
 #set ($order = "$!request.sort")
 #set ($orderQueryPart = '')
 #if ($order != '')
+  #if (!$regextool.compile('^(doc\.)?\w+$').matcher($order).matches())
+    { "error" : "invalid sort parameter" }
+    #stop ("invalid sort parameter [$order] found")
+  #end
   #set ($orderDirection = "$!{request.get('dir').toLowerCase()}")
   #if ("$!orderDirection" != '' && "$!orderDirection" != 'asc')
     #set($orderDirection = 'desc')
@@ -99,6 +110,12 @@ $response.setContentType("application/json")
 #set ($limit = $numbertool.toNumber($request.get('limit')).intValue())
 #if (!$limit)
   #set ($limit = 15)
+#else
+  ## Security protection for guest users: limit the number of items returned to avoid DOS attacks.
+  #if (!$xcontext.userReference)
+    #set ($maxLimit = $services.security.getQueryItemsLimit())
+    #set ($limit = $mathtool.min($limit, $maxLimit))
+  #end
 #end
 ##
 ## Build the query
@@ -142,7 +159,7 @@ $response.setContentType("application/json")
   #set ($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${docName}"))
   #set ($row = {'doc_viewable' : $viewable})
   #if (!$viewable)
-    #set ($discard = $row.put('doc_fullName', "${xcontext.database}:${item}"))
+    #set ($discard = $row.put('doc_fullName', 'obfuscated'))
   #else
     #set ($itemDoc = $xwiki.getDocument($docName))
     ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
@@ -204,6 +221,7 @@ $response.setContentType("application/json")
   #set ($discard = $rows.add($row))
 #end
 #set ($discard = $map.put('rows', $rows))
+#livetable_filterObfuscated($map)
 ##
 ## Serialize the JSON
 ##

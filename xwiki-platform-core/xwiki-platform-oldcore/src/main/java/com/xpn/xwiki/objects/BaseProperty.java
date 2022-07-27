@@ -326,10 +326,12 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        super.setOwnerDocument(ownerDocument);
+        if (this.ownerDocument != ownerDocument) {
+            super.setOwnerDocument(ownerDocument);
 
-        if (ownerDocument != null && this.isValueDirty) {
-            ownerDocument.setMetaDataDirty(true);
+            if (ownerDocument != null && this.isValueDirty) {
+                ownerDocument.setMetaDataDirty(true);
+            }
         }
     }
 

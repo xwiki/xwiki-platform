@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-jmeter</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - JMeter</name>
@@ -61,6 +61,10 @@
           <groupId>xalan</groupId>
           <artifactId>xalan</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.apache.tika</groupId>
+          <artifactId>tika-parsers</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -87,6 +91,10 @@
         <exclusion>
           <groupId>xalan</groupId>
           <artifactId>xalan</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tika</groupId>
+          <artifactId>tika-parsers</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -115,6 +123,10 @@
           <groupId>xalan</groupId>
           <artifactId>xalan</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.apache.tika</groupId>
+          <artifactId>tika-parsers</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -141,6 +153,10 @@
         <exclusion>
           <groupId>xalan</groupId>
           <artifactId>xalan</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tika</groupId>
+          <artifactId>tika-parsers</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -169,6 +185,10 @@
           <groupId>xalan</groupId>
           <artifactId>xalan</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.apache.tika</groupId>
+          <artifactId>tika-parsers</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -195,6 +215,10 @@
         <exclusion>
           <groupId>xalan</groupId>
           <artifactId>xalan</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tika</groupId>
+          <artifactId>tika-parsers</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -223,6 +247,10 @@
           <groupId>xalan</groupId>
           <artifactId>xalan</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.apache.tika</groupId>
+          <artifactId>tika-parsers</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -249,6 +277,10 @@
         <exclusion>
           <groupId>xalan</groupId>
           <artifactId>xalan</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tika</groupId>
+          <artifactId>tika-parsers</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

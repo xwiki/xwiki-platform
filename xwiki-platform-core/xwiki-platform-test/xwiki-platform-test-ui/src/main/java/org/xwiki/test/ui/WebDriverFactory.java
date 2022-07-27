@@ -19,18 +19,12 @@
  */
 package org.xwiki.test.ui;
 
-import java.io.IOException;
-
-import org.jboss.arquillian.phantom.resolver.ResolvingPhantomJSDriverService;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -70,14 +64,6 @@ public class WebDriverFactory
             driver = new InternetExplorerDriver();
         } else if (browserName.startsWith("*chrome")) {
             driver = new ChromeDriver();
-        } else if (browserName.startsWith("*phantomjs")) {
-            DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
-            capabilities.setCapability("handlesAlerts", true);
-            try {
-                driver = new PhantomJSDriver(ResolvingPhantomJSDriverService.createDefaultService(), capabilities);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         } else {
             throw new RuntimeException("Unsupported browser name [" + browserName + "]");
         }

@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.concurrent.ContextStoreManager;
-import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
@@ -61,7 +61,7 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
     private ContextStoreManager contextStore;
 
     @Inject
-    private ContextualLocalizationManager localization;
+    private LocalizationManager localization;
 
     @Inject
     private Logger logger;
@@ -97,7 +97,8 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
             }
             entriesString.append(entry);
 
-            String translation = this.localization.getTranslationPlain("rendering.async.context.entry." + entry);
+            String translation = this.localization.getTranslationPlain("rendering.async.context.entry." + entry,
+                this.localization.getDefaultLocale());
             if (translation != null) {
                 entriesString.append('=');
                 entriesString.append(translation);

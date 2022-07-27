@@ -102,7 +102,7 @@ public class CreateWikiPage extends ExtendedViewPage
     public CreateWikiPageStepUser goUserStep()
     {
         goNextStep();
-        return new CreateWikiPageStepUser().waitUntilPageIsLoaded();
+        return new CreateWikiPageStepUser();
     }
 
     public void goNextStep()

@@ -204,7 +204,7 @@ public class WikiEditPage extends PreviewableEditPage
     public void clickToolbarButton(String buttonTitle)
     {
         String buttonLocator = "//img[@title = '" + buttonTitle + "']";
-        getDriver().findElementByXPath(buttonLocator).click();
+        getDriver().findElement(By.xpath(buttonLocator)).click();
     }
 
     public void clearContent()

@@ -47,7 +47,6 @@ public class ViewAttachRevAction extends XWikiAction
     public ViewAttachRevAction()
     {
         this.waitForXWikiInitialization = false;
-        this.handleRedirectObject = true;
     }
 
     @Override
@@ -86,6 +85,12 @@ public class ViewAttachRevAction extends XWikiAction
             ScriptContext.ENGINE_SCOPE);
 
         return "viewattachrev";
+    }
+
+    @Override
+    protected boolean supportRedirections()
+    {
+        return true;
     }
 
     /**

@@ -23,7 +23,7 @@ package com.xpn.xwiki.plugin.skinx;
 import java.util.Collections;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -31,7 +31,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 /**
  * CSs Skin File Extension plugin to use css files from the skin.
- * 
+ *
  * @version $Id$
  * @since 1.6
  */
@@ -45,11 +45,11 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
 
     /**
      * XWiki plugin constructor.
-     * 
+     *
      * @param name The name of the plugin, which can be used for retrieving the plugin API from velocity. Unused.
      * @param className The canonical classname of the plugin. Unused.
      * @param context The current request context.
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#XWikiDefaultPlugin(String, String, com.xpn.xwiki.XWikiContext)
      */
     public CssSkinFileExtensionPlugin(String name, String className, XWikiContext context)
     {
@@ -71,19 +71,8 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     @Override
     public String getLink(String filename, XWikiContext context)
     {
-        boolean forceSkinAction = (Boolean) getParametersForResource(filename, context).get("forceSkinAction");
-        StringBuilder result = new StringBuilder("<link rel='stylesheet' type='text/css' href='");
-        result.append(context.getWiki().getSkinFile(filename, forceSkinAction, context));
-        if (forceSkinAction) {
-            String parameters = StringUtils.removeStart(parametersAsQueryString(filename, context), "&amp;");
-            if (!StringUtils.isEmpty(parameters)) {
-                String queryParamDelimiter =
-                    StringUtils.contains(result, QUERY_PARAMETER_DELIMITER) ? "&" : QUERY_PARAMETER_DELIMITER;
-                result.append(queryParamDelimiter).append(parameters);
-            }
-        }
-        result.append("'/>");
-        return result.toString();
+        return "<link rel='stylesheet' type='text/css' href='"
+            + XMLUtils.escapeAttributeValue(getSkinFileURL(filename, context)) + "'/>\n";
     }
 
     /**
@@ -92,7 +81,7 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
      * We must override this method since the plugin manager only calls it for classes that provide their own
      * implementation, and not an inherited one.
      * </p>
-     * 
+     *
      * @see AbstractSkinExtensionPlugin#endParsing(String, XWikiContext)
      */
     @Override
@@ -106,7 +95,7 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
      * <p>
      * There is no support for always used skinfile-based extensions.
      * </p>
-     * 
+     *
      * @see AbstractSkinExtensionPlugin#getAlwaysUsedExtensions(XWikiContext)
      */
     @Override
@@ -120,7 +109,7 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
      * <p>
      * Not supported for skinfile-based extensions.
      * </p>
-     * 
+     *
      * @see com.xpn.xwiki.plugin.skinx.AbstractSkinExtensionPlugin#hasPageExtensions(com.xpn.xwiki.XWikiContext)
      */
     @Override

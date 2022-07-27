@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.http.Cookie;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -116,6 +117,7 @@ public class RequestInitializer
 
         Map<String, String[]> parameters =
             (Map<String, String[]>) contextStore.get(XWikiContextContextStore.PROP_REQUEST_PARAMETERS);
+        Cookie[] cookies = (Cookie[]) contextStore.get(XWikiContextContextStore.PROP_REQUEST_COOKIES);
 
         boolean daemon;
 
@@ -133,6 +135,9 @@ public class RequestInitializer
                 if (parameters == null) {
                     parameters = request.getParameterMap();
                 }
+                if (cookies == null) {
+                    cookies = request.getCookies();
+                }
             }
 
             // We don't want to take into account the context request URL when generating URLs
@@ -147,14 +152,14 @@ public class RequestInitializer
 
         // Set the context request
         if (url != null) {
-            restoreRequest(url, contextPath, parameters, daemon, xcontext);
+            restoreRequest(url, contextPath, parameters, cookies, daemon, xcontext);
         }
     }
 
-    private void restoreRequest(URL url, String contextPath, Map<String, String[]> parameters, boolean daemon,
-        XWikiContext xcontext)
+    private void restoreRequest(URL url, String contextPath, Map<String, String[]> parameters, Cookie[] cookies,
+        boolean daemon, XWikiContext xcontext)
     {
-        XWikiServletRequestStub stubRequest = new XWikiServletRequestStub(url, contextPath, parameters);
+        XWikiServletRequestStub stubRequest = new XWikiServletRequestStub(url, contextPath, parameters, cookies);
         xcontext.setRequest(stubRequest);
         // Indicate that the URL should be taken into account when generating a URL
         stubRequest.setDaemon(daemon);
@@ -167,5 +172,7 @@ public class RequestInitializer
             xcontext.setURLFactory(urlFactory);
         }
         urlFactory.init(xcontext);
+
+        xcontext.setURL(url);
     }
 }

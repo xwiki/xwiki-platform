@@ -20,7 +20,6 @@
 package org.xwiki.model.validation;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define the configuration of the name strategy to be used.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.0RC1
  */
 @Role
-@Unstable
 public interface EntityNameValidationConfiguration
 {
     /**

@@ -31,7 +31,6 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Docker tests for the Release Application.
@@ -78,11 +77,10 @@ class ReleaseIT
 
         // Add new Release
         ReleaseEntryEditPage entryPage = homePage.addRelease(RELEASE_VERSION);
-        vp = entryPage.waitUntilPageIsLoaded().clickSaveAndView();
+        vp = entryPage.clickSaveAndView();
 
         // Go back to the home page by clicking in the breadcrumb
         vp.clickBreadcrumbLink("Releases");
-        homePage.waitUntilPageIsLoaded();
 
         // Assert Livetable:
         // - verify that the Livetable contains our new Release entry.

@@ -67,7 +67,7 @@ class AddEntryIT
         testUtils.gotoPage(testReference, "edit", editQueryStringParameters);
         // Wait for the page to load before clicking on the save button to make sure the page layout is stable.
         // The page being tested.
-        ApplicationHomePage homePage = new ApplicationHomeEditPage().waitUntilPageIsLoaded().clickSaveAndView();
+        ApplicationHomePage homePage = new ApplicationHomeEditPage().clickSaveAndView();
 
         // Test
         EntryNamePane entryNamePane = homePage.clickAddNewEntry();

@@ -17,7 +17,11 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-## Helper macros for ActivityPub notifications.
+## Renders the Mentions notifications.
+## Parameters:
+## $compositeEvent:       a CompositeEvent containing the events of the notification group
+## $compositeEventParams: a map of Events and MentionView. The keys are the events of the notification group, and the
+##                        values are the additional parameters required to display the notification 
 
 #template('notification/macros.vm')
 
@@ -59,7 +63,7 @@
     #if ($compositeEvent.events.size() == 1)
             $services.localization.render('mentions.event.mention.summary.singular')
         #else
-      $services.localization.render('mentions.event.mention.summary.plural', $compositeEvent.events.size())
+      $services.localization.render('mentions.event.mention.summary.plural', [$compositeEvent.events.size()])
     #end
   </div>
   <div><small class="text-muted">$compositeEventDate</small></div>

@@ -19,7 +19,11 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.lang.reflect.Type;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
@@ -40,5 +44,22 @@ class DefaultSolrUtilsTest
     void toFilterQueryString()
     {
         assertEquals("\\OR", this.utils.toFilterQueryString("OR"));
+    }
+
+    @Test
+    void toCompleteFilterQueryString()
+    {
+        assertEquals("\"\"", this.utils.toCompleteFilterQueryString(""));
+    }
+
+    @Test
+    void getMapFieldName()
+    {
+        assertEquals("key__map_string", this.utils.getMapFieldName("key", "map", (Type) null));
+        assertEquals("key__map_string", this.utils.getMapFieldName("key", "map", String.class));
+        assertEquals("key__map_pint", this.utils.getMapFieldName("key", "map", Integer.class));
+        assertEquals("key__map_strings", this.utils.getMapFieldName("key", "map", List.class));
+        assertEquals("key__map_pints",
+            this.utils.getMapFieldName("key", "map", new DefaultParameterizedType(null, List.class, Integer.class)));
     }
 }

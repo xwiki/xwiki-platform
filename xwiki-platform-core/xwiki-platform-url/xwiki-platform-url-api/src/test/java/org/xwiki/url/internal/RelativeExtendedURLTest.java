@@ -22,7 +22,6 @@ package org.xwiki.url.internal;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.url.internal.RelativeExtendedURL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

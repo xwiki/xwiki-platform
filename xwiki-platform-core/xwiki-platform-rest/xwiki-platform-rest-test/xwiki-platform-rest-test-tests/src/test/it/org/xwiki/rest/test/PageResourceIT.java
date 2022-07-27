@@ -363,6 +363,12 @@ public class PageResourceIT extends AbstractHttpIT
         Assert.assertEquals(PARENT, modifiedPage.getParent());
     }
 
+    /**
+     * Note that logs output are expected related to this test with a stacktrace, but we cannot capture it easily
+     * in the test, since it's not an exception which is directly thrown in the current thread.
+     * The stacktrace appear because of an event triggered which is then captured by
+     * {@link javax.xml.bind.helpers.DefaultValidationEventHandler} which immediately output the message.
+     */
     @Test
     public void testPUTWithInvalidRepresentation() throws Exception
     {

@@ -58,16 +58,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest(
     properties = {
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
-        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
-        // Prevent the DW from starting. This is needed because xwiki-platform-extension-distribution is provisioned
-        // transitively by org.xwiki.platform:xwiki-platform-wiki-creationjob and will cause a ClassNotFoundException
-        // since Struts is in the webapp CL and will not see the DistributionAction located in the extension CL. And
-        // even if the class was found the DW would start which is not something we want.
-        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false"
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
         // Required by components located in a core extensions
         "org.xwiki.platform:xwiki-platform-wiki-template-default",
@@ -185,7 +180,7 @@ class SubWikiIT
     {
         setup.loginAsSuperAdmin();
         // Go to the template wiki
-        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
+        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         WikiLink templateWikiLink = wikiIndexPage.getWikiLink(SUBWIKI_NAME);
         if (templateWikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
@@ -193,7 +188,7 @@ class SubWikiIT
         DeleteWikiPage deleteWikiPage = wikiIndexPage.deleteWiki(SUBWIKI_NAME).confirm(SUBWIKI_NAME);
         assertTrue(deleteWikiPage.hasSuccessMessage());
         // Verify the wiki has been deleted
-        wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
+        wikiIndexPage = WikiIndexPage.gotoPage();
         assertNull(wikiIndexPage.getWikiLink(SUBWIKI_NAME, false));
         setup.forceGuestUser();
     }

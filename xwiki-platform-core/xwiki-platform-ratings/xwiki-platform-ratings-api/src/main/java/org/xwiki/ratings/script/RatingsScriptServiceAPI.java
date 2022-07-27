@@ -29,6 +29,8 @@ import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
+import com.xpn.xwiki.util.Programming;
+
 /**
  * Defines the available methods for {@link RatingsScriptService}.
  * Those methods are available when using {@code $services.ratings.RatingsManagerName} where {@code RatingsManagerName}
@@ -39,7 +41,6 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public interface RatingsScriptServiceAPI
 {
     /**
@@ -92,6 +93,23 @@ public interface RatingsScriptServiceAPI
      * @return the average rating in an optional or an empty optional in case of error.
      */
     Optional<AverageRating> getAverageRating(EntityReference reference);
+
+    /**
+     * Recompute the average rating of a reference.
+     * Note that this method can be resource consuming if the set of data is large.
+     *
+     * @param reference the reference for which to recompute the average ratings.
+     * @return the average rating in an optional or an empty optional in case of error.
+     * @since 13.7RC1
+     * @since 13.4.3
+     * @since 12.10.9
+     */
+    @Unstable
+    @Programming
+    default Optional<AverageRating> recomputeAverageRating(EntityReference reference)
+    {
+        return Optional.empty();
+    }
 
     /**
      * Retrieve the rating performed by the given author on the given reference.

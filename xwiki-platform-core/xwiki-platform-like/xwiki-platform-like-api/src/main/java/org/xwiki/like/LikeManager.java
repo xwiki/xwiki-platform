@@ -24,7 +24,6 @@ import java.util.List;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -34,7 +33,6 @@ import org.xwiki.user.UserReference;
  * @since 12.7RC1
  */
 @Role
-@Unstable
 public interface LikeManager
 {
     /**
@@ -66,7 +64,6 @@ public interface LikeManager
      * @throws LikeException in case of problem when getting the information.
      * @since 12.9RC1
      */
-    @Unstable
     long countUserLikes(UserReference source) throws LikeException;
 
     /**
@@ -108,7 +105,6 @@ public interface LikeManager
      * @throws LikeException in case of problem for performing the query.
      * @since 12.9RC1
      */
-    @Unstable
     List<UserReference> getLikers(EntityReference target, int offset, int limit) throws LikeException;
 
     /**
@@ -121,13 +117,11 @@ public interface LikeManager
      * @param target the reference for which data should be cleared.
      * @since 12.9RC1
      */
-    @Unstable
     void clearCache(EntityReference target);
 
     /**
      * Clear all data from caches.
      * @since 12.9RC1
      */
-    @Unstable
     void clearCache();
 }

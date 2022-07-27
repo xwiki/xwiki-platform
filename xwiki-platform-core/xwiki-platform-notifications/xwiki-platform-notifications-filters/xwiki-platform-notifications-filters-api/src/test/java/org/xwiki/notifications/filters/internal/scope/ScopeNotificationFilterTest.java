@@ -53,7 +53,6 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -74,7 +73,7 @@ import static org.mockito.Mockito.when;
     ScopeNotificationFilterPreferencesGetter.class,
     ScopeNotificationFilterLocationStateComputer.class
 })
-public class ScopeNotificationFilterTest
+class ScopeNotificationFilterTest
 {
     @InjectMockComponents
     private ScopeNotificationFilter scopeNotificationFilter;

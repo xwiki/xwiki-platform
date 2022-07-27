@@ -1,0 +1,4 @@
+org.xwiki.websocket.internal.DefaultWebSocketContext
+org.xwiki.websocket.internal.DynamicEchoEndpoint
+org.xwiki.websocket.internal.StaticEchoEndpoint
+org.xwiki.websocket.script.WebSocketScriptService

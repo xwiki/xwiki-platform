@@ -37,7 +37,6 @@ import org.xwiki.notifications.sources.NotificationManager;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service for the notification sources.
@@ -137,7 +136,6 @@ public class NotificationSourcesScriptService implements ScriptService
      * @throws NotificationException in case of errors.
      * @since 12.2
      */
-    @Unstable
     public NotificationParameters getNotificationParameters(Map<String, String> parameters) throws NotificationException
     {
         return this.notificationParametersFactory.createNotificationParametersWithStringMap(parameters);

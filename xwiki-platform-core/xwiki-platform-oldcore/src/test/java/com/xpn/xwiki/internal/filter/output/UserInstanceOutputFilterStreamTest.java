@@ -39,12 +39,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * 
  * @version $Id$
  */
-public class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterStreamTest
+class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterStreamTest
 {
     // Tests
 
     @Test
-    public void testImportUsersAndGroupsPreserveVersion() throws FilterException, XWikiException, ParseException
+    void importUsersAndGroupsPreserveVersion() throws FilterException, XWikiException, ParseException
     {
         UserInstanceOutputProperties outputProperties = new UserInstanceOutputProperties();
 
@@ -133,7 +133,7 @@ public class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterSt
     }
 
     @Test
-    public void testImportUserWithoutWiki() throws FilterException, XWikiException, ParseException
+    void importUserWithoutWiki() throws FilterException, XWikiException, ParseException
     {
         UserInstanceOutputProperties outputProperties = new UserInstanceOutputProperties();
 

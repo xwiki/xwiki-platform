@@ -20,7 +20,6 @@
 package org.xwiki.mail;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Expose general mail configuration, such as whether email address obfuscation is turned on or not. Note that these
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.4RC1
  */
-@Unstable
 @Role
 public interface GeneralMailConfiguration
 {

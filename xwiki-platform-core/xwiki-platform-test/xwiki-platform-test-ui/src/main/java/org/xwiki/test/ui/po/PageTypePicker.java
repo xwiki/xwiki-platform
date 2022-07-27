@@ -38,7 +38,7 @@ public class PageTypePicker extends BaseElement
 
     public PageTypePicker()
     {
-        this.container = getDriver().findElementByCssSelector(".xwiki-select.page-type");
+        this.container = getDriver().findElement(By.cssSelector(".xwiki-select.page-type"));
         waitUntilReady();
     }
 

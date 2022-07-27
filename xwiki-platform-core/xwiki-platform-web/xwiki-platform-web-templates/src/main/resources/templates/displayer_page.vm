@@ -57,7 +57,7 @@
   #else
     #set ($title = $escapetool.xml($pageDoc.plainTitle))
     #if ($pageDoc.isNew())
-      <span class="wikicreatelink"><a href="$pageDoc.getURL('create')">$title</a><span/>
+      <span class="wikicreatelink"><a href="$pageDoc.getURL('create')">$title</a></span>
     #else
       <a href="$pageDoc.URL">$title</a>
     #end

@@ -30,11 +30,13 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Users related script API.
@@ -69,6 +71,9 @@ public class UserScriptService implements ScriptService
     @Inject
     private UserReferenceResolver<String> userReferenceResolver;
 
+    @Inject
+    private UserReferenceSerializer<String> userReferenceSerializer;
+
     /**
      * @param <S> the type of the {@link ScriptService}
      * @param serviceName the name of the sub {@link ScriptService}
@@ -86,7 +91,6 @@ public class UserScriptService implements ScriptService
      * @return the User Properties object
      * @since 12.2
      */
-    @Unstable
     public UserProperties getProperties(UserReference userReference, Object... parameters)
     {
         return this.userPropertiesResolver.resolve(userReference, parameters);
@@ -103,7 +107,6 @@ public class UserScriptService implements ScriptService
      * @return the User Properties object
      * @since 12.3RC1
      */
-    @Unstable
     public UserProperties getProperties(String userReference, Object... parameters)
     {
         return this.userPropertiesResolver.resolve(this.userReferenceResolver.resolve(userReference), parameters);
@@ -114,7 +117,6 @@ public class UserScriptService implements ScriptService
      * @return the User Properties object for the current user
      * @since 12.2
      */
-    @Unstable
     public UserProperties getProperties(Object... parameters)
     {
         return this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE, parameters);
@@ -124,7 +126,6 @@ public class UserScriptService implements ScriptService
      * @return the User Properties object for the current user
      * @since 12.2
      */
-    @Unstable
     public UserProperties getProperties()
     {
         return this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE);
@@ -136,7 +137,6 @@ public class UserScriptService implements ScriptService
      * @return the User Properties object
      * @since 12.2
      */
-    @Unstable
     public UserProperties getAllProperties(UserReference userReference, Object... parameters)
     {
         return this.allUserPropertiesResolver.resolve(userReference, parameters);
@@ -147,7 +147,6 @@ public class UserScriptService implements ScriptService
      * @return the User Properties object for the current user
      * @since 12.2
      */
-    @Unstable
     public UserProperties getAllProperties(Object... parameters)
     {
         return this.allUserPropertiesResolver.resolve(CurrentUserReference.INSTANCE, parameters);
@@ -157,7 +156,6 @@ public class UserScriptService implements ScriptService
      * @return the User Properties object for the current user
      * @since 12.2
      */
-    @Unstable
     public UserProperties getAllProperties()
     {
         return this.allUserPropertiesResolver.resolve(CurrentUserReference.INSTANCE);
@@ -167,7 +165,6 @@ public class UserScriptService implements ScriptService
      * @return the Guest User reference
      * @since 12.2
      */
-    @Unstable
     public UserReference getGuestUserReference()
     {
         return GuestUserReference.INSTANCE;
@@ -177,7 +174,6 @@ public class UserScriptService implements ScriptService
      * @return the SuperAdmin User reference
      * @since 12.2
      */
-    @Unstable
     public UserReference getSuperAdminUserReference()
     {
         return SuperAdminUserReference.INSTANCE;
@@ -187,7 +183,6 @@ public class UserScriptService implements ScriptService
      * @return the current User reference
      * @since 12.2
      */
-    @Unstable
     public UserReference getCurrentUserReference()
     {
         return CurrentUserReference.INSTANCE;
@@ -198,11 +193,24 @@ public class UserScriptService implements ScriptService
      *                      reference exists or not - for example the superadmin users or the guest users don't exist,
      *                      and a "document"-based User can be constructed and have no profile page and thus not exist)
      * @return true if the user exists in the store or false otherwise
+     * @throws UserException (since 14.6RC1, 14.4.3, 13.10.8) in case of error while checking if the user exists
      * @since 12.2
      */
-    @Unstable
-    public boolean exists(UserReference userReference)
+    public boolean exists(UserReference userReference) throws UserException
     {
         return this.userManager.exists(userReference);
+    }
+
+    /**
+     * Serialize the given user reference by using the default serializer.
+     *
+     * @param userReference the user reference to serialize.
+     * @return a serialization of the user reference.
+     * @since 13.8RC1
+     */
+    @Unstable
+    public String serialize(UserReference userReference)
+    {
+        return this.userReferenceSerializer.serialize(userReference);
     }
 }

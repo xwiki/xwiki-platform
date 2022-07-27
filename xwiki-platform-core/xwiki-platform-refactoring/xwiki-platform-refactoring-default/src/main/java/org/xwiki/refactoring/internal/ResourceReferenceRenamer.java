@@ -61,14 +61,15 @@ public class ResourceReferenceRenamer
     private PageReferenceResolver<EntityReference> defaultReferencePageReferenceResolver;
 
     /**
-     * Update the given resource reference so that if it targets the old reference, the new reference is used instead.
+     * Update the given document reference so that if it targets the old document reference, the new document reference
+     * is used instead.
      *
-     * @param resourceReference the resource reference to be checked and updated.
-     * @param oldReference the old reference that needs to be replaced.
-     * @param newReference the new reference target.
-     * @param currentDocumentReference the current document where the resource reference is located.
-     * @param relative {@code true} if the reference should be kept relative to the current document.
-     * @return {@code true} if the resource reference has been updated.
+     * @param resourceReference the document reference to be checked and updated
+     * @param oldReference the old document reference that needs to be replaced
+     * @param newReference the new document reference target
+     * @param currentDocumentReference the current document where the resource reference is located
+     * @param relative {@code true} if the reference should be kept relative to the current document
+     * @return {@code true} if the resource reference has been updated
      */
     public boolean updateResourceReference(ResourceReference resourceReference,
         DocumentReference oldReference, DocumentReference newReference, DocumentReference currentDocumentReference,
@@ -77,7 +78,28 @@ public class ResourceReferenceRenamer
         return (relative)
             ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference)
             : this.updateAbsoluteResourceReference(resourceReference, oldReference, newReference,
-                currentDocumentReference);
+            currentDocumentReference);
+    }
+
+    /**
+     * Update the given document reference so that if it targets the old attachment reference, the new attachment
+     * reference is used instead.
+     *
+     * @param resourceReference the document reference to be checked and updated
+     * @param oldReference the old attachment reference that needs to be replaced
+     * @param newReference the new attachment reference target
+     * @param currentDocumentReference the current document where the resource reference is located
+     * @param relative {@code true} if the reference should be kept relative to the current document
+     * @return {@code true} if the attachment reference has been updated
+     */
+    public boolean updateResourceReference(ResourceReference resourceReference,
+        AttachmentReference oldReference, AttachmentReference newReference, DocumentReference currentDocumentReference,
+        boolean relative)
+    {
+        return (relative)
+            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference)
+            : this.updateAbsoluteResourceReference(resourceReference, oldReference, newReference,
+            currentDocumentReference);
     }
 
     private boolean updateAbsoluteResourceReference(ResourceReference resourceReference,
@@ -87,7 +109,7 @@ public class ResourceReferenceRenamer
 
         // FIXME: the root cause of XWIKI-18634 is related to this call.
         EntityReference linkEntityReference =
-                this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
+            this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
 
         DocumentReference linkTargetDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
@@ -132,8 +154,8 @@ public class ResourceReferenceRenamer
         return result;
     }
 
-    private boolean updateRelativeResourceReference(ResourceReference resourceReference,
-        DocumentReference oldReference, DocumentReference newReference)
+    private <T extends EntityReference> boolean updateRelativeResourceReference(ResourceReference resourceReference,
+        T oldReference, T newReference)
     {
         boolean result = false;
 
@@ -155,6 +177,27 @@ public class ResourceReferenceRenamer
             String serializedLinkReference =
                 this.compactEntityReferenceSerializer.serialize(oldLinkReference, newReference);
             resourceReference.setReference(serializedLinkReference);
+            result = true;
+        }
+        return result;
+    }
+
+    private boolean updateAbsoluteResourceReference(ResourceReference resourceReference,
+        AttachmentReference oldReference, AttachmentReference newReference, DocumentReference currentDocumentReference)
+    {
+        boolean result = false;
+
+        // FIXME: the root cause of XWIKI-18634 is related to this call.
+        EntityReference linkEntityReference =
+            this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
+
+        // If the link targets the old (renamed) document reference, we must update it.
+        if (linkEntityReference.equals(oldReference)) {
+            
+            String newReferenceString =
+                this.compactEntityReferenceSerializer.serialize(newReference, currentDocumentReference);
+
+            resourceReference.setReference(newReferenceString);
             result = true;
         }
         return result;

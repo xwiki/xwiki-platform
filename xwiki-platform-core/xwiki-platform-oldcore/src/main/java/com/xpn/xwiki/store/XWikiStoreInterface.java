@@ -22,6 +22,7 @@ package com.xpn.xwiki.store;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.stability.Unstable;
@@ -48,7 +49,6 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of problem during the rename.
      * @since 12.5RC1
      */
-    @Unstable
     default void renameXWikiDoc(XWikiDocument doc, DocumentReference newReference, XWikiContext context)
         throws XWikiException
     {
@@ -403,10 +403,30 @@ public interface XWikiStoreInterface
     List<XWikiLink> loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     /**
+     * Returns the backlinks for the given document reference.
+     *
+     * @param documentReference the document reference to search backlinks for
+     * @param bTransaction {@code true} if a transaction must be create
+     * @param context the current context
      * @since 2.2M2
      */
     List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext context) throws XWikiException;
+
+    /**
+     * Returns the backlinks for the given attachment reference.
+     *
+     * @param documentReference the attachment reference to search backlinks for
+     * @param bTransaction {@code true} if a transaction must be create
+     * @param context the current context
+     * @since 14.2RC1
+     */
+    @Unstable
+    default List<DocumentReference> loadBacklinks(AttachmentReference documentReference, boolean bTransaction,
+        XWikiContext context) throws XWikiException
+    {
+        return List.of();
+    }
 
     /**
      * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}

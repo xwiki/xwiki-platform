@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.edit.DocumentEditConfiguration;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service for XWiki document editing.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Singleton
 @Named(EditScriptService.ROLE_HINT + ".document")
-@Unstable
 public class DocumentEditScriptService implements ScriptService
 {
     @Inject

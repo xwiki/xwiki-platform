@@ -73,8 +73,9 @@ public class SystemUserNotificationFilter implements NotificationFilter, Togglea
     public FilterPolicy filterEvent(Event event, DocumentReference user,
             Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format)
     {
-        return event.getUser() != null && event.getUser().getLocalDocumentReference().equals(SYSTEM_USER)
-                ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
+        return event.getTarget().isEmpty() && event.getUser() != null
+            && event.getUser().getLocalDocumentReference().equals(SYSTEM_USER) ? FilterPolicy.FILTER
+                : FilterPolicy.NO_EFFECT;
     }
 
     @Override

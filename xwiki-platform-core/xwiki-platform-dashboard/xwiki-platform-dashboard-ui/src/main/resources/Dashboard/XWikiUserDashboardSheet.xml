@@ -283,7 +283,13 @@
       &lt;div class="full column xform"&gt;
         &lt;div class="userDashboard"&gt;
           #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-            &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('edit', 'category=dashboard')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.dashboard.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+            &lt;div class="editProfileCategory"&gt;
+              &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.dashboard.edit'))"
+                  href="$doc.getURL('edit', 'category=dashboard')" class="btn btn-xs"&gt;
+                &lt;span class="action-icon"&gt;$services.icon.renderHTML('pencil')&lt;/span&gt;
+                &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.dashboard.edit'))&lt;/span&gt;
+              &lt;/a&gt;
+            &lt;/div&gt;
           #end
           &lt;h1&gt;$services.localization.render('platform.dashboard.user.preferences')&lt;/h1&gt;
           &lt;dl&gt;

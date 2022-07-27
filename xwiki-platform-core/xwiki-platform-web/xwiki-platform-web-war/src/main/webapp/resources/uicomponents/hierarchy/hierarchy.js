@@ -38,7 +38,7 @@
  * Expand hierarchy breadcrumbs on clicks.
  */
 require(['jquery', 'xwiki-events-bridge'], function($) {
-  $(document).ready(function() {
+  $(function() {
 
     /**
      * Function that expand a breadcumb on some events.
@@ -48,24 +48,23 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       var ellipsis = $(this).parent('li');
       ellipsis.addClass('loading');
       // Get the full breadcumb with an AJAX call
-      var breadcrumb  = $(this).parents('.breadcrumb-expandable');
-      var ajaxURL     = new XWiki.Document(XWiki.Model.resolve(breadcrumb.data('entity'), XWiki.EntityType.DOCUMENT))
+      var breadcrumb = $(this).parents('.breadcrumb-expandable');
+      var breadcrumbURL = new XWiki.Document(XWiki.Model.resolve(breadcrumb.data('entity'), XWiki.EntityType.DOCUMENT))
         .getURL('get', 'xpage=hierarchy_reference');
-      $.ajax(ajaxURL, { 'data': {
-          'id'           : breadcrumb[0].id,
-          'displayTitle' : breadcrumb.data('displaytitle'),
-          'local'        : breadcrumb.data('local'),
-          'excludeSelf'  : breadcrumb.data('excludeself'),
-          'treeNavigation': breadcrumb.data('treenavigation')
-      }}).done(function (data) {
-          var updatedBreadcrumb = $(data);
-          breadcrumb.replaceWith(updatedBreadcrumb);
-          $(document).trigger('xwiki:dom:updated', {'elements': updatedBreadcrumb.toArray()});
-        })
-        .fail(function (){
-          new XWiki.widgets.Notification(l10n['web.hierarchy.error'], 'error');
-          ellipsis.removeClass('loading');
-        });
+      $.get(breadcrumbURL, {
+        id: breadcrumb[0].id,
+        displayTitle: breadcrumb.data('displaytitle'),
+        local: breadcrumb.data('local'),
+        excludeSelf: breadcrumb.data('excludeself'),
+        treeNavigation: breadcrumb.data('treenavigation')
+      }).then(data => {
+        var updatedBreadcrumb = $(data);
+        breadcrumb.replaceWith(updatedBreadcrumb);
+        $(document).trigger('xwiki:dom:updated', {'elements': updatedBreadcrumb.toArray()});
+      }).catch(() => {
+        new XWiki.widgets.Notification(l10n['web.hierarchy.error'], 'error');
+        ellipsis.removeClass('loading');
+      });
     };
 
    /**
@@ -77,7 +76,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         if (!ellipsis.children().first().is('a')) {
           ellipsis.wrapInner(function () {
             // Wrap the ellipsis with a link (to be consistent with other path items) that expands the breadcrumb
-            return $('<a href="#"></a>').click(expandBreadCrumb);
+            return $('<a href="#"></a>').on('click', expandBreadCrumb);
           });
         }
       });
@@ -109,7 +108,7 @@ require([paths.treeRequireConfig], function() {
             });
           }
         });
-      }).children('.dropdown-menu').click(function(event) {
+      }).children('.dropdown-menu').on('click', function(event) {
         // Prevent the drop-down from closing when the user expands the tree nodes.
         event.stopPropagation();
       });

@@ -40,16 +40,15 @@
 XWiki.UserDirectoryPreferencesClass_columns_hint=Die Liste der Spalten, die den Eigenschaften der Benutzerklasse entsprechen und im Benutzerverzeichnis angezeigt werden sollen
 XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Deaktivierte Benutzerprofile ausblenden
 XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Schließen Sie die Benutzer aus dem Benutzerverzeichnis aus, bei denen das Profil deaktiviert ist
-
 userdirectory.userScopeFilter=Benutzerart:
-userdirectory.userScopeFilter.hint=Wählen Sie, welche Art von Benutzern Sie anzeigen möchten
+userdirectory.userScopeFilter.hint=Wählen Sie, welche Art von Benutzern Sie anzeigen möchten.
 userdirectory.userScopeFilter.local=Lokaler Benutzer
 userdirectory.userScopeFilter.global=Globale Benutzer, welche in diesem Wiki Mitglieder sind
 userdirectory.configuration.title=Einstellungen
 userdirectory.configuration.columns.editHint=Klicken Sie hier, um die Spalten auszuwählen
-
 platform.userdirectory.customizeNotAllowed=Sie sind nicht berechtigt, dieses Benutzerverzeichnis anzupassen.
 platform.userdirectory.configTitle=Konfiguration des Benutzerverzeichnisses
 platform.userdirectory.configSheetTitle=Konfigurationsblatt für das Benutzerverzeichnis
-platform.userdirectory.configSheetApplyOnConfiguration=Dieses Blatt muss auf das Konfigurationsdokument des Benutzerverzeichnisses angewendet werden.</content>
+platform.userdirectory.configSheetApplyOnConfiguration=Dieses Blatt muss auf das Konfigurationsdokument des Benutzerverzeichnisses angewendet werden.
+</content>
 </xwikidoc>

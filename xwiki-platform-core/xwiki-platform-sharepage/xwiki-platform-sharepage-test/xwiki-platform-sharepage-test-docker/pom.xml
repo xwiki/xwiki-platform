@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-sharepage-test</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-sharepage-test-docker</artifactId>
   <name>XWiki Platform - Share Page - Tests - Functional Tests</name>
@@ -71,7 +71,7 @@
     </dependency>
     <dependency>
       <groupId>com.icegreen</groupId>
-      <artifactId>greenmail</artifactId>
+      <artifactId>greenmail-junit5</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

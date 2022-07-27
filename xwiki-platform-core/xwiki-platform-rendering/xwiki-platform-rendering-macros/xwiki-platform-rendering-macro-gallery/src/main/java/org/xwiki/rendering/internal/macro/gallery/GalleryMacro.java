@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -91,7 +92,7 @@ public class GalleryMacro extends AbstractMacro<GalleryMacroParameters>
     public GalleryMacro()
     {
         super("Gallery", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), GalleryMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_LAYOUT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_LAYOUT));
     }
 
     @Override

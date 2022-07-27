@@ -49,7 +49,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="less">
 
 /*
  * Fix the styles of some known HTML widgets that may be used with the HTML displayer.
@@ -58,6 +58,10 @@ export default {
   margin: 0;
   padding: 0;
   background-color: transparent;
-}
 
+  /* Make the last segment of the breadcrumbs the same color as the rest of the segments. */
+  .active a {
+    color: @link-color;
+  }
+}
 </style>

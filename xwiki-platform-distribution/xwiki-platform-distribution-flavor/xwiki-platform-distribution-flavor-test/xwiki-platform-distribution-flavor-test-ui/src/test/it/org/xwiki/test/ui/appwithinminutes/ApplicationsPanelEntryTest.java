@@ -64,7 +64,7 @@ public class ApplicationsPanelEntryTest extends AbstractTest
         editQueryStringParameters.put("template", "AppWithinMinutes.LiveTableTemplate");
         editQueryStringParameters.put("AppWithinMinutes.LiveTableClass_0_class", "XWiki.XWikiUsers");
         getUtil().gotoPage(getTestClassName(), getTestMethodName(), "edit", editQueryStringParameters);
-        editPage = new ApplicationHomeEditPage().waitUntilPageIsLoaded();
+        editPage = new ApplicationHomeEditPage();
     }
 
     @Test

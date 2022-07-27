@@ -21,8 +21,7 @@
 DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
-Adds all jar files discovered in $JETTY_HOME/lib/ext
-and $JETTY_BASE/lib/ext to the servers classpath.
+Adds the jar file from $JETTY_HOME/lib/ext and $JETTY_BASE/lib/ext to the server classpath.
 
 [tags]
 classpath

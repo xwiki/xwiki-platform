@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -31,9 +32,13 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.SetUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
@@ -43,8 +48,8 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
+import org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheManager;
 
-import com.google.common.collect.Sets;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -71,12 +76,14 @@ import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 // TODO: migrate watchlist objects to filters instead of dynamically converting them every time
 // (see: https://jira.xwiki.org/browse/XWIKI-17243)
 @Deprecated
-public class WatchlistBridgeProvider implements NotificationFilterPreferenceProvider
+public class WatchlistBridgeProvider implements NotificationFilterPreferenceProvider, Initializable
 {
     /**
      * Hint of the provider.
      */
     public static final String PROVIDER_HINT = "watchlistbridge";
+
+    private static final String PREFERENCEFILTERCACHE_NAME = "WatchlistFilterPreferences";
 
     private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("XWiki",
         "WatchListClass");
@@ -96,7 +103,18 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     private WatchedEntitiesConfiguration configuration;
 
     @Inject
+    private UnboundedEntityCacheManager cacheManager;
+
+    @Inject
     private Logger logger;
+
+    private Map<EntityReference, Set<NotificationFilterPreference>> preferenceCache;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.preferenceCache = this.cacheManager.createCache(PREFERENCEFILTERCACHE_NAME, true);
+    }
 
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user)
@@ -105,10 +123,15 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
             return Collections.emptySet();
         }
 
+        Set<NotificationFilterPreference> results = this.preferenceCache.get(user);
+        if (results != null) {
+            return results;
+        }
+
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
-        Set<NotificationFilterPreference> results = new HashSet<>();
+        results = new HashSet<>();
         try {
             XWikiDocument document = xwiki.getDocument(user, context);
             List<BaseObject> objects = document.getXObjects(CLASS_REFERENCE.appendParent(user.getWikiReference()));
@@ -127,6 +150,8 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         } catch (XWikiException e) {
             logger.error("Failed to read the preferences of the watchlist for the user {}.", user, e);
         }
+
+        this.preferenceCache.put(user, results);
 
         return results;
     }
@@ -172,7 +197,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
         pref.setId(id);
         pref.setEnabled(true);
-        pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
+        pref.setNotificationFormats(SetUtils.hashSet(NotificationFormat.values()));
         pref.setProviderHint(PROVIDER_HINT);
         pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         pref.setFilterType(NotificationFilterType.INCLUSIVE);

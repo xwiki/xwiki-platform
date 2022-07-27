@@ -17,38 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($paths = {
-  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
-})
-#set ($discard = "#mimetypeimg('' '')")
-#set ($discard = $mimetypeMap.put('attachment', ['attach', 'attachment']))
-#foreach ($map in [$mimetypeMap, $extensionMap])
-  #foreach ($entry in $map.entrySet())
-    #set ($discard = $entry.value.set(0, $services.icon.getMetaData($entry.value.get(0))))
-    #set ($translationKey = "core.viewers.attachments.mime.$entry.value.get(1)")
-    #set ($discard = $entry.value.set(1, $services.localization.render($translationKey)))
-  #end
-#end
-#set ($l10nBundle = {
-  'upload': $services.localization.render('web.uicomponents.suggest.attachments.upload'),
-  'uploading': $services.localization.render('web.uicomponents.suggest.attachments.uploading', ['{0}']),
-  'uploadDone': $services.localization.render('web.uicomponents.suggest.attachments.uploadDone', ['{0}']),
-  'uploadFailed': $services.localization.render('web.uicomponents.suggest.attachments.uploadFailed', ['{0}'])
-})
-#[[*/
-// Start JavaScript-only code.
-(function(paths, contextPath, mimeTypeMap, extensionMap, l10nBundle) {
-  "use strict";
-
-require.config({paths});
-
 define('xwiki-attachments-store', ['jquery'], function($) {
   /**
    * Returns the REST URL that can be used to search or retrieve the attachments located inside the specified entity.
    */
   var getAttachmentsRestURL = function(entityReference, parameters) {
-    var path = [contextPath, 'rest'];
+    var path = [XWiki.contextPath, 'rest'];
     entityReference.getReversedReferenceChain().forEach(function(reference) {
       var restResourceType = reference.type === XWiki.EntityType.DOCUMENT ? 'page' :
         XWiki.EntityType.getName(reference.type);
@@ -103,7 +77,7 @@ define('xwiki-attachments-store', ['jquery'], function($) {
         }, false);
         return xhr;
       }
-    }).done($.proxy(deferred, 'resolve')).fail($.proxy(deferred, 'reject'));
+    }).then(deferred.resolve.bind(deferred), deferred.reject.bind(deferred));
     return deferred.promise();
   };
 
@@ -138,80 +112,6 @@ define('xwiki-attachments-store', ['jquery'], function($) {
     get: getAttachments,
     upload: attachFile,
     create: createAttachment
-  };
-});
-
-define('xwiki-attachments-icon', ['jquery'], function($) {
-  var getAttachmentIcon = function(attachment) {
-    if (typeof attachment.mimeType === 'string' && attachment.mimeType.substring(0, 6) === 'image/') {
-      var url = attachment.xwikiRelativeUrl;
-      // If the image URL is relative to the current page or is absolute (HTTP) then we can pass the icon width as a
-      // query string parameter to allow the image to be resized on the server side.
-      if (url.substring(0, 1) === '/' || url.substring(0, 7) === 'http://') {
-        url += (url.indexOf('?') < 0 ? '?' : '&') + 'width=48';
-      }
-      var icon = {
-        iconSetType: 'IMAGE',
-        url: url
-      };
-      if (attachment.file) {
-        // Show the icon using the local file while the file is being uploaded.
-        icon.promise = readAsDataURL(attachment.file).done(function(dataURL) {
-          icon.url = dataURL;
-        });
-      }
-      return icon;
-    } else {
-      return getIcon(attachment.mimeType, attachment.name);
-    }
-  };
-
-  var readAsDataURL = function(file) {
-    var deferred = $.Deferred();
-    if (typeof FileReader !== 'undefined') {
-      var fileReader = new FileReader();
-      fileReader.onload = function (event) {
-        deferred.resolve(event.target.result);
-      };
-      fileReader.readAsDataURL(file);
-    }
-    return deferred.promise();
-  };
-
-  var getIcon = function(mimeType, fileName) {
-    var extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-    if (mimeTypeMap.hasOwnProperty(mimeType)) {
-      return mimeTypeMap[mimeType][0];
-    } else if (extensionMap.hasOwnProperty(extension)) {
-      return extensionMap[extension][0];
-    } else {
-      var mimeTypePrefix = mimeType.substring(0, mimeType.indexOf('/') + 1);
-      if (mimeTypeMap.hasOwnProperty(mimeTypePrefix)) {
-        return mimeTypeMap[mimeTypePrefix][0];
-      } else {
-        return mimeTypeMap['attachment'][0];
-      }
-    }
-  };
-
-  var loadAttachmentIcon = function(attachment) {
-    var deferred = $.Deferred();
-    if (attachment.icon.iconSetType === 'IMAGE') {
-      var image = new Image();
-      image.onload = function() {
-        deferred.resolve(attachment);
-      };
-      image.src = attachment.icon.url;
-    } else {
-      // Nothing to load.
-      deferred.resolve(attachment);
-    }
-    return deferred.promise();
-  };
-
-  return {
-    getIcon: getAttachmentIcon,
-    loadIcon: loadAttachmentIcon
   };
 });
 
@@ -252,8 +152,10 @@ define('xwiki-attachments-filter', ['jquery'], function($) {
 
 define('xwiki-file-picker', ['jquery'], function($) {
   var pickLocalFiles = function(options) {
-    var deferred = $.Deferred();
+    return new Promise((resolve, reject) => pickLocalFilesPromise(options, {resolve, reject}));
+  };
 
+  var pickLocalFilesPromise = function(options, deferred) {
     // There's no clean way to detect when the file browser dialog is canceled so we must rely on a hack: catch
     // when the current window gets back the focus after the file browser dialog is closed, making sure the
     // listener is removed in case some files were selected. In some cases (e.g. Chrome on MacOS) the file browser
@@ -274,7 +176,7 @@ define('xwiki-file-picker', ['jquery'], function($) {
       fileInput.attr('accept', options.accept.replace(/\/(\s*(,|$))/g, '/*$1'));
     }
 
-    fileInput.change(function(event) {
+    fileInput.on('change', function(event) {
       // The user has selected some files to upload. Make sure the promise is not rejected.
       $(window).off('focus.filePicker');
       clearTimeout(rejectTimeout);
@@ -282,32 +184,19 @@ define('xwiki-file-picker', ['jquery'], function($) {
       fileInput.remove();
     // Open the file browser dialog.
     }).click();
-
-    return deferred.promise();
   };
 
   return {pickLocalFiles};
 });
 
-define('xwiki-l10n', ['jquery'], function($) {
-  var withParams = function(translation) {
-    return function() {
-      var result = translation;
-      $.each(arguments, function(index, value) {
-        result = result.replace('{' + index + '}', value);
-      });
-      return result;
-    };
-  };
-
-  return function(entries) {
-    $.each(entries, function(key, value) {
-      if (typeof value === 'string' && value.match(/{\d+}/)) {
-        entries[key] = withParams(value);
-      }
-    });
-    return entries;
-  };
+define('xwiki-suggestAttachments-messages', {
+  prefix: 'web.uicomponents.suggest.attachments.',
+  keys: [
+    'upload',
+    'uploading',
+    'uploadDone',
+    'uploadFailed'
+  ]
 });
 
 define('xwiki-suggestAttachments', [
@@ -316,11 +205,9 @@ define('xwiki-suggestAttachments', [
   'xwiki-attachments-icon',
   'xwiki-attachments-filter',
   'xwiki-file-picker',
-  'xwiki-l10n',
+  'xwiki-l10n!xwiki-suggestAttachments-messages',
   'xwiki-selectize'
-], function($, attachmentsStore, attachmentsIcon, attachmentsFilter, filePicker, L10n) {
-  var l10n = L10n(l10nBundle);
-
+], function($, attachmentsStore, attachmentsIcon, attachmentsFilter, filePicker, l10n) {
   var getSelectizeOptions = function(select) {
     return {
       maxOptions: 10,
@@ -343,10 +230,10 @@ define('xwiki-suggestAttachments', [
       // If nothing is specified then no restriction is applied.
       accept: select.data('accept'),
       load: function(text, callback) {
-        loadAttachments(text, this.settings).done(callback).fail(callback);
+        loadAttachments(text, this.settings).then(callback, callback);
       },
       loadSelected: function(text, callback) {
-        loadAttachment(text, this.settings).done(callback).fail(callback);
+        loadAttachment(text, this.settings).then(callback, callback);
       },
       create: function(input, callback) {
         if (input.length > 0) {
@@ -356,7 +243,7 @@ define('xwiki-suggestAttachments', [
           data[this.settings.valueField] = input;
           return data;
         } else {
-          createFromLocalFiles(this).done(callback).fail(callback);
+          createFromLocalFiles(this).then(callback, callback);
         }
       }
     };
@@ -398,13 +285,13 @@ define('xwiki-suggestAttachments', [
       name: text,
       types: options.accept,
       number: options.maxOptions
-    }).then($.proxy(processAttachments, null, options));
+    }).then(processAttachments.bind(null, options));
   };
 
   var loadAttachment = function(value, options) {
     var attachmentReference = getAttachmentReferenceFromValue(value, options);
     return attachmentsStore.get(attachmentReference)
-      .then($.proxy(processAttachment, null, options))
+      .then(processAttachment.bind(null, options))
       .then(function(attachment) {
         // An array is expected in xwiki.selectize.js
         return [attachment];
@@ -415,8 +302,8 @@ define('xwiki-suggestAttachments', [
    * Adapt the JSON returned by the REST call to the format expected by the Selectize widget.
    */
   var processAttachments = function(options, response) {
-    if ($.isArray(response.attachments)) {
-      return response.attachments.map($.proxy(processAttachment, null, options));
+    if (Array.isArray(response.attachments)) {
+      return response.attachments.map(processAttachment.bind(null, options));
     } else {
       return [];
     }
@@ -492,7 +379,7 @@ define('xwiki-suggestAttachments', [
         return oldCreate.apply(this, arguments);
       } else {
         // Allow the user to upload a file.
-        return $('<div class="create upload option"/>').text(l10n.upload);
+        return $('<div class="create upload option"></div>').text(l10n.upload);
       }
     };
 
@@ -520,7 +407,7 @@ define('xwiki-suggestAttachments', [
     return filePicker.pickLocalFiles({
       accept: selectize.settings.accept,
       multiple: selectize.settings.maxItems !== 1
-    }).then($.proxy(selectAndUploadFiles, null, selectize));
+    }).then(selectAndUploadFiles.bind(null, selectize));
   };
 
   var selectAndUploadFiles = function(selectize, files) {
@@ -535,20 +422,16 @@ define('xwiki-suggestAttachments', [
     selectize.addOption(attachments);
     // Uploading the files in parallel can cause problems, at least until XWIKI-13473 (Exception when the same document
     // is saved at the same time in 2 different threads) is fixed. Let's upload them sequentially for now.
-    var deferred = $.Deferred();
-    var uploadQueue = deferred;
-    attachments.forEach(function(attachment) {
+    attachments.reduce((uploadQueue, attachment) => {
       // Select the attachments.
       selectize.addItem(attachment.value);
       // Use the local file as icon while the file is being uploaded.
-      attachment.icon.promise && attachment.icon.promise.done(function() {
+      attachment.icon.promise && attachment.icon.promise.then(function() {
         selectize.updateOption(attachment.value, attachment);
       });
-      var uploadNextFile = $.proxy(uploadFileAndShowProgress, null, attachment, selectize);
-      uploadQueue = uploadQueue.then(uploadNextFile, uploadNextFile);
-    });
-    // Start the upload.
-    deferred.resolve();
+      var uploadNextFile = uploadFileAndShowProgress.bind(null, attachment, selectize);
+      return uploadQueue.then(uploadNextFile, uploadNextFile);
+    }, Promise.resolve());
     return attachments;
   };
 
@@ -564,8 +447,8 @@ define('xwiki-suggestAttachments', [
   };
 
   var uploadFileAndShowProgress = function(attachment, selectize) {
-    var attachmentName = '<em>' + $('<em/>').text(attachment.label).html() + '</em>';
-    var notification = new XWiki.widgets.Notification(l10n.uploading(attachmentName), 'inprogress');
+    var attachmentName = $('<em></em>').text(attachment.label).prop('outerHTML');
+    var notification = new XWiki.widgets.Notification(l10n.get('uploading', attachmentName), 'inprogress');
     attachment.data.upload = {
       status: 'pending',
       progress: {
@@ -575,21 +458,23 @@ define('xwiki-suggestAttachments', [
       }
     };
     return uploadFile(attachment.data)
-    .then($.proxy(processAttachment, null, selectize.settings))
+    .then(processAttachment.bind(null, selectize.settings))
     // Load the attachment icon before updating the display in order to reduce the flickering.
     .then(attachmentsIcon.loadIcon)
-    .progress(function(data) {
+    .progress(data => {
       attachment.data.upload.status = 'running';
       attachment.data.upload.progress = data;
       selectize.updateOption(attachment.value, attachment);
-    }).done(function(attachment) {
+    }).then(attachment => {
       attachment.data.upload = {status: 'done'};
       selectize.updateOption(attachment.value, attachment);
-      notification.replace(new XWiki.widgets.Notification(l10n.uploadDone(attachmentName), 'done'));
-    }).fail(function() {
+      notification.replace(new XWiki.widgets.Notification(l10n.get('uploadDone', attachmentName), 'done'));
+      return attachment;
+    }).catch(() => {
       attachment.data.upload.status = 'failed';
       selectize.updateOption(attachment.value, attachment);
-      notification.replace(new XWiki.widgets.Notification(l10n.uploadFailed(attachmentName), 'error'));
+      notification.replace(new XWiki.widgets.Notification(l10n.get('uploadFailed', attachmentName), 'error'));
+      return Promise.reject();
     });
   };
 
@@ -622,7 +507,7 @@ define('xwiki-suggestAttachments', [
   var onDropHTML = function(selectize, html) {
     $(html).find('[data-entity-type="ATTACHMENT"][data-entity-reference]').each(function() {
       var attachmentReference = XWiki.Model.resolve($(this).data('entityReference'), XWiki.EntityType.ATTACHMENT);
-      attachmentsStore.get(attachmentReference).done(function(attachment) {
+      attachmentsStore.get(attachmentReference).then(attachment => {
         var attachments = processAttachments(selectize.settings, {
           attachments: attachmentsFilter.filter([attachment], selectize.settings.accept)
         });
@@ -650,7 +535,7 @@ define('xwiki-suggestAttachments', [
         hint.remove();
       } else if (hint.length === 1) {
         // Show a bigger attachment icon.
-        $('<div class="xwiki-selectize-option-label-wrapper"/>')
+        $('<div class="xwiki-selectize-option-label-wrapper"></div>')
           .append(output.find('.xwiki-selectize-option-label'))
           .append(hint)
           .appendTo(output);
@@ -748,6 +633,3 @@ require(['jquery', 'xwiki-suggestAttachments', 'xwiki-attachmentResourcePicker',
   $(document).on('xwiki:dom:updated', init);
   $(init);
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $request.contextPath, $mimetypeMap, $extensionMap, $l10nBundle]));

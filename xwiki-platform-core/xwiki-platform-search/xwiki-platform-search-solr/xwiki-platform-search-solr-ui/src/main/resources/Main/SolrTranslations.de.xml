@@ -42,11 +42,9 @@ solr.admin.error.action={0} fehlgeschlagen:
 solr.admin.error.notallowed=Sie sind zur Ausführung dieser Aktion nicht berechtigt.
 solr.admin.error.norights=Sie benötigen Adminstratorenrechte, um diesen Abschnitt zu sehen.
 solr.admin.success.action={0} erfolgreich gestartet.
-
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Länge der Warteschlange
-solr.admin.status.queueSize.hint=Die Anzahl der Einträge, die noch  hinzugefügt, reindexiert oder aus dem Index gelöscht werden müssen (je nach gewählter Aktion).
-
+solr.admin.status.queueSize.hint=Die Anzahl der Einträge, die noch hinzugefügt, reindexiert oder aus dem Index gelöscht werden müssen (je nach gewählter Aktion).
 solr.admin.indexing.title=Indexiere
 solr.admin.indexing.action.label=Aktion
 solr.admin.indexing.action.hint=Die Aktion, die auf dem Index ausgeführt werden soll.
@@ -58,9 +56,7 @@ solr.admin.indexing.wiki.hint=Das Wiki, auf dessen Dokumente die ausgewählte Ak
 solr.admin.indexing.wiki.select_farm=Alle Wikis
 solr.admin.indexing.query.label=Einschränkende Abfrage
 solr.admin.indexing.query.hint=Optionale Abfrage, welche die gewählte Aktion nur mit den Dokumenten ausführt, die auf die Abfrage passen.
-
 solr.admin.info.affectedDocuments=Betroffene Dokumente im Index:
-
 solr.sortBy=Sortierung:
 solr.sortBy.score=Relevanz
 solr.sortBy.title_sort=Titel
@@ -72,20 +68,17 @@ solr.sortBy.attdate_sort=Hochgeladen am
 solr.sortBy.attauthor_display_sort=Hochgeladen von
 solr.sortOrder.asc=Aufsteigend
 solr.sortOrder.desc=Absteigend
-
 solr.options=Anzeigen:
 solr.options.highlight=Hervorheben
 solr.options.highlight.title=Einen Auszug dessen anzeigen, was mit den Suchergebnissen übereinstimmt
 solr.options.facet=Facetten
 solr.options.facet.title=Erlauben Sie die zusätzliche Filterung der Ergebnisse
-
 solr.result.language=Sprache
 solr.result.locatedIn=Speicherort
 solr.result.author=Geändert von {0} am {1}
 solr.result.mediaType=Dateityp {0}
 solr.result.uploadedBy=Hochgeladen von {0} am {1} ({2})
 solr.result.highlightAll=Alle Vorkommen anzeigen
-
 solr.facets.title=Suche verfeinern
 solr.facets.hint=Wählen Sie eine Kategorie aus und aktivieren Sie die Filter, um die aktuellen Suchergebnisse einzugrenzen
 solr.facets.resetAll=Zurücksetzen
@@ -93,12 +86,10 @@ solr.facets.expandAll=Alles aufklappen
 solr.facets.collapseAll=Alles zuklappen
 solr.facets.emptyValue=Leerer Wert
 solr.facets.moreValues={0} weitere
-
 solr.filterBy.type.document=Dokument
 solr.filterBy.type.attachment=Anhang
 solr.filterBy.type.object=Objekt
 solr.filterBy.type.object_property=Objekteigenschaft
-
 solr.filterBy.fileType.image=Bild
 solr.filterBy.fileType.audio=Audio
 solr.filterBy.fileType.video=Video
@@ -118,7 +109,6 @@ solr.facet.fileType.image.icon=Piktogramm
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
 solr.facet.fileType.other.octet-stream=Binärdaten
-
 solr.facet.date.today=Heute
 solr.facet.date.last7Days=Letzte 7 Tage
 solr.facet.date.last30Days=Letzte 30 Tage
@@ -131,7 +121,6 @@ solr.facet.date.between=Von {0} bis {1}
 solr.facet.date.after=Nach {0}
 solr.facet.date.before=Vor {0}
 solr.facet.date.any=Jedes Datum
-
 solr.facet.size.tiny=Winzig
 solr.facet.size.small=Klein
 solr.facet.size.medium=Mittel
@@ -140,7 +129,6 @@ solr.facet.size.between=Zwischen {0} und {1}
 solr.facet.size.lessThan=Weniger als {0}
 solr.facet.size.moreThan=Mehr als {0}
 solr.facet.size.any=Jede Größe
-
 solr.field.type=Ergebnistyp
 solr.field.locale=Sprache
 solr.field.locale.emptyValue=Ohne Sprachangabe
@@ -173,7 +161,6 @@ solr.field.attauthor=Hochgeladen von
 solr.field.attauthor_display=Hochgeladen von
 solr.field.attdate=Hochgeladen am
 solr.field.attsize=Dateigröße
-
 solr.uix.docdoesnotexist.title=Haben Sie stattdessen eine der folgenden Seiten gesucht?
 solr.uix.attachmentdoesnotexist.title=Haben Sie stattdessen nach einem der folgenden Anhänge gesucht?
 
@@ -187,5 +174,6 @@ solr.result.location=Gefunden in {0} » {1} » {2}
 solr.field.space=Bereich
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

@@ -184,16 +184,6 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     }
 
     /**
-     * Allows to init the hibernate configuration
-     *
-     * @throws org.hibernate.HibernateException
-     */
-    private synchronized void initHibernate() throws HibernateException
-    {
-        this.store.initHibernate();
-    }
-
-    /**
      * This get's the current session. This is set in beginTransaction
      *
      * @param inputxcontext
@@ -471,7 +461,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     }
 
     /**
-     * Initializes hibernate
+     * Initializes Hibernate.
      *
      * @param context
      * @throws HibernateException
@@ -479,7 +469,16 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     public void checkHibernate(XWikiContext context) throws HibernateException
     {
         if (getSessionFactory() == null) {
-            initHibernate();
+            // If not already initialized make sure to check/init but protected by a lock this time to make sure it's
+            // not done by several threads
+            checkHibernateSynchronized();
+        }
+    }
+
+    private synchronized void checkHibernateSynchronized() throws HibernateException
+    {
+        if (getSessionFactory() == null) {
+            this.store.initHibernate();
         }
     }
 

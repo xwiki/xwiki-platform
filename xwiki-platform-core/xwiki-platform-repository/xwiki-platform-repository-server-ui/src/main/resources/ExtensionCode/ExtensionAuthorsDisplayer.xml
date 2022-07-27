@@ -37,7 +37,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+#if ($xcontext.action == 'edit')
   #set($isEditMode = true)
 #else
   #set($isViewMode = true)

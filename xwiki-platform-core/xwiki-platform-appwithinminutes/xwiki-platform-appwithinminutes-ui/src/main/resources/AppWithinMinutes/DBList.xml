@@ -301,7 +301,7 @@ define('xwiki-awm-list-enhancer', ['jquery', 'xwiki-awm-class-field-enhancer'], 
     // relational storage if multiple selection is on.
     relationalStorageField.closest('dt').hide();
 
-    $('#' + field.getPropertyId('multiSelect')).click(function(event) {
+    $('#' + field.getPropertyId('multiSelect')).on('click', function(event) {
       if ($(this).prop('checked')) {
         // Enable relational storage whenever multiple selection is enabled.
         relationalStorageField.prop('checked', true);
@@ -329,7 +329,7 @@ define('xwiki-awm-list-enhancer', ['jquery', 'xwiki-awm-class-field-enhancer'], 
     // Initialize the state of the size meta property.
     sizeField.prop('readOnly', displayTypeField.val() !== 'select');
 
-    displayTypeField.change(function(event) {
+    displayTypeField.on('change', function(event) {
       // Use suggest picker whenever input display type is selected.
       useSuggestField.prop('checked', $(this).val() === 'input');
 

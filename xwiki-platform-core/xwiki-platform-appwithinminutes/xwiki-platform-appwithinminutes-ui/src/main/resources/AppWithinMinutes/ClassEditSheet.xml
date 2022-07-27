@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AppWithinMinutes.ClassEditSheet" locale="">
+<xwikidoc version="1.5" reference="AppWithinMinutes.ClassEditSheet" locale="">
   <web>AppWithinMinutes</web>
   <name>ClassEditSheet</name>
   <language/>
@@ -426,8 +426,6 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * Display the edit class form.
  *#
 #macro (displayEditForm)
-  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/effects.js'))
-  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
   #set ($discard = $xwiki.jsx.use('AppWithinMinutes.ClassEditSheet'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassEditSheet'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
@@ -809,6 +807,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -856,6 +856,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -1018,6 +1020,8 @@ return XWiki;
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -1065,6 +1069,8 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -1599,11 +1605,7 @@ return XWiki;
 }(XWiki || {}));
 
 (function() {
-  function init() {
-    var form = $('inline');
-    if (!form) {
-      return false;
-    }
+  function initForm(form) {
     // Let the sheet handle the form submit. The form is submitted by default to the preview action which dispatches the
     // request to the save action if the save button is detected on the request parameters. By submitting to the edit
     // action the edit sheet is evaluated and thus it can handle the save by itself.
@@ -1641,9 +1643,18 @@ return XWiki;
     // Make the palette and the canvas live.
     new XWiki.FormFieldPalette('palette');
     new XWiki.FormCanvas('canvas');
-
-    return true;
   }
+
+  function init() {
+    var form = $('inline');
+    if (form) {
+      require(['scriptaculous/dragdrop'], function() {
+        initForm(form);
+      });
+    }
+    return form;
+  }
+
   (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
 }).call();
 
@@ -1788,6 +1799,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -1816,6 +1829,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -1851,6 +1866,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -2035,6 +2052,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -2063,6 +2082,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -2098,6 +2119,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

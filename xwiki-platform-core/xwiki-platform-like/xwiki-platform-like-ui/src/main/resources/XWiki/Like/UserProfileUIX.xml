@@ -194,11 +194,16 @@
     ]
   }
 })
+#set ($currentUser = $services.model.serialize($doc.documentReference, "default"))
+#set ($sourceParameters = $escapetool.url({
+  'resultPage': 'XWiki.Like.Code.LiveTableResultPage',
+  'user': $currentUser
+}))
 ##
 {{liveData
   id='likedPages'
   source='liveTable'
-  sourceParameters='resultPage=XWiki.Like.Code.LiveTableResultPage'
+  sourceParameters="$sourceParameters"
   properties='doc.title,doc.location,like'
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>

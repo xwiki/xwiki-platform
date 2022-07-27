@@ -86,7 +86,6 @@ public interface NotificationFilterManager
      * @since 12.9RC1
      * @since 12.6.3
      */
-    @Unstable
     default Collection<NotificationFilter> getAllFilters(DocumentReference user, boolean onlyEnabled,
         NotificationFilter.FilteringPhase filteringPhase)
         throws NotificationException

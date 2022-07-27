@@ -17,21 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($paths = {
-  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
-})
-#[[*/
-// Start JavaScript-only code.
-(function(paths, contextPath) {
-  "use strict";
-
-require.config({paths});
-
 define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($) {
   var getSelectizeOptions = function(select) {
     var loadURL = [
-      contextPath, 'rest',
+      XWiki.contextPath, 'rest',
       'wikis', encodeURIComponent(XWiki.currentWiki),
       'classes', encodeURIComponent(select.attr('data-className')),
       'properties', encodeURIComponent(select.attr('data-propertyName')),
@@ -41,12 +30,12 @@ define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($)
     var getLoad = function(getOptions) {
       return function(text, callback) {
         $.getJSON(loadURL, getOptions(text)).then(function(response) {
-          if (response && $.isArray(response.propertyValues)) {
+          if (response && Array.isArray(response.propertyValues)) {
             return response.propertyValues.map(getSuggestion);
           } else {
             return [];
           }
-        }).done(callback).fail(callback);
+        }).then(callback, callback);
       };
     }
 
@@ -100,6 +89,3 @@ require(['jquery', 'xwiki-suggestPropertyValues', 'xwiki-events-bridge'], functi
   $(document).on('xwiki:dom:updated', init);
   $(init);
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $request.contextPath]));

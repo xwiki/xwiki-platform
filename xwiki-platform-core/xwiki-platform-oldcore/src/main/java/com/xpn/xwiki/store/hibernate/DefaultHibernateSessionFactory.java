@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.DisposePriority;
 
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 

@@ -1,3 +1,4 @@
 org.xwiki.container.servlet.internal.CacheControlRequestInitializer
 org.xwiki.container.servlet.internal.DefaultServletContainerInitializer
+org.xwiki.container.servlet.internal.HttpSessionManager
 900:org.xwiki.container.servlet.internal.LegacyEnvironmentConfiguration

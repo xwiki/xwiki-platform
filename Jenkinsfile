@@ -107,7 +107,7 @@ def builds = [
       name: 'TestRelease',
       goals: 'clean install',
       profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
-      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true -Ddoclint=all'
+      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddoclint=all'
     )
   },
   'Quality' : {
@@ -123,14 +123,8 @@ def builds = [
       name: 'Quality',
       goals: 'clean install jacoco:report sonar:sonar',
       profiles: 'quality,legacy,coverage',
-      // Note: We specify the "jvm" system property to to execute the tests with Java 8 in order to limit problems
-      // with more recent versions of Java. In the future, we'll need to be able to also execute the tests with
-      // Java 14+. Remove that when we support it. See for example https://jira.xwiki.org/browse/XCOMMONS-2136
-      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec -Djvm=/home/hudsonagent/java8/bin/java',
+      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec',
       sonar: true,
-      // Build with Java 14 since Sonar requires Java 11+ and we want at the same time to verify that XWiki builds
-      // with the latest Java version.
-      javaTool: 'java14'
     )
   }
 ]

@@ -28,7 +28,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.rest.model.jaxb.MapAdapter;
-import org.xwiki.stability.Unstable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,7 +43,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @since 12.10
  */
 @XmlJavaTypeAdapter(MapAdapter.class)
-@Unstable
 public class StringMap extends HashMap<String, Object>
 {
     /**

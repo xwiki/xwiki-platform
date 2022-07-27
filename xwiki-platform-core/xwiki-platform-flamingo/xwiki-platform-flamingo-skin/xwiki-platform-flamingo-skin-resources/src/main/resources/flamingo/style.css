@@ -6,13 +6,5 @@
 #if($index >= 0)
   #set($css = $css.substring(0, $index))
 #end
-## Remove from the CSS some rules that make IE9 crash using the WYSIWYG (XWIKI-10661)
-## Only if the user agent contains the IE9 signature
-## @TODO: Remove this when IE9 will no longer be supported.
-#if($request.getHeader('User-Agent').contains('MSIE 9.0'))
-  ## We removes css rules like ".className:empty{...}"
-  ## "(?s)" means that the expression "." matches any character, including a line terminator
-  #set($css = $css.replaceAll('(?s)\.[^\{]*:empty\{[^\}]*\}', ''))
-#end
 ## Display the CSS
 */$!css

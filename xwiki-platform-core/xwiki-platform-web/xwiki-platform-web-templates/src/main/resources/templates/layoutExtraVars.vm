@@ -26,4 +26,5 @@
  * #set($displayMainMenu = false)
  * #set($displayDocExtra = false)
  * #set($displayShortcuts = false)
+ * #set ($displayQuickSearch = false)
  *#

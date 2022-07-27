@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
@@ -123,7 +124,7 @@ public class UserEventDispatcherListener extends AbstractEventListener implement
             // Try to match one of the given descriptors with the current event.
             for (RecordableEventDescriptor descriptor : descriptorList) {
                 // Find a descriptor that corresponds to the given event
-                if (descriptor.getEventType().equals(eventStreamEvent.getType())) {
+                if (StringUtils.equals(descriptor.getEventType(), eventStreamEvent.getType())) {
                     // Add the event to the queue
                     this.dispatcher.addEvent(eventStreamEvent);
 

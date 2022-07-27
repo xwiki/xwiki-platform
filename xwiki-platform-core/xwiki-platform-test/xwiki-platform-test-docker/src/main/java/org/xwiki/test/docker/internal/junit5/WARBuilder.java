@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.RepositoryUtils;
@@ -61,6 +63,8 @@ public class WARBuilder
     private static final Logger LOGGER = LoggerFactory.getLogger(WARBuilder.class);
 
     private static final String JAR = "jar";
+
+    private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
 
     private ExtensionMojoHelper extensionHelper;
 
@@ -179,9 +183,9 @@ public class WARBuilder
             // Step: Unzip the Flamingo skin
             unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
 
-            // In order to work around issue https://jira.xwiki.org/browse/XWIKI-18335 with Jetty 10+, we replace
-            // jetty-web.xml with an overridden version when we're deploying on Jetty 10+
-            handleJetty10(webInfDirectory);
+            // In order to make XWiki work OOB in Jetty 9, we need to replace jetty-web.xml with an overridden
+            // version. TODO: Remove once we drop support for Jetty 9.
+            handleJetty9(webInfDirectory);
 
             // Mark it as having been built successfully
             touchMarkerFile();
@@ -190,46 +194,6 @@ public class WARBuilder
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
         this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
-    }
-
-    private void handleJetty10(File webInfDirectory) throws Exception
-    {
-        ServletEngine engine = this.testConfiguration.getServletEngine();
-        String tag = this.testConfiguration.getServletEngineTag();
-        if (engine == ServletEngine.JETTY && extractJettyVersionFromDockerTag(tag) >= 10) {
-            // Override the jetty-web.xml
-            copyJettyWebFile(webInfDirectory);
-        }
-    }
-
-    private void copyJettyWebFile(File webInfDirectory) throws Exception
-    {
-        File outputFile = new File(webInfDirectory, "jetty-web.xml");
-        if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... Override jetty-web.xml since Jetty version is >= 10");
-        }
-        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-            InputStream is = getClass().getClassLoader().getResourceAsStream("jetty10-web.xml");
-            IOUtils.copy(is, fos);
-        }
-    }
-
-    private int extractJettyVersionFromDockerTag(String tag)
-    {
-        int result;
-        // TODO: Latest is currently 9.4.x for Jetty. Change this when it's no longer the case.
-        if (this.testConfiguration.getServletEngineTag() == null) {
-            result = 9;
-        } else {
-            try {
-                result = Integer.valueOf(this.testConfiguration.getServletEngineTag().substring(0, 2));
-            } catch (Exception e) {
-                // This can happen for example if we have "9-jre11" since "9-" will raise a NumberFormatException.
-                // In this case consider we're on 9.
-                result = 9;
-            }
-        }
-        return result;
     }
 
     private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception
@@ -386,5 +350,43 @@ public class WARBuilder
     private File getMarkerFile()
     {
         return new File(this.targetWARDirectory, "build.marker");
+    }
+
+    private void handleJetty9(File webInfDirectory) throws Exception
+    {
+        ServletEngine engine = this.testConfiguration.getServletEngine();
+        String tag = this.testConfiguration.getServletEngineTag();
+        if (engine == ServletEngine.JETTY && extractJettyVersionFromDockerTag(tag) < 10) {
+            // Override the jetty-web.xml
+            copyJettyWebFile(webInfDirectory);
+        }
+    }
+
+    private void copyJettyWebFile(File webInfDirectory) throws Exception
+    {
+        File outputFile = new File(webInfDirectory, "jetty-web.xml");
+        if (this.testConfiguration.isVerbose()) {
+            LOGGER.info("... Override jetty-web.xml since Jetty version is < 10");
+        }
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            InputStream is = getClass().getClassLoader().getResourceAsStream("jetty9-web.xml");
+            IOUtils.copy(is, fos);
+        }
+    }
+
+    private int extractJettyVersionFromDockerTag(String tag)
+    {
+        int result = 10;
+        if (tag != null) {
+            Matcher matcher = MAJOR_VERSION.matcher(tag);
+            if (matcher.find()) {
+                try {
+                    result = Integer.valueOf(matcher.group());
+                } catch (NumberFormatException e) {
+                    // On error consider we're on Jetty 10
+                }
+            }
+        }
+        return result;
     }
 }

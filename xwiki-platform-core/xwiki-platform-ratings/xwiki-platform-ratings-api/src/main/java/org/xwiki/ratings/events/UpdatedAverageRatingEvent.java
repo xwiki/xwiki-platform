@@ -34,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public class UpdatedAverageRatingEvent extends AbstractAverageRatingEvent implements EndEvent
 {
     /**

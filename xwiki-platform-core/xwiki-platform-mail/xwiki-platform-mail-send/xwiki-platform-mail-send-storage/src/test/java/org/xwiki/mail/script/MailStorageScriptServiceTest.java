@@ -146,7 +146,7 @@ class MailStorageScriptServiceTest
     @Test
     void resendSynchronouslySeveralMessages() throws Exception
     {
-        Map filterMap = Collections.singletonMap("state", "prepare_%");
+        Map<String, Object> filterMap = Collections.singletonMap("state", "prepare_%");
 
         MailStatus status1 = new MailStatus();
         status1.setBatchId("batch1");

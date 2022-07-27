@@ -30,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;
@@ -57,9 +56,6 @@ public class XWQLQueryExecutor implements QueryExecutor
     @Inject
     private ModelContext context;
 
-    @Inject
-    private JobProgressManager progress;
-
     public QueryManager getQueryManager() throws ComponentLookupException
     {
         // We can't inject QueryManager because of cyclic dependency.
@@ -82,8 +78,6 @@ public class XWQLQueryExecutor implements QueryExecutor
 
         Query nativeQuery;
         try {
-            this.progress.startStep(query, "query.xwql.progress.execute", "Execute XWQL query [{}]", query);
-
             if (query.getWiki() != null) {
                 if (currentEntityReference.getType() == EntityType.WIKI) {
                     this.context.setCurrentEntityReference(new WikiReference(query.getWiki()));
@@ -93,9 +87,8 @@ public class XWQLQueryExecutor implements QueryExecutor
                 }
             }
 
-            nativeQuery =
-                getQueryManager().createQuery(this.translator.translate(query.getStatement()),
-                    this.translator.getOutputLanguage());
+            nativeQuery = getQueryManager().createQuery(this.translator.translate(query.getStatement()),
+                this.translator.getOutputLanguage());
             nativeQuery.setLimit(query.getLimit());
             nativeQuery.setOffset(query.getOffset());
             nativeQuery.setWiki(query.getWiki());
@@ -129,8 +122,6 @@ public class XWQLQueryExecutor implements QueryExecutor
                 + this.translator.getOutputLanguage() + "] language", query, e);
         } finally {
             this.context.setCurrentEntityReference(currentEntityReference);
-
-            this.progress.endStep(query);
         }
     }
 

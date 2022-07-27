@@ -163,7 +163,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     /**
      * {@inheritDoc}
      * <p>
-     * For this kind of resources, an XObject property (<tt>use</tt>) with the value <tt>always</tt> indicates always
+     * For this kind of resources, an XObject property ({@code use}) with the value {@code always} indicates always
      * used extensions. The list of extensions for each wiki is lazily placed in a cache: if the extension set for the
      * context wiki is null, then they will be looked up in the database and added to it. The cache is invalidated using
      * the notification mechanism.
@@ -185,7 +185,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
     /**
      * Returns the list of always used extensions of this type as a set of document references. For this kind of
-     * resources, an XObject property (<tt>use</tt>) with the value <tt>always</tt> indicates always used extensions.
+     * resources, an XObject property ({@code use}) with the value {@code always} indicates always used extensions.
      * The list of extensions for each wiki is lazily placed in a cache: if the extension set for the context wiki is
      * null, then they will be looked up in the database and added to it. The cache is invalidated using the
      * notification mechanism. Note that this method is called for each request, as the list might change in time, and
@@ -215,7 +215,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                         // Only add the extension as being "always used" if the page holding it has been saved with
                         // programming rights.
                         if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
-                            doc.getContentAuthorReference(), doc.getDocumentReference())) {
+                            doc.getAuthorReference(), doc.getDocumentReference())) {
                             extensions.add(extension);
                         }
                     } catch (XWikiException e1) {
@@ -236,14 +236,16 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     public boolean hasPageExtensions(XWikiContext context)
     {
         XWikiDocument doc = context.getDoc();
-        List<BaseObject> objects = doc.getObjects(getExtensionClassName());
-        if (objects != null) {
-            for (BaseObject obj : objects) {
-                if (obj == null) {
-                    continue;
-                }
-                if (obj.getStringValue(USE_FIELDNAME).equals("currentPage")) {
-                    return true;
+        if (doc != null) {
+            List<BaseObject> objects = doc.getObjects(getExtensionClassName());
+            if (objects != null) {
+                for (BaseObject obj : objects) {
+                    if (obj == null) {
+                        continue;
+                    }
+                    if (obj.getStringValue(USE_FIELDNAME).equals("currentPage")) {
+                        return true;
+                    }
                 }
             }
         }
@@ -331,7 +333,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             // new or already existing object
             if (document.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
                 if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
-                    document.getContentAuthorReference(), document.getDocumentReference())) {
+                    document.getAuthorReference(), document.getDocumentReference())) {
                     getAlwaysUsedExtensions().add(document.getDocumentReference());
 
                     return;
@@ -453,7 +455,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     protected String getDocumentSkinExtensionURL(DocumentReference documentReference, String documentName,
             String pluginName, XWikiContext context)
     {
-        String queryString = String.format("%s&amp;%s%s",
+        String queryString = String.format("%s&%s%s",
                 getLanguageQueryString(context),
                 getDocumentVersionQueryString(documentReference, context),
                 parametersAsQueryString(documentName, context));

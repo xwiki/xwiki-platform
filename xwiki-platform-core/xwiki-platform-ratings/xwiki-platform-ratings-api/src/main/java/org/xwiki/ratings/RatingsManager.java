@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.ratings.events.CreatedRatingEvent;
 import org.xwiki.ratings.events.UpdatedRatingEvent;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -36,7 +35,6 @@ import org.xwiki.user.UserReference;
  * @since 12.9RC1
  */
 @Role
-@Unstable
 public interface RatingsManager
 {
     /**
@@ -213,7 +211,6 @@ public interface RatingsManager
      * @throws RatingsException in case of problem during the query.
      * @since 12.10
      */
-    @Unstable
     long moveRatings(EntityReference oldReference, EntityReference newReference) throws RatingsException;
 
     /**

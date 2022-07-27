@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -40,6 +41,10 @@ import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.filter.instance.input.EntityEventGenerator;
 import org.xwiki.filter.instance.internal.input.AbstractBeanEntityEventGenerator;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -48,6 +53,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * @version $Id$
@@ -79,6 +85,29 @@ public class XWikiDocumentLocaleEventGenerator
     @Inject
     private EntityEventGenerator<BaseObject> objectEventGenerator;
 
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userSerializer;
+
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> compactwikiSerializer;
+
+    private String toString(UserReference userReference2)
+    {
+        DocumentReference userDocumentReference = this.userSerializer.serialize(userReference2);
+
+        String userString;
+
+        if (userDocumentReference != null) {
+            userString = this.compactwikiSerializer.serialize(userDocumentReference);
+        } else {
+            userString = XWikiRightService.GUEST_USER_FULLNAME;
+        }
+
+        return userString;
+    }
+
     @Override
     public void write(XWikiDocument document, Object filter, XWikiDocumentFilter documentFilter,
         DocumentInstanceInputProperties properties) throws FilterException
@@ -103,7 +132,7 @@ public class XWikiDocumentLocaleEventGenerator
                 }
             }
 
-            localeParameters.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, document.getCreator());
+            localeParameters.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, toString(document.getAuthors().getCreator()));
             localeParameters.put(WikiDocumentFilter.PARAMETER_CREATION_DATE, document.getCreationDate());
             localeParameters.put(WikiDocumentFilter.PARAMETER_LASTREVISION, document.getVersion());
 
@@ -155,12 +184,13 @@ public class XWikiDocumentLocaleEventGenerator
         revisionParameters.put(WikiDocumentFilter.PARAMETER_SYNTAX, document.getSyntax());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, document.isHidden());
 
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, document.getAuthor());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR, toString(document.getAuthors().getEffectiveMetadataAuthor()));
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR, toString(document.getAuthors().getOriginalMetadataAuthor()));
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, document.getComment());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_DATE, document.getDate());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_MINOR, document.isMinorEdit());
 
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, document.getContentAuthor());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, toString(document.getAuthors().getContentAuthor()));
         revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_DATE, document.getContentUpdateDate());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT, document.getContent());
 

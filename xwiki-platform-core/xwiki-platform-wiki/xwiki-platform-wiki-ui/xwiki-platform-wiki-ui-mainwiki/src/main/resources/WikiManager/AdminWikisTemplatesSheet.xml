@@ -57,7 +57,8 @@
   'className': 'XWiki.XWikiServerClass',
   'resultPage': 'WikiManager.WikisLiveTableResults',
   'translationPrefix': 'platform.wiki.browse.',
-  'onlyTemplates': '1'
+  'onlyTemplates': '1',
+  '$doc' : $doc.fullName
 }))
 {{liveData
   id='wikis'

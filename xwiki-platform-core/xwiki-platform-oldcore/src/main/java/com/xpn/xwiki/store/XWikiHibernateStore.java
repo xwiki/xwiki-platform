@@ -35,9 +35,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -66,10 +68,14 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageAttachmentReference;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
@@ -142,6 +148,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     @Inject
     private DocumentReferenceResolver<String> defaultDocumentReferenceResolver;
+
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<PageReference> currentPageReferenceDocumentReferenceResolver;
 
     /**
      * Used to convert a proper Document Reference to string (standard form).
@@ -578,18 +588,34 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     bclass.setDirty(false);
                 }
 
-                if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
-                    saveAttachmentList(doc, context);
-                }
                 // Remove attachments planned for removal
                 if (!doc.getAttachmentsToRemove().isEmpty()) {
                     for (XWikiAttachmentToRemove attachmentToRemove : doc.getAttachmentsToRemove()) {
                         XWikiAttachment attachment = attachmentToRemove.getAttachment();
-                        XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);
-                        store.deleteXWikiAttachment(attachment, false, context, false);
+
+                        XWikiAttachment attachmentToAdd = doc.getAttachment(attachment.getFilename());
+                        if (attachmentToAdd != null && attachmentToAdd.getId() == attachment.getId()) {
+                            // Hibernate does not like when the "same" database entity (from identifier point of view)
+                            // is manipulated through two different Java objects in the same session. But it also refuse
+                            // to delete and insert the "same" entity (still from id point of view) in the same
+                            // sessions. So when we hit such a case we only remove the attachment history and let the
+                            // saveAttachmentList code below update the current attachment content.
+                            AttachmentVersioningStore store = getAttachmentVersioningStore(attachment);
+                            store.deleteArchive(attachment, context, bTransaction);
+                            // Keep the same content store since we need to overwrite existing data
+                            attachmentToAdd.setContentStore(attachment.getContentStore());
+                        } else {
+                            XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);
+                            store.deleteXWikiAttachment(attachment, false, context, false);
+                        }
                     }
-                    doc.clearAttachmentsToRemove();
                 }
+                // Update/add new attachments
+                if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
+                    saveAttachmentList(doc, context);
+                }
+                // Reset the list of attachments to remove
+                doc.clearAttachmentsToRemove();
 
                 // Handle the latest text file
                 if (doc.isContentDirty() || doc.isMetaDataDirty()) {
@@ -597,7 +623,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     doc.setDate(ndate);
                     if (doc.isContentDirty()) {
                         doc.setContentUpdateDate(ndate);
-                        doc.setContentAuthorReference(doc.getAuthorReference());
+                        DocumentAuthors authors = doc.getAuthors();
+                        authors.setContentAuthor(authors.getEffectiveMetadataAuthor());
                     }
                     doc.incrementVersion();
                     if (context.getWiki().hasVersioning(context)) {
@@ -644,10 +671,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 Query query =
                     session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
                 query.setParameter("id", doc.getId());
+                if (query.uniqueResult() == null) {
+                    doc.setNew(true);
+                }
 
                 // Note: we don't use session.saveOrUpdate(doc) because it used to be slower in Hibernate than calling
                 // session.save() and session.update() separately.
-                if (query.uniqueResult() == null) {
+                if (doc.isNew()) {
                     if (doc.isContentDirty() || doc.isMetaDataDirty()) {
                         // Reset the creationDate to reflect the date of the first save, not the date of the object
                         // creation
@@ -688,15 +718,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 }
 
-                if (context.getWiki().hasBacklinks(context)) {
-                    try {
-                        saveLinks(doc, context, true);
-                    } catch (Exception e) {
-                        this.logger.error("Failed to save links for document [{}]",
-                            doc.getDocumentReferenceWithLocale(), e);
-                    }
-                }
-
                 // Update space table
                 updateXWikiSpaceTable(doc, session);
 
@@ -734,6 +755,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private void updateXWikiSpaceTable(XWikiDocument document, Session session)
     {
         if (document.getLocale().equals(Locale.ROOT)) {
+            // It's possible the space does not yet exist yet
+            maybeCreateSpace(document.getDocumentReference().getLastSpaceReference(), document.isHidden(), session);
+
             if (!document.isNew()) {
                 // If the hidden state of an existing document did not changed there is nothing to do
                 if (document.isHidden() != document.getOriginalDocument().isHidden()) {
@@ -746,22 +770,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         makeSpaceVisible(document.getDocumentReference().getLastSpaceReference(), session);
                     }
                 }
-            } else {
-                // It's possible the space of a new document does not yet exist
-                maybeCreateSpace(document.getDocumentReference().getLastSpaceReference(), document.isHidden(),
-                    document.getFullName(), session);
             }
         }
     }
 
-    private void insertXWikiSpace(XWikiSpace space, String newDocument, Session session)
+    private void insertXWikiSpace(XWikiSpace space, Session session)
     {
         // Insert the space
         session.save(space);
 
         // Update parent space
         if (space.getSpaceReference().getParent() instanceof SpaceReference) {
-            maybeCreateSpace((SpaceReference) space.getSpaceReference().getParent(), space.isHidden(), newDocument,
+            maybeCreateSpace((SpaceReference) space.getSpaceReference().getParent(), space.isHidden(),
                 session);
         }
     }
@@ -817,7 +837,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private void maybeCreateSpace(SpaceReference spaceReference, boolean hidden, String newDocument, Session session)
+    private void maybeCreateSpace(SpaceReference spaceReference, boolean hidden, Session session)
     {
         XWikiSpace space = loadXWikiSpace(spaceReference, session);
 
@@ -826,7 +846,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 makeSpaceVisible(space, session);
             }
         } else {
-            insertXWikiSpace(new XWikiSpace(spaceReference, hidden), newDocument, session);
+            insertXWikiSpace(new XWikiSpace(spaceReference, hidden), session);
         }
     }
 
@@ -985,10 +1005,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
+    public XWikiDocument loadXWikiDoc(XWikiDocument defaultDocument, XWikiContext inputxcontext) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
+        XWikiDocument doc = defaultDocument;
         try {
             boolean bTransaction = true;
             MonitorPlugin monitor = Util.getMonitorPlugin(context);
@@ -997,31 +1018,33 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 if (monitor != null) {
                     monitor.startTimer(HINT);
                 }
-                doc.setStore(this);
                 checkHibernate(context);
 
-                SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
+                SessionFactory sfactory = injectCustomMappingsInSessionFactory(defaultDocument, context);
                 bTransaction = bTransaction && beginTransaction(sfactory, context);
                 Session session = getSession(context);
                 session.setHibernateFlushMode(FlushMode.MANUAL);
 
-                try {
-                    session.load(doc, Long.valueOf(doc.getId()));
-                    doc.setNew(false);
-                    doc.setMostRecent(true);
-                    // Fix for XWIKI-1651
-                    doc.setDate(new Date(doc.getDate().getTime()));
-                    doc.setCreationDate(new Date(doc.getCreationDate().getTime()));
-                    doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
-                } catch (ObjectNotFoundException e) { // No document
-                    doc.setNew(true);
+                doc = session.get(XWikiDocument.class, doc.getId());
+                if (doc == null) {
+                    defaultDocument.setNew(true);
 
                     // Make sure to always return a document with an original version, even for one that does not exist.
                     // Allow writing more generic code.
-                    doc.setOriginalDocument(new XWikiDocument(doc.getDocumentReference(), doc.getLocale()));
+                    defaultDocument
+                        .setOriginalDocument(
+                            new XWikiDocument(defaultDocument.getDocumentReference(), defaultDocument.getLocale()));
 
-                    return doc;
+                    return defaultDocument;                    
                 }
+
+                doc.setStore(this);
+                doc.setNew(false);
+                doc.setMostRecent(true);
+                // Fix for XWIKI-1651
+                doc.setDate(new Date(doc.getDate().getTime()));
+                doc.setCreationDate(new Date(doc.getCreationDate().getTime()));
+                doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
 
                 // Loading the attachment list
                 if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
@@ -1130,7 +1153,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
-                Object[] args = { doc.getDocumentReference() };
+                Object[] args = { defaultDocument.getDocumentReferenceWithLocale() };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Exception while reading document [{0}]", e,
                     args);
@@ -1148,7 +1171,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
-            this.logger.debug("Loaded XWikiDocument: [{}]", doc.getDocumentReference());
+            this.logger.debug("Loaded XWikiDocument: [{}]", doc.getDocumentReferenceWithLocale());
 
             return doc;
         } finally {
@@ -1392,7 +1415,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     for (String key : xclass.getPropertyList()) {
                         if (object.safeget(key) == null) {
                             PropertyClass classProperty = (PropertyClass) xclass.getField(key);
-                            object.safeput(key, classProperty.newProperty());
+                            BaseProperty property = classProperty.newProperty();
+                            if (property != null) {
+                                object.safeput(key, property);
+                            }
                         }
                     }
                 }
@@ -1843,6 +1869,17 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
+    private boolean isDeleted(XWikiAttachment attachment, XWikiDocument doc)
+    {
+        for (XWikiAttachmentToRemove attachmentToRemove : doc.getAttachmentsToRemove()) {
+            if (attachmentToRemove.getAttachment().getFilename().equals(attachment.getFilename())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void saveAttachmentList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         try {
@@ -1850,7 +1887,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             List<XWikiAttachment> list = doc.getAttachmentList();
             for (XWikiAttachment attachment : list) {
-                saveAttachment(attachment, context);
+                saveAttachment(attachment, isDeleted(attachment, doc), context);
             }
 
         } catch (Exception e) {
@@ -1861,7 +1898,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private void saveAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
+    private void saveAttachment(XWikiAttachment attachment, boolean deleted, XWikiContext context) throws XWikiException
     {
         try {
             // If the comment is larger than the max size supported by the Storage, then abbreviate it
@@ -1879,9 +1916,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             boolean saveContent;
             if (exist) {
+                // Don't update the history if the document was actually not supposed to exist
                 // Don't update the attachment version if document metadata dirty is forced false (any modification to
                 // the attachment automatically set document metadata dirty to true)
-                if (attachment.isContentDirty() && attachment.getDoc().isMetaDataDirty()) {
+                if (!deleted && attachment.isContentDirty() && attachment.getDoc().isMetaDataDirty()) {
                     attachment.updateContentArchive(context);
                 }
 
@@ -2167,6 +2205,50 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext inputxcontext) throws XWikiException
     {
+        return innerLoadBacklinks(bTransaction, inputxcontext, (Session session) -> {
+            // the select clause is compulsory to reach the fullName i.e. the page pointed
+            Query<String> query = session.createQuery(
+                "select distinct backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink",
+                String.class);
+
+            // if we are in the same wiki context, we should only get the local reference
+            // but if we are not, then we have to check the full reference, containing the wiki part since
+            // it's how the link are recorded.
+            // This should be changed once the refactoring to support backlinks properly has been done.
+            // See: XWIKI-16192
+            query.setParameter("backlink", this.compactWikiEntityReferenceSerializer.serialize(documentReference));
+            return query;
+        });
+    }
+
+    @Override
+    public List<DocumentReference> loadBacklinks(AttachmentReference attachmentReference, boolean bTransaction,
+        XWikiContext inputxcontext) throws XWikiException
+    {
+        return innerLoadBacklinks(bTransaction, inputxcontext, (Session session) -> {
+            // the select clause is compulsory to reach the fullName i.e. the page pointed
+            Query<String> query = session.createQuery(
+                "select distinct backlink.fullName from XWikiLink as backlink "
+                    + "where backlink.id.link = :backlink "
+                    + "and backlink.id.type = :type "
+                    + "and backlink.attachmentName = :attachmentName", String.class);
+
+            // if we are in the same wiki context, we should only get the local reference
+            // but if we are not, then we have to check the full reference, containing the wiki part since
+            // it's how the link are recorded.
+            // This should be changed once the refactoring to support backlinks properly has been done.
+            // See: XWIKI-16192
+            query.setParameter("backlink",
+                this.compactWikiEntityReferenceSerializer.serialize(attachmentReference.getDocumentReference()));
+            query.setParameter("type", attachmentReference.getType().getLowerCase());
+            query.setParameter("attachmentName", attachmentReference.getName());
+            return query;
+        });
+    }
+
+    private List<DocumentReference> innerLoadBacklinks(boolean bTransaction, XWikiContext inputxcontext,
+        Function<Session, Query<String>> queryBuilder) throws XWikiException
+    {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         // Note: Ideally the method should return a Set but it would break the current API.
@@ -2182,20 +2264,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);
             }
-            Session session = getSession(context);
 
-            // the select clause is compulsory to reach the fullName i.e. the page pointed
-            Query<String> query = session.createQuery(
-                "select backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink", String.class);
-
-            // if we are in the same wiki context, we should only get the local reference
-            // but if we are not, then we have to check the full reference, containing the wiki part since
-            // it's how the link are recorded.
-            // This should be changed once the refactoring to support backlinks properly has been done.
-            // See: XWIKI-16192
-            query.setParameter("backlink", this.compactWikiEntityReferenceSerializer.serialize(documentReference));
-
-            List<String> backlinkNames = query.list();
+            Query<String> apply = queryBuilder.apply(getSession(context));
+            List<String> backlinkNames = apply.list();
 
             // Convert strings into references
             for (String backlinkName : backlinkNames) {
@@ -2248,8 +2319,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             Session session = getSession(context);
 
-            // need to delete existing links before saving the page's one
-            deleteLinks(doc.getId(), context, bTransaction);
+            // We delete the existing links before saving the newly analyzed ones. Unless non exists yet.
+            if (countLinks(doc.getId(), context, false) > 0) {
+                deleteLinks(doc.getId(), context, bTransaction);
+            }
 
             // necessary to blank links from doc
             context.remove("links");
@@ -2259,14 +2332,30 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             String fullName = this.localEntityReferenceSerializer.serialize(doc.getDocumentReference());
 
-            // Add wiki syntax links.
-            Set<String> linkedPages = doc.getUniqueLinkedPages(context);
-            for (String linkedPage : linkedPages) {
+            // Add entity references.
+            for (EntityReference entityReference : doc.getUniqueLinkedEntities(context)) {
                 XWikiLink wikiLink = new XWikiLink();
 
                 wikiLink.setDocId(doc.getId());
                 wikiLink.setFullName(fullName);
-                wikiLink.setLink(linkedPage);
+
+                // getUniqueLinkedEntities() returns both DOCUMENT and PAGE references (and ATTACHMENT and
+                // PAGE_ATTACHMENT references). If the reference is a PageReference (or a PageAttachmentReference) then
+                // we can't know if it points to a terminal page or a non-terminal one, and thus we need to get the
+                // document to check if it exists, starting with the non-terminal one since "[[page:test]]" points
+                // first to the non-terminal page when it exists.
+                EntityReference documentReferenceToSerialize =
+                    convertToDocumentReference(entityReference, inputxcontext);
+                wikiLink.setLink(this.localEntityReferenceSerializer.serialize(documentReferenceToSerialize));
+                boolean isAttachmentReference = false;
+                if (Objects.equals(entityReference.getType(), EntityType.ATTACHMENT)
+                    || Objects.equals(entityReference.getType(), EntityType.PAGE_ATTACHMENT))
+                {
+                    wikiLink.setAttachmentName(entityReference.getName());
+                    isAttachmentReference = true;
+                }
+                wikiLink.setType(isAttachmentReference ? EntityType.ATTACHMENT.getLowerCase()
+                    : EntityType.DOCUMENT.getLowerCase());
 
                 links.add(wikiLink);
             }
@@ -2279,7 +2368,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 wikiLink.setDocId(doc.getId());
                 wikiLink.setFullName(fullName);
                 wikiLink.setLink(includedPage);
-
+                wikiLink.setType(EntityType.DOCUMENT.getLowerCase());
                 links.add(wikiLink);
             }
 
@@ -2316,6 +2405,24 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
+    private EntityReference convertToDocumentReference(EntityReference entityReference, XWikiContext context)
+    {
+        // The passed entityReference can of type DOCUMENT, ATTACHMENT, PAGE or PAGE_ATTACHMENT.
+        EntityReference documentReference = entityReference;
+        if (documentReference instanceof PageAttachmentReference) {
+            documentReference = documentReference.extractReference(EntityType.PAGE);
+        }
+        if (documentReference instanceof PageReference) {
+            // If the reference is a PageReference then we can't know if it points to a terminal page or a
+            // non-terminal one, and thus we need to resolve it.
+            documentReference =
+                this.currentPageReferenceDocumentReferenceResolver.resolve((PageReference) documentReference);
+        } else {
+            documentReference = documentReference.extractReference(EntityType.DOCUMENT);
+        }
+        return documentReference;
+    }
+
     @Override
     public void deleteLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
@@ -2350,7 +2457,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             restoreExecutionXContext();
         }
     }
-
+    
     public void getContent(XWikiDocument doc, StringBuffer buf)
     {
         buf.append(doc.getContent());
@@ -3368,9 +3475,54 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return this.attachmentContentStore;
     }
 
+    private AttachmentVersioningStore getAttachmentVersioningStore(XWikiAttachment attachment)
+        throws ComponentLookupException
+    {
+        String storeHint = attachment.getArchiveStore();
+
+        if (storeHint != null && !storeHint.equals(HINT)) {
+            return this.componentManager.getInstance(AttachmentVersioningStore.class, storeHint);
+        }
+
+        return this.attachmentArchiveStore;
+    }
+
     @Override
     public int getLimitSize(XWikiContext context, Class<?> entityType, String propertyName)
     {
         return this.store.getLimitSize(entityType, propertyName);
+    }
+    
+    private long countLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
+    {
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
+
+        long count;
+
+        try {
+            if (bTransaction) {
+                checkHibernate(context);
+                bTransaction = beginTransaction(context);
+            }
+            Session session = getSession(context);
+            Query<Long> query =
+                session.createQuery("select count(*) from XWikiLink as link where link.id.docId = :docId")
+                    .setParameter("docId", docId);
+            count = query.getSingleResult();
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_BACKLINKS, "Exception while count backlinks", e);
+        } finally {
+            try {
+                if (bTransaction) {
+                    endTransaction(context, false);
+                }
+            } catch (Exception e) {
+            }
+
+            restoreExecutionXContext();
+        }
+
+        return count;
     }
 }

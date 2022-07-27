@@ -289,10 +289,10 @@
   var enhanceMediaTypeCategory = function() {
     var category = $(this);
     var subtypes = category.next('ul');
-    var selected = category.add(subtypes).find('.selected, input:checked').size() &gt; 0;
+    var selected = category.add(subtypes).find('.selected, input:checked').length &gt; 0;
     !selected &amp;&amp; category.addClass('closed');
     subtypes.toggle(selected);
-    category.find('.itemCount').click(function(event) {
+    category.find('.itemCount').on('click', function(event) {
       category.toggleClass('closed');
       subtypes.toggle();
     });

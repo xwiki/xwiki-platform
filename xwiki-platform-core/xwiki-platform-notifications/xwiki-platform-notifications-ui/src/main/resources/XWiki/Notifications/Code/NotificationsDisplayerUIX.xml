@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsDisplayerUIX" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsDisplayerUIX" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsDisplayerUIX</name>
   <language/>
@@ -44,7 +44,7 @@ Get the actual notifications.
 #if ('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'getNotifications' == $request.action)
   #set ($requestedDocumentReference = $services.model.resolveDocument($request.document))
   #macro (generateNotificationInput $id $reference $label)
-    &lt;label class="hidden" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
+    &lt;label class="sr-only" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
     &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
   #end
   {{html clean="false"}} ## we need clean="false" because we want to display the raw content
@@ -76,11 +76,9 @@ Get the actual notifications.
       #if ($services.notification.watch.isEnabled())
         &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
           #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatchedWithAllEventTypes($scope))checked="checked"#end#end
-          &lt;pre&gt;
-            #generateNotificationInput('notificationPageOnly' $requestedDocumentReference 'notifications.filters.preferences.label.page')
-            #generateNotificationInput('notificationPageAndChildren' $requestedDocumentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
-            #generateNotificationInput('notificationWiki' $requestedDocumentReference.wikiReference 'notifications.filters.preferences.label.wiki')
-          &lt;/pre&gt;
+          #generateNotificationInput('notificationPageOnly' $requestedDocumentReference 'notifications.filters.preferences.label.page')
+          #generateNotificationInput('notificationPageAndChildren' $requestedDocumentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
+          #generateNotificationInput('notificationWiki' $requestedDocumentReference.wikiReference 'notifications.filters.preferences.label.wiki')
         &lt;/div&gt;
       #end
       &lt;div class="notifications-header-uix col-xs-12"&gt;
@@ -318,9 +316,9 @@ Get the actual notifications.
     var markAllReadButton = $('&lt;a href="#"&gt;')
       .addClass('notification-event-clean')
       .html('$services.icon.renderHTML("trash")&amp;nbsp;$escapetool.xml($escapetool.javascript($services.localization.render('notifications.menu.clear')))')
-      .click(function (event) {
+      .on('click', function (event) {
         // Avoid the menu closing
-        event.stopPropagation();
+        event.preventDefault();
         // Ask confirmation
         new XWiki.widgets.ConfirmationBox({
           onYes: function(event) {
@@ -333,7 +331,7 @@ Get the actual notifications.
               outputSyntax: 'plain',
               action: 'clear',
               date: startDate
-            }).success(function (){
+            }).then(() =&gt; {
               // Display the success message
               notification.hide();
               new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.cleared'))", 'done');
@@ -384,7 +382,7 @@ Get the actual notifications.
   /**
    * Initialize the widget.
    */
-  $(document).ready(function () {
+  $(function () {
 
     var container = $('.notification-uix');
     getUnreadNotificationsCount();
@@ -400,10 +398,10 @@ Get the actual notifications.
     /**
      * Prevent the dropdown menu for being closed when the user clicks on the notifications menu.
      */
-    $('#tmNotifications .dropdown-menu').click(function(event) {
+    $('#tmNotifications .dropdown-menu').on('click', function(event) {
       event.stopPropagation();
     });
-    
+
     var processEvents = function (mutations) {
       for (var i = 0; i &lt; mutations.length; i++) {
         var mutation = mutations[i];
@@ -437,8 +435,8 @@ Get the actual notifications.
           outputSyntax: 'html',
           action: 'getNotifications',
           document: documentReference
-        }).success(function (data){
-          $('.notification-uix').html(data).removeClass('loading');
+        }).then(html =&gt; {
+          $('.notification-uix').html(html).removeClass('loading');
           $('.notification-uix').find('.notifications-macro').each(function() {
             new XWikiAsyncNotificationsMacro(this);
           });
@@ -551,20 +549,7 @@ Get the actual notifications.
     </property>
     <property>
       <code>#if ($services.notification.watch.isEnabled())
-## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
-#set ($jsExtension = '.min.js')
-#if (!$services.debug.minify)
-  #set ($jsExtension = '.js')
-#end
-require.config({
-  paths: {
-    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', "js/bootstrap-switch${jsExtension}")'
-  },
-  shim: {
-    'bootstrap-switch' : ['jquery']
-  }
-});
-require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, xm) {
+require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
   'use strict';
   // Most of the code comes from the deprecated Watchlist Application
   $(document).on('xwiki:notification:loaded', function() {
@@ -616,7 +601,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         placement: 'bottom'
       });
     }
-    
+
     allWatchSwitches.bootstrapSwitch('size', 'small');
 
     /**
@@ -635,7 +620,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         'location': location,
         'type': type,
         'currentDoc': XWiki.Model.serialize(xm.documentReference)
-      }).done(function (data) {
+      }).then(data =&gt; {
         // Unfortunately, bootstrap switch does not allow to change the state if it is disabled
         allWatchSwitches.bootstrapSwitch('disabled', false);
         // Update states
@@ -643,11 +628,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         watchSpaceSwitch.bootstrapSwitch('state', data.space, true);
         watchWikiSwitch.bootstrapSwitch('state', data.wiki, true);
         // Display success message
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).fail (function() {
-        notification.hide();
-        new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('notifications.switches.changeStatusError'))', 'error');
+        notification.replace(new XWiki.widgets.Notification(
+          "$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done'));
+      }).catch(() =&gt; {
+        notification.replace(new XWiki.widgets.Notification(
+          '$escapetool.javascript($services.localization.render('notifications.switches.changeStatusError'))', 'error'));
         allWatchSwitches.bootstrapSwitch('disabled', false);
       });
     };
@@ -668,7 +653,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     ///
     /// Avoid the dropdown menu to be closed when the user click on the bootstrap switch
     ///
-    $('.notifications-toggles .bootstrap-switch').click(function(event) {
+    $('.notifications-toggles .bootstrap-switch').on('click', function(event) {
       event.stopImmediatePropagation();
     });
  });
@@ -896,11 +881,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         <number>4</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

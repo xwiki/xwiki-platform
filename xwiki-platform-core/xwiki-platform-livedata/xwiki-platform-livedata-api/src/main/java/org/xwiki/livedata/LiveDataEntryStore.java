@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * The interface used to store and retrieve live data entries.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Role
-@Unstable
 public interface LiveDataEntryStore
 {
     /**

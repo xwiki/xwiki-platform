@@ -68,7 +68,10 @@ rendering.macro.notifications.parameter.tags.name=Теги
 rendering.macro.notifications.parameter.tags.description=Список тегов для рассмотрения (через запятую). Это работает только на текущей вики. Игнорируется, если для «useUserPreferences» установлено значение «true».
 notifications.macro.noWatchedUsers=Вы ни на кого не подписаны.
 notifications.macro.whenNotView=Макрос уведомлений. Может быть видно в режиме просмотра.
+notifications.macro.markEventAsRead=Отметить как прочитанное
+notifications.macro.showEventDetails=Показать подробности уведомления
 notifications.menu.nothing=Нет доступных уведомлений!
 notifications.menu.more=Загрузить старые уведомления
-notifications.menu.details=Подробности ({0})</content>
+notifications.menu.details=Подробности ({0})
+</content>
 </xwikidoc>

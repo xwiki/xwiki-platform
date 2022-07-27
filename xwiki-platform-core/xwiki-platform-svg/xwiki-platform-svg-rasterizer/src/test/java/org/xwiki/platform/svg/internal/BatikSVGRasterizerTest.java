@@ -251,7 +251,7 @@ public class BatikSVGRasterizerTest
         Response r = Mockito.mock(Response.class);
         when(this.container.getResponse()).thenReturn(r);
         this.mocker.getComponentUnderTest().rasterizeToResponse(VALID_SVG, 100, 200);
-        Mockito.verifyZeroInteractions(r);
+        Mockito.verifyNoInteractions(r);
     }
 
     @Test

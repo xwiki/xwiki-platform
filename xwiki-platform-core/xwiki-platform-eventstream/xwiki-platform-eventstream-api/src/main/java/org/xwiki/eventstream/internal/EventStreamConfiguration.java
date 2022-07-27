@@ -36,6 +36,8 @@ import org.xwiki.eventstream.EventStore;
 @Singleton
 public class EventStreamConfiguration
 {
+    private static final String KEY_STORE = "eventstream.store";
+
     @Inject
     private ConfigurationSource configuration;
 
@@ -44,7 +46,15 @@ public class EventStreamConfiguration
      */
     public String getEventStore()
     {
-        return this.configuration.getProperty("eventstream.store", "solr");
+        return this.configuration.getProperty(KEY_STORE, "solr");
+    }
+
+    /**
+     * @return true if the event store is explicitly set
+     */
+    public boolean isEventStoreSet()
+    {
+        return this.configuration.containsKey(KEY_STORE);
     }
 
     /**

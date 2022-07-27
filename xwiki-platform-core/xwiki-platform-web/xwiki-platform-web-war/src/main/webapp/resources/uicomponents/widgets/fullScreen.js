@@ -339,9 +339,7 @@ widgets.FullScreen = Class.create({
       parent.siblings().each(function(item) {
         // if the element has been hidden by us, we should rollback its style
         if (item._fullscreenHidden) {
-          // IE8 does not like null values. Default to "" (specific to each element's type) for elements that were added
-          // while in full screen mode (like the Save & Continue notifications) and which don't have the _originalDisplay set.
-          item.style['display'] = item._originalDisplay || "";
+          item.style['display'] = item._originalDisplay;
         }
       });
     }
@@ -359,16 +357,8 @@ widgets.FullScreen = Class.create({
       // Replace the Restore button in the toolbar with the Maximize one
       this.closeButton.replace(targetElement._x_fullScreenActivator);
     }
-    if (Prototype.Browser.IE) {
-      // IE crashes if we try to resize this without a bit of delay.
-      setTimeout(function() {
-        targetElement._x_fullScreenActivator.show();
-        this.setStyle(this._originalStyle);
-      }.bind(targetElement), 500);
-    } else {
-      targetElement._x_fullScreenActivator.show();
-      targetElement.setStyle(targetElement._originalStyle);
-    }
+    targetElement._x_fullScreenActivator.show();
+    targetElement.setStyle(targetElement._originalStyle);
     // No element is maximized anymore
     delete this.maximized;
     if (this.maximizedReference) {

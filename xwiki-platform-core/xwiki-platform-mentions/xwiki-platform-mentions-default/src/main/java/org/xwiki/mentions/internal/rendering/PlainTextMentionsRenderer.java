@@ -36,7 +36,7 @@ import org.xwiki.mentions.internal.MentionFormatterProvider;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 
 /**
- * Plain text rendered with a specialization to display well formatted user mentions.
+ * Plain text rendered with a specialization to display well-formatted user mentions.
  *
  * @version $Id$
  * @since 12.6
@@ -57,12 +57,7 @@ public class PlainTextMentionsRenderer extends PlainTextRenderer implements Init
             String style = parameters.get("style");
             String type = parameters.get("type");
 
-            DisplayStyle displayStyle;
-            if (style != null) {
-                displayStyle = DisplayStyle.valueOf(style);
-            } else {
-                displayStyle = DisplayStyle.FULL_NAME;
-            }
+            DisplayStyle displayStyle = DisplayStyle.getOrDefault(style);
 
             // Uses the "user" type when the mention has an undefined type.
             String hint;

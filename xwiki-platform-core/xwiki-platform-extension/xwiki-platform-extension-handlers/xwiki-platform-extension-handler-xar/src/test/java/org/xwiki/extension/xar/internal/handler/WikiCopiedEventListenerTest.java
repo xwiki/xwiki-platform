@@ -36,8 +36,8 @@ import org.xwiki.extension.test.EmptyExtension;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AfterComponent;
@@ -74,7 +74,7 @@ public class WikiCopiedEventListenerTest
     {
         // avoid dependency issue with refactoring listeners
         this.repositoryUtil.getComponentManager().registerMockComponent(ModelBridge.class);
-        this.repositoryUtil.getComponentManager().registerMockComponent(LinkRefactoring.class);
+        this.repositoryUtil.getComponentManager().registerMockComponent(ReferenceUpdater.class);
 
         this.localExtensionRepository =
             this.repositoryUtil.getComponentManager().getInstance(LocalExtensionRepository.class);

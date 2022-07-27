@@ -19,7 +19,6 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,7 +39,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
-public class DefaultFilesystemAttachmentsConfigurationTest
+class DefaultFilesystemAttachmentsConfigurationTest
 {
     @InjectMockComponents
     private DefaultFilesystemAttachmentsConfiguration configuration;
@@ -50,7 +49,7 @@ public class DefaultFilesystemAttachmentsConfigurationTest
     private ConfigurationSource configurationSource;
 
     @Test
-    public void cleanOnStartup()
+    void cleanOnStartup()
     {
         when(configurationSource.getProperty("store.fsattach.cleanOnStartup", Boolean.TRUE)).thenReturn(true);
         assertTrue(configuration.cleanOnStartup());
@@ -58,7 +57,7 @@ public class DefaultFilesystemAttachmentsConfigurationTest
     }
 
     @Test
-    public void getDirectory() throws IOException
+    void getDirectory() throws IOException
     {
         assertNull(configuration.getDirectory());
 

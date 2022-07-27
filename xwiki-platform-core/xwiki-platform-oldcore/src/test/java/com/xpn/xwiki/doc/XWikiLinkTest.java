@@ -29,11 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  *
  * @version $Id$
  */
-public class XWikiLinkTest
+class XWikiLinkTest
 {
-
     @Test
-    public void testXWikiLinkEquals()
+    void testXWikiLinkEquals()
     {
         final long docId = 101;
         final String link = "test link";
@@ -60,19 +59,21 @@ public class XWikiLinkTest
     }
 
     @Test
-    public void testXWikiLinkToString()
+    void testXWikiLinkToString()
     {
         final long docId = 101;
         final String link = "test link";
         final String fullName = "test fullName";
 
         XWikiLink xWikiLink = new XWikiLink();
-        assertEquals("DocId = [0], FullName = [<null>], Link = [<null>]", xWikiLink.toString());
+        assertEquals("DocId = [0], FullName = [<null>], Link = [<null>], Type = [<null>], AttachmentName = [<null>]",
+            xWikiLink.toString());
 
         xWikiLink.setDocId(docId);
         xWikiLink.setLink(link);
         xWikiLink.setFullName(fullName);
-        assertEquals("DocId = [101], FullName = [test fullName], Link = [test link]", xWikiLink.toString());
-
+        assertEquals(
+            "DocId = [101], FullName = [test fullName], Link = [test link], Type = [<null>], AttachmentName = [<null>]",
+            xWikiLink.toString());
     }
 }

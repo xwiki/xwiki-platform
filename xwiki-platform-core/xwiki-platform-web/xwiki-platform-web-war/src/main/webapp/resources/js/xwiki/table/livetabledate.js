@@ -19,8 +19,6 @@
  */
 /*!
 #set ($paths = {
-  'moment': $services.webjars.url('momentjs', 'min/moment.min'),
-  'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
   'daterangepicker': $services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')
 })
 #set ($l10nKeys = ['today', 'yesterday', 'lastSevenDays', 'lastThirtyDays', 'thisMonth', 'lastMonth', 'clear', 'apply',

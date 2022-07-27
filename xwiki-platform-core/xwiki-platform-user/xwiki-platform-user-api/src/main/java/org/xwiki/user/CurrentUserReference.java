@@ -19,15 +19,12 @@
  */
 package org.xwiki.user;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a reference to the current logged-in user.
  *
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 public final class CurrentUserReference implements UserReference
 {
     /**

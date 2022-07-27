@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,6 +53,7 @@ import org.xwiki.extension.test.po.flavor.FlavorPicker;
 import org.xwiki.extension.test.po.flavor.FlavorPickerInstallStep;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.model.namespace.WikiNamespace;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.test.ui.po.ViewPage;
@@ -115,10 +117,6 @@ public class UpgradeTest extends AbstractTest
     private static final String STEP_EXTENSIONS_NAME = "Extensions";
 
     private static final int STEP_EXTENSIONS_ID = 3;
-
-    private static final String STEP_EVENTSMIGRATION_NAME = "Events migration";
-
-    private static final int STEP_EVENTSMIGRATION_ID = 4;
 
     /**
      * Automatically register as Admin user.
@@ -228,11 +226,6 @@ public class UpgradeTest extends AbstractTest
         extensionsStep();
 
         ////////////////////
-        // Validate Events Migration step
-
-        eventsMigrationStep();
-
-        ////////////////////
         // Validate Report step
 
         reportStep();
@@ -247,9 +240,14 @@ public class UpgradeTest extends AbstractTest
 
         // Make sure the watchlist UI has been uninstalled
         assertNotInstalledOnMainWiki(EXTENSIONID_WATCHLIST_UI);
+
         // Make sure the previous codemirror versions have been replaced
         assertNotInstalled(EXTENSIONID_CODEMIRROR_58);
         assertNotInstalled(EXTENSIONID_CODEMIRROR_5242);
+
+        // Make sure it's possible to create a page with 768 characters in the reference
+        getUtil().rest()
+            .savePage(new LocalDocumentReference("Upgrade", StringUtils.repeat("a", 768 - "Upgrade".length() - 1)));
 
         ////////////////////
         // Custom validation
@@ -289,9 +287,6 @@ public class UpgradeTest extends AbstractTest
         assertEquals(4, icons.get(STEP_EXTENSIONS_ID).getNumber());
         assertEquals(STEP_EXTENSIONS_ID + 1, icons.get(STEP_EXTENSIONS_ID).getNumber());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
-        assertEquals(5, icons.get(STEP_EVENTSMIGRATION_ID).getNumber());
-        assertEquals(STEP_EVENTSMIGRATION_ID + 1, icons.get(STEP_EVENTSMIGRATION_ID).getNumber());
-        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
 
         // Go to next step
         step.clickCompleteStep();
@@ -316,9 +311,6 @@ public class UpgradeTest extends AbstractTest
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
-        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isDone());
-        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isActive());
-        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
 
         // Make sure complete step is disabled
         assertFalse(step.isCompleteStepDisabled());
@@ -460,9 +452,6 @@ public class UpgradeTest extends AbstractTest
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
-        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isDone());
-        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isActive());
-        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
 
         // Confirm the extension to uninstall/make top level
         CleanApplyDistributionStep cleanApply = step.clickContinue();
@@ -505,47 +494,9 @@ public class UpgradeTest extends AbstractTest
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
         assertTrue(icons.get(STEP_EXTENSIONS_ID).isActive());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
-        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isDone());
-        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isActive());
-        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
 
         // Search for extension update
         step.checkForUpdates();
-
-        // TODO: check some stuff
-
-        // Go to next step
-        step.clickCompleteStep();
-    }
-
-    private void eventsMigrationStep()
-    {
-        CleanDistributionStep step = new CleanDistributionStep();
-
-        // Steps
-
-        List<DistributionStepIcon> icons = step.getIcons();
-
-        // Make sure the events migration step is active
-        if (!icons.get(STEP_EVENTSMIGRATION_ID).isActive()) {
-            return;
-        }
-
-        assertTrue(icons.get(STEP_ADMIN_ID).isDone());
-        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
-        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
-        assertTrue(icons.get(STEP_FLAVOR_ID).isDone());
-        assertFalse(icons.get(STEP_FLAVOR_ID).isActive());
-        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
-        assertTrue(icons.get(STEP_ORPHANED_ID).isDone());
-        assertFalse(icons.get(STEP_ORPHANED_ID).isActive());
-        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
-        assertTrue(icons.get(STEP_EXTENSIONS_ID).isDone());
-        assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
-        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
-        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isDone());
-        assertTrue(icons.get(STEP_EVENTSMIGRATION_ID).isActive());
-        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
 
         // TODO: check some stuff
 
@@ -572,9 +523,6 @@ public class UpgradeTest extends AbstractTest
         assertTrue(icons.get(STEP_EXTENSIONS_ID).isDone());
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
-        assertTrue(icons.get(STEP_EVENTSMIGRATION_ID).isDone());
-        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isActive());
-        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
 
         // Finish
         step.clickCompleteStep();

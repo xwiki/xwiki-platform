@@ -714,7 +714,7 @@ require(['jquery'], function($) {
     // Filter the categories.
     panelGroup.find('a.panel-heading').each(function() {
       var panel = $(this).closest('.panel');
-      var hasVisibleSections = panel.find('.list-group-item').not('.hidden').size() &gt; 0;
+      var hasVisibleSections = panel.find('.list-group-item').not('.hidden').length &gt; 0;
       var matchesFilterQuery = !filterItem.call($(this), text);
       panel.toggle(hasVisibleSections || matchesFilterQuery);
       if (!hasVisibleSections &amp;&amp; matchesFilterQuery) {
@@ -738,7 +738,7 @@ require(['jquery'], function($) {
         .next('.panel-collapse').addClass('in').css('height', '');
     }
     // Show/Hide the "No results." message.
-    var hasVisibleCategories = panelGroup.find('a.panel-heading').filter(':visible').size() &gt; 0;
+    var hasVisibleCategories = panelGroup.find('a.panel-heading').filter(':visible').length &gt; 0;
     panelGroup.find('.noitems').toggleClass('hidden', hasVisibleCategories);
   };
 
@@ -749,7 +749,7 @@ require(['jquery'], function($) {
     var panelGroup = $(this).closest('.panel-group');
     var text = $(this).val().toLowerCase();
     // Schedule a new filter operation.
-    timeoutId = setTimeout($.proxy(filterPanelGroup, panelGroup, text), 500);
+    timeoutId = setTimeout(filterPanelGroup.bind(panelGroup, text), 500);
 
   // Finally, enable the search input.
   }).prop('disabled', false);

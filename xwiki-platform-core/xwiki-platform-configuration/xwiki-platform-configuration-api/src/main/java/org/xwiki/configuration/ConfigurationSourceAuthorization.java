@@ -20,7 +20,6 @@
 package org.xwiki.configuration;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -29,7 +28,6 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @since 12.4RC1
  */
-@Unstable
 @Role
 public interface ConfigurationSourceAuthorization
 {

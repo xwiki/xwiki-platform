@@ -24,10 +24,16 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.observation.event.Event;
 
 /**
- * The configuration of the default Notification Filter Preference implementation.
- * 
+ * The configuration of the default Notification Filter Preference implementation. Note: the configuration options
+ * {@link #useLocalStore()} and {@link  #useMainStore()} are not used in a consistent way.
+ * {@link DocumentMovedListener#onEvent(Event, Object, Object)} consider that both method can return {@code true} at the
+ * same time, meaning that preferences can be stored duplicated in both the main wiki and a local wiki if both options
+ * are true. Whereas, {@link NotificationFilterPreferenceStore} only consider {@link #useMainStore()} to decides where
+ * to store the preferences.
+ *
  * @version $Id$
  * @since 12.6
  */
@@ -41,7 +47,12 @@ public class NotificationFilterPreferenceConfiguration
     private ConfigurationSource configurationSource;
 
     /**
-     * @return true if the filter preferences should must be stored in the main wiki, false otherwise
+     * Indicates if the filter preference must be stored in the local wiki, by reading the
+     * {@code eventstream.usemainstore} and {@code eventstream.uselocalstore} properties. The default value of the
+     * properties is {@code true}.
+     *
+     * @return {@code false} if {@link #useMainStore()} returns {@code true}, and {@code eventstream.uselocalstore} is
+     *     {@code false}, {@code true} is returned otherwise
      */
     public boolean useLocalStore()
     {
@@ -50,23 +61,22 @@ public class NotificationFilterPreferenceConfiguration
             return true;
         }
 
-        return getProperty("uselocalstore", true);
+        return getProperty("uselocalstore");
     }
 
     /**
-     * This method determine if filter preferences must be stored in the main wiki. If the current wiki is the main
-     * wiki, this method returns false, otherwise if retrieves the configuration option. If the option is not found the
-     * method returns true (default behavior).
+     * Indicates if the filter preference must be stored in the main wiki, by reading the
+     * {@code eventstream.usemainstore} property. The default value is {@code true}.
      *
-     * @return true if the filter preferences should be stored in the main wiki, false otherwise
+     * @return {@code true} if the filter preferences should be stored in the main wiki, {@code false} otherwise
      */
     public boolean useMainStore()
     {
-        return getProperty("usemainstore", true);
+        return getProperty("usemainstore");
     }
 
-    private boolean getProperty(String name, boolean defaultValue)
+    private boolean getProperty(String name)
     {
-        return this.configurationSource.getProperty(PREFERENCE_PREFIX + name, defaultValue);
+        return this.configurationSource.getProperty(PREFERENCE_PREFIX + name, true);
     }
 }

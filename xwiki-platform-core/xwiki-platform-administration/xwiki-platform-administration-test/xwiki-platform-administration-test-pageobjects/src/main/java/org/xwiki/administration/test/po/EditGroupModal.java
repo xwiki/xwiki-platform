@@ -34,7 +34,7 @@ public class EditGroupModal extends BaseModal
     private static class ModalContent extends GroupEditPage
     {
         @Override
-        public void waitUntilPageJSIsLoaded()
+        public void waitUntilPageIsReady()
         {
             // There's no need to wait for any JavaScript here because the group edit form is loaded with AJAX inside
             // the modal body, after the page has been loaded.

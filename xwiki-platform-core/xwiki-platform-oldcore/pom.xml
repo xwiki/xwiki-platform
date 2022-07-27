@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -41,10 +41,13 @@
     </xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.35</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.37</xwiki.jacoco.instructionRatio>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+
+    <!-- Workaround a limitation in Eclipse M2E which prevent using classes from OldCore test-jar in other module's main classes -->
+    <m2e.disableTestClasspathFlag>true</m2e.disableTestClasspathFlag>
   </properties>
   <dependencies>
     <dependency>
@@ -67,11 +70,15 @@
     <!-- CSS4J (used for PDF export) -->
     <dependency>
       <groupId>io.sf.carte</groupId>
-      <artifactId>xml-dtd</artifactId>
+      <artifactId>css4j</artifactId>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.sf.carte</groupId>
+      <artifactId>xml-dtd</artifactId>
     </dependency>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
@@ -181,10 +188,6 @@
     </dependency>
 
     <!-- XML processing -->
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-    </dependency>
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
@@ -300,7 +303,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-api</artifactId>
+      <artifactId>xwiki-platform-image-processing-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -429,7 +432,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-api</artifactId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -600,6 +603,11 @@
       <version>1.6</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava-testlib</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -618,6 +626,13 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-filter-stream-xml</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- To be remove if we stop declaring hibernate validator as oldcore runtime dependency -->
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -821,7 +836,7 @@
                 **/store/migration/hibernate/R6079XWIKI1878DataMigration.java,
                 **/store/migration/hibernate/R7350XWIKI2079DataMigration.java,
                 **/store/migration/hibernate/R40000XWIKI6990DataMigration.java,
-                **/store/migration/hibernate/R130200001XWIKI18429DataMigration.java,
+                **/store/migration/hibernate/AbstractResizeMigration.java,
                 **/store/XWikiAttachmentStoreInterface.java,
                 **/store/XWikiBatcherFactory.java,
                 **/store/XWikiBatcher.java,
@@ -883,14 +898,12 @@
                 **/web/includeservletasstring/BufferedResponse.java,
                 **/web/includeservletasstring/BufferOutputStream.java,
                 **/web/includeservletasstring/IncludeServletAsString.java,
-                **/web/InlineAction.java,
                 **/web/LifeBlogAction.java,
                 **/web/LockAction.java,
                 **/web/ObjectAddAction.java,
                 **/web/ObjectAddForm.java,
                 **/web/ObjectRemoveAction.java,
                 **/web/ObjectRemoveForm.java,
-                **/web/PrepareEditForm.java,
                 **/web/PreviewAction.java,
                 **/web/PreviewForm.java,
                 **/web/PropAddAction.java,
@@ -930,7 +943,8 @@
                 **/web/XWikiURLFactoryServiceImpl.java,
                 **/web/XWikiURLFactoryService.java,
                 <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
-                **/stats/impl/xwiki/XWikiStatsReader.java
+                **/stats/impl/xwiki/XWikiStatsReader.java,
+                **/com/xpn/xwiki/internal/filter/output/AbstractEntityOutputFilterStream.java
               </excludes>
               <resourceExcludes>
                 ApplicationResources*.properties

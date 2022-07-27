@@ -32,6 +32,7 @@ import java.util.TreeSet;
 
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -48,6 +49,8 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  */
 public class XWikiDocumentArchive
 {
+    private final WikiReference wikiReference;
+
     /** =docId. */
     private long id;
 
@@ -69,18 +72,40 @@ public class XWikiDocumentArchive
     /** Set of {@link XWikiRCSNodeContent} which need to update. */
     private Set<XWikiRCSNodeContent> updatedNodeContents = new TreeSet<XWikiRCSNodeContent>();
 
-    /** @param id = {@link XWikiDocument#getId()} */
-    public XWikiDocumentArchive(long id)
+    /**
+     * @param wikiReference the wiki of the document
+     * @param id the local identifier of the document
+     * @since 13.10.7
+     * @since 14.4.1
+     * @since 14.5
+     */
+    public XWikiDocumentArchive(WikiReference wikiReference, long id)
     {
-        setId(id);
+        this.wikiReference = wikiReference;
+        this.id = id;
     }
 
-    /** default constructor. */
+    /**
+     * @param id the local identifier of the document
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
+     */
+    @Deprecated(since = "13.10.7")
+    public XWikiDocumentArchive(long id)
+    {
+        this(null, id);
+    }
+
+    /**
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
+     */
+    @Deprecated(since = "13.10.7")
     public XWikiDocumentArchive()
     {
+        this.wikiReference = null;
     }
 
     // helper methods
+
     /**
      * @param cur - current version
      * @param isMinor - is modification is minor
@@ -120,8 +145,8 @@ public class XWikiDocumentArchive
      * @return node content for newnode
      * @throws XWikiException if exception while loading content
      */
-    protected XWikiRCSNodeContent makePatch(XWikiRCSNodeInfo newnode, XWikiDocument doc,
-        XWikiContext context) throws XWikiException
+    protected XWikiRCSNodeContent makePatch(XWikiRCSNodeInfo newnode, XWikiDocument doc, XWikiContext context)
+        throws XWikiException
     {
         XWikiRCSNodeContent result = new XWikiRCSNodeContent();
         result.setPatch(new XWikiPatch().setFullVersion(doc, context));
@@ -129,13 +154,11 @@ public class XWikiDocumentArchive
         XWikiRCSNodeInfo latestNode = getLatestNode();
         if (latestNode != null) {
             int nodesCount = getNodes().size();
-            int nodesPerFull =
-                context.getWiki() == null ? 5 : Integer.parseInt(context.getWiki().getConfig()
-                    .getProperty("xwiki.store.rcs.nodesPerFull", "5"));
+            int nodesPerFull = context.getWiki() == null ? 5
+                : Integer.parseInt(context.getWiki().getConfig().getProperty("xwiki.store.rcs.nodesPerFull", "5"));
             if (nodesPerFull <= 0 || (nodesCount % nodesPerFull) != 0) {
                 XWikiRCSNodeContent latestContent = latestNode.getContent(context);
-                latestContent.getPatch().setDiffVersion(latestContent.getPatch().getContent(),
-                    doc, context);
+                latestContent.getPatch().setDiffVersion(latestContent.getPatch().getContent(), doc, context);
                 latestNode.setContent(latestContent);
                 updateNode(latestNode);
                 getUpdatedNodeContents().add(latestContent);
@@ -144,13 +167,28 @@ public class XWikiDocumentArchive
         return result;
     }
 
+    /**
+     * @return the wikiReference the wiki of the document
+     * @since 13.10.7
+     * @since 14.4.1
+     * @since 14.5
+     */
+    public WikiReference getWikiReference()
+    {
+        return this.wikiReference;
+    }
+
     /** @return {@link XWikiDocument#getId()} - primary key */
     public long getId()
     {
         return this.id;
     }
 
-    /** @param id = {@link XWikiDocument#getId()} */
+    /**
+     * @param id = {@link XWikiDocument#getId()}
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
+     */
+    @Deprecated(since = "13.10.7")
     public void setId(long id)
     {
         this.id = id;
@@ -210,7 +248,7 @@ public class XWikiDocumentArchive
         try {
             XWikiRCSArchive archive = new XWikiRCSArchive(text);
             resetArchive();
-            Collection nodes = archive.getNodes(getId());
+            Collection nodes = archive.getNodes(getWikiReference(), getId());
             for (Iterator it = nodes.iterator(); it.hasNext();) {
                 XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
                 XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
@@ -219,9 +257,8 @@ public class XWikiDocumentArchive
                 this.updatedNodeContents.add(nodeContent);
             }
         } catch (Exception e) {
-            Object[] args = { text, Long.valueOf(getId()) };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
+            Object[] args = {text, Long.valueOf(getId())};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
                 "Exception while constructing archive for JRCS string [{0}] for document [{1}]", e, args);
         }
     }
@@ -237,15 +274,15 @@ public class XWikiDocumentArchive
      * @param context - used for loading nodes content
      * @throws XWikiException in any error
      */
-    public void updateArchive(XWikiDocument doc, String author, Date date, String comment,
-        Version version, XWikiContext context) throws XWikiException
+    public void updateArchive(XWikiDocument doc, String author, Date date, String comment, Version version,
+        XWikiContext context) throws XWikiException
     {
         Version oldLatestVer = getLatestVersion();
         Version newVer = version;
         if (newVer == null || oldLatestVer != null && newVer.compareVersions(oldLatestVer) <= 0) {
             newVer = createNextVersion(oldLatestVer, doc.isMinorEdit());
         }
-        XWikiRCSNodeInfo newNode = new XWikiRCSNodeInfo(new XWikiRCSNodeId(getId(), newVer));
+        XWikiRCSNodeInfo newNode = new XWikiRCSNodeInfo(new XWikiRCSNodeId(getWikiReference(), getId(), newVer));
         newNode.setAuthor(author);
         newNode.setComment(comment);
         newNode.setDate(date);
@@ -264,8 +301,7 @@ public class XWikiDocumentArchive
      * @param context - used for loading nodes content
      * @throws XWikiException if any error
      */
-    public void removeVersions(Version newerVersion, Version olderVersion, XWikiContext context)
-        throws XWikiException
+    public void removeVersions(Version newerVersion, Version olderVersion, XWikiContext context) throws XWikiException
     {
         Version upperBound = newerVersion;
         Version lowerBound = olderVersion;
@@ -317,8 +353,7 @@ public class XWikiDocumentArchive
      * @param context - used for loading
      * @throws XWikiException if any error
      */
-    public XWikiDocument loadDocument(Version version, XWikiContext context)
-        throws XWikiException
+    public XWikiDocument loadDocument(Version version, XWikiContext context) throws XWikiException
     {
         XWikiRCSNodeInfo nodeInfo = getNode(version);
         if (nodeInfo == null) {
@@ -340,7 +375,7 @@ public class XWikiDocumentArchive
 
             return doc;
         } catch (Exception e) {
-            Object[] args = { version.toString(), Long.valueOf(getId()) };
+            Object[] args = {version.toString(), Long.valueOf(getId())};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_RCS_READING_REVISIONS,
                 "Exception while reading version [{0}] for document id [{1,number}]", e, args);
@@ -484,7 +519,7 @@ public class XWikiDocumentArchive
      */
     public XWikiDocumentArchive clone(long docId, XWikiContext context) throws XWikiException
     {
-        XWikiDocumentArchive result = new XWikiDocumentArchive(docId);
+        XWikiDocumentArchive result = new XWikiDocumentArchive(this.wikiReference, docId);
         result.setArchive(getArchive(context));
         return result;
     }

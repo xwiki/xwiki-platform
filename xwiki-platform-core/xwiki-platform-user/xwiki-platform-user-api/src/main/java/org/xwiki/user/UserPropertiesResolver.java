@@ -20,7 +20,6 @@
 package org.xwiki.user;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Gets the properties for a user (represented by a {@link UserReference}).
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 @Role
 // Note: the reason why we didn't have UserPropertiesResolver<? extends UserReference> is to make the API easier to use
 // and make less mistakes since only UserReference should be used (and not DocumentUserReference for example).

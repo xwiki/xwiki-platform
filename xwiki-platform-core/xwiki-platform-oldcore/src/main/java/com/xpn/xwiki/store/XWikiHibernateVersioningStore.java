@@ -35,6 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -45,6 +48,7 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Realization of {@link XWikiVersioningStoreInterface} for Hibernate-based storage.
@@ -145,7 +149,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             if (doc.getDatabase() != null) {
                 context.setWikiId(doc.getDatabase());
             }
-            archiveDoc = new XWikiDocumentArchive(doc.getId());
+            archiveDoc = new XWikiDocumentArchive(doc.getDocumentReference().getWikiReference(), doc.getId());
             loadXWikiDocArchive(archiveDoc, true, context);
             doc.setDocumentArchive(archiveDoc);
         } finally {
@@ -266,7 +270,10 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
         try {
             XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, context);
-            archiveDoc.updateArchive(doc, doc.getAuthor(), doc.getDate(), doc.getComment(), doc.getRCSVersion(),
+            UserReferenceSerializer<String> userReferenceSerializer = Utils.getComponent(
+                new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
+            String author = userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());
+            archiveDoc.updateArchive(doc, author, doc.getDate(), doc.getComment(), doc.getRCSVersion(),
                 context);
             doc.setRCSVersion(archiveDoc.getLatestVersion());
             saveXWikiDocArchive(archiveDoc, bTransaction, context);
@@ -303,7 +310,12 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
                 predicates[1] = builder.isNotNull(root.get("diff"));
                 query.where(predicates);
 
-                return session.createQuery(query).getResultList();
+                List<XWikiRCSNodeInfo> nodes = session.createQuery(query).getResultList();
+
+                // Remember the wiki where the nodes are from
+                nodes.forEach(n -> n.getId().setWikiReference(context.getWikiReference()));
+
+                return nodes;
             } catch (IllegalArgumentException e) {
                 // This happens when the database has wrong values...
                 LOGGER.error("Invalid history for document [{}]", id, e);
@@ -317,12 +329,22 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public XWikiRCSNodeContent loadRCSNodeContent(final XWikiRCSNodeId id, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
-        return executeRead(context, session -> {
-            XWikiRCSNodeContent content = new XWikiRCSNodeContent(id);
-            session.load(content, content.getId());
+        WikiReference currentWiki = context.getWikiReference();
 
-            return content;
-        });
+        try {
+            if (id.getWikiReference() != null) {
+                context.setWikiReference(id.getWikiReference());
+            }
+
+            return executeRead(context, session -> {
+                XWikiRCSNodeContent content = new XWikiRCSNodeContent(id);
+                session.load(content, content.getId());
+
+                return content;
+            });
+        } finally {
+            context.setWikiReference(currentWiki);
+        }
     }
 
     @Override

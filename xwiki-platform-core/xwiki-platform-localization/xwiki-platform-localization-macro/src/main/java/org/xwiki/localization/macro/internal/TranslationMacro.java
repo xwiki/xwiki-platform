@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -104,7 +105,7 @@ public class TranslationMacro extends AbstractMacro<TranslationMacroParameters>
         super("Translation", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
             TranslationMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override

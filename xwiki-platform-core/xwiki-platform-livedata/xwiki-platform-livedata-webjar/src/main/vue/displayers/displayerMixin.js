@@ -83,6 +83,17 @@ export default {
       set(value) {
         this.editedValue = value;
       }
+    },
+    // Checks if the property value is allowed to be edited and if the livedata is in a state where the displayer can
+    // be edited.
+    isEditable() {
+      const editable = this.logic.isEditable({
+        entry: this.entry,
+        propertyId: this.propertyId,
+      });
+      // Checks that no other property is currently being edited.
+      const noOtherEditing = this.logic.getEditBus().isEditable()
+      return editable && noOtherEditing;
     }
   },
 

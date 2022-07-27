@@ -189,7 +189,7 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
         Map<String, Map<String, String>> conversionOutput =
             (Map<String, Map<String, String>>) mreq.getSessionAttribute(CONVERSION_OUTPUT);
         if (conversionOutput == null) {
-            conversionOutput = new HashMap<String, Map<String, String>>();
+            conversionOutput = new HashMap<>();
             mreq.setSessionAttribute(CONVERSION_OUTPUT, conversionOutput);
         }
         conversionOutput.put(key, output);
@@ -198,7 +198,7 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
         Map<String, Map<String, Throwable>> conversionErrors =
             (Map<String, Map<String, Throwable>>) mreq.getSessionAttribute(CONVERSION_ERRORS);
         if (conversionErrors == null) {
-            conversionErrors = new HashMap<String, Map<String, Throwable>>();
+            conversionErrors = new HashMap<>();
             mreq.setSessionAttribute(CONVERSION_ERRORS, conversionErrors);
         }
         conversionErrors.put(key, errors);

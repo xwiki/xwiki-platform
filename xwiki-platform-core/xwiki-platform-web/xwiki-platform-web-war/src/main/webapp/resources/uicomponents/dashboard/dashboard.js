@@ -79,8 +79,8 @@ XWiki.Dashboard = Class.create( {
     this.addNewGadgetHandler();
     this.addNewContainerHandler();
 
-    // add save listener, to save the dashboard before submit of the form
-    document.observe("xwiki:actions:save", this.saveChanges.bindAsEventListener(this));
+    // Save the dashboard before the edit form is submitted.
+    document.observe("xwiki:actions:beforeSave", this.saveChanges.bindAsEventListener(this));
   },
 
   /**
@@ -309,7 +309,7 @@ XWiki.Dashboard = Class.create( {
     }
     button.addClassName('loading');
     require(['gadgetWizard'], function(gadgetWizard) {
-      gadgetWizard(gadget).done(callback).always(function() {
+      gadgetWizard(gadget).then(callback).finally(() => {
         button.removeClassName('loading');
       });
     });
@@ -356,10 +356,7 @@ XWiki.Dashboard = Class.create( {
           window.location.reload();
         }.bind(this),
         onFailure : function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           this._x_notification.replace(new XWiki.widgets.Notification(
             l10n['dashboard.actions.add.failed'] + failureReason, "error", {timeout: 5}));
         }.bind(this),
@@ -461,10 +458,7 @@ XWiki.Dashboard = Class.create( {
           window.location.reload();
         }.bind(this),
         onFailure : function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           this._x_notification.replace(new XWiki.widgets.Notification(l10n['dashboard.gadget.actions.edit.failed'] +
             failureReason, "error", {timeout: 5}));
         }.bind(this),
@@ -608,10 +602,7 @@ XWiki.Dashboard = Class.create( {
           }
         }.bind(this),
         onFailure: function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           // show the error message at the bottom
           this._x_notification = new XWiki.widgets.Notification(l10n['dashboard.actions.edit.failed'] + failureReason,
             "error", {timeout: 5});
@@ -651,10 +642,9 @@ XWiki.Dashboard = Class.create( {
 
     // stop the event, so that it doesn't actually send the request just yet, we'll send it when we're done with saving
     event.stop();
-    event.memo.originalEvent.stop();
 
     // get the element of the event
-    var eventElt = event.memo.originalEvent.element();
+    var eventElt = event.element();
 
     // start to submit the edit, notify
     this._x_edit_notification = new XWiki.widgets.Notification(l10n['dashboard.actions.save.loading'], "inprogress");
@@ -723,7 +713,9 @@ function init() {
     // edit first dashboard FIXME: to create a dashboard editor for all dashboards
     var dashboardRootElt = $$('.dashboard')[0];
     if (dashboardRootElt) {
-      new XWiki.Dashboard(dashboardRootElt);
+      require(['scriptaculous/dragdrop'], function() {
+        new XWiki.Dashboard(dashboardRootElt);
+      });
     }
   }
   return true;

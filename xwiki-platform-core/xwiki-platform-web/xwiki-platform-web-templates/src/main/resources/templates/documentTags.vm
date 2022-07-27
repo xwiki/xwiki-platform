@@ -25,72 +25,91 @@
 ##
 ##
 #macro(displayTag $tag)
-<span class="tag-wrapper"><span class="tag"><a href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;tag=$!{escapetool.url($tag)}")">$!{escapetool.xml($tag)}</a></span>#if($hasedit)<span class="separator">[</span><a href="$doc.getURL('view', "xpage=documentTags&amp;xaction=delete&amp;tag=$!{escapetool.url($tag)}&amp;xredirect=${xredirect}")" class="tag-tool tag-delete" title="$services.localization.render('core.tags.remove.tooltip')">X</a><span class="separator">]</span>#end</span>
+  #set ($viewTagUrl = $xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;tag=$!{escapetool.url($tag)}"))
+  ## Note that the form_token parameter needs to be kept before the xredirect parameter since the JS code might replace the latter
+  ## All that would need a cleaner fix in the javascript of tags.
+  #set ($deleteTagUrl = $doc.getURL('view', "xpage=documentTags&amp;xaction=delete&amp;tag=$!{escapetool.url($tag)}&amp;form_token=$!{escapetool.url($services.csrf.token)}&amp;xredirect=${xredirect}"))
+<span class="tag-wrapper">
+  <span class="tag"><a href="$viewTagUrl">$!{escapetool.xml($tag)}</a></span>
+  #if($hasedit)<span class="separator">[</span><a href="$deleteTagUrl" class="tag-tool tag-delete" title="$services.localization.render('core.tags.remove.tooltip')">X</a><span class="separator">]</span>#end
+</span>
 #end
 ##
 #macro(removeTag $tag)
-    #if($xwiki.tag)
-        #set($result = $xwiki.tag.removeTagFromDocument($tag, $doc.fullName))
-        #if($result == 'OK' && "$!{request.ajax}" != '')
-            $response.setStatus(200)
-            #set($responseMessage = 'OK')
-        #elseif($result == 'NO_EFFECT')
-            $response.setStatus(409)
-            #set($responseMessage = $services.localization.render('core.tags.remove.error.notFound', [$tag]))
-        #elseif($result == 'NOT_ALLOWED')
-            $response.setStatus(403)
-            #set($responseMessage = $services.localization.render('core.tags.remove.error.notAllowed', [$tag]))
-        #elseif($result == 'FAILED')
-            $response.setStatus(500)
-            #set($responseMessage = $services.localization.render('core.tags.remove.error.failed', [$tag]))
-        #end
-        #if("$!{request.ajax}" != '')
-            $!responseMessage
-        #elseif("$!{request.xredirect}" != '')
-            $response.sendRedirect($request.xredirect)
+    #if ($services.csrf.isTokenValid($request.get('form_token')))
+        #if($xwiki.tag)
+            #set($result = $xwiki.tag.removeTagFromDocument($tag, $doc.fullName))
+            #if($result == 'OK' && "$!{request.ajax}" != '')
+                #set ($discard= $response.setStatus(200))
+                #set($responseMessage = 'OK')
+            #elseif($result == 'NO_EFFECT')
+                #set ($discard= $response.setStatus(409))
+                #set($responseMessage = $services.localization.render('core.tags.remove.error.notFound', [$tag]))
+            #elseif($result == 'NOT_ALLOWED')
+                #set ($discard= $response.setStatus(403))
+                #set($responseMessage = $services.localization.render('core.tags.remove.error.notAllowed', [$tag]))
+            #elseif($result == 'FAILED')
+                #set ($discard= $response.setStatus(500))
+                #set($responseMessage = $services.localization.render('core.tags.remove.error.failed', [$tag]))
+            #end
+        #else
+            #set ($discard= $response.setStatus(501))
+            #set ($responseMessage = "Tag plugin is missing")
         #end
     #else
-        ## TODO
+        #set ($discard= $response.setStatus(401))
+        #set($responseMessage = $services.localization.render('core.tags.remove.error.notAllowed', [$tag]))
+    #end
+    #if("$!{request.ajax}" != '')
+        $!responseMessage
+    #elseif("$!{request.xredirect}" != '')
+        $response.sendRedirect($request.xredirect)
     #end
 #end
 ##
 #macro(addTag $tag)
-    #if($xwiki.tag)
-        #set($oldTags = $xwiki.tag.getTagsFromDocument($doc.fullName))
-        #set($result = $xwiki.tag.addTagsToDocument($tag, $doc.fullName))
-        #if($result == 'OK' && "$!{request.ajax}" != '')
-            #set($newTags = $xwiki.tag.getTagsFromDocument($doc.fullName))
-            #set($discard = $newTags.removeAll($oldTags))
-            #foreach($t in $newTags)
-                #if($t != '' && !$oldTags.contains($t))
-                    #displayTag($t)
+    #if ($services.csrf.isTokenValid($request.get('form_token')))
+        #if($xwiki.tag)
+            #set($oldTags = $xwiki.tag.getTagsFromDocument($doc.fullName))
+            #set($result = $xwiki.tag.addTagsToDocument($tag, $doc.fullName))
+            #if($result == 'OK' && "$!{request.ajax}" != '')
+                #set($newTags = $xwiki.tag.getTagsFromDocument($doc.fullName))
+                #set($discard = $newTags.removeAll($oldTags))
+                #foreach($t in $newTags)
+                    #if($t != '' && !$oldTags.contains($t))
+                        #displayTag($t)
+                    #end
                 #end
+            #elseif($result == 'NO_EFFECT')
+                $response.setStatus(409)
+                #set($tagErrorMessage = $services.localization.render('core.tags.add.error.alreadySet', [$tag]))
+            #elseif($result == 'NOT_ALLOWED')
+                $response.setStatus(403)
+                #set($tagErrorMessage = $services.localization.render('core.tags.add.error.notAllowed', [$tag]))
+            #elseif($result == 'FAILED')
+                $response.setStatus(500)
+                #set($tagErrorMessage = $services.localization.render('core.tags.add.error.failed', [$tag]))
             #end
-        #elseif($result == 'NO_EFFECT')
-            $response.setStatus(409)
-            #set($tagErrorMessage = $services.localization.render('core.tags.add.error.alreadySet', [$tag]))
-        #elseif($result == 'NOT_ALLOWED')
-            $response.setStatus(403)
-            #set($tagErrorMessage = $services.localization.render('core.tags.add.error.notAllowed', [$tag]))
-        #elseif($result == 'FAILED')
-            $response.setStatus(500)
-            #set($tagErrorMessage = $services.localization.render('core.tags.add.error.failed', [$tag]))
-        #end
-        #if("$!{request.ajax}" != '')
-            $tagErrorMessage
-        #elseif("$!{request.xredirect}" != '')
-            $response.sendRedirect($request.xredirect)
+            #if("$!{request.ajax}" != '')
+                $tagErrorMessage
+            #elseif("$!{request.xredirect}" != '')
+                $response.sendRedirect($request.xredirect)
+            #end
+        #else
+            #set ($discard= $response.setStatus(501))
+            #set ($responseMessage = "Tag plugin is missing")
         #end
     #else
-        ## TODO
+        #set ($discard= $response.setStatus(401))
+        #set($responseMessage = $services.localization.render('core.tags.add.error.notAllowed', [$tag]))
     #end
 #end
 ##
 #macro(displayAddForm)
-<form action="$doc.getURL('view', "xpage=documentTags&amp;xaction=add&amp;xredirect=${xredirect}")" method="post" class="tag-add-form">
+## Note that the form_token parameter needs to be kept before the xredirect parameter since the JS code might replace the latter
+## All that would need a cleaner fix in the javascript of tags.
+<form action="$doc.getURL('view', "xpage=documentTags&amp;xaction=add&amp;form_token=$!{escapetool.url($services.csrf.token)}&amp;xredirect=${xredirect}")" method="post" class="tag-add-form">
   <div>
-      ## CSRF prevention
-    <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
     <label for="tag">$services.localization.render('core.tags.add.label')<br/>
       <input class="input-tag" type="text" id="tag" name="tag" autocomplete="off"/></label><br/>
     <span class="buttonwrapper"><input class="button button-add-tag" type="submit" value="$services.localization.render('core.tags.add.submit')"/></span>

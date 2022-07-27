@@ -20,7 +20,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-<h3>$services.localization.render("core.viewers.attachments.revisions", [$attachment.filename])</h3>
+<h3>$services.localization.render("core.viewers.attachments.revisions", [$escapetool.html($attachment.filename)])</h3>
 #if ("$tdoc.realLocale" != '')
 #set($lang = "&language=${tdoc.realLocale}")
 #else
@@ -40,7 +40,7 @@
   #set($url = $doc.getAttachmentRevisionURL("${attachment.filename}", ${version.toString()}))
 #end
 #if ($attachment.isImage())
-        <td><img src="${url}" alt="${attachment.filename}" width="80" />
+        <td><img src="${url}" alt="${escapetool.xml($attachment.filename)}" width="80" />
 #else
         <td class="mime">#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase())
 #end

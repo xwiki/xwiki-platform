@@ -30,7 +30,7 @@ require(['jquery'], function($) {
     // ----------------------
     var self = this;
     self.selectWidget = $(domElement);
-    
+
     /**
      * Send an event to say that the selection have changed
      */
@@ -55,7 +55,7 @@ require(['jquery'], function($) {
       option.addClass('xwiki-select-option-selected');
       self.triggerSelectionChange();
     };
-    
+
     /**
      * When the user types some text to filter the options, we hide/show each options according to their matching with
      * the filter.
@@ -100,10 +100,10 @@ require(['jquery'], function($) {
             option.hide();
           }
         }
-      
+
         // Now, we update the count of matching items in the heading of the category.
         category.find('.xwiki-select-category-count').text(matchingOptionsCount);
-        
+
         // We hide the category if it has no matching options.
         if (matchingOptionsCount == 0) {
           category.hide();
@@ -125,15 +125,16 @@ require(['jquery'], function($) {
         self.selectWidget.find('.xwiki-select-no-results').remove();
       }
     };
-    
+
     /**
     /* Initialization
      */
     self.init = function () {
-      self.selectWidget.find('.xwiki-select-option').click(self.onOptionClicked);
-      self.selectWidget.find('input.xwiki-select-filter').change(self.onFilterChange).keyup(self.onFilterChange);
+      self.selectWidget.find('.xwiki-select-option').on('click', self.onOptionClicked);
+      self.selectWidget.find('input.xwiki-select-filter').on('change', self.onFilterChange)
+        .on('keyup', self.onFilterChange);
     };
-    
+
     /**
      * Clear selection
      */
@@ -149,10 +150,10 @@ require(['jquery'], function($) {
     self.getValue = function () {
       return self.selectWidget.find('input[type="radio"]:checked').val();
     };
-    
+
     self.init();
   };
-    
+
   /**
    * Define a jQuery plugin about the select widget.
    * @since 7.4.1
@@ -182,15 +183,15 @@ require(['jquery'], function($) {
       // In such a case, there is no possible chaining
       return $(this[0]).data('xwikiSelectWidget').getValue();
     }
-    
+
     // Enable chaining
     return this;
   };
-  
+
   /**
    * Initializer called when the DOM is ready
    */
-  $(document).ready(function() {
+  $(function() {
     $('.xwiki-select').xwikiSelectWidget();
   });
 });

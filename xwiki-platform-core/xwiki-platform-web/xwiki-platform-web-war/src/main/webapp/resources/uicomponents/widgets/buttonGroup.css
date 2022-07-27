@@ -75,10 +75,7 @@
   right: 0;
 }
 
-/* IE discards the :target selector and thus we have to duplicate the rule.. */
-.button-group > .dropdown-menu:target {
-  display: block;
-}
+.button-group > .dropdown-menu:target,
 .button-group > .dropdown-menu.open {
   display: block;
 }
@@ -94,8 +91,6 @@
   box-shadow: none;
   color: $theme.textColor;
   display: block;
-  /* Reset the IE filter. */
-  filter: none;
   padding: 3px 6px;
   text-align: left;
   text-shadow: none;

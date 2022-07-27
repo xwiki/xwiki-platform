@@ -31,7 +31,6 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -61,7 +60,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class ZipExplorerTest
+class ZipExplorerTest
 {
     private ZipExplorerPlugin plugin;
 
@@ -82,7 +81,7 @@ public class ZipExplorerTest
     }
 
     @Test
-    public void isZipFile() throws Exception
+    void isZipFile() throws Exception
     {
         byte txtbuf[] = { 0x00, 0x01, 0x02, 0x03, 0x06, 0x07 };
         ByteArrayInputStream txtBais = new ByteArrayInputStream(txtbuf);
@@ -98,7 +97,7 @@ public class ZipExplorerTest
     }
 
     @Test
-    public void testIsValidZipURL()
+    void testIsValidZipURL()
     {
         assertTrue(this.plugin.isValidZipURL(
             "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt", "download"));
@@ -117,7 +116,7 @@ public class ZipExplorerTest
     }
 
     @Test
-    public void downloadAttachmentWithInvalidZipURL() throws Exception
+    void downloadAttachmentWithInvalidZipURL() throws Exception
     {
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "Main", "Document"));
@@ -131,7 +130,7 @@ public class ZipExplorerTest
     }
 
     @Test
-    public void downloadAttachment() throws Exception
+    void downloadAttachment() throws Exception
     {
         String zipFileContent = "File.txt content";
         XWikiDocument document = mock(XWikiDocument.class);
@@ -152,7 +151,7 @@ public class ZipExplorerTest
     }
 
     @Test
-    public void downloadAttachmentWhenURLIsNotZipFile() throws Exception
+    void downloadAttachmentWhenURLIsNotZipFile() throws Exception
     {
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "Main", "Document"));
@@ -166,7 +165,7 @@ public class ZipExplorerTest
     }
 
     @Test
-    public void downloadAttachmentWhenURLIsZipButNotPointingInsideZip() throws Exception
+    void downloadAttachmentWhenURLIsZipButNotPointingInsideZip() throws Exception
     {
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "Main", "Document"));
@@ -180,7 +179,7 @@ public class ZipExplorerTest
     }
 
     @Test
-    public void getFileList() throws Exception
+    void getFileList() throws Exception
     {
         XWikiDocument document = createXWikiDocumentWithZipFileAttachment();
 
@@ -192,7 +191,7 @@ public class ZipExplorerTest
     }
 
     @Test
-    public void getFileTreeList() throws Exception
+    void getFileTreeList() throws Exception
     {
         XWikiDocument document = createXWikiDocumentWithZipFileAttachment();
 
@@ -214,7 +213,7 @@ public class ZipExplorerTest
     }
 
     @Test
-    public void getFileLink() throws Exception
+    void getFileLink() throws Exception
     {
         XWikiDocument xwikiDocument = mock(XWikiDocument.class);
         when(xwikiDocument.getAttachmentURL(eq("zipfile.zip"), any(XWikiContext.class))).thenReturn(
@@ -227,7 +226,7 @@ public class ZipExplorerTest
     }
 
     @Test
-    public void getFileLocationFromZipURL()
+    void getFileLocationFromZipURL()
     {
         String urlPrefix = "server/xwiki/bin/download/Main/Document/zipfile.zip";
 

@@ -21,7 +21,6 @@ package org.xwiki.search.solr;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * An extension point used to inject mandatory Solr cores.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.2
  */
 @Role
-@Unstable
 public interface SolrCoreInitializer
 {
     /**

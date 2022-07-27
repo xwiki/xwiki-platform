@@ -365,8 +365,8 @@ public class DBTreeListClass extends DBListClass
     /**
      * <p>
      * Computes the query corresponding to the current XProperty. The query is either manually specified by the XClass
-     * creator in the <tt>sql</tt> field, or, if the query field is blank, constructed using the <tt>classname</tt>,
-     * <tt>idField</tt>, <tt>valueField</tt> and <tt>parentField</tt> properties. The query is constructed according to
+     * creator in the {@code sql} field, or, if the query field is blank, constructed using the {@code classname},
+     * {@code idField}, {@code valueField} and {@code parentField} properties. The query is constructed according to
      * the following rules:
      * </p>
      * <ul>

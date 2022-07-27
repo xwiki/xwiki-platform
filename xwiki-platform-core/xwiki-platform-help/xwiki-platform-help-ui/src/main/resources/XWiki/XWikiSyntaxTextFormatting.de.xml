@@ -54,13 +54,6 @@
 
 === 2.0 Text Formatting ===
 
-{{info}}
-Neu in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} im Vergleich zu XWiki Syntax 1.0:
-* Leerzeichen sind direkt nach einem Syntaxsymbol erlaubt (zum Beispiel war dies in XWiki Syntax 1.0 nicht möglich: * fett *).
-* Doppelsymbole werden verwendet, wo einzelne Symbole in XWiki Syntax 1.0 verwendet wurden, damit es unwahrscheinlicher wird, dass Benutzer sie versehentlich im Text verwenden.
-* Fähigkeit mehrere Zeilen zu überspannen (war in XWiki Syntax 1.0 nicht möglich).
-{{/info}}
-
 |=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Ergebnis
 |Fett|{{{**fett**}}}|**fett**
 |Unterstrichen|{{{__unterstrichen__}}}|__unterstrichen__

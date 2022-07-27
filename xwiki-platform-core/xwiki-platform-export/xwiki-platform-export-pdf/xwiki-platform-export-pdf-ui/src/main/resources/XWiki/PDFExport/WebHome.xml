@@ -1,0 +1,667 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.PDFExport.WebHome" locale="">
+  <web>XWiki.PDFExport</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#macro (returnPDFExportJobStatusJSON $pdfExportJobId)
+  #set ($pdfExportJobStatus = $services.job.getJobStatus($pdfExportJobId))
+  #set ($pdfExportJobStatusJSON = {
+    'id': $pdfExportJobStatus.request.id,
+    'state': $pdfExportJobStatus.state,
+    'canceled': $pdfExportJobStatus.canceled,
+    'progress': {
+      'offset': $pdfExportJobStatus.progress.offset
+    }
+  })
+  #if ($pdfExportJobStatus.state == 'FINISHED')
+    #if ($pdfExportJobStatus.request.isServerSide() &amp;&amp; $services.resource.temporary.exists(
+        $pdfExportJobStatus.getPDFFileReference()))
+      #set ($pdfExportJobStatusJSON.pdfFileURL = $services.resource.temporary.getURL(
+        $pdfExportJobStatus.getPDFFileReference()))
+    #end
+    #set ($pdfExportJobStatusJSON.failed = $pdfExportJobStatus.logTail.hasLogLevel('ERROR'))
+  #end
+  #jsonResponse($pdfExportJobStatusJSON)
+#end
+{{/velocity}}
+
+{{velocity wiki="false"}}
+#if ($xcontext.action == 'get')
+  #if ("$!request.action" != '' &amp;&amp; !$services.csrf.isTokenValid($request.form_token))
+    #set ($discard = $response.sendError(401, 'CSRF token verification failed!'))
+  #elseif ($request.action == 'export')
+    #set ($pdfExportJobRequest = $services.export.pdf.createRequest())
+    #set ($pdfExportJob = $services.export.pdf.execute($pdfExportJobRequest))
+    #returnPDFExportJobStatusJSON($pdfExportJobRequest.id)
+  #elseif ($request.action == 'cancel')
+    #set ($pdfExportJobId = $request.jobId.split('/'))
+    #set ($pdfExportJobStatus = $services.job.getJobStatus($pdfExportJobId))
+    #set ($discard = $pdfExportJobStatus.cancel())
+    #returnPDFExportJobStatusJSON($pdfExportJobId)
+  #elseif ($request.data == 'jobStatus')
+    #set ($pdfExportJobId = $request.jobId.split('/'))
+    #returnPDFExportJobStatusJSON($pdfExportJobId)
+  #end
+#end
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.PDFExport.WebHome</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>57ca008e-5189-4605-aae7-e96467904c44</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('xwiki-pdf-export-messages', {
+  keys: [
+    'core.export.pdf.options.title',
+    'export.pdf.options.template',
+    'export.pdf.options.template.hint',
+    'export.pdf.options.loadFailure',
+    'export.pdf.modal.close',
+    'export.pdf.inProgress',
+    'export.pdf.failed',
+    'export.pdf.canceling',
+    'export.pdf.canceled',
+    'export.pdf.cancelFailed'
+  ]
+});
+
+define('xwiki-pdf-export-config', ['jquery'], function($) {
+  try {
+    return JSON.parse($('#pdfExportConfig').text());
+  } catch (e) {
+    console.error(e);
+    return {};
+  }
+});
+
+require([
+  'jquery',
+  'xwiki-meta',
+  'xwiki-pdf-export-config',
+  'xwiki-l10n!xwiki-pdf-export-messages',
+  'xwiki-job-runner',
+  'bootstrap'
+], function($, xwikiMeta, config, l10n, JobRunner) {
+  const pdfExportOptionsModal = $(`
+    &lt;form class="modal xform" id="pdfExportOptions" tabindex="-1" role="dialog"
+        aria-labelledby="pdfExportOptionsTitle"&gt;
+      &lt;div class="modal-dialog" role="document"&gt;
+        &lt;div class="modal-content"&gt;
+          &lt;div class="modal-header"&gt;
+            &lt;button type="button" class="close" data-dismiss="modal"&gt;
+              &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;h4 class="modal-title" id="pdfExportOptionsTitle"&gt;&lt;/h4&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-body loading"&gt;&lt;/div&gt;
+          &lt;div class="modal-footer"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+  `);
+  pdfExportOptionsModal.find('button.close').attr({
+    'title': l10n['export.pdf.modal.close'],
+    'aria-label': l10n['export.pdf.modal.close']
+  });
+  pdfExportOptionsModal.find('.modal-title').text(l10n['core.export.pdf.options.title']);
+  // Fade only on hide. We don't want to fade on show because we want the transition from the Export modal (previous
+  // step) to be fast and smooth.
+  pdfExportOptionsModal.on('shown.bs.modal', function() {
+    // We need the fade CSS class name on the backdrop also, otherwise we get an ugly flicker when the modal is hidden.
+    pdfExportOptionsModal.add('.modal-backdrop.in').addClass('fade');
+  });
+
+  const templateOption = $(`
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for="pdfTemplate"&gt;&lt;/label&gt;
+        &lt;span class="xHint"&gt;&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;select id="pdfTemplate" name="template"&gt;&lt;/select&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+  `);
+  templateOption.find('label').text(l10n['export.pdf.options.template']);
+  templateOption.find('.xHint').text(l10n['export.pdf.options.template.hint']);
+  if (Array.isArray(config.templates)) {
+    const select = templateOption.find('select');
+    config.templates.forEach(template =&gt; {
+      $('&lt;option&gt;&lt;/option&gt;').text(template.label).attr('value', template.value).appendTo(select);
+    });
+    // Select the first option by default.
+    select.find('option').first().attr('selected', 'selected');
+  }
+
+  const openPDFOptionsModal = function(url, data) {
+    // Store the document selection so it can be used later when the modal is submitted.
+    pdfExportOptionsModal.data('selection', data);
+    // Disable the animation on show in order to have a smooth transition from the previous modal.
+    pdfExportOptionsModal.removeClass('fade').modal();
+    if (!pdfExportOptionsModal.find('.modal-body').hasClass('loading')) {
+      // The modal is already loaded and initialized.
+      return;
+    }
+    $('&lt;div&gt;&lt;/div&gt;').load(url + ' #pdfExportOptions', function() {
+      const form = $(this).find('#pdfExportOptions');
+      if (form.length) {
+        form.find('.buttons').appendTo(pdfExportOptionsModal.find('.modal-footer'));
+        // Hide useless options.
+        form.find('#comments, #attachments').closest('dt').hide().parent().css('margin-bottom', '0');
+        // Add the template option.
+        form.find('dl').prepend(templateOption.contents());
+        pdfExportOptionsModal.attr('action', form.attr('action'));
+        pdfExportOptionsModal.find('.modal-body').removeClass('loading').append(form.contents());
+      } else {
+        new XWiki.widgets.Notification(l10n['export.pdf.options.loadFailure'], 'error');
+        pdfExportOptionsModal.modal('hide');
+      }
+    });
+  };
+
+  // There's no PDF export job started. This promise is used to cancel the PDF export job (the job needs to be started
+  // before we can cancel it).
+  let pdfExportJobStarted = false;
+
+  const runPDFExportJob = function(data) {
+    let resolvePDFExportJobStarted, rejectPDFExportJobStarted;
+    pdfExportJobStarted = new Promise((resolve, reject) =&gt; {
+      resolvePDFExportJobStarted = resolve;
+      rejectPDFExportJobStarted = reject;
+    });
+    data.push(
+      {name: 'outputSyntax', value: 'plain'},
+      {name: 'sheet', value: 'XWiki.PDFExport.WebHome'},
+      {name: 'action', value: 'export'},
+      {name: 'form_token', value: xwikiMeta.form_token},
+      // We add the current value of the query string because we want to export the current state of the page (the query
+      // string can hold for instance the state of the live data component).
+      {name: 'pdfQueryString', value: window.location.search.substring(1)},
+      // We add the hash (document fragment) because it can contain information used by the JavaScript code (e.g. the
+      // state of the live table component).
+      {name: 'pdfHash', value: window.location.hash.substring(1)}
+    );
+    return Promise.resolve(new JobRunner({
+      createStatusRequest: function(jobId) {
+        resolvePDFExportJobStarted(jobId);
+        return {
+          url: XWiki.currentDocument.getURL('get'),
+          data: {
+            outputSyntax: 'plain',
+            sheet: 'XWiki.PDFExport.WebHome',
+            data: 'jobStatus',
+            jobId: jobId.join('/')
+          }
+        };
+      }
+    }).run(XWiki.currentDocument.getURL('get'), data)).catch((reason) =&gt; {
+      // We need to reject any pending cancel requests.
+      rejectPDFExportJobStarted();
+      // But we also need to reject the PDF export itself.
+      return Promise.reject(reason);
+    }).finally(() =&gt; {
+      pdfExportJobStarted = false;
+    });
+  };
+
+  const cancelPDFExportJob = (jobId) =&gt; {
+    return Promise.resolve($.post(XWiki.currentDocument.getURL('get'), {
+      outputSyntax: 'plain',
+      sheet: 'XWiki.PDFExport.WebHome',
+      action: 'cancel',
+      form_token: xwikiMeta.form_token,
+      jobId: jobId.join('/')
+    }));
+  };
+
+  const showPrintPreviewModal = function(jobId) {
+    return new Promise((resolve, reject) =&gt; {
+      const iframe = $('&lt;iframe/&gt;').css({
+        // The load event is not fired if we hide it completely with display:none.
+        'visibility': 'hidden',
+        // Use the same width as the main window because the CSS or JavaScript code could rely on it (we want the result
+        // to look exactly as if the user has opened the export URL directly).
+        'width': $(window).width()
+      }).on('load', () =&gt; {
+        iframe[0].contentWindow.require(['xwiki-page-ready'], function(pageReady) {
+          pageReady.afterPageReady(() =&gt; {
+            // Trigger the print only after all page ready callbacks were executed, because the print preview is
+            // initialized as a page ready callback.
+            pageReady.afterPageReady(() =&gt; {
+              iframe[0].contentWindow.print();
+              iframe.remove();
+              resolve();
+            });
+          });
+        });
+      });
+      const exportURL = XWiki.currentDocument.getURL('export', $.param({
+        format: 'html-print',
+        xpage: 'get',
+        outputSyntax: 'plain',
+        // Asynchronous rendering is disabled by default on the export action so we need to force it.
+        async: true,
+        sheet: 'XWiki.PDFExport.Sheet',
+        jobId: jobId.join('/')
+      // We add the query string and hash (fragment identifier) from the current URL because they can contain
+      // information used by the JavaScript code (e.g. the state of the live table and live data components).
+      }) + '&amp;' + window.location.search.substring(1)) + window.location.hash;
+      iframe.attr('src', exportURL).appendTo($('body'));
+    });
+  };
+
+  const exportToPDF = function(data) {
+    return runPDFExportJob(data).then(job =&gt; {
+      if (job.canceled) {
+        // Do nothing.
+      } else if (job.pdfFileURL) {
+        // The PDF file was generated on the server-side. The user just needs to download it.
+        window.location.href = job.pdfFileURL;
+      } else if (job.failed) {
+        return Promise.reject();
+      } else {
+        // Show the Print Preview modal in order for the user to be able to save the result as PDF.
+        return showPrintPreviewModal(job.id);
+      }
+    })
+  };
+
+  pdfExportOptionsModal.on('submit', event =&gt; {
+    event.preventDefault();
+    $('body').css('cursor', 'wait');
+    const notification = new XWiki.widgets.Notification(l10n['export.pdf.inProgress'], 'inprogress');
+    // Prevent multiple clicks on the export button.
+    pdfExportOptionsModal.find('.modal-footer input[type=submit]').prop('disabled', true);
+    // Concatenate the PDF export options with the document selection.
+    const data = pdfExportOptionsModal.serializeArray().concat(pdfExportOptionsModal.data('selection'));
+    exportToPDF(data).then(() =&gt; {
+      // PDF export job finished.
+      notification.hide();
+    }).catch(() =&gt; {
+      // PDF export job failed.
+      notification.replace(new XWiki.widgets.Notification(l10n['export.pdf.failed'], 'error'));
+    }).finally(() =&gt; {
+      // Re-enable the PDF export options modal.
+      pdfExportOptionsModal.find('.modal-footer input[type=submit]').prop('disabled', false);
+      $('body').css('cursor', '');
+    });
+  });
+
+  pdfExportOptionsModal.on('click', 'a.secondary.button', event =&gt; {
+    event.preventDefault();
+    pdfExportOptionsModal.modal('hide');
+  });
+
+  pdfExportOptionsModal.on('hide.bs.modal', event =&gt; {
+    const closeButton = pdfExportOptionsModal.find('.modal-header button.close');
+    if (closeButton.prop('disabled')) {
+      // Don't close the modal because there's a pending cancel request.
+      return event.preventDefault();
+    } else if (pdfExportJobStarted) {
+      // Cancel the running PDF export job.
+      const notification = new XWiki.widgets.Notification(l10n['export.pdf.canceling'], 'inprogress');
+      // Prevent multiple cancel requests.
+      pdfExportOptionsModal.find('.modal-header button.close').prop('disabled', true);
+      pdfExportOptionsModal.find('.modal-footer a.secondary.button').addClass('disabled');
+      pdfExportJobStarted.then(cancelPDFExportJob).then(() =&gt; {
+        notification.replace(new XWiki.widgets.Notification(l10n['export.pdf.canceled'], 'done'));
+      }).catch(() =&gt; {
+        notification.replace(new XWiki.widgets.Notification(l10n['export.pdf.cancelFailed'], 'error'));
+      }).finally(() =&gt; {
+        // Allow the user to retry the cancel (e.g. in case it failed due to some network issue).
+        pdfExportOptionsModal.find('.modal-header button.close').prop('disabled', false);
+        pdfExportOptionsModal.find('.modal-footer a.secondary.button').removeClass('disabled');
+      });
+      // Don't close the modal because the job doesn't finish immediately after being canceled.
+      return event.preventDefault();
+    }
+  });
+
+  const switchToPDFOptionsModal = function(event, url, data) {
+    event.preventDefault();
+    // Show the PDF Export Options modal only after the Export modal is completely hidden, otherwise the code that hides
+    // the Export modal can revert changes done by the code that shows the PDF Export Options modal (e.g. we loose the
+    // 'modal-open' CSS class on the BODY element which is needed in order to hide the page scrollbars).
+    $('#exportModal').one('hidden.bs.modal', () =&gt; {
+      // Enable the animation back for the next time the Export modal is shown.
+      $('#exportModal').addClass('fade');
+      openPDFOptionsModal(url, data);
+    // Disable the animation when moving to the next step (PDF Export Options) in order to have a smooth transition.
+    }).removeClass('fade').modal('hide');
+  };
+
+  const customizeExportModal = function() {
+    const exportButton = $('#exportModelOfficeCollapse a[href*="xpage=pdfoptions"]');
+
+    // Move the "Export as PDF" button to the Other category in order to enable multiple page selection.
+    exportButton.prependTo('#exportModalOtherCollapse .export-buttons');
+
+    // Remove the accordion if the Office category is empty.
+    if (!$('#exportModelOfficeCollapse .panel-body').children().length) {
+      // We need to keep the '#exportModalOtherCollapse' element because it is used by exporter.js
+      $('#exportModalAccordion').replaceWith($('#exportModalOtherCollapse'));
+      $('#exportModalOtherCollapse').attr({
+        'class': 'xform',
+        'role': null,
+        'aria-labeledby': null,
+        'aria-expanded': null
+      }).children('.panel-body').children().unwrap();
+    }
+
+    // Remove the qs parameter because:
+    // * the PDF export options modal is loaded only once (per page load) and the query string can change afterwards
+    // * the query string can change after the page is loaded (e.g. that's how the live data component saves its state
+    //   in the URL) and we want to use the query string value at the moment when the PDF export is triggered
+    const exportOptionsURL = exportButton.attr('href').replace(/([?&amp;])qs=[^&amp;#]*/, '$1');
+
+    const exportTree = $('#exportModalOtherCollapse').find('.export-tree');
+    if (exportTree.length) {
+      // Multiple selection.
+      $(document).on('submit', 'form#export-modal-form', event =&gt; {
+        const form = $(event.target);
+        if (form.attr('action').indexOf('xpage=pdfoptions') &gt; 0) {
+          // Pass the document selection to the PDF export options modal.
+          switchToPDFOptionsModal(event, exportOptionsURL, form.serializeArray());
+        }
+      });
+    } else {
+      // Single selection. Only the current page is exported.
+      exportButton.on('click', event =&gt; {
+        switchToPDFOptionsModal(event, exportOptionsURL, [{
+          name: 'pages',
+          value: XWiki.Model.serialize(XWiki.currentDocument.documentReference)
+        }]);
+      });
+    }
+  };
+
+  $(customizeExportModal);
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.PDFExport.WebHome</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>7272898b-2569-49db-8899-4156ad57a03c</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}
+{{html clean="false"}}
+#set ($discard = $xwiki.jsx.use('XWiki.PDFExport.WebHome'))
+#set ($configClassRef = 'XWiki.PDFExport.ConfigurationClass')
+#set ($configLocalRef = 'XWiki.PDFExport.Configuration')
+#set ($configRef = $services.model.resolveDocument($configLocalRef))
+#set ($configObj = $xwiki.getDocument($configRef).getObject($configClassRef))
+#set ($templates = [])
+#foreach ($template in $configObj.getValue('templates'))
+  #if ($services.security.authorization.hasAccess('view', $template))
+    #set ($discard = $templates.add({
+      'label': $xwiki.getDocument($template).plainTitle,
+      'value': $template
+    }))
+  #end
+#end
+#set ($config = {
+  'templates': $templates
+})
+&lt;script id="pdfExportConfig" type="application/json"&gt;$jsontool.serialize($config).replace(
+  '&lt;', '\u003C')&lt;/script&gt;
+{{/html}}
+{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.plaftorm.menu.export.buttons</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.export.pdf.buttons</name>
+    </property>
+    <property>
+      <parameters/>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

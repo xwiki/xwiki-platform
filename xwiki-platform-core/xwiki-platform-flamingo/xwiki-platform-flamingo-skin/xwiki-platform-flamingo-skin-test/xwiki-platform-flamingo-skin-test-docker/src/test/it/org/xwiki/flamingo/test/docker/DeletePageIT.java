@@ -23,8 +23,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -87,6 +90,14 @@ class DeletePageIT
 
         // Create a new Page that will be deleted
         this.viewPage = setup.createPage(SPACE_VALUE, PAGE_VALUE, PAGE_CONTENT, PAGE_TITLE);
+    }
+
+    @AfterEach
+    void tearDown(TestUtils setup) throws Exception
+    {
+        // we play with multilingual in some tests, ensure to set it back to default values.
+        setup.setWikiPreference("multilingual", "false");
+        setup.setWikiPreference("default_language", "en");
     }
 
     @Test
@@ -311,7 +322,7 @@ class DeletePageIT
 
         // Try to delete the parent page
         ViewPage parentPage = setup.gotoPage(parentReference);
-        ConfirmationPage confirmationPage = parentPage.deletePage();
+        DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
         confirmationPage.setAffectChildren(true);
         confirmationPage.confirmDeletePage();
 
@@ -436,5 +447,325 @@ class DeletePageIT
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
         assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
+    }
+
+    /**
+     * This test is similar than {@link #deletePageWithUsedClass(TestUtils, TestInfo)} except that here we're checking
+     * the deletion when deleting only the xclass page alone: by default it should not be selected, and should not
+     * be deleted when confirming.
+     */
+    @Test
+    @Order(11)
+    void deletePageWithSingleUsedClass(TestUtils setup, TestInfo info)
+    {
+        // Create 2 pages in two locations:
+        // first page is an xclass that we'll try to delete
+        // second page will contain an xobject of the created xclass
+
+        String testClassName = info.getTestClass().get().getSimpleName();
+        String testMethodName = info.getTestMethod().get().getName();
+        String xclassSpace = "XClassSpace";
+        String xobjectSpace = "XObjectSpace";
+        List<String> xclassSpaceReference = Arrays.asList(testClassName, testMethodName, xclassSpace);
+        DocumentReference xclassReference = new DocumentReference("xwiki",
+            xclassSpaceReference,
+            "WebHome");
+        List<String> xobjectSpaceReference = Arrays.asList(testClassName, testMethodName, xobjectSpace);
+        DocumentReference xobjectReference = new DocumentReference("xwiki",
+            xobjectSpaceReference,
+            "WebHome");
+        String space = testClassName + "." + testMethodName;
+        String classPageName = "ClassPage";
+        String objectPageName = "ObjectPage";
+
+        DocumentReference classReference = new DocumentReference("xwiki", xclassSpaceReference, classPageName);
+        DocumentReference objectReference = new DocumentReference("xwiki", xobjectSpaceReference, objectPageName);
+
+        setup.createPage(classReference, "XClass page content", classPageName);
+        setup.createPage(objectReference, "XObject page content", objectPageName);
+
+        setup.addClassProperty(space, classPageName, "Foo", "String");
+        setup.addObject(objectReference, classReference.toString(), Collections.singletonMap("Foo", "Bar"));
+
+        // Try to delete the xclass page
+        ViewPage parentPage = setup.gotoPage(classReference);
+        DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
+        confirmationPage.confirmDeletePage();
+
+        // At this point we should have the question job UI
+        JobQuestionPane jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
+        assertFalse(jobQuestionPane.isEmpty());
+
+        assertEquals("You are about to delete pages that contain used XClass.", jobQuestionPane.getQuestionTitle());
+        TreeElement treeElement = jobQuestionPane.getQuestionTree();
+        List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
+
+        // there is a single node for the xclass:
+        //  1. to represent free pages
+        //  2. to represent classes with associated objects
+        assertEquals(1, topLevelNodes.size());
+
+        TreeNodeElement classPage = topLevelNodes.get(0);
+        assertEquals(classPageName, classPage.getLabel());
+        assertEquals(String.format("%s.%s.%s", space, xclassSpace, classPageName), classPage.getId());
+        assertFalse(classPage.isSelected());
+
+        classPage = classPage.open().waitForIt();
+        List<TreeNodeElement> children = classPage.getChildren();
+        assertEquals(1, children.size());
+
+        assertEquals(objectPageName, children.get(0).getLabel());
+
+        // here it's an object
+        assertEquals(String.format("object-%s.%s.%s", space, xobjectSpace, objectPageName), children.get(0).getId());
+        assertTrue(children.get(0).isLeaf());
+
+        CopyOrRenameOrDeleteStatusPage statusPage = jobQuestionPane.confirmQuestion();
+        statusPage.waitUntilFinished();
+
+        // check that the class page still exist
+        ViewPage viewPage = setup.gotoPage(classReference);
+        assertTrue(viewPage.exists());
+    }
+
+    /**
+     * This is basically the same scenario than before except that we create a translation of the xclass, and we try
+     * to delete that one: in theory it should only delete the translation.
+     */
+    @Test
+    @Order(12)
+    void deleteTranslationXClass(TestUtils setup, TestInfo info) throws Exception
+    {
+        // Create 2 pages in two locations:
+        // first page is an xclass that we'll translate
+        // second page will contain an xobject of the created xclass
+
+        String testClassName = info.getTestClass().get().getSimpleName();
+        String testMethodName = info.getTestMethod().get().getName();
+        String xclassSpace = "XClassSpace";
+        String xobjectSpace = "XObjectSpace";
+        List<String> xclassSpaceReference = Arrays.asList(testClassName, testMethodName, xclassSpace);
+        DocumentReference xclassReference = new DocumentReference("xwiki",
+            xclassSpaceReference,
+            "WebHome");
+        List<String> xobjectSpaceReference = Arrays.asList(testClassName, testMethodName, xobjectSpace);
+        DocumentReference xobjectReference = new DocumentReference("xwiki",
+            xobjectSpaceReference,
+            "WebHome");
+        String space = testClassName + "." + testMethodName;
+        String classPageName = "ClassPage";
+        String objectPageName = "ObjectPage";
+
+        DocumentReference classReference = new DocumentReference("xwiki", xclassSpaceReference, classPageName);
+        DocumentReference objectReference = new DocumentReference("xwiki", xobjectSpaceReference, objectPageName);
+
+        setup.createPage(classReference, "XClass page content", classPageName);
+        setup.createPage(objectReference, "XObject page content", objectPageName);
+
+        setup.addClassProperty(space, classPageName, "Foo", "String");
+        setup.addObject(objectReference, classReference.toString(), Collections.singletonMap("Foo", "Bar"));
+
+        // switch the wiki to multilingual
+        setup.setWikiPreference("multilingual", "true");
+        setup.setWikiPreference("languages", "en,fr");
+
+        DocumentReference frenchXClassTranslation = new DocumentReference(classReference, Locale.FRENCH);
+        setup.createPage(frenchXClassTranslation, "French XClass page content", classPageName);
+
+        DocumentReference rootLocaleXClassReference = new DocumentReference(classReference, Locale.ROOT);
+
+        // Check that accessing the page and its translation displays different content, since we'll use that
+        // for checking if translation exists.
+        ViewPage viewPage = setup.gotoPage(rootLocaleXClassReference);
+        assertEquals("XClass page content", viewPage.getContent());
+
+        viewPage = setup.gotoPage(frenchXClassTranslation);
+        assertEquals("French XClass page content", viewPage.getContent());
+
+        // Try to delete the xclass page
+        ViewPage parentPage = setup.gotoPage(frenchXClassTranslation);
+        DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
+        DeletingPage deletingPage = confirmationPage.confirmDeletePage();
+        deletingPage.waitUntilFinished();
+
+        // check that the translation does not exist, but the xclass does
+        viewPage = setup.gotoPage(rootLocaleXClassReference);
+        assertTrue(viewPage.exists());
+        assertEquals("XClass page content", viewPage.getContent());
+
+        viewPage = setup.gotoPage(frenchXClassTranslation);
+        // We cannot check the deletion of the translation with a viewPage.exists() because
+        // the original page is automatically displayed when the translation does not exist.
+        assertEquals("XClass page content", viewPage.getContent());
+
+        // We create back the translation
+        setup.createPage(frenchXClassTranslation, "French XClass page content", classPageName);
+
+        // This time we try to delete the class reference page (not the translation)
+        parentPage = setup.gotoPage(rootLocaleXClassReference);
+        confirmationPage = parentPage.deletePage();
+        confirmationPage.confirmDeletePage();
+
+        // At this point we should have the question job UI
+        JobQuestionPane jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
+        assertFalse(jobQuestionPane.isEmpty());
+
+        assertEquals("You are about to delete pages that contain used XClass.", jobQuestionPane.getQuestionTitle());
+        TreeElement treeElement = jobQuestionPane.getQuestionTree();
+        List<TreeNodeElement> topLevelNodes = treeElement.getTopLevelNodes();
+
+        // there is a single node for the xclass:
+        // 1. to represent free pages
+        // 2. to represent classes with associated objects
+        assertEquals(1, topLevelNodes.size());
+
+        TreeNodeElement classPage = topLevelNodes.get(0);
+        assertEquals(classPageName, classPage.getLabel());
+        assertEquals(String.format("%s.%s.%s", space, xclassSpace, classPageName), classPage.getId());
+        assertFalse(classPage.isSelected());
+
+        classPage = classPage.open().waitForIt();
+        List<TreeNodeElement> children = classPage.getChildren();
+        assertEquals(1, children.size());
+
+        assertEquals(objectPageName, children.get(0).getLabel());
+
+        // here it's an object
+        assertEquals(String.format("object-%s.%s.%s", space, xobjectSpace, objectPageName), children.get(0).getId());
+        assertTrue(children.get(0).isLeaf());
+
+        // select the class to be deleted
+        classPage.select();
+
+        CopyOrRenameOrDeleteStatusPage statusPage = jobQuestionPane.confirmQuestion();
+        statusPage.waitUntilFinished();
+
+        // Ensure the xclass has been deleted
+        DeletePageOutcomePage deletePageOutcomePage = deletingPage.getDeletePageOutcomePage();
+        assertTrue(deletePageOutcomePage.hasTerminalPagesInRecycleBin());
+
+        // Ensure the translation has also been deleted
+        setup.gotoPage(frenchXClassTranslation);
+        deletePageOutcomePage = new DeletePageOutcomePage();
+        assertEquals("Impossible de trouver ce document.", deletePageOutcomePage.getMessage());
+    }
+
+    /**
+     * Check that when a new target document is selected, the backlinks are updated to the new value and the redirect is
+     * working when accessing the old page.
+     *
+     * @since 14.4.2
+     * @since 14.5
+     */
+    @Test
+    @Order(13)
+    void deleteWithUpdateLinksAndAutoRedirect(TestUtils testUtils, TestReference reference) throws Exception
+    {
+        DocumentReference backlinkDocumentReference = new DocumentReference("xwiki", "Backlink", "WebHome");
+        DocumentReference newTargetReference = new DocumentReference("xwiki", "NewTarget", "WebHome");
+
+        testUtils.createPage(reference, PAGE_CONTENT, PAGE_TITLE);
+        // Create backlink.
+        testUtils.createPage(backlinkDocumentReference,
+            String.format("[[Link>>doc:%s]]", testUtils.serializeReference(reference)), "Backlink document");
+        testUtils.createPage(newTargetReference, "", "New target");
+
+        // Delete page and provide a new target, with updateLinks and autoRedirect enabled.
+        ViewPage viewPage = testUtils.gotoPage(reference);
+        DeletePageConfirmationPage confirmationPage = viewPage.deletePage();
+        confirmationPage.toggleBacklinksPane();
+        confirmationPage.setNewBacklinkTarget(testUtils.serializeReference(newTargetReference));
+        confirmationPage.setUpdateLinks(true);
+        confirmationPage.setAutoRedirect(true);
+        confirmationPage.clickYes();
+        DeletingPage deletingPage = new DeletingPage();
+        deletingPage.waitUntilFinished();
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+
+        // Verify that a redirect was added and the link was updated.
+        viewPage = testUtils.gotoPage(reference);
+        assertEquals("New target", this.viewPage.getDocumentTitle());
+        assertEquals("[[Link>>doc:NewTarget.WebHome]]",
+            testUtils.rest().<Page>get(backlinkDocumentReference).getContent());
+    }
+
+    /**
+     * Check that if a new target is not selected, the backlinks are not altered and no redirect is added.
+     *
+     * @since 14.4.2
+     * @since 14.5
+     */
+    @Test
+    @Order(14)
+    void deleteWithoutNewTarget(TestUtils testUtils, TestReference reference) throws Exception
+    {
+        DocumentReference backlinkDocReference = new DocumentReference("xwiki", "Backlink", "WebHome");
+        String backlinkDocContent = String.format("[[Link>>doc:%s]]", testUtils.serializeReference(reference));
+
+        testUtils.createPage(reference, PAGE_CONTENT, PAGE_TITLE);
+        // Create backlink.
+        testUtils.createPage(backlinkDocReference, backlinkDocContent, "Backlink document");
+
+        // Delete page without specifying a new target.
+        ViewPage viewPage = testUtils.gotoPage(reference);
+        DeletePageConfirmationPage confirmationPage = viewPage.deletePage();
+        confirmationPage.clickYes();
+        DeletingPage deletingPage = new DeletingPage();
+        deletingPage.waitUntilFinished();
+
+        // Verify that there is no redirect and the links were not altered.
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
+        assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
+        assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
+        assertEquals(String.format("[[Link>>doc:%s]]", testUtils.serializeReference(reference).split(":")[1]),
+            testUtils.rest().<Page>get(backlinkDocReference).getContent());
+    }
+
+    /**
+     * Test that when you delete a page and you select "affect children" along with a new target document, only the
+     * parent page has the backlinks updated a the redirect added.
+     *
+     * @since 14.4.2
+     * @since 14.5
+     */
+    @Test
+    @Order(15)
+    void deleteWithAffectChildrenAndNewTarget(TestUtils testUtils, TestReference parentReference) throws Exception
+    {
+        DocumentReference childReference = new DocumentReference("Child", parentReference.getLastSpaceReference());
+        String childFullName = testUtils.serializeReference(childReference).split(":")[1];
+        DocumentReference backlinkDocReference = new DocumentReference("xwiki", "Backlink", "WebHome");
+        DocumentReference newTargetReference = new DocumentReference("xwiki", "NewTarget", "WebHome");
+
+        testUtils.createPage(parentReference, "Content", "Parent");
+        testUtils.createPage(childReference, "", "Child");
+        testUtils.createPage(newTargetReference, "", "New target");
+        // Create backlinks to the parent and the child page.
+        String format = "[[Parent>>doc:%s]] [[Child>>doc:%s]]";
+        testUtils.createPage(backlinkDocReference,
+            String.format(format, testUtils.serializeReference(parentReference), childFullName), "Backlink document");
+
+        // Delete parent page with affectChildren and newTarget (updateLinks and autoRedirect enabled).
+        ViewPage parentPage = testUtils.gotoPage(parentReference);
+        DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
+        confirmationPage.setAffectChildren(true);
+        confirmationPage.toggleBacklinksPane();
+        confirmationPage.setNewBacklinkTarget(testUtils.serializeReference(newTargetReference));
+        confirmationPage.setUpdateLinks(true);
+        confirmationPage.setAutoRedirect(true);
+        confirmationPage.clickYes();
+        DeletingPage deletingPage = new DeletingPage();
+        deletingPage.waitUntilFinished();
+
+        // Verify that there is no redirect on the child page and backlink was not altered.
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        String newContent =
+            String.format(format, testUtils.serializeReference(newTargetReference).split(":")[1], childFullName);
+        assertEquals(newContent, testUtils.rest().<Page>get(backlinkDocReference).getContent());
+        parentPage = testUtils.gotoPage(parentReference);
+        assertEquals("New target", parentPage.getDocumentTitle());
+        ViewPage childPage = testUtils.gotoPage(childReference);
+        assertEquals("Child", childPage.getDocumentTitle());
     }
 }

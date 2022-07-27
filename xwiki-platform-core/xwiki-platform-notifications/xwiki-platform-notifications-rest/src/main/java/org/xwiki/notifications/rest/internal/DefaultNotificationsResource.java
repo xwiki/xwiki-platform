@@ -185,7 +185,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     {
         // Build the response
         Response.ResponseBuilder response;
-        XWikiUser xWikiUser = getXWikiContext().getWiki().getAuthService().checkAuth(getXWikiContext());
+        XWikiUser xWikiUser = getXWikiContext().getWiki().checkAuth(getXWikiContext());
         if (xWikiUser == null) {
             response = Response.status(Status.UNAUTHORIZED);
         } else {
@@ -215,7 +215,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         String tags, String currentWiki) throws Exception
     {
         // Build the response
-        XWikiUser xWikiUser = getXWikiContext().getWiki().getAuthService().checkAuth(getXWikiContext());
+        XWikiUser xWikiUser = getXWikiContext().getWiki().checkAuth(getXWikiContext());
         DocumentReference userIdDoc = this.documentReferenceResolver.resolve(userId);
         if (xWikiUser == null || !userIdDoc.equals(xWikiUser.getUserReference())) {
             getXWikiContext().getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED);

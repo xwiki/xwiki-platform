@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Other Wiki Syntaxes</title>
+  <title>Andere Wiki Syntaxen</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -43,13 +43,5 @@
 {{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 Other Syntaxes ===
 
-Die folgenden weiteren Syntaxen sind in XWiki Enterprise 1.6 und später implementiert:
-* [[JSPWiki&gt;&gt;http://www.jspwiki.org/wiki/TextFormattingRules]]
-* [[MediaWiki&gt;&gt;http://en.wikipedia.org/wiki/Help:Editing]]
-* [[Confluence&gt;&gt;http://confluence.atlassian.com/display/CONF20/Confluence+Notation+Guide+Overview]]
-* [[TWiki&gt;&gt;http://twiki.org/cgi-bin/view/TWiki/WikiSyntax]]
-* [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]]
-* [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]]
-
-{{warning}}Die Implementierung einiger dieser Syntaxen ist noch nicht vollständig fertig. Beispielsweise funktioniert die Unterstützung für Links noch nicht perfekt. Wir müssen zudem definieren, ob wir die originalen Syntaxen erweitern wollen um XWiki-spezifische Funktionen, wie die Möglichkeit zu einem anderen Unterwiki zu verlinken, zu unterstützen.{{/warning}}</content>
+Andere Syntaxen sind auch [[verfügbar&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/ExtensionCode/AllExtensions/WebHome#%7Ct=extensions&amp;category=syntax]].</content>
 </xwikidoc>

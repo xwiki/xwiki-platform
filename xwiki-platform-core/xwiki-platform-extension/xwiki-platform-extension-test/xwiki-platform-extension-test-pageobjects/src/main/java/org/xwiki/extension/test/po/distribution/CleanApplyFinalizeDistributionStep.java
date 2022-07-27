@@ -25,7 +25,7 @@ import org.openqa.selenium.support.FindBy;
 
 /**
  * The Orphaned Dependencies step UI.
- * 
+ *
  * @version $Id$
  * @since 11.10
  */
@@ -36,16 +36,23 @@ public class CleanApplyFinalizeDistributionStep extends AbstractDistributionPage
 
     public void waitForUninstallComplete()
     {
-        getDriver().waitUntilElementIsVisible(By.xpath("//button[@name='cleanapplyreport' and not(@disabled)]"));
+        // Skip this step when the progress bar is not needed (i.e., no dependencies are checked in the orphaned 
+        // dependencies list).
+        if (!isCompleteStepDisabled()) {
+            getDriver().waitUntilElementIsVisible(By.xpath("//button[@name='cleanapplyreport' and not(@disabled)]"));
+        }
     }
 
     public CleanApplyReportDistributionStep clickContinue()
     {
-        // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
-        getDriver().addPageNotYetReloadedMarker();
-        this.continueButton.click();
-        getDriver().waitUntilPageIsReloaded();
-
+        // Skip this step when the progress bar is not needed (i.e., no dependencies are checked in the orphaned 
+        // dependencies list).
+        if (!isCompleteStepDisabled()) {
+            // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
+            getDriver().addPageNotYetReloadedMarker();
+            this.continueButton.click();
+            getDriver().waitUntilPageIsReloaded();
+        }
         return new CleanApplyReportDistributionStep();
     }
 }

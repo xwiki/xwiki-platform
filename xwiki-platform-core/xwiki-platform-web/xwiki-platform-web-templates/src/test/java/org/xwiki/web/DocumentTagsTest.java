@@ -26,15 +26,12 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authorization.script.SecurityAuthorizationScriptService;
-import org.xwiki.security.authorization.script.internal.RightConverter;
-import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.skinx.internal.async.SkinExtensionAsync;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
-import org.xwiki.velocity.tools.EscapeTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -52,11 +49,8 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @HTML50ComponentList
+@SecurityScriptServiceComponentList
 @ComponentList({
-    // Security SS so that $service.security.* calls in the vm work and their behavior controlled.
-    SecurityScriptService.class,
-    SecurityAuthorizationScriptService.class,
-    RightConverter.class,
     // SKin Extensions so that $jsx.* and $ssx.* calls in the vm work.
     SkinExtensionAsync.class
 })
@@ -81,9 +75,6 @@ class DocumentTagsTest extends PageTest
         document.setSyntax(Syntax.XWIKI_2_1);
         this.xwiki.saveDocument(document, this.context);
         this.context.setDoc(document);
-
-        // Make $escapetool available since it's used in the tested vm
-        registerVelocityTool("escapetool", new EscapeTool());
     }
 
     @Test
@@ -139,10 +130,15 @@ class DocumentTagsTest extends PageTest
         // - The tags after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
         assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label "
-            + "<span class=\"tag-wrapper\"><span class=\"tag\">"
-                + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag1\">tag1</a></span></span> "
-            + "<span class=\"tag-wrapper\"><span class=\"tag\">"
-                + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag2\">tag2</a></span></span> "
+            + "<span class=\"tag-wrapper\"> "
+            + "<span class=\"tag\">"
+                + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag1\">tag1</a></span> "
+            + "</span> "
+            + "<span class=\"tag-wrapper\"> "
+            + "<span class=\"tag\">"
+                + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag2\">tag2</a>"
+            + "</span> "
+            + "</span> "
             + "</div>"));
     }
 }

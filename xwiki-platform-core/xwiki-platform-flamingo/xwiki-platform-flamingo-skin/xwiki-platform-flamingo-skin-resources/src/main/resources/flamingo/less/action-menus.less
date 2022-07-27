@@ -21,6 +21,11 @@
 
   .navbar-nav {
     float: right;
+    &.navbar-left > li {
+      float: left;
+    }
+    // Should be explicitly defined as "&.navbar-right > li", but leaving this implicit (i.e. as it was)
+    // in order to not increase specificity and break any customizations
     > li {
       float: right;
     }
@@ -163,10 +168,10 @@
     max-height: @navbar-height;
 
     > img {
-      @avatar-size: floor(ceil(@navbar-height/2)/2)*2;
+      @avatar-size: floor((ceil((@navbar-height / 2)) / 2)) * 2;
       border-radius: @thumbnail-border-radius;
       height: @avatar-size;
-      margin-top: -@navbar-padding-vertical+@navbar-height/2-@avatar-size/2;
+      margin-top: -@navbar-padding-vertical + (@navbar-height / 2) - (@avatar-size / 2);
       vertical-align: middle;
       width: @avatar-size;
     }
@@ -217,7 +222,7 @@
     }
     > .dropdown-split-left {
       /* Display it closer to the menu toggle. */
-      padding-right: ceil(@navbar-padding-horizontal / 2);
+      padding-right: ceil((@navbar-padding-horizontal / 2));
       > .caret {
         /* Hide the caret used for extra small screens. */
         display: none;
@@ -245,7 +250,7 @@
     }
     > .dropdown-split-right {
       /* Display it closer to the menu label. */
-      padding-left: ceil(@navbar-padding-horizontal / 2);
+      padding-left: ceil((@navbar-padding-horizontal / 2));
       > .caret {
         /* Reset the left margin for the caret used on large screens. */
         margin-left: 0;

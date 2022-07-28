@@ -160,7 +160,13 @@
 
 {{velocity wiki="false"}}
 #if ($xcontext.action == 'get')
-  #if ($request.getHeader('X-XWiki-Temporary-Attachment-Support') == 'true')
+  ## We fallback on the old mechanism also in case of editing a translation to avoid any problem.
+  ## See: XWIKI-20034
+  #set ($document = $tdoc)
+  #if ("$!request.document" != '')
+    #set ($document = $xwiki.getDocument($request.document))
+  #end
+  #if ($request.getHeader('X-XWiki-Temporary-Attachment-Support') == 'true' &amp;&amp; !$document.isTranslation())
     #handleTemporaryUploadRequest
   #else
     #handleUploadRequest

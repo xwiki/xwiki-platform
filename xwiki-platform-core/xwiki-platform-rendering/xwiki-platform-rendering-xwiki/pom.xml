@@ -30,12 +30,16 @@
   <artifactId>xwiki-platform-rendering-xwiki</artifactId>
   <name>XWiki Platform - Rendering - XWiki-specific Implementation</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Rendering - XWiki-specific Implementation</description>
+  <description>Adds XWiki-specific concepts to XWiki Rendering</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+    <!-- Name to display by the Extension Manager. -->
+    <xwiki.extension.name>XWiki-specific Rendering API</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager. -->
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

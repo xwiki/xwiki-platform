@@ -155,11 +155,16 @@
     </property>
     <property>
       <code>/*
+#if ($services.debug.minify)
+  #set ($jsExtension = '.min')
+#else
+  #set ($jsExtension = '')
+#end
 #set ($ckeditorPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-webjar', 'ckeditor'))
 #set ($ckeditorBasePath = $stringtool.removeEnd($stringtool.removeEnd($ckeditorPath, '.js'), 'ckeditor'))
-#set ($resourcePickerBundlePath = "${ckeditorBasePath}plugins/xwiki-resource/resourcePicker.bundle.min")
-#set ($macroWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-macro/macroWizard.bundle.min")
-#set ($imageWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-image/imageWizard.bundle.min")
+#set ($resourcePickerBundlePath = "${ckeditorBasePath}plugins/xwiki-resource/resourcePicker.bundle$jsExtension")
+#set ($macroWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-macro/macroWizard.bundle$jsExtension")
+#set ($imageWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-image/imageWizard.bundle$jsExtension")
 #set ($modalPath = "${ckeditorBasePath}plugins/xwiki-dialog/modal.min")
 #set ($l10nPath = "${ckeditorBasePath}plugins/xwiki-localization/l10n.min")
 */

@@ -26,7 +26,9 @@ define('macroSelectorTranslationKeys', [], [
   'filter.category.other',
   'failedToRetrieveMacros',
   'select',
+  'recommended',
   'install',
+  'install.confirm',
   'install.notAllowed'
 ]);
 
@@ -104,6 +106,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'xwiki-selecti
         macroListItem.attr({
           'data-extensionId': macro.extensionId,
           'data-extensionVersion': macro.extensionVersion,
+          'data-extensionName': macro.extensionName,
           'data-extensionInstallAllowed': macro.extensionInstallAllowed
         });
       }
@@ -111,6 +114,11 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'xwiki-selecti
         macroListItem.find('.macro-categories-badges')
           .append($('<span>').addClass('badge').text(category.label));
       });
+
+      if (macro.extensionRecommended) {
+        macroListItem.find('.macro-categories-badges').append($('<span>')
+          .addClass('badge').addClass('recommended').text(translations.get('recommended')));
+      }
 
       macroListItem.find('.macro-description').text(macro.description);
     });
@@ -296,6 +304,12 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'xwiki-selecti
       getSelectedExtensionVersion: function() {
         return macroSelector.find('.macro-list > li.selected').attr('data-extensionVersion');
       },
+      getSelectedExtensionName: function() {
+        return macroSelector.find('.macro-list > li.selected').attr('data-extensionName');
+      },
+      getSelectedExtensionRecommended: function() {
+        return macroSelector.find('.macro-list > li.selected').attr('data-extensionRecommended') == 'true';
+      },
       isInstalledMacro: function() {
         return !this.getSelectedMacroCategories().includes('_notinstalled');
       },
@@ -367,11 +381,18 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector', 'xwiki-selecti
       });
       selectButton.on('click', function() {
         var macroSelectorAPI = modal.find('.macro-selector').xwikiMacroSelector();
+        var extensionId = macroSelectorAPI.getSelectedExtensionId();
+        var extensionVersion = macroSelectorAPI.getSelectedExtensionVersion();
+        var extensionName = macroSelectorAPI.getSelectedExtensionName();
+        // When adding a macro involves installing an extension ask for confirmation
+        if (extensionId && !window.confirm(translations.get('install.confirm', extensionName, extensionVersion))) {
+          return;
+        }
         var output = modal.data('input') || {};
         output.macroId = macroSelectorAPI.getSelectedMacro();
         output.macroCategories = macroSelectorAPI.getSelectedMacroCategories();
-        output.extensionId = macroSelectorAPI.getSelectedExtensionId();
-        output.extensionVersion = macroSelectorAPI.getSelectedExtensionVersion();
+        output.extensionId = extensionId;
+        output.extensionVersion = extensionVersion;
         modal.data('output', output).modal('hide');
       });
     }

@@ -194,7 +194,9 @@ macroSelector.filter.category.other=Other
 macroSelector.filter.category.notinstalled=Not installed
 macroSelector.failedToRetrieveMacros=Failed to retrieve the list of available macros.
 macroSelector.select=Select
+macroSelector.recommended=Recommended
 macroSelector.install=Install
+macroSelector.install.confirm=You are about to install the extension {0} {1}. Are you sure you want to continue ?
 macroSelector.install.notAllowed=You are not allowed to install this extension
 macroSelector.filter.category.placeholder=Select a category...
 

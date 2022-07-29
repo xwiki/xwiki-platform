@@ -94,7 +94,7 @@ public class DefaultAsyncRendererExecutorTest
     private JobGroupPath jobGroupPath;
 
     @BeforeEach
-    private void beforeEach() throws RenderingException, ComponentLookupException, JobException
+    void beforeEach() throws RenderingException, ComponentLookupException, JobException
     {
         this.renderer = mock(AsyncRenderer.class);
 

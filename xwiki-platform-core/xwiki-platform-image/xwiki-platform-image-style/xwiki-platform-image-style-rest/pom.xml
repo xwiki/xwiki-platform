@@ -32,7 +32,7 @@
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager. -->
-    <xwiki.extension.name>Rest Endpoint for the Image Style Application.</xwiki.extension.name>
+    <xwiki.extension.name>Rest Endpoint for the Image Style Application</xwiki.extension.name>
     <!-- Description to display by the Extension Manager. -->
     <xwiki.extension.description>Provides the Rest endpoints for the Image Style configurations Application.</xwiki.extension.description>
     <!-- Category to display in the Extension Manager. -->

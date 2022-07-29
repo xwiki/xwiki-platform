@@ -28,9 +28,9 @@
     <version>14.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-misc</artifactId>
-  <name>XWiki Platform - Distribution - Flavor - Functional Tests - Misc.</name>
+  <name>XWiki Platform - Distribution - Flavor - Functional Tests - Misc</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Distribution - Flavor - Functional Tests - Misc.</description>
+  <description>XWiki Platform - Distribution - Flavor - Functional Tests - Misc</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

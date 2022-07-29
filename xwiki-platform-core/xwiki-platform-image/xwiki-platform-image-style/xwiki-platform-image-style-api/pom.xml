@@ -32,7 +32,7 @@
   <properties>
     <xwiki.jacoco.instructionRatio>0.53</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager. -->
-    <xwiki.extension.name>API for the Image Style Application.</xwiki.extension.name>
+    <xwiki.extension.name>API for the Image Style Application</xwiki.extension.name>
     <!-- Description to display by the Extension Manager. -->
     <xwiki.extension.description>Provides the API to interact with the Image Style configurations.</xwiki.extension.description>
     <!-- Category to display in the Extension Manager. -->

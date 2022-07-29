@@ -29,11 +29,11 @@
   </parent>
   <artifactId>xwiki-platform-like-ui</artifactId>
   <name>XWiki Platform - Like - UI</name>
+  <description>Like and unlike XWiki entities.</description>
   <packaging>xar</packaging>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Like Application</xwiki.extension.name>
-    <xwiki.extension.description>Allow to like XWiki entities.</xwiki.extension.description>
     <xwiki.extension.category>application</xwiki.extension.category>
     <xwiki.extension.icon>heart</xwiki.extension.icon>
   </properties>

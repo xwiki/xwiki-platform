@@ -29,13 +29,11 @@
   </parent>
   <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
   <name>XWiki Platform - Attachment - Picker - UI</name>
-  <description>Integration of the attachment picker macro in the UI.</description>
+  <description>Integration of the attachment picker macro in all XWiki UIs (WYSIWYG Image Dialog)</description>
   <packaging>xar</packaging>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Attachment Picker Application</xwiki.extension.name>
-    <!-- Description to display by the Extension Manager -->
-    <xwiki.extension.description>Integration of the attachment picker macro in the UI.</xwiki.extension.description>
     <!-- Category to display by the Extension Manager -->
     <xwiki.extension.category>application</xwiki.extension.category>
   </properties>

@@ -82,7 +82,7 @@ class LiveTableLiveDataConfigurationResolverTest
     }
 
     @ParameterizedTest
-    @MethodSource("getTestData")
+    @MethodSource("testData")
     void getConfigJSON(String input, String output) throws Exception
     {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -91,7 +91,7 @@ class LiveTableLiveDataConfigurationResolverTest
         assertEquals(output, objectMapper.writeValueAsString(liveDataConfig));
     }
 
-    private static Stream<String[]> getTestData()
+    static Stream<String[]> testData()
     {
         File inputFolder = new File("src/test/resources/liveTableConfigHelper");
         return Stream.of(inputFolder.listFiles(file -> file.getName().endsWith(".test")))

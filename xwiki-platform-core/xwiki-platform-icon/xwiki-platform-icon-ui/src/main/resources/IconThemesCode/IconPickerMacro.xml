@@ -294,13 +294,13 @@
   require(['jquery', 'xwiki-icon-picker'], function($) {
     var options = {};
     #if($xcontext.macro.params.parameterNames.contains('prefix'))
-      options['prefix'] = '$escapetool.javascript($xcontext.macro.params.prefix)';
+      options['prefix'] = $jsontool.serialize($xcontext.macro.params.prefix);
     #end
     #if("$!xcontext.macro.params.id" != '')
-      $('#${escapetool.javascript(${xcontext.macro.params.id})}').xwikiIconPicker(options);
+      $($jsontool.serialize("#$escapetool.css($xcontext.macro.params.id)")).xwikiIconPicker(options);
     #end
     #if("$!xcontext.macro.params.get('class')" != '')
-      $('.${escapetool.javascript(${xcontext.macro.params.get('class')})}').xwikiIconPicker(options);
+      $($jsontool.serialize(".$escapetool.css($xcontext.macro.params.get('class'))")).xwikiIconPicker(options);
     #end
   });
 &lt;/script&gt;

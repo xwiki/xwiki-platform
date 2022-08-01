@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
  * @since 11.10
  */
 @ComponentTest
-public class JCaptchaResourceReferenceSerializerTest
+class JCaptchaResourceReferenceSerializerTest
 {
     @InjectMockComponents
     private JCaptchaResourceReferenceSerializer jCaptchaResourceReferenceSerializer;
@@ -60,13 +60,13 @@ public class JCaptchaResourceReferenceSerializerTest
     private URLNormalizer<ExtendedURL> extendedURLNormalizer;
 
     @BeforeEach
-    private void setup()
+    void setup()
     {
         when(extendedURLNormalizer.normalize(any())).then(returnsFirstArg());
     }
 
     @Test
-    public void serialize() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
+    void serialize() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
     {
         JCaptchaResourceReference jCaptchaResourceReference = new JCaptchaResourceReference("fooType", "barEngine");
         ExtendedURL extendedURL = jCaptchaResourceReferenceSerializer.serialize(jCaptchaResourceReference);
@@ -81,7 +81,7 @@ public class JCaptchaResourceReferenceSerializerTest
     }
 
     @Test
-    public void serializeWithParameters()
+    void serializeWithParameters()
         throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
     {
         JCaptchaResourceReference jCaptchaResourceReference = new JCaptchaResourceReference("bar", "foo");

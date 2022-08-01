@@ -245,7 +245,7 @@
   #doEdit
   {{/html}}
 
-  {{iconPicker id="XWiki\\.TemplateProviderClass_0_icon" prefix="" /}}
+  {{iconPicker id="XWiki.TemplateProviderClass_0_icon" prefix="" /}}
 #end
 {{/velocity}}</content>
   <object>

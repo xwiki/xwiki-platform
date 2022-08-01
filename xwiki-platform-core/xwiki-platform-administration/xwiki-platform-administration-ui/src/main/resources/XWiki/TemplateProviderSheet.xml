@@ -268,7 +268,7 @@
 &lt;/div&gt;
 {{/html}}
 
-{{iconPicker id="XWiki\\.TemplateProviderClass_0_icon" prefix="" /}}
+{{iconPicker id="XWiki.TemplateProviderClass_0_icon" prefix="" /}}
 
 ##
 ## Go back to the administration

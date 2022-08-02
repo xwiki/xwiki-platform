@@ -47,8 +47,18 @@ help.tipsPanel.linkAutocompleteWYSIWYGTip=При редагуванні в WYSIW
 help.macroList.title=Доступні макроси
 help.macroList.id=ID
 help.macroList.name=Назва
-help.macroList.category=Категорія
 help.macroList.description=Опис
 help.macroList.visibility=Видимість
-</content>
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=Категорія
+
+#@deprecatedend</content>
 </xwikidoc>

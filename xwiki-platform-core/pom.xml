@@ -125,25 +125,7 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <justification>Unstable API changes</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.field.removed</code>
-                  <old>field org.xwiki.security.authentication.AuthenticationAction.FORGOT_USERNAME</old>
-                  <justification>The field has been renamed RETRIEVE_USERNAME.</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.numberOfParametersChanged</code>
-                  <old>method void org.xwiki.security.authentication.AuthenticationResourceReference::&lt;init&gt;(org.xwiki.security.authentication.AuthenticationAction)</old>
-                  <new>method void org.xwiki.security.authentication.AuthenticationResourceReference::&lt;init&gt;(org.xwiki.model.reference.WikiReference, org.xwiki.security.authentication.AuthenticationAction)</new>
-                  <justification>Needed change to allow using the resource on subwikis.</justification>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

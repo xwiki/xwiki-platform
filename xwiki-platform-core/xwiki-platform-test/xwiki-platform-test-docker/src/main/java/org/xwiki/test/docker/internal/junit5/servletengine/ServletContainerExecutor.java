@@ -360,10 +360,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                         builder
                             .from(baseImageName)
                             .user(ROOT_USER)
-                            // Use a label so that it's easy to identify these containers. We use this to work around
-                            // https://github.com/testcontainers/testcontainers-java/issues/3558 by pruning these
-                            // containers on the CI before the tests start.
-                            .label("org.xwiki.docker.libreoffice", "true")
                             .env("LIBREOFFICE_VERSION", officeVersion)
                             // Note: we use https://download.documentfoundation.org/libreoffice/stable/ and not
                             // https://downloadarchive.documentfoundation.org/libreoffice/old so that we can benefit
